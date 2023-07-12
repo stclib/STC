@@ -9,7 +9,7 @@ typedef struct {
     clist_pnt pntlist;
 } MyStruct;
 
-#define i_val int
+#define i_key int
 #define i_tag i32
 #define i_is_forward
 #include <stc/clist.h>
@@ -20,20 +20,20 @@ int point_cmp(const Point* a, const Point* b) {
     return c ? c : a->y - b->y;
 }
 
-#define i_val Point
+#define i_key Point
 #define i_cmp point_cmp
 #define i_is_forward
 #define i_tag pnt
 #include <stc/clist.h>
 
-#define i_val float
+#define i_key float
 #define i_native_cmp               // use < and == operators for comparison 
 #include <stc/clist.h>
 
 void MyStruct_drop(MyStruct* s);
 #define i_type MyList
-#define i_val MyStruct
-#define i_valdrop MyStruct_drop   // define drop function
+#define i_key MyStruct
+#define i_keydrop MyStruct_drop   // define drop function
 #define i_no_clone                // must explicitely exclude or define cloning support because of drop.
 #include <stc/clist.h>
 

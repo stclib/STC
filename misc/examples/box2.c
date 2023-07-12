@@ -14,15 +14,15 @@ typedef struct {
     Point bottom_right;
 } Rectangle;
 
-#define i_val Point
+#define i_key Point
 #include <stc/cbox.h> // cbox_Point
 
-#define i_val Rectangle
+#define i_key Rectangle
 #include <stc/cbox.h> // cbox_Rectangle
 
 // Box in box:
 #define i_type BoxBoxPoint
-#define i_valboxed cbox_Point // NB: use i_valboxed when value is a cbox or carc!
+#define i_keyboxed cbox_Point // NB: use i_keyboxed when value is a cbox or carc!
 #define i_no_cmp
 #include <stc/cbox.h> // BoxBoxPoint
 

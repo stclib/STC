@@ -76,7 +76,7 @@ struct ShapeAPI Triangle_api = {
 // ============================================================
 
 #define i_type PointVec 
-#define i_val Point
+#define i_key Point
 #include <stc/cstack.h>
 
 typedef struct {
@@ -122,8 +122,8 @@ struct ShapeAPI Polygon_api = {
 // ============================================================
 
 #define i_type Shapes
-#define i_val Shape*
-#define i_valdrop(x) Shape_delete(*x)
+#define i_key Shape*
+#define i_keydrop(x) Shape_delete(*x)
 #define i_no_clone
 #include <stc/cstack.h>
 

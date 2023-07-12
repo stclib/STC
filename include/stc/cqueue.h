@@ -88,13 +88,13 @@ STC_INLINE _cx_value*   _cx_MEMB(_back)(const _cx_Self* self)
                             { return self->data + ((self->end - 1) & self->capmask); }
 
 STC_INLINE void _cx_MEMB(_pop)(_cx_Self* self) { // pop_front
-    assert(!_cx_MEMB(_empty)(self));
+    c_assert(!_cx_MEMB(_empty)(self));
     i_keydrop((self->data + self->start));
     self->start = (self->start + 1) & self->capmask;
 }
 
 STC_INLINE _cx_value _cx_MEMB(_pull)(_cx_Self* self) { // move front out of queue
-    assert(!_cx_MEMB(_empty)(self));
+    c_assert(!_cx_MEMB(_empty)(self));
     intptr_t s = self->start;
     self->start = (s + 1) & self->capmask;
     return self->data[s];

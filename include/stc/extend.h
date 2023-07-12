@@ -43,8 +43,10 @@
   #define _i_val i_val
 #endif
 
-#ifdef _i_key
+#if defined _i_key && defined _i_val
   c_PASTE(forward_, i_base)(i_type, _i_key, _i_val);
+#elif defined _i_key
+  c_PASTE(forward_, i_base)(i_type, _i_key);
 #else
   c_PASTE(forward_, i_base)(i_type, _i_val);
 #endif

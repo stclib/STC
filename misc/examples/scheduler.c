@@ -9,7 +9,7 @@ struct Task {
 };
 
 #define i_type Scheduler
-#define i_val struct Task
+#define i_key struct Task
 #include <stc/cqueue.h>
 
 static bool schedule(Scheduler* sched)

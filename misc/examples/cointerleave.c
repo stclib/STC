@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stc/calgo.h>
 #define i_type IVec
-#define i_val int
+#define i_key int
 #include <stc/cvec.h>
 
 struct GenValue {

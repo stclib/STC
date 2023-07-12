@@ -4,7 +4,7 @@
 #include <stc/crand.h>
 
 #define i_type DList
-#define i_val double
+#define i_key double
 #define i_native_cmp
 #include <stc/clist.h>
 

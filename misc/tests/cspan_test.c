@@ -44,7 +44,7 @@ CTEST(cspan, slice) {
     ASSERT_EQ(45, sum2);
 }
 
-#define i_val int
+#define i_key int
 #include <stc/cstack.h>
 
 CTEST(cspan, slice2) {
@@ -75,7 +75,7 @@ CTEST(cspan, slice2) {
 
 
 #define i_type Tiles
-#define i_val intspan3
+#define i_key intspan3
 #include <stc/cstack.h>
 
 CTEST_FIXTURE(cspan_cube) {

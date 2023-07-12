@@ -12,7 +12,7 @@
 #define i_tag istr // Map of int => cstr
 #include <stc/csmap.h>
 
-#define i_val csmap_ii_raw
+#define i_key csmap_ii_raw
 #define i_opt c_no_cmp
 #define i_tag ii
 #include <stc/cvec.h>

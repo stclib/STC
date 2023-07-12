@@ -9,21 +9,21 @@ int Person_cmp(const Person* a, const Person* b);
 uint64_t Person_hash(const Person* p);
 
 #define i_type PersonArc
-#define i_valclass Person // "class" assume _clone, _drop, _cmp, _hash is defined.
+#define i_keyclass Person // "class" assume _clone, _drop, _cmp, _hash is defined.
 #include <stc/carc.h>
 
 #define i_type IPtr
-#define i_val int
-#define i_valdrop(x) printf("drop: %d\n", *x)
+#define i_key int
+#define i_keydrop(x) printf("drop: %d\n", *x)
 #define i_native_cmp
 #include <stc/carc.h>
 
 #define i_type IPStack
-#define i_valboxed IPtr
+#define i_keyboxed IPtr
 #include <stc/cstack.h>
 
 #define i_type PASet
-#define i_valboxed PersonArc
+#define i_keyboxed PersonArc
 #include <stc/cset.h>
 
 

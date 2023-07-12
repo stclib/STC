@@ -47,8 +47,11 @@ SpanTypeN_iter  SpanType_begin(const SpanTypeN* self);
 SpanTypeN_iter  SpanType_end(const SpanTypeN* self);
 void            SpanType_next(SpanTypeN_iter* it);
 
-SpanTypeN       cspan_md(char order, ValueType* data, d1, d2, ...); // make a multi-dim cspan. order: 'C' or 'F' (Fortran)
-                // transpose the md span (inverse axes). no changes to the underlying array.
+SpanTypeN       cspan_md(ValueType* data, d1, d2, ...);                     // make a multi-dim cspan, row-major order.
+SpanTypeN       cspan_md_left(ValueType* data, d1, d2, ...);                // column-major ordered cspan (layout left).
+SpanTypeN       cspan_md_ordered(char order, ValueType* data, d1, d2, ...); // order='C': row-major, 'F' (Fortran): column-major.
+
+                // transpose a md span (inverse axes). no changes to the underlying array.
 void            cspan_transpose(const SpanTypeN* self);
 
                 // create a sub md span of lower rank. Like e.g. cspan_slice(Span2, &ms4, {x}, {y}, {c_ALL}, {c_ALL});

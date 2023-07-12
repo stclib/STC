@@ -22,16 +22,16 @@ See the c++ class [std::list](https://en.cppreference.com/w/cpp/container/list) 
 ## Header file and declaration
 
 ```c
-#define i_type      // container type name (default: clist_{i_val})
-#define i_val       // value: REQUIRED
-#define i_cmp       // three-way compare two i_valraw* : REQUIRED IF i_valraw is a non-integral type
-#define i_valdrop   // destroy value func - defaults to empty destruct
-#define i_valclone  // REQUIRED IF i_valdrop defined
+#define i_type      // container type name (default: clist_{i_key})
+#define i_key       // value: REQUIRED
+#define i_cmp       // three-way compare two i_keyraw* : REQUIRED IF i_keyraw is a non-integral type
+#define i_keydrop   // destroy value func - defaults to empty destruct
+#define i_keyclone  // REQUIRED IF i_keydrop defined
 
-#define i_valraw    // convertion "raw" type (default: {i_val})
-#define i_valto     // convertion func i_val* => i_valraw
-#define i_valfrom   // convertion func i_valraw => i_val
-#define i_tag       // alternative typename: cpque_{i_tag}. i_tag defaults to i_val
+#define i_keyraw    // convertion "raw" type (default: {i_key})
+#define i_keyto     // convertion func i_key* => i_keyraw
+#define i_keyfrom   // convertion func i_keyraw => i_key
+#define i_tag       // alternative typename: cpque_{i_tag}. i_tag defaults to i_key
 #include <stc/clist.h>
 ```
 
@@ -53,31 +53,31 @@ intptr_t            clist_X_count(const clist_X* list);                         
 clist_X_value*      clist_X_back(const clist_X* self);
 clist_X_value*      clist_X_front(const clist_X* self);
 
-void                clist_X_push_back(clist_X* self, i_val value);                      // note: no pop_back()
-void                clist_X_push_front(clist_X* self, i_val value);
-void                clist_X_push(clist_X* self, i_val value);                           // alias for push_back()
+void                clist_X_push_back(clist_X* self, i_key value);                      // note: no pop_back()
+void                clist_X_push_front(clist_X* self, i_key value);
+void                clist_X_push(clist_X* self, i_key value);                           // alias for push_back()
 
-void                clist_X_emplace_back(clist_X* self, i_valraw raw);
-void                clist_X_emplace_front(clist_X* self, i_valraw raw);
-void                clist_X_emplace(clist_X* self, i_valraw raw);                       // alias for emplace_back()
+void                clist_X_emplace_back(clist_X* self, i_keyraw raw);
+void                clist_X_emplace_front(clist_X* self, i_keyraw raw);
+void                clist_X_emplace(clist_X* self, i_keyraw raw);                       // alias for emplace_back()
 
-clist_X_iter        clist_X_insert_at(clist_X* self, clist_X_iter it, i_val value);     // return iter to new elem
-clist_X_iter        clist_X_emplace_at(clist_X* self, clist_X_iter it, i_valraw raw);
+clist_X_iter        clist_X_insert_at(clist_X* self, clist_X_iter it, i_key value);     // return iter to new elem
+clist_X_iter        clist_X_emplace_at(clist_X* self, clist_X_iter it, i_keyraw raw);
 
 void                clist_X_pop_front(clist_X* self);
 clist_X_iter        clist_X_erase_at(clist_X* self, clist_X_iter it);                   // return iter after it
 clist_X_iter        clist_X_erase_range(clist_X* self, clist_X_iter it1, clist_X_iter it2);
-intptr_t            clist_X_remove(clist_X* self, i_valraw raw);                        // removes all matches
+intptr_t            clist_X_remove(clist_X* self, i_keyraw raw);                        // removes all matches
 
 clist_X             clist_X_split_off(clist_X* self, clist_X_iter i1, clist_X_iter i2); // split off [i1, i2)
 clist_X_iter        clist_X_splice(clist_X* self, clist_X_iter it, clist_X* other);     // return updated valid it
 clist_X_iter        clist_X_splice_range(clist_X* self, clist_X_iter it,                // return updated valid it
                                          clist_X* other, clist_X_iter it1, clist_X_iter it2);
 
-clist_X_iter        clist_X_find(const clist_X* self, i_valraw raw);
-clist_X_iter        clist_X_find_in(clist_X_iter it1, clist_X_iter it2, i_valraw raw);
-const i_val*        clist_X_get(const clist_X* self, i_valraw raw);
-i_val*              clist_X_get_mut(clist_X* self, i_valraw raw);
+clist_X_iter        clist_X_find(const clist_X* self, i_keyraw raw);
+clist_X_iter        clist_X_find_in(clist_X_iter it1, clist_X_iter it2, i_keyraw raw);
+const i_key*        clist_X_get(const clist_X* self, i_keyraw raw);
+i_key*              clist_X_get_mut(clist_X* self, i_keyraw raw);
 
 void                clist_X_reverse(clist_X* self);
 void                clist_X_sort(clist_X* self);
@@ -108,8 +108,8 @@ void                clist_X_value_drop(clist_X_value* pval);
 |:--------------------|:------------------------------------|:-----------------------------------------|
 | `clist_X`           | `struct { clist_X_node* last; }`                      | The clist type         |
 | `clist_X_node`      | `struct { clist_X_node* next; clist_X_value value; }` | The clist node type |
-| `clist_X_value`     | `i_val`                                               | The clist element type |
-| `clist_X_raw`       | `i_valraw`                                            | clist raw value type   |
+| `clist_X_value`     | `i_key`                                               | The clist element type |
+| `clist_X_raw`       | `i_keyraw`                                            | clist raw value type   |
 | `clist_X_iter`      | `struct { clist_value *ref; ... }`                    | clist iterator         |
 
 ## Example
@@ -117,7 +117,7 @@ void                clist_X_value_drop(clist_X_value* pval);
 Interleave *push_front()* / *push_back()* then *sort()*:
 ```c
 #define i_type DList
-#define i_val double
+#define i_key double
 #include <stc/clist.h>
 
 #include <stdio.h>
@@ -154,7 +154,7 @@ Use of *erase_at()* and *erase_range()*:
 ```c
 // erasing from clist
 #define i_tag i
-#define i_val int
+#define i_key int
 #include <stc/clist.h>
 
 #include <stdio.h>
@@ -189,7 +189,7 @@ mylist contains: 10 30
 Splice `[30, 40]` from *L2* into *L1* before `3`:
 ```c
 #define i_tag i
-#define i_val int
+#define i_key int
 #include <stc/clist.h>
 
 #include <stdio.h>

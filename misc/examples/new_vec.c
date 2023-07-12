@@ -9,14 +9,14 @@ typedef struct MyStruct {
     cvec_pnt pntvec;
 } MyStruct;
 
-#define i_val int
+#define i_key int
 #define i_tag i32
 #define i_is_forward
 #include <stc/cvec.h>
 
 typedef struct Point { int x, y; } Point;
 
-#define i_val Point
+#define i_key Point
 #define i_tag pnt
 #define i_less(a, b) a->x < b->x || (a->x == b->x && a->y < b->y)
 #define i_eq(a, b) a->x == b->x && a->y == b->y

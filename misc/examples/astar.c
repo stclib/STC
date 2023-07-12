@@ -57,11 +57,11 @@ point_key_cmp(const point* a, const point* b)
     return (i == j) ? 0 : (i < j) ? -1 : 1;
 }
 
-#define i_val point
+#define i_key point
 #define i_cmp point_cmp_priority
 #include <stc/cpque.h>
 
-#define i_val point
+#define i_key point
 #define i_opt c_no_cmp
 #include <stc/cdeq.h>
 

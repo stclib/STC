@@ -34,11 +34,6 @@ typedef long long _llong;
 #define c_NPOS INTPTR_MAX
 #define c_ZI PRIiPTR
 #define c_ZU PRIuPTR
-#if defined STC_NDEBUG || defined NDEBUG
-  #define c_ASSERT(expr) (void)(0)
-#else
-  #define c_ASSERT(expr) assert(expr)
-#endif
 
 #if defined(_MSC_VER)
   #pragma warning(disable: 4116 4996) // unnamed type definition in parentheses
@@ -80,7 +75,14 @@ typedef long long _llong;
 #define c_free(p)               free(p)
 #define c_delete(T, ptr)        do { T *_tp = ptr; T##_drop(_tp); free(_tp); } while (0)
 
-#define c_static_assert(b)      ((int)(0*sizeof(int[(b) ? 1 : -1])))
+#define c_static_assert(...)    c_MACRO_OVERLOAD(c_static_assert, __VA_ARGS__)
+#define c_static_assert_1(b)    ((int)(0*sizeof(int[(b) ? 1 : -1])))
+#define c_static_assert_2(b, m) c_static_assert_1(b)
+#if defined STC_NDEBUG || defined NDEBUG
+  #define c_assert(expr)        ((void)0)
+#else
+  #define c_assert(expr)        assert(expr)
+#endif
 #define c_container_of(p, C, m) ((C*)((char*)(1 ? (p) : &((C*)0)->m) - offsetof(C, m)))
 #define c_const_cast(T, p)      ((T)(p) + 0*sizeof((T)0 == (p)))
 #define c_swap(T, xp, yp)       do { T *_xp = xp, *_yp = yp, \

@@ -3,7 +3,7 @@
 #include <time.h>
 #include <stc/crand.h>
 
-#define i_val int64_t
+#define i_key int64_t
 #define i_cmp -c_default_cmp  // min-heap (increasing values)
 #define i_tag i
 #include <stc/cpque.h>

@@ -3,14 +3,14 @@
 #include <stdio.h>
 #define i_implement
 #include <stc/cstr.h>
-#define i_val int
+#define i_key int
 #include <stc/cvec.h>
-#define i_val int
+#define i_key int
 #include <stc/cstack.h>
-#define i_val_str
+#define i_key_str
 #include <stc/csset.h>
-#include <stc/cspan.h>
 
+#include <stc/cspan.h>
 using_cspan(intspan, int, 1);
 
 void printMe(intspan container) {

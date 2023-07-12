@@ -185,7 +185,7 @@ void print_split(csview input, const char* sep)
 }
 #define i_implement
 #include <stc/cstr.h>
-#define i_val_str
+#define i_key_str
 #include <stc/cstack.h>
 
 cstack_str string_split(csview input, const char* sep)

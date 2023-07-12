@@ -51,13 +51,13 @@ _cx_MEMB(_push_back)(_cx_Self* self, _cx_value val)
 
 STC_INLINE void
 _cx_MEMB(_pop_back)(_cx_Self* self) {
-    assert(!_cx_MEMB(_empty)(self));
+    c_assert(!_cx_MEMB(_empty)(self));
     self->end = (self->end - 1) & self->capmask;
     i_keydrop((self->data + self->end));
 }
 
 STC_INLINE _cx_value _cx_MEMB(_pull_back)(_cx_Self* self) { // move back out of deq
-    assert(!_cx_MEMB(_empty)(self));
+    c_assert(!_cx_MEMB(_empty)(self));
     self->end = (self->end - 1) & self->capmask;
     return self->data[self->end];
 }

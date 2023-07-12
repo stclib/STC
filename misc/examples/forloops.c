@@ -2,7 +2,7 @@
 #include <stc/algo/filter.h>
 
 #define i_type IVec
-#define i_val int
+#define i_key int
 #include <stc/cstack.h>
 
 #define i_type IMap

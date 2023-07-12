@@ -89,7 +89,7 @@ STC_INLINE const _cx_value* _cx_MEMB(_top)(const _cx_Self* self)
     { return &self->data[0]; }
 
 STC_INLINE void _cx_MEMB(_pop)(_cx_Self* self)
-    { assert(!_cx_MEMB(_empty)(self)); _cx_MEMB(_erase_at)(self, 0); }
+    { c_assert(!_cx_MEMB(_empty)(self)); _cx_MEMB(_erase_at)(self, 0); }
 
 #if !defined i_no_clone
 STC_API _cx_Self _cx_MEMB(_clone)(_cx_Self q);

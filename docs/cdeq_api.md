@@ -11,16 +11,16 @@ See the c++ class [std::deque](https://en.cppreference.com/w/cpp/container/deque
 
 ```c
 #define i_type      // full typename of the container
-#define i_val       // value: REQUIRED
-#define i_cmp       // three-way compare two i_valraw* : REQUIRED IF i_valraw is a non-integral type
-#define i_valdrop   // destroy value func - defaults to empty destruct
-#define i_valclone  // REQUIRED IF i_valdrop defined
+#define i_key       // value: REQUIRED
+#define i_cmp       // three-way compare two i_keyraw* : REQUIRED IF i_keyraw is a non-integral type
+#define i_keydrop   // destroy value func - defaults to empty destruct
+#define i_keyclone  // REQUIRED IF i_keydrop defined
 
-#define i_valraw    // convertion "raw" type - defaults to i_val
-#define i_valfrom   // convertion func i_valraw => i_val
-#define i_valto     // convertion func i_val* => i_valraw
+#define i_keyraw    // convertion "raw" type - defaults to i_key
+#define i_keyfrom   // convertion func i_keyraw => i_key
+#define i_keyto     // convertion func i_key* => i_keyraw
 
-#define i_tag       // alternative typename: cdeq_{i_tag}. i_tag defaults to i_val
+#define i_tag       // alternative typename: cdeq_{i_tag}. i_tag defaults to i_key
 #include <stc/cdeq.h>
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.
@@ -44,30 +44,30 @@ intptr_t            cdeq_X_capacity(const cdeq_X* self);
 
 const cdeq_X_value* cdeq_X_at(const cdeq_X* self, intptr_t idx);
 cdeq_X_value*       cdeq_X_at_mut(cdeq_X* self, intptr_t idx);
-const cdeq_X_value* cdeq_X_get(const cdeq_X* self, i_valraw raw);                   // return NULL if not found
-cdeq_X_value*       cdeq_X_get_mut(cdeq_X* self, i_valraw raw);                     // mutable get
-cdeq_X_iter         cdeq_X_find(const cdeq_X* self, i_valraw raw);
-cdeq_X_iter         cdeq_X_find_in(cdeq_X_iter i1, cdeq_X_iter i2, i_valraw raw);   // return cvec_X_end() if not found
+const cdeq_X_value* cdeq_X_get(const cdeq_X* self, i_keyraw raw);                   // return NULL if not found
+cdeq_X_value*       cdeq_X_get_mut(cdeq_X* self, i_keyraw raw);                     // mutable get
+cdeq_X_iter         cdeq_X_find(const cdeq_X* self, i_keyraw raw);
+cdeq_X_iter         cdeq_X_find_in(cdeq_X_iter i1, cdeq_X_iter i2, i_keyraw raw);   // return cvec_X_end() if not found
 
 cdeq_X_value*       cdeq_X_front(const cdeq_X* self);
 cdeq_X_value*       cdeq_X_back(const cdeq_X* self);
 
-cdeq_X_value*       cdeq_X_push_front(cdeq_X* self, i_val value);
-cdeq_X_value*       cdeq_X_emplace_front(cdeq_X* self, i_valraw raw);
+cdeq_X_value*       cdeq_X_push_front(cdeq_X* self, i_key value);
+cdeq_X_value*       cdeq_X_emplace_front(cdeq_X* self, i_keyraw raw);
 void                cdeq_X_pop_front(cdeq_X* self);
 
-cdeq_X_value*       cdeq_X_push_back(cdeq_X* self, i_val value);
-cdeq_X_value*       cdeq_X_push(cdeq_X* self, i_val value);                         // alias for push_back()
-cdeq_X_value*       cdeq_X_emplace_back(cdeq_X* self, i_valraw raw);
-cdeq_X_value*       cdeq_X_emplace(cdeq_X* self, i_valraw raw);                     // alias for emplace_back()
+cdeq_X_value*       cdeq_X_push_back(cdeq_X* self, i_key value);
+cdeq_X_value*       cdeq_X_push(cdeq_X* self, i_key value);                         // alias for push_back()
+cdeq_X_value*       cdeq_X_emplace_back(cdeq_X* self, i_keyraw raw);
+cdeq_X_value*       cdeq_X_emplace(cdeq_X* self, i_keyraw raw);                     // alias for emplace_back()
 void                cdeq_X_pop_back(cdeq_X* self);
 
-cdeq_X_iter         cdeq_X_insert_n(cdeq_X* self, intptr_t idx, const i_val[] arr, intptr_t n);  // move values
-cdeq_X_iter         cdeq_X_insert_at(cdeq_X* self, cdeq_X_iter it, i_val value);    // move value 
+cdeq_X_iter         cdeq_X_insert_n(cdeq_X* self, intptr_t idx, const i_key[] arr, intptr_t n);  // move values
+cdeq_X_iter         cdeq_X_insert_at(cdeq_X* self, cdeq_X_iter it, i_key value);    // move value 
 cdeq_X_iter         cdeq_X_insert_uninit(cdeq_X* self, intptr_t idx, intptr_t n);   // uninitialized data 
                     // copy values:
-cdeq_X_iter         cdeq_X_emplace_n(cdeq_X* self, intptr_t idx, const i_valraw[] arr, intptr_t n);
-cdeq_X_iter         cdeq_X_emplace_at(cdeq_X* self, cdeq_X_iter it, i_valraw raw);
+cdeq_X_iter         cdeq_X_emplace_n(cdeq_X* self, intptr_t idx, const i_keyraw[] arr, intptr_t n);
+cdeq_X_iter         cdeq_X_emplace_at(cdeq_X* self, cdeq_X_iter it, i_keyraw raw);
 
 void                cdeq_X_erase_n(cdeq_X* self, intptr_t idx, intptr_t n);
 cdeq_X_iter         cdeq_X_erase_at(cdeq_X* self, cdeq_X_iter it);
@@ -88,14 +88,14 @@ void                cdeq_X_value_drop(cdeq_X_value* pval);
 
 | Type name          | Type definition                     | Used to represent...   |
 |:-------------------|:------------------------------------|:-----------------------|
-| `cdeq_X`           | `struct { cdeq_X_value* data; }`  | The cdeq type          |
-| `cdeq_X_value`     | `i_val`                             | The cdeq value type    |
-| `cdeq_X_raw`       | `i_valraw`                          | The raw value type     |
-| `cdeq_X_iter`      | `struct { cdeq_X_value* ref; }`   | The iterator type      |
+| `cdeq_X`           | `struct { cdeq_X_value* data; }`    | The cdeq type          |
+| `cdeq_X_value`     | `i_key`                             | The cdeq value type    |
+| `cdeq_X_raw`       | `i_keyraw`                          | The raw value type     |
+| `cdeq_X_iter`      | `struct { cdeq_X_value* ref; }`     | The iterator type      |
 
 ## Examples
 ```c
-#define i_val int
+#define i_key int
 #define i_tag i
 #include <stc/cdeq.h>
 

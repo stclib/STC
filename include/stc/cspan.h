@@ -84,7 +84,7 @@ int demo2() {
                                   const int rank, const int32_t a[][2]) { \
         Self s = {.data=v}; int outrank; \
         s.data += _cspan_slice(s.shape, s.stride.d, &outrank, shape, stri, rank, a); \
-        c_ASSERT(outrank == RANK); \
+        c_assert(outrank == RANK); \
         return s; \
     } \
     STC_INLINE Self##_iter Self##_begin(const Self* self) { \
@@ -145,7 +145,6 @@ using_cspan_tuple(7); using_cspan_tuple(8);
 #define cspan_subspan3(self, offset, count) \
     {.data=cspan_at(self, offset, 0, 0), .shape={count, (self)->shape[1], (self)->shape[2]}, .stride=(self)->stride}
 
-
 // cspan_submd(): Reduce rank (N <= 4) Optimized, same as e.g. cspan_slice(Span2, &ms4, {x}, {y}, {c_ALL}, {c_ALL});
 #define cspan_submd2(OutSpan, self, ...) _cspan_submdN(OutSpan, 2, self, __VA_ARGS__)
 #define cspan_submd3(OutSpan, self, ...) _cspan_submdN(OutSpan, 3, self, __VA_ARGS__)
@@ -172,15 +171,14 @@ using_cspan_tuple(7); using_cspan_tuple(8);
 #define _cspan_submd4_5(ok, self, x, y, z) \
     {.data=cspan_at(self, x, y, z, 0) + ok, .shape={(self)->shape[3]}, .stride={.d={(self)->stride.d[3]}}}
 
-#define cspan_md(array, ...) cspan_md_order('C', array, __VA_ARGS__)
-#define cspan_md_left(array, ...) cspan_md_order('F', array, __VA_ARGS__)
-#define cspan_md_order(order, array, ...) \
+#define cspan_md(array, ...) cspan_md_ordered('C', array, __VA_ARGS__)
+#define cspan_md_left(array, ...) cspan_md_ordered('F', array, __VA_ARGS__)
+#define cspan_md_ordered(order, array, ...) \
     {.data=array, .shape={__VA_ARGS__}, \
      .stride=*(c_PASTE(cspan_tuple, c_NUMARGS(__VA_ARGS__))*)_cspan_shape2stride(order, ((int32_t[]){__VA_ARGS__}), c_NUMARGS(__VA_ARGS__))}
 
 #define cspan_transpose(self) \
     _cspan_transpose((self)->shape, (self)->stride.d, cspan_rank(self))
-
 
 // General slicing function;
 #define cspan_slice(OutSpan, parent, ...) \
@@ -188,7 +186,7 @@ using_cspan_tuple(7); using_cspan_tuple(8);
                      c_static_assert(cspan_rank(parent) == sizeof((int32_t[][2]){__VA_ARGS__})/sizeof(int32_t[2])), \
                      (const int32_t[][2]){__VA_ARGS__})
 
-// ----------- private definitions ------------
+/* ------------------- PRIVAT DEFINITIONS ------------------- */
 
 // cspan_index() helpers:
 #define cspan_idx_1 cspan_idx_3
@@ -215,19 +213,19 @@ STC_INLINE void _cspan_transpose(int32_t shape[], int32_t stride[], int rank) {
 }
 
 STC_INLINE intptr_t _cspan_idx1(const int32_t shape[1], const cspan_tuple1 stri, int32_t x)
-    { c_ASSERT(c_LTu(x, shape[0])); return x; }
+    { c_assert(c_LTu(x, shape[0])); return (intptr_t)stri.d[0]*x; }
 
 STC_INLINE intptr_t _cspan_idx2(const int32_t shape[2], const cspan_tuple2 stri, int32_t x, int32_t y)
-    { c_ASSERT(c_LTu(x, shape[0]) && c_LTu(y, shape[1])); return (intptr_t)stri.d[0]*x + stri.d[1]*y; }
+    { c_assert(c_LTu(x, shape[0]) && c_LTu(y, shape[1])); return (intptr_t)stri.d[0]*x + stri.d[1]*y; }
 
 STC_INLINE intptr_t _cspan_idx3(const int32_t shape[3], const cspan_tuple3 stri, int32_t x, int32_t y, int32_t z) {
-    c_ASSERT(c_LTu(x, shape[0]) && c_LTu(y, shape[1]) && c_LTu(z, shape[2]));
+    c_assert(c_LTu(x, shape[0]) && c_LTu(y, shape[1]) && c_LTu(z, shape[2]));
     return (intptr_t)stri.d[0]*x + stri.d[1]*y + stri.d[2]*z;
 }
 STC_INLINE intptr_t _cspan_idxN(int rank, const int32_t shape[], const int32_t stride[], const int32_t a[]) {
     intptr_t off = 0;
     while (rank--) {
-        c_ASSERT(c_LTu(a[rank], shape[rank]));
+        c_assert(c_LTu(a[rank], shape[rank]));
         off += stride[rank]*a[rank];
     }
     return off;
@@ -239,6 +237,8 @@ STC_API intptr_t _cspan_next2(int32_t pos[], const int32_t shape[], const int32_
 #define _cspan_next4 _cspan_next2
 #define _cspan_next5 _cspan_next2
 #define _cspan_next6 _cspan_next2
+#define _cspan_next7 _cspan_next2
+#define _cspan_next8 _cspan_next2
 
 STC_API intptr_t _cspan_slice(int32_t oshape[], int32_t ostride[], int* orank,
                               const int32_t shape[], const int32_t stride[],
@@ -247,7 +247,7 @@ STC_API intptr_t _cspan_slice(int32_t oshape[], int32_t ostride[], int* orank,
 STC_API int32_t* _cspan_shape2stride(char order, int32_t shape[], int rank);
 #endif // STC_CSPAN_H_INCLUDED
 
-/* -------------------------- IMPLEMENTATION ------------------------- */
+/* --------------------- IMPLEMENTATION --------------------- */
 #if defined(i_implement) || defined(i_static)
 
 STC_DEF int32_t* _cspan_shape2stride(char order, int32_t shape[], int rank) {
@@ -283,13 +283,13 @@ STC_DEF intptr_t _cspan_slice(int32_t oshape[], int32_t ostride[], int* orank,
     for (; i < rank; ++i) {
         off += stride[i]*a[i][0];
         switch (a[i][1]) {
-            case 0: c_ASSERT(c_LTu(a[i][0], shape[i])); continue;
+            case 0: c_assert(c_LTu(a[i][0], shape[i])); continue;
             case -1: end = shape[i]; break;
             default: end = a[i][1];
         }
         oshape[oi] = end - a[i][0];
         ostride[oi] = stride[i];
-        c_ASSERT(c_LTu(0, oshape[oi]) & !c_LTu(shape[i], end));
+        c_assert(c_LTu(0, oshape[oi]) & !c_LTu(shape[i], end));
         ++oi;
     }
     *orank = oi;

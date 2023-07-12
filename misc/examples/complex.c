@@ -9,11 +9,11 @@
 #include <stc/cstr.h>
 
 #define i_type FloatStack
-#define i_val float
+#define i_key float
 #include <stc/cstack.h>
 
 #define i_type StackList
-#define i_valclass FloatStack  // "class" picks up _clone, _drop, _cmp
+#define i_keyclass FloatStack  // "class" picks up _clone, _drop, _cmp
 #define i_opt c_no_cmp         // exclude FloatStack_cmp(): not defined
 #include <stc/clist.h>
 

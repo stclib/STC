@@ -16,7 +16,7 @@
 
 // Alternatively, using cbox:
 #define i_type IBox
-#define i_val long
+#define i_key long
 #include <stc/cbox.h> // unique_ptr<long> alike.
 
 // cmap of cstr => IBox

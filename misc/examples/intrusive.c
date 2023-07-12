@@ -3,7 +3,7 @@
 #include <stdio.h> 
 
 #define i_type List
-#define i_val int
+#define i_key int
 #define i_native_cmp
 #include <stc/clist.h>
 

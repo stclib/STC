@@ -10,14 +10,14 @@ int point_cmp(const Point* a, const Point* b) {
     int c = c_default_cmp(&a->x, &b->x);
     return c ? c : c_default_cmp(&a->y, &b->y);
 }
-#define i_val Point
+#define i_key Point
 #define i_cmp point_cmp
 #define i_is_forward
 #define i_tag pnt
 #include <stc/cqueue.h>
 
 #define i_type IQ
-#define i_val int
+#define i_key int
 #include <stc/cqueue.h>
 
 int main() {

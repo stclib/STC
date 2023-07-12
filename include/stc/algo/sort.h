@@ -22,13 +22,13 @@
  */
 /* Generic Quicksort in C, performs as fast as c++ std::sort().
 template params:
-#define i_val           - value type [required]
+#define i_key           - value type [required]
 #define i_less          - less function. default: *x < *y
-#define i_type name     - define {{name}}_sort_n(), else {{i_val}}array_sort_n().
+#define i_type name     - define {{name}}_sort_n(), else {{i_key}}array_sort_n().
 
 // ex1:
 #include <stdio.h>
-#define i_val int
+#define i_key int
 #include <stc/algo/sort.h>
 
 int main() {
@@ -42,7 +42,7 @@ int main() {
 }
 
 // ex2:
-#define i_val int
+#define i_key int
 #define i_type IDeq
 #define i_more // retain input template params to be reused by sort.h
 #include <stc/cdeq.h>
@@ -62,13 +62,16 @@ int main() {
 */
 #include "../ccommon.h"
 
+#if !defined i_key && defined i_val
+  #define i_key i_val
+#endif
 #ifndef i_type
   #define i_at(arr, idx) (&arr[idx])
   #ifndef i_tag
-    #define i_tag i_val
+    #define i_tag i_key
   #endif
   #define i_type c_PASTE(i_tag, array)
-  typedef i_val i_type;
+  typedef i_key i_type;
 #endif
 #ifndef i_at
   #define i_at(arr, idx) _cx_MEMB(_at_mut)(arr, idx)
@@ -78,7 +81,7 @@ int main() {
 
 static inline void _cx_MEMB(_insertsort_ij)(_cx_Self* arr, intptr_t lo, intptr_t hi) {
     for (intptr_t j = lo, i = lo + 1; i <= hi; j = i, ++i) {
-        i_val key = *i_at(arr, i);
+        i_key key = *i_at(arr, i);
         while (j >= 0 && (i_less((&key), i_at(arr, j)))) {
             *i_at(arr, j + 1) = *i_at(arr, j);
             --j;
@@ -90,14 +93,14 @@ static inline void _cx_MEMB(_insertsort_ij)(_cx_Self* arr, intptr_t lo, intptr_t
 static inline void _cx_MEMB(_sort_ij)(_cx_Self* arr, intptr_t lo, intptr_t hi) {
     intptr_t i = lo, j;
     while (lo < hi) {
-        i_val pivot = *i_at(arr, lo + (hi - lo)*7/16);
+        i_key pivot = *i_at(arr, lo + (hi - lo)*7/16);
         j = hi;
 
         while (i <= j) {
             while (i_less(i_at(arr, i), (&pivot))) ++i;
             while (i_less((&pivot), i_at(arr, j))) --j;
             if (i <= j) {
-                c_swap(i_val, i_at(arr, i), i_at(arr, j));
+                c_swap(i_key, i_at(arr, i), i_at(arr, j));
                 ++i; --j;
             }
         }

@@ -90,7 +90,7 @@ STC_INLINE _llong _cbits_count(const uint64_t* set, const _llong sz) {
 STC_INLINE char* _cbits_to_str(const uint64_t* set, const _llong sz, 
                                char* out, _llong start, _llong stop) {
     if (stop > sz) stop = sz;
-    assert(start <= stop);
+    c_assert(start <= stop);
 
     c_memset(out, '0', stop - start);
     for (_llong i = start; i < stop; ++i) 
@@ -122,7 +122,7 @@ STC_INLINE bool _cbits_disjoint(const uint64_t* set, const uint64_t* other, cons
 
 #if !defined i_capacity // DYNAMIC SIZE BITARRAY
 
-#define _i_assert(x) assert(x)
+#define _i_assert(x) c_assert(x)
 #define i_type cbits
 
 typedef struct { uint64_t *data64; _llong _size; } i_type;
@@ -216,13 +216,13 @@ STC_INLINE void _i_memb(_set_all)(i_type *self, const bool value);
 STC_INLINE void _i_memb(_set_pattern)(i_type *self, const uint64_t pattern);
 
 STC_INLINE i_type _i_memb(_with_size)(const _llong size, const bool value) {
-    assert(size <= i_capacity);
+    c_assert(size <= i_capacity);
     i_type set; _i_memb(_set_all)(&set, value);
     return set;
 }
 
 STC_INLINE i_type _i_memb(_with_pattern)(const _llong size, const uint64_t pattern) {
-    assert(size <= i_capacity);
+    c_assert(size <= i_capacity);
     i_type set; _i_memb(_set_pattern)(&set, pattern);
     return set;
 }

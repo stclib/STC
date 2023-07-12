@@ -8,7 +8,7 @@
 #define i_tag istr
 #include <stc/csmap.h>
 
-#define i_val csmap_istr_raw
+#define i_key csmap_istr_raw
 #define i_tag istr
 #include <stc/cvec.h>
 

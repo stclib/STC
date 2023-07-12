@@ -6,18 +6,18 @@ void int_drop(int* x) {
 }
 
 // carc implements its own clone method using reference counting,
-// so 'i_valclone' is not required to be defined (ignored).
+// so 'i_keyclone' is not required to be defined (ignored).
 
 #define i_type Arc          // set type name to be defined (instead of 'carc_int')
-#define i_val int
-#define i_valdrop int_drop  // optional, just to display the elements destroyed
+#define i_key int
+#define i_keydrop int_drop  // optional, just to display the elements destroyed
 #define i_native_cmp        // use int comparison (x < y, x == y).
 #include <stc/carc.h>       // Arc
 
 #define i_keyboxed Arc      // note: use i_keyboxed instead of i_key for carc/cbox elements
 #include <stc/csset.h>      // csset_Arc (like: std::set<std::shared_ptr<int>>)
 
-#define i_valboxed Arc      // note: as above.
+#define i_keyboxed Arc      // note: as above.
 #include <stc/cvec.h>       // cvec_Arc (like: std::vector<std::shared_ptr<int>>)
 
 int main()

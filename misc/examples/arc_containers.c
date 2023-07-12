@@ -10,18 +10,18 @@
 #include <stc/csmap.h>
 
 #define i_type Arc // (atomic) ref. counted type
-#define i_val Map
-#define i_valdrop(p) (printf("drop Arc:\n"), Map_drop(p))
+#define i_key Map
+#define i_keydrop(p) (printf("drop Arc:\n"), Map_drop(p))
 // no need for atomic ref. count in single thread:
 #define i_opt c_no_atomic
 #include <stc/carc.h>
 
 #define i_type Stack
-#define i_valboxed Arc // define i_valboxed for carc/cbox value (not i_val)
+#define i_keyboxed Arc // define i_keyboxed for carc/cbox value (not i_key)
 #include <stc/cvec.h>
 
 #define i_type List
-#define i_valboxed Arc // as above
+#define i_keyboxed Arc // as above
 #include <stc/clist.h>
 
 int main()

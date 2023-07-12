@@ -129,10 +129,10 @@ STC_INLINE _cx_value* _cx_MEMB(_push)(_cx_Self* self, _cx_value val) {
 }
 
 STC_INLINE void _cx_MEMB(_pop)(_cx_Self* self)
-    { assert(self->_len); _cx_value* p = &self->data[--self->_len]; i_keydrop(p); }
+    { c_assert(self->_len); _cx_value* p = &self->data[--self->_len]; i_keydrop(p); }
 
 STC_INLINE _cx_value _cx_MEMB(_pull)(_cx_Self* self)
-    { assert(self->_len); return self->data[--self->_len]; }
+    { c_assert(self->_len); return self->data[--self->_len]; }
 
 STC_INLINE void _cx_MEMB(_put_n)(_cx_Self* self, const _cx_raw* raw, intptr_t n)
     { while (n--) _cx_MEMB(_push)(self, i_keyfrom(*raw++)); }
@@ -141,9 +141,9 @@ STC_INLINE _cx_Self _cx_MEMB(_from_n)(const _cx_raw* raw, intptr_t n)
     { _cx_Self cx = {0}; _cx_MEMB(_put_n)(&cx, raw, n); return cx; }
 
 STC_INLINE const _cx_value* _cx_MEMB(_at)(const _cx_Self* self, intptr_t idx)
-    { assert(idx < self->_len); return self->data + idx; }
+    { c_assert(idx < self->_len); return self->data + idx; }
 STC_INLINE _cx_value* _cx_MEMB(_at_mut)(_cx_Self* self, intptr_t idx)
-    { assert(idx < self->_len); return self->data + idx; }
+    { c_assert(idx < self->_len); return self->data + idx; }
 
 #if !defined i_no_emplace
 STC_INLINE _cx_value* _cx_MEMB(_emplace)(_cx_Self* self, _cx_raw raw)

@@ -117,7 +117,7 @@ STC_INLINE bool         _cx_MEMB(_contains)(const _cx_Self* self, _cx_keyraw rke
     STC_INLINE const _cx_mapped*
     _cx_MEMB(_at)(const _cx_Self* self, _cx_keyraw rkey) {
         chash_bucket b = _cx_MEMB(_bucket_)(self, &rkey);
-        assert(b.found);
+        c_assert(b.found);
         return &self->data[b.idx].second;
     }
     STC_INLINE _cx_mapped*

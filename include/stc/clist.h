@@ -145,7 +145,7 @@ STC_INLINE void         _cx_MEMB(_clear)(_cx_Self* self) { _cx_MEMB(_drop)(self)
 STC_INLINE _cx_value*   _cx_MEMB(_push)(_cx_Self* self, i_key value)
                             { return _cx_MEMB(_push_back)(self, value); }
 STC_INLINE void         _cx_MEMB(_pop_front)(_cx_Self* self)
-                            { assert(!_cx_MEMB(_empty)(self)); _cx_MEMB(_erase_after_node)(self, self->last); }
+                            { c_assert(!_cx_MEMB(_empty)(self)); _cx_MEMB(_erase_after_node)(self, self->last); }
 STC_INLINE _cx_value*   _cx_MEMB(_front)(const _cx_Self* self) { return &self->last->next->value; }
 STC_INLINE _cx_value*   _cx_MEMB(_back)(const _cx_Self* self) { return &self->last->value; }
 STC_INLINE _cx_raw      _cx_MEMB(_value_toraw)(const _cx_value* pval) { return i_keyto(pval); }

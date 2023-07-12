@@ -3,7 +3,7 @@
 #define i_implement
 #include <stc/csview.h>
 
-#define i_val float
+#define i_key float
 #include <stc/cstack.h>
 
 int main()

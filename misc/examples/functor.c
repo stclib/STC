@@ -6,7 +6,7 @@
 
 #define i_type IPQue
 #define i_base cpque
-#define i_val int
+#define i_key int
 #define i_extend bool(*less)(const int*, const int*);
 #define i_less(x, y) c_extend()->less(x, y)
 // Note: i_less: c_extend() accessible for cpque types

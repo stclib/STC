@@ -133,9 +133,9 @@ STC_INLINE _cx_value*   _cx_MEMB(_front)(const _cx_Self* self) { return self->da
 STC_INLINE _cx_value*   _cx_MEMB(_back)(const _cx_Self* self)
                             { return self->data + self->_len - 1; }
 STC_INLINE void         _cx_MEMB(_pop)(_cx_Self* self)
-                            { assert(self->_len); _cx_value* p = &self->data[--self->_len]; i_keydrop(p); }
+                            { c_assert(self->_len); _cx_value* p = &self->data[--self->_len]; i_keydrop(p); }
 STC_INLINE _cx_value    _cx_MEMB(_pull)(_cx_Self* self)
-                            { assert(self->_len); return self->data[--self->_len]; }
+                            { c_assert(self->_len); return self->data[--self->_len]; }
 STC_INLINE _cx_value*   _cx_MEMB(_push_back)(_cx_Self* self, i_key value)
                             { return _cx_MEMB(_push)(self, value); }
 STC_INLINE void         _cx_MEMB(_pop_back)(_cx_Self* self) { _cx_MEMB(_pop)(self); }
@@ -182,11 +182,11 @@ _cx_MEMB(_erase_range)(_cx_Self* self, _cx_iter i1, _cx_iter i2) {
 
 STC_INLINE const _cx_value*
 _cx_MEMB(_at)(const _cx_Self* self, const intptr_t idx) {
-    assert(idx < self->_len); return self->data + idx;
+    c_assert(idx < self->_len); return self->data + idx;
 }
 STC_INLINE _cx_value*
 _cx_MEMB(_at_mut)(_cx_Self* self, const intptr_t idx) {
-    assert(idx < self->_len); return self->data + idx;
+    c_assert(idx < self->_len); return self->data + idx;
 }
 
 

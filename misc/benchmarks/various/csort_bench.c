@@ -7,7 +7,7 @@
 #endif
 #define NDEBUG
 #define i_type Ints
-#define i_val int
+#define i_key int
 #define i_more
 #include <stc/cvec.h>
 #include <stc/algo/sort.h>

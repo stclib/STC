@@ -1,7 +1,7 @@
 #include <stc/crand.h>
 #include <stdio.h>
 
-#define i_val int
+#define i_key int
 #define i_tag i
 #include <stc/cqueue.h>
 

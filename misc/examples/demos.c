@@ -28,7 +28,7 @@ void stringdemo1()
     cstr_drop(&cs);
 }
 
-#define i_val int64_t
+#define i_key int64_t
 #define i_tag ix
 #include <stc/cvec.h>
 
@@ -52,7 +52,7 @@ void vectordemo1()
     cvec_ix_drop(&bignums);
 }
 
-#define i_val_str
+#define i_key_str
 #include <stc/cvec.h>
 
 void vectordemo2()
@@ -72,7 +72,7 @@ void vectordemo2()
     cvec_str_drop(&names);
 }
 
-#define i_val int
+#define i_key int
 #define i_tag ix
 #define i_native_cmp
 #include <stc/clist.h>

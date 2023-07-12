@@ -18,17 +18,17 @@ inline static int ipair_cmp(const ipair_t* a, const ipair_t* b) {
 }
 
 
-#define i_val ipair_t
+#define i_key ipair_t
 #define i_cmp ipair_cmp
 #define i_tag ip
 #include <stc/cvec.h>
 
-#define i_val ipair_t
+#define i_key ipair_t
 #define i_cmp ipair_cmp
 #define i_tag ip
 #include <stc/clist.h>
 
-#define i_val float
+#define i_key float
 #define i_tag f
 #include <stc/cpque.h>
 

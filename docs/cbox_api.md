@@ -2,11 +2,11 @@
 
 **cbox** is a smart pointer to a heap allocated value of type X. A **cbox** can
 be empty. The *cbox_X_cmp()*, *cbox_X_drop()* methods are defined based on the `i_cmp`
-and `i_valdrop` macros specified. Use *cbox_X_clone(p)* to make a deep copy, which uses the
-`i_valclone` macro if defined.
+and `i_keydrop` macros specified. Use *cbox_X_clone(p)* to make a deep copy, which uses the
+`i_keyclone` macro if defined.
 
-When declaring a container of **cbox** values, define `i_valboxed` with the
-cbox type instead of defining `i_val`. This will auto-set `i_valdrop`, `i_valclone`, and `i_cmp` using 
+When declaring a container of **cbox** values, define `i_keyboxed` with the
+cbox type instead of defining `i_key`. This will auto-set `i_keydrop`, `i_keyclone`, and `i_cmp` using 
 functions defined by the specified **cbox**.
 
 See similar c++ class [std::unique_ptr](https://en.cppreference.com/w/cpp/memory/unique_ptr) for a functional reference, or Rust [std::boxed::Box](https://doc.rust-lang.org/std/boxed/struct.Box.html)
@@ -15,29 +15,29 @@ See similar c++ class [std::unique_ptr](https://en.cppreference.com/w/cpp/memory
 
 ```c
 #define i_type          // full typename of the cbox
-#define i_val           // value: REQUIRED
-#define i_cmp           // three-way compare two i_val* : REQUIRED IF i_val is a non-integral type
-#define i_valdrop       // destroy value func - defaults to empty destruct
-#define i_valclone      // REQUIRED if i_valdrop is defined, unless 'i_opt c_no_clone' is defined.
+#define i_key           // element type: REQUIRED
+#define i_cmp           // three-way compare two i_key* : REQUIRED IF i_key is a non-integral type
+#define i_keydrop       // destroy element func - defaults to empty destruct
+#define i_keyclone      // REQUIRED if i_keydrop is defined, unless 'i_opt c_no_clone' is defined.
 
-#define i_valraw        // convertion type (lookup): default to {i_val}
-#define i_valto         // convertion func i_val* => i_valraw: REQUIRED IF i_valraw defined.
-#define i_valfrom       // from-raw func.
+#define i_keyraw        // convertion type (lookup): default to {i_key}
+#define i_keyto         // convertion func i_key* => i_keyraw: REQUIRED IF i_keyraw defined.
+#define i_keyfrom       // from-raw func.
 
-#define i_valclass      // alt. to i_val: REQUIRES that {i_val}_clone, {i_val}_drop, {i_valraw}_cmp exist.
-#define i_tag           // alternative typename: cbox_{i_tag}. i_tag defaults to i_val
+#define i_keyclass      // alt. to i_key: REQUIRES that {i_key}_clone, {i_key}_drop, {i_keyraw}_cmp exist.
+#define i_tag           // alternative typename: cbox_{i_tag}. i_tag defaults to i_key
 #include <stc/cbox.h>    
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.
-Define `i_opt` with `c_no_cmp` if comparison between i_val's is not needed/available. Will then
+Define `i_opt` with `c_no_cmp` if comparison between i_key's is not needed/available. Will then
 compare the pointer addresses when used. Additionally, `c_no_clone` or `i_is_fwd` may be defined.
 
 ## Methods
 ```c
 cbox_X      cbox_X_init();                                    // return an empty cbox
-cbox_X      cbox_X_from(i_valraw raw);                        // create a cbox from raw type. Avail if i_valraw user defined.
-cbox_X      cbox_X_from_ptr(i_val* ptr);                      // create a cbox from a pointer. Takes ownership of ptr.
-cbox_X      cbox_X_make(i_val val);                           // create a cbox from unowned val object.
+cbox_X      cbox_X_from(i_keyraw raw);                        // create a cbox from raw type. Avail if i_keyraw user defined.
+cbox_X      cbox_X_from_ptr(i_key* ptr);                      // create a cbox from a pointer. Takes ownership of ptr.
+cbox_X      cbox_X_make(i_key val);                           // create a cbox from unowned val object.
 
 cbox_X      cbox_X_clone(cbox_X other);                       // return deep copied clone
 cbox_X      cbox_X_move(cbox_X* self);                        // transfer ownership to receiving cbox returned. self becomes NULL.
@@ -46,7 +46,7 @@ void        cbox_X_assign(cbox_X* self, cbox_X* moved);       // transfer owners
 void        cbox_X_drop(cbox_X* self);                        // destruct the contained object and free its heap memory.
 
 void        cbox_X_reset(cbox_X* self);   
-void        cbox_X_reset_to(cbox_X* self, i_val* p);          // assign new cbox from ptr. Takes ownership of p.
+void        cbox_X_reset_to(cbox_X* self, i_key* p);          // assign new cbox from ptr. Takes ownership of p.
 
 uint64_t    cbox_X_hash(const cbox_X* x);                     // hash value
 int         cbox_X_cmp(const cbox_X* x, const cbox_X* y);     // compares pointer addresses if no `i_cmp` is specified.
@@ -55,9 +55,9 @@ bool        cbox_X_eq(const cbox_X* x, const cbox_X* y);      // cbox_X_cmp() ==
 
 // functions on pointed to objects.
 
-uint64_t    cbox_X_value_hash(const i_val* x);
-int         cbox_X_value_cmp(const i_val* x, const i_val* y);
-bool        cbox_X_value_eq(const i_val* x, const i_val* y);
+uint64_t    cbox_X_value_hash(const i_key* x);
+int         cbox_X_value_cmp(const i_key* x, const i_key* y);
+bool        cbox_X_value_eq(const i_key* x, const i_key* y);
 ```
 
 ## Types and constants
@@ -66,7 +66,7 @@ bool        cbox_X_value_eq(const i_val* x, const i_val* y);
 |:-------------------|:--------------------------------|:------------------------|
 | `cbox_null`        | `{0}`                           | Init nullptr const      |
 | `cbox_X`           | `struct { cbox_X_value* get; }` | The cbox type           |
-| `cbox_X_value`     | `i_val`                         | The cbox element type   |
+| `cbox_X_value`     | `i_key`                         | The cbox element type   |
 
 ## Example
 
@@ -77,9 +77,9 @@ void int_drop(int* x) {
 }
 
 #define i_type IBox
-#define i_val int
-#define i_valdrop int_drop    // optional func, just to display elements destroyed
-#define i_valclone(x) x       // must specified when i_valdrop is defined.
+#define i_key int
+#define i_keydrop int_drop    // optional func, just to display elements destroyed
+#define i_keyclone(x) x       // must specified when i_keydrop is defined.
 #include <stc/cbox.h>
 
 #define i_type ISet
@@ -87,7 +87,7 @@ void int_drop(int* x) {
 #include <stc/csset.h>        // ISet : std::set<std::unique_ptr<int>>
 
 #define i_type IVec
-#define i_valboxed IBox       // NB: use i_valboxed instead of i_val
+#define i_keyboxed IBox       // NB: use i_keyboxed instead of i_key
 #include <stc/cvec.h>         // IVec : std::vector<std::unique_ptr<int>>
 
 int main()

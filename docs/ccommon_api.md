@@ -162,7 +162,7 @@ Note that `c_flt_take()` and `c_flt_takewhile()` breaks the loop on false.
 
 Make any container from an initializer list:
 ```c
-#define i_val_str // owned cstr string value type
+#define i_key_str // owned cstr string value type
 #include <stc/cset.h>
 
 #define i_key int
@@ -210,7 +210,7 @@ You may customize `i_tag` and the comparison function `i_cmp` or `i_less`.
 
 There is a [benchmark/test file here](../misc/benchmarks/various/csort_bench.c).
 ```c
-#define i_val int
+#define i_key int
 #include <stc/algo/sort.h>
 #include <stdio.h>
 
@@ -224,7 +224,7 @@ Containers with random access may also be sorted. Even sorting cdeq/cqueue (with
 possible and very fast. Note that `i_more` must be defined to retain specified template parameters for use by sort:
 ```c
 #define i_type MyDeq
-#define i_val int
+#define i_key int
 #define i_more
 #include <stc/cdeq.h> // deque
 #include <stc/algo/sort.h>
@@ -273,7 +273,7 @@ int* ip = c_const_cast(int*, cs);  // issues a warning!
 
 ### Predefined template parameter functions
 
-**crawstr** - Non-owned `const char*` "class" element type: `#define i_valclass crawstr`
+**crawstr** - Non-owned `const char*` "class" element type: `#define i_keyclass crawstr`
 ```c
 typedef     const char* crawstr;
 int         crawstr_cmp(const crawstr* x, const crawstr* y);
@@ -485,7 +485,7 @@ return ok;
 #define i_implement
 #include <stc/cstr.h>
 
-#define i_val_str
+#define i_key_str
 #include <stc/cvec.h>
 
 // receiver should check errno variable

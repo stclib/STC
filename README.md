@@ -81,7 +81,7 @@ List of contents
 1. ***Centralized analysis of template parameters***. The analyser assigns values to all
 non-specified template parameters (based on the specified ones) using meta-programming, so
 that you don't have to! You may specify a set of "standard" template parameters for each
-container, but as a minimum *only one is required*: `i_val` (+ `i_key` for maps). In this
+container, but as a minimum *only one is required*: `i_key` (+ `i_val` for maps). In this
 case, STC assumes that the elements are of basic types. For non-trivial types, additional
 template parameters must be given. 
 2. ***Alternative insert/lookup type***. You may specify an alternative type to use for
@@ -118,7 +118,7 @@ Benchmark notes:
 
 - Container names are prefixed by `c`, e.g. `cvec`, `cstr`.
 - Public STC macros are prefixed by `c_`, e.g. `c_foreach`, `c_init`.
-- Template parameter macros are prefixed by `i_`, e.g. `i_val`, `i_type`.
+- Template parameter macros are prefixed by `i_`, e.g. `i_key`, `i_type`.
 - All containers can be initialized with `{0}`, i.e. no heap allocation used by default init.
 - Common types for a container type Con:
     - Con
@@ -150,7 +150,7 @@ templated types in C++. However, to specify template parameters with STC, you de
 including the container:
 ```c
 #define i_type Floats  // Container type name; unless defined name would be cvec_float
-#define i_val float    // Container element type
+#define i_key float    // Container element type
 #include <stc/cvec.h>  // "instantiate" the desired container type
 #include <stdio.h>
 
@@ -177,7 +177,7 @@ You may switch to a different container type, e.g. a sorted set (csset):
 [ [Run this code](https://godbolt.org/z/qznfa65e1) ]
 ```c
 #define i_type Floats
-#define i_val float
+#define i_key float
 #include <stc/csset.h> // Use a sorted set instead
 #include <stdio.h>
 
@@ -196,7 +196,7 @@ int main()
 }
 ```
 For user-defined struct elements, `i_cmp` compare function should be defined as the default `<` and `==`
-only works for integral types. *Alternatively, `#define i_opt c_no_cmp` to disable sorting and searching*. Similarily, if an element destructor `i_valdrop` is defined, `i_valclone` function is required.
+only works for integral types. *Alternatively, `#define i_opt c_no_cmp` to disable sorting and searching*. Similarily, if an element destructor `i_keydrop` is defined, `i_keyclone` function is required.
 *Alternatively `#define i_opt c_no_clone` to disable container cloning.*
 
 Let's make a vector of vectors, which can be cloned. All of its element vectors will be destroyed when destroying the Vec2D.
@@ -206,11 +206,11 @@ Let's make a vector of vectors, which can be cloned. All of its element vectors 
 #include <stdio.h>
 
 #define i_type Vec
-#define i_val float
+#define i_key float
 #include <stc/cvec.h>
 
 #define i_type Vec2D
-#define i_valclass Vec  // Use i_valclass when element type has "members" _clone(), _drop() and _cmp().
+#define i_keyclass Vec  // Use i_keyclass when element type has "members" _clone(), _drop() and _cmp().
 #define i_opt c_no_cmp  // Disable cmp (search/sort) for Vec2D because Vec_cmp() is not defined.
 #include <stc/cvec.h>
 
@@ -246,12 +246,12 @@ This example uses four different container types:
 
 struct Point { float x, y; };
 // Define cvec_pnt with a less-comparison function for Point.
-#define i_val struct Point
+#define i_key struct Point
 #define i_less(a, b) a->x < b->x || (a->x == b->x && a->y < b->y)
 #define i_tag pnt
 #include <stc/cvec.h>   // cvec_pnt: vector of struct Point
 
-#define i_val int
+#define i_key int
 #include <stc/clist.h>  // clist_int: singly linked list
 
 #define i_key int
@@ -369,10 +369,10 @@ or define your own, e.g.:
 #define i_tag ix
 #include <stc/cset.h>  // cset_ix
 
-#define i_val int
+#define i_key int
 #include <stc/cvec.h>  // cvec_int
 
-#define i_val Point
+#define i_key Point
 #define i_tag pnt
 #include <stc/clist.h> // clist_pnt
 ```
@@ -383,8 +383,8 @@ Each templated type requires one `#include`, even if it's the same container bas
 The template parameters are given by a `#define i_xxxx` statement, where *xxxx* is the parameter name.
 The list of template parameters:
 
-- `i_key` *Type* - Element key type for map/set only. **[required]**.
-- `i_val` *Type* - Element value type. **[required for]** cmap/csmap, it is the mapped value type.
+- `i_key` *Type* - Element key type. **[required]**. Note: `i_val` *may* be used instead for non-maps (not recommended).
+- `i_val` *Type* - Element value type. **[required for]** cmap/csmap as the mapped value type.
 - `i_cmp` *Func* - Three-way comparison of two *i_keyraw*\* or *i_valraw*\* - **[required for]** non-integral *i_keyraw* elements unless *i_opt* is defined with *c_no_cmp*.
 - `i_hash` *Func* - Hash function taking *i_keyraw*\* - defaults to *c_default_hash*. **[required for]** ***cmap/cset*** with non-POD *i_keyraw* elements.
 - `i_eq` *Func* - Equality comparison of two *i_keyraw*\* - defaults to *!i_cmp*. Companion with *i_hash*.
@@ -458,7 +458,7 @@ and non-emplace methods:
 #define i_implement     // define in ONE file to implement longer functions in cstr
 #include <stc/cstr.h>
 
-#define i_val_str       // special macro to enable container of cstr
+#define i_key_str       // special macro to enable container of cstr
 #include <stc/cvec.h>   // vector of string (cstr)
 ...
 cvec_str vec = {0};
@@ -518,7 +518,7 @@ last example on the **cmap** page demonstrates how to specify a map with non-tri
 Define `i_type` instead of `i_tag`:
 ```c
 #define i_type MyVec
-#define i_val int
+#define i_key int
 #include <stc/cvec.h>
 
 myvec vec = MyVec_init();
@@ -543,7 +543,7 @@ typedef struct Dataset {
 
 // Implementation
 #define i_is_forward                  // flag that the container was forward declared.
-#define i_val struct Point
+#define i_key struct Point
 #define i_tag pnt
 #include <stc/cstack.h>
 ```
@@ -617,8 +617,8 @@ STC is generally very memory efficient. Memory usage for the different container
 - coroutines: much improved with some new API and added features.
 - cspan: Support for column-major (fortran order) multidim spans and transposed views.
 - Removed default comparison for clist, cvec and cdeq (as with cstack and cqueue). 
-    - Using i_val_str, i_valclass, i_valboxed still expects comparisons defined. 
-    - Define i_native_cmp to enable built-in i_val types comparisons (<, ==).
+    - Using i_key_str, i_keyclass, i_keyboxed still expects comparisons defined. 
+    - Define i_native_cmp to enable built-in i_key types comparisons (<, ==).
 - cstr and csview are now shared linked by default. Static linking by defining i_static.
 - New cdeq and cqueue implementation(s), using circular buffer.
 - Renamed i_extern => i_import.
