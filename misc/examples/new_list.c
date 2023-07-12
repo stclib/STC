@@ -32,8 +32,9 @@ int point_cmp(const Point* a, const Point* b) {
 
 void MyStruct_drop(MyStruct* s);
 #define i_type MyList
-#define i_valclass MyStruct        // MyStruct contains "class"-types, so define as "class"
-#define i_opt c_no_clone|c_no_cmp  // exclude cloning and comparison support
+#define i_val MyStruct
+#define i_valdrop MyStruct_drop   // define drop function
+#define i_no_clone                // must explicitely exclude or define cloning support because of drop.
 #include <stc/clist.h>
 
 void MyStruct_drop(MyStruct* s) {

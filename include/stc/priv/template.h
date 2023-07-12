@@ -105,6 +105,9 @@
 #if c_option(c_native_cmp)
   #define i_native_cmp
 #endif
+#if c_option(c_no_clone) || defined _i_carc
+  #define i_no_clone
+#endif
 
 #if defined i_key_str
   #define i_keyclass cstr
@@ -160,25 +163,26 @@
   #endif
 #endif
 
+#if !defined i_keyraw && !defined i_no_clone
+  #if !defined i_keyfrom && defined i_keyclone
+    #define i_keyfrom i_keyclone
+  #elif !defined i_keyclone && defined i_keyfrom
+    #define i_keyclone i_keyfrom
+  #endif
+#endif
+
 #if !defined i_key
   #error "No i_key or i_val defined"
 #elif defined i_keyraw ^ defined i_keyto
-  #error "Both i_keyraw/valraw and i_keyto/valto must be defined, if any"
-#elif defined i_keyfrom && !defined i_keyraw && !defined i_keyclone
-  #define i_keyclone i_keyfrom
-#elif defined i_keyfrom && !defined i_keyraw
-  #error "i_keyfrom/valfrom defined without i_keyraw/valraw"
+  #error "Both i_keyraw/i_valraw and i_keyto/i_valto must be defined, if any"
+#elif !defined i_no_clone && (defined i_keyclone ^ defined i_keydrop)
+  #error "Both i_keyclone/i_valclone and i_keydrop/i_valdrop must be defined, if any"
 #elif defined i_from || defined i_drop
   #error "i_from / i_drop not supported. Define i_keyfrom/i_valfrom and/or i_keydrop/i_valdrop instead"
 #endif
 
 #ifndef i_tag
   #define i_tag i_key
-#endif
-#if c_option(c_no_clone) || defined _i_carc 
-  #define i_no_clone
-#elif !(defined i_keyclone || defined i_no_clone) && (defined i_keydrop || defined i_keyraw)
-  #error i_keyclone/valclone should be defined when i_keydrop/valdrop or i_keyraw/valraw is defined
 #endif
 #ifndef i_keyraw
   #define i_keyraw i_key
@@ -259,15 +263,22 @@
   #endif
 #endif
 
-#ifndef i_val
-  #error "i_val* must be defined for maps"
+#if !defined i_valraw && !defined i_no_clone
+  #if !defined i_valfrom && defined i_valclone
+    #define i_valfrom i_valclone
+  #elif !defined i_valclone && defined i_valfrom
+    #define i_valclone i_valfrom
+  #endif
 #endif
 
-#if !defined i_valclone && defined i_valfrom && !defined i_valraw
-  #define i_valclone i_valfrom
-#elif !(defined i_valclone || defined i_no_clone) && (defined i_valdrop || defined i_valraw)
-  #error i_valclone should be defined when i_valdrop or i_valraw is defined
+#ifndef i_val
+  #error "i_val* must be defined for maps"
+#elif defined i_valraw ^ defined i_valto
+  #error "Both i_valraw and i_valto must be defined, if any"
+#elif !defined i_no_clone && (defined i_valclone ^ defined i_valdrop)
+  #error "Both i_valclone and i_valdrop must be defined, if any"
 #endif
+
 #ifndef i_valraw
   #define i_valraw i_val
 #endif
