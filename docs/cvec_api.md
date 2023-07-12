@@ -70,8 +70,7 @@ cvec_X_value*       cvec_X_emplace_back(cvec_X* self, i_valraw raw);        // a
 void                cvec_X_pop(cvec_X* self);
 void                cvec_X_pop_back(cvec_X* self);                          // alias for pop
 
-cvec_X_iter         cvec_X_insert(cvec_X* self, intptr_t idx, i_val value); // move value 
-cvec_X_iter         cvec_X_insert_n(cvec_X* self, intptr_t idx, const i_val arr[], intptr_t n);  // move values
+cvec_X_iter         cvec_X_insert_n(cvec_X* self, intptr_t idx, const i_val arr[], intptr_t n); // move values
 cvec_X_iter         cvec_X_insert_at(cvec_X* self, cvec_X_iter it, i_val value);  // move value 
 cvec_X_iter         cvec_X_insert_uninit(cvec_X* self, intptr_t idx, intptr_t n); // return iter at idx 
 

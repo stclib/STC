@@ -167,11 +167,7 @@ _cx_MEMB(_insert_n)(_cx_Self* self, const intptr_t idx, const _cx_value arr[], c
     return it;
 }
 STC_INLINE _cx_iter
-_cx_MEMB(_insert)(_cx_Self* self, const intptr_t idx, const i_key value) {
-    return _cx_MEMB(_insert_n)(self, idx, &value, 1);
-}
-STC_INLINE _cx_iter
-_cx_MEMB(_insert_at)(_cx_Self* self, _cx_iter it, const i_key value) {
+_cx_MEMB(_insert_at)(_cx_Self* self, _cx_iter it, const _cx_value value) {
     return _cx_MEMB(_insert_n)(self, _it_ptr(it) - self->data, &value, 1);
 }
 

@@ -63,7 +63,6 @@ cdeq_X_value*       cdeq_X_emplace(cdeq_X* self, i_valraw raw);                 
 void                cdeq_X_pop_back(cdeq_X* self);
 
 cdeq_X_iter         cdeq_X_insert_n(cdeq_X* self, intptr_t idx, const i_val[] arr, intptr_t n);  // move values
-cdeq_X_iter         cdeq_X_insert(cdeq_X* self, intptr_t idx, i_val value);         // move value 
 cdeq_X_iter         cdeq_X_insert_at(cdeq_X* self, cdeq_X_iter it, i_val value);    // move value 
 cdeq_X_iter         cdeq_X_insert_uninit(cdeq_X* self, intptr_t idx, intptr_t n);   // uninitialized data 
                     // copy values:
