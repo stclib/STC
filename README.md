@@ -83,7 +83,7 @@ non-specified template parameters (based on the specified ones) using meta-progr
 that you don't have to! You may specify a set of "standard" template parameters for each
 container, but as a minimum *only one is required*: `i_key` (+ `i_val` for maps). In this
 case, STC assumes that the elements are of basic types. For non-trivial types, additional
-template parameters must be given. 
+template parameters must be given.
 2. ***Alternative insert/lookup type***. You may specify an alternative type to use for
 lookup in containers. E.g., containers with STC string elements (**cstr**) uses `const char*`
 as lookup type, so constructing a `cstr` (which may allocate memory) for the lookup
@@ -147,9 +147,9 @@ Benchmark notes:
 STC containers have similar functionality to C++ STL standard containers. All containers except for a few, 
 like **cstr** and **cbits** are generic/templated. No type casting is used, so containers are type-safe like 
 templated types in C++. However, to specify template parameters with STC, you define them as macros prior to
-including the container:
+including the container.
 ```c
-#define i_type Floats  // Container type name; unless defined name would be cvec_float
+#define i_type Floats  // Container type name (optional); if not defined name would be cvec_float
 #define i_key float    // Container element type
 #include <stc/cvec.h>  // "instantiate" the desired container type
 #include <stdio.h>
@@ -164,15 +164,15 @@ int main(void)
     for (int i = 0; i < Floats_size(&nums); ++i)
         printf(" %g", nums.data[i]);
     
-    Floats_sort(&nums);
-
     c_foreach (i, Floats, nums)     // Alternative and recommended way to iterate.
         printf(" %g", *i.ref);      // i.ref is a pointer to the current element.
 
     Floats_drop(&nums); // cleanup memory
 }
 ```
-You may switch to a different container type, e.g. a sorted set (csset):
+Note that `i_val*` template parameters can be used instead of `i_key*` for *non-map* containers.
+
+Switching to a different container type, e.g. a sorted set (csset):
 
 [ [Run this code](https://godbolt.org/z/qznfa65e1) ]
 ```c
@@ -188,14 +188,14 @@ int main()
     Floats_push(&nums, 10.f);
     Floats_push(&nums, 20.f);
 
-    // already sorted, print the numbers
+    // print the numbers (sorted)
     c_foreach (i, Floats, nums)
         printf(" %g", *i.ref);
 
     Floats_drop(&nums);
 }
 ```
-For user-defined struct elements, `i_cmp` compare function should be defined as the default `<` and `==`
+For user-defined struct elements, `i_cmp` compare function should be defined because the default `<` and `==`
 only works for integral types. *Alternatively, `#define i_opt c_no_cmp` to disable sorting and searching*. Similarily, if an element destructor `i_keydrop` is defined, `i_keyclone` function is required.
 *Alternatively `#define i_opt c_no_clone` to disable container cloning.*
 
@@ -210,8 +210,8 @@ Let's make a vector of vectors, which can be cloned. All of its element vectors 
 #include <stc/cvec.h>
 
 #define i_type Vec2D
-#define i_keyclass Vec  // Use i_keyclass when element type has "members" _clone(), _drop() and _cmp().
-#define i_opt c_no_cmp  // Disable cmp (search/sort) for Vec2D because Vec_cmp() is not defined.
+#define i_keyclass Vec  // Use i_keyclass instead i_key when element type has "members" _clone(), _drop() and _cmp().
+#define i_opt c_no_cmp  // Disable cmp (search/sort) for Vec2D because Vec_cmp() does not exist.
 #include <stc/cvec.h>
 
 int main(void)
@@ -242,16 +242,17 @@ This example uses four different container types:
 #include <stdio.h>
 
 #define i_key int
-#include <stc/cset.h>  // cset_int: unordered set
+#include <stc/cset.h>  // cset_int: unordered set (assume i_key is basic type, uses `==` operator)
 
 struct Point { float x, y; };
 // Define cvec_pnt with a less-comparison function for Point.
 #define i_key struct Point
-#define i_less(a, b) a->x < b->x || (a->x == b->x && a->y < b->y)
+#define i_less(a, b) a->x < b->x || (a->x == b->x && a->y < b->y) // enable sort/search
 #define i_tag pnt
 #include <stc/cvec.h>   // cvec_pnt: vector of struct Point
 
 #define i_key int
+#define i_native_cmp    // enable sort/search. Use native `<` and `==` operators
 #include <stc/clist.h>  // clist_int: singly linked list
 
 #define i_key int

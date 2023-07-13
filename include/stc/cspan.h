@@ -130,9 +130,7 @@ using_cspan_tuple(7); using_cspan_tuple(8);
 #define cspan_size(self) _cspan_size((self)->shape, cspan_rank(self))
 #define cspan_rank(self) c_arraylen((self)->shape)
 #define cspan_is_order_F(self) ((self)->stride.d[0] < (self)->stride.d[cspan_rank(self) - 1])
-
 #define cspan_index(self, ...) c_PASTE(cspan_idx_, c_NUMARGS(__VA_ARGS__))(self, __VA_ARGS__)
-
 #define cspan_at(self, ...) ((self)->data + cspan_index(self, __VA_ARGS__))
 #define cspan_front(self) ((self)->data)
 #define cspan_back(self) ((self)->data + cspan_size(self) - 1)
@@ -151,7 +149,7 @@ using_cspan_tuple(7); using_cspan_tuple(8);
 #define cspan_submd4(OutSpan, self, ...) _cspan_submdN(OutSpan, 4, self, __VA_ARGS__)
 
 #define _cspan_submdN(OutSpan, N, self, ...) \
-    _cspan_submd##N(c_static_assert(cspan_rank((OutSpan*)0) == N - c_NUMARGS(__VA_ARGS__)), self, __VA_ARGS__)
+    (OutSpan)_cspan_submd##N(c_static_assert(cspan_rank((OutSpan*)0) == N - c_NUMARGS(__VA_ARGS__)), self, __VA_ARGS__)
 
 #define _cspan_submd2(ok, self, x) \
     {.data=cspan_at(self, x, 0) + ok, .shape={(self)->shape[1]}, .stride={.d={(self)->stride.d[1]}}}
@@ -171,9 +169,8 @@ using_cspan_tuple(7); using_cspan_tuple(8);
 #define _cspan_submd4_5(ok, self, x, y, z) \
     {.data=cspan_at(self, x, y, z, 0) + ok, .shape={(self)->shape[3]}, .stride={.d={(self)->stride.d[3]}}}
 
-#define cspan_md(array, ...) cspan_md_ordered('C', array, __VA_ARGS__)
-#define cspan_md_left(array, ...) cspan_md_ordered('F', array, __VA_ARGS__)
-#define cspan_md_ordered(order, array, ...) \
+#define cspan_md(array, ...) cspan_md_order('C', array, __VA_ARGS__)
+#define cspan_md_order(order, array, ...) /* order='C' or 'F' */ \
     {.data=array, .shape={__VA_ARGS__}, \
      .stride=*(c_PASTE(cspan_tuple, c_NUMARGS(__VA_ARGS__))*)_cspan_shape2stride(order, ((int32_t[]){__VA_ARGS__}), c_NUMARGS(__VA_ARGS__))}
 

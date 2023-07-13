@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stc/cbits.h>
-#include <stc/algo/raii.h>
 
 int main(void)
 {

@@ -6,7 +6,6 @@
 //     https://www.redblobgames.com/pathfinding/a-star/introduction.html
 #define i_implement
 #include <stc/cstr.h>
-#include <stc/algo/raii.h>
 #include <stdio.h>
 
 typedef struct

@@ -436,6 +436,7 @@ The **checkauto** utility described below, ensures that the `c_auto*` macros are
 #include <stc/algo/raii.h> // or <stc/calgo.h>
 ...
 // `c_defer` executes the expression(s) when leaving scope.
+//  Note: does not require inclusion of "raii.h".
 cstr s1 = cstr_lit("Hello"), s2 = cstr_lit("world");
 c_defer (cstr_drop(&s1), cstr_drop(&s2))
 {

@@ -23,9 +23,6 @@
 #ifndef STC_RAII_INCLUDED
 #define STC_RAII_INCLUDED
 
-#define c_defer(...) \
-    for (int _i = 1; _i; _i = 0, __VA_ARGS__)
-
 #define c_with(...) c_MACRO_OVERLOAD(c_with, __VA_ARGS__)
 #define c_with_2(declvar, drop) \
     for (declvar, *_i, **_ip = &_i; _ip; _ip = 0, drop)

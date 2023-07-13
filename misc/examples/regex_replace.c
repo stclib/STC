@@ -1,7 +1,6 @@
 #define i_import
 #include <stc/cregex.h>
 #include <stc/csview.h>
-#include <stc/algo/raii.h>
 
 bool add_10_years(int i, csview match, cstr* out) {
     if (i == 1) { // group 1 matches year
