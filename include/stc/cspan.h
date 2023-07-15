@@ -82,7 +82,7 @@ int demo2() {
     } \
     STC_INLINE Self Self##_slice_(Self##_value* v, const int32_t shape[], const int32_t stri[], \
                                   const int rank, const int32_t a[][2]) { \
-        Self s = {.data=v}; int outrank; \
+        Self s; s.data = v; int outrank; \
         s.data += _cspan_slice(s.shape, s.stride.d, &outrank, shape, stri, rank, a); \
         c_assert(outrank == RANK); \
         return s; \
@@ -144,30 +144,23 @@ using_cspan_tuple(7); using_cspan_tuple(8);
     {.data=cspan_at(self, offset, 0, 0), .shape={count, (self)->shape[1], (self)->shape[2]}, .stride=(self)->stride}
 
 // cspan_submd(): Reduce rank (N <= 4) Optimized, same as e.g. cspan_slice(Span2, &ms4, {x}, {y}, {c_ALL}, {c_ALL});
-#define cspan_submd2(OutSpan, self, ...) _cspan_submdN(OutSpan, 2, self, __VA_ARGS__)
-#define cspan_submd3(OutSpan, self, ...) _cspan_submdN(OutSpan, 3, self, __VA_ARGS__)
-#define cspan_submd4(OutSpan, self, ...) _cspan_submdN(OutSpan, 4, self, __VA_ARGS__)
-
-#define _cspan_submdN(OutSpan, N, self, ...) \
-    (OutSpan)_cspan_submd##N(c_static_assert(cspan_rank((OutSpan*)0) == N - c_NUMARGS(__VA_ARGS__)), self, __VA_ARGS__)
-
-#define _cspan_submd2(ok, self, x) \
-    {.data=cspan_at(self, x, 0) + ok, .shape={(self)->shape[1]}, .stride={.d={(self)->stride.d[1]}}}
-#define _cspan_submd3(...) c_MACRO_OVERLOAD(_cspan_submd3, __VA_ARGS__)
-#define _cspan_submd3_3(ok, self, x) \
-    {.data=cspan_at(self, x, 0, 0) + ok, .shape={(self)->shape[1], (self)->shape[2]}, \
-                                    .stride={.d={(self)->stride.d[1], (self)->stride.d[2]}}}
-#define _cspan_submd3_4(ok, self, x, y) \
-    {.data=cspan_at(self, x, y, 0) + ok, .shape={(self)->shape[2]}, .stride={.d={(self)->stride.d[2]}}}
-#define _cspan_submd4(...) c_MACRO_OVERLOAD(_cspan_submd4, __VA_ARGS__)
-#define _cspan_submd4_3(ok, self, x) \
-    {.data=cspan_at(self, x, 0, 0, 0) + ok, .shape={(self)->shape[1], (self)->shape[2], (self)->shape[3]}, \
-                                       .stride={.d={(self)->stride.d[1], (self)->stride.d[2], (self)->stride.d[3]}}}
-#define _cspan_submd4_4(ok, self, x, y) \
-    {.data=cspan_at(self, x, y, 0, 0) + ok, .shape={(self)->shape[2], (self)->shape[3]}, \
-                                       .stride={.d={(self)->stride.d[2], (self)->stride.d[3]}}}
-#define _cspan_submd4_5(ok, self, x, y, z) \
-    {.data=cspan_at(self, x, y, z, 0) + ok, .shape={(self)->shape[3]}, .stride={.d={(self)->stride.d[3]}}}
+#define cspan_submd2(self, x) \
+    {.data=cspan_at(self, x, 0), .shape={(self)->shape[1]}, .stride=(cspan_tuple1){.d={(self)->stride.d[1]}}}
+#define cspan_submd3(...) c_MACRO_OVERLOAD(cspan_submd3, __VA_ARGS__)
+#define cspan_submd3_2(self, x) \
+    {.data=cspan_at(self, x, 0, 0), .shape={(self)->shape[1], (self)->shape[2]}, \
+                                    .stride=(cspan_tuple2){.d={(self)->stride.d[1], (self)->stride.d[2]}}}
+#define cspan_submd3_3(self, x, y) \
+    {.data=cspan_at(self, x, y, 0), .shape={(self)->shape[2]}, .stride=(cspan_tuple1){.d={(self)->stride.d[2]}}}
+#define cspan_submd4(...) c_MACRO_OVERLOAD(cspan_submd4, __VA_ARGS__)
+#define cspan_submd4_2(self, x) \
+    {.data=cspan_at(self, x, 0, 0, 0), .shape={(self)->shape[1], (self)->shape[2], (self)->shape[3]}, \
+                                       .stride=(cspan_tuple3){.d={(self)->stride.d[1], (self)->stride.d[2], (self)->stride.d[3]}}}
+#define cspan_submd4_3(self, x, y) \
+    {.data=cspan_at(self, x, y, 0, 0), .shape={(self)->shape[2], (self)->shape[3]}, \
+                                       .stride=(cspan_tuple2){.d={(self)->stride.d[2], (self)->stride.d[3]}}}
+#define cspan_submd4_4(self, x, y, z) \
+    {.data=cspan_at(self, x, y, z, 0), .shape={(self)->shape[3]}, .stride=(cspan_tuple1){.d={(self)->stride.d[3]}}}
 
 #define cspan_md(array, ...) cspan_md_order('C', array, __VA_ARGS__)
 #define cspan_md_order(order, array, ...) /* order='C' or 'F' */ \

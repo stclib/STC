@@ -30,11 +30,6 @@ SpanType        cspan_init(T SpanType, {v1, v2, ...});              // make a 1-
 SpanType        cspan_from(STCContainer* cnt);                      // make a 1-d cspan from compatible STC container
 SpanType        cspan_from_array(ValueType array[]);                // make a 1-d cspan from C array
                 
-                // make a subspan of input span rank. Like e.g. cspan_slice(Span3, &ms3, {off,off+count}, {c_ALL}, {c_ALL});
-SpanType        cspan_subspan(const SpanType* span, intptr_t offset, intptr_t count);
-SpanType2       cspan_subspan2(const SpanType2* span, intptr_t offset, intptr_t count);
-SpanType3       cspan_subspan3(const SpanType3* span, intptr_t offset, intptr_t count);
-
 intptr_t        cspan_size(const SpanTypeN* self);                  // return number of elements
 intptr_t        cspan_rank(const SpanTypeN* self);                  // dimensions; compile time constant
 intptr_t        cspan_index(const SpanTypeN* self, intptr_t x, ..); // index of element
@@ -54,10 +49,15 @@ SpanTypeN       cspan_md_order(char order, ValueType* data, d1, d2, ...); // ord
 void            cspan_transpose(const SpanTypeN* self);
 bool            cspan_is_order_F(const SpanTypeN* self);
 
+                // create a subspan of input span rank. Like e.g. cspan_slice(Span3, &ms3, {off,off+count}, {c_ALL}, {c_ALL});
+SpanType        cspan_subspan(const SpanType* span, intptr_t offset, intptr_t count);
+SpanType2       cspan_subspan2(const SpanType2* span, intptr_t offset, intptr_t count);
+SpanType3       cspan_subspan3(const SpanType3* span, intptr_t offset, intptr_t count);
+
                 // create a sub md span of lower rank. Like e.g. cspan_slice(Span2, &ms4, {x}, {y}, {c_ALL}, {c_ALL});
-OutSpan1        cspan_submd2(TYPE OutSpan1, const SpanType2* parent, intptr_t x);        // return a 1d subspan from a 2d span.
-OutSpanN        cspan_submd3(TYPE OutSpanN, const SpanType3* parent, intptr_t x, ...);   // return a 1d or 2d subspan from a 3d span.
-OutSpanN        cspan_submd4(TYPE OutSpanN, const SpanType4* parent, intptr_t x, ...);   // number of args decides rank of output span.
+OutSpan1        cspan_submd2(const SpanType2* parent, intptr_t x);        // return a 1d subspan from a 2d span.
+OutSpanN        cspan_submd3(const SpanType3* parent, intptr_t x, ...);   // return a 1d or 2d subspan from a 3d span.
+OutSpanN        cspan_submd4(const SpanType4* parent, intptr_t x, ...);   // number of args decides rank of output span.
 
                 // general slicing of an md span.
                 // {i}: reduce rank. {i,c_END}: slice to end. {c_ALL}: use full extent.
@@ -106,7 +106,7 @@ int main() {
 
     myspan3 ms3 = cspan_md(arr, 2, 3, 4); // C-order, i.e. row-major.
     myspan3 ss3 = cspan_slice(myspan3, &ms3, {c_ALL}, {1,3}, {2,c_END});
-    myspan2 ss2 = cspan_submd3(myspan2, &ss3, 1);
+    myspan2 ss2 = cspan_submd3(&ss3, 1);
 
     c_forrange (i, ss2.shape[0])
         c_forrange (j, ss2.shape[1])
@@ -156,7 +156,7 @@ int main()
     Span3 span3 = cspan_md(span.data, 2, 4, 3);
 
     // reduce rank: (i.e. span3[1])
-    Span2 span2 = cspan_submd3(Span2, &span3, 1);
+    Span2 span2 = cspan_submd3(&span3, 1);
 
     puts("\niterate span2 flat:");
     c_foreach (i, Span2, span2)

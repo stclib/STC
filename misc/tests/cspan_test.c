@@ -10,11 +10,11 @@ CTEST(cspan, subdim) {
     int array[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
     intspan3 m = cspan_md(array, 2, 2, 3);
     
-    for (size_t i = 0; i < m.shape[0]; ++i) {
-        intspan2 sub_i = cspan_submd3(intspan2, &m, i);
-        for (size_t j = 0; j < m.shape[1]; ++j) {
-            intspan sub_i_j = cspan_submd2(intspan, &sub_i, j);
-            for (size_t k = 0; k < m.shape[2]; ++k) {
+    for (int i = 0; i < m.shape[0]; ++i) {
+        intspan2 sub_i = cspan_submd3(&m, i);
+        for (int j = 0; j < m.shape[1]; ++j) {
+            intspan sub_i_j = cspan_submd2(&sub_i, j);
+            for (int k = 0; k < m.shape[2]; ++k) {
                ASSERT_EQ(*cspan_at(&sub_i_j, k), *cspan_at(&m, i, j, k));
             }
         }
@@ -25,18 +25,18 @@ CTEST(cspan, slice) {
     int array[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
     intspan2 m1 = cspan_md(array, 3, 4);
 
-    size_t sum1 = 0;
-    for (size_t i = 0; i < m1.shape[0]; ++i) {
-        for (size_t j = 0; j < m1.shape[1]; ++j) {
+    int sum1 = 0;
+    for (int i = 0; i < m1.shape[0]; ++i) {
+        for (int j = 0; j < m1.shape[1]; ++j) {
             sum1 += *cspan_at(&m1, i, j);
         }
     }
 
     intspan2 m2 = cspan_slice(intspan2, &m1, {c_ALL}, {2,4});
 
-    size_t sum2 = 0;
-    for (size_t i = 0; i < m2.shape[0]; ++i) {
-        for (size_t j = 0; j < m2.shape[1]; ++j) {
+    int sum2 = 0;
+    for (int i = 0; i < m2.shape[0]; ++i) {
+        for (int j = 0; j < m2.shape[1]; ++j) {
             sum2 += *cspan_at(&m2, i, j);
         }
     }
@@ -56,10 +56,10 @@ CTEST(cspan, slice2) {
         intspan3 ms3 = cspan_md(stack.data, 10, 20, 30);
         ms3 = cspan_slice(intspan3, &ms3, {1,4}, {3,7}, {20,24});
 
-        size_t sum = 0;
-        for (size_t i = 0; i < ms3.shape[0]; ++i) {
-            for (size_t j = 0; j < ms3.shape[1]; ++j) {
-                for (size_t k = 0; k < ms3.shape[2]; ++k) {
+        int sum = 0;
+        for (int i = 0; i < ms3.shape[0]; ++i) {
+            for (int j = 0; j < ms3.shape[1]; ++j) {
+                for (int k = 0; k < ms3.shape[2]; ++k) {
                     sum += *cspan_at(&ms3, i, j, k);
                 }
             }
