@@ -41,7 +41,7 @@ static inline RViking Viking_toraw(const Viking* vp) {
 #define i_val       int         // mapped type
 #include <stc/cmap.h>
 
-int main()
+int main(void)
 {
     Vikings vikings = {0};
     Vikings_emplace(&vikings, c_LITERAL(RViking){"Einar", "Norway"}, 20);

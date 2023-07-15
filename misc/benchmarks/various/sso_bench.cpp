@@ -112,7 +112,7 @@ int benchmark_lookup(C& container, const int n, const int strsize) {
 }
 
 #include <time.h>
-int main() {
+int main(void) {
     uint64_t seed = time(NULL); // 4321;
     int sum, n;
 

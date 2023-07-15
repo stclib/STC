@@ -28,7 +28,7 @@
 #include <stc/cmap.h>
 
 
-int main()
+int main(void)
 {
     MapMap mmap = {0};
 

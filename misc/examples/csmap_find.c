@@ -40,7 +40,7 @@ void findit(csmap_istr c, csmap_istr_key val)
     }
 }
 
-int main()
+int main(void)
 {
     csmap_istr m1 = c_init(csmap_istr, {{40, "Zr"}, {45, "Rh"}});
     cvec_istr v = {0};

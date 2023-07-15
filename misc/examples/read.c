@@ -15,7 +15,7 @@ cvec_str read_file(const char* name)
     return vec;
 }
 
-int main()
+int main(void)
 {
     int n = 0;
     c_with (cvec_str vec = read_file(__FILE__), cvec_str_drop(&vec))

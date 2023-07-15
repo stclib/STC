@@ -29,7 +29,7 @@ void print_istr(csmap_istr map) {
     puts("");
 }
 
-int main()
+int main(void)
 {
     // insert single values
     csmap_ii m1 = {0};

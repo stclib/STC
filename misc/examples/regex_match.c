@@ -6,7 +6,7 @@
 #define i_key float
 #include <stc/cstack.h>
 
-int main()
+int main(void)
 {
     // Lets find the first sequence of digits in a string
     const char *str = "Hello numeric world, there are 24 hours in a day, 3600 seconds in an hour."

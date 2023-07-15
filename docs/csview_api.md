@@ -121,7 +121,7 @@ uint64_t        csview_hash(const csview* x);
 #include <stc/cstr.h>
 #include <stc/csview.h>
 
-int main ()
+int main(void)
 {
     cstr str1 = cstr_lit("We think in generalities, but we live in details.");
                                                             // (quoting Alfred N. Whitehead)
@@ -151,7 +151,7 @@ red Apples
 #define i_import // include dependent cstr, utf8 and cregex function definitions.
 #include <stc/cstr.h>
 
-int main()
+int main(void)
 {
     cstr s1 = cstr_lit("hell😀 w😀rld");
 
@@ -198,7 +198,7 @@ cstack_str string_split(csview input, const char* sep)
     return out;
 }
 
-int main()
+int main(void)
 {
     print_split(c_sv("//This is a//double-slash//separated//string"), "//");
     print_split(c_sv("This has no matching separator"), "xx");

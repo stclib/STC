@@ -86,7 +86,7 @@ int dining(struct Dining* d)
     return 0;
 }
 
-int main()
+int main(void)
 {
     struct Dining dine;
     cco_reset(&dine);

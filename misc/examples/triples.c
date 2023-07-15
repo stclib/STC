@@ -52,7 +52,7 @@ int triples_coro(struct triples* t) {
     return 0;
 }
 
-int main()
+int main(void)
 {
     puts("Vanilla triples:");
     triples_vanilla(5);

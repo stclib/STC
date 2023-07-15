@@ -30,7 +30,7 @@ static bool int_less(const int* x, const int* y) { return *x < *y; }
 static bool int_greater(const int* x, const int* y) { return *x > *y; }
 static bool int_lambda(const int* x, const int* y) { return (*x ^ 1) < (*y ^ 1); }
 
-int main()
+int main(void)
 {
     const int data[] = {1,8,5,6,3,4,0,9,7,2}, n = c_arraylen(data);
     printf("data: \t");

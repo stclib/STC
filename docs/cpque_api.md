@@ -68,7 +68,7 @@ i_key               cpque_X_value_clone(i_key value);
 #define i_tag i
 #include <stc/cpque.h>
 
-int main()
+int main(void)
 {
     intptr_t N = 10000000;
     crand_t rng = crand_init(1234);

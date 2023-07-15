@@ -102,7 +102,7 @@ If an error occurs ```cregex_compile``` returns a negative error code stored in 
 #define i_import // include dependent cstr, utf8 and cregex function definitions.
 #include <stc/cregex.h>
 
-int main() {
+int main(void) {
     const char* input = "start date is 2023-03-01, end date 2025-12-31.";
     const char* pattern = "\\b(\\d\\d\\d\\d)-(\\d\\d)-(\\d\\d)\\b";
 

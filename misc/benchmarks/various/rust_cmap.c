@@ -22,7 +22,7 @@ uint64_t romu_trio(uint64_t s[3]) {
    return xp;
 }
 
-int main()
+int main(void)
 {
     cmap_u64 m = {0};
 

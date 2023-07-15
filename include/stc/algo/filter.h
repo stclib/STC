@@ -26,7 +26,7 @@
 #include <stc/cstack.h>
 #include <stc/calgo.h>
 
-int main()
+int main(void)
 {
     cstack_int stk = c_init(cstack_int, {1, 2, 3, 4, 5, 6, 7, 8, 9});
 

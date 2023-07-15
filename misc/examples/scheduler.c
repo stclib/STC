@@ -68,7 +68,7 @@ void Use(void)
     Scheduler_drop(&scheduler);
 }
 
-int main()
+int main(void)
 {
     Use();
 }

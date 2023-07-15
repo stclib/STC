@@ -4,7 +4,7 @@
 #define i_implement
 #include <stc/csview.h>
 
-int main()
+int main(void)
 {
     puts("Split with c_fortoken (csview):");
 

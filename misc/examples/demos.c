@@ -1,7 +1,7 @@
 #define i_implement
 #include <stc/cstr.h>
 
-void stringdemo1()
+void stringdemo1(void)
 {
     cstr cs = cstr_lit("one-nine-three-seven-five");
     printf("%s.\n", cstr_str(&cs));
@@ -32,7 +32,7 @@ void stringdemo1()
 #define i_tag ix
 #include <stc/cvec.h>
 
-void vectordemo1()
+void vectordemo1(void)
 {
     cvec_ix bignums = cvec_ix_with_capacity(100);
     cvec_ix_reserve(&bignums, 100);
@@ -55,7 +55,7 @@ void vectordemo1()
 #define i_key_str
 #include <stc/cvec.h>
 
-void vectordemo2()
+void vectordemo2(void)
 {
     cvec_str names = {0};
     cvec_str_emplace_back(&names, "Mary");
@@ -77,7 +77,7 @@ void vectordemo2()
 #define i_native_cmp
 #include <stc/clist.h>
 
-void listdemo1()
+void listdemo1(void)
 {
     clist_ix nums = {0}, nums2 = {0};
     for (int i = 0; i < 10; ++i)
@@ -109,7 +109,7 @@ void listdemo1()
 #define i_tag i
 #include <stc/cset.h>
 
-void setdemo1()
+void setdemo1(void)
 {
     cset_i nums = {0};
     cset_i_insert(&nums, 8);
@@ -125,7 +125,7 @@ void setdemo1()
 #define i_tag ii
 #include <stc/cmap.h>
 
-void mapdemo1()
+void mapdemo1(void)
 {
     cmap_ii nums = {0};
     cmap_ii_insert(&nums, 8, 64);
@@ -139,7 +139,7 @@ void mapdemo1()
 #define i_tag si
 #include <stc/cmap.h>
 
-void mapdemo2()
+void mapdemo2(void)
 {
     cmap_si nums = {0};
     cmap_si_emplace_or_assign(&nums, "Hello", 64);
@@ -161,7 +161,7 @@ void mapdemo2()
 #define i_val_str
 #include <stc/cmap.h>
 
-void mapdemo3()
+void mapdemo3(void)
 {
     cmap_str table = {0};
     cmap_str_emplace(&table, "Map", "test");
@@ -181,7 +181,7 @@ void mapdemo3()
     cmap_str_drop(&table); // frees key and value cstrs, and hash table.
 }
 
-int main()
+int main(void)
 {
     printf("\nSTRINGDEMO1\n"); stringdemo1();
     printf("\nVECTORDEMO1\n"); vectordemo1();

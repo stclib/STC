@@ -20,7 +20,7 @@ void int_drop(int* x) {
 #define i_keyboxed Arc      // note: as above.
 #include <stc/cvec.h>       // cvec_Arc (like: std::vector<std::shared_ptr<int>>)
 
-int main()
+int main(void)
 {
     const int years[] = {2021, 2012, 2022, 2015};
 

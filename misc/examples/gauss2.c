@@ -10,7 +10,7 @@
 #define i_val int
 #include <stc/csmap.h>
 
-int main()
+int main(void)
 {
     enum {N = 5000000};
     uint64_t seed = (uint64_t)time(NULL);

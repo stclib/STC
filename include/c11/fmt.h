@@ -33,7 +33,7 @@ void        fmt_close(fmt_stream* ss);
 #define FMT_SHORTS
 #include "c11/fmt.h"
 
-int main() {
+int main(void) {
     const double pi = 3.141592653589793;
     const size_t x = 1234567890;
     const char* string = "Hello world";

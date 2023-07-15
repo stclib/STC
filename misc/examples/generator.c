@@ -42,7 +42,7 @@ Triple_iter Triple_begin(Triple* g) {
 }
 
 
-int main()
+int main(void)
 {
     puts("Pythagorean triples with c < 100:");
     Triple triple = {.size=30}; // max number of triples

@@ -32,7 +32,7 @@
     #define i_tag ix
     #include <stc/clist.h>
 
-    int main()
+    int main(void)
     {
         c_auto (clist_ix, list)
         {

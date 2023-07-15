@@ -101,7 +101,7 @@ void                cdeq_X_value_drop(cdeq_X_value* pval);
 
 #include <stdio.h>
 
-int main() {
+int main(void) {
     cdeq_i q = cdeq_i_init();
     cdeq_i_push_front(&q, 10);
     c_foreach (i, cdeq_i, q)

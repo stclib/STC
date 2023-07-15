@@ -5,7 +5,7 @@
 #define i_capacity 80 // enable fixed bitset on the stack
 #include <stc/cbits.h>
 
-int main() 
+int main(void) 
 {
     Bits s1 = Bits_from("1110100110111");
     

@@ -7,7 +7,7 @@
 
 // Type inference lets us omit an explicit type signature (which
 // would be `HashMap<String, String>` in this example).
-int main()
+int main(void)
 {
     cmap_str book_reviews = {0};
 

@@ -114,7 +114,7 @@ static void MDRanges_loop_over_joined(intptr_t state)
     printf("joined: %.1f ms, %f\n", 1000.0f * t / CLOCKS_PER_SEC, sum);
 }
 
-int main()
+int main(void)
 {
     for (int i = 0; i < nx * ny * nz; ++i)
         Vin[i] = i + 1.23;

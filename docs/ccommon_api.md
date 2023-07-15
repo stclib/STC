@@ -137,7 +137,7 @@ bool isPrime(long long i) {
     return true;
 }
 
-int main() {
+int main(void) {
     // Get 10 prime numbers starting from 1000. Skip the first 15 primes,
     // then select every 25th prime (including the initial).
     crange R = crange_make(1001, INT64_MAX, 2); // 1001, 1003, ...
@@ -214,7 +214,7 @@ There is a [benchmark/test file here](../misc/benchmarks/various/csort_bench.c).
 #include <stc/algo/sort.h>
 #include <stdio.h>
 
-int main() {
+int main(void) {
     int nums[] = {5, 3, 5, 9, 7, 4, 7, 2, 4, 9, 3, 1, 2, 6, 4};
     intarray_sort_n(nums, c_arraylen(nums));
     c_forrange (i, c_arraylen(arr)) printf(" %d", arr[i]);
@@ -230,7 +230,7 @@ possible and very fast. Note that `i_more` must be defined to retain specified t
 #include <stc/algo/sort.h>
 #include <stdio.h>
 
-int main() {
+int main(void) {
     MyDeq deq = c_init(MyDeq, {5, 3, 5, 9, 7, 4, 7, 2, 4, 9, 3, 1, 2, 6, 4});
     MyDeq_sort_n(&deq, MyDeq_size(&deq));
     c_foreach (i, MyDeq, deq) printf(" %d", *i.ref);
@@ -348,7 +348,7 @@ int gcd(int a, int b) { // greatest common denominator
     return a;
 }
 
-int main()
+int main(void)
 {
     struct triples t = {.n=INT32_MAX};
     int n = 0;
@@ -500,7 +500,7 @@ cvec_str readFile(const char* name)
     return vec;
 }
 
-int main()
+int main(void)
 {
     c_with (cvec_str vec = readFile(__FILE__), cvec_str_drop(&vec))
         c_foreach (i, cvec_str, vec)

@@ -25,7 +25,7 @@
 #include <stc/algo/filter.h>
 #include <stc/algo/crange.h>
 
-int main()
+int main(void)
 {
     crange r1 = crange_make(80, 90);
     c_foreach (i, crange, r1)

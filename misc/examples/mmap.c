@@ -30,7 +30,7 @@ void insert(Multimap* mmap, int key, const char* str)
     clist_str_emplace_back(list, str);
 }
 
-int main()
+int main(void)
 {
     Multimap mmap = {0};
 

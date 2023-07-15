@@ -8,7 +8,7 @@ typedef struct Point { int x, y; } Point;
 #include <stc/cpque.h>
 
 
-int main()
+int main(void)
 {
     PointQ pque = c_init(PointQ, {{23, 80}, {12, 32}, {54, 74}, {12, 62}});
     // print

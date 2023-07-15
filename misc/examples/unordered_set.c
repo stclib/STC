@@ -5,7 +5,7 @@
 #define i_key_str
 #include <stc/cset.h>
 
-int main()
+int main(void)
 {
     // declaring set for storing string data-type
     cset_str stringSet = {0};

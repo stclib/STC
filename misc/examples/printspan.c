@@ -20,7 +20,7 @@ void printMe(intspan container) {
     puts("");
 }
 
-int main()
+int main(void)
 {
     intspan sp1 = cspan_init(intspan, {1, 2});
     printMe( sp1 );

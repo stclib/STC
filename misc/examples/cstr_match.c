@@ -3,7 +3,7 @@
 #include <stc/csview.h>
 #include <stdio.h>
 
-int main()
+int main(void)
 {
     cstr ss = cstr_lit("The quick brown fox jumps over the lazy dog.JPG");
 

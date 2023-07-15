@@ -90,7 +90,7 @@ void int_drop(int* x) {
 #define i_keyboxed IBox       // NB: use i_keyboxed instead of i_key
 #include <stc/cvec.h>         // IVec : std::vector<std::unique_ptr<int>>
 
-int main()
+int main(void)
 {
     IVec vec = c_init(Vec, {2021, 2012, 2022, 2015});
     ISet set = {0};

@@ -31,7 +31,7 @@ void Song_drop(Song* s) {
 #define i_keyboxed SongArc // use i_keyboxed on carc / cbox (instead of i_key)
 #include <stc/cvec.h>
 
-void example3()
+void example3(void)
 {
     SongVec vec1 = c_init(SongVec, {
         Song_make("Bob Dylan", "The Times They Are A Changing"),
@@ -61,7 +61,7 @@ void example3()
     c_drop(SongVec, &vec1, &vec2);
 }
 
-int main()
+int main(void)
 {
     example3();
 }

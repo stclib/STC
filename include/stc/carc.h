@@ -46,7 +46,7 @@ void Person_drop(Person* p) {
 #define i_opt c_no_cmp|c_no_hash  // exclude cmp, hash
 #include <stc/carc.h>
 
-int main() {
+int main(void) {
     ArcPers p = ArcPers_from(Person_make("John", "Smiths"));
     ArcPers q = ArcPers_clone(p); // share the pointer
 

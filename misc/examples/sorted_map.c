@@ -5,7 +5,7 @@
 #define i_val int
 #include <stc/csmap.h>
 
-int main() 
+int main(void) 
 { 
   
     // empty map containers

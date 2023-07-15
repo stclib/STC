@@ -112,7 +112,7 @@ cvec_X_raw          cvec_X_value_drop(cvec_X_value* pval);
 
 #include <stdio.h>
 
-int main()
+int main(void)
 {
     // Create a vector containing integers
     cvec_int vec = {0};
@@ -153,7 +153,7 @@ sorted: 5 7 8 13 16 25
 #define i_key_str
 #include <stc/cvec.h>
 
-int main() {
+int main(void) {
     cvec_str names = cvec_str_init();
 
     cvec_str_emplace(&names, "Mary");

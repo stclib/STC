@@ -5,7 +5,7 @@
 #define i_tag i
 #include <stc/cqueue.h>
 
-int main() {
+int main(void) {
     int n = 100000000;
     crand_unif_t dist;
     crand_t rng = crand_init(1234);

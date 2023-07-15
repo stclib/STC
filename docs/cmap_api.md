@@ -121,7 +121,7 @@ bool                  c_memcmp_eq(const i_keyraw* a, const i_keyraw* b);    // !
 #define i_val_str
 #include <stc/cmap.h>
 
-int main()
+int main(void)
 {
     // Create an unordered_map of three strings (that map to strings)
     cmap_str umap = c_init(cmap_str, {
@@ -165,7 +165,7 @@ This example uses a cmap with cstr as mapped value.
 #define i_val_str
 #include <stc/cmap.h>
 
-int main()
+int main(void)
 {
     uint32_t col = 0xcc7744ff;
 
@@ -208,7 +208,7 @@ typedef struct { int x, y, z; } Vec3i;
 #define i_tag vi
 #include <stc/cmap.h>
 
-int main()
+int main(void)
 {
     // Define map with defered destruct
     cmap_vi vecs = {0};
@@ -243,7 +243,7 @@ typedef struct { int x, y, z; } Vec3i;
 #define i_tag iv
 #include <stc/cmap.h>
 
-int main()
+int main(void)
 {
     cmap_iv vecs = {0}
 
@@ -304,7 +304,7 @@ static inline void Viking_drop(Viking* vk) {
 #define i_val int
 #include <stc/cmap.h>
 
-int main()
+int main(void)
 {
     // Use a HashMap to store the vikings' health points.
     Vikings vikings = {0};
@@ -380,7 +380,7 @@ static inline RViking Viking_toraw(const Viking* vp) {
 #define i_val       int
 #include <stc/cmap.h>
 
-int main()
+int main(void)
 {
     Vikings vikings = {0};
 

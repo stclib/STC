@@ -23,7 +23,7 @@ typedef struct Point { int x, y; } Point;
 #define i_is_forward
 #include <stc/cvec.h>
 
-int main()
+int main(void)
 {
     MyStruct my = {0};
 

@@ -1,7 +1,7 @@
 #define i_implement
 #include <stc/cstr.h>
 
-int main ()
+int main(void)
 {
     const char *base = "this is a test string.";
     const char *s2 = "n example";

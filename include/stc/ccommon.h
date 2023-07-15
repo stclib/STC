@@ -85,7 +85,7 @@ typedef long long _llong;
   #define c_assert(expr)        assert(expr)
 #endif
 #define c_container_of(p, C, m) ((C*)((char*)(1 ? (p) : &((C*)0)->m) - offsetof(C, m)))
-#define c_const_cast(T, p)      ((T)(p) + 0*sizeof((T)0 == (p)))
+#define c_const_cast(T, p)      ((T)(1 ? (p) : (T)0))
 #define c_swap(T, xp, yp)       do { T *_xp = xp, *_yp = yp, \
                                     _tv = *_xp; *_xp = *_yp; *_yp = _tv; } while (0)
 #define c_sizeof                (intptr_t)sizeof
@@ -96,8 +96,8 @@ typedef long long _llong;
 #define c_memmove(d, s, ilen)   memmove(d, s, c_i2u(ilen))
 #define c_memset(d, val, ilen)  memset(d, val, c_i2u(ilen))
 #define c_memcmp(a, b, ilen)    memcmp(a, b, c_i2u(ilen))
-#define c_u2i(u)                ((intptr_t)((u) + 0*sizeof((u) == 1U)))
-#define c_i2u(i)                ((size_t)(i) + 0*sizeof((i) == 1))
+#define c_u2i(u)                ((intptr_t)(1 ? (u) : (size_t)1))
+#define c_i2u(i)                ((size_t)(1 ? (i) : (intptr_t)1))
 #define c_LTu(a, b)             ((size_t)(a) < (size_t)(b))
 
 // x and y are i_keyraw* type, defaults to i_key*:

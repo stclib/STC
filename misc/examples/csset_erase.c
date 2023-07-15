@@ -3,7 +3,7 @@
 #define i_key int
 #include <stc/csset.h>
 
-int main()
+int main(void)
 {
     csset_int set = c_init(csset_int, {30, 20, 80, 40, 60, 90, 10, 70, 50});
 

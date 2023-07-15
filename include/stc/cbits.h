@@ -26,7 +26,7 @@ Similar to boost::dynamic_bitset / std::bitset
 #include <stdio.h>
 #include "cbits.h"
 
-int main() {
+int main(void) {
     cbits bset = cbits_with_size(23, true);
     cbits_reset(&bset, 9);
     cbits_resize(&bset, 43, false);

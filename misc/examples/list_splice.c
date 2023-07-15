@@ -13,7 +13,7 @@ void print_ilist(const char* s, clist_i list)
     puts("");
 }
 
-int main ()
+int main(void)
 {
     clist_i list1 = c_init(clist_i, {1, 2, 3, 4, 5});
     clist_i list2 = c_init(clist_i, {10, 20, 30, 40, 50});

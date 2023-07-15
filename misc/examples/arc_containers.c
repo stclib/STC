@@ -24,7 +24,7 @@
 #define i_keyboxed Arc // as above
 #include <stc/clist.h>
 
-int main()
+int main(void)
 {
     Stack stack = {0};
     List list = {0};

@@ -13,7 +13,7 @@
 #define i_val int
 #include <stc/cmap.h>
 
-int main() {
+int main(void) {
     {
         std::map<int, int> hist;
         hist.emplace(12, 100).first->second += 1;

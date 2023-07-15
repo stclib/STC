@@ -83,7 +83,7 @@ csset_X_value        csset_X_value_clone(csset_X_value val);
 #define i_key_str
 #include <stc/csset.h>
 
-int main ()
+int main(void)
 {
     SSet second={0}, third={0}, fourth={0}, fifth={0};
 

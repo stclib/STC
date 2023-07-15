@@ -56,7 +56,7 @@ void Use(void)
     c_drop(IVec, &a, &b);
 }
 
-int main()
+int main(void)
 {
     Use();
 }

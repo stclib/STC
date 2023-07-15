@@ -8,7 +8,7 @@
 #define i_tag i
 #include <stc/cpque.h>
 
-int main() {
+int main(void) {
     intptr_t N = 10000000;
     crand_t rng = crand_init((uint64_t)time(NULL));
     crand_unif_t dist = crand_unif_init(0, N * 10);

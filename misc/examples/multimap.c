@@ -66,7 +66,7 @@ void OlympicLoc_drop(OlympicLoc* self) {
 }
 
 
-int main()
+int main(void)
 {
     // Define the multimap with destructor defered to when block is completed.
     csmap_OL multimap = {0};

@@ -160,7 +160,7 @@ char*        cstrnstrn(const char* str, const char* search, intptr_t slen, intpt
 #define i_implement
 #include <stc/cstr.h>
 
-int main() {
+int main(void) {
     cstr s0, s1, full_path;
     c_defer(
         cstr_drop(&s0),

@@ -16,7 +16,7 @@ void printmap(mymap m)
     printf("\nsize() == %" c_ZI "\n\n", mymap_size(&m));
 }
 
-int main()
+int main(void)
 {
     mymap m1 = {0};
 

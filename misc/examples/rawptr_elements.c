@@ -25,7 +25,7 @@
 #define i_valboxed IBox // i_valboxed: use properties from IBox automatically
 #include <stc/cmap.h>
 
-int main()
+int main(void)
 {
     // These have the same behaviour, except IBox has a get member:
     SIPtrMap map1 = {0};

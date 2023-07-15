@@ -31,7 +31,7 @@ template params:
 #define i_key int
 #include <stc/algo/sort.h>
 
-int main() {
+int main(void) {
     int nums[] = {23, 321, 5434, 25, 245, 1, 654, 33, 543, 21};
     
     intarray_sort_n(nums, c_arraylen(nums));
@@ -48,7 +48,7 @@ int main() {
 #include <stc/cdeq.h>
 #include <stc/algo/sort.h>
 
-int main() {
+int main(void) {
     IDeq nums = c_init(IDeq, {5434, 25, 245, 1, 654, 33, 543, 21});
     IDeq_push_front(&nums, 23);
     IDeq_push_front(&nums, 321);

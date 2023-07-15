@@ -29,7 +29,7 @@
 // crand: Pseudo-random number generator
 #include "stc/crand.h"
 
-int main() {
+int main(void) {
     uint64_t seed = 123456789;
     crand_t rng = crand_init(seed);
     crand_unif_t dist1 = crand_unif_init(1, 6);

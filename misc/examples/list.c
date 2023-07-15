@@ -8,7 +8,7 @@
 #define i_native_cmp
 #include <stc/clist.h>
 
-int main() {
+int main(void) {
     const int n = 3000000;
     DList list = {0};
 

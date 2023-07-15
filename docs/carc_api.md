@@ -97,7 +97,7 @@ bool        carc_X_value_eq(const i_key* x, const i_key* y);
 #define i_keyboxed Arc // Note: use i_keyboxed for carc or cbox value types
 #include <stc/cstack.h>
 
-int main()
+int main(void)
 {
     Stack s1 = {0}, s2 = {0};
     Map *map;

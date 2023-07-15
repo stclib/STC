@@ -77,7 +77,7 @@ void                cstack_X_value_drop(cvec_X_value* pval);
 
 #include <stdio.h>
 
-int main() {
+int main(void) {
     IStack stk = IStack_init();
 
     for (int i=0; i < 100; ++i)

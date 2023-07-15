@@ -12,7 +12,7 @@ bool add_10_years(int i, csview match, cstr* out) {
     return false;
 }
 
-int main()
+int main(void)
 {
     const char* pattern = "\\b(\\d\\d\\d\\d)-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])\\b";
     const char* input = "start date: 2015-12-31, end date: 2022-02-28";

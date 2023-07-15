@@ -76,7 +76,7 @@ double              crand_norm(crand_t* rng, crand_norm_t* dist);
 #define i_tag i
 #include <stc/csmap.h>
 
-int main()
+int main(void)
 {
     enum {N = 10000000};
     const double Mean = -12.0, StdDev = 6.0, Scale = 74;

@@ -108,7 +108,7 @@ void                  csmap_X_value_drop(csmap_X_value* pval);
 #define i_val_str // ditto
 #include <stc/csmap.h>
 
-int main()
+int main(void)
 {
     // Create a sorted map of three strings (maps to string)
     csmap_str colors = c_init(csmap_str, {
@@ -166,7 +166,7 @@ static void print_result(strmap_result result) {
     print_node(result.ref);
 }
  
-int main()
+int main(void)
 {
     strmap m = {0};
  
@@ -191,7 +191,7 @@ This example uses a csmap with cstr as mapped value.
 #define i_val_str
 #include <stc/csmap.h>
 
-int main()
+int main(void)
 {
     uint32_t col = 0xcc7744ff;
     IDSMap idnames = c_init(IDSMap, { {100, "Red"}, {110, "Blue"} });
@@ -237,7 +237,7 @@ static int Vec3i_cmp(const Vec3i* a, const Vec3i* b) {
 #include <stc/csmap.h>
 #include <stdio.h>
 
-int main()
+int main(void)
 {
     csmap_vi vmap = {0};
 

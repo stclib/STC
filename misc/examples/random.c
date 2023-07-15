@@ -2,7 +2,7 @@
 #include <time.h>
 #include <stc/crand.h>
 
-int main()
+int main(void)
 {
     const int N = 1000000000;
     const uint64_t seed = (uint64_t)time(NULL), range = 1000000;

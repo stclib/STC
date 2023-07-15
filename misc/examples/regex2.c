@@ -1,7 +1,7 @@
 #define i_import
 #include <stc/cregex.h>
 
-int main()
+int main(void)
 {
     struct { const char *pattern, *input; } s[] = {
         {"(\\d\\d\\d\\d)[-_](1[0-2]|0[1-9])[-_](3[01]|[12][0-9]|0[1-9])",

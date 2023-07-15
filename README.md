@@ -181,7 +181,7 @@ Switching to a different container type, e.g. a sorted set (csset):
 #include <stc/csset.h> // Use a sorted set instead
 #include <stdio.h>
 
-int main()
+int main(void)
 {
     Floats nums = {0};
     Floats_push(&nums, 30.f);

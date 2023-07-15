@@ -11,7 +11,7 @@
 #define i_key_str
 #include <stc/clist.h>
 
-int main()
+int main(void)
 {
     cmap_str map, mclone;
     cvec_str keys = {0}, values = {0};

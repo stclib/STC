@@ -13,7 +13,7 @@ void show_drop(int* x) { printf("drop: %d\n", *x); }
 #include <stc/cvec.h>       // Vec: cvec<Arc>
 
 
-int main()
+int main(void)
 {
     Vec vec = c_init(Vec, {2012, 1990, 2012, 2019, 2015});
     

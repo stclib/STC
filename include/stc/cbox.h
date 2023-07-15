@@ -47,7 +47,7 @@ void Person_drop(Person* p) {
 #define i_no_cmp          // no cmp/hash is defined
 #include <stc/cbox.h>
 
-int main() {
+int main(void) {
     c_auto (PBox, p, q)
     {
         p = PBox_from(Person_from("John Smiths", "josmiths@gmail.com"));

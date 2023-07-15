@@ -60,7 +60,7 @@ void test_distribution(void)
     cmap_x_drop(&map);
 }
 
-int main()
+int main(void)
 {
     seed = (uint64_t)time(NULL);
     test_distribution();

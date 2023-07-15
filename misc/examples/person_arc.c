@@ -39,7 +39,7 @@ void Person_drop(Person* p) {
 #include <stc/cvec.h>
 
 
-int main()
+int main(void)
 {
     PSPtr p = PSPtr_from(Person_make("Laura", "Palmer"));
     PSPtr q = PSPtr_from(Person_clone(*p.get)); // deep copy

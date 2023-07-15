@@ -44,7 +44,7 @@ struct MyStruct {
 #define i_tag i32
 #include <stc/cvec.h>
 
-int main() {
+int main(void) {
     cvec_i32 vec = {0};
     cvec_i32_push(&vec, 123);
     cvec_i32_drop(&vec);

@@ -11,7 +11,7 @@
 #include <stc/cmap.h>
 
 
-int main()
+int main(void)
 {
     puts("c_forrange:");
     c_forrange (30) printf(" xx");

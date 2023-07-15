@@ -36,7 +36,7 @@ void Person_drop(Person* p) {
 #define i_keyboxed PBox // "arcbox" informs that PBox is a smart pointer.
 #include <stc/csset.h>
 
-int main()
+int main(void)
 {
     Persons vec = {0};
     PBox p = PBox_from(Person_make("Laura", "Palmer"));

@@ -41,7 +41,7 @@ int point_cmp(const Point* a, const Point* b) {
 #include <stc/cset.h>
 
 
-int main()
+int main(void)
 {
     cmap_pnt pmap = c_init(cmap_pnt, {{{42, 14}, 1}, {{32, 94}, 2}, {{62, 81}, 3}});
 

@@ -74,7 +74,7 @@ void                cqueue_X_value_drop(cqueue_X_value* pval);
 
 #include <stdio.h>
 
-int main() {
+int main(void) {
     cqueue_i Q = cqueue_i_init();
 
     // push() and pop() a few.

@@ -5,7 +5,7 @@
 #define i_key int
 #include <stc/clist.h>
 
-int main ()
+int main(void)
 {
     IList L = c_init(IList, {10, 20, 30, 40, 50});
 

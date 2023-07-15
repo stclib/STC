@@ -101,7 +101,7 @@ if __name__ == '__main__':
 #include <stc/cspan.h>
 using_cspan3(myspan, int); // define myspan, myspan2, myspan3.
 
-int main() {
+int main(void) {
     int arr[] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24};
 
     myspan3 ms3 = cspan_md(arr, 2, 3, 4); // C-order, i.e. row-major.
@@ -123,7 +123,7 @@ int main() {
 #include <mdspan>
 #include <tuple>
 
-int main() {
+int main(void) {
     int arr[] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24};
 
     std::mdspan ms3(arr, 2, 3, 4);
@@ -147,7 +147,7 @@ Slicing cspan without and with reducing the rank:
 
 using_cspan3(Span, int); // Shorthand to define Span, Span2, and Span3
 
-int main()
+int main(void)
 {
     // c_init() can create any STC container/span from an initializer list:
     Span span = c_init(Span, {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,

@@ -7,7 +7,7 @@
 #define i_key int
 #include <stc/csset.h>
 
-int main()
+int main(void)
 {
     // TEST SORTED VECTOR
     {

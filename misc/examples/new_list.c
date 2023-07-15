@@ -43,7 +43,7 @@ void MyStruct_drop(MyStruct* s) {
 }
 
 
-int main()
+int main(void)
 {
     MyStruct my = {0};
     clist_i32_push_back(&my.intlist, 123);

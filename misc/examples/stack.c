@@ -10,7 +10,7 @@
 #define i_key char
 #include <stc/cstack.h>
 
-int main() {
+int main(void) {
     cstack_i stack = {0};
     cstack_c chars = {0};
 

@@ -20,7 +20,7 @@ int point_cmp(const Point* a, const Point* b) {
 #define i_key int
 #include <stc/cqueue.h>
 
-int main() {
+int main(void) {
     int n = 50000000;
     crand_t rng = crand_init((uint64_t)time(NULL));
     crand_unif_t dist = crand_unif_init(0, n);
