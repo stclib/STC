@@ -114,7 +114,7 @@ using_cspan_tuple(5); using_cspan_tuple(6);
 using_cspan_tuple(7); using_cspan_tuple(8);
 
 #define c_END -1
-#define c_ALL 0,-1
+#define c_ALL 0,c_END
 
 /* Use cspan_init() for static initialization only. c_init() for non-static init. */
 #define cspan_init(SpanType, ...) \
@@ -221,8 +221,16 @@ STC_INLINE intptr_t _cspan_idxN(int rank, const int32_t shape[], const int32_t s
     return off;
 }
 
+STC_INLINE intptr_t _cspan_next2(int32_t pos[], const int32_t shape[], const int32_t stride[], int rank, int i, int inc) {
+    intptr_t off = stride[i];
+    ++pos[i];
+    for (; --rank && pos[i] == shape[i]; i += inc) {
+        pos[i] = 0; ++pos[i + inc];
+        off += stride[i + inc] - stride[i]*shape[i];
+    }
+    return off;
+}
 #define _cspan_next1(pos, shape, stride, rank, i, inc) (++pos[0], stride[0])
-STC_API intptr_t _cspan_next2(int32_t pos[], const int32_t shape[], const int32_t stride[], int rank, int i, int inc);
 #define _cspan_next3 _cspan_next2
 #define _cspan_next4 _cspan_next2
 #define _cspan_next5 _cspan_next2
@@ -252,16 +260,6 @@ STC_DEF int32_t* _cspan_shape2stride(char order, int32_t shape[], int rank) {
         s1 = s2;
     }
     return shape;
-}
-
-STC_DEF intptr_t _cspan_next2(int32_t pos[], const int32_t shape[], const int32_t stride[], int rank, int i, int inc) {
-    intptr_t off = stride[i];
-    ++pos[i];
-    for (; --rank && pos[i] == shape[i]; i += inc) {
-        pos[i] = 0; ++pos[i + inc];
-        off += stride[i + inc] - stride[i]*shape[i];
-    }
-    return off;
 }
 
 STC_DEF intptr_t _cspan_slice(int32_t oshape[], int32_t ostride[], int* orank, 
