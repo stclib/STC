@@ -178,17 +178,22 @@ typedef struct { intptr_t count; } cco_sem;
 
 #ifdef _WIN32
     #ifdef __cplusplus
-    #define _c_LINKC extern "C" __declspec(dllimport) 
+      #define _c_LINKC extern "C" __declspec(dllimport)
     #else
-    #define _c_LINKC __declspec(dllimport) 
+      #define _c_LINKC __declspec(dllimport) 
+    #endif
+    #if _WIN32_WINNT < _WIN32_WINNT_WIN8 || defined __TINYC__
+      #define _c_getsystime GetSystemTimeAsFileTime
+    #else
+      #define _c_getsystime GetSystemTimePreciseAsFileTime
     #endif
     struct _FILETIME;
-    _c_LINKC void GetSystemTimePreciseAsFileTime(struct _FILETIME*);
+    _c_LINKC void _c_getsystime(struct _FILETIME*);
     _c_LINKC void Sleep(unsigned long);
 
     static inline double cco_time(void) { /* seconds since epoch */
         unsigned long long quad;          /* 64-bit value representing 1/10th usecs since Jan 1 1601, 00:00 UTC */
-        GetSystemTimePreciseAsFileTime((struct _FILETIME*)&quad);
+        _c_getsystime((struct _FILETIME*)&quad);
         return (double)(quad - 116444736000000000ULL)*1e-7;  /* time diff Jan 1 1601-Jan 1 1970 in 1/10th usecs */
     }
 

@@ -15,7 +15,7 @@ uint64_t Person_hash(const Person* p);
 #define i_type IPtr
 #define i_key int
 #define i_keydrop(x) printf("drop: %d\n", *x)
-#define i_native_cmp
+#define i_cmp_native
 #include <stc/carc.h>
 
 #define i_type IPStack

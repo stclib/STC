@@ -17,26 +17,25 @@ See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/contain
 ## Header file and declaration
 
 ```c
-#define i_type      // container type name (default: cmap_{i_key})
-#define i_key       // hash key: REQUIRED
-#define i_val       // map value: REQUIRED
-#define i_hash      // hash func i_keyraw*: REQUIRED IF i_keyraw is non-pod type
-#define i_eq        // equality comparison two i_keyraw*: REQUIRED IF i_keyraw is a
-                    // non-integral type. Three-way i_cmp may alternatively be specified.
-#define i_keydrop   // destroy key func - defaults to empty destruct
-#define i_keyclone  // REQUIRED IF i_keydrop defined
-#define i_keyraw    // convertion "raw" type - defaults to i_key
-#define i_keyfrom   // convertion func i_keyraw => i_key
-#define i_keyto     // convertion func i_key* => i_keyraw
+#define i_key <t>      // key type: REQUIRED.
+#define i_val <t>      // mapped value type: REQUIRED.
+#define i_type <t>     // container type name (default: cmap_{i_key})
+#define i_hash <f>     // hash func i_keyraw*: REQUIRED IF i_keyraw is non-pod type
+#define i_eq <f>       // equality comparison two i_keyraw*: REQUIRED IF i_keyraw is a
+                       // non-integral type. Three-way i_cmp may alternatively be specified.
+#define i_keydrop <f>  // destroy key func - defaults to empty destruct
+#define i_keyclone <f> // REQUIRED IF i_keydrop defined
+#define i_keyraw <t>   // convertion "raw" type - defaults to i_key
+#define i_keyfrom <f>  // convertion func i_keyraw => i_key
+#define i_keyto <f>    // convertion func i_key* => i_keyraw
 
-#define i_valdrop   // destroy value func - defaults to empty destruct
-#define i_valclone  // REQUIRED IF i_valdrop defined
-#define i_valraw    // convertion "raw" type - defaults to i_val
-#define i_valfrom   // convertion func i_valraw => i_val
-#define i_valto     // convertion func i_val* => i_valraw
+#define i_valdrop <f>  // destroy value func - defaults to empty destruct
+#define i_valclone <f> // REQUIRED IF i_valdrop defined
+#define i_valraw <t>   // convertion "raw" type - defaults to i_val
+#define i_valfrom <f>  // convertion func i_valraw => i_val
+#define i_valto <f>    // convertion func i_val* => i_valraw
 
-#define i_tag       // alternative typename: cmap_{i_tag}. i_tag defaults to i_val
-#define i_expandby  // default 1. If 2, table expand 2x (else 1.5x)
+#define i_tag <s>      // alternative typename: cmap_{i_tag}. i_tag defaults to i_val
 #include <stc/cmap.h>
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.

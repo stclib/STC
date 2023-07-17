@@ -252,7 +252,7 @@ struct Point { float x, y; };
 #include <stc/cvec.h>   // cvec_pnt: vector of struct Point
 
 #define i_key int
-#define i_native_cmp    // enable sort/search. Use native `<` and `==` operators
+#define i_cmp_native    // enable sort/search. Use native `<` and `==` operators
 #include <stc/clist.h>  // clist_int: singly linked list
 
 #define i_key int
@@ -619,7 +619,7 @@ STC is generally very memory efficient. Memory usage for the different container
 - cspan: Support for column-major (fortran order) multidim spans and transposed views.
 - Removed default comparison for clist, cvec and cdeq (as with cstack and cqueue). 
     - Using i_key_str, i_keyclass, i_keyboxed still expects comparisons defined. 
-    - Define i_native_cmp to enable built-in i_key types comparisons (<, ==).
+    - Define i_cmp_native to enable built-in i_key types comparisons (<, ==).
 - cstr and csview are now shared linked by default. Static linking by defining i_static.
 - New cdeq and cqueue implementation(s), using circular buffer.
 - Renamed i_extern => i_import.

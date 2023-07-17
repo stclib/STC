@@ -15,24 +15,24 @@ See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) fo
 ## Header file and declaration
 
 ```c
-#define i_type      // container type name (default: cmap_{i_key})
-#define i_key       // key: REQUIRED
-#define i_val       // value: REQUIRED
-#define i_cmp       // three-way compare two i_keyraw* : REQUIRED IF i_keyraw is a non-integral type
+#define i_key <t>      // key type: REQUIRED.
+#define i_val <t>      // mapped value type: REQUIRED.
+#define i_type <t>     // container type name (default: cmap_{i_key})
+#define i_cmp <f>      // three-way compare two i_keyraw* : REQUIRED IF i_keyraw is a non-integral type
 
-#define i_keydrop   // destroy key func - defaults to empty destruct
-#define i_keyclone  // REQUIRED IF i_valdrop defined
-#define i_keyraw    // convertion "raw" type - defaults to i_key
-#define i_keyfrom   // convertion func i_keyraw => i_key
-#define i_keyto     // convertion func i_key* => i_keyraw
+#define i_keydrop <f>  // destroy key func - defaults to empty destruct
+#define i_keyclone <f> // REQUIRED IF i_valdrop defined
+#define i_keyraw <t>   // convertion "raw" type - defaults to i_key
+#define i_keyfrom <f>  // convertion func i_keyraw => i_key
+#define i_keyto <f>    // convertion func i_key* => i_keyraw
 
-#define i_valdrop   // destroy value func - defaults to empty destruct
-#define i_valclone  // REQUIRED IF i_valdrop defined
-#define i_valraw    // convertion "raw" type - defaults to i_val
-#define i_valfrom   // convertion func i_valraw => i_val
-#define i_valto     // convertion func i_val* => i_valraw
+#define i_valdrop <f>  // destroy value func - defaults to empty destruct
+#define i_valclone <f> // REQUIRED IF i_valdrop defined
+#define i_valraw <t>   // convertion "raw" type - defaults to i_val
+#define i_valfrom <f>  // convertion func i_valraw => i_val
+#define i_valto <f>    // convertion func i_val* => i_valraw
 
-#define i_tag       // alternative typename: csmap_{i_tag}. i_tag defaults to i_val
+#define i_tag <s>      // alternative typename: csmap_{i_tag}. i_tag defaults to i_val
 #include <stc/csmap.h>
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.

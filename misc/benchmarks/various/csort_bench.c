@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
     Ints a = Ints_with_capacity(size);
 
     for (i = 0; i < size; i++)
-        *Ints_push(&a, romutrio(s) & (1U << 30) - 1);
+        Ints_push(&a, romutrio(s) & (1U << 30) - 1);
     testsort(&a, size, "random");
     for (i = 0; i < 20; i++)
         printf(" %d", (int)*Ints_at(&a, i));

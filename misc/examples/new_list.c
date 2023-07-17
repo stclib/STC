@@ -27,7 +27,7 @@ int point_cmp(const Point* a, const Point* b) {
 #include <stc/clist.h>
 
 #define i_key float
-#define i_native_cmp               // use < and == operators for comparison 
+#define i_cmp_native               // use < and == operators for comparison 
 #include <stc/clist.h>
 
 void MyStruct_drop(MyStruct* s);

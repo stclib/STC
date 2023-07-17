@@ -85,6 +85,21 @@ int main(void)
     if (it.ref == _endref) it.ref = NULL; \
 } while (0)
 
+#define c_all_of(boolptr, it, C, cnt, pred) do { \
+    C##_iter it; \
+    c_find_if_4(it, C, cnt, !(pred)); \
+    *(boolptr) = it.ref == NULL; \
+} while (0)
+#define c_any_of(boolptr, it, C, cnt, pred) do { \
+    C##_iter it; \
+    c_find_if_4(it, C, cnt, pred); \
+    *(boolptr) = it.ref != NULL; \
+} while (0)
+#define c_none_of(boolptr, it, C, cnt, pred) do { \
+    C##_iter it; \
+    c_find_if_4(it, C, cnt, pred); \
+    *(boolptr) = it.ref == NULL; \
+} while (0)
 
 // Use with: clist, cmap, cset, csmap, csset:
 #define c_erase_if(it, C, cnt, pred) do { \
@@ -94,7 +109,6 @@ int main(void)
         else C##_next(&it); \
     } \
 } while (0)
-
 
 // Use with: cstack, cvec, cdeq, cqueue:
 #define c_eraseremove_if(it, C, cnt, pred) do { \

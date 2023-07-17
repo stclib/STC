@@ -5,7 +5,7 @@
 
 #define i_type DList
 #define i_key double
-#define i_native_cmp
+#define i_cmp_native
 #include <stc/clist.h>
 
 int main(void) {

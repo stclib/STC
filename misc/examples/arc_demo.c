@@ -11,7 +11,7 @@ void int_drop(int* x) {
 #define i_type Arc          // set type name to be defined (instead of 'carc_int')
 #define i_key int
 #define i_keydrop int_drop  // optional, just to display the elements destroyed
-#define i_native_cmp        // use int comparison (x < y, x == y).
+#define i_cmp_native        // use int comparison (x < y, x == y).
 #include <stc/carc.h>       // Arc
 
 #define i_keyboxed Arc      // note: use i_keyboxed instead of i_key for carc/cbox elements

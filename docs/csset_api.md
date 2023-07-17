@@ -8,17 +8,17 @@ See the c++ class [std::set](https://en.cppreference.com/w/cpp/container/set) fo
 ## Header file and declaration
 
 ```c
-#define i_type      // full typename of the container
-#define i_key       // key: REQUIRED
-#define i_cmp       // three-way compare two i_keyraw* : REQUIRED IF i_keyraw is a non-integral type
-#define i_keydrop   // destroy key func - defaults to empty destruct
-#define i_keyclone  // REQUIRED IF i_keydrop defined
+#define i_key <t>      // element type: REQUIRED. Note: i_val* may be specified instead of i_key*.
+#define i_type <t>     // container type name
+#define i_cmp <f>      // three-way compare two i_keyraw* : REQUIRED IF i_keyraw is a non-integral type
+#define i_keydrop <f>  // destroy key func - defaults to empty destruct
+#define i_keyclone <f> // REQUIRED IF i_keydrop defined
 
-#define i_keyraw    // convertion "raw" type - defaults to i_key
-#define i_keyfrom   // convertion func i_keyraw => i_key - defaults to plain copy
-#define i_keyto     // convertion func i_key* => i_keyraw - defaults to plain copy
+#define i_keyraw <t>   // convertion "raw" type - defaults to i_key
+#define i_keyfrom <f>  // convertion func i_keyraw => i_key - defaults to plain copy
+#define i_keyto <f>    // convertion func i_key* => i_keyraw - defaults to plain copy
 
-#define i_tag       // alternative typename: csset_{i_tag}. i_tag defaults to i_key
+#define i_tag <s>      // alternative typename: csset_{i_tag}. i_tag defaults to i_key
 #include <stc/csset.h>
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.
