@@ -1,3 +1,4 @@
+#define i_implement
 #include <stc/cstr.h>
 #include <stc/forward.h>
 
@@ -10,7 +11,7 @@ typedef struct {
 } MyStruct;
 
 // Point => int map
-struct Point { int x, y; } typedef Point;
+typedef struct Point { int x, y; } Point;
 int point_cmp(const Point* a, const Point* b) {
     int c = a->x - b->x;
     return c ? c : a->y - b->y;
@@ -35,14 +36,14 @@ int point_cmp(const Point* a, const Point* b) {
 #include <stc/csset.h>
 
 
-int main()
+int main(void)
 {
-    PMap pmap = c_make(PMap, {
+    PMap pmap = c_init(PMap, {
         {{42, 14}, 1},
         {{32, 94}, 2},
         {{62, 81}, 3},
     });
-    SMap smap = c_make(SMap, {
+    SMap smap = c_init(SMap, {
         {"Hello, friend", "this is the mapped value"},
         {"The brown fox", "jumped"},
         {"This is the time", "for all good things"},

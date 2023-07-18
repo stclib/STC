@@ -3,9 +3,9 @@
 #define i_key int
 #include <stc/csset.h>
 
-int main()
+int main(void)
 {
-    csset_int set = c_make(csset_int, {30, 20, 80, 40, 60, 90, 10, 70, 50});
+    csset_int set = c_init(csset_int, {30, 20, 80, 40, 60, 90, 10, 70, 50});
 
     c_foreach (k, csset_int, set)
         printf(" %d", *k.ref);

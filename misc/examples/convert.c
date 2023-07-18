@@ -1,17 +1,17 @@
+#define i_implement
 #include <stc/cstr.h>
 
 #define i_key_str
 #define i_val_str
 #include <stc/cmap.h>
 
-#define i_val_str
+#define i_key_str
 #include <stc/cvec.h>
 
-#define i_val_str
-#define i_extern // define _clist_mergesort() once
+#define i_key_str
 #include <stc/clist.h>
 
-int main()
+int main(void)
 {
     cmap_str map, mclone;
     cvec_str keys = {0}, values = {0};
@@ -24,7 +24,7 @@ int main()
         cvec_str_drop(&values),
         clist_str_drop(&list)
     ){
-        map = c_make(cmap_str, {
+        map = c_init(cmap_str, {
             {"green", "#00ff00"},
             {"blue", "#0000ff"},
             {"yellow", "#ffff00"},

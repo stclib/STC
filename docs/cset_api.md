@@ -18,8 +18,8 @@ A **cset** is an associative container that contains a set of unique objects of 
 #define i_keyfrom   // convertion func i_keyraw => i_key - defaults to plain copy
 #define i_keyto     // convertion func i_key* => i_keyraw - defaults to plain copy
 
-#define i_tag       // alternative typename: cmap_{i_tag}. i_tag defaults to i_val
-#define i_ssize      // default int32_t. If defined, table expand 2x (else 1.5x)
+#define i_tag       // alternative typename: cmap_{i_tag}. i_tag defaults to i_key
+#define i_expandby  // default 1. If 2, table expand 2x (else 1.5x)
 #include <stc/cset.h>
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.
@@ -77,16 +77,17 @@ cset_X_value        cset_X_value_clone(cset_X_value val);
 
 ## Example
 ```c
+#define i_implement
 #include <stc/cstr.h>
 #define i_type Strset
 #define i_key_str
 #include <stc/cset.h>
 
-int main ()
+int main(void)
 {
     Strset first, second={0}, third={0}, fourth={0}, fifth;
 
-    first = c_make(Strset, {"red", "green", "blue"});
+    first = c_init(Strset, {"red", "green", "blue"});
     fifth = Strset_clone(second);
 
     c_forlist (i, const char*, {"orange", "pink", "yellow"})

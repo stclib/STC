@@ -20,15 +20,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#define c_FORLIST c_forlist
-#define c_FORRANGE c_forrange
-#define c_FOREACH c_foreach
-#define c_FORPAIR c_forpair
-#define c_FORFILTER c_forfilter
-#define c_FORMATCH c_formatch
-#define c_FORTOKEN c_fortoken
-#define c_FORTOKEN_SV c_fortoken_sv
-#define c_AUTO c_auto
-#define c_WITH c_with
-#define c_SCOPE c_scope
-#define c_DEFER c_defer
+#undef STC_API
+#undef STC_DEF
+
+#ifdef i_extern // [deprecated]
+#  define i_import
+#endif
+#if !defined(i_static) && !defined(STC_STATIC) && (defined(i_header) || defined(STC_HEADER) || \
+                                                   defined(i_implement) || defined(STC_IMPLEMENT))
+  #define STC_API extern
+  #define STC_DEF
+#else
+  #define i_static
+  #define STC_API static inline
+  #define STC_DEF static inline
+#endif
+#if defined(STC_IMPLEMENT) || defined(i_import)
+  #define i_implement
+#endif

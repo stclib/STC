@@ -9,8 +9,8 @@ hashing (aka open addressing) with linear probing, and without leaving tombstone
 
 ***Iterator invalidation***: References and iterators are invalidated after erase. No iterators are invalidated after insert,
 unless the hash-table need to be extended. The hash table size can be reserved prior to inserts if the total max size is known.
-The order of elements is preserved after erase and insert. This makes it possible to erase individual elements while iterating
-through the container by using the returned iterator from *erase_at()*, which references the next element.
+The order of elements may not be preserved after erase. It is still possible to erase elements when iterating through
+the container by setting the iterator to the value returned from *erase_at()*, which references the next element. Note that a small number of elements may be visited twice when doing this, but all elements will be visited.
 
 See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/container/unordered_map) for a functional description.
 
@@ -36,7 +36,7 @@ See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/contain
 #define i_valto     // convertion func i_val* => i_valraw
 
 #define i_tag       // alternative typename: cmap_{i_tag}. i_tag defaults to i_val
-#define i_ssize     // internal; default int32_t. If defined, table expand 2x (else 1.5x)
+#define i_expandby  // default 1. If 2, table expand 2x (else 1.5x)
 #include <stc/cmap.h>
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.
@@ -114,16 +114,17 @@ bool                  c_memcmp_eq(const i_keyraw* a, const i_keyraw* b);    // !
 ## Examples
 
 ```c
+#define i_implement
 #include <stc/cstr.h>
 
 #define i_key_str
 #define i_val_str
 #include <stc/cmap.h>
 
-int main()
+int main(void)
 {
     // Create an unordered_map of three strings (that map to strings)
-    cmap_str umap = c_make(cmap_str, {
+    cmap_str umap = c_init(cmap_str, {
         {"RED", "#FF0000"},
         {"GREEN", "#00FF00"},
         {"BLUE", "#0000FF"}
@@ -157,13 +158,14 @@ The HEX of color BLACK is:[#000000]
 ### Example 2
 This example uses a cmap with cstr as mapped value.
 ```c
+#define i_implement
 #include <stc/cstr.h>
 #define i_type IDMap
 #define i_key int
 #define i_val_str
 #include <stc/cmap.h>
 
-int main()
+int main(void)
 {
     uint32_t col = 0xcc7744ff;
 
@@ -206,7 +208,7 @@ typedef struct { int x, y, z; } Vec3i;
 #define i_tag vi
 #include <stc/cmap.h>
 
-int main()
+int main(void)
 {
     // Define map with defered destruct
     cmap_vi vecs = {0};
@@ -241,7 +243,7 @@ typedef struct { int x, y, z; } Vec3i;
 #define i_tag iv
 #include <stc/cmap.h>
 
-int main()
+int main(void)
 {
     cmap_iv vecs = {0}
 
@@ -267,6 +269,7 @@ Output:
 ### Example 5: Advanced
 Key type is struct.
 ```c
+#define i_implement
 #include <stc/cstr.h>
 
 typedef struct {
@@ -274,7 +277,7 @@ typedef struct {
     cstr country;
 } Viking;
 
-#define Viking_init() ((Viking){cstr_NULL, cstr_NULL})
+#define Viking_init() ((Viking){cstr_null, cstr_null})
 
 static inline int Viking_cmp(const Viking* a, const Viking* b) {
     int c = cstr_cmp(&a->name, &b->name);
@@ -301,7 +304,7 @@ static inline void Viking_drop(Viking* vk) {
 #define i_val int
 #include <stc/cmap.h>
 
-int main()
+int main(void)
 {
     // Use a HashMap to store the vikings' health points.
     Vikings vikings = {0};
@@ -335,6 +338,7 @@ In example 5 we needed to construct a lookup key which allocated strings, and th
 In this example we use rawtype feature to make it even simpler to use. Note that we must use the emplace() methods
 to add "raw" type entries (otherwise compile error):
 ```c
+#define i_implement
 #include <stc/cstr.h>
 
 typedef struct Viking {
@@ -376,7 +380,7 @@ static inline RViking Viking_toraw(const Viking* vp) {
 #define i_val       int
 #include <stc/cmap.h>
 
-int main()
+int main(void)
 {
     Vikings vikings = {0};
 

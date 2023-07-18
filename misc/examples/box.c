@@ -1,10 +1,11 @@
 /* cbox: heap allocated boxed type */
+#define i_implement
 #include <stc/cstr.h>
 
 typedef struct { cstr name, last; } Person;
 
 Person Person_make(const char* name, const char* last) {
-    return (Person){.name = cstr_from(name), .last = cstr_from(last)};
+    return c_LITERAL(Person){.name = cstr_from(name), .last = cstr_from(last)};
 }
 
 uint64_t Person_hash(const Person* a) {
@@ -28,14 +29,14 @@ void Person_drop(Person* p) {
 }
 
 #define i_type PBox
-#define i_valclass Person // "class" binds _cmp, _clone, _drop functions.
+#define i_keyclass Person // "class" binds _cmp, _clone, _drop functions.
 #include <stc/cbox.h>
 
 #define i_type Persons
-#define i_valboxed PBox // "arcbox" informs that PBox is a smart pointer.
+#define i_keyboxed PBox // "arcbox" informs that PBox is a smart pointer.
 #include <stc/csset.h>
 
-int main()
+int main(void)
 {
     Persons vec = {0};
     PBox p = PBox_from(Person_make("Laura", "Palmer"));

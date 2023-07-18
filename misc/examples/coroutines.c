@@ -5,38 +5,39 @@
 // Demonstrate to call another coroutine from a coroutine:
 // First create prime generator, then call fibonacci sequence:
 
-bool is_prime(int64_t i) {
-    for (int64_t j=2; j*j <= i; ++j)
+bool is_prime(long long i) {
+    for (long long j=2; j*j <= i; ++j)
         if (i % j == 0) return false;
     return true;
 }
 
 struct prime {
     int count, idx;
-    int64_t result, pos;
+    long long result, pos;
     int cco_state;
 };
 
-bool prime(struct prime* U) {
-    cco_begin(U);
-        if (U->result < 2) U->result = 2;
-        if (U->result == 2) {
-            if (U->count-- == 0) cco_return;
-            ++U->idx;
-            cco_yield(true);
+int prime(struct prime* g) {
+    cco_routine(g) {
+        if (g->result < 2) g->result = 2;
+        if (g->result == 2) {
+            if (g->count-- == 0) cco_return;
+            ++g->idx;
+            cco_yield();
         }
-        U->result += !(U->result & 1);
-        for (U->pos = U->result; U->count > 0; U->pos += 2) {
-            if (is_prime(U->pos)) {
-                --U->count;
-                ++U->idx;
-                U->result = U->pos;
-                cco_yield(true);
+        g->result += !(g->result & 1);
+        for (g->pos = g->result; g->count > 0; g->pos += 2) {
+            if (is_prime(g->pos)) {
+                --g->count;
+                ++g->idx;
+                g->result = g->pos;
+                cco_yield();
             }
         }
-        cco_final:
-            printf("final prm\n");
-    cco_end(false);
+        cco_cleanup:
+        printf("final prm\n");
+    }
+    return 0;
 }
 
 
@@ -44,30 +45,33 @@ bool prime(struct prime* U) {
 
 struct fibonacci {
     int count, idx;
-    int64_t result, b;
+    long long result, b;
     int cco_state;
 };
 
-bool fibonacci(struct fibonacci* F) {
-    assert(F->count < 94);
+int fibonacci(struct fibonacci* g) {
+    assert(g->count < 94);
 
-    cco_begin(F);
-        F->idx = 0;
-        F->result = 0;
-        F->b = 1;
+    long long sum;
+    cco_routine(g) {
+        g->idx = 0;
+        g->result = 0;
+        g->b = 1;
         for (;;) {
-            if (F->count-- == 0)
+            if (g->count-- == 0)
                 cco_return;
-            if (++F->idx > 1) {
-                int64_t sum = F->result + F->b; // NB! locals only lasts until next cco_yield!
-                F->result = F->b;
-                F->b = sum;
+            if (++g->idx > 1) {
+                // NB! locals lasts only until next yield/await!
+                sum = g->result + g->b;
+                g->result = g->b;
+                g->b = sum;
             }
-            cco_yield(true);
+            cco_yield();
         }
-        cco_final:
-            printf("final fib\n");
-    cco_end(false);
+        cco_cleanup:
+        printf("final fib\n");
+    }
+    return 0;
 }
 
 // Combine
@@ -78,29 +82,31 @@ struct combined {
     int cco_state;
 };
 
-bool combined(struct combined* C) {
-    cco_begin(C);
-        cco_yield(prime(&C->prm), &C->prm, true);
-        cco_yield(fibonacci(&C->fib), &C->fib, true);
+int combined(struct combined* g) {
+    cco_routine(g) {
+        cco_await_on(prime(&g->prm));
+        cco_await_on(fibonacci(&g->fib));
 
-        // Reuse the C->prm context and extend the count:
-        C->prm.count = 8; C->prm.result += 2;
-        cco_reset(&C->prm);
-        cco_yield(prime(&C->prm), &C->prm, true);
+        // Reuse the g->prm context and extend the count:
+        g->prm.count = 8, g->prm.result += 2;
+        cco_reset(&g->prm);
+        cco_await_on(prime(&g->prm));
 
-        cco_final: puts("final comb");
-    cco_end(false);
+        cco_cleanup:
+        puts("final combined");
+    }
+    return 0;
 }
 
-int main(void) {
-    struct combined comb = {.prm={.count=8}, .fib={14}};
-    if (true)
-        while (combined(&comb))
+int main(void)
+{
+    struct combined c = {.prm={.count=8}, .fib={14}};
+    int res;
+
+    cco_block_on(combined(&c), &res) {
+        if (res == CCO_YIELD)
             printf("Prime(%d)=%lld, Fib(%d)=%lld\n", 
-                comb.prm.idx, (long long)comb.prm.result, 
-                comb.fib.idx, (long long)comb.fib.result);
-    else
-        while (prime(&comb.prm))
-            printf("Prime(%d)=%lld\n", 
-                comb.prm.idx, (long long)comb.prm.result);
+                c.prm.idx, c.prm.result, 
+                c.fib.idx, c.fib.result);
+    }
 }

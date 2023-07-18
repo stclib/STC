@@ -1,5 +1,5 @@
 // create a structure like: std::map<std::string, std::map<std::string, std::string>>:
-
+#define i_implement
 #include <stc/cstr.h>
 
 // People: std::map<std::string, std::string>

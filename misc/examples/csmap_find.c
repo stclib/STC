@@ -1,5 +1,6 @@
 // This implements the c++ std::map::find example at:
 // https://docs.microsoft.com/en-us/cpp/standard-library/map-class?view=msvc-160#example-17
+#define i_implement
 #include <stc/cstr.h>
 
 #define i_key int
@@ -7,8 +8,7 @@
 #define i_tag istr
 #include <stc/csmap.h>
 
-#define i_val csmap_istr_raw
-#define i_opt c_no_cmp
+#define i_key csmap_istr_raw
 #define i_tag istr
 #include <stc/cvec.h>
 
@@ -40,21 +40,21 @@ void findit(csmap_istr c, csmap_istr_key val)
     }
 }
 
-int main()
+int main(void)
 {
-    csmap_istr m1 = c_make(csmap_istr, {{40, "Zr"}, {45, "Rh"}});
+    csmap_istr m1 = c_init(csmap_istr, {{40, "Zr"}, {45, "Rh"}});
     cvec_istr v = {0};
 
     puts("The starting map m1 is (key, value):");
     print_collection_csmap_istr(&m1);
 
     typedef cvec_istr_value pair;
-    cvec_istr_push(&v, (pair){43, "Tc"});
-    cvec_istr_push(&v, (pair){41, "Nb"});
-    cvec_istr_push(&v, (pair){46, "Pd"});
-    cvec_istr_push(&v, (pair){42, "Mo"});
-    cvec_istr_push(&v, (pair){44, "Ru"});
-    cvec_istr_push(&v, (pair){44, "Ru"}); // attempt a duplicate
+    cvec_istr_push(&v, c_LITERAL(pair){43, "Tc"});
+    cvec_istr_push(&v, c_LITERAL(pair){41, "Nb"});
+    cvec_istr_push(&v, c_LITERAL(pair){46, "Pd"});
+    cvec_istr_push(&v, c_LITERAL(pair){42, "Mo"});
+    cvec_istr_push(&v, c_LITERAL(pair){44, "Ru"});
+    cvec_istr_push(&v, c_LITERAL(pair){44, "Ru"}); // attempt a duplicate
 
     puts("Inserting the following vector data into m1:");
     print_collection_cvec_istr(&v);

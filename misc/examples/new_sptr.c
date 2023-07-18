@@ -1,3 +1,4 @@
+#define i_implement
 #include <stc/cstr.h>
 
 typedef struct { cstr name, last; } Person;
@@ -8,28 +9,27 @@ int Person_cmp(const Person* a, const Person* b);
 uint64_t Person_hash(const Person* p);
 
 #define i_type PersonArc
-#define i_valclass Person // "class" ensure Person_drop will be called
-#define i_cmp Person_cmp   // enable carc object comparisons (not ptr to obj)
-#define i_hash Person_hash // enable carc object hash (not ptr to obj)
+#define i_keyclass Person // "class" assume _clone, _drop, _cmp, _hash is defined.
 #include <stc/carc.h>
 
 #define i_type IPtr
-#define i_val int
-#define i_valdrop(x) printf("drop: %d\n", *x)
-#define i_no_clone
+#define i_key int
+#define i_keydrop(x) printf("drop: %d\n", *x)
+#define i_native_cmp
 #include <stc/carc.h>
 
 #define i_type IPStack
-#define i_valboxed IPtr
+#define i_keyboxed IPtr
 #include <stc/cstack.h>
 
 #define i_type PASet
-#define i_valboxed PersonArc
+#define i_keyboxed PersonArc
 #include <stc/cset.h>
 
 
 Person Person_make(const char* name, const char* last) {
-    return (Person){.name = cstr_from(name), .last = cstr_from(last)};
+    Person p = {.name = cstr_from(name), .last = cstr_from(last)};
+    return p;
 }
 
 int Person_cmp(const Person* a, const Person* b) {

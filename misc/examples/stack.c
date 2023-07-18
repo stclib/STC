@@ -3,14 +3,14 @@
 
 #define i_tag i
 #define i_capacity 100
-#define i_val int
+#define i_key int
 #include <stc/cstack.h>
 
 #define i_tag c
-#define i_val char
+#define i_key char
 #include <stc/cstack.h>
 
-int main() {
+int main(void) {
     cstack_i stack = {0};
     cstack_c chars = {0};
 

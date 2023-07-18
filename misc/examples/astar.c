@@ -4,6 +4,7 @@
 // This is a reimplementation of the CTL example to STC:
 //     https://github.com/glouw/ctl/blob/master/examples/astar.c
 //     https://www.redblobgames.com/pathfinding/a-star/introduction.html
+#define i_implement
 #include <stc/cstr.h>
 #include <stdio.h>
 
@@ -19,7 +20,7 @@ point;
 point
 point_init(int x, int y, int width)
 {
-    return (point) { x, y, 0, width };
+    return c_LITERAL(point){ x, y, 0, width };
 }
 
 int
@@ -55,11 +56,11 @@ point_key_cmp(const point* a, const point* b)
     return (i == j) ? 0 : (i < j) ? -1 : 1;
 }
 
-#define i_val point
+#define i_key point
 #define i_cmp point_cmp_priority
 #include <stc/cpque.h>
 
-#define i_val point
+#define i_key point
 #define i_opt c_no_cmp
 #include <stc/cdeq.h>
 

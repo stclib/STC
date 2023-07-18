@@ -1,6 +1,9 @@
 #ifndef UTF8_C_INCLUDED
 #define UTF8_C_INCLUDED
-#include <stc/utf8.h> // header only
+
+#ifndef UTF8_H_INCLUDED
+#include "../include/stc/utf8.h" /* header only */
+#endif
 #include "utf8tabs.inc"
 
 const uint8_t utf8_dtab[] = {
@@ -458,28 +461,31 @@ static const URange16 Latin_range16[] = {
 
 #define UNI_ENTRY(Code) \
     { Code##_range16, sizeof(Code##_range16)/sizeof(URange16) }
-#ifndef __cplusplus
+#ifdef __cplusplus
+#define _e_arg(k, v) v
+#else
+#define _e_arg(k, v) [k] = v
 static
 #endif
 const UGroup _utf8_unicode_groups[U8G_SIZE] = {
-    [U8G_Cc] = UNI_ENTRY(Cc),
-    [U8G_Lt] = UNI_ENTRY(Lt),
-    [U8G_Nd] = UNI_ENTRY(Nd),
-    [U8G_Nl] = UNI_ENTRY(Nl),
-    [U8G_Pc] = UNI_ENTRY(Pc),
-    [U8G_Pd] = UNI_ENTRY(Pd),
-    [U8G_Pf] = UNI_ENTRY(Pf),
-    [U8G_Pi] = UNI_ENTRY(Pi),
-    [U8G_Sc] = UNI_ENTRY(Sc),
-    [U8G_Zl] = UNI_ENTRY(Zl),
-    [U8G_Zp] = UNI_ENTRY(Zp),
-    [U8G_Zs] = UNI_ENTRY(Zs),
-    [U8G_Arabic] = UNI_ENTRY(Arabic),
-    [U8G_Cyrillic] = UNI_ENTRY(Cyrillic),
-    [U8G_Devanagari] = UNI_ENTRY(Devanagari),
-    [U8G_Greek] = UNI_ENTRY(Greek),
-    [U8G_Han] = UNI_ENTRY(Han),
-    [U8G_Latin] = UNI_ENTRY(Latin),
+    _e_arg(U8G_Cc, UNI_ENTRY(Cc)),
+    _e_arg(U8G_Lt, UNI_ENTRY(Lt)),
+    _e_arg(U8G_Nd, UNI_ENTRY(Nd)),
+    _e_arg(U8G_Nl, UNI_ENTRY(Nl)),
+    _e_arg(U8G_Pc, UNI_ENTRY(Pc)),
+    _e_arg(U8G_Pd, UNI_ENTRY(Pd)),
+    _e_arg(U8G_Pf, UNI_ENTRY(Pf)),
+    _e_arg(U8G_Pi, UNI_ENTRY(Pi)),
+    _e_arg(U8G_Sc, UNI_ENTRY(Sc)),
+    _e_arg(U8G_Zl, UNI_ENTRY(Zl)),
+    _e_arg(U8G_Zp, UNI_ENTRY(Zp)),
+    _e_arg(U8G_Zs, UNI_ENTRY(Zs)),
+    _e_arg(U8G_Arabic, UNI_ENTRY(Arabic)),
+    _e_arg(U8G_Cyrillic, UNI_ENTRY(Cyrillic)),
+    _e_arg(U8G_Devanagari, UNI_ENTRY(Devanagari)),
+    _e_arg(U8G_Greek, UNI_ENTRY(Greek)),
+    _e_arg(U8G_Han, UNI_ENTRY(Han)),
+    _e_arg(U8G_Latin, UNI_ENTRY(Latin)),
 };
 
 #endif

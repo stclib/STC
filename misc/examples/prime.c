@@ -28,15 +28,18 @@ cbits sieveOfEratosthenes(llong n)
 
 int main(void)
 {
+
     llong n = 100000000;
     printf("Computing prime numbers up to %lld\n", n);
 
-    clock_t t1 = clock();
+    clock_t t = clock();
     cbits primes = sieveOfEratosthenes(n + 1);
+
     llong np = cbits_count(&primes);
     clock_t t2 = clock();
 
     printf("Number of primes: %lld, time: %f\n\n", np, (float)(t2 - t1) / (float)CLOCKS_PER_SEC);
+
     puts("Show all the primes in the range [2, 1000):");
     printf("2");
     c_forrange (i, 3, 1000, 2)
@@ -44,7 +47,9 @@ int main(void)
     puts("\n");
 
     puts("Show the last 50 primes using a temporary crange generator:");
-    c_forfilter (i, crange, crange_obj(n - 1, 0, -2),
+    crange range = crange_make(n - 1, 0, -2);
+
+    c_forfilter (i, crange, range,
         cbits_test(&primes, *i.ref/2) &&
         c_flt_take(i, 50)
     ){

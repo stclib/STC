@@ -6,9 +6,9 @@
 
 using_cspan3(ispan, int);
 
-int main()
+int main(void)
 {
-    cstack_int v = c_make(cstack_int, {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24});
+    cstack_int v = c_init(cstack_int, {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24});
 
     // View data as contiguous memory representing 24 ints
     ispan ms1 = cspan_from(&v);
@@ -28,7 +28,6 @@ int main()
     }
     puts("ss3 = ms3[:, 1:3, 1:3]");
     ispan3 ss3 = ms3;
-    //cspan_slice(&ss3, {c_ALL}, {1,3}, {1,3});
     ss3 = cspan_slice(ispan3, &ms3, {c_ALL}, {1,3}, {1,3});
 
     for (int i=0; i != ss3.shape[0]; i++) {

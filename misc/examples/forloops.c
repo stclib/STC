@@ -2,7 +2,7 @@
 #include <stc/algo/filter.h>
 
 #define i_type IVec
-#define i_val int
+#define i_key int
 #include <stc/cstack.h>
 
 #define i_type IMap
@@ -11,7 +11,7 @@
 #include <stc/cmap.h>
 
 
-int main()
+int main(void)
 {
     puts("c_forrange:");
     c_forrange (30) printf(" xx");
@@ -34,8 +34,8 @@ int main()
         printf(" %s", *i.ref);
     puts("");
 
-    IVec vec = c_make(IVec, {12, 23, 453, 65, 113, 215, 676, 34, 67, 20, 27, 66, 189, 45, 280, 199});
-    IMap map = c_make(IMap, {{12, 23}, {453, 65}, {676, 123}, {34, 67}});
+    IVec vec = c_init(IVec, {12, 23, 453, 65, 113, 215, 676, 34, 67, 20, 27, 66, 189, 45, 280, 199});
+    IMap map = c_init(IMap, {{12, 23}, {453, 65}, {676, 123}, {34, 67}});
 
     puts("\n\nc_foreach:");
     c_foreach (i, IVec, vec)

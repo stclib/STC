@@ -18,8 +18,7 @@ See the c++ class [std::set](https://en.cppreference.com/w/cpp/container/set) fo
 #define i_keyfrom   // convertion func i_keyraw => i_key - defaults to plain copy
 #define i_keyto     // convertion func i_key* => i_keyraw - defaults to plain copy
 
-#define i_tag       // alternative typename: csset_{i_tag}. i_tag defaults to i_val
-#define i_ssize     // defaults to int32_t
+#define i_tag       // alternative typename: csset_{i_tag}. i_tag defaults to i_key
 #include <stc/csset.h>
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.
@@ -77,17 +76,18 @@ csset_X_value        csset_X_value_clone(csset_X_value val);
 
 ## Example
 ```c
+#define i_implement
 #include <stc/cstr.h>
 
 #define i_type SSet
 #define i_key_str
 #include <stc/csset.h>
 
-int main ()
+int main(void)
 {
     SSet second={0}, third={0}, fourth={0}, fifth={0};
 
-    second = c_make(SSet, {"red", "green", "blue"});
+    second = c_init(SSet, {"red", "green", "blue"});
 
     c_forlist (i, const char*, {"orange", "pink", "yellow"})
         SSet_emplace(&third, *i.ref);

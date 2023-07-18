@@ -20,15 +20,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#include "ccommon.h"
+#include "priv/linkage.h"
 
 #ifndef CRAND_H_INCLUDED
 #define CRAND_H_INCLUDED
+#include "ccommon.h"
 /*
 // crand: Pseudo-random number generator
 #include "stc/crand.h"
 
-int main() {
+int main(void) {
     uint64_t seed = 123456789;
     crand_t rng = crand_init(seed);
     crand_unif_t dist1 = crand_unif_init(1, 6);
@@ -92,7 +93,7 @@ STC_INLINE double crand_f64(crand_t* rng) {
 }
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if defined(i_implement)
+#if defined(i_implement) || defined(i_static)
 
 /* Global random() */
 static crand_t crand_global = {{
@@ -127,18 +128,6 @@ STC_DEF crand_unif_t crand_unif_init(int64_t low, int64_t high) {
     return dist;
 }
 
-#if defined(__SIZEOF_INT128__)
-    #define c_umul128(a, b, lo, hi) \
-        do { __uint128_t _z = (__uint128_t)(a)*(b); \
-             *(lo) = (uint64_t)_z, *(hi) = (uint64_t)(_z >> 64U); } while(0)
-#elif defined(_MSC_VER) && defined(_WIN64)
-    #include <intrin.h>
-    #define c_umul128(a, b, lo, hi) ((void)(*(lo) = _umul128(a, b, hi)))
-#elif defined(__x86_64__)
-    #define c_umul128(a, b, lo, hi) \
-        asm("mulq %3" : "=a"(*(lo)), "=d"(*(hi)) : "a"(a), "rm"(b))
-#endif
-
 /* Int64 uniform distributed RNG, range [low, high]. */
 STC_DEF int64_t crand_unif(crand_t* rng, crand_unif_t* d) {
     uint64_t lo, hi;
@@ -164,11 +153,10 @@ STC_DEF double crand_norm(crand_t* rng, crand_norm_t* dist) {
     dist->next = u2*m;
     return (u1*m)*dist->stddev + dist->mean;
 }
-
 #endif
 #endif
 #undef i_opt
 #undef i_static
 #undef i_header
 #undef i_implement
-#undef i_extern
+#undef i_import

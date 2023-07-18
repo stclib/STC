@@ -1,7 +1,9 @@
+#define i_implement
 #include <stc/cstr.h>
+#define i_implement
 #include <stc/csview.h>
 
-int main ()
+int main(void)
 {
     cstr str = cstr_lit("We think in generalities, but we live in details.");
     csview sv1 = cstr_substr_ex(&str, 3, 5);               // "think"

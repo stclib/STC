@@ -8,17 +8,17 @@ See the c++ class [std::priority_queue](https://en.cppreference.com/w/cpp/contai
 ## Header file and declaration
 
 ```c
-#define i_type      // define type name of the container (default cpque_{i_val})
-#define i_val       // value: REQUIRED
-#define i_less      // compare two i_val* : REQUIRED IF i_val/i_valraw is a non-integral type
-#define i_valdrop   // destroy value func - defaults to empty destruct
-#define i_valclone  // REQUIRED IF i_valdrop defined
+#define i_type      // define type name of the container (default cpque_{i_key})
+#define i_key       // value: REQUIRED
+#define i_less      // compare two i_key* : REQUIRED IF i_key/i_keyraw is a non-integral type
+#define i_keydrop   // destroy value func - defaults to empty destruct
+#define i_keyclone  // REQUIRED IF i_keydrop defined
 
-#define i_valraw    // convertion type
-#define i_valfrom   // convertion func i_valraw => i_val
-#define i_valto     // convertion func i_val* => i_valraw.
+#define i_keyraw    // convertion type
+#define i_keyfrom   // convertion func i_keyraw => i_key
+#define i_keyto     // convertion func i_key* => i_keyraw.
 
-#define i_tag       // alternative typename: cpque_{i_tag}. i_tag defaults to i_val
+#define i_tag       // alternative typename: cpque_{i_tag}. i_tag defaults to i_key
 #include <stc/cpque.h>
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.
@@ -28,7 +28,7 @@ See the c++ class [std::priority_queue](https://en.cppreference.com/w/cpp/contai
 ```c
 cpque_X             cpque_X_init(void);                    // create empty pri-queue.
 cpque_X             cpque_X_with_capacity(intptr_t cap);
-cpque_X             cpque_X_with_size(intptr_t size, i_val null);
+cpque_X             cpque_X_with_size(intptr_t size, i_key null);
 cpque_X             cpque_X_clone(cpque_X pq);
 
 void                cpque_X_clear(cpque_X* self);
@@ -39,16 +39,16 @@ void                cpque_X_drop(cpque_X* self);        // destructor
 
 intptr_t            cpque_X_size(const cpque_X* self);
 bool                cpque_X_empty(const cpque_X* self);
-i_val*              cpque_X_top(const cpque_X* self);
+i_key*              cpque_X_top(const cpque_X* self);
 
 void                cpque_X_make_heap(cpque_X* self);  // heapify the vector.
-void                cpque_X_push(cpque_X* self, i_val value);
-void                cpque_X_emplace(cpque_X* self, i_valraw raw); // converts from raw
+void                cpque_X_push(cpque_X* self, i_key value);
+void                cpque_X_emplace(cpque_X* self, i_keyraw raw); // converts from raw
 
 void                cpque_X_pop(cpque_X* self);
 void                cpque_X_erase_at(cpque_X* self, intptr_t idx);
 
-i_val               cpque_X_value_clone(i_val value);
+i_key               cpque_X_value_clone(i_key value);
 ```
 
 ## Types
@@ -56,19 +56,19 @@ i_val               cpque_X_value_clone(i_val value);
 | Type name          | Type definition                       | Used to represent...    |
 |:-------------------|:--------------------------------------|:------------------------|
 | `cpque_X`          | `struct {cpque_X_value* data; ...}`   | The cpque type          |
-| `cpque_X_value`    | `i_val`                               | The cpque element type  |
+| `cpque_X_value`    | `i_key`                               | The cpque element type  |
 
 ## Example
 ```c
 #include <stc/crand.h>
 #include <stdio.h>
 
-#define i_val int64_t
+#define i_key int64_t
 #define i_cmp -c_default_cmp // min-heap
 #define i_tag i
 #include <stc/cpque.h>
 
-int main()
+int main(void)
 {
     intptr_t N = 10000000;
     crand_t rng = crand_init(1234);

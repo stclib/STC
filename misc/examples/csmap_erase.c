@@ -1,5 +1,6 @@
 // map_erase.c
 // From C++ example: https://docs.microsoft.com/en-us/cpp/standard-library/map-class?view=msvc-160#example-16
+#define i_implement
 #include <stc/cstr.h>
 #include <stdio.h>
 
@@ -15,7 +16,7 @@ void printmap(mymap m)
     printf("\nsize() == %" c_ZI "\n\n", mymap_size(&m));
 }
 
-int main()
+int main(void)
 {
     mymap m1 = {0};
 
@@ -34,7 +35,7 @@ int main()
     printmap(m1);
 
     // Fill in some data to test with
-    mymap m2 = c_make(mymap, {
+    mymap m2 = c_init(mymap, {
         {10, "Bob"},
         {11, "Rob"},
         {12, "Robert"},

@@ -1,4 +1,4 @@
-#define i_extern
+#define i_import
 #include <stc/cregex.h>
 #include <stc/csview.h>
 
@@ -12,7 +12,7 @@ bool add_10_years(int i, csview match, cstr* out) {
     return false;
 }
 
-int main()
+int main(void)
 {
     const char* pattern = "\\b(\\d\\d\\d\\d)-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])\\b";
     const char* input = "start date: 2015-12-31, end date: 2022-02-28";
@@ -47,7 +47,7 @@ int main()
         printf("euros: %s\n", cstr_str(&str));
 
         /* Strip out everything but the matches */
-        cstr_take(&str, cregex_replace_sv(&re, csview_from(input), "$3.$2.$1;", 0, NULL, CREG_R_STRIP));
+        cstr_take(&str, cregex_replace_sv(&re, csview_from(input), "$3.$2.$1;", 0, NULL, CREG_STRIP));
         printf("strip: %s\n", cstr_str(&str));
 
         /* Wrap all words in ${} */

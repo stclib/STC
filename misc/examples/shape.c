@@ -62,9 +62,9 @@ static void Triangle_draw(const Shape* shape)
 {
     const Triangle* self = DYN_CAST(Triangle, shape);
     printf("Triangle : (%g,%g), (%g,%g), (%g,%g)\n",
-           self->p[0].x, self->p[0].y,
-           self->p[1].x, self->p[1].y,
-           self->p[2].x, self->p[2].y);
+           (double)self->p[0].x, (double)self->p[0].y,
+           (double)self->p[1].x, (double)self->p[1].y,
+           (double)self->p[2].x, (double)self->p[2].y);
 }
 
 struct ShapeAPI Triangle_api = {
@@ -76,7 +76,7 @@ struct ShapeAPI Triangle_api = {
 // ============================================================
 
 #define i_type PointVec 
-#define i_val Point
+#define i_key Point
 #include <stc/cstack.h>
 
 typedef struct {
@@ -109,7 +109,7 @@ static void Polygon_draw(const Shape* shape)
     const Polygon* self = DYN_CAST(Polygon, shape);
     printf("Polygon  :");
     c_foreach (i, PointVec, self->points)
-        printf(" (%g,%g)", i.ref->x, i.ref->y);
+        printf(" (%g,%g)", (double)i.ref->x, (double)i.ref->y);
     puts("");
 }
 
@@ -122,8 +122,8 @@ struct ShapeAPI Polygon_api = {
 // ============================================================
 
 #define i_type Shapes
-#define i_val Shape*
-#define i_valdrop(x) Shape_delete(*x)
+#define i_key Shape*
+#define i_keydrop(x) Shape_delete(*x)
 #define i_no_clone
 #include <stc/cstack.h>
 
@@ -137,7 +137,7 @@ int main(void)
 {
     Shapes shapes = {0};
 
-    Triangle* tri1 = c_new(Triangle, Triangle_from((Point){5, 7}, (Point){12, 7}, (Point){12, 20}));
+    Triangle* tri1 = c_new(Triangle, Triangle_from(c_LITERAL(Point){5, 7}, c_LITERAL(Point){12, 7}, c_LITERAL(Point){12, 20}));
     Polygon* pol1 = c_new(Polygon, Polygon_init());
     Polygon* pol2 = c_new(Polygon, Polygon_init());
 

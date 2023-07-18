@@ -25,9 +25,24 @@ THE SOFTWARE.
 */
 #ifndef CREGEX_C_INCLUDED
 #define CREGEX_C_INCLUDED
-#include <stc/cstr.h>
-#include <stc/cregex.h> // header only
+
 #include <setjmp.h>
+#ifdef i_import
+#  define _i_import
+#endif
+#ifndef CREGEX_H_INCLUDED
+#  include "../include/stc/cregex.h"
+#endif
+#ifdef _i_import
+#  include "utf8code.c"
+#endif
+#ifdef _i_import
+#  define i_implement
+#else
+#  undef i_implement
+#endif
+#undef _i_import
+#include "../include/stc/cstr.h"
 
 typedef uint32_t _Rune; /* Utf8 code point */
 typedef int32_t _Token;
@@ -842,20 +857,21 @@ _bldcclass(_Parser *par)
 
 
 static _Reprog*
-_regcomp1(_Reprog *progp, _Parser *par, const char *s, int cflags)
+_regcomp1(_Reprog *pp, _Parser *par, const char *s, int cflags)
 {
     _Token token;
 
     /* get memory for the program. estimated max usage */
     par->instcap = 5U + 6*strlen(s);
-    _Reprog* pp = (_Reprog *)c_realloc(progp, sizeof(_Reprog) + par->instcap*sizeof(_Reinst));
-    if (pp == NULL) {
+    _Reprog* old_pp = pp;
+    pp = (_Reprog *)c_realloc(pp, sizeof(_Reprog) + par->instcap*sizeof(_Reinst));
+    if (! pp) {
+        c_free(old_pp);
         par->error = CREG_OUTOFMEMORY;
-        c_free(progp);
         return NULL;
     }
-    pp->flags.icase = (cflags & CREG_C_ICASE) != 0;
-    pp->flags.dotall = (cflags & CREG_C_DOTALL) != 0;
+    pp->flags.icase = (cflags & CREG_ICASE) != 0;
+    pp->flags.dotall = (cflags & CREG_DOTALL) != 0;
     par->freep = pp->firstinst;
     par->classp = pp->cclass;
     par->error = 0;
@@ -928,14 +944,14 @@ _runematch(_Rune s, _Rune r)
     case ASC_LO: inv = 1; case ASC_lo: return inv ^ (islower((int)r) != 0);
     case ASC_UP: inv = 1; case ASC_up: return inv ^ (isupper((int)r) != 0);
     case ASC_XD: inv = 1; case ASC_xd: return inv ^ (isxdigit((int)r) != 0);
-    case UTF_AN: inv = 1; case UTF_an: return inv ^ utf8_isalnum(r);
-    case UTF_BL: inv = 1; case UTF_bl: return inv ^ utf8_isblank(r);
-    case UTF_SP: inv = 1; case UTF_sp: return inv ^ utf8_isspace(r);
-    case UTF_LL: inv = 1; case UTF_ll: return inv ^ utf8_islower(r);
-    case UTF_LU: inv = 1; case UTF_lu: return inv ^ utf8_isupper(r);
-    case UTF_LC: inv = 1; case UTF_lc: return inv ^ utf8_iscased(r); 
-    case UTF_AL: inv = 1; case UTF_al: return inv ^ utf8_isalpha(r);
-    case UTF_WR: inv = 1; case UTF_wr: return inv ^ utf8_isword(r);
+    case UTF_AN: inv = 1; case UTF_an: return inv ^ (int)utf8_isalnum(r);
+    case UTF_BL: inv = 1; case UTF_bl: return inv ^ (int)utf8_isblank(r);
+    case UTF_SP: inv = 1; case UTF_sp: return inv ^ (int)utf8_isspace(r);
+    case UTF_LL: inv = 1; case UTF_ll: return inv ^ (int)utf8_islower(r);
+    case UTF_LU: inv = 1; case UTF_lu: return inv ^ (int)utf8_isupper(r);
+    case UTF_LC: inv = 1; case UTF_lc: return inv ^ (int)utf8_iscased(r); 
+    case UTF_AL: inv = 1; case UTF_al: return inv ^ (int)utf8_isalpha(r);
+    case UTF_WR: inv = 1; case UTF_wr: return inv ^ (int)utf8_isword(r);
     case UTF_cc: case UTF_CC:
     case UTF_lt: case UTF_LT:
     case UTF_nd: case UTF_ND:
@@ -956,7 +972,7 @@ _runematch(_Rune s, _Rune r)
     case UTF_latin: case UTF_LATIN:
         n = (int)s - UTF_GRP;
         inv = n & 1;
-        return inv ^ utf8_isgroup(n / 2, r);
+        return inv ^ (int)utf8_isgroup(n / 2, r);
     }
     return s == r;
 }
@@ -1100,7 +1116,7 @@ _regexec1(const _Reprog *progp,  /* program to run */
                     /* efficiency: advance and re-evaluate */
                     continue;
                 case TOK_END:    /* Match! */
-                    match = !(mflags & CREG_M_FULLMATCH) ||
+                    match = !(mflags & CREG_FULLMATCH) ||
                             ((s == j->eol || r == 0 || r == '\n') &&
                             (tlp->se.m[0].str == bol || tlp->se.m[0].str[-1] == '\n'));
                     tlp->se.m[0].size = (s - tlp->se.m[0].str);
@@ -1168,9 +1184,9 @@ _regexec(const _Reprog *progp,    /* program to run */
     j.eol = NULL;
 
     if (mp && mp[0].size) {
-        if (mflags & CREG_M_STARTEND)
+        if (mflags & CREG_STARTEND)
             j.starts = mp[0].str, j.eol = mp[0].str + mp[0].size;
-        else if (mflags & CREG_M_NEXT)
+        else if (mflags & CREG_NEXT)
             j.starts = mp[0].str + mp[0].size;
     }
 
@@ -1204,7 +1220,7 @@ _build_subst(const char* replace, int nmatch, const csview match[],
     cstr_buf buf = cstr_buffer(subst);
     intptr_t len = 0, cap = buf.cap;
     char* dst = buf.data;
-    cstr mstr = cstr_NULL;
+    cstr mstr = cstr_null;
 
     while (*replace != '\0') {
         if (*replace == '$') {
@@ -1216,11 +1232,11 @@ _build_subst(const char* replace, int nmatch, const csview match[],
                 g = arg - '0';
                 if (replace[1] >= '0' && replace[1] <= '9' && replace[2] == ';')
                     { g = g*10 + (replace[1] - '0'); replace += 2; }
-                if (g < (int)nmatch) {
+                if (g < nmatch) {
                     csview m = mfun && mfun(g, match[g], &mstr) ? cstr_sv(&mstr) : match[g];
                     if (len + m.size > cap)
-                        dst = cstr_reserve(subst, cap = cap*3/2 + m.size);
-                    for (int i = 0; i < (int)m.size; ++i)
+                        dst = cstr_reserve(subst, cap += cap/2 + m.size);
+                    for (int i = 0; i < m.size; ++i)
                         dst[len++] = m.str[i];
                 }
                 ++replace;
@@ -1229,7 +1245,7 @@ _build_subst(const char* replace, int nmatch, const csview match[],
             }
         }
         if (len == cap)
-            dst = cstr_reserve(subst, cap = cap*3/2 + 4);
+            dst = cstr_reserve(subst, cap += cap/2 + 4);
         dst[len++] = *replace++;
     }
     cstr_drop(&mstr);
@@ -1250,12 +1266,12 @@ cregex_compile_3(cregex *self, const char* pattern, int cflags) {
 
 int
 cregex_captures(const cregex* self) {
-    return self->prog ? 1 + self->prog->nsubids : 0;
+    return self->prog ? self->prog->nsubids : 0;
 }
 
 int
 cregex_find_4(const cregex* re, const char* input, csview match[], int mflags) {
-    int res = _regexec(re->prog, input, cregex_captures(re), match, mflags);
+    int res = _regexec(re->prog, input, cregex_captures(re) + 1, match, mflags);
     switch (res) {
     case 1: return CREG_OK;
     case 0: return CREG_NOMATCH;
@@ -1277,12 +1293,12 @@ cregex_find_pattern_4(const char* pattern, const char* input,
 cstr
 cregex_replace_sv_6(const cregex* re, csview input, const char* replace, int count,
                     bool (*mfun)(int, csview, cstr*), int rflags) {
-    cstr out = cstr_NULL;
-    cstr subst = cstr_NULL;
+    cstr out = cstr_null;
+    cstr subst = cstr_null;
     csview match[CREG_MAX_CAPTURES];
-    int nmatch = cregex_captures(re);
+    int nmatch = cregex_captures(re) + 1;
     if (!count) count = INT32_MAX;
-    bool copy = !(rflags & CREG_R_STRIP);
+    bool copy = !(rflags & CREG_STRIP);
 
     while (count-- && cregex_find_sv(re, input, match) == CREG_OK) {
         _build_subst(replace, nmatch, match, mfun, &subst);

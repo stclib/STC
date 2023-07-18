@@ -1,7 +1,7 @@
 ///////////////////////// ankerl::unordered_dense::{map, set} /////////////////////////
 
 // A fast & densely stored hashmap and hashset based on robin-hood backward shift deletion.
-// Version 3.1.0
+// Version 4.0.1
 // https://github.com/martinus/unordered_dense
 //
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
@@ -30,12 +30,15 @@
 #define ANKERL_UNORDERED_DENSE_H
 
 // see https://semver.org/spec/v2.0.0.html
-#define ANKERL_UNORDERED_DENSE_VERSION_MAJOR 3 // NOLINT(cppcoreguidelines-macro-usage) incompatible API changes
-#define ANKERL_UNORDERED_DENSE_VERSION_MINOR 1 // NOLINT(cppcoreguidelines-macro-usage) backwards compatible functionality
-#define ANKERL_UNORDERED_DENSE_VERSION_PATCH 0 // NOLINT(cppcoreguidelines-macro-usage) backwards compatible bug fixes
+#define ANKERL_UNORDERED_DENSE_VERSION_MAJOR 4 // NOLINT(cppcoreguidelines-macro-usage) incompatible API changes
+#define ANKERL_UNORDERED_DENSE_VERSION_MINOR 0 // NOLINT(cppcoreguidelines-macro-usage) backwards compatible functionality
+#define ANKERL_UNORDERED_DENSE_VERSION_PATCH 1 // NOLINT(cppcoreguidelines-macro-usage) backwards compatible bug fixes
 
 // API versioning with inline namespace, see https://www.foonathan.net/2018/11/inline-namespaces/
+
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define ANKERL_UNORDERED_DENSE_VERSION_CONCAT1(major, minor, patch) v##major##_##minor##_##patch
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define ANKERL_UNORDERED_DENSE_VERSION_CONCAT(major, minor, patch) ANKERL_UNORDERED_DENSE_VERSION_CONCAT1(major, minor, patch)
 #define ANKERL_UNORDERED_DENSE_NAMESPACE   \
     ANKERL_UNORDERED_DENSE_VERSION_CONCAT( \
@@ -57,9 +60,9 @@
 
 // exceptions
 #if defined(__cpp_exceptions) || defined(__EXCEPTIONS) || defined(_CPPUNWIND)
-#    define ANKERL_UNORDERED_DENSE_HAS_EXCEPTIONS() 1
+#    define ANKERL_UNORDERED_DENSE_HAS_EXCEPTIONS() 1 // NOLINT(cppcoreguidelines-macro-usage)
 #else
-#    define ANKERL_UNORDERED_DENSE_HAS_EXCEPTIONS() 0
+#    define ANKERL_UNORDERED_DENSE_HAS_EXCEPTIONS() 0 // NOLINT(cppcoreguidelines-macro-usage)
 #endif
 #ifdef _MSC_VER
 #    define ANKERL_UNORDERED_DENSE_NOINLINE __declspec(noinline)
@@ -89,20 +92,13 @@
 #        include <cstdlib> // for abort
 #    endif
 
-#    define ANKERL_UNORDERED_DENSE_PMR 0 // NOLINT(cppcoreguidelines-macro-usage)
 #    if defined(__has_include)
 #        if __has_include(<memory_resource>)
-#            undef ANKERL_UNORDERED_DENSE_PMR
-#            define ANKERL_UNORDERED_DENSE_PMR 1 // NOLINT(cppcoreguidelines-macro-usage)
-#            define ANKERL_UNORDERED_DENSE_PMR_ALLOCATOR \
-                std::pmr::polymorphic_allocator // NOLINT(cppcoreguidelines-macro-usage)
-#            include <memory_resource>          // for polymorphic_allocator
+#            define ANKERL_UNORDERED_DENSE_PMR std::pmr // NOLINT(cppcoreguidelines-macro-usage)
+#            include <memory_resource>                  // for polymorphic_allocator
 #        elif __has_include(<experimental/memory_resource>)
-#            undef ANKERL_UNORDERED_DENSE_PMR
-#            define ANKERL_UNORDERED_DENSE_PMR 1 // NOLINT(cppcoreguidelines-macro-usage)
-#            define ANKERL_UNORDERED_DENSE_PMR_ALLOCATOR \
-                std::experimental::pmr::polymorphic_allocator // NOLINT(cppcoreguidelines-macro-usage)
-#            include <experimental/memory_resource>           // for polymorphic_allocator
+#            define ANKERL_UNORDERED_DENSE_PMR std::experimental::pmr // NOLINT(cppcoreguidelines-macro-usage)
+#            include <experimental/memory_resource>                   // for polymorphic_allocator
 #        endif
 #    endif
 
@@ -428,7 +424,7 @@ constexpr bool is_map_v = !std::is_void_v<Mapped>;
 
 // clang-format off
 template <typename Hash, typename KeyEqual>
-constexpr bool is_transparent_v = is_detected_v<detect_is_transparent, Hash>&& is_detected_v<detect_is_transparent, KeyEqual>;
+constexpr bool is_transparent_v = is_detected_v<detect_is_transparent, Hash> && is_detected_v<detect_is_transparent, KeyEqual>;
 // clang-format on
 
 template <typename From, typename To1, typename To2>
@@ -446,19 +442,320 @@ struct base_table_type_map {
 // base type for set doesn't have mapped_type
 struct base_table_type_set {};
 
+} // namespace detail
+
+// Very much like std::deque, but faster for indexing (in most cases). As of now this doesn't implement the full std::vector
+// API, but merely what's necessary to work as an underlying container for ankerl::unordered_dense::{map, set}.
+// It allocates blocks of equal size and puts them into the m_blocks vector. That means it can grow simply by adding a new
+// block to the back of m_blocks, and doesn't double its size like an std::vector. The disadvantage is that memory is not
+// linear and thus there is one more indirection necessary for indexing.
+template <typename T, typename Allocator = std::allocator<T>, size_t MaxSegmentSizeBytes = 4096>
+class segmented_vector {
+    template <bool IsConst>
+    class iter_t;
+
+public:
+    using allocator_type = Allocator;
+    using pointer = typename std::allocator_traits<allocator_type>::pointer;
+    using const_pointer = typename std::allocator_traits<allocator_type>::const_pointer;
+    using difference_type = typename std::allocator_traits<allocator_type>::difference_type;
+    using value_type = T;
+    using size_type = std::size_t;
+    using reference = T&;
+    using const_reference = T const&;
+    using iterator = iter_t<false>;
+    using const_iterator = iter_t<true>;
+
+private:
+    using vec_alloc = typename std::allocator_traits<Allocator>::template rebind_alloc<pointer>;
+    std::vector<pointer, vec_alloc> m_blocks{};
+    size_t m_size{};
+
+    // Calculates the maximum number for x in  (s << x) <= max_val
+    static constexpr auto num_bits_closest(size_t max_val, size_t s) -> size_t {
+        auto f = size_t{0};
+        while (s << (f + 1) <= max_val) {
+            ++f;
+        }
+        return f;
+    }
+
+    using self_t = segmented_vector<T, Allocator, MaxSegmentSizeBytes>;
+    static constexpr auto num_bits = num_bits_closest(MaxSegmentSizeBytes, sizeof(T));
+    static constexpr auto num_elements_in_block = 1U << num_bits;
+    static constexpr auto mask = num_elements_in_block - 1U;
+
+    /**
+     * Iterator class doubles as const_iterator and iterator
+     */
+    template <bool IsConst>
+    class iter_t {
+        using ptr_t = typename std::conditional_t<IsConst, segmented_vector::const_pointer const*, segmented_vector::pointer*>;
+        ptr_t m_data{};
+        size_t m_idx{};
+
+        template <bool B>
+        friend class iter_t;
+
+    public:
+        using difference_type = segmented_vector::difference_type;
+        using value_type = T;
+        using reference = typename std::conditional_t<IsConst, value_type const&, value_type&>;
+        using pointer = typename std::conditional_t<IsConst, segmented_vector::const_pointer, segmented_vector::pointer>;
+        using iterator_category = std::forward_iterator_tag;
+
+        iter_t() noexcept = default;
+
+        template <bool OtherIsConst, typename = typename std::enable_if<IsConst && !OtherIsConst>::type>
+        // NOLINTNEXTLINE(google-explicit-constructor,hicpp-explicit-conversions)
+        constexpr iter_t(iter_t<OtherIsConst> const& other) noexcept
+            : m_data(other.m_data)
+            , m_idx(other.m_idx) {}
+
+        constexpr iter_t(ptr_t data, size_t idx) noexcept
+            : m_data(data)
+            , m_idx(idx) {}
+
+        template <bool OtherIsConst, typename = typename std::enable_if<IsConst && !OtherIsConst>::type>
+        constexpr auto operator=(iter_t<OtherIsConst> const& other) noexcept -> iter_t& {
+            m_data = other.m_data;
+            m_idx = other.m_idx;
+            return *this;
+        }
+
+        constexpr auto operator++() noexcept -> iter_t& {
+            ++m_idx;
+            return *this;
+        }
+
+        constexpr auto operator+(difference_type diff) noexcept -> iter_t {
+            return {m_data, static_cast<size_t>(static_cast<difference_type>(m_idx) + diff)};
+        }
+
+        template <bool OtherIsConst>
+        constexpr auto operator-(iter_t<OtherIsConst> const& other) noexcept -> difference_type {
+            return static_cast<difference_type>(m_idx) - static_cast<difference_type>(other.m_idx);
+        }
+
+        constexpr auto operator*() const noexcept -> reference {
+            return m_data[m_idx >> num_bits][m_idx & mask];
+        }
+
+        constexpr auto operator->() const noexcept -> pointer {
+            return &m_data[m_idx >> num_bits][m_idx & mask];
+        }
+
+        template <bool O>
+        constexpr auto operator==(iter_t<O> const& o) const noexcept -> bool {
+            return m_idx == o.m_idx;
+        }
+
+        template <bool O>
+        constexpr auto operator!=(iter_t<O> const& o) const noexcept -> bool {
+            return !(*this == o);
+        }
+    };
+
+    // slow path: need to allocate a new segment every once in a while
+    void increase_capacity() {
+        auto ba = Allocator(m_blocks.get_allocator());
+        pointer block = std::allocator_traits<Allocator>::allocate(ba, num_elements_in_block);
+        m_blocks.push_back(block);
+    }
+
+    // Moves everything from other
+    void append_everything_from(segmented_vector&& other) {
+        reserve(size() + other.size());
+        for (auto&& o : other) {
+            emplace_back(std::move(o));
+        }
+    }
+
+    // Copies everything from other
+    void append_everything_from(segmented_vector const& other) {
+        reserve(size() + other.size());
+        for (auto const& o : other) {
+            emplace_back(o);
+        }
+    }
+
+    void dealloc() {
+        auto ba = Allocator(m_blocks.get_allocator());
+        for (auto ptr : m_blocks) {
+            std::allocator_traits<Allocator>::deallocate(ba, ptr, num_elements_in_block);
+        }
+    }
+
+    [[nodiscard]] static constexpr auto calc_num_blocks_for_capacity(size_t capacity) {
+        return (capacity + num_elements_in_block - 1U) / num_elements_in_block;
+    }
+
+public:
+    segmented_vector() = default;
+
+    // NOLINTNEXTLINE(google-explicit-constructor,hicpp-explicit-conversions)
+    segmented_vector(Allocator alloc)
+        : m_blocks(vec_alloc(alloc)) {}
+
+    segmented_vector(segmented_vector&& other, Allocator alloc)
+        : m_blocks(vec_alloc(alloc)) {
+        if (other.get_allocator() == alloc) {
+            *this = std::move(other);
+        } else {
+            // Oh my, allocator is different so we need to copy everything.
+            append_everything_from(std::move(other));
+        }
+    }
+
+    segmented_vector(segmented_vector&& other) noexcept
+        : m_blocks(std::move(other.m_blocks))
+        , m_size(std::exchange(other.m_size, {})) {}
+
+    segmented_vector(segmented_vector const& other, Allocator alloc)
+        : m_blocks(vec_alloc(alloc)) {
+        append_everything_from(other);
+    }
+
+    segmented_vector(segmented_vector const& other) {
+        append_everything_from(other);
+    }
+
+    auto operator=(segmented_vector const& other) -> segmented_vector& {
+        if (this == &other) {
+            return *this;
+        }
+        clear();
+        append_everything_from(other);
+        return *this;
+    }
+
+    auto operator=(segmented_vector&& other) noexcept -> segmented_vector& {
+        clear();
+        dealloc();
+        m_blocks = std::move(other.m_blocks);
+        m_size = std::exchange(other.m_size, {});
+        return *this;
+    }
+
+    ~segmented_vector() {
+        clear();
+        dealloc();
+    }
+
+    [[nodiscard]] constexpr auto size() const -> size_t {
+        return m_size;
+    }
+
+    [[nodiscard]] constexpr auto capacity() const -> size_t {
+        return m_blocks.size() * num_elements_in_block;
+    }
+
+    // Indexing is highly performance critical
+    [[nodiscard]] constexpr auto operator[](size_t i) const noexcept -> T const& {
+        return m_blocks[i >> num_bits][i & mask];
+    }
+
+    [[nodiscard]] constexpr auto operator[](size_t i) noexcept -> T& {
+        return m_blocks[i >> num_bits][i & mask];
+    }
+
+    [[nodiscard]] constexpr auto begin() -> iterator {
+        return {m_blocks.data(), 0U};
+    }
+    [[nodiscard]] constexpr auto begin() const -> const_iterator {
+        return {m_blocks.data(), 0U};
+    }
+    [[nodiscard]] constexpr auto cbegin() const -> const_iterator {
+        return {m_blocks.data(), 0U};
+    }
+
+    [[nodiscard]] constexpr auto end() -> iterator {
+        return {m_blocks.data(), m_size};
+    }
+    [[nodiscard]] constexpr auto end() const -> const_iterator {
+        return {m_blocks.data(), m_size};
+    }
+    [[nodiscard]] constexpr auto cend() const -> const_iterator {
+        return {m_blocks.data(), m_size};
+    }
+
+    [[nodiscard]] constexpr auto back() -> reference {
+        return operator[](m_size - 1);
+    }
+    [[nodiscard]] constexpr auto back() const -> const_reference {
+        return operator[](m_size - 1);
+    }
+
+    void pop_back() {
+        back().~T();
+        --m_size;
+    }
+
+    [[nodiscard]] auto empty() const {
+        return 0 == m_size;
+    }
+
+    void reserve(size_t new_capacity) {
+        m_blocks.reserve(calc_num_blocks_for_capacity(new_capacity));
+        while (new_capacity > capacity()) {
+            increase_capacity();
+        }
+    }
+
+    [[nodiscard]] auto get_allocator() const -> allocator_type {
+        return allocator_type{m_blocks.get_allocator()};
+    }
+
+    template <class... Args>
+    auto emplace_back(Args&&... args) -> reference {
+        if (m_size == capacity()) {
+            increase_capacity();
+        }
+        auto* ptr = static_cast<void*>(&operator[](m_size));
+        auto& ref = *new (ptr) T(std::forward<Args>(args)...);
+        ++m_size;
+        return ref;
+    }
+
+    void clear() {
+        if constexpr (!std::is_trivially_destructible_v<T>) {
+            for (size_t i = 0, s = size(); i < s; ++i) {
+                operator[](i).~T();
+            }
+        }
+        m_size = 0;
+    }
+
+    void shrink_to_fit() {
+        auto ba = Allocator(m_blocks.get_allocator());
+        auto num_blocks_required = calc_num_blocks_for_capacity(m_size);
+        while (m_blocks.size() > num_blocks_required) {
+            std::allocator_traits<Allocator>::deallocate(ba, m_blocks.back(), num_elements_in_block);
+            m_blocks.pop_back();
+        }
+        m_blocks.shrink_to_fit();
+    }
+};
+
+namespace detail {
+
 // This is it, the table. Doubles as map and set, and uses `void` for T when its used as a set.
 template <class Key,
           class T, // when void, treat it as a set.
           class Hash,
           class KeyEqual,
           class AllocatorOrContainer,
-          class Bucket>
+          class Bucket,
+          bool IsSegmented>
 class table : public std::conditional_t<is_map_v<T>, base_table_type_map<T>, base_table_type_set> {
+    using underlying_value_type = typename std::conditional_t<is_map_v<T>, std::pair<Key, T>, Key>;
+    using underlying_container_type = std::conditional_t<IsSegmented,
+                                                         segmented_vector<underlying_value_type, AllocatorOrContainer>,
+                                                         std::vector<underlying_value_type, AllocatorOrContainer>>;
+
 public:
-    using value_container_type = std::conditional_t<
-        is_detected_v<detect_iterator, AllocatorOrContainer>,
-        AllocatorOrContainer,
-        typename std::vector<typename std::conditional_t<is_map_v<T>, std::pair<Key, T>, Key>, AllocatorOrContainer>>;
+    using value_container_type = std::
+        conditional_t<is_detected_v<detect_iterator, AllocatorOrContainer>, AllocatorOrContainer, underlying_container_type>;
 
 private:
     using bucket_alloc =
@@ -492,7 +789,8 @@ private:
     static_assert(std::is_trivially_copyable_v<Bucket>, "assert we can just memset / memcpy");
 
     value_container_type m_values{}; // Contains all the key-value pairs in one densely stored container. No holes.
-    typename std::allocator_traits<bucket_alloc>::pointer m_buckets{};
+    using bucket_pointer = typename std::allocator_traits<bucket_alloc>::pointer;
+    bucket_pointer m_buckets{};
     size_t m_num_buckets = 0;
     size_t m_max_bucket_capacity = 0;
     float m_max_load_factor = default_max_load_factor;
@@ -507,8 +805,7 @@ private:
     }
 
     // Helper to access bucket through pointer types
-    [[nodiscard]] static constexpr auto at(typename std::allocator_traits<bucket_alloc>::pointer bucket_ptr, size_t offset)
-        -> Bucket& {
+    [[nodiscard]] static constexpr auto at(bucket_pointer bucket_ptr, size_t offset) -> Bucket& {
         return *(bucket_ptr + static_cast<typename std::allocator_traits<bucket_alloc>::difference_type>(offset));
     }
 
@@ -578,7 +875,7 @@ private:
     }
 
     [[nodiscard]] static constexpr auto calc_num_buckets(uint8_t shifts) -> size_t {
-        return std::min(max_bucket_count(), size_t{1} << (64U - shifts));
+        return (std::min)(max_bucket_count(), size_t{1} << (64U - shifts));
     }
 
     [[nodiscard]] constexpr auto calc_shifts_for_size(size_t s) const -> uint8_t {
@@ -983,7 +1280,7 @@ public:
     }
 
     [[nodiscard]] static constexpr auto max_size() noexcept -> size_t {
-        if constexpr (std::numeric_limits<value_idx_type>::max() == std::numeric_limits<size_t>::max()) {
+        if constexpr ((std::numeric_limits<value_idx_type>::max)() == (std::numeric_limits<size_t>::max)()) {
             return size_t{1} << (sizeof(value_idx_type) * 8 - 1);
         } else {
             return size_t{1} << (sizeof(value_idx_type) * 8);
@@ -1272,7 +1569,7 @@ public:
         auto const last_to_end = std::distance(last, cend());
 
         // remove elements from left to right which moves elements from the end back
-        auto const mid = idx_first + std::min(first_to_last, last_to_end);
+        auto const mid = idx_first + (std::min)(first_to_last, last_to_end);
         auto idx = idx_first;
         while (idx != mid) {
             erase(begin() + idx);
@@ -1439,8 +1736,8 @@ public:
     }
 
     void rehash(size_t count) {
-        count = std::min(count, max_size());
-        auto shifts = calc_shifts_for_size(std::max(count, size()));
+        count = (std::min)(count, max_size());
+        auto shifts = calc_shifts_for_size((std::max)(count, size()));
         if (shifts != m_shifts) {
             m_shifts = shifts;
             deallocate_buckets();
@@ -1451,12 +1748,12 @@ public:
     }
 
     void reserve(size_t capa) {
-        capa = std::min(capa, max_size());
+        capa = (std::min)(capa, max_size());
         if constexpr (has_reserve<value_container_type>) {
             // std::deque doesn't have reserve(). Make sure we only call when available
             m_values.reserve(capa);
         }
-        auto shifts = calc_shifts_for_size(std::max(capa, size()));
+        auto shifts = calc_shifts_for_size((std::max)(capa, size()));
         if (0 == m_num_buckets || shifts < m_shifts) {
             m_shifts = shifts;
             deallocate_buckets();
@@ -1519,16 +1816,31 @@ template <class Key,
           class KeyEqual = std::equal_to<Key>,
           class AllocatorOrContainer = std::allocator<std::pair<Key, T>>,
           class Bucket = bucket_type::standard>
-using map = detail::table<Key, T, Hash, KeyEqual, AllocatorOrContainer, Bucket>;
+using map = detail::table<Key, T, Hash, KeyEqual, AllocatorOrContainer, Bucket, false>;
+
+template <class Key,
+          class T,
+          class Hash = hash<Key>,
+          class KeyEqual = std::equal_to<Key>,
+          class AllocatorOrContainer = std::allocator<std::pair<Key, T>>,
+          class Bucket = bucket_type::standard>
+using segmented_map = detail::table<Key, T, Hash, KeyEqual, AllocatorOrContainer, Bucket, true>;
 
 template <class Key,
           class Hash = hash<Key>,
           class KeyEqual = std::equal_to<Key>,
           class AllocatorOrContainer = std::allocator<Key>,
           class Bucket = bucket_type::standard>
-using set = detail::table<Key, void, Hash, KeyEqual, AllocatorOrContainer, Bucket>;
+using set = detail::table<Key, void, Hash, KeyEqual, AllocatorOrContainer, Bucket, false>;
 
-#    if ANKERL_UNORDERED_DENSE_PMR
+template <class Key,
+          class Hash = hash<Key>,
+          class KeyEqual = std::equal_to<Key>,
+          class AllocatorOrContainer = std::allocator<Key>,
+          class Bucket = bucket_type::standard>
+using segmented_set = detail::table<Key, void, Hash, KeyEqual, AllocatorOrContainer, Bucket, true>;
+
+#    if defined(ANKERL_UNORDERED_DENSE_PMR)
 
 namespace pmr {
 
@@ -1537,10 +1849,23 @@ template <class Key,
           class Hash = hash<Key>,
           class KeyEqual = std::equal_to<Key>,
           class Bucket = bucket_type::standard>
-using map = detail::table<Key, T, Hash, KeyEqual, ANKERL_UNORDERED_DENSE_PMR_ALLOCATOR<std::pair<Key, T>>, Bucket>;
+using map =
+    detail::table<Key, T, Hash, KeyEqual, ANKERL_UNORDERED_DENSE_PMR::polymorphic_allocator<std::pair<Key, T>>, Bucket, false>;
+
+template <class Key,
+          class T,
+          class Hash = hash<Key>,
+          class KeyEqual = std::equal_to<Key>,
+          class Bucket = bucket_type::standard>
+using segmented_map =
+    detail::table<Key, T, Hash, KeyEqual, ANKERL_UNORDERED_DENSE_PMR::polymorphic_allocator<std::pair<Key, T>>, Bucket, true>;
 
 template <class Key, class Hash = hash<Key>, class KeyEqual = std::equal_to<Key>, class Bucket = bucket_type::standard>
-using set = detail::table<Key, void, Hash, KeyEqual, ANKERL_UNORDERED_DENSE_PMR_ALLOCATOR<Key>, Bucket>;
+using set = detail::table<Key, void, Hash, KeyEqual, ANKERL_UNORDERED_DENSE_PMR::polymorphic_allocator<Key>, Bucket, false>;
+
+template <class Key, class Hash = hash<Key>, class KeyEqual = std::equal_to<Key>, class Bucket = bucket_type::standard>
+using segmented_set =
+    detail::table<Key, void, Hash, KeyEqual, ANKERL_UNORDERED_DENSE_PMR::polymorphic_allocator<Key>, Bucket, true>;
 
 } // namespace pmr
 
@@ -1558,11 +1883,18 @@ using set = detail::table<Key, void, Hash, KeyEqual, ANKERL_UNORDERED_DENSE_PMR_
 
 namespace std { // NOLINT(cert-dcl58-cpp)
 
-template <class Key, class T, class Hash, class KeyEqual, class AllocatorOrContainer, class Bucket, class Pred>
+template <class Key,
+          class T,
+          class Hash,
+          class KeyEqual,
+          class AllocatorOrContainer,
+          class Bucket,
+          class Pred,
+          bool IsSegmented>
 // NOLINTNEXTLINE(cert-dcl58-cpp)
-auto erase_if(ankerl::unordered_dense::detail::table<Key, T, Hash, KeyEqual, AllocatorOrContainer, Bucket>& map, Pred pred)
-    -> size_t {
-    using map_t = ankerl::unordered_dense::detail::table<Key, T, Hash, KeyEqual, AllocatorOrContainer, Bucket>;
+auto erase_if(ankerl::unordered_dense::detail::table<Key, T, Hash, KeyEqual, AllocatorOrContainer, Bucket, IsSegmented>& map,
+              Pred pred) -> size_t {
+    using map_t = ankerl::unordered_dense::detail::table<Key, T, Hash, KeyEqual, AllocatorOrContainer, Bucket, IsSegmented>;
 
     // going back to front because erase() invalidates the end iterator
     auto const old_size = map.size();
@@ -1575,7 +1907,7 @@ auto erase_if(ankerl::unordered_dense::detail::table<Key, T, Hash, KeyEqual, All
         }
     }
 
-    return map.size() - old_size;
+    return old_size - map.size();
 }
 
 } // namespace std

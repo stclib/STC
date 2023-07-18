@@ -1,5 +1,6 @@
 // shared_ptr-examples.cpp
 // based on https://docs.microsoft.com/en-us/cpp/cpp/how-to-create-and-use-shared-ptr-instances?view=msvc-160
+#define i_implement
 #include <stc/cstr.h>
 
 typedef struct
@@ -12,7 +13,7 @@ int Song_cmp(const Song* x, const Song* y)
     { return cstr_cmp(&x->title, &y->title); }
 
 Song Song_make(const char* artist, const char* title)
-    { return (Song){cstr_from(artist), cstr_from(title)}; }
+    { return c_LITERAL(Song){cstr_from(artist), cstr_from(title)}; }
 
 void Song_drop(Song* s) {
     printf("drop: %s\n", cstr_str(&s->title));
@@ -21,18 +22,18 @@ void Song_drop(Song* s) {
 
 // Define the shared pointer:
 #define i_type SongArc
-#define i_valclass Song
-#define i_opt c_no_hash // arc require hash fn, disable as we don't need it.
+#define i_keyclass Song
+#define i_no_hash          // no hash fn for Song, fallback hash pointer to Song.
 #include <stc/carc.h>
 
 // ... and a vector of them
 #define i_type SongVec
-#define i_valboxed SongArc // use i_valboxed on carc / cbox instead of i_val
-#include <stc/cstack.h>
+#define i_keyboxed SongArc // use i_keyboxed on carc / cbox (instead of i_key)
+#include <stc/cvec.h>
 
-void example3()
+void example3(void)
 {
-    SongVec vec1 = c_make(SongVec, {
+    SongVec vec1 = c_init(SongVec, {
         Song_make("Bob Dylan", "The Times They Are A Changing"),
         Song_make("Aretha Franklin", "Bridge Over Troubled Water"),
         Song_make("Thalia", "Entre El Mar y Una Estrella")
@@ -60,7 +61,7 @@ void example3()
     c_drop(SongVec, &vec1, &vec2);
 }
 
-int main()
+int main(void)
 {
     example3();
 }

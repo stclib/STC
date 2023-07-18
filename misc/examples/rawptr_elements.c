@@ -1,6 +1,6 @@
 #include <stc/ccommon.h>
 #include <stdio.h>
-
+#define i_implement
 #include <stc/cstr.h>
 
 // Create cmap of cstr => long*
@@ -16,7 +16,7 @@
 
 // Alternatively, using cbox:
 #define i_type IBox
-#define i_val long
+#define i_key long
 #include <stc/cbox.h> // unique_ptr<long> alike.
 
 // cmap of cstr => IBox
@@ -25,7 +25,7 @@
 #define i_valboxed IBox // i_valboxed: use properties from IBox automatically
 #include <stc/cmap.h>
 
-int main()
+int main(void)
 {
     // These have the same behaviour, except IBox has a get member:
     SIPtrMap map1 = {0};

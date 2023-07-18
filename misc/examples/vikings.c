@@ -1,3 +1,4 @@
+#define i_implement
 #include <stc/cstr.h>
 
 typedef struct Viking {
@@ -40,15 +41,15 @@ static inline RViking Viking_toraw(const Viking* vp) {
 #define i_val       int         // mapped type
 #include <stc/cmap.h>
 
-int main()
+int main(void)
 {
     Vikings vikings = {0};
-    Vikings_emplace(&vikings, (RViking){"Einar", "Norway"}, 20);
-    Vikings_emplace(&vikings, (RViking){"Olaf", "Denmark"}, 24);
-    Vikings_emplace(&vikings, (RViking){"Harald", "Iceland"}, 12);
-    Vikings_emplace(&vikings, (RViking){"Björn", "Sweden"}, 10);
+    Vikings_emplace(&vikings, c_LITERAL(RViking){"Einar", "Norway"}, 20);
+    Vikings_emplace(&vikings, c_LITERAL(RViking){"Olaf", "Denmark"}, 24);
+    Vikings_emplace(&vikings, c_LITERAL(RViking){"Harald", "Iceland"}, 12);
+    Vikings_emplace(&vikings, c_LITERAL(RViking){"Björn", "Sweden"}, 10);
 
-    Vikings_value* v = Vikings_get_mut(&vikings, (RViking){"Einar", "Norway"});
+    Vikings_value* v = Vikings_get_mut(&vikings, c_LITERAL(RViking){"Einar", "Norway"});
     v->second += 3; // add 3 hp points to Einar
 
     c_forpair (vk, hp, Vikings, vikings) {

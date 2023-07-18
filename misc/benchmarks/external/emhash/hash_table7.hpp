@@ -92,7 +92,7 @@ of resizing granularity. Ignoring variance, the expected occurrences of list siz
     #include "wyhash.h"
 #endif
 
-#ifdef EMH_KEY
+#ifdef EMH_NEW
     #undef  EMH_KEY
     #undef  EMH_VAL
     #undef  EMH_PKV
@@ -547,10 +547,10 @@ public:
 
     static PairT* alloc_bucket(size_type num_buckets)
     {
-#if _WIN32
-        auto* new_pairs = (PairT*)malloc(AllocSize(num_buckets));
-#else
+#ifdef EMH_ALLOC
         auto* new_pairs = (PairT*)aligned_alloc(EMH_MALIGN, AllocSize(num_buckets));
+#else
+        auto* new_pairs = (PairT*)malloc(AllocSize(num_buckets));
 #endif
         return new_pairs;
     }
@@ -1668,16 +1668,10 @@ private:
     // key is not in this map. Find a place to put it.
     size_type find_empty_bucket(const size_type bucket_from, const size_type main_bucket)
     {
-#ifdef EMH_ALIGN64 // only works 64bit
-        const auto boset  = bucket_from % MASK_BIT;
-        auto* const align = _bitmask + bucket_from / MASK_BIT;
-        const auto bmask  = ((size_t)align[1] << (MASK_BIT - boset)) | (align[0] >> boset);
-        if (EMH_LIKELY(bmask != 0))
-            return bucket_from + CTZ(bmask);
-#elif EMH_ITER_SAFE
+#if EMH_ITER_SAFE
         const auto boset = bucket_from % 8;
-        auto* const start = (uint8_t*)_bitmask + bucket_from / 8;
-        size_t bmask; memcpy(&bmask, start + 0, sizeof(bmask)); bmask >>= boset;// bmask |= ((size_t)start[8] << (SIZE_BIT - boset));
+        auto* const align = (uint8_t*)_bitmask + bucket_from / 8;(void)main_bucket;
+        size_t bmask; memcpy(&bmask, align + 0, sizeof(bmask)); bmask >>= boset;// bmask |= ((size_t)align[8] << (SIZE_BIT - boset));
         if (EMH_LIKELY(bmask != 0))
             return bucket_from + CTZ(bmask);
 #else
@@ -1715,21 +1709,15 @@ private:
     }
 
     // key is not in this map. Find a place to put it.
-    size_type find_unique_empty(const size_type bucket_from, const size_t main_bucket)
+    size_type find_unique_empty(const size_type bucket_from)
     {
-#ifdef EMH_ALIGN64
-        const auto boset  = bucket_from % MASK_BIT;
-        auto* const align = _bitmask + bucket_from / MASK_BIT;
-        const auto bmask  = ((size_t)align[1] << (MASK_BIT - boset)) | (align[0] >> boset);
-        static_assert(sizeof(size_t) > 4);
-#elif EMH_ITER_SAFE
         const auto boset = bucket_from % 8;
-        auto* const start = (uint8_t*)_bitmask + bucket_from / 8;
-        size_t bmask; memcpy(&bmask, start + 0, sizeof(bmask)); bmask >>= boset;
-#else
-        const auto boset  = bucket_from % 8; (void)main_bucket;
         auto* const align = (uint8_t*)_bitmask + bucket_from / 8;
-        const auto bmask  = (*(size_t*)(align) >> boset); //maybe not aligned and warning
+
+#if EMH_ITER_SAFE
+        size_t bmask; memcpy(&bmask, align + 0, sizeof(bmask)); bmask >>= boset;
+#else
+        const auto bmask = (*(size_t*)(align) >> boset); //maybe not aligned and warning
 #endif
         if (EMH_LIKELY(bmask != 0))
             return bucket_from + CTZ(bmask);
@@ -1789,12 +1777,12 @@ private:
             next_bucket = find_last_bucket(next_bucket);
 
         //find a new empty and link it to tail
-        return EMH_BUCKET(_pairs, next_bucket) = find_unique_empty(next_bucket, bucket);
+        return EMH_BUCKET(_pairs, next_bucket) = find_empty_bucket(next_bucket, bucket);
     }
 
 #if EMH_INT_HASH
     static constexpr uint64_t KC = UINT64_C(11400714819323198485);
-    inline uint64_t hash64(uint64_t key)
+    inline static uint64_t hash64(uint64_t key)
     {
 #if __SIZEOF_INT128__ && EMH_INT_HASH == 1
         __uint128_t r = key; r *= KC;

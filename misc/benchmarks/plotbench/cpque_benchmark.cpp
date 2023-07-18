@@ -58,7 +58,7 @@ void stc_test()
 }
 
 
-int main()
+int main(void)
 {
     puts("STD P.QUEUE:");
     std_test();

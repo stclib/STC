@@ -1,9 +1,10 @@
+#define i_implement
 #include <stc/cstr.h>
 #define i_key_str
 #define i_val_str
 #include <stc/cmap.h>
 
-int main()
+int main(void)
 {
     cmap_str m = {0};
     cmap_str_emplace(&m, "Test short", "This is a short string");

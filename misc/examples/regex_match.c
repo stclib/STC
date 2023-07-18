@@ -1,11 +1,12 @@
-#define i_extern
+#define i_import
 #include <stc/cregex.h>
+#define i_implement
 #include <stc/csview.h>
 
-#define i_val float
+#define i_key float
 #include <stc/cstack.h>
 
-int main()
+int main(void)
 {
     // Lets find the first sequence of digits in a string
     const char *str = "Hello numeric world, there are 24 hours in a day, 3600 seconds in an hour."
@@ -24,10 +25,10 @@ int main()
         cstack_float_push(&vec, (float)atof(i.match[0].str));
 
     c_foreach (i, cstack_float, vec)
-        printf("  %g\n", *i.ref);
+        printf("  %g\n", (double)*i.ref);
 
     // extracts the numbers only to a comma separated string.
-    cstr nums = cregex_replace_sv(&re, csview_from(str), " $0,", 0, NULL, CREG_R_STRIP);
+    cstr nums = cregex_replace_sv(&re, csview_from(str), " $0,", 0, NULL, CREG_STRIP);
     printf("\n%s\n", cstr_str(&nums));
 
     cstr_drop(&nums);

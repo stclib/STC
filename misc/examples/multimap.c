@@ -1,3 +1,4 @@
+#define i_implement
 #include <stc/cstr.h>
 
 // Olympics multimap example
@@ -39,7 +40,7 @@ OlympicLoc OlympicLoc_clone(OlympicLoc loc);
 void OlympicLoc_drop(OlympicLoc* self);
 
 // Create a clist<OlympicLoc>, can be sorted by year.
-#define i_valclass OlympicLoc // binds _cmp, _clone and _drop.
+#define i_keyclass OlympicLoc // binds _cmp, _clone and _drop.
 #define i_tag OL
 #include <stc/clist.h>
 
@@ -65,7 +66,7 @@ void OlympicLoc_drop(OlympicLoc* self) {
 }
 
 
-int main()
+int main(void)
 {
     // Define the multimap with destructor defered to when block is completed.
     csmap_OL multimap = {0};

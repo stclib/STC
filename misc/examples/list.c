@@ -4,10 +4,11 @@
 #include <stc/crand.h>
 
 #define i_type DList
-#define i_val double
+#define i_key double
+#define i_native_cmp
 #include <stc/clist.h>
 
-int main() {
+int main(void) {
     const int n = 3000000;
     DList list = {0};
 
@@ -34,7 +35,7 @@ int main() {
     puts("");
 
     DList_drop(&list);
-    list = c_make(DList, {10, 20, 30, 40, 30, 50});
+    list = c_init(DList, {10, 20, 30, 40, 30, 50});
 
     const double* v = DList_get(&list, 30);
     printf("found: %f\n", *v);

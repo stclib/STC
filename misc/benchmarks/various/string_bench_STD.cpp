@@ -12,6 +12,7 @@
 #include <unordered_map>
 #define i_static
 #include <stc/cstr.h>
+#include <stc/algo/raii.h>
 
 std::vector<std::string> read_file(const char* name)
 {
@@ -193,7 +194,7 @@ void benchmark(
 //const size_t MAX_LOOP = 1000000;
 const size_t MAX_LOOP = 2000;
 
-int main()
+int main(void)
 {
     std::vector<std::string> vec_shortstr;
     std::vector<std::string_view> vec_shortstrview;

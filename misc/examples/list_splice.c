@@ -1,8 +1,7 @@
 #include <stdio.h>
 
-#define i_val int
+#define i_key int
 #define i_tag i
-#define i_extern // define _clist_mergesort() once
 #include <stc/clist.h>
 
 void print_ilist(const char* s, clist_i list)
@@ -14,10 +13,10 @@ void print_ilist(const char* s, clist_i list)
     puts("");
 }
 
-int main ()
+int main(void)
 {
-    clist_i list1 = c_make(clist_i, {1, 2, 3, 4, 5});
-    clist_i list2 = c_make(clist_i, {10, 20, 30, 40, 50});
+    clist_i list1 = c_init(clist_i, {1, 2, 3, 4, 5});
+    clist_i list2 = c_init(clist_i, {10, 20, 30, 40, 50});
 
     print_ilist("list1:", list1);
     print_ilist("list2:", list2);

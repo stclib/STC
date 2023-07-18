@@ -1,6 +1,6 @@
 d=$(git rev-parse --show-toplevel)
 mkdir -p $d/../stcsingle/c11 $d/../stcsingle/stc
-python singleheader.py $d/include/c11/print.h   > $d/../stcsingle/c11/print.h
+python singleheader.py $d/include/c11/fmt.h   > $d/../stcsingle/c11/fmt.h
 python singleheader.py $d/include/stc/calgo.h   > $d/../stcsingle/stc/calgo.h
 python singleheader.py $d/include/stc/carc.h    > $d/../stcsingle/stc/carc.h
 python singleheader.py $d/include/stc/cbits.h   > $d/../stcsingle/stc/cbits.h
@@ -24,4 +24,4 @@ python singleheader.py $d/include/stc/csview.h  > $d/../stcsingle/stc/csview.h
 python singleheader.py $d/include/stc/cvec.h    > $d/../stcsingle/stc/cvec.h
 python singleheader.py $d/include/stc/extend.h  > $d/../stcsingle/stc/extend.h
 python singleheader.py $d/include/stc/forward.h > $d/../stcsingle/stc/forward.h
-echo "stcsingle headers updated"
+echo "$d/../stcsingle headers updated"

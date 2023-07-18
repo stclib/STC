@@ -1,12 +1,13 @@
 #include <stdio.h>
-#define i_extern
+#define i_import
 #include <stc/cstr.h>
+#define i_implement
 #include <stc/csview.h>
 #include <stc/algo/filter.h>
 #include <stc/algo/crange.h>
 
 #define i_type IVec
-#define i_val int
+#define i_key int
 #include <stc/cstack.h>
 
 // filters and transforms:
@@ -17,7 +18,7 @@
 
 void demo1(void)
 {
-    IVec vec = c_make(IVec, {0, 1, 2, 3, 4, 5, 80, 6, 7, 80, 8, 9, 80,
+    IVec vec = c_init(IVec, {0, 1, 2, 3, 4, 5, 80, 6, 7, 80, 8, 9, 80,
                              10, 11, 12, 13, 14, 15, 80, 16, 17});
 
     c_forfilter (i, IVec, vec, flt_skipValue(i, 80))
@@ -54,7 +55,8 @@ fn main() {
 void demo2(void)
 {
     IVec vector = {0};
-    c_forfilter (x, crange, crange_obj(INT64_MAX),
+    crange r = crange_make(INT64_MAX);
+    c_forfilter (x, crange, r,
         c_flt_skipwhile(x, *x.ref != 11) &&
         (*x.ref % 2) != 0                &&
         c_flt_take(x, 5)
@@ -81,7 +83,7 @@ fn main() {
 }
 */
 #define i_type SVec
-#define i_valclass csview
+#define i_keyclass csview
 #include <stc/cstack.h>
 
 void demo3(void)

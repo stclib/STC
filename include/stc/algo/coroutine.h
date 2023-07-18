@@ -26,92 +26,226 @@
 #include <stdio.h>
 #include <stc/algo/coroutine.h>
 
-struct iterate {
+struct iterpair {
     int max_x, max_y;
     int x, y;
     int cco_state; // required member
 };
 
-bool iterate(struct iterate* I) {
-    cco_begin(I);
+int iterpair(struct iterpair* I) {
+    cco_routine(I) {
         for (I->x = 0; I->x < I->max_x; I->x++)
             for (I->y = 0; I->y < I->max_y; I->y++)
-                cco_yield(true);
+                cco_yield();
 
-        cco_final:
-            puts("final");
-    cco_end(false);
+        cco_cleanup: // required if there is cleanup code
+        puts("final");
+    }
+    return 0; // CCO_DONE
 }
 
 int main(void) {
-    struct iterate it = {.max_x=3, .max_y=3};
+    struct iterpair it = {.max_x=3, .max_y=3};
     int n = 0;
-    while (iterate(&it))
+    while (iterpair(&it))
     {
         printf("%d %d\n", it.x, it.y);
         // example of early stop:
-        if (++n == 20) cco_stop(&it); // signal to stop at next
+        if (++n == 7) cco_stop(&it); // signal to stop/finalize in next
     }
     return 0;
 }
 */
-#include <stc/ccommon.h>
+#include "../ccommon.h"
 
 enum {
-    cco_state_final = -1,
-    cco_state_done = -2,
+    CCO_STATE_CLEANUP = -1,
+    CCO_STATE_DONE = -2,
 };
+typedef enum {
+    CCO_DONE = 0,
+    CCO_YIELD = 1,
+    CCO_AWAIT = 2,
+    CCO_ERROR = -1,
+} cco_result;
 
-#define cco_suspended(ctx) ((ctx)->cco_state > 0)
-#define cco_alive(ctx) ((ctx)->cco_state != cco_state_done)
+#define cco_initial(co) ((co)->cco_state == 0)
+#define cco_suspended(co) ((co)->cco_state > 0)
+#define cco_done(co) ((co)->cco_state == CCO_STATE_DONE)
 
-#define cco_begin(ctx) \
-    int *_state = &(ctx)->cco_state; \
-    switch (*_state) { \
-        case 0:
+#define cco_routine(co) \
+    for (int *_state = &(co)->cco_state; *_state != CCO_STATE_DONE; *_state = CCO_STATE_DONE) \
+        _resume: switch (*_state) case 0: // thanks, @liigo!
 
-#define cco_end(retval) \
-        *_state = cco_state_done; break; \
-        case -99: goto _cco_final_; \
-    } \
-    return retval
-
-#define cco_yield(...) c_MACRO_OVERLOAD(cco_yield, __VA_ARGS__)
-#define cco_yield_1(retval) \
+#define cco_yield() cco_yield_v(CCO_YIELD)
+#define cco_yield_v(ret) \
     do { \
-        *_state = __LINE__; return retval; \
+        *_state = __LINE__; return ret; goto _resume; \
         case __LINE__:; \
     } while (0)
 
-#define cco_yield_2(corocall2, ctx2) \
-    cco_yield_3(corocall2, ctx2, )
-
-#define cco_yield_3(corocall2, ctx2, retval) \
+#define cco_await(promise) cco_await_v_2(promise, CCO_AWAIT)
+#define cco_await_v(...) c_MACRO_OVERLOAD(cco_await_v, __VA_ARGS__)
+#define cco_await_v_1(promise) cco_await_v_2(promise, )
+#define cco_await_v_2(promise, ret) \
     do { \
         *_state = __LINE__; \
-        do { \
-            corocall2; if (cco_suspended(ctx2)) return retval; \
-            case __LINE__:; \
-        } while (cco_alive(ctx2)); \
+        case __LINE__: if (!(promise)) {return ret; goto _resume;} \
     } while (0)
 
-#define cco_final \
-    case cco_state_final: \
-    _cco_final_
+/* cco_await_on(): assumes coroutine returns a cco_result value (int) */
+#define cco_await_on(corocall) \
+    do { \
+        *_state = __LINE__; \
+        case __LINE__: { int _r = corocall; if (_r != CCO_DONE) {return _r; goto _resume;} } \
+    } while (0)
+
+/* cco_block_on(): assumes coroutine returns a cco_result value (int) */
+#define cco_block_on(...) c_MACRO_OVERLOAD(cco_block_on, __VA_ARGS__)
+#define cco_block_on_1(corocall) while ((corocall) != CCO_DONE)
+#define cco_block_on_2(corocall, result) while ((*(result) = (corocall)) != CCO_DONE)
+
+#define cco_cleanup \
+    *_state = CCO_STATE_CLEANUP; case CCO_STATE_CLEANUP
 
 #define cco_return \
-    goto _cco_final_
-
-#define cco_stop(ctx) \
     do { \
-        int* _state = &(ctx)->cco_state; \
-        if (*_state > 0) *_state = cco_state_final; \
+        *_state = *_state >= 0 ? CCO_STATE_CLEANUP : CCO_STATE_DONE; \
+        goto _resume; \
     } while (0)
 
-#define cco_reset(ctx) \
+#define cco_yield_final() cco_yield_final_v(CCO_YIELD)
+#define cco_yield_final_v(value) \
     do { \
-        int* _state = &(ctx)->cco_state; \
-        if (*_state == cco_state_done) *_state = 0; \
+        *_state = *_state >= 0 ? CCO_STATE_CLEANUP : CCO_STATE_DONE; \
+        return value; \
     } while (0)
+
+#define cco_stop(co) \
+    do { \
+        int* _s = &(co)->cco_state; \
+        if (*_s > 0) *_s = CCO_STATE_CLEANUP; \
+        else if (*_s == 0) *_s = CCO_STATE_DONE; \
+    } while (0)
+
+#define cco_reset(co) \
+    (void)((co)->cco_state = 0)
+
+/*
+ * Closure (optional)
+ */
+
+#define cco_closure(Name, ...) \
+    struct Name { \
+        int (*cco_fn)(struct Name*); \
+        int cco_state; \
+        __VA_ARGS__ \
+    }
+
+typedef struct cco_base { 
+    int (*cco_fn)(struct cco_base*);
+    int cco_state;
+} cco_base;
+
+#define cco_resume(closure) \
+    (closure)->cco_fn(closure)
+
+#define cco_cast(closure) \
+    ((cco_base *)(closure) + 0*sizeof((cco_resume(closure), (int*)0 == &(closure)->cco_state)))
+
+/*
+ * Semaphore
+ */
+
+typedef struct { intptr_t count; } cco_sem;
+
+#define cco_sem_await(sem) cco_sem_await_v_2(sem, CCO_AWAIT)
+#define cco_sem_await_v(...) c_MACRO_OVERLOAD(cco_sem_await_v, __VA_ARGS__)
+#define cco_sem_await_v_1(sem) cco_sem_await_v_2(sem, )
+#define cco_sem_await_v_2(sem, ret) \
+    do { \
+        cco_await_v_2((sem)->count > 0, ret); \
+        --(sem)->count; \
+    } while (0)
+
+#define cco_sem_release(sem) ++(sem)->count
+#define cco_sem_from(value) ((cco_sem){value})
+#define cco_sem_set(sem, value) ((sem)->count = value)
+
+/*
+ * Timer
+ */
+
+#ifdef _WIN32
+    #ifdef __cplusplus
+    #define _c_LINKC extern "C" __declspec(dllimport) 
+    #else
+    #define _c_LINKC __declspec(dllimport) 
+    #endif
+    struct _FILETIME;
+    _c_LINKC void GetSystemTimePreciseAsFileTime(struct _FILETIME*);
+    _c_LINKC void Sleep(unsigned long);
+
+    static inline double cco_time(void) { /* seconds since epoch */
+        unsigned long long quad;          /* 64-bit value representing 1/10th usecs since Jan 1 1601, 00:00 UTC */
+        GetSystemTimePreciseAsFileTime((struct _FILETIME*)&quad);
+        return (double)(quad - 116444736000000000ULL)*1e-7;  /* time diff Jan 1 1601-Jan 1 1970 in 1/10th usecs */
+    }
+
+    static inline void cco_sleep(double sec) {
+        Sleep((unsigned long)(sec*1000.0));
+    }
+#else
+    #include <sys/time.h>
+    static inline double cco_time(void) { /* seconds since epoch */
+        struct timeval tv;
+        gettimeofday(&tv, NULL);
+        return (double)tv.tv_sec + (double)tv.tv_usec*1e-6;
+    }
+
+    static inline void cco_sleep(double sec) {
+        struct timeval tv;
+        tv.tv_sec = (time_t)sec;
+        tv.tv_usec = (suseconds_t)((sec - (double)(long)sec)*1e6);
+        select(0, NULL, NULL, NULL, &tv);
+    }
+#endif
+
+typedef struct { double interval, start; } cco_timer;
+
+#define cco_timer_await(tm, sec) cco_timer_await_v_3(tm, sec, CCO_AWAIT)
+#define cco_timer_await_v(...) c_MACRO_OVERLOAD(cco_timer_await_v, __VA_ARGS__)
+#define cco_timer_await_v_2(tm, sec) cco_timer_await_v_3(tm, sec, )
+#define cco_timer_await_v_3(tm, sec, ret) \
+    do { \
+        cco_timer_start(tm, sec); \
+        cco_await_v_2(cco_timer_expired(tm), ret); \
+    } while (0)
+
+static inline void cco_timer_start(cco_timer* tm, double sec) {
+    tm->interval = sec;
+    tm->start = cco_time();
+}
+
+static inline cco_timer cco_timer_from(double sec) {
+    cco_timer tm = {.interval=sec, .start=cco_time()};
+    return tm;
+}
+
+static inline void cco_timer_restart(cco_timer* tm) {
+    tm->start = cco_time();
+}
+
+static inline bool cco_timer_expired(cco_timer* tm) {
+    return cco_time() - tm->start >= tm->interval;
+}
+
+static inline double cco_timer_elapsed(cco_timer* tm) {
+    return cco_time() - tm->start;
+}
+
+static inline double cco_timer_remaining(cco_timer* tm) {
+    return tm->start + tm->interval - cco_time();
+}
 
 #endif

@@ -5,13 +5,14 @@
 #define i_tag ii  // Map of int => int
 #include <stc/csmap.h>
 
+#define i_implement
 #include <stc/cstr.h>
 #define i_key int
 #define i_val_str
 #define i_tag istr // Map of int => cstr
 #include <stc/csmap.h>
 
-#define i_val csmap_ii_raw
+#define i_key csmap_ii_raw
 #define i_opt c_no_cmp
 #define i_tag ii
 #include <stc/cvec.h>
@@ -28,12 +29,12 @@ void print_istr(csmap_istr map) {
     puts("");
 }
 
-int main()
+int main(void)
 {
     // insert single values
     csmap_ii m1 = {0};
     csmap_ii_insert(&m1, 1, 10);
-    csmap_ii_push(&m1, (csmap_ii_value){2, 20});
+    csmap_ii_push(&m1, c_LITERAL(csmap_ii_value){2, 20});
 
     puts("The original key and mapped values of m1 are:");
     print_ii(m1);
@@ -60,11 +61,11 @@ int main()
     csmap_ii m2 = {0};
     cvec_ii v = {0};
     typedef cvec_ii_value ipair;
-    cvec_ii_push(&v, (ipair){43, 294});
-    cvec_ii_push(&v, (ipair){41, 262});
-    cvec_ii_push(&v, (ipair){45, 330});
-    cvec_ii_push(&v, (ipair){42, 277});
-    cvec_ii_push(&v, (ipair){44, 311});
+    cvec_ii_push(&v, c_LITERAL(ipair){43, 294});
+    cvec_ii_push(&v, c_LITERAL(ipair){41, 262});
+    cvec_ii_push(&v, c_LITERAL(ipair){45, 330});
+    cvec_ii_push(&v, c_LITERAL(ipair){42, 277});
+    cvec_ii_push(&v, c_LITERAL(ipair){44, 311});
 
     puts("Inserting the following vector data into m2:");
     c_foreach (e, cvec_ii, v)
@@ -96,7 +97,7 @@ int main()
 
     csmap_ii m4 = {0};
     // Insert the elements from an initializer_list
-    m4 = c_make(csmap_ii, {{4, 44}, {2, 22}, {3, 33}, {1, 11}, {5, 55}});
+    m4 = c_init(csmap_ii, {{4, 44}, {2, 22}, {3, 33}, {1, 11}, {5, 55}});
     puts("After initializer_list insertion, m4 contains:");
     print_ii(m4);
     puts("");

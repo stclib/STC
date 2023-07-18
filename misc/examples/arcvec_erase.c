@@ -3,19 +3,19 @@
 void show_drop(int* x) { printf("drop: %d\n", *x); }
 
 #define i_type Arc
-#define i_val int
-#define i_valdrop show_drop
-#define i_no_clone          // required because of valdrop
+#define i_key int
+#define i_keydrop show_drop
+#define i_native_cmp        // enable sort/search for int type
 #include <stc/carc.h>       // Shared pointer to int
 
 #define i_type Vec
-#define i_valboxed Arc
+#define i_keyboxed Arc
 #include <stc/cvec.h>       // Vec: cvec<Arc>
 
 
-int main()
+int main(void)
 {
-    Vec vec = c_make(Vec, {2012, 1990, 2012, 2019, 2015});
+    Vec vec = c_init(Vec, {2012, 1990, 2012, 2019, 2015});
     
     // clone the second 2012 and push it back.
     // note: cloning make sure that vec.data[2] has ref count 2.

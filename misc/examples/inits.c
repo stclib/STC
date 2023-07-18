@@ -1,3 +1,4 @@
+#define i_implement
 #include <stc/cstr.h>
 
 #define i_key int
@@ -17,18 +18,17 @@ inline static int ipair_cmp(const ipair_t* a, const ipair_t* b) {
 }
 
 
-#define i_val ipair_t
+#define i_key ipair_t
 #define i_cmp ipair_cmp
 #define i_tag ip
 #include <stc/cvec.h>
 
-#define i_val ipair_t
+#define i_key ipair_t
 #define i_cmp ipair_cmp
 #define i_tag ip
-#define i_extern // define _clist_mergesort() once
 #include <stc/clist.h>
 
-#define i_val float
+#define i_key float
 #define i_tag f
 #include <stc/cpque.h>
 
@@ -45,7 +45,7 @@ int main(void)
 
     puts("\npop and show high priorites first:");
     while (! cpque_f_empty(&floats)) {
-        printf("%.1f ", *cpque_f_top(&floats));
+        printf("%.1f ", (double)*cpque_f_top(&floats));
         cpque_f_pop(&floats);
     }
     puts("\n");
@@ -66,7 +66,7 @@ int main(void)
 
     // CMAP CNT
 
-    cmap_cnt countries = c_make(cmap_cnt, {
+    cmap_cnt countries = c_init(cmap_cnt, {
         {"Norway", 100},
         {"Denmark", 50},
         {"Iceland", 10},
@@ -88,7 +88,7 @@ int main(void)
 
     // CVEC PAIR
 
-    cvec_ip pairs1 = c_make(cvec_ip, {{5, 6}, {3, 4}, {1, 2}, {7, 8}});
+    cvec_ip pairs1 = c_init(cvec_ip, {{5, 6}, {3, 4}, {1, 2}, {7, 8}});
     cvec_ip_sort(&pairs1);
 
     c_foreach (i, cvec_ip, pairs1)
@@ -98,7 +98,7 @@ int main(void)
 
     // CLIST PAIR
 
-    clist_ip pairs2 = c_make(clist_ip, {{5, 6}, {3, 4}, {1, 2}, {7, 8}});
+    clist_ip pairs2 = c_init(clist_ip, {{5, 6}, {3, 4}, {1, 2}, {7, 8}});
     clist_ip_sort(&pairs2);
 
     c_foreach (i, clist_ip, pairs2)

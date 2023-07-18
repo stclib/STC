@@ -1,7 +1,9 @@
+#define i_implement
 #include <stc/cstr.h>
+#define i_implement
 #include <stc/csview.h>
 
-int  main()
+int main(void)
 {
     // No memory allocations or string length calculations!
     const csview date = c_sv("2021/03/12");

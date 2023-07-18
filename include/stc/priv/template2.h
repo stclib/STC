@@ -20,6 +20,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+#ifdef i_more
+#undef i_more
+#else
 #undef i_type
 #undef i_tag
 #undef i_imp
@@ -30,7 +33,6 @@
 #undef i_hash
 #undef i_rawclass
 #undef i_capacity
-#undef i_ssize
 
 #undef i_val
 #undef i_val_str
@@ -57,7 +59,7 @@
 #undef i_header
 #undef i_implement
 #undef i_static
-#undef i_extern
+#undef i_import
 
 #undef i_allocator
 #undef i_malloc
@@ -65,14 +67,17 @@
 #undef i_realloc
 #undef i_free
 
+#undef i_native_cmp
 #undef i_no_cmp
 #undef i_no_hash
 #undef i_no_clone
 #undef i_no_emplace
 #undef i_is_forward
+#undef i_has_emplace
 
+#undef _i_has_cmp
+#undef _i_has_eq
 #undef _i_prefix
 #undef _i_expandby
-#undef _i_has_from
-#undef _i_has_eq
 #undef _i_template
+#endif

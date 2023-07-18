@@ -4,10 +4,11 @@
 #include <iostream>
 #include <iomanip>
 #include <chrono>
-#define i_static
+#define i_implement
 #include <stc/cstr.h>   // string
-#define i_static
+#define i_implement
 #include <stc/csview.h> // string_view
+#include <stc/algo/raii.h>
 
 #define i_key_str
 #include <stc/cvec.h>   // vec of cstr with const char* lookup
@@ -183,7 +184,7 @@ void benchmark(
 //const size_t MAX_LOOP = 1000000;
 const size_t MAX_LOOP = 2000;
 
-int main()
+int main(void)
 {
     c_auto (cvec_str, vec_string)
     c_auto (cvec_sv, vec_stringview)

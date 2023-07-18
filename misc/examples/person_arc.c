@@ -1,10 +1,12 @@
 /* cbox: heap allocated boxed type */
+#define i_implement
 #include <stc/cstr.h>
 
 typedef struct { cstr name, last; } Person;
 
 Person Person_make(const char* name, const char* last) {
-    return (Person){.name = cstr_from(name), .last = cstr_from(last)};
+    Person p = {.name = cstr_from(name), .last = cstr_from(last)};
+    return p;
 }
 
 int Person_cmp(const Person* a, const Person* b) {
@@ -28,16 +30,16 @@ void Person_drop(Person* p) {
 }
 
 #define i_type PSPtr
-#define i_valclass Person // ensure Person_drop
+#define i_keyclass Person // ensure Person_drop
 #define i_cmp Person_cmp   // specify object cmp, instead of ptr cmp for arc.
 #include <stc/carc.h>
 
 #define i_type Persons
-#define i_valboxed PSPtr // binds PSPtr_cmp, PSPtr_drop...
+#define i_keyboxed PSPtr // binds PSPtr_cmp, PSPtr_drop...
 #include <stc/cvec.h>
 
 
-int main()
+int main(void)
 {
     PSPtr p = PSPtr_from(Person_make("Laura", "Palmer"));
     PSPtr q = PSPtr_from(Person_clone(*p.get)); // deep copy

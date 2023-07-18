@@ -5,17 +5,16 @@
 // using StackList = std::stack<FloatStack>;
 // using ListMap = std::unordered_map<int, std::forward_list<StackList>>;
 // using MapMap = std::unordered_map<std::string, ListMap>;
-
+#define i_implement
 #include <stc/cstr.h>
 
-
 #define i_type FloatStack
-#define i_val float
+#define i_key float
 #include <stc/cstack.h>
 
 #define i_type StackList
-#define i_valclass FloatStack  // "class" picks up _clone, _drop
-#define i_opt c_no_cmp         // no FloatStack_cmp()
+#define i_keyclass FloatStack  // "class" picks up _clone, _drop, _cmp
+#define i_opt c_no_cmp         // exclude FloatStack_cmp(): not defined
 #include <stc/clist.h>
 
 #define i_type ListMap
@@ -29,7 +28,7 @@
 #include <stc/cmap.h>
 
 
-int main()
+int main(void)
 {
     MapMap mmap = {0};
 
@@ -44,7 +43,7 @@ int main()
     const ListMap* lmap_p = MapMap_at(&mmap, "first");
     const StackList* list_p = ListMap_at(lmap_p, 42);
     const FloatStack* stack_p = StackList_back(list_p);
-    printf("value is: %f\n", *FloatStack_at(stack_p, 3)); // pi
+    printf("value is: %f\n", (double)*FloatStack_at(stack_p, 3)); // pi
 
     MapMap_drop(&mmap);
 }

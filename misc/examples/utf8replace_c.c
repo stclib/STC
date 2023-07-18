@@ -1,6 +1,7 @@
+#define i_implement
 #include <stc/cstr.h>
 
-int main()
+int main(void)
 {
     cstr hello = cstr_lit("hell😀 w😀rld");
     printf("%s\n", cstr_str(&hello));

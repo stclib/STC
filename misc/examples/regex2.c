@@ -1,7 +1,7 @@
-#define i_extern
+#define i_import
 #include <stc/cregex.h>
 
-int main()
+int main(void)
 {
     struct { const char *pattern, *input; } s[] = {
         {"(\\d\\d\\d\\d)[-_](1[0-2]|0[1-9])[-_](3[01]|[12][0-9]|0[1-9])",
@@ -26,7 +26,7 @@ int main()
         printf("\ninput: %s\n", s[i].input);
 
         c_formatch (j, &re, s[i].input) {
-            c_forrange (k, cregex_captures(&re))
+            c_forrange (k, cregex_captures(&re) + 1)
                 printf("  submatch %lld: %.*s\n", k, c_SV(j.match[k]));
         }
     }

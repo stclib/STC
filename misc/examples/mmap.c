@@ -2,8 +2,9 @@
 // https://en.cppreference.com/w/cpp/container/multimap/insert
 
 // Multimap entries
+#define i_implement
 #include <stc/cstr.h>
-#define i_val_str
+#define i_key_str
 #include <stc/clist.h>
 
 // Map of int => clist_str.
@@ -29,7 +30,7 @@ void insert(Multimap* mmap, int key, const char* str)
     clist_str_emplace_back(list, str);
 }
 
-int main()
+int main(void)
 {
     Multimap mmap = {0};
 

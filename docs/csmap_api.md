@@ -33,7 +33,6 @@ See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) fo
 #define i_valto     // convertion func i_val* => i_valraw
 
 #define i_tag       // alternative typename: csmap_{i_tag}. i_tag defaults to i_val
-#define i_ssize     // internal size rep. defaults to int32_t
 #include <stc/csmap.h>
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.
@@ -84,7 +83,8 @@ void                  csmap_X_next(csmap_X_iter* iter);
 csmap_X_iter          csmap_X_advance(csmap_X_iter it, intptr_t n);
 
 csmap_X_value         csmap_X_value_clone(csmap_X_value val);
-csmap_X_raw           csmap_X_value_toraw(csmap_X_value* pval);
+csmap_X_raw           csmap_X_value_toraw(const csmap_X_value* pval);
+void                  csmap_X_value_drop(csmap_X_value* pval);
 ```
 ## Types
 
@@ -102,16 +102,16 @@ csmap_X_raw           csmap_X_value_toraw(csmap_X_value* pval);
 
 ## Examples
 ```c
+#define i_implement
 #include <stc/cstr.h>
-
 #define i_key_str // special macro for i_key = cstr, i_tag = str
 #define i_val_str // ditto
 #include <stc/csmap.h>
 
-int main()
+int main(void)
 {
     // Create a sorted map of three strings (maps to string)
-    csmap_str colors = c_make(csmap_str, {
+    csmap_str colors = c_init(csmap_str, {
         {"RED", "#FF0000"},
         {"GREEN", "#00FF00"},
         {"BLUE", "#0000FF"}
@@ -150,6 +150,7 @@ Translate a
 
 [ [Run this code](https://godbolt.org/z/9d1PP77Pa) ]
 ```c
+#define i_implement
 #include <stc/cstr.h>
 #define i_type strmap
 #define i_key_str
@@ -165,7 +166,7 @@ static void print_result(strmap_result result) {
     print_node(result.ref);
 }
  
-int main()
+int main(void)
 {
     strmap m = {0};
  
@@ -182,6 +183,7 @@ int main()
 ### Example 3
 This example uses a csmap with cstr as mapped value.
 ```c
+#define i_implement
 #include <stc/cstr.h>
 
 #define i_type IDSMap
@@ -189,10 +191,10 @@ This example uses a csmap with cstr as mapped value.
 #define i_val_str
 #include <stc/csmap.h>
 
-int main()
+int main(void)
 {
     uint32_t col = 0xcc7744ff;
-    IDSMap idnames = c_make(IDSMap, { {100, "Red"}, {110, "Blue"} });
+    IDSMap idnames = c_init(IDSMap, { {100, "Red"}, {110, "Blue"} });
 
     // Assign/overwrite an existing mapped value with a const char*
     IDSMap_emplace_or_assign(&idnames, 110, "White");
@@ -235,7 +237,7 @@ static int Vec3i_cmp(const Vec3i* a, const Vec3i* b) {
 #include <stc/csmap.h>
 #include <stdio.h>
 
-int main()
+int main(void)
 {
     csmap_vi vmap = {0};
 

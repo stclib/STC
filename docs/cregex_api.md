@@ -12,16 +12,16 @@ The API is simple and includes powerful string pattern matches and replace funct
 ```c
 enum {
     // compile-flags
-    CREG_C_DOTALL = 1<<0,    // dot matches newline too: can be set/overridden by (?s) and (?-s) in RE
-    CREG_C_ICASE = 1<<1,     // ignore case mode: can be set/overridden by (?i) and (?-i) in RE
+    CREG_DOTALL = 1<<0,    // dot matches newline too: can be set/overridden by (?s) and (?-s) in RE
+    CREG_ICASE = 1<<1,     // ignore case mode: can be set/overridden by (?i) and (?-i) in RE
 
     // match-flags
-    CREG_M_FULLMATCH = 1<<2, // like start-, end-of-line anchors were in pattern: "^ ... $"
-    CREG_M_NEXT = 1<<3,      // use end of previous match[0] as start of input
-    CREG_M_STARTEND = 1<<4,  // use match[0] as start+end of input
+    CREG_FULLMATCH = 1<<2, // like start-, end-of-line anchors were in pattern: "^ ... $"
+    CREG_NEXT = 1<<3,      // use end of previous match[0] as start of input
+    CREG_STARTEND = 1<<4,  // use match[0] as start+end of input
 
     // replace-flags
-    CREG_R_STRIP = 1<<5,     // only keep the replaced matches, strip the rest
+    CREG_STRIP = 1<<5,     // only keep the replaced matches, strip the rest
 };
 
 cregex      cregex_init(void);
@@ -29,7 +29,7 @@ cregex      cregex_from(const char* pattern, int cflags = CREG_DEFAULT);
             // return CREG_OK, or negative error code on failure
 int         cregex_compile(cregex *self, const char* pattern, int cflags = CREG_DEFAULT);
 
-            // num. of capture groups in regex. 0 if RE is invalid. First group is the full match
+            // num. of capture groups in regex, excluding the 0th group which is the full match
 int         cregex_captures(const cregex* self); 
 
             // return CREG_OK, CREG_NOMATCH, or CREG_MATCHERROR
@@ -44,15 +44,15 @@ bool        cregex_is_match(const cregex* re, const char* input);
 
             // Replace all matches in input
 cstr        cregex_replace(const cregex* re, const char* input, const char* replace, int count = INT_MAX);
-            // Replace count matches in input string-view. Optionally transform replacement with mfun.
+            // Replace count matches in input string-view. Optionally transform replacement.
 cstr        cregex_replace_sv(const cregex* re, csview input, const char* replace, int count = INT_MAX);
 cstr        cregex_replace_sv(const cregex* re, csview input, const char* replace, int count,
-                              bool(*mfun)(int capgrp, csview match, cstr* mstr), int rflags);
+                              bool(*transform)(int group, csview match, cstr* result), int rflags);
 
             // All-in-one replacement (compile + find/replace + drop)
 cstr        cregex_replace_pattern(const char* pattern, const char* input, const char* replace, int count = INT_MAX);
 cstr        cregex_replace_pattern(const char* pattern, const char* input, const char* replace, int count,
-                                   bool(*mfun)(int capgrp, csview match, cstr* mstr), int rflags);
+                                   bool(*transform)(int group, csview match, cstr* result), int rflags);
             // destroy
 void        cregex_drop(cregex* self);
 ```
@@ -99,10 +99,10 @@ If an error occurs ```cregex_compile``` returns a negative error code stored in 
 
 [ [Run this code](https://godbolt.org/z/z434TMKfo) ]
 ```c
-#define i_extern // include external cstr, utf8, cregex functions implementation.
+#define i_import // include dependent cstr, utf8 and cregex function definitions.
 #include <stc/cregex.h>
 
-int main() {
+int main(void) {
     const char* input = "start date is 2023-03-01, end date 2025-12-31.";
     const char* pattern = "\\b(\\d\\d\\d\\d)-(\\d\\d)-(\\d\\d)\\b";
 
@@ -138,20 +138,20 @@ In order to use a callback function in the replace call, see `examples/regex_rep
 To iterate multiple matches in an input string, you may use
 ```c
 csview match[5] = {0};
-while (cregex_find(&re, input, match, CREG_M_NEXT) == CREG_OK)
-    c_forrange (k, cregex_captures(&re))
-        printf("submatch %lld: %.*s\n", k, c_SV(match[k]));
+while (cregex_find(&re, input, match, CREG_NEXT) == CREG_OK)
+    for (int k = 1; i <= cregex_captures(&re); ++k)
+        printf("submatch %d: %.*s\n", k, c_SV(match[k]));
 ```
 There is also a for-loop macro to simplify it:
 ```c
 c_formatch (it, &re, input)
-    c_forrange (k, cregex_captures(&re))
-        printf("submatch %lld: %.*s\n", k, c_SV(it.match[k]));
+    for (int k = 1; i <= cregex_captures(&re); ++k)
+        printf("submatch %d: %.*s\n", k, c_SV(it.match[k]));
 ```
 
 ## Using cregex in a project
 
-The easiest is to `#define i_extern` before `#include <stc/cregex.h>`. Make sure to do that in one translation unit only.
+The easiest is to `#define i_import` before `#include <stc/cregex.h>`. Make sure to do that in one translation unit only.
 
 For reference, **cregex** uses the following files: 
 - `stc/cregex.h`, `stc/utf8.h`, `stc/csview.h`, `stc/cstr.h`, `stc/ccommon.h`, `stc/forward.h`
@@ -181,8 +181,8 @@ For reference, **cregex** uses the following files:
 | \B | Not UTF8 word boundary | * |
 | \Q | Start literal input mode | * |
 | \E | End literal input mode | * |
-| (?i) (?-i)  | Ignore case on/off (override CREG_C_ICASE) | * |
-| (?s) (?-s)  | Dot matches newline on/off (override CREG_C_DOTALL) | * |
+| (?i) (?-i)  | Ignore case on/off (override CREG_ICASE) | * |
+| (?s) (?-s)  | Dot matches newline on/off (override CREG_DOTALL) | * |
 | \n \t \r | Match UTF8 newline, tab, carriage return | |
 | \d \s \w | Match UTF8 digit, whitespace, alphanumeric character | |
 | \D \S \W | Do not match the groups described above | |

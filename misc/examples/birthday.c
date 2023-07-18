@@ -13,8 +13,8 @@ static uint64_t seed = 12345;
 static void test_repeats(void)
 {
     enum {BITS = 46, BITS_TEST = BITS/2 + 2};
-    const static uint64_t N = 1ull << BITS_TEST;
-    const static uint64_t mask = (1ull << BITS) - 1;
+    static const uint64_t N = 1ull << BITS_TEST;
+    static const uint64_t mask = (1ull << BITS) - 1;
 
     printf("birthday paradox: value range: 2^%d, testing repeats of 2^%d values\n", BITS, BITS_TEST);
     crand_t rng = crand_init(seed);
@@ -60,7 +60,7 @@ void test_distribution(void)
     cmap_x_drop(&map);
 }
 
-int main()
+int main(void)
 {
     seed = (uint64_t)time(NULL);
     test_distribution();

@@ -1,12 +1,13 @@
+#define i_implement
 #include <stc/cstr.h>
 #include <stc/forward.h>
 
 forward_cmap(cmap_pnt, struct Point, int);
 
-struct MyStruct {
+typedef struct MyStruct {
     cmap_pnt pntmap;
     cstr name;
-} typedef MyStruct;
+} MyStruct;
 
 // int => int map
 #define i_key int
@@ -14,7 +15,7 @@ struct MyStruct {
 #include <stc/cmap.h>
 
 // Point => int map
-struct Point { int x, y; } typedef Point;
+typedef struct Point { int x, y; } Point;
 
 int point_cmp(const Point* a, const Point* b) {
     int c = a->x - b->x;
@@ -40,20 +41,20 @@ int point_cmp(const Point* a, const Point* b) {
 #include <stc/cset.h>
 
 
-int main()
+int main(void)
 {
-    cmap_pnt pmap = c_make(cmap_pnt, {{{42, 14}, 1}, {{32, 94}, 2}, {{62, 81}, 3}});
+    cmap_pnt pmap = c_init(cmap_pnt, {{{42, 14}, 1}, {{32, 94}, 2}, {{62, 81}, 3}});
 
     c_foreach (i, cmap_pnt, pmap)
         printf(" (%d, %d: %d)", i.ref->first.x, i.ref->first.y, i.ref->second);
     puts("");
 
-    cmap_str smap = c_make(cmap_str, {
+    cmap_str smap = c_init(cmap_str, {
         {"Hello, friend", "long time no see"},
         {"So long", "see you around"},
     });
 
-    cset_str sset = c_make(cset_str, {
+    cset_str sset = c_init(cset_str, {
         "Hello, friend",
         "Nice to see you again",
         "So long",

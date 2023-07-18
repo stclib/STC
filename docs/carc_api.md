@@ -6,14 +6,14 @@ deallocated when the last remaining **carc** owning the object is destroyed with
 
 The object is destroyed using *carc_X_drop()*. A **carc** may also own no objects, in which 
 case it is called empty. The *carc_X_cmp()*, *carc_X_drop()* methods are defined based on
-the `i_cmp` and `i_valdrop` macros specified. Use *carc_X_clone(p)* when sharing ownership of
+the `i_cmp` and `i_keydrop` macros specified. Use *carc_X_clone(p)* when sharing ownership of
 the pointed-to object. 
 
 All **carc** functions can be called by multiple threads on different instances of **carc** without
 additional synchronization even if these instances are copies and share ownership of the same object.
 **carc** uses thread-safe atomic reference counting, through the *carc_X_clone()* and *carc_X_drop()* methods.
 
-When declaring a container with shared pointers, define `i_valboxed` with the carc type, see example.
+When declaring a container with shared pointers, define `i_keyboxed` with the carc type, see example.
 
 See similar c++ class [std::shared_ptr](https://en.cppreference.com/w/cpp/memory/shared_ptr) for a functional reference, or Rust [std::sync::Arc](https://doc.rust-lang.org/std/sync/struct.Arc.html) / [std::rc::Rc](https://doc.rust-lang.org/std/rc/struct.Rc.html).
 
@@ -21,14 +21,14 @@ See similar c++ class [std::shared_ptr](https://en.cppreference.com/w/cpp/memory
 
 ```c
 #define i_type            // full typename of the carc
-#define i_val             // value: REQUIRED
+#define i_key             // element type: REQUIRED
 
-#define i_valraw          // convertion "raw" type - defaults to i_val
-#define i_valto           // convertion func i_val* => i_valraw: REQUIRED IF i_valraw defined.
-#define i_valfrom         // convertion func i_valraw => i_val
+#define i_keyraw          // convertion "raw" type - defaults to i_key
+#define i_keyto           // convertion func i_key* => i_keyraw: REQUIRED IF i_keyraw defined.
+#define i_keyfrom         // convertion func i_keyraw => i_key
       
 #define i_opt c_no_atomic // Non-atomic reference counting, like Rust Rc.
-#define i_tag             // alternative typename: carc_{i_tag}. i_tag defaults to i_val
+#define i_tag             // alternative typename: carc_{i_tag}. i_tag defaults to i_key
 #include <stc/carc.h>
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.
@@ -36,9 +36,9 @@ See similar c++ class [std::shared_ptr](https://en.cppreference.com/w/cpp/memory
 ## Methods
 ```c
 carc_X      carc_X_init();                                     // empty shared pointer
-carc_X      carc_X_from(i_valraw raw);                         // create an carc from raw type (available if i_valraw defined by user).
-carc_X      carc_X_from_ptr(i_val* p);                         // create an carc from raw pointer. Takes ownership of p.
-carc_X      carc_X_make(i_val val);                            // create an carc from constructed val object. Faster than from_ptr().
+carc_X      carc_X_from(i_keyraw raw);                         // create an carc from raw type (available if i_keyraw defined by user).
+carc_X      carc_X_from_ptr(i_key* p);                         // create an carc from raw pointer. Takes ownership of p.
+carc_X      carc_X_make(i_key key);                            // create an carc from constructed key object. Faster than from_ptr().
 
 carc_X      carc_X_clone(carc_X other);                        // return other with increased use count
 carc_X      carc_X_move(carc_X* self);                         // transfer ownership to receiver; self becomes NULL
@@ -49,7 +49,7 @@ void        carc_X_drop(carc_X* self);                         // destruct (decr
 long        carc_X_use_count(const carc_X* self);    
 
 void        carc_X_reset(carc_X* self);    
-void        carc_X_reset_to(carc_X* self, i_val* p);           // assign new carc from ptr. Takes ownership of p.
+void        carc_X_reset_to(carc_X* self, i_key* p);           // assign new carc from ptr. Takes ownership of p.
 
 uint64_t    carc_X_hash(const carc_X* x);                      // hash value
 int         carc_X_cmp(const carc_X* x, const carc_X* y);      // compares pointer addresses if no `i_cmp` is specified.
@@ -58,19 +58,19 @@ bool        carc_X_eq(const carc_X* x, const carc_X* y);       // carc_X_cmp() =
 
 // functions on pointed to objects.
 
-uint64_t    carc_X_value_hash(const i_val* x);
-int         carc_X_value_cmp(const i_val* x, const i_val* y);
-bool        carc_X_value_eq(const i_val* x, const i_val* y);
+uint64_t    carc_X_value_hash(const i_key* x);
+int         carc_X_value_cmp(const i_key* x, const i_key* y);
+bool        carc_X_value_eq(const i_key* x, const i_key* y);
 ```
 
 ## Types and constants
 
 | Type name         | Type definition                                   | Used to represent...   |
 |:------------------|:--------------------------------------------------|:-----------------------|
-| `carc_NULL`       | `{NULL, NULL}`                                    | Init nullptr const     |
+| `carc_null`       | `{0}`                                             | Init nullptr const     |
 | `carc_X`          | `struct { carc_X_value* get; long* use_count; }`  | The carc type          |
-| `carc_X_value`    | `i_val`                                           | The carc element type  |
-| `carc_X_raw`      | `i_valraw`                                        | Convertion type        |
+| `carc_X_value`    | `i_key`                                           | The carc element type  |
+| `carc_X_raw`      | `i_keyraw`                                        | Convertion type        |
 
 ## Example
 
@@ -78,6 +78,7 @@ bool        carc_X_value_eq(const i_val* x, const i_val* y);
 // Create two stacks with carcs to maps.
 // Demonstrate sharing and cloning of maps.
 // Show elements dropped.
+#define i_implement
 #include <stc/cstr.h>
 
 #define i_type Map
@@ -88,15 +89,15 @@ bool        carc_X_value_eq(const i_val* x, const i_val* y);
 #include <stc/csmap.h>
 
 #define i_type Arc // (atomic) ref. counted pointer
-#define i_val Map
-#define i_valdrop(p) (printf("drop Arc:\n"), Map_drop(p))
+#define i_key Map
+#define i_keydrop(p) (printf("drop Arc:\n"), Map_drop(p))
 #include <stc/carc.h>
 
 #define i_type Stack
-#define i_valboxed Arc // Note: use i_valboxed for carc or cbox value types
+#define i_keyboxed Arc // Note: use i_keyboxed for carc or cbox value types
 #include <stc/cstack.h>
 
-int main()
+int main(void)
 {
     Stack s1 = {0}, s2 = {0};
     Map *map;

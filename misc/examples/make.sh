@@ -1,20 +1,19 @@
 #!/bin/sh
 
 if [ "$(uname)" = 'Linux' ]; then
-    sanitize='-fsanitize=address'
+    sanitize='-fsanitize=address -fsanitize=undefined -fsanitize-trap'
     clibs='-lm' # -pthread
     oflag='-o '
 fi
 
-cc=gcc; cflags="-s -O3 -std=c99 -Wconversion -Wpedantic -Wall -Wsign-compare -Wwrite-strings -Wno-maybe-uninitialized"
-#cc=gcc; cflags="-g -std=c99 -Werror -Wfatal-errors -Wpedantic -Wall $sanitize"
-#cc=tcc; cflags="-Wall -std=c99"
-#cc=clang; cflags="-s -O2 -std=c99 -Werror -Wfatal-errors -Wpedantic -Wall -Wno-unused-function -Wsign-compare -Wwrite-strings"
-#cc=gcc; cflags="-x c++ -s -O2 -Wall -std=c++20"
-#cc=g++; cflags="-x c++ -s -O2 -Wall"
-#cc=cl; cflags="-O2 -nologo -W3 -MD"
-#cc=cl; cflags="-nologo -TP"
-#cc=cl; cflags="-nologo -std:c11"
+cc=gcc; cflags="-std=c99 -s -O3 -Wall -Wextra -Wpedantic -Wconversion -Wwrite-strings -Wdouble-promotion -Wno-unused-parameter -Wno-maybe-uninitialized -Wno-implicit-fallthrough -Wno-missing-field-initializers"
+#cc=gcc; cflags="-std=c99 -g -Werror -Wfatal-errors -Wpedantic -Wall $sanitize"
+#cc=tcc; cflags="-std=c99 -Wall"
+#cc=clang; cflags="-std=c99 -s -O3 -Wall -Wextra -Wpedantic -Wconversion -Wwrite-strings -Wdouble-promotion -Wno-unused-parameter -Wno-unused-function -Wno-implicit-fallthrough -Wno-missing-field-initializers"
+#cc=gcc; cflags="-x c++ -std=c++20 -O2 -s -Wall"
+#cc=cl; cflags="-nologo -O2 -MD -W3 -wd4003"
+#cc=cl; cflags="-nologo -TP -std:c++20 -wd4003"
+#cc=cl; cflags="-nologo -std:c11 -wd4003"
 
 if [ "$cc" = "cl" ]; then
     oflag='/Fe:'

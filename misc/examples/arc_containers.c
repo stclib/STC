@@ -1,7 +1,8 @@
 // Create a stack and a list of shared pointers to maps,
 // and demonstrate sharing and cloning of maps.
-#define i_static
+#define i_implement
 #include <stc/cstr.h>
+#include <stc/algo/raii.h>
 #define i_type Map
 #define i_key_str // strings
 #define i_val int
@@ -9,23 +10,21 @@
 #include <stc/csmap.h>
 
 #define i_type Arc // (atomic) ref. counted type
-#define i_val Map
-#define i_valdrop(p) (printf("drop Arc:\n"), Map_drop(p))
+#define i_key Map
+#define i_keydrop(p) (printf("drop Arc:\n"), Map_drop(p))
 // no need for atomic ref. count in single thread:
-#define i_opt c_no_atomic|c_no_cmp|c_no_clone
+#define i_opt c_no_atomic
 #include <stc/carc.h>
 
 #define i_type Stack
-#define i_valboxed Arc // define i_valboxed for carc/cbox value (not i_val)
-#define i_opt c_no_cmp
+#define i_keyboxed Arc // define i_keyboxed for carc/cbox value (not i_key)
 #include <stc/cvec.h>
 
 #define i_type List
-#define i_valboxed Arc // as above
-#define i_opt c_no_cmp
+#define i_keyboxed Arc // as above
 #include <stc/clist.h>
 
-int main()
+int main(void)
 {
     Stack stack = {0};
     List list = {0};
