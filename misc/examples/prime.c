@@ -32,7 +32,7 @@ int main(void)
     llong n = 100000000;
     printf("Computing prime numbers up to %lld\n", n);
 
-    clock_t t = clock();
+    clock_t t1 = clock();
     cbits primes = sieveOfEratosthenes(n + 1);
 
     llong np = cbits_count(&primes);
