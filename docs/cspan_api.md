@@ -26,14 +26,14 @@ i.e., it may be expanded multiple times. However, all index arguments are safe, 
 `cspan_at(&ms3, i++, j++, k++)` is allowed. If the number of arguments does not match the span rank,
 a compile error is issued. Runtime bounds checks are enabled by default (define `STC_NDEBUG` or `NDEBUG` to disable).
 ```c
-SpanType        cspan_init(T SpanType, {v1, v2, ...});              // make a 1-d cspan from values
-SpanType        cspan_from(STCContainer* cnt);                      // make a 1-d cspan from compatible STC container
-SpanType        cspan_from_array(ValueType array[]);                // make a 1-d cspan from C array
-                
+SpanType        cspan_init(TYPE SpanType, {v1, v2, ...});           // make a 1-d cspan from values
+SpanType        cspan_from(STCContainer* cnt);                      // make a 1-d cspan from a cvec, cstack, cpque (heap)
+SpanType        cspan_from_array(ValueType array[]);                // make a 1-d cspan from a C array
+
 intptr_t        cspan_size(const SpanTypeN* self);                  // return number of elements
 intptr_t        cspan_rank(const SpanTypeN* self);                  // dimensions; compile time constant
 intptr_t        cspan_index(const SpanTypeN* self, intptr_t x, ..); // index of element
-                
+
 ValueType*      cspan_at(const SpanTypeN* self, intptr_t x, ...);   // #args must match input span rank
 ValueType*      cspan_front(const SpanTypeN* self);
 ValueType*      cspan_back(const SpanTypeN* self);
@@ -55,13 +55,13 @@ SpanType2       cspan_subspan2(const SpanType2* span, intptr_t offset, intptr_t 
 SpanType3       cspan_subspan3(const SpanType3* span, intptr_t offset, intptr_t count);
 
                 // create a sub md span of lower rank. Like e.g. cspan_slice(Span2, &ms4, {x}, {y}, {c_ALL}, {c_ALL});
-OutSpan1        cspan_submd2(const SpanType2* parent, intptr_t x);        // return a 1d subspan from a 2d span.
+OutSpan         cspan_submd2(const SpanType2* parent, intptr_t x);        // return a 1d subspan from a 2d span.
 OutSpanN        cspan_submd3(const SpanType3* parent, intptr_t x, ...);   // return a 1d or 2d subspan from a 3d span.
 OutSpanN        cspan_submd4(const SpanType4* parent, intptr_t x, ...);   // number of args decides rank of output span.
 
                 // general slicing of an md span.
                 // {i}: reduce rank. {i,c_END}: slice to end. {c_ALL}: use full extent.
-OutSpanN        cspan_slice(TYPE OutSpanN, const SpanTypeN* parent, {x0,x1}, {y0,y1}.., {N0,N1});
+OutSpanN        cspan_slice(TYPE OutSpanN, const SpanTypeM* parent, {x0,x1}, {y0,y1}.., {N0,N1});
 ```
 ## TypesPd
 | Type name         | Type definition / usage                             | Used to represent... |

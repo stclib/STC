@@ -64,9 +64,8 @@ enum {
 };
 typedef enum {
     CCO_DONE = 0,
-    CCO_YIELD = 1,
-    CCO_AWAIT = 2,
-    CCO_ERROR = -1,
+    CCO_AWAIT = 1<<0,
+    CCO_YIELD = 1<<1,
 } cco_result;
 
 #define cco_initial(co) ((co)->cco_state == 0)
@@ -132,26 +131,45 @@ typedef enum {
     (void)((co)->cco_state = 0)
 
 /*
- * Closure (optional)
+ * Tasks (optional)
  */
 
-#define cco_closure(Name, ...) \
+struct cco_runtime;
+
+#define cco_task_struct(Name, ...) \
     struct Name { \
-        int (*cco_fn)(struct Name*); \
-        int cco_state; \
+        int (*cco_fn)(struct Name*, struct cco_runtime*); \
+        int cco_state, cco_expect; \
         __VA_ARGS__ \
     }
 
-typedef struct cco_base { 
-    int (*cco_fn)(struct cco_base*);
-    int cco_state;
-} cco_base;
+typedef cco_task_struct(cco_task, /**/) cco_task;
 
-#define cco_resume(closure) \
-    (closure)->cco_fn(closure)
+typedef struct cco_runtime { 
+    int result, top;
+    cco_task* stack[];
+} cco_runtime;
 
-#define cco_cast(closure) \
-    ((cco_base *)(closure) + 0*sizeof((cco_resume(closure), (int*)0 == &(closure)->cco_state)))
+#define cco_cast_task(task) \
+    ((cco_task *)(task) + 0*sizeof((task)->cco_fn(task, (cco_runtime*)0) + ((int*)0 == &(task)->cco_state)))
+
+#define cco_resume(task, rt) \
+    (task)->cco_fn(task, rt)
+
+#define cco_block_task(...) c_MACRO_OVERLOAD(cco_block_task, __VA_ARGS__)
+#define cco_block_task_1(task) cco_block_task_3(task, rt, 16)
+#define cco_block_task_3(task, rt, STACKDEPTH) \
+    for (struct { int result, top; cco_task* stack[STACKDEPTH]; } rt = {.stack={cco_cast_task(task)}}; \
+         (((rt.result = cco_resume(rt.stack[rt.top], (cco_runtime*)&rt)) & rt.stack[rt.top]->cco_expect) || --rt.top >= 0); )
+
+#define cco_await_task(...) c_MACRO_OVERLOAD(cco_await_task, __VA_ARGS__)
+#define cco_await_task_2(task, rt) cco_await_task_3(task, rt, CCO_DONE)
+#define cco_await_task_3(task, rt, resultbits) \
+    do { \
+        cco_runtime* _rt = rt; \
+        (_rt->stack[++_rt->top] = cco_cast_task(task))->cco_expect = ~(resultbits); \
+        cco_yield_v(CCO_AWAIT); \
+    } while (0)
 
 /*
  * Semaphore
@@ -182,7 +200,7 @@ typedef struct { intptr_t count; } cco_sem;
     #else
       #define _c_LINKC __declspec(dllimport) 
     #endif
-    #if _WIN32_WINNT < _WIN32_WINNT_WIN8 || defined __TINYC__
+    #if 1 // _WIN32_WINNT < _WIN32_WINNT_WIN8 || defined __TINYC__
       #define _c_getsystime GetSystemTimeAsFileTime
     #else
       #define _c_getsystime GetSystemTimePreciseAsFileTime

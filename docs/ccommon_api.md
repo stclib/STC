@@ -390,7 +390,10 @@ cco_routine scope; Use `if-else-if` constructs instead.
 |           | `cco_await_v(condition, ret);`       | Suspend until condition is true (return ret)|
 |           | `cco_await_on(cocall);`              | Await on sub-coroutine to finish (return its ret) |
 |           | `cco_return;`                        | Return from coroutine (inside cco_routine) |
-|           | `cco_closure(Closure, ...);`         | Define a coroutine closure struct (optional) |
+|           | Task objects:                        |                                         |
+|           | `cco_task_struct(Name, ...);`        | Define a coroutine task struct          |
+|           | `cco_await_task(task, ...);`         | Await for task to finish or optionally yield a value |
+|           | `cco_block_task(task);`              | Run blocking until task is finished (stackless) |
 |           | Semaphores:                          |                                         | 
 |           | `cco_sem`                            | Semaphore type                          |
 | `cco_sem` | `cco_sem_from(long value)`           | Create semaphore                        |

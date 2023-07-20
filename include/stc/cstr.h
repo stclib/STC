@@ -170,14 +170,14 @@ STC_INLINE intptr_t cstr_capacity(const cstr* self)
 
 // utf8 methods defined in/depending on src/utf8code.c:
 
-STC_API cstr cstr_casefold_sv(csview sv);
-STC_API cstr cstr_tolower_sv(csview sv);
-STC_API cstr cstr_toupper_sv(csview sv);
-STC_API cstr cstr_tolower(const char* str);
-STC_API cstr cstr_toupper(const char* str);
-STC_API void cstr_lowercase(cstr* self);
-STC_API void cstr_uppercase(cstr* self);
-STC_API bool cstr_valid_utf8(const cstr* self);
+extern cstr cstr_casefold_sv(csview sv);
+extern cstr cstr_tolower_sv(csview sv);
+extern cstr cstr_toupper_sv(csview sv);
+extern cstr cstr_tolower(const char* str);
+extern cstr cstr_toupper(const char* str);
+extern void cstr_lowercase(cstr* self);
+extern void cstr_uppercase(cstr* self);
+extern bool cstr_valid_utf8(const cstr* self);
 
 // other utf8 
 
@@ -394,7 +394,7 @@ fn_tocase[] = {{tolower, utf8_casefold},
                {tolower, utf8_tolower},
                {toupper, utf8_toupper}};
 
-STC_DEF cstr cstr_tocase(csview sv, int k) {
+static cstr cstr_tocase(csview sv, int k) {
     cstr out = cstr_init();
     char *buf = cstr_reserve(&out, sv.size*3/2);
     const char *end = sv.str + sv.size;
@@ -415,28 +415,28 @@ STC_DEF cstr cstr_tocase(csview sv, int k) {
     return out;
 }
 
-STC_DEF cstr cstr_casefold_sv(csview sv)
+cstr cstr_casefold_sv(csview sv)
     { return cstr_tocase(sv, 0); }
 
-STC_DEF cstr cstr_tolower_sv(csview sv)
+cstr cstr_tolower_sv(csview sv)
     { return cstr_tocase(sv, 1); }
 
-STC_DEF cstr cstr_toupper_sv(csview sv)
+cstr cstr_toupper_sv(csview sv)
     { return cstr_tocase(sv, 2); }
 
-STC_DEF cstr cstr_tolower(const char* str) 
+cstr cstr_tolower(const char* str) 
     { return cstr_tolower_sv(c_sv(str, c_strlen(str))); }
 
-STC_DEF cstr cstr_toupper(const char* str) 
+cstr cstr_toupper(const char* str) 
     { return cstr_toupper_sv(c_sv(str, c_strlen(str))); }
 
-STC_DEF void cstr_lowercase(cstr* self) 
+void cstr_lowercase(cstr* self) 
     { cstr_take(self, cstr_tolower_sv(cstr_sv(self))); }
 
-STC_DEF void cstr_uppercase(cstr* self) 
+void cstr_uppercase(cstr* self) 
     { cstr_take(self, cstr_toupper_sv(cstr_sv(self))); }
 
-STC_DEF bool cstr_valid_utf8(const cstr* self)
+bool cstr_valid_utf8(const cstr* self)
     { return utf8_valid(cstr_str(self)); }
 #endif // i_import
 
