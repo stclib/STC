@@ -24,7 +24,7 @@
 #define STC_COROUTINE_INCLUDED
 /*
 #include <stdio.h>
-#include <stc/algo/coroutine.h>
+#include <stc/coroutine.h>
 
 struct iterpair {
     int max_x, max_y;
@@ -56,7 +56,7 @@ int main(void) {
     return 0;
 }
 */
-#include "../ccommon.h"
+#include "ccommon.h"
 
 enum {
     CCO_STATE_CLEANUP = -1,
@@ -73,7 +73,7 @@ typedef enum {
 #define cco_done(co) ((co)->cco_state == CCO_STATE_DONE)
 
 #define cco_routine(co) \
-    for (int *_state = &(co)->cco_state; *_state != CCO_STATE_DONE; *_state = CCO_STATE_DONE) \
+    for (int* _state = &(co)->cco_state; *_state != CCO_STATE_DONE; *_state = CCO_STATE_DONE) \
         _resume: switch (*_state) case 0: // thanks, @liigo!
 
 #define cco_yield() cco_yield_v(CCO_YIELD)
@@ -138,7 +138,7 @@ struct cco_runtime;
 
 #define cco_task_struct(Name, ...) \
     struct Name { \
-        int (*cco_fn)(struct Name*, struct cco_runtime*); \
+        int (*cco_func)(struct Name*, struct cco_runtime*); \
         int cco_state, cco_expect; \
         __VA_ARGS__ \
     }
@@ -146,30 +146,29 @@ struct cco_runtime;
 typedef cco_task_struct(cco_task, /**/) cco_task;
 
 typedef struct cco_runtime { 
-    int result, top;
-    cco_task* stack[];
+    int result, top; cco_task* stack[];
 } cco_runtime;
 
 #define cco_cast_task(task) \
-    ((cco_task *)(task) + 0*sizeof((task)->cco_fn(task, (cco_runtime*)0) + ((int*)0 == &(task)->cco_state)))
+    ((cco_task *)(task) + 0*sizeof((task)->cco_func(task, (cco_runtime*)0) + ((int*)0 == &(task)->cco_state)))
 
 #define cco_resume(task, rt) \
-    (task)->cco_fn(task, rt)
+    (task)->cco_func(task, rt)
 
-#define cco_block_task(...) c_MACRO_OVERLOAD(cco_block_task, __VA_ARGS__)
-#define cco_block_task_1(task) cco_block_task_3(task, rt, 16)
-#define cco_block_task_3(task, rt, STACKDEPTH) \
-    for (struct { int result, top; cco_task* stack[STACKDEPTH]; } rt = {.stack={cco_cast_task(task)}}; \
-         (((rt.result = cco_resume(rt.stack[rt.top], (cco_runtime*)&rt)) & rt.stack[rt.top]->cco_expect) || --rt.top >= 0); )
-
-#define cco_await_task(...) c_MACRO_OVERLOAD(cco_await_task, __VA_ARGS__)
-#define cco_await_task_2(task, rt) cco_await_task_3(task, rt, CCO_DONE)
-#define cco_await_task_3(task, rt, resultbits) \
+#define cco_task_await(...) c_MACRO_OVERLOAD(cco_task_await, __VA_ARGS__)
+#define cco_task_await_2(task, rt) cco_task_await_3(task, rt, CCO_DONE)
+#define cco_task_await_3(task, rt, resultbits) \
     do { \
         cco_runtime* _rt = rt; \
-        (_rt->stack[++_rt->top] = cco_cast_task(task))->cco_expect = ~(resultbits); \
+        (_rt->stack[++_rt->top] = cco_cast_task(task))->cco_expect = (resultbits); \
         cco_yield_v(CCO_AWAIT); \
     } while (0)
+
+#define cco_task_block_on(...) c_MACRO_OVERLOAD(cco_task_block_on, __VA_ARGS__)
+#define cco_task_block_on_1(task) cco_task_block_on_3(task, _rt, 16)
+#define cco_task_block_on_3(task, rt, STACKDEPTH) \
+    for (struct { int result, top; cco_task* stack[STACKDEPTH]; } rt = {.stack={cco_cast_task(task)}}; \
+         (((rt.result = cco_resume(rt.stack[rt.top], (cco_runtime*)&rt)) & ~rt.stack[rt.top]->cco_expect) || --rt.top >= 0); )
 
 /*
  * Semaphore

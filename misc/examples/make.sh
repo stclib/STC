@@ -38,8 +38,8 @@ fi
 
 if [ $run = 0 ] ; then
     for i in */*.c ; do
-        #out=$(basename $i .c).exe
-        out=$(dirname $i)/$(basename $i .c).exe
+        out=$(basename $i .c).exe
+        #out=$(dirname $i)/$(basename $i .c).exe
         echo $comp -I../../include $i $clibs $oflag$out
         $comp -I../../include $i $clibs $oflag$out
     done
@@ -47,8 +47,8 @@ else
     for i in */*.c ; do
         echo $comp -I../../include $i $clibs
         $comp -I../../include $i $clibs
-        #out=$(basename $i .c).exe
-        out=$(dirname $i)/$(basename $i .c).exe
+        out=$(basename $i .c).exe
+        #out=$(dirname $i)/$(basename $i .c).exe
         if [ -f $out ]; then ./$out; fi
     done
 fi

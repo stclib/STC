@@ -4,7 +4,7 @@
 #include <stdio.h>
 #define i_static
 #include <stc/cstr.h>
-#include <stc/algo/coroutine.h>
+#include <stc/coroutine.h>
 
 struct next_value { 
     int val;

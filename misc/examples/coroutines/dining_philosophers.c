@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <stc/crand.h>
-#include <stc/algo/coroutine.h>
+#include <stc/coroutine.h>
  
 // Define the number of philosophers and forks
 enum {

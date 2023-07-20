@@ -1,6 +1,6 @@
 #define i_implement
 #include <stc/cstr.h>
-#include <stc/algo/coroutine.h>
+#include <stc/coroutine.h>
 #include <errno.h>
 
 // Read file line by line using coroutines:

@@ -392,8 +392,7 @@ cco_routine scope; Use `if-else-if` constructs instead.
 |           | `cco_return;`                        | Return from coroutine (inside cco_routine) |
 |           | Task objects:                        |                                         |
 |           | `cco_task_struct(Name, ...);`        | Define a coroutine task struct          |
-|           | `cco_await_task(task, ...);`         | Await for task to finish or optionally yield a value |
-|           | `cco_block_task(task);`              | Run blocking until task is finished (stackless) |
+|           | `cco_task_await(task, ...);`         | Await for task to finish or optionally yield a value |
 |           | Semaphores:                          |                                         | 
 |           | `cco_sem`                            | Semaphore type                          |
 | `cco_sem` | `cco_sem_from(long value)`           | Create semaphore                        |
@@ -414,7 +413,9 @@ cco_routine scope; Use `if-else-if` constructs instead.
 | `void`    | `cco_stop(co)`                       | Next call of coroutine finalizes        |
 | `void`    | `cco_reset(co)`                      | Reset state to initial (for reuse)      |
 | `void`    | `cco_block_on(cocall) { }`           | Run blocking until cocall is finished   |
-| `void`    | `cco_block_on(cocall, int *result) { }`| Run blocking until cocall is finished |
+| `void`    | `cco_block_on(cocall, int *result) {}`| Run blocking until cocall is finished |
+|           | `cco_task_block_on(task) {}`         | Run blocking until task is finished |
+|           | `cco_task_block_on(task, rt, STACKSZ) {}`| Run blocking until task is finished |
 |           | Time functions:                      |                                         |
 | `double`  | `cco_time(void)`                     | Return secs with usec prec. since Epoch |
 |           | `cco_sleep(double sec)`              | Sleep for seconds (msec or usec prec.)  |

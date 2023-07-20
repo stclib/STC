@@ -1,7 +1,7 @@
 // https://quuxplusone.github.io/blog/2019/03/06/pythagorean-triples/
 
-#include <stc/algo/coroutine.h>
 #include <stdio.h>
+#include <stc/coroutine.h>
 
 int gcd(int a, int b) {
     while (b) {

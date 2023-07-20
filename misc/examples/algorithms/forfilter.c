@@ -3,8 +3,7 @@
 #include <stc/cstr.h>
 #define i_implement
 #include <stc/csview.h>
-#include <stc/algo/filter.h>
-#include <stc/algo/crange.h>
+#include <stc/algorithm.h>
 
 #define i_type IVec
 #define i_key int

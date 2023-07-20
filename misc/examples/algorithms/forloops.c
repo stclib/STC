@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <stc/algo/filter.h>
+#include <stc/algorithm.h>
 
 #define i_type IVec
 #define i_key int

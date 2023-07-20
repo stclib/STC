@@ -4,6 +4,5 @@
 #include "algo/raii.h"
 #include "algo/crange.h"
 #include "algo/filter.h"
-#include "algo/coroutine.h"
 
 #endif

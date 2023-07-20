@@ -72,14 +72,14 @@ int main(void)
 {
     intptr_t N = 10000000;
     crand_t rng = crand_init(1234);
-    crand_unif_t dist = crand_unif_init(0, N * 10);
+    crand_uniform_t dist = crand_uniform_init(0, N * 10);
 
     // Define heap
     cpque_i heap = {0};
 
     // Push ten million random numbers to priority queue.
     c_forrange (N)
-        cpque_i_push(&heap, crand_unif(&rng, &dist));
+        cpque_i_push(&heap, crand_uniform(&rng, &dist));
 
     // Add some negative ones.
     int nums[] = {-231, -32, -873, -4, -343};

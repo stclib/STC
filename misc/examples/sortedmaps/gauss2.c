@@ -21,14 +21,14 @@ int main(void)
     printf("Mean %f, StdDev %f\n", Mean, StdDev);
 
     // Setup random engine with normal distribution.
-    crand_norm_t dist = crand_norm_init(Mean, StdDev);
+    crand_normal_t dist = crand_normal_init(Mean, StdDev);
 
     // Create and init histogram map with defered destruct
     csmap_int hist = {0};
     cstr bar = {0};
 
     c_forrange (N) {
-        int index = (int)round(crand_norm(&rng, &dist));
+        int index = (int)round(crand_normal(&rng, &dist));
         csmap_int_insert(&hist, index, 0).ref->second += 1;
     }
 

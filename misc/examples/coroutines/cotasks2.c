@@ -4,7 +4,7 @@
 #include <stdio.h>
 #define i_static
 #include <stc/cstr.h>
-#include <stc/algo/coroutine.h>
+#include <stc/coroutine.h>
 
 cco_task_struct (next_value,
     int val;
@@ -45,7 +45,7 @@ int produce_items(struct produce_items* p, cco_runtime* rt)
         while (true)
         {
             // await for next CCO_YIELD in next_value()
-            cco_await_task(&p->next, rt, CCO_YIELD);
+            cco_task_await(&p->next, rt, CCO_YIELD);
             cstr_printf(&p->str, "item %d", p->next.val);
             print_time();
             printf("produced %s\n", cstr_str(&p->str));
@@ -71,7 +71,7 @@ int consume_items(struct consume_items* c, cco_runtime* rt)
         for (c->i = 1; c->i <= c->n; ++c->i)
         {
             printf("consume #%d\n", c->i);
-            cco_await_task(&c->produce, rt, CCO_YIELD);
+            cco_task_await(&c->produce, rt, CCO_YIELD);
             print_time();
             printf("consumed %s\n", cstr_str(&c->produce.str));
         }
@@ -87,12 +87,12 @@ int main(void)
 {
     struct consume_items consume = {
         .n=5,
-        .cco_fn=consume_items,
-        .produce={.cco_fn=produce_items, .next={.cco_fn=next_value}},
+        .cco_func=consume_items,
+        .produce={.cco_func=produce_items, .next={.cco_func=next_value}},
     };
     int count = 0;
 
-    cco_block_task(&consume)
+    cco_task_block_on(&consume)
     {
         ++count;
         //cco_sleep(0.001);

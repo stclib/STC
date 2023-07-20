@@ -11,21 +11,21 @@
 int main(void) {
     intptr_t N = 10000000;
     crand_t rng = crand_init((uint64_t)time(NULL));
-    crand_unif_t dist = crand_unif_init(0, N * 10);
+    crand_uniform_t dist = crand_uniform_init(0, N * 10);
 
     cpque_i heap = {0};
 
     // Push ten million random numbers to priority queue
     printf("Push %" c_ZI " numbers\n", N);
     c_forrange (N)
-        cpque_i_push(&heap, crand_unif(&rng, &dist));
+        cpque_i_push(&heap, crand_uniform(&rng, &dist));
 
     // push some negative numbers too.
     c_forlist (i, int, {-231, -32, -873, -4, -343})
         cpque_i_push(&heap, *i.ref);
 
     c_forrange (N)
-        cpque_i_push(&heap, crand_unif(&rng, &dist));
+        cpque_i_push(&heap, crand_uniform(&rng, &dist));
 
     puts("Extract the hundred smallest.");
     c_forrange (100) {

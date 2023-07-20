@@ -2,23 +2,23 @@
 #include <math.h>
 #include <time.h>
 #include <stc/cbits.h>
-#include <stc/algo/filter.h>
-#include <stc/algo/crange.h>
+#include <stc/algorithm.h>
 
+typedef long long llong;
 
-cbits sieveOfEratosthenes(int64_t n)
+cbits sieveOfEratosthenes(llong n)
 {
     cbits bits = cbits_with_size(n/2 + 1, true);
-    int64_t q = (int64_t)sqrt((double) n) + 1;
-    for (int64_t i = 3; i < q; i += 2) {
-        int64_t j = i;
+    llong q = (llong)sqrt((double) n) + 1;
+    for (llong i = 3; i < q; i += 2) {
+        llong j = i;
         for (; j < n; j += 2) {
             if (cbits_test(&bits, j>>1)) {
                 i = j;
                 break;
             }
         }
-        for (int64_t j = i*i; j < n; j += i*2)
+        for (llong j = i*i; j < n; j += i*2)
             cbits_reset(&bits, j>>1);
     }
     return bits;
@@ -26,12 +26,12 @@ cbits sieveOfEratosthenes(int64_t n)
 
 int main(void)
 {
-    int n = 1000000000;
-    printf("Computing prime numbers up to %d\n", n);
+    llong n = 100000000;
+    printf("Computing prime numbers up to %lld\n", n);
 
     clock_t t = clock();
     cbits primes = sieveOfEratosthenes(n + 1);
-    int np = (int)cbits_count(&primes);
+    llong np = cbits_count(&primes);
     t = clock() - t;
 
     puts("Show all the primes in the range [2, 1000):");
@@ -50,7 +50,7 @@ int main(void)
         printf("%lld ", *i.ref);
         if (c_flt_getcount(i) % 10 == 0) puts("");
     }
-    printf("Number of primes: %d, time: %.2f\n\n", np, (double)t/CLOCKS_PER_SEC);
+    printf("Number of primes: %lld, time: %.2f\n\n", np, (double)t/CLOCKS_PER_SEC);
 
     cbits_drop(&primes);
 }

@@ -23,19 +23,19 @@ int point_cmp(const Point* a, const Point* b) {
 int main(void) {
     int n = 50000000;
     crand_t rng = crand_init((uint64_t)time(NULL));
-    crand_unif_t dist = crand_unif_init(0, n);
+    crand_uniform_t dist = crand_uniform_init(0, n);
 
     IQ Q = {0};
 
     // Push 50'000'000 random numbers onto the queue.
     c_forrange (n)
-        IQ_push(&Q, (int)crand_unif(&rng, &dist));
+        IQ_push(&Q, (int)crand_uniform(&rng, &dist));
 
     // Push or pop on the queue 50 million times
     printf("befor: size %" c_ZI ", capacity %" c_ZI "\n", IQ_size(&Q), IQ_capacity(&Q));
     
     c_forrange (n) {
-        int r = (int)crand_unif(&rng, &dist);
+        int r = (int)crand_uniform(&rng, &dist);
         if (r & 3)
             IQ_push(&Q, r);
         else

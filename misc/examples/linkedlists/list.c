@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <time.h>
-#include <stc/algo/filter.h>
+#include <stc/algorithm.h>
 #include <stc/crand.h>
 
 #define i_type DList
