@@ -7,9 +7,9 @@
 
 cvec_str read_file(const char* name)
 {
-    cvec_str vec = cvec_str_init();
+    cvec_str vec = {0};
     c_with (FILE* f = fopen(name, "r"), fclose(f))
-        c_with (cstr line = cstr_null, cstr_drop(&line))
+        c_with (cstr line = {0}, cstr_drop(&line))
             while (cstr_getline(&line, f))
                 cvec_str_push(&vec, cstr_clone(line));
     return vec;

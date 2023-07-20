@@ -37,18 +37,20 @@ else
 fi
 
 if [ $run = 0 ] ; then
-    for i in *.c ; do
-        echo $comp -I../../include $i $clibs $oflag$(basename $i .c).exe
-        $comp -I../../include $i $clibs $oflag$(basename $i .c).exe
+    for i in */*.c ; do
+        #out=$(basename $i .c).exe
+        out=$(dirname $i)/$(basename $i .c).exe
+        echo $comp -I../../include $i $clibs $oflag$out
+        $comp -I../../include $i $clibs $oflag$out
     done
 else
-    for i in *.c ; do
+    for i in */*.c ; do
         echo $comp -I../../include $i $clibs
         $comp -I../../include $i $clibs
-        if [ -f $(basename -s .c $i).exe ]; then ./$(basename -s .c $i).exe; fi
-        if [ -f ./a.exe ]; then ./a.exe; fi
-        if [ -f ./a.out ]; then ./a.out; fi
+        #out=$(basename $i .c).exe
+        out=$(dirname $i)/$(basename $i .c).exe
+        if [ -f $out ]; then ./$out; fi
     done
 fi
 
-rm -f a.out *.o *.obj # *.exe
+#rm -f a.out *.o *.obj # *.exe
