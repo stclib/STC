@@ -374,36 +374,32 @@ cco_routine scope; Use `if-else-if` constructs instead.
 
 |           |  Function / operator                 | Description                             |
 |:----------|:-------------------------------------|:----------------------------------------|
-|           | Function / 'keywords':               |                                         |
-|`cco_result` | Enum `CCO_DONE=0`, `CCO_YIELD`, `CCO_AWAIT` | Recommended return values in coroutines |
-|           | Function / 'keywords':               |                                         |
+|`cco_result` | `CCO_DONE`, `CCO_AWAIT`, `CCO_YIELD` | Default set of return values from coroutines |
 |           | `cco_cleanup:`                       | Label for cleanup position in coroutine |
 | `bool`    | `cco_done(co)`                       | Is coroutine done?                      |
-|           | `cco_routine(co) { }`                | The coroutine scope                     |
+|           | `cco_routine(co) {}`                 | The coroutine scope                     |
 |           | `cco_yield();`                       | Yield/suspend execution (return CCO_YIELD)|
-|           | `cco_yield_v();`                     | Yield/suspend execution (return void)   |
 |           | `cco_yield_v(ret);`                  | Yield/suspend execution (return ret)    |
-|           | `cco_yield_final();`                 | Yield final time, enables cleanup-state |
-|           | `cco_yield_final(ret);`              | Yield a final value (e.g. CCO_ERROR) |
+|           | `cco_yield_final();`                 | Yield final suspend, enter cleanup-state |
+|           | `cco_yield_final(ret);`              | Yield a final value                     |
 |           | `cco_await(condition);`              | Suspend until condition is true (return CCO_AWAIT)|
-|           | `cco_await_v(condition);`            | Suspend until condition is true (return void) |
-|           | `cco_await_v(condition, ret);`       | Suspend until condition is true (return ret)|
-|           | `cco_await_on(cocall);`              | Await on sub-coroutine to finish (return its ret) |
+|           | `cco_call_await(cocall);`            | Await for subcoro to finish (returns its ret value) |
+|           | `cco_call_await(cocall, retbit);`    | Await for subcoro's return to be in (retbit \| CCO_DONE)  |
 |           | `cco_return;`                        | Return from coroutine (inside cco_routine) |
 |           | Task objects:                        |                                         |
 |           | `cco_task_struct(Name, ...);`        | Define a coroutine task struct          |
-|           | `cco_task_await(task, ...);`         | Await for task to finish or optionally yield a value |
+|           | `cco_task_await(task, cco_runtime* rt);`| Await for task to finish             |
+|           | `cco_task_await(task, rt, retbit);`  | Await for task's return to be in (retbit \| CCO_DONE) |
+|`cco_result`| `cco_task_resume(task, rt);`       | Resume suspended task                   |
 |           | Semaphores:                          |                                         | 
 |           | `cco_sem`                            | Semaphore type                          |
 | `cco_sem` | `cco_sem_from(long value)`           | Create semaphore                        |
 |           | `cco_sem_set(sem, long value)`       | Set semaphore value                     |
 |           | `cco_sem_await(sem)`                 | Await for the semaphore count > 0       |
-|           | `cco_sem_await(sem, ret)`            | Await with ret on the semaphore         |
 |           | `cco_sem_release(sem)`               | Signal the semaphore (count += 1)       |
 |           | Timers:                              |                                         | 
 |           | `cco_timer`                          | Timer type                              |
 |           | `cco_timer_await(tm, double sec)`    | Await secs for timer to expire (usec prec.)|
-|           | `cco_timer_await(tm, double sec, ret)`| Await secs for timer with ret value    |
 |           | `cco_timer_start(tm, double sec)`    | Start timer for secs duration           |
 |           | `cco_timer_restart(tm)`              | Restart timer with same duration        |
 | `bool`    | `cco_timer_expired(tm)`              | Return true if timer is expired         |
@@ -412,10 +408,10 @@ cco_routine scope; Use `if-else-if` constructs instead.
 |           | From caller side:                    |                                         | 
 | `void`    | `cco_stop(co)`                       | Next call of coroutine finalizes        |
 | `void`    | `cco_reset(co)`                      | Reset state to initial (for reuse)      |
-| `void`    | `cco_block_on(cocall) { }`           | Run blocking until cocall is finished   |
-| `void`    | `cco_block_on(cocall, int *result) {}`| Run blocking until cocall is finished |
-|           | `cco_task_block_on(task) {}`         | Run blocking until task is finished |
-|           | `cco_task_block_on(task, rt, STACKSZ) {}`| Run blocking until task is finished |
+| `void`    | `cco_call_blocking(cocall) {}`       | Run blocking until cocall is finished   |
+| `void`    | `cco_call_blocking(cocall, int* outres) {}`| Run blocking until cocall is finished |
+|           | `cco_task_blocking(task) {}`         | Run blocking until task is finished |
+|           | `cco_task_blocking(task, rt, STACKSZ) {}`| Run blocking until task is finished |
 |           | Time functions:                      |                                         |
 | `double`  | `cco_time(void)`                     | Return secs with usec prec. since Epoch |
 |           | `cco_sleep(double sec)`              | Sleep for seconds (msec or usec prec.)  |

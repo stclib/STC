@@ -12,17 +12,17 @@ int main(void) {
     DSpan3 ms = cspan_md_order('F', data, nx, ny, nz); // Fortran, not 'C'
 
     int idx = 0;
-    c_forrange (i, ms.shape[0])
-        c_forrange (j, ms.shape[1])
-            c_forrange (k, ms.shape[2]) 
+    for (int i = 0; i < ms.shape[0]; ++i)
+        for (int j = 0; j < ms.shape[1]; ++j)
+            for (int k = 0; k < ms.shape[2]; ++k)
                 *cspan_at(&ms, i, j, k) = ++idx;
 
     cspan_transpose(&ms);
 
     printf(", transposed:\n\n");
-    c_forrange (i, ms.shape[0]) {
-        c_forrange (j, ms.shape[1]) {
-            c_forrange (k, ms.shape[2])
+    for (int i = 0; i < ms.shape[0]; ++i) {
+        for (int j = 0; j < ms.shape[1]; ++j) {
+            for (int k = 0; k < ms.shape[2]; ++k)
                 printf(" %3g", *cspan_at(&ms, i, j, k));
             puts("");
         }

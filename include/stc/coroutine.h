@@ -83,26 +83,27 @@ typedef enum {
         case __LINE__:; \
     } while (0)
 
-#define cco_await(promise) cco_await_v_2(promise, CCO_AWAIT)
-#define cco_await_v(...) c_MACRO_OVERLOAD(cco_await_v, __VA_ARGS__)
-#define cco_await_v_1(promise) cco_await_v_2(promise, )
-#define cco_await_v_2(promise, ret) \
+#define cco_await(promise) cco_await_and_return(promise, CCO_AWAIT)
+#define cco_await_v(promise) cco_await_and_return(promise, )
+#define cco_await_and_return(promise, ret) \
     do { \
         *_state = __LINE__; \
         case __LINE__: if (!(promise)) {return ret; goto _resume;} \
     } while (0)
 
-/* cco_await_on(): assumes coroutine returns a cco_result value (int) */
-#define cco_await_on(corocall) \
+/* cco_call_await(): assumes coroutine returns a cco_result value (int) */
+#define cco_call_await(...) c_MACRO_OVERLOAD(cco_call_await, __VA_ARGS__)
+#define cco_call_await_1(corocall) cco_call_await_2(corocall, CCO_DONE)
+#define cco_call_await_2(corocall, resultbits) \
     do { \
         *_state = __LINE__; \
-        case __LINE__: { int _r = corocall; if (_r != CCO_DONE) {return _r; goto _resume;} } \
+        case __LINE__: { int _r = corocall; if (!(_r & ~(resultbits))) {return _r; goto _resume;} } \
     } while (0)
 
-/* cco_block_on(): assumes coroutine returns a cco_result value (int) */
-#define cco_block_on(...) c_MACRO_OVERLOAD(cco_block_on, __VA_ARGS__)
-#define cco_block_on_1(corocall) while ((corocall) != CCO_DONE)
-#define cco_block_on_2(corocall, result) while ((*(result) = (corocall)) != CCO_DONE)
+/* cco_call_blocking(): assumes coroutine returns a cco_result value (int) */
+#define cco_call_blocking(...) c_MACRO_OVERLOAD(cco_call_blocking, __VA_ARGS__)
+#define cco_call_blocking_1(corocall) while ((corocall) != CCO_DONE)
+#define cco_call_blocking_2(corocall, result) while ((*(result) = (corocall)) != CCO_DONE)
 
 #define cco_cleanup \
     *_state = CCO_STATE_CLEANUP; case CCO_STATE_CLEANUP
@@ -152,7 +153,7 @@ typedef struct cco_runtime {
 #define cco_cast_task(task) \
     ((cco_task *)(task) + 0*sizeof((task)->cco_func(task, (cco_runtime*)0) + ((int*)0 == &(task)->cco_state)))
 
-#define cco_resume(task, rt) \
+#define cco_task_resume(task, rt) \
     (task)->cco_func(task, rt)
 
 #define cco_task_await(...) c_MACRO_OVERLOAD(cco_task_await, __VA_ARGS__)
@@ -164,11 +165,11 @@ typedef struct cco_runtime {
         cco_yield_v(CCO_AWAIT); \
     } while (0)
 
-#define cco_task_block_on(...) c_MACRO_OVERLOAD(cco_task_block_on, __VA_ARGS__)
-#define cco_task_block_on_1(task) cco_task_block_on_3(task, _rt, 16)
-#define cco_task_block_on_3(task, rt, STACKDEPTH) \
+#define cco_task_blocking(...) c_MACRO_OVERLOAD(cco_task_blocking, __VA_ARGS__)
+#define cco_task_blocking_1(task) cco_task_blocking_3(task, _rt, 16)
+#define cco_task_blocking_3(task, rt, STACKDEPTH) \
     for (struct { int result, top; cco_task* stack[STACKDEPTH]; } rt = {.stack={cco_cast_task(task)}}; \
-         (((rt.result = cco_resume(rt.stack[rt.top], (cco_runtime*)&rt)) & ~rt.stack[rt.top]->cco_expect) || --rt.top >= 0); )
+         (((rt.result = cco_task_resume(rt.stack[rt.top], (cco_runtime*)&rt)) & ~rt.stack[rt.top]->cco_expect) || --rt.top >= 0); )
 
 /*
  * Semaphore
@@ -176,12 +177,11 @@ typedef struct cco_runtime {
 
 typedef struct { intptr_t count; } cco_sem;
 
-#define cco_sem_await(sem) cco_sem_await_v_2(sem, CCO_AWAIT)
-#define cco_sem_await_v(...) c_MACRO_OVERLOAD(cco_sem_await_v, __VA_ARGS__)
-#define cco_sem_await_v_1(sem) cco_sem_await_v_2(sem, )
-#define cco_sem_await_v_2(sem, ret) \
+#define cco_sem_await(sem) cco_sem_await_and_return(sem, CCO_AWAIT)
+#define cco_sem_await_v(sem) cco_sem_await_and_return(sem, )
+#define cco_sem_await_and_return(sem, ret) \
     do { \
-        cco_await_v_2((sem)->count > 0, ret); \
+        cco_await_and_return((sem)->count > 0, ret); \
         --(sem)->count; \
     } while (0)
 
@@ -241,7 +241,7 @@ typedef struct { double interval, start; } cco_timer;
 #define cco_timer_await_v_3(tm, sec, ret) \
     do { \
         cco_timer_start(tm, sec); \
-        cco_await_v_2(cco_timer_expired(tm), ret); \
+        cco_await_and_return(cco_timer_expired(tm), ret); \
     } while (0)
 
 static inline void cco_timer_start(cco_timer* tm, double sec) {

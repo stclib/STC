@@ -77,7 +77,7 @@ int consume_items(struct consume_items* c, cco_runtime* rt)
         }
         cco_cleanup:
             cco_stop(&c->produce);
-            cco_resume(&c->produce, rt);
+            cco_task_resume(&c->produce, rt);
             puts("done consume");
     }
     return 0;
@@ -92,7 +92,7 @@ int main(void)
     };
     int count = 0;
 
-    cco_task_block_on(&consume)
+    cco_task_blocking(&consume)
     {
         ++count;
         //cco_sleep(0.001);

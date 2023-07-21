@@ -88,7 +88,7 @@ int main(void)
     struct consume_items consume = {.n=5};
     int count = 0;
 
-    cco_block_on(consume_items(&consume, &produce))
+    cco_call_blocking(consume_items(&consume, &produce))
     {
         ++count;
         //cco_sleep(0.001);
