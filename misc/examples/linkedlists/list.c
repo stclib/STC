@@ -12,10 +12,10 @@ int main(void) {
     const int n = 3000000;
     DList list = {0};
 
-    crand_t rng = crand_init(1234567);
+    csrand(1234567);
     int m = 0;
     c_forrange (n)
-        DList_push_back(&list, crand_f64(&rng)*n + 100), ++m;
+        DList_push_back(&list, crandf()*n + 100), ++m;
 
     double sum = 0.0;
     printf("sumarize %d:\n", m);

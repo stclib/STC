@@ -41,10 +41,6 @@ int main(void)
     c_foreach (i, IVec, vec)
         printf(" %d", *i.ref);
 
-    puts("\n\nc_foreach_r: reverse");
-    c_foreach_rv (i, IVec, vec)
-        printf(" %d", *i.ref);
-
     puts("\n\nc_foreach in map:");
     c_foreach (i, IMap, map)
         printf(" (%d %d)", i.ref->first, i.ref->second);

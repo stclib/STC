@@ -640,7 +640,6 @@ STC is generally very memory efficient. Memory usage for the different container
 - Added new crand.h API & header. Old crandom.h is deprecated.
 - Added `c_const_cast()` typesafe macro.
 - Removed RAII macros usage from examples
-- Renamed c_foreach_r => `c_foreach_rv`
 - Renamed c_flt_count(i) => `c_flt_counter(i)`
 - Renamed c_flt_last(i) => `c_flt_getcount(i)`
 - Renamed c_ARRAYLEN() => c_arraylen()
