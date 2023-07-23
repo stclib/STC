@@ -68,12 +68,14 @@ def process_file(
 
 
 if __name__ == "__main__":
-    print(
-        process_file(
-            abspath(sys.argv[1]),
-            [],
-            # We use an include guard instead of `#pragma once` because Godbolt will
-            # cause complaints about `#pragma once` when they are used in URL includes.
-            [abspath(sys.argv[1])],
+    with open(sys.argv[2], "w", newline='\n') as f:
+        print(
+            process_file(
+                abspath(sys.argv[1]),
+                [],
+                # We use an include guard instead of `#pragma once` because Godbolt will
+                # cause complaints about `#pragma once` when they are used in URL includes.
+                [abspath(sys.argv[1])],
+            ),
+            file=f
         )
-    )
