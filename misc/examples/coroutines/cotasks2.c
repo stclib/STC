@@ -42,18 +42,20 @@ int produce_items(struct produce_items* p, cco_runtime* rt)
 {
     cco_routine (p) {
         p->str = cstr_null;
+        p->next.cco_func = next_value;
         while (true)
         {
-            // await for next CCO_YIELD in next_value()
+            // await for next CCO_YIELD (or CCO_DONE) in next_value
             cco_task_await(&p->next, rt, CCO_YIELD);
             cstr_printf(&p->str, "item %d", p->next.val);
             print_time();
             printf("produced %s\n", cstr_str(&p->str));
             cco_yield();
         }
+
         cco_cleanup:
-            cstr_drop(&p->str);
-            puts("done produce");
+        cstr_drop(&p->str);
+        puts("done produce");
     }
     return 0;
 }
@@ -68,6 +70,8 @@ cco_task_struct (consume_items,
 int consume_items(struct consume_items* c, cco_runtime* rt)
 {
    cco_routine (c) {
+        c->produce.cco_func = produce_items;
+
         for (c->i = 1; c->i <= c->n; ++c->i)
         {
             printf("consume #%d\n", c->i);
@@ -75,10 +79,11 @@ int consume_items(struct consume_items* c, cco_runtime* rt)
             print_time();
             printf("consumed %s\n", cstr_str(&c->produce.str));
         }
+
         cco_cleanup:
-            cco_stop(&c->produce);
-            cco_task_resume(&c->produce, rt);
-            puts("done consume");
+        cco_stop(&c->produce);
+        cco_task_resume(&c->produce, rt);
+        puts("done consume");
     }
     return 0;
 }
@@ -86,18 +91,8 @@ int consume_items(struct consume_items* c, cco_runtime* rt)
 int main(void)
 {
     struct consume_items consume = {
-        .n=5,
-        .cco_func=consume_items,
-        .produce={.cco_func=produce_items, .next={.cco_func=next_value}},
+        .cco_func = consume_items,
+        .n = 5,
     };
-    int count = 0;
-
-    cco_task_blocking(&consume)
-    {
-        ++count;
-        //cco_sleep(0.001);
-        //if (consume.i == 3)
-        //    cco_stop(&consume);
-    }
-    printf("count: %d\n", count);
+    cco_task_blocking(&consume);
 }

@@ -12,7 +12,7 @@ typedef struct
 int Song_cmp(const Song* x, const Song* y)
     { return cstr_cmp(&x->title, &y->title); }
 
-Song Song_make(const char* artist, const char* title)
+Song Song_init(const char* artist, const char* title)
     { return c_LITERAL(Song){cstr_from(artist), cstr_from(title)}; }
 
 void Song_drop(Song* s) {
@@ -34,9 +34,9 @@ void Song_drop(Song* s) {
 void example3(void)
 {
     SongVec vec1 = c_init(SongVec, {
-        Song_make("Bob Dylan", "The Times They Are A Changing"),
-        Song_make("Aretha Franklin", "Bridge Over Troubled Water"),
-        Song_make("Thalia", "Entre El Mar y Una Estrella")
+        Song_init("Bob Dylan", "The Times They Are A Changing"),
+        Song_init("Aretha Franklin", "Bridge Over Troubled Water"),
+        Song_init("Thalia", "Entre El Mar y Una Estrella")
     });
 
     SongVec vec2 = {0};
@@ -47,8 +47,8 @@ void example3(void)
 
     // Add a few more to vec2. We can use emplace when creating new entries
     // Emplace calls SongArc_from() on the argument to create the Arc:
-    SongVec_emplace(&vec2, Song_make("Michael Jackson", "Billie Jean"));
-    SongVec_emplace(&vec2, Song_make("Rihanna", "Stay"));
+    SongVec_emplace(&vec2, Song_init("Michael Jackson", "Billie Jean"));
+    SongVec_emplace(&vec2, Song_init("Rihanna", "Stay"));
 
     // We now have two vectors with some shared, some unique entries.
     c_forlist (i, SongVec, {vec1, vec2}) {
