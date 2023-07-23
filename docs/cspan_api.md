@@ -21,10 +21,11 @@ using_cspan4(S, ValueType);              // define span types S, S2, S3, S4 with
 ```
 ## Methods
 
-All functions are type-safe. Note that the span argument itself is generally not side-effect safe,
-i.e., it may be expanded multiple times. However, all index arguments are safe, e.g.
-`cspan_at(&ms3, i++, j++, k++)` is allowed. If the number of arguments does not match the span rank,
-a compile error is issued. Runtime bounds checks are enabled by default (define `STC_NDEBUG` or `NDEBUG` to disable).
+All functions are type-safe. NOTE: the span argument itself is generally **not** side-effect safe -
+it may be expanded multiple times. However, all index arguments are safe, e.g.
+`cspan_at(&ms3, i++, j++, k++)` is safe, but `cspan_at(&spans[n++], i, j)` is an error! If the number
+of arguments does not match the span rank, a compile error is issued. Runtime bounds checks are enabled
+by default (define `STC_NDEBUG` or `NDEBUG` to disable).
 ```c
 SpanType        cspan_init(TYPE SpanType, {v1, v2, ...});           // make a 1-d cspan from values
 SpanType        cspan_from(STCContainer* cnt);                      // make a 1-d cspan from a cvec, cstack, cpque (heap)
@@ -45,7 +46,7 @@ void            SpanType_next(SpanTypeN_iter* it);
 SpanTypeN       cspan_md(ValueType* data, d1, d2, ...);                   // make a multi-dim cspan, row-major order.
 SpanTypeN       cspan_md_order(char order, ValueType* data, d1, d2, ...); // order='C': row-major, 'F': column-major (FORTRAN).
 
-                // transpose a md span (inverse axes). no changes to the underlying array.
+                // transpose a md span (inverse axes). No changes to the underlying array.
 void            cspan_transpose(const SpanTypeN* self);
 bool            cspan_is_order_F(const SpanTypeN* self);
 

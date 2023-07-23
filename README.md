@@ -3,8 +3,8 @@
 STC - Smart Template Containers
 ===============================
 
-### [Version 4.3 RC3](#version-history)
-
+### [Version 4.3 Released](#version-history)
+- See details for breaking changes.
 ---
 Description
 -----------
@@ -33,10 +33,10 @@ Containers
 
 Algorithms
 ----------  
-- [***Ranged for-loops*** - c_foreach, c_forpair, c_forlist](docs/ccommon_api.md#ranged-for-loops)
-- [***Range algorithms*** - c_forrange, crange, c_forfilter](docs/ccommon_api.md#range-algorithms)
-- [***Generic algorithms*** - c_init, c_find_if, c_erase_if, csort, etc.](docs/ccommon_api.md#generic-algorithms)
-- [***Coroutines*** - Simon Tatham's coroutines done right.](docs/ccommon_api.md#coroutines)
+- [***Ranged for-loops*** - c_foreach, c_forpair, c_forlist](docs/algorithm_api.md#ranged-for-loops)
+- [***Range algorithms*** - c_forrange, crange, c_forfilter](docs/algorithm_api.md#range-algorithms)
+- [***Generic algorithms*** - c_init, c_find_if, c_erase_if, csort, etc.](docs/algorithm_api.md#generic-algorithms)
+- [***Coroutines*** - ergonomic portable coroutines](docs/coroutine_api.md)
 - [***Regular expressions*** - Rob Pike's Plan 9 regexp modernized!](docs/cregex_api.md)
 - [***Random numbers*** - a very fast *PRNG* based on *SFC64*](docs/crandom_api.md)
 - [***Command line argument parser*** - similar to *getopt()*](docs/coption_api.md)
@@ -61,12 +61,11 @@ List of contents
 ---
 ## Highlights
 
-- **No boilerplate code** - Specify only the required template parameters, e.g. ***cmp***- and/or ***clone***-, ***drop***- functions, and leave the rest as defaults.
+- **Minimal boilerplate code** - Specify only the required template parameters, and leave the rest as defaults.
 - **Fully type safe** - Because of templating, it avoids error-prone casting of container types and elements back and forth from the containers.
-- **User friendly** - Just include the headers and you are good. The API and functionality is very close to c++ STL and is fully listed in the docs. 
-- **Unparalleled performance** - Maps and sets are much faster than the C++ STL containers, the remaining are similar in speed.
+- **High performance** - Unordered maps and sets, queues and deques are significantly faster than the C++ STL containers, the remaining are similar or close to STL in speed (See graph below).
 - **Fully memory managed** - Containers destructs keys/values via default or user supplied drop function. They may be cloned if element types are clonable. Also, smart pointers are supported and can be stored in containers. See [***carc***](docs/carc_api.md) and [***cbox***](docs/cbox_api.md).
-- **Uniform, easy-to-learn API** - Intuitive method/type names and uniform usage across the various containers.
+- **Uniform, easy-to-learn API** - Just include the headers and you are good. The API and functionality resembles c++ STL and is fully listed in the docs. Intuitive method/type names and uniform usage across the various containers.
 - **No signed/unsigned mixing** - Unsigned sizes and indices mixed with signed for comparison and calculation is asking for trouble. STC only uses signed numbers in the API for this reason.
 - **Small footprint** - Small source code and generated executables. The executable from the example below using *four different* container types is only ***19 Kb in size*** compiled with gcc -O3 -s on Linux.
 - **Dual mode compilation** - By default it is a simple header-only library with inline and static methods only, but you can easily switch to create a traditional library with shared symbols, without changing existing source files. See the Installation section.
@@ -95,17 +94,17 @@ So instead of calling e.g. `cvec_str_push(&vec, cstr_from("Hello"))`, you may ca
 same element access syntax. E.g.:
     - `c_foreach (it, MyInts, myints) *it.ref += 42;` works for any container defined as 
     `MyInts` with `int` elements.
-    - `c_foreach (it, MyInts, it1, it2)  *it.ref += 42;` iterates from `it1` up to `it2`.
+    - `c_foreach (it, MyInts, it1, it2)  *it.ref += 42;` iterates from `it1` up to not including `it2`.
 
 ---
 ## Performance
 
 STC is a fast and memory efficient library, and code compiles fast:
 
-![Benchmark](misc/benchmarks/pics/benchmark.gif)
+![Benchmark](docs/pics/Figure_1.png)
 
 Benchmark notes:
-- The barchart shows average test times over three platforms: Mingw64 10.30, Win-Clang 12, VC19. CPU: Ryzen 7 2700X CPU @4Ghz.
+- The barchart shows average test times over three compilers: **Mingw64 13.1.0, Win-Clang 16.0.5, VC-19-36**. CPU: **Ryzen 7 5700X**.
 - Containers uses value types `uint64_t` and pairs of `uint64_t` for the maps.
 - Black bars indicates performance variation between various platforms/compilers.
 - Iterations are repeated 4 times over n elements.
@@ -615,19 +614,20 @@ STC is generally very memory efficient. Memory usage for the different container
 
 ## Version 4.3
 - Some breaking changes.
-- coroutines: much improved with some new API and added features.
-- cspan: Support for column-major (fortran order) multidim spans and transposed views.
-- Removed default comparison for clist, cvec and cdeq (as with cstack and cqueue). 
-    - Using i_key_str, i_keyclass, i_keyboxed still expects comparisons defined. 
-    - Define i_cmp_native to enable built-in i_key types comparisons (<, ==).
-- cstr and csview are now shared linked by default. Static linking by defining i_static.
-- New cdeq and cqueue implementation(s), using circular buffer.
-- Renamed i_extern => i_import.
-    - Define i_import before #include <stc/cstr.h> will also define utf8 case conversions.
-    - Define i_import before #include <stc/cregex.h> will also define cstr + utf8 tables.
-- Renamed c_make() => c_init() macro for initialization lists.
-- Renamed input enum flags for cregex functions.
-- Removed deprecated crandom.h. Use crand.h with new API.
+- **coroutines**: much improved with some new API and added features.
+- **cspan**: Rewritten to add support for **column-major** order (fortran) multidim spans and transposed views.
+- Removed default comparison for **clist**, **cvec** and **cdeq** (like cstack and cqueue). 
+    - Define `i_cmp_native` to enable built-in i_key types comparisons (<, ==).
+    - Use of `i_keyclass` still expects comparison functions defined. 
+    - Use of `i_keyboxed` compares hosted pointers instead of pointed to values if comparisons not defined.
+- **cstr** and **csview** now uses *shared linking* by default. Implement by either defining `i_implement` or `i_static` before including.
+- All new faster and smaller **cqueue** and **cdeq** implementations, using a circular buffer.
+- Renamed i_extern => `i_import`.
+    - Define `i_import` before `#include <stc/cstr.h>` will also define utf8 case conversions.
+    - Define `i_import` before `#include <stc/cregex.h>` will also define cstr + utf8 tables.
+- Renamed c_make() => ***c_init()*** macro for initializing containers with element lists.
+- Renamed input enum flags for ***cregex***-functions.
+- Removed deprecated <stc/crandom.h>. Use `<stc/crand.h>` with the new API.
 - Removed deprecated uppercase flow-control macro names.
 - Improved default string hash function.
 
@@ -653,8 +653,8 @@ Major changes:
 - Customizable allocator [per templated container type](https://github.com/tylov/STC/discussions/44#discussioncomment-4891925).
 - Updates on **cregex** with several [new unicode character classes](docs/cregex_api.md#regex-cheatsheet).
 - Algorithms:
-    - [crange](docs/ccommon_api.md#crange) - similar to [boost::irange](https://www.boost.org/doc/libs/release/libs/range/doc/html/range/reference/ranges/irange.html) integer range generator.
-    - [c_forfilter](docs/ccommon_api.md#c_forfilter) - ranges-like view filtering.
+    - [crange](docs/algorithm_api.md#crange) - similar to [boost::irange](https://www.boost.org/doc/libs/release/libs/range/doc/html/range/reference/ranges/irange.html) integer range generator.
+    - [c_forfilter](docs/algorithm_api.md#c_forfilter) - ranges-like view filtering.
     - [csort](include/stc/algo/sort.h) - [fast quicksort](misc/benchmarks/various/csort_bench.c) with custom inline comparison.
 - Renamed `c_ARGSV()` => `c_SV()`: **csview** print arg. Note `c_sv()` is shorthand for *csview_from()*.
 - Support for [uppercase flow-control](include/stc/priv/altnames.h) macro names in ccommon.h.
@@ -715,10 +715,10 @@ Major changes:
 - Renamed: *csptr_X_make()* to `carc_X_from()`.
 - Renamed: *cstr_new()* to `cstr_lit(literal)`, and *cstr_assign_fmt()* to `cstr_printf()`.
 - Renamed: *c_default_fromraw()* to `c_default_from()`.
-- Changed: the [**c_apply**](docs/ccommon_api.md) macros API.
+- Changed: the [**c_apply**](docs/algorithm_api.md) macros API.
 - Replaced: *csview_first_token()* and *csview_next_token()* with one function: `csview_token()`.
 - Added: **checkauto** tool for checking that c-source files uses `c_auto*` macros correctly.
 - Added: general `i_keyclass` / `i_valclass` template parameters which auto-binds template functions.
 - Added: `i_opt` template parameter: compile-time options: `c_no_cmp`, `c_no_clone`, `c_no_atomic`, `c_is_forward`; may be combined with `|`
 - Added: [**cbox**](docs/cbox_api.md) type: smart pointer, similar to [Rust Box](https://doc.rust-lang.org/rust-by-example/std/box.html) and [std::unique_ptr](https://en.cppreference.com/w/cpp/memory/unique_ptr).
-- Added: [**c_forpair**](docs/ccommon_api.md) macro: for-loop with "structured binding"
+- Added: [**c_forpair**](docs/algorithm_api.md) macro: for-loop with "structured binding"

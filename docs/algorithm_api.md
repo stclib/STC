@@ -1,9 +1,12 @@
 # STC Algorithms
 
----
+"No raw loops" - Sean Parent
 ## Ranged for-loops
 
 ### c_foreach, c_forpair
+```c
+#include <stc/ccommon.h>
+```
 
 | Usage                                    | Description                               |
 |:-----------------------------------------|:------------------------------------------|
@@ -53,9 +56,9 @@ c_forlist (i, cmap_ii_raw, { {4, 5}, {6, 7} })
 c_forlist (i, const char*, {"Hello", "crazy", "world"})
     cstack_str_emplace(&stk, *i.ref);
 ```
-
 ---
-## Range algorithms
+
+## Integer range loops
 
 ### c_forrange
 Abstraction for iterating sequence of integers. Like python's **for** *i* **in** *range()* loop.
@@ -78,7 +81,7 @@ c_forrange (i, 30, 0, -5) printf(" %lld", i);
 // 30 25 20 15 10 5
 ```
 
-### crange
+### crange: Integer range generator object
 A number sequence generator type, similar to [boost::irange](https://www.boost.org/doc/libs/release/libs/range/doc/html/range/reference/ranges/irange.html). The **crange_value** type is `long long`. Below *start*, *stop*, and *step* are of type *crange_value*:
 ```c
 crange      crange_init(stop);              // will generate 0, 1, ..., stop-1
@@ -109,12 +112,12 @@ c_forfilter (i, crange, range,
 ```
 
 ### c_forfilter
-Iterate a container/range with chained range filtering.
+Iterate a container or a crange with chained `&&` filtering.
 
 | Usage                                               | Description                            |
 |:----------------------------------------------------|:---------------------------------------|
 | `c_forfilter (it, ctype, container, filter)`        | Filter out items in chain with &&      |
-| `c_forfilter_it (it, ctype, startit, filter)`       | Filter from startit position           |
+| `c_forfilter_it (it, ctype, startit, filter)`       | Filter from startit iterator position  |
 
 | Built-in filter                   | Description                                |
 |:----------------------------------|:-------------------------------------------|
@@ -215,7 +218,7 @@ There is a [benchmark/test file here](../misc/benchmarks/various/csort_bench.c).
 
 int main(void) {
     int nums[] = {5, 3, 5, 9, 7, 4, 7, 2, 4, 9, 3, 1, 2, 6, 4};
-    intarray_sort_n(nums, c_arraylen(nums));
+    ints_sort_n(nums, c_arraylen(nums)); // note: function name derived from i_key
     c_forrange (i, c_arraylen(arr)) printf(" %d", arr[i]);
 }
 ```
@@ -289,132 +292,6 @@ Type        c_default_clone(Type val);                  // return val
 Type        c_default_toraw(const Type* p);             // return *p
 void        c_default_drop(Type* p);                    // does nothing
 ```
-
----
-## Coroutines
-This is a much improved implementation of 
-[Simon Tatham's coroutines](https://www.chiark.greenend.org.uk/~sgtatham/coroutines.html),
-which utilizes the *Duff's device* trick. Tatham's implementation is not typesafe,
-and it always allocates the coroutine's internal state dynamically. But crucially,
-it does not let the coroutine do self-cleanup on early finish - i.e. it
-only frees the initial dynamically allocated memory.
-
-In this implementation, a coroutine may have any signature, but it should
-take a struct pointer as parameter, which must contain the member `int cco_state;`
-The struct should normally store all the *local* variables to be used in the
-coroutine. It can also store input and output data if desired.
-
-The coroutine example below generates Pythagorian triples, but the calling loop
-skips the triples which are upscaled version of smaller ones, by checking 
-the gcd() function. It also ensures that it stops when the diagonal size >= 100:
-
-[ [Run this code](https://godbolt.org/z/coqqrfbd5) ]
-```c
-#include <stc/calgo.h>
-#include <stdio.h>
-
-struct triples {
-    int n; // input: max number of triples to be generated.
-    int a, b, c;
-    int cco_state; // required member
-};
-
-int triples(struct triples* i) { // coroutine
-    cco_routine(i) {
-        for (i->c = 5; i->n; ++i->c) {
-            for (i->a = 1; i->a < i->c; ++i->a) {
-                for (i->b = i->a + 1; i->b < i->c; ++i->b) {
-                    if ((int64_t)i->a*i->a + (int64_t)i->b*i->b == (int64_t)i->c*i->c) {
-                        cco_yield();
-                        if (--i->n == 0)
-                            cco_return;
-                    }
-                }
-            }
-        }
-        cco_cleanup:
-        puts("done");
-    }
-    return 0;
-}
-
-int gcd(int a, int b) { // greatest common denominator
-    while (b) {
-        int t = a % b;
-        a = b;
-        b = t;
-    }
-    return a;
-}
-
-int main(void)
-{
-    struct triples t = {.n=INT32_MAX};
-    int n = 0;
-
-    while (triples(&t)) {
-        // Skip triples with GCD(a,b) > 1
-        if (gcd(t.a, t.b) > 1)
-            continue;
-        
-        // Stop when c >= 100
-        if (t.c < 100)
-            printf("%d: [%d, %d, %d]\n", ++n, t.a, t.b, t.c);
-        else
-            cco_stop(&t); // cleanup in next coroutine call/resume
-    }
-}
-```
-### Coroutine API
-To resume the coroutine from where it was suspended with *cco_yield()*: call the coroutine again.
-
-**Note**: *cco_yield()* / *cco_await()* may not be called inside a `switch` statement from a
-cco_routine scope; Use `if-else-if` constructs instead.
-
-|           |  Function / operator                 | Description                             |
-|:----------|:-------------------------------------|:----------------------------------------|
-|`cco_result` | `CCO_DONE`, `CCO_AWAIT`, `CCO_YIELD` | Default set of return values from coroutines |
-|           | `cco_cleanup:`                       | Label for cleanup position in coroutine |
-| `bool`    | `cco_done(co)`                       | Is coroutine done?                      |
-|           | `cco_routine(co) {}`                 | The coroutine scope                     |
-|           | `cco_yield();`                       | Yield/suspend execution (return CCO_YIELD)|
-|           | `cco_yield_v(ret);`                  | Yield/suspend execution (return ret)    |
-|           | `cco_yield_final();`                 | Yield final suspend, enter cleanup-state |
-|           | `cco_yield_final(ret);`              | Yield a final value                     |
-|           | `cco_await(condition);`              | Suspend until condition is true (return CCO_AWAIT)|
-|           | `cco_call_await(cocall);`            | Await for subcoro to finish (returns its ret value) |
-|           | `cco_call_await(cocall, retbit);`    | Await for subcoro's return to be in (retbit \| CCO_DONE)  |
-|           | `cco_return;`                        | Return from coroutine (inside cco_routine) |
-|           | Task objects:                        |                                         |
-|           | `cco_task_struct(Name, ...);`        | Define a coroutine task struct          |
-|           | `cco_task_await(task, cco_runtime* rt);`| Await for task to finish             |
-|           | `cco_task_await(task, rt, retbit);`  | Await for task's return to be in (retbit \| CCO_DONE) |
-|`cco_result`| `cco_task_resume(task, rt);`       | Resume suspended task                   |
-|           | Semaphores:                          |                                         | 
-|           | `cco_sem`                            | Semaphore type                          |
-| `cco_sem` | `cco_sem_from(long value)`           | Create semaphore                        |
-|           | `cco_sem_set(sem, long value)`       | Set semaphore value                     |
-|           | `cco_sem_await(sem)`                 | Await for the semaphore count > 0       |
-|           | `cco_sem_release(sem)`               | Signal the semaphore (count += 1)       |
-|           | Timers:                              |                                         | 
-|           | `cco_timer`                          | Timer type                              |
-|           | `cco_timer_await(tm, double sec)`    | Await secs for timer to expire (usec prec.)|
-|           | `cco_timer_start(tm, double sec)`    | Start timer for secs duration           |
-|           | `cco_timer_restart(tm)`              | Restart timer with same duration        |
-| `bool`    | `cco_timer_expired(tm)`              | Return true if timer is expired         |
-| `double`  | `cco_timer_elapsed(tm)`              | Return seconds elapsed                  |
-| `double`  | `cco_timer_remaining(tm)`            | Return seconds remaining                |
-|           | From caller side:                    |                                         | 
-| `void`    | `cco_stop(co)`                       | Next call of coroutine finalizes        |
-| `void`    | `cco_reset(co)`                      | Reset state to initial (for reuse)      |
-| `void`    | `cco_call_blocking(cocall) {}`       | Run blocking until cocall is finished   |
-| `void`    | `cco_call_blocking(cocall, int* outres) {}`| Run blocking until cocall is finished |
-|           | `cco_task_blocking(task) {}`         | Run blocking until task is finished |
-|           | `cco_task_blocking(task, rt, STACKSZ) {}`| Run blocking until task is finished |
-|           | Time functions:                      |                                         |
-| `double`  | `cco_time(void)`                     | Return secs with usec prec. since Epoch |
-|           | `cco_sleep(double sec)`              | Sleep for seconds (msec or usec prec.)  |
-
 ---
 ## RAII scope macros
 General ***defer*** mechanics for resource acquisition. These macros allows you to specify the
