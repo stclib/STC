@@ -6,7 +6,7 @@ clang++ -DNDEBUG -I../../include -O3 -o cmap_benchmark$exe   cmap_benchmark.cpp
 clang++ -DNDEBUG -I../../include -O3 -o csmap_benchmark$exe  csmap_benchmark.cpp
 clang++ -DNDEBUG -I../../include -O3 -o cvec_benchmark$exe   cvec_benchmark.cpp
 
-c='Win-Clang-14.0.1'
+c='Win-Clang-16.0.5'
 ./cdeq_benchmark$exe $c
 ./clist_benchmark$exe $c
 ./cmap_benchmark$exe $c

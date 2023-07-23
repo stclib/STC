@@ -4,7 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 #sns.set_theme(style="whitegrid")
 
-comp = ['All compilers', 'Mingw-g++-11.3.0', 'Win-Clang-14.0.1', 'VC-19.28']
+comp = ['All compilers', 'Mingw-g++-13.1.0', 'Win-Clang-16.0.5', 'VC-19.36']
 n = int(sys.argv[1]) if len(sys.argv) > 1 else 0
 file = sys.argv[2] if len(sys.argv) > 2 else 'plot_win.csv'
 df = pd.read_csv(file)
