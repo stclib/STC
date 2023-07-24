@@ -4,7 +4,7 @@
 
 int main(void)
 {
-    long long N = 1000000000;
+    const int N = 10000000;
     const uint64_t seed = (uint64_t)time(NULL), range = 1000000;
     crand_t rng = crand_init(seed);
 
