@@ -9,10 +9,10 @@
 #endif
 
 enum {INSERT, ERASE, FIND, ITER, DESTRUCT, N_TESTS};
-const char* operations[] = {"insert", "erase", "find", "iter", "destruct"};
+const char* operations[] = {"insert", "erase", "access", "iter", "destruct"};
 typedef struct { time_t t1, t2; uint64_t sum; float fac; } Range;
 typedef struct { const char* name; Range test[N_TESTS]; } Sample;
-enum {SAMPLES = 2, N = 10000000, S = 0x3ffc, R = 4};
+enum {SAMPLES = 2, N = 10000000, R = 4};
 uint64_t seed = 1, mask1 = 0xfffffff, mask2 = 0xffff;
 
 static float secs(Range s) { return (float)(s.t2 - s.t1) / CLOCKS_PER_SEC; }
@@ -45,7 +45,6 @@ Sample test_std_forward_list() {
         size_t sum = 0;
         container::iterator it;
         // Iteration - not inherent find - skipping
-        //c_forrange (S) if ((it = std::find(con.begin(), con.end(), crand() & mask2)) != con.end()) sum += *it;
         s.test[FIND].t2 = clock();
         s.test[FIND].sum = sum;
         s.test[ITER].t1 = clock();
@@ -86,8 +85,7 @@ Sample test_stc_forward_list() {
         c_forrange (N) clist_x_push_front(&con, crand() & mask2);
         s.test[FIND].t1 = clock();
         size_t sum = 0;
-        //clist_x_iter it, end = clist_x_end(&con);
-        //c_forrange (S) if ((it = clist_x_find(&con, crand() & mask2)).ref != end.ref) sum += *it.ref;
+        //clist iteration - skipping
         s.test[FIND].t2 = clock();
         s.test[FIND].sum = sum;
         s.test[ITER].t1 = clock();

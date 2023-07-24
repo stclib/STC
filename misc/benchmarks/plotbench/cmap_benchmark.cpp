@@ -8,7 +8,7 @@
 #endif
 
 enum {INSERT, ERASE, FIND, ITER, DESTRUCT, N_TESTS};
-const char* operations[] = {"insert", "erase", "find", "iter", "destruct"};
+const char* operations[] = {"insert", "erase", "access", "iter", "destruct"};
 typedef struct { time_t t1, t2; uint64_t sum; float fac; } Range;
 typedef struct { const char* name; Range test[N_TESTS]; } Sample;
 enum {SAMPLES = 2, N = 2000000, R = 4};
@@ -47,12 +47,14 @@ Sample test_std_unordered_map() {
         s.test[FIND].t1 = clock();
         size_t sum = 0;
         container::iterator it;
-        c_forrange (N) if ((it = con.find(crand() & mask1)) != con.end()) sum += it->second;
+        c_forrange (N)
+            if ((it = con.find(crand() & mask1)) != con.end())
+                sum += it->second;
         s.test[FIND].t2 = clock();
         s.test[FIND].sum = sum;
         s.test[ITER].t1 = clock();
         sum = 0;
-        c_forrange (R) for (auto i: con) sum += i.second;
+        c_forrange (R) for (const auto& i: con) sum += i.second;
         s.test[ITER].t2 = clock();
         s.test[ITER].sum = sum;
         s.test[DESTRUCT].t1 = clock();

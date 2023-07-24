@@ -103,7 +103,7 @@ STC_INLINE bool _cx_MEMB(_reserve)(_cx_Self* self, intptr_t n) {
 
 STC_INLINE _cx_value* _cx_MEMB(_append_uninit)(_cx_Self *self, intptr_t n) {
     intptr_t len = self->_len;
-    if (!_cx_MEMB(_reserve)(self, len + n)) return NULL;
+    if (!_cx_MEMB(_reserve)(self, len*3/2 + n)) return NULL;
     self->_len += n;
     return self->data + len;
 }

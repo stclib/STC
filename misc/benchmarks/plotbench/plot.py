@@ -13,12 +13,11 @@ if n > 0:
     df = df[df.Compiler == comp[n]]
 
 g = sns.catplot(data=df, x='Method', y='Seconds', hue='Library', col='C', kind='bar', orient='v',
-                 errorbar=('ci', 68), legend=False, col_wrap=2, sharex=False, aspect=1.4, height=3.1)
+                 errorbar=('ci', 68), legend=False, col_wrap=2, sharex=False, aspect=1.4, height=3.0)
 g.set_xlabels('')
 
-g.add_legend(bbox_to_anchor=(0.75, 0.2), borderaxespad=0.)
-
-g.fig.subplots_adjust(top=0.90, left=0.06, bottom=0.07)
+g.add_legend(bbox_to_anchor=(0.75, 0.2), borderaxespad=0)
+g.fig.subplots_adjust(top=0.90, left=0.08, right=0.98, bottom=0.04, hspace=0.4)
 g.fig.suptitle('Benchmark STC vs c++ std containers: %s' % comp[n], fontsize=15, y=0.98)
 
 plt.show()

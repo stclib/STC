@@ -9,10 +9,10 @@
 #endif
 
 enum {INSERT, ERASE, FIND, ITER, DESTRUCT, N_TESTS};
-const char* operations[] = {"insert", "erase", "find", "iter", "destruct"};
+const char* operations[] = {"insert", "erase", "access", "iter", "destruct"};
 typedef struct { time_t t1, t2; uint64_t sum; float fac; } Range;
 typedef struct { const char* name; Range test[N_TESTS]; } Sample;
-enum {SAMPLES = 2, N = 60000000, S = 0x3ffc, R = 4};
+enum {SAMPLES = 2, N = 60000000, R = 4};
 uint64_t seed = 1, mask1 = 0xfffffff, mask2 = 0xffff;
 
 static float secs(Range s) { return (float)(s.t2 - s.t1) / CLOCKS_PER_SEC; }
@@ -44,14 +44,12 @@ Sample test_std_deque() {
         c_forrange (N) con.push_back(crand() & mask2);
         s.test[FIND].t1 = clock();
         size_t sum = 0;
-        // Iteration - not inherent find - skipping
-        //container::iterator it;
-        //c_forrange (S) if ((it = std::find(con.begin(), con.end(), crand() & mask2)) != con.end()) sum += *it;
+        c_forrange (R) c_forrange (i, N) sum += con[i];
         s.test[FIND].t2 = clock();
         s.test[FIND].sum = sum;
         s.test[ITER].t1 = clock();
         sum = 0;
-        c_forrange (R) c_forrange (i, N) sum += con[i];
+        c_forrange (R) for (const auto i: con) sum += i;
         s.test[ITER].t2 = clock();
         s.test[ITER].sum = sum;
         s.test[DESTRUCT].t1 = clock();
@@ -89,13 +87,12 @@ Sample test_stc_deque() {
         c_forrange (N) cdeq_x_push_back(&con, crand() & mask2);
         s.test[FIND].t1 = clock();
         size_t sum = 0;
-        //cdeq_x_iter it, end = cdeq_x_end(&con);
-        //c_forrange (S) if ((it = cdeq_x_find(&con, crand() & mask2)).ref != end.ref) sum += *it.ref;
+        c_forrange (R) c_forrange (i, N) sum += *cdeq_x_at(&con, i);
         s.test[FIND].t2 = clock();
         s.test[FIND].sum = sum;
         s.test[ITER].t1 = clock();
         sum = 0;
-        c_forrange (R) c_forrange (i, N) sum += con.data[i];
+        c_forrange (R) c_foreach (i, cdeq_x, con) sum += *i.ref;
         s.test[ITER].t2 = clock();
         s.test[ITER].sum = sum;
         s.test[DESTRUCT].t1 = clock();

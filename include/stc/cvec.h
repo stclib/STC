@@ -316,7 +316,7 @@ _cx_MEMB(_resize)(_cx_Self* self, const intptr_t len, i_key null) {
 STC_DEF _cx_value*
 _cx_MEMB(_push)(_cx_Self* self, i_key value) {
     if (self->_len == self->_cap)
-        if (!_cx_MEMB(_reserve)(self, self->_len*3/2 + 4))
+        if (!_cx_MEMB(_reserve)(self, self->_len*2 + 4))
             return NULL;
     _cx_value *v = self->data + self->_len++;
     *v = value;

@@ -37,7 +37,8 @@ void stc_test()
 {
     int N = 10000000;
 
-    c_auto (cpque_f, pq)
+    cpque_f pq = {0};   
+    c_defer(cpque_f_drop(&pq))
     {
         csrand(seed);
         clock_t start = clock();
