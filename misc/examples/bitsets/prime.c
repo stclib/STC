@@ -35,7 +35,7 @@ int main(void)
     llong np = cbits_count(&primes);
     t = clock() - t;
 
-    printf("Number of primes: %lld, time: %f\n\n", np, (float)t / (float)CLOCKS_PER_SEC);
+    printf("Number of primes: %lld, time: %f\n\n", np, (double)t/CLOCKS_PER_SEC);
 
     puts("Show all the primes in the range [2, 1000):");
     printf("2");

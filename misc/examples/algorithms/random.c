@@ -4,7 +4,7 @@
 
 int main(void)
 {
-    const int N = 10000000;
+    const long long N = 10000000;
     const uint64_t seed = (uint64_t)time(NULL), range = 1000000;
     crand_t rng = crand_init(seed);
 
@@ -19,7 +19,7 @@ int main(void)
     }
     diff = clock() - before;
     printf("full range\t\t: %f secs, %lld, avg: %f\n",
-           (double)diff/CLOCKS_PER_SEC, N, (double)(sum/N));
+           (double)diff/(double)CLOCKS_PER_SEC, N, (double)(sum/N));
 
     crand_uniform_t dist1 = crand_uniform_init(0, range);
     rng = crand_init(seed);
@@ -29,8 +29,8 @@ int main(void)
         sum += crand_uniform(&rng, &dist1); // unbiased
     }
     diff = clock() - before;
-    printf("unbiased 0-%" PRIu64 "\t: %f secs, %lld, avg: %f\n",
-            range, (double)diff/CLOCKS_PER_SEC, N, (double)(sum/N));
+    printf("unbiased 0-%lld\t: %f secs, %lld, avg: %f\n",
+            (long long)range, (double)diff/CLOCKS_PER_SEC, N, (double)(sum/N));
 
     sum = 0;
     rng = crand_init(seed);
@@ -40,6 +40,6 @@ int main(void)
     }
     diff = clock() - before;
     printf("biased 0-%" PRIu64 "  \t: %f secs, %lld, avg: %f\n",
-            range, (double)diff/CLOCKS_PER_SEC, N, (double)(sum/N));
+            (long long)range, (double)diff/CLOCKS_PER_SEC, N, (double)(sum/N));
 
 }
