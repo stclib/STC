@@ -20,15 +20,21 @@ See similar c++ class [std::shared_ptr](https://en.cppreference.com/w/cpp/memory
 ## Header file and declaration
 
 ```c
-#define i_type            // full typename of the carc
-#define i_key             // element type: REQUIRED
+#define i_key <t>          // element type: REQUIRED. Note: i_val* may be specified instead of i_key*.
+#define i_type <t>         // carc container type name
+#define i_cmp <f>          // three-way compareison. REQUIRED IF i_key is a non-integral type
+                           // Note that containers of carcs will "inherit" i_cmp
+                           // when using carc in containers with i_valboxed MyArc - ie. the i_type.
+#define i_cmp_native       // define instead of i_cmp only when i_key is an integral/native-type.
+#define i_keydrop <f>      // destroy element func - defaults to empty destruct
+#define i_keyclone <f>     // REQUIRED if i_keydrop is defined, unless 'i_opt c_no_clone' is defined.
 
-#define i_keyraw          // convertion "raw" type - defaults to i_key
-#define i_keyto           // convertion func i_key* => i_keyraw: REQUIRED IF i_keyraw defined.
-#define i_keyfrom         // convertion func i_keyraw => i_key
-      
-#define i_opt c_no_atomic // Non-atomic reference counting, like Rust Rc.
-#define i_tag             // alternative typename: carc_{i_tag}. i_tag defaults to i_key
+#define i_keyraw <t>       // convertion type (lookup): default to {i_key}
+#define i_keyto <f>        // convertion func i_key* => i_keyraw: REQUIRED IF i_keyraw defined.
+#define i_keyfrom <f>      // from-raw func.
+
+#define i_opt c_no_atomic  // Non-atomic reference counting, like Rust Rc.
+#define i_tag <s>          // alternative typename: carc_{i_tag}. i_tag defaults to i_key
 #include <stc/carc.h>
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.

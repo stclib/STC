@@ -4,4 +4,4 @@ echo gcc
 sh run_gcc.sh >> %out%
 echo clang
 sh run_clang.sh >> %out%
-REM call run_vc.bat >> %out%
+call run_vc.bat >> %out%

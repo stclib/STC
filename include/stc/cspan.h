@@ -80,19 +80,19 @@ int demo2() {
     STC_INLINE Self Self##_from_n(Self##_raw* raw, const intptr_t n) { \
         return (Self){.data=raw, .shape={(int32_t)n}}; \
     } \
-    STC_INLINE Self Self##_slice_(Self##_value* v, const int32_t shape[], const int32_t stri[], \
+    STC_INLINE Self Self##_slice_(Self##_value* d, const int32_t shape[], const int32_t stri[], \
                                   const int rank, const int32_t a[][2]) { \
-        Self s; s.data = v; int outrank; \
-        s.data += _cspan_slice(s.shape, s.stride.d, &outrank, shape, stri, rank, a); \
+        Self s; int outrank; \
+        s.data = d + _cspan_slice(s.shape, s.stride.d, &outrank, shape, stri, rank, a); \
         c_assert(outrank == RANK); \
         return s; \
     } \
     STC_INLINE Self##_iter Self##_begin(const Self* self) { \
-        Self##_iter it = {.ref=self->data, .pos={0}, ._s=self}; \
+        Self##_iter it = {.ref=self->data, ._s=self}; \
         return it; \
     } \
     STC_INLINE Self##_iter Self##_end(const Self* self) { \
-        Self##_iter it = {.ref=NULL}; \
+        Self##_iter it = {0}; \
         return it; \
     } \
     STC_INLINE void Self##_next(Self##_iter* it) { \
@@ -120,7 +120,7 @@ using_cspan_tuple(7); using_cspan_tuple(8);
 #define cspan_init(SpanType, ...) \
     {.data=(SpanType##_value[])__VA_ARGS__, .shape={sizeof((SpanType##_value[])__VA_ARGS__)/sizeof(SpanType##_value)}, .stride={.d={1}}}
 
-/* create a cspan from a cvec, cstack, cdeq, cqueue, or cpque (heap) */
+/* create a cspan from a cvec, cstack, or cpque (heap) */
 #define cspan_from(container) \
     {.data=(container)->data, .shape={(int32_t)(container)->_len}, .stride={.d={1}}}
 

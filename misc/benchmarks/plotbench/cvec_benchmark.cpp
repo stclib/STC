@@ -71,18 +71,18 @@ Sample test_stc_vector() {
         s.test[INSERT].t1 = clock();
         container con = cvec_x_init();
         csrand(seed);
-        c_forrange (N) cvec_x_push_back(&con, crand() & mask1);
+        c_forrange (N) cvec_x_push(&con, crand() & mask1);
         s.test[INSERT].t2 = clock();
         s.test[INSERT].sum = cvec_x_size(&con);
         s.test[ERASE].t1 = clock();
-        c_forrange (N) { cvec_x_pop_back(&con); }
+        c_forrange (N) { cvec_x_pop(&con); }
         s.test[ERASE].t2 = clock();
         s.test[ERASE].sum = cvec_x_size(&con);
         cvec_x_drop(&con);
      }{
         csrand(seed);
         container con = cvec_x_init();
-        c_forrange (N) cvec_x_push_back(&con, crand() & mask2);
+        c_forrange (N) cvec_x_push(&con, crand() & mask2);
         s.test[FIND].t1 = clock();
         size_t sum = 0;
         //cvec_x_iter it, end = cvec_x_end(&con);

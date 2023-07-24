@@ -70,7 +70,7 @@ int main(void) {
   #ifndef i_tag
     #define i_tag i_key
   #endif
-  #define i_type c_PASTE(i_tag, array)
+  #define i_type c_PASTE(i_tag, s)
   typedef i_key i_type;
 #endif
 #ifndef i_at

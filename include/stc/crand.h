@@ -32,20 +32,20 @@
 int main(void) {
     uint64_t seed = 123456789;
     crand_t rng = crand_init(seed);
-    crand_unif_t dist1 = crand_unif_init(1, 6);
-    crand_norm_t dist3 = crand_norm_init(1.0, 10.0);
+    crand_uniform_t dist1 = crand_uniform_init(1, 6);
+    crand_normal_t dist3 = crand_normal_init(1.0, 10.0);
 
     uint64_t i = crand_u64(&rng);
-    int64_t iu = crand_unif(&rng, &dist1);
-    double xn = crand_norm(&rng, &dist3);
+    int64_t iu = crand_uniform(&rng, &dist1);
+    double xn = crand_normal(&rng, &dist3);
 }
 */
 #include <string.h>
 #include <math.h>
 
 typedef struct crand { uint64_t state[5]; } crand_t;
-typedef struct crand_unif { int64_t lower; uint64_t range, threshold; } crand_unif_t;
-typedef struct crand_norm { double mean, stddev, next; int has_next; } crand_norm_t;
+typedef struct crand_uniform { int64_t lower; uint64_t range, threshold; } crand_uniform_t;
+typedef struct crand_normal { double mean, stddev, next; int has_next; } crand_normal_t;
 
 /* PRNG crand_t.
  * Very fast PRNG suited for parallel usage with Weyl-sequence parameter.
@@ -67,14 +67,14 @@ STC_API double crandf(void);
 STC_API crand_t crand_init(uint64_t seed);
 
 /* Unbiased bounded uniform distribution. range [low, high] */
-STC_API crand_unif_t crand_unif_init(int64_t low, int64_t high);
-STC_API int64_t crand_unif(crand_t* rng, crand_unif_t* dist);
+STC_API crand_uniform_t crand_uniform_init(int64_t low, int64_t high);
+STC_API int64_t crand_uniform(crand_t* rng, crand_uniform_t* dist);
 
 /* Normal/gaussian distribution. */
-STC_INLINE crand_norm_t crand_norm_init(double mean, double stddev)
-    { crand_norm_t r = {mean, stddev, 0.0, 0}; return r; }
+STC_INLINE crand_normal_t crand_normal_init(double mean, double stddev)
+    { crand_normal_t r = {mean, stddev, 0.0, 0}; return r; }
 
-STC_API double crand_norm(crand_t* rng, crand_norm_t* dist);
+STC_API double crand_normal(crand_t* rng, crand_normal_t* dist);
 
 /* Main crand_t prng */
 STC_INLINE uint64_t crand_u64(crand_t* rng) {
@@ -95,11 +95,10 @@ STC_INLINE double crand_f64(crand_t* rng) {
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined(i_implement) || defined(i_static)
 
-/* Global random() */
-static crand_t crand_global = {{
-    0x26aa069ea2fb1a4d, 0x70c72c95cd592d04,
-    0x504f333d3aa0b359, 0x9e3779b97f4a7c15,
-    0x6a09e667a754166b
+/* Global random seed */
+static crand_t crand_global = {{ // csrand(0)
+    0x9e3779b97f4a7c15, 0x6f68261b57e7a770,
+    0xe220a838bf5c9dde, 0x7c17d1800457b1ba, 0x1,
 }};
 
 STC_DEF void csrand(uint64_t seed)
@@ -116,20 +115,20 @@ STC_DEF crand_t crand_init(uint64_t seed) {
     s[0] = seed + 0x9e3779b97f4a7c15;
     s[1] = (s[0] ^ (s[0] >> 30))*0xbf58476d1ce4e5b9;
     s[2] = (s[1] ^ (s[1] >> 27))*0x94d049bb133111eb;
-    s[3] = (s[2] ^ (s[2] >> 31));
-    s[4] = ((seed + 0x6aa069ea2fb1a4d) << 1) | 1;
+    s[3] = s[0] ^ s[2] ^ (s[2] >> 31);
+    s[4] = (seed << 1) | 1;
     return rng;
 }
 
 /* Init unbiased uniform uint RNG with bounds [low, high] */
-STC_DEF crand_unif_t crand_unif_init(int64_t low, int64_t high) {
-    crand_unif_t dist = {low, (uint64_t) (high - low + 1)};
+STC_DEF crand_uniform_t crand_uniform_init(int64_t low, int64_t high) {
+    crand_uniform_t dist = {low, (uint64_t) (high - low + 1)};
     dist.threshold = (uint64_t)(0 - dist.range) % dist.range;
     return dist;
 }
 
 /* Int64 uniform distributed RNG, range [low, high]. */
-STC_DEF int64_t crand_unif(crand_t* rng, crand_unif_t* d) {
+STC_DEF int64_t crand_uniform(crand_t* rng, crand_uniform_t* d) {
     uint64_t lo, hi;
 #ifdef c_umul128
     do { c_umul128(crand_u64(rng), d->range, &lo, &hi); } while (lo < d->threshold);
@@ -140,7 +139,7 @@ STC_DEF int64_t crand_unif(crand_t* rng, crand_unif_t* d) {
 }
 
 /* Normal distribution PRNG. Marsaglia polar method */
-STC_DEF double crand_norm(crand_t* rng, crand_norm_t* dist) {
+STC_DEF double crand_normal(crand_t* rng, crand_normal_t* dist) {
     double u1, u2, s, m;
     if (dist->has_next++ & 1)
         return dist->next*dist->stddev + dist->mean;

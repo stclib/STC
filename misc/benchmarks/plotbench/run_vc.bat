@@ -6,9 +6,9 @@ cl.exe -nologo -EHsc -std:c++latest -I../include -O2 clist_benchmark.cpp >nul
 cl.exe -nologo -EHsc -std:c++latest -I../include -O2 cmap_benchmark.cpp >nul
 cl.exe -nologo -EHsc -std:c++latest -I../include -O2 csmap_benchmark.cpp >nul
 cl.exe -nologo -EHsc -std:c++latest -I../include -O2 cvec_benchmark.cpp >nul
-del *.obj >nul
+if exist *obj del *.obj
 
-set c=VC-19.28
+set c=VC-19.36
 cdeq_benchmark.exe %c%
 clist_benchmark.exe %c%
 cmap_benchmark.exe %c%

@@ -103,7 +103,7 @@
   #define i_no_emplace
 #endif
 #if c_option(c_native_cmp)
-  #define i_native_cmp
+  #define i_cmp_native
 #endif
 #if c_option(c_no_clone) || defined _i_carc
   #define i_no_clone
@@ -203,10 +203,10 @@
 #endif
 
 #ifndef i_no_cmp
-  #if defined i_cmp || defined i_less || defined i_native_cmp
+  #if defined i_cmp || defined i_less || defined i_cmp_native
     #define _i_has_cmp
   #endif
-  #if defined i_eq || defined i_native_cmp
+  #if defined i_eq || defined i_cmp_native
     #define _i_has_eq
   #endif
   
@@ -228,7 +228,7 @@
   #endif
 #endif
 
-#if !defined i_hash && (!(defined _i_cbox || defined _i_carc) || defined i_native_cmp)
+#if !defined i_hash && (!(defined _i_cbox || defined _i_carc) || defined i_cmp_native)
   #define i_hash c_default_hash
 #endif
 
