@@ -29,6 +29,7 @@ by default (define `STC_NDEBUG` or `NDEBUG` to disable).
 ```c
 SpanType        cspan_init(TYPE SpanType, {v1, v2, ...});           // make a 1-d cspan from values
 SpanType        cspan_from(STCContainer* cnt);                      // make a 1-d cspan from a cvec, cstack, cpque (heap)
+SpanType        cspan_from_n(ValueType* ptr, intptr_t n);           // make a 1-d cspan from a pointer and length
 SpanType        cspan_from_array(ValueType array[]);                // make a 1-d cspan from a C array
 
 intptr_t        cspan_size(const SpanTypeN* self);                  // return number of elements
@@ -144,6 +145,7 @@ Slicing cspan without and with reducing the rank:
 ```c
 #define i_implement
 #include <c11/fmt.h>
+#include <stc/algorithm.h>
 #include <stc/cspan.h>
 
 using_cspan3(Span, int); // Shorthand to define Span, Span2, and Span3
@@ -161,6 +163,14 @@ int main(void)
 
     puts("\niterate span2 flat:");
     c_foreach (i, Span2, span2)
+        fmt_print(" {}", *i.ref);
+    puts("");
+
+    // create span on-the-fly
+    int array[] = {3, 65, 4, 3, 7, 87, 45};
+    c_forfilter (i, ISpan, (ISpan)cspan_from_array(array),
+                    c_flt_skip(i, 2) &&
+                    c_flt_take(i, 3))
         fmt_print(" {}", *i.ref);
     puts("");
 

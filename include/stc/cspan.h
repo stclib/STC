@@ -26,7 +26,7 @@
 #include <stc/cspan.h>
 #include <stc/algo/filter.h>
 using_cspan(Span2f, float, 2);
-using_cspan(Intspan, int, 1);
+using_cspan(Intspan, int);
 
 int demo1() {
     float raw[4*5];
@@ -65,7 +65,11 @@ int demo2() {
 
 #define using_cspan(...) c_MACRO_OVERLOAD(using_cspan, __VA_ARGS__)
 #define using_cspan_2(Self, T) \
-    using_cspan_3(Self, T, 1)
+    using_cspan_3(Self, T, 1); \
+    STC_INLINE Self Self##_from_n(Self##_raw* raw, const intptr_t n) { \
+        return (Self){.data=raw, .shape={(int32_t)n}, .stride={.d={1}}}; \
+    } \
+    struct stc_nostruct
 
 #define using_cspan_3(Self, T, RANK) \
     typedef T Self##_value; typedef T Self##_raw; \
@@ -77,9 +81,6 @@ int demo2() {
     \
     typedef struct { Self##_value *ref; int32_t pos[RANK]; const Self *_s; } Self##_iter; \
     \
-    STC_INLINE Self Self##_from_n(Self##_raw* raw, const intptr_t n) { \
-        return (Self){.data=raw, .shape={(int32_t)n}}; \
-    } \
     STC_INLINE Self Self##_slice_(Self##_value* d, const int32_t shape[], const int32_t stri[], \
                                   const int rank, const int32_t a[][2]) { \
         Self s; int outrank; \
@@ -104,7 +105,7 @@ int demo2() {
     } \
     struct stc_nostruct
 
-#define using_cspan2(Self, T) using_cspan_3(Self, T, 1); using_cspan_3(Self##2, T, 2)
+#define using_cspan2(Self, T) using_cspan_2(Self, T); using_cspan_3(Self##2, T, 2)
 #define using_cspan3(Self, T) using_cspan2(Self, T); using_cspan_3(Self##3, T, 3)
 #define using_cspan4(Self, T) using_cspan3(Self, T); using_cspan_3(Self##4, T, 4)
 #define using_cspan_tuple(N) typedef struct { int32_t d[N]; } cspan_tuple##N
@@ -124,8 +125,11 @@ using_cspan_tuple(7); using_cspan_tuple(8);
 #define cspan_from(container) \
     {.data=(container)->data, .shape={(int32_t)(container)->_len}, .stride={.d={1}}}
 
+#define cspan_from_n(ptr, n) \
+    {.data=(ptr), .shape={n}, .stride={.d={1}}}
+
 #define cspan_from_array(array) \
-    {.data=(array), .shape={c_arraylen(array)}, .stride={.d={1}}}
+    cspan_from_n(array, c_arraylen(array))
 
 #define cspan_size(self) _cspan_size((self)->shape, cspan_rank(self))
 #define cspan_rank(self) c_arraylen((self)->shape)

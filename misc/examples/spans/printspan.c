@@ -11,7 +11,7 @@
 #include <stc/csset.h>
 
 #include <stc/cspan.h>
-using_cspan(intspan, int, 1);
+using_cspan(intspan, int);
 
 void printMe(intspan container) {
     printf("%d:", (int)cspan_size(&container));
