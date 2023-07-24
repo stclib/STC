@@ -532,17 +532,22 @@ MyVec_push_back(&vec, 1);
 It is possible to forward declare containers. This is useful when a container is part of a struct, 
 but still not expose or include the full implementation / API of the container.
 ```c
-// Header file
+// Dataset.h
 #include <stc/forward.h> // only include data structures
-forward_cstack(cstack_pnt, struct Point); // declare cstack_pnt (and cstack_pnt_value, cstack_pnt_iter);
-                                          // struct Point may be an incomplete type.
+
+// declare cstack_pnt; struct Point may be an incomplete type.
+forward_cstack(cstack_pnt, struct Point);
 typedef struct Dataset {
     cstack_pnt vertices;
     cstack_pnt colors;
 } Dataset;
 
-// Implementation
-#define i_is_forward                  // flag that the container was forward declared.
+...
+// Dataset.c
+#include "Dataset.h"
+
+struct Point { int x, y, z; };            // Point must be defined here.
+#define i_is_forward                      // flag that the container was forward declared.
 #define i_key struct Point
 #define i_tag pnt
 #include <stc/cstack.h>
