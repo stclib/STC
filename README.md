@@ -3,7 +3,7 @@
 STC - Smart Template Containers
 ===============================
 
-### [Version 4.3 Released](#version-history)
+### [Version 4.3 Pre-release](#version-history)
 - See details for breaking changes.
 ---
 Description
@@ -107,8 +107,8 @@ Benchmark notes:
 - The barchart shows average test times over three compilers: **Mingw64 13.1.0, Win-Clang 16.0.5, VC-19-36**. CPU: **Ryzen 7 5700X**.
 - Containers uses value types `uint64_t` and pairs of `uint64_t` for the maps.
 - Black bars indicates performance variation between various platforms/compilers.
-- Iterations are repeated 4 times over n elements.
-- **find()**: not executed for *forward_list*, *deque*, and *vector* because these c++ containers does not have native *find()*.
+- Iterations and access are repeated 4 times over n elements.
+- access: no entryfor *forward_list*, *deque*, and *vector* because these c++ containers does not have native *find()*.
 - **deque**: *insert*: n/3 push_front(), n/3 push_back()+pop_front(), n/3 push_back().
 - **map and unordered map**: *insert*: n/2 random numbers, n/2 sequential numbers. *erase*: n/2 keys in the map, n/2 random keys.
 
@@ -537,6 +537,7 @@ but still not expose or include the full implementation / API of the container.
 
 // declare cstack_pnt; struct Point may be an incomplete type.
 forward_cstack(cstack_pnt, struct Point);
+
 typedef struct Dataset {
     cstack_pnt vertices;
     cstack_pnt colors;
