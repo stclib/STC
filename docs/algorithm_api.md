@@ -130,7 +130,7 @@ Iterate a container or a crange with chained `&&` filtering.
 
 [ [Run this example](https://godbolt.org/z/n9aYrYPv8) ]
 ```c
-#include <stc/calgo.h>
+#include <stc/algorithm.h>
 #include <stdio.h>
 
 bool isPrime(long long i) {
@@ -309,8 +309,6 @@ The **checkauto** utility described below, ensures that the `c_auto*` macros are
 | `continue`                             | Exit a defer-block without resource leak                  |
 
 ```c
-#include <stc/algo/raii.h> // or <stc/calgo.h>
-...
 // `c_defer` executes the expression(s) when leaving scope.
 //  Note: does not require inclusion of "raii.h".
 cstr s1 = cstr_lit("Hello"), s2 = cstr_lit("world");

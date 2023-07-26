@@ -72,6 +72,7 @@ csmap_X_result        csmap_X_push(csmap_X* self, csmap_X_value entry);         
 
 csmap_X_result        csmap_X_emplace(csmap_X* self, i_keyraw rkey, i_valraw rmapped);           // no change if rkey in map
 csmap_X_result        csmap_X_emplace_or_assign(csmap_X* self, i_keyraw rkey, i_valraw rmapped); // always update rmapped
+csmap_X_result        csmap_X_emplace_key(csmap_X* self, i_keyraw rkey);    // if key not in map, mapped is left unassigned
 
 int                   csmap_X_erase(csmap_X* self, i_keyraw rkey);
 csmap_X_iter          csmap_X_erase_at(csmap_X* self, csmap_X_iter it);                          // returns iter after it

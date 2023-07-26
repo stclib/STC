@@ -24,7 +24,7 @@
 #include <stdio.h>
 #define i_val int
 #include <stc/cstack.h>
-#include <stc/calgo.h>
+#include <stc/algorithm.h>
 
 int main(void)
 {

@@ -2,7 +2,6 @@
 // and demonstrate sharing and cloning of maps.
 #define i_implement
 #include <stc/cstr.h>
-#include <stc/algo/raii.h>
 #define i_type Map
 #define i_key_str // strings
 #define i_val int

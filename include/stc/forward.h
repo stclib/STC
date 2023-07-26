@@ -120,6 +120,7 @@ typedef struct chash_slot chash_slot;
     typedef struct { \
         SELF##_value *ref; \
         bool inserted; \
+        uint8_t hashx; \
     } SELF##_result; \
 \
     typedef struct { \

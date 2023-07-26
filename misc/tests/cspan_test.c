@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stc/cspan.h>
-#include <stc/algo/raii.h>
 #include "ctest.h"
 
 using_cspan3(intspan, int);
@@ -48,7 +47,8 @@ CTEST(cspan, slice) {
 #include <stc/cstack.h>
 
 CTEST(cspan, slice2) {
-    c_auto (cstack_int, stack)
+    cstack_int stack = {0};
+    c_defer (cstack_int_drop(&stack))
     {
         c_forrange (i, 10*20*30)
             cstack_int_push(&stack, i);

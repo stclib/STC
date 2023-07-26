@@ -619,23 +619,24 @@ STC is generally very memory efficient. Memory usage for the different container
 # Version History
 
 ## Version 4.3
-- Some breaking changes.
-- **coroutines**: much improved with some new API and added features.
-- **cspan**: Rewritten to add support for **column-major** order (fortran) multidim spans and transposed views.
-- Removed default comparison for **clist**, **cvec** and **cdeq** (like cstack and cqueue). 
-    - Define `i_cmp_native` to enable built-in i_key types comparisons (<, ==).
-    - Use of `i_keyclass` still expects comparison functions defined. 
-    - Use of `i_keyboxed` compares hosted pointers instead of pointed to values if comparisons not defined.
-- **cstr** and **csview** now uses *shared linking* by default. Implement by either defining `i_implement` or `i_static` before including.
+- Some breaking changes:
+    - **cstr** and **csview** now uses *shared linking* by default. Implement by either defining `i_implement` or `i_static` before including.
+    - Changes in `coroutine.h`: much improved with some new API and added features.
+    - Renamed stc/calgo.h => `<stc/algorithms.h>`
+    - Removed deprecated stc/crandom.h. Use `<stc/crand.h>` with the new API.
+    - Removed default comparison for **clist**, **cvec** and **cdeq**:
+        - Define `i_cmp_native` to enable comparison for built-in i_key types (<, ==).
+        - Use of `i_keyclass` still expects comparison functions to be defined. 
+        - Use of `i_keyboxed` compares hosted pointers instead of pointed to values if comparisons not defined.
+    - Renamed input enum flags for ***cregex***-functions.
+- **cspan**: Changed representation of strides to add **column-major** order (fortran) multidimensional spans and transposed views.
 - All new faster and smaller **cqueue** and **cdeq** implementations, using a circular buffer.
-- Renamed i_extern => `i_import`.
-    - Define `i_import` before `#include <stc/cstr.h>` will also define utf8 case conversions.
+- Renamed i_extern => `i_import` (i_extern deprecated).
+    - Define `i_import` before `#include <stc/cstr.h>` will also define full utf8 case conversions.
     - Define `i_import` before `#include <stc/cregex.h>` will also define cstr + utf8 tables.
-- Renamed c_make() => ***c_init()*** macro for initializing containers with element lists.
-- Renamed input enum flags for ***cregex***-functions.
-- Removed deprecated <stc/crandom.h>. Use `<stc/crand.h>` with the new API.
+- Renamed c_make() => ***c_init()*** macro for initializing containers with element lists. c_make deprecated.
 - Removed deprecated uppercase flow-control macro names.
-- Improved default string hash function.
+- Other smaller additions, bug fixes and improved documentation.
 
 ## Version 4.2
 - New home! And online single headers for https://godbolt.org
