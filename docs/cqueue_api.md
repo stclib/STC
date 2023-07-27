@@ -45,6 +45,7 @@ cqueue_X_value*     cqueue_X_back(const cqueue_X* self);
 cqueue_X_value*     cqueue_X_push(cqueue_X* self, i_key value);
 cqueue_X_value*     cqueue_X_emplace(cqueue_X* self, i_keyraw raw);
 void                cqueue_X_pop(cqueue_X* self);
+cqueue_X_value      cqueue_X_pull(cqueue_X* self);                       // move out last element
 
 cqueue_X_iter       cqueue_X_begin(const cqueue_X* self);
 cqueue_X_iter       cqueue_X_end(const cqueue_X* self);

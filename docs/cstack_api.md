@@ -48,7 +48,8 @@ i_key*              cstack_X_at_mut(cstack_X* self, intptr_t idx);
 i_key*              cstack_X_push(cstack_X* self, i_key value);
 i_key*              cstack_X_emplace(cstack_X* self, i_keyraw raw);
 
-void                cstack_X_pop(cstack_X* self);
+void                cstack_X_pop(cstack_X* self);                        // destroy last element
+cstack_X_value      cstack_X_pull(cstack_X* self);                       // move out last element
 
 cstack_X_iter       cstack_X_begin(const cstack_X* self);
 cstack_X_iter       cstack_X_end(const cstack_X* self);

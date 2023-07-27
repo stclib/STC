@@ -56,12 +56,14 @@ cdeq_X_value*       cdeq_X_back(const cdeq_X* self);
 cdeq_X_value*       cdeq_X_push_front(cdeq_X* self, i_key value);
 cdeq_X_value*       cdeq_X_emplace_front(cdeq_X* self, i_keyraw raw);
 void                cdeq_X_pop_front(cdeq_X* self);
+cdeq_X_value        cdeq_X_pull_front(cdeq_X* self);                                // move out front element
 
 cdeq_X_value*       cdeq_X_push_back(cdeq_X* self, i_key value);
 cdeq_X_value*       cdeq_X_push(cdeq_X* self, i_key value);                         // alias for push_back()
 cdeq_X_value*       cdeq_X_emplace_back(cdeq_X* self, i_keyraw raw);
 cdeq_X_value*       cdeq_X_emplace(cdeq_X* self, i_keyraw raw);                     // alias for emplace_back()
 void                cdeq_X_pop_back(cdeq_X* self);
+cdeq_X_value        cdeq_X_pull_back(cdeq_X* self);                                 // move out last element
 
 cdeq_X_iter         cdeq_X_insert_n(cdeq_X* self, intptr_t idx, const i_key[] arr, intptr_t n);  // move values
 cdeq_X_iter         cdeq_X_insert_at(cdeq_X* self, cdeq_X_iter it, i_key value);    // move value 

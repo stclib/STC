@@ -68,8 +68,9 @@ cvec_X_value*       cvec_X_emplace(cvec_X* self, i_keyraw raw);
 cvec_X_value*       cvec_X_push_back(cvec_X* self, i_key value);            // alias for push
 cvec_X_value*       cvec_X_emplace_back(cvec_X* self, i_keyraw raw);        // alias for emplace
 
-void                cvec_X_pop(cvec_X* self);
+void                cvec_X_pop(cvec_X* self);                               // destroy last element
 void                cvec_X_pop_back(cvec_X* self);                          // alias for pop
+cvec_X_value        cvec_X_pull(cvec_X* self);                              // move out last element
 
 cvec_X_iter         cvec_X_insert_n(cvec_X* self, intptr_t idx, const i_key arr[], intptr_t n); // move values
 cvec_X_iter         cvec_X_insert_at(cvec_X* self, cvec_X_iter it, i_key value);  // move value 

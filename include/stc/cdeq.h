@@ -34,6 +34,7 @@
 #define _pull _pull_front
 #include "priv/cqueue_hdr.h"
 #undef _pop
+#undef _pull
 
 STC_API _cx_value* _cx_MEMB(_push_front)(_cx_Self* self, i_key value);
 STC_API _cx_iter   _cx_MEMB(_insert_n)(_cx_Self* self, intptr_t idx, const _cx_value* arr, intptr_t n);
