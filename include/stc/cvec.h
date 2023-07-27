@@ -326,7 +326,7 @@ _cx_MEMB(_push)(_cx_Self* self, i_key value) {
 STC_DEF _cx_iter
 _cx_MEMB(_insert_uninit)(_cx_Self* self, const intptr_t idx, const intptr_t n) {
     if (self->_len + n > self->_cap)
-        if (!_cx_MEMB(_reserve)(self, self->_len*3/2 + n))
+        if (!_cx_MEMB(_reserve)(self, self->_len*5/4 + n))
             return _cx_MEMB(_end)(self);
 
     _cx_value* pos = self->data + idx;

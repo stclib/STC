@@ -169,7 +169,8 @@ typedef struct cco_runtime {
 #define cco_task_blocking_1(task) cco_task_blocking_3(task, _rt, 16)
 #define cco_task_blocking_3(task, rt, STACKDEPTH) \
     for (struct { int result, top; cco_task* stack[STACKDEPTH]; } rt = {.stack={cco_cast_task(task)}}; \
-         (((rt.result = cco_task_resume(rt.stack[rt.top], (cco_runtime*)&rt)) & ~rt.stack[rt.top]->cco_expect) || --rt.top >= 0); )
+         (((rt.result = cco_task_resume(rt.stack[rt.top], (cco_runtime*)&rt)) & \
+           ~rt.stack[rt.top]->cco_expect) || --rt.top >= 0); )
 
 /*
  * Semaphore
