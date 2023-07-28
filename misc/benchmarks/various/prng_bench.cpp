@@ -186,7 +186,7 @@ int main(void)
         for (size_t i = 0; i < N; i++)
             recipient[i] = crand_u64(&rng);
         end = clock();
-        cout << "stc64:\t\t"
+        cout << "crand64:\t"
              << (float(end - beg) / CLOCKS_PER_SEC)
              << "s: " << recipient[312] << endl;
 
