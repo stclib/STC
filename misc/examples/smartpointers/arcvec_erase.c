@@ -19,7 +19,8 @@ int main(void)
     
     // clone the second 2012 and push it back.
     // note: cloning make sure that vec.data[2] has ref count 2.
-    Vec_push(&vec, Arc_clone(vec.data[2]));
+    Vec_push(&vec, Arc_clone(vec.data[2]));  // => share vec.data[2]
+    Vec_emplace(&vec, *vec.data[2].get);     // => deep-copy vec.data[2]
     
     printf("vec before erase :");
     c_foreach (i, Vec, vec)

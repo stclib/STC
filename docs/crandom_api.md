@@ -8,27 +8,23 @@ See [random](https://en.cppreference.com/w/cpp/header/random) for similar c++ fu
 
 ## Description
 
-**crand64** is a novel, very fast PRNG, suited for parallel usage. It features a
-Weyl-sequence as part of its state. It is based on *sfc64*, but has a different output function
-and state size.
+**crand64** is a very fast PRNG, suited for parallel usage. It is based on *sfc64*, but has a
+different output function and state size. It features a Weyl-sequence as part of its state. 
 
-**sfc64** is the fastest among *pcg*, *xoshiro`**`*, and *lehmer*. It is equally fast or faster than
-*sfc64* on most platforms. *wyrand* is faster on platforms with fast 128-bit multiplication, and has
-2^64 period (https://github.com/lemire/SwiftWyhash/issues/10). *wyrand* is not suited for massive
-parallel usage due to its limited minimal period.
+**crand64** is faster or equally fast as *wyrand*, *xoshiro\*\**, *sfc64*, and *romu_trio*
+with both **clang 16.0** and **gcc 13.1** from the [prng_bench.c](../misc/benchmarks/various/prng_bench.cpp)
+on windows 11, Ryzen 7 5700X. (clang does not optimize *xoshiro\*\** and *sfc64* as well as gcc does).
+
+**crand64** has no jump *function*, but each odd number Weyl-increment (state[4]) starts a new
+unique 2^64 *minimum* length period, i.e. virtually unlimitied number of unique threads.
+In contrast, *wyrand* and *sfc64* have only a (total) minimum period of 2^64 (*romu_trio* has
+no guarantees), and may therefore not be suited for massive parallel usage (for purists).
 
 **crand64** does not require multiplication or 128-bit integer operations. It has 320 bit state,
-where 64-bits are constant per prng instance created.
-
-There is no *jump function*, but each odd number Weyl-increment (state[4]) starts a new
-unique 2^64 *minimum* length period, i.e. virtually unlimitied number of unique threads.
+where 64-bits are constant per instance.
 
 **crand64** passes *PractRand* (tested up to 8TB output), Vigna's Hamming weight test, and simple
-correlation tests, i.e. *n* interleaved streams with only one-bit differences in initial state.
-Also 32-bit and 16-bit versions passes PractRand up to their size limits.
-
-For more, see the PRNG shootout by Vigna: http://prng.di.unimi.it and a debate between the authors of
-xoshiro and pcg (Vigna/O'Neill) PRNGs: https://www.pcg-random.org/posts/on-vignas-pcg-critique.html
+correlation tests. The 16- and 32-bit variants also passes PractRand up to their size limits.
 
 ## Header file
 

@@ -66,7 +66,7 @@ uint32_t pcg32(uint32_t s[2]) {
 }
 
 
-/* xoshiro128+  */
+/* xo(ro)shiro  */
 
 uint64_t xoroshiro128plus(uint64_t s[2]) {
     const uint64_t s0 = s[0];
@@ -80,9 +80,6 @@ uint64_t xoroshiro128plus(uint64_t s[2]) {
     return result;
 }
 
-
-/* xoshiro256**  */
-
 static inline uint64_t xoshiro256starstar(uint64_t s[4]) {
     const uint64_t result = rotl64(s[1] * 5, 7) * 9;
     const uint64_t t = s[1] << 17;
@@ -95,7 +92,7 @@ static inline uint64_t xoshiro256starstar(uint64_t s[4]) {
     return result;
 }
 
-// wyrand - 2020-12-07
+/* wyrand - 2020-12-07 */
 static inline void _wymum(uint64_t *A, uint64_t *B){
 #if defined(__SIZEOF_INT128__)
     __uint128_t r = *A; r *= *B;
@@ -136,23 +133,7 @@ int main(void)
     for (size_t ti = 0; ti < 2; ti++) {
         init_state(rng.state, 12345123);
         cout << endl << "ROUND " << ti+1 << " ---------" << endl;
-
-        beg = clock();
-        for (size_t i = 0; i < N; i++)
-            recipient[i] = romu_trio(rng.state);
-        end = clock();
-        cout << "romu_trio:\t"
-             << (float(end - beg) / CLOCKS_PER_SEC)
-             << "s: " << recipient[312] << endl;
-
-        beg = clock();
-        for (size_t i = 0; i < N; i++)
-            recipient[i] = wyrand64(rng.state);
-        end = clock();
-        cout << "wyrand64:\t"
-             << (float(end - beg) / CLOCKS_PER_SEC)
-             << "s: " << recipient[312] << endl;
-
+/*
         beg = clock();
         for (size_t i = 0; i < N; i++)
             recipient[i] = sfc32((uint32_t *)rng.state);
@@ -174,6 +155,22 @@ int main(void)
             recipient[i] = pcg32((uint32_t *)rng.state);
         end = clock();
         cout << "pcg32:\t\t"
+             << (float(end - beg) / CLOCKS_PER_SEC)
+             << "s: " << recipient[312] << endl;
+*/
+        beg = clock();
+        for (size_t i = 0; i < N; i++)
+            recipient[i] = romu_trio(rng.state);
+        end = clock();
+        cout << "romu_trio:\t"
+             << (float(end - beg) / CLOCKS_PER_SEC)
+             << "s: " << recipient[312] << endl;
+
+        beg = clock();
+        for (size_t i = 0; i < N; i++)
+            recipient[i] = wyrand64(rng.state);
+        end = clock();
+        cout << "wyrand64:\t"
              << (float(end - beg) / CLOCKS_PER_SEC)
              << "s: " << recipient[312] << endl;
 
