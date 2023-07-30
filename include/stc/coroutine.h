@@ -132,7 +132,19 @@ typedef enum {
     (void)((co)->cco_state = 0)
 
 /*
- * Tasks (optional)
+ * Generators
+ */
+
+#define cco_generator(Name, ...) \
+    typedef Name Name##_value; \
+    typedef struct { \
+        Name##_value* ref; \
+        int cco_state; \
+        __VA_ARGS__ \
+    } Name##_iter
+
+/*
+ * Tasks
  */
 
 struct cco_runtime;
