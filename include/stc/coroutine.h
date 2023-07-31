@@ -135,7 +135,7 @@ typedef enum {
  * Generators
  */
 
-#define cco_generator(Name, ...) \
+#define cco_iter_struct(Name, ...) \
     typedef Name Name##_value; \
     typedef struct { \
         Name##_value* ref; \

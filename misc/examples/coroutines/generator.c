@@ -8,7 +8,7 @@ typedef struct {
     int a, b, c;
 } Triple;
 
-cco_generator(Triple,
+cco_iter_struct(Triple,
     int count;
 );
 
