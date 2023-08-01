@@ -29,6 +29,7 @@
 #endif
 
 #define _i_prefix cpque_
+#define _i_ispque
 #include "priv/template.h"
 #ifndef i_is_forward
   _cx_DEFTYPES(_c_cpque_types, _cx_Self, i_key);
@@ -160,3 +161,4 @@ _cx_MEMB(_push)(_cx_Self* self, _cx_value value) {
 #endif
 #define CPQUE_H_INCLUDED
 #include "priv/template2.h"
+#undef _i_ispque
