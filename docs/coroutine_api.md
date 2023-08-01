@@ -24,23 +24,24 @@ NB! ***cco_yield\*()*** / ***cco_await\*()*** may not be called from within a `s
 |           | `cco_yield_final();`                 | Yield final suspend, enter cleanup-state |
 |           | `cco_yield_final(ret);`              | Yield a final value                     |
 |           | `cco_await(condition);`              | Suspend until condition is true (return CCO_AWAIT)|
-|           | `cco_call_await(cocall);`            | Await for subcoro to finish (returns its ret value) |
-|           | `cco_call_await(cocall, retbit);`    | Await for subcoro's return to be in (retbit \| CCO_DONE)  |
+|           | `cco_await_call(cocall);`            | Await for subcoro to finish (returns its ret value) |
+|           | `cco_await_call(cocall, retbit);`    | Await for subcoro's return to be in (retbit \| CCO_DONE)  |
 |           | `cco_return;`                        | Return from coroutine (inside cco_routine) |
 |           | Task objects:                        |                                         |
 |           | `cco_task_struct(Name, ...);`        | Define a coroutine task struct          |
-|           | `cco_task_await(task, cco_runtime* rt);`| Await for task to finish             |
-|           | `cco_task_await(task, rt, retbit);`  | Await for task's return to be in (retbit \| CCO_DONE) |
-|`cco_result`| `cco_task_resume(task, rt);`       | Resume suspended task                   |
+|           | `cco_await_task(task, cco_runtime* rt);`| Await for task to finish             |
+|           | `cco_await_task(task, rt, retbit);`  | Await for task's return to be in (retbit \| CCO_DONE) |
+|`cco_result`| `cco_resume_task(task, rt);`        | Resume suspended task                   |
 |           | Semaphores:                          |                                         | 
 |           | `cco_sem`                            | Semaphore type                          |
+|           | `cco_await_sem(sem)`                 | Await for the semaphore count > 0       |
 | `cco_sem` | `cco_sem_from(long value)`           | Create semaphore                        |
 |           | `cco_sem_set(sem, long value)`       | Set semaphore value                     |
-|           | `cco_sem_await(sem)`                 | Await for the semaphore count > 0       |
+
 |           | `cco_sem_release(sem)`               | Signal the semaphore (count += 1)       |
 |           | Timers:                              |                                         | 
 |           | `cco_timer`                          | Timer type                              |
-|           | `cco_timer_await(tm, double sec)`    | Await secs for timer to expire (usec prec.)|
+|           | `cco_await_timer(tm, double sec)`    | Await secs for timer to expire (usec prec.)|
 |           | `cco_timer_start(tm, double sec)`    | Start timer for secs duration           |
 |           | `cco_timer_restart(tm)`              | Restart timer with same duration        |
 | `bool`    | `cco_timer_expired(tm)`              | Return true if timer is expired         |
@@ -49,10 +50,10 @@ NB! ***cco_yield\*()*** / ***cco_await\*()*** may not be called from within a `s
 |           | From caller side:                    |                                         | 
 | `void`    | `cco_stop(co)`                       | Next call of coroutine finalizes        |
 | `void`    | `cco_reset(co)`                      | Reset state to initial (for reuse)      |
-| `void`    | `cco_call_blocking(cocall) {}`       | Run blocking until cocall is finished   |
-| `void`    | `cco_call_blocking(cocall, int* outres) {}`| Run blocking until cocall is finished |
-|           | `cco_task_blocking(task) {}`         | Run blocking until task is finished |
-|           | `cco_task_blocking(task, rt, STACKSZ) {}`| Run blocking until task is finished |
+| `void`    | `cco_blocking_call(cocall) {}`       | Run blocking until cocall is finished   |
+| `void`    | `cco_blocking_call(cocall, int* outres) {}`| Run blocking until cocall is finished |
+|           | `cco_blocking_task(task) {}`         | Run blocking until task is finished |
+|           | `cco_blocking_task(task, rt, STACKSZ) {}`| Run blocking until task is finished |
 |           | Time functions:                      |                                         |
 | `double`  | `cco_time(void)`                     | Return secs with usec prec. since Epoch |
 |           | `cco_sleep(double sec)`              | Sleep for seconds (msec or usec prec.)  |
@@ -117,7 +118,7 @@ int main(void) {
     struct triples co = {.max_c = 25};
     int n = 0;
 
-    cco_call_blocking(triples(&co)) {
+    cco_blocking_call(triples(&co)) {
         printf("%d: [%d, %d, %d]\n", ++n, co.a, co.b, co.c);
     }
 }
@@ -171,26 +172,26 @@ int main(void) {
     struct gcd1_triples co = {.max_n = 100, .max_c = 100};
     int n = 0;
 
-    cco_call_blocking(gcd1_triples(&co)) {
+    cco_blocking_call(gcd1_triples(&co)) {
         printf("%d: [%d, %d, %d]\n", ++n, co.tri.a, co.tri.b, co.tri.c);
     }
 }
 ```
-When using ***cco_call_blocking()***, the coroutine is continuously resumed after each yield suspension.
+When using ***cco_blocking_call()***, the coroutine is continuously resumed after each yield suspension.
 However, this means that it first calls ***gcd1_triples()***, which immediately jumps to after the `cco_yield`
 -statement and calls ***triples()***, which again jumps and resumes after its `cco_yield`-statement. This
 is efficient only when yielding or awaiting from the top- or second-level call like here, but naturally not
 when couroutine calls are more deeply nested or recursive.
 
 The STC coroutine implementation therefore also contains task-objects (`cco_task`), which are base-coroutine 
-objects/enclosures. These can be executed using ***cco_task_blocking()*** instead of ***cco_call_blocking()***.
-Inner coroutine calls are done by ***cco_task_await()***, where you may await for a certain return value, normally CCO_YIELD or just CCO_DONE. It uses a stack of pointers of task-enclosures to call the current
+objects/enclosures. These can be executed using ***cco_blocking_task()*** instead of ***cco_blocking_call()***.
+Inner coroutine calls are done by ***cco_await_task()***, where you may await for a certain return value, normally CCO_YIELD or just CCO_DONE. It uses a stack of pointers of task-enclosures to call the current
 inner-level function directly. The task-objects have the added benefit that coroutines can be managed
 by a scheduler, which is useful when dealing with large numbers of coroutines (like in many games and
 simulations).
 
 Note that these two modes may be mixed, and that for short-lived coroutines (only a few suspends),
-it is often beneficial to call the sub-coroutine directly rather than via ***cco_task_await()***
+it is often beneficial to call the sub-coroutine directly rather than via ***cco_await_task()***
 (which pushes the task on top of the runtime stack and yields - then executed on next resume).
 
 The following example uses task-objects with 3-levels deep coroutine calls. It emulates an async generator
@@ -212,7 +213,7 @@ int next_value(struct next_value* co, cco_runtime* rt)
 {
     cco_routine (co) {
         while (true) {
-            cco_timer_await(&co->tm, 1 + rand() % 2); // suspend with CCO_AWAIT
+            cco_await_timer(&co->tm, 1 + rand() % 2); // suspend with CCO_AWAIT
             co->val = rand();
             cco_yield();                              // suspend with CCO_YIELD
         }
@@ -242,7 +243,7 @@ int produce_items(struct produce_items* p, cco_runtime* rt)
         while (true)
         {
             // await for CCO_YIELD (or CCO_DONE)
-            cco_task_await(&p->next, rt, CCO_YIELD);
+            cco_await_task(&p->next, rt, CCO_YIELD);
             cstr_printf(&p->str, "item %d", p->next.val);
             print_time();
             printf("produced %s\n", cstr_str(&p->str));
@@ -269,13 +270,13 @@ int consume_items(struct consume_items* c, cco_runtime* rt)
         for (c->i = 1; c->i <= c->n; ++c->i)
         {
             printf("consume #%d\n", c->i);
-            cco_task_await(&c->produce, rt, CCO_YIELD);
+            cco_await_task(&c->produce, rt, CCO_YIELD);
             print_time();
             printf("consumed %s\n", cstr_str(&c->produce.str));
         }
         cco_cleanup:
             cco_stop(&c->produce);
-            cco_task_resume(&c->produce, rt);
+            cco_resume_task(&c->produce, rt);
             puts("done consume");
     }
     return 0;
@@ -287,6 +288,6 @@ int main(void)
         .n = 5,
         .cco_func = consume_items,
     };
-    cco_task_blocking(&consume);
+    cco_blocking_task(&consume);
 }
 ```

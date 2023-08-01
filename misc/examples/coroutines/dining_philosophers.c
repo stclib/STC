@@ -34,15 +34,15 @@ int philosopher(struct Philosopher* p)
         while (1) {
             duration = 1.0 + crandf()*2.0;
             printf("Philosopher %d is thinking for %.0f minutes...\n", p->id, duration*10);
-            cco_timer_await(&p->tm, duration);
+            cco_await_timer(&p->tm, duration);
 
             printf("Philosopher %d is hungry...\n", p->id);
-            cco_sem_await(p->left_fork);
-            cco_sem_await(p->right_fork);
+            cco_await_sem(p->left_fork);
+            cco_await_sem(p->right_fork);
             
             duration = 0.5 + crandf();
             printf("Philosopher %d is eating for %.0f minutes...\n", p->id, duration*10);
-            cco_timer_await(&p->tm, duration);
+            cco_await_timer(&p->tm, duration);
 
             cco_sem_release(p->left_fork);
             cco_sem_release(p->right_fork);

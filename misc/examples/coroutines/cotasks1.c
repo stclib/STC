@@ -16,7 +16,7 @@ int next_value(struct next_value* co)
 {
     cco_routine (co) {
         while (true) {
-            cco_timer_await(&co->tm, 1 + rand() % 2);
+            cco_await_timer(&co->tm, 1 + rand() % 2);
             co->val = rand();
             cco_yield();
         }
@@ -88,7 +88,7 @@ int main(void)
     struct consume_items consume = {.n=5};
     int count = 0;
 
-    cco_call_blocking(consume_items(&consume, &produce))
+    cco_blocking_call(consume_items(&consume, &produce))
     {
         ++count;
         //cco_sleep(0.001);
