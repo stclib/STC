@@ -28,7 +28,7 @@ void stringdemo1(void)
     cstr_drop(&cs);
 }
 
-#define i_key int64_t
+#define i_key long long
 #define i_tag ix
 #include <stc/cvec.h>
 
@@ -39,14 +39,14 @@ void vectordemo1(void)
     for (int i = 10; i <= 100; i += 10)
         cvec_ix_push(&bignums, i * i);
 
-    printf("erase - %d: %" PRIu64 "\n", 3, bignums.data[3]);
+    printf("erase - %d: %lld\n", 3, bignums.data[3]);
     cvec_ix_erase_n(&bignums, 3, 1); // erase index 3
 
     cvec_ix_pop(&bignums);           // erase the last
     cvec_ix_erase_n(&bignums, 0, 1); // erase the first
 
     for (int i = 0; i < cvec_ix_size(&bignums); ++i) {
-        printf("%d: %" PRIu64 "\n", i, bignums.data[i]);
+        printf("%d: %lld\n", i, bignums.data[i]);
     }
 
     cvec_ix_drop(&bignums);
