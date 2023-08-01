@@ -94,10 +94,10 @@ typedef enum {
 /* cco_call_await(): assumes coroutine returns a cco_result value (int) */
 #define cco_call_await(...) c_MACRO_OVERLOAD(cco_call_await, __VA_ARGS__)
 #define cco_call_await_1(corocall) cco_call_await_2(corocall, CCO_DONE)
-#define cco_call_await_2(corocall, resultbits) \
+#define cco_call_await_2(corocall, awaitbits) \
     do { \
         *_state = __LINE__; \
-        case __LINE__: { int _r = corocall; if (!(_r & ~(resultbits))) {return _r; goto _resume;} } \
+        case __LINE__: { int _r = corocall; if (_r & ~(awaitbits)) {return _r; goto _resume;} } \
     } while (0)
 
 /* cco_call_blocking(): assumes coroutine returns a cco_result value (int) */
@@ -170,10 +170,10 @@ typedef struct cco_runtime {
 
 #define cco_task_await(...) c_MACRO_OVERLOAD(cco_task_await, __VA_ARGS__)
 #define cco_task_await_2(task, rt) cco_task_await_3(task, rt, CCO_DONE)
-#define cco_task_await_3(task, rt, resultbits) \
+#define cco_task_await_3(task, rt, awaitbits) \
     do { \
         cco_runtime* _rt = rt; \
-        (_rt->stack[++_rt->top] = cco_cast_task(task))->cco_expect = (resultbits); \
+        (_rt->stack[++_rt->top] = cco_cast_task(task))->cco_expect = (awaitbits); \
         cco_yield_v(CCO_AWAIT); \
     } while (0)
 
