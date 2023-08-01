@@ -619,17 +619,19 @@ STC is generally very memory efficient. Memory usage for the different container
 # Version History
 
 ## Version 4.3
-- Some breaking changes:
+- Breaking changes:
     - **cstr** and **csview** now uses *shared linking* by default. Implement by either defining `i_implement` or `i_static` before including.
-    - Changes in `coroutine.h`: much improved with some new API and added features.
-    - Renamed stc/calgo.h => `<stc/algorithms.h>`
-    - Removed deprecated stc/crandom.h. Use `<stc/crand.h>` with the new API.
+    - Renamed <stc/calgo.h> => `<stc/algorithm.h>`
+    - Moved <stc/algo/coroutine.h> => `<stc/coroutine.h>`
+        - Much improved with some new API and added features.
+    - Removed deprecated <stc/crandom.h>. Use `<stc/crand.h>` with the new API.
+        - Reverted names _unif and _norm back to `_uniform` and `_normal`.
     - Removed default comparison for **clist**, **cvec** and **cdeq**:
         - Define `i_cmp_native` to enable comparison for built-in i_key types (<, ==).
         - Use of `i_keyclass` still expects comparison functions to be defined. 
-        - Use of `i_keyboxed` compares hosted pointers instead of pointed to values if comparisons not defined.
+        - Use of `i_keyboxed` compares stored pointers instead of pointed to values if comparison not defined.
     - Renamed input enum flags for ***cregex***-functions.
-- **cspan**: Changed representation of strides to add **column-major** order (fortran) multidimensional spans and transposed views.
+- **cspan**: Added **column-major** order (fortran) multidimensional spans and transposed views (changed representation of strides).
 - All new faster and smaller **cqueue** and **cdeq** implementations, using a circular buffer.
 - Renamed i_extern => `i_import` (i_extern deprecated).
     - Define `i_import` before `#include <stc/cstr.h>` will also define full utf8 case conversions.
