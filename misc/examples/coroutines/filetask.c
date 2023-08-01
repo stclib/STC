@@ -21,7 +21,7 @@ int file_read(struct file_read* co, cco_runtime* rt)
 
         while (true) {
             // emulate async io: await 10ms per line
-            cco_timer_await(&co->tm, 0.003);
+            cco_await_timer(&co->tm, 0.003);
 
             if (!cstr_getline(&co->line, co->fp))
                 break;
@@ -50,7 +50,7 @@ int count_line(struct count_line* co, cco_runtime* rt)
         while (true)
         {
             // await for next CCO_YIELD (or CCO_DONE) in file_read()
-            cco_task_await(&co->reader, rt, CCO_YIELD);
+            cco_await_task(&co->reader, rt, CCO_YIELD);
             if (rt->result == CCO_DONE) break;
             co->lineCount += 1;
             cco_yield();
@@ -73,7 +73,7 @@ int main(void)
 
     // Execute coroutine as top-level blocking
     int loop = 0;
-    cco_task_blocking(&countTask) { ++loop; }
+    cco_blocking_task(&countTask) { ++loop; }
 
     printf("line count = %d\n", countTask.lineCount);
     printf("exec count = %d\n", loop);

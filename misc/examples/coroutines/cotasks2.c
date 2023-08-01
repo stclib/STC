@@ -15,7 +15,7 @@ int next_value(struct next_value* co, cco_runtime* rt)
 {
     cco_routine (co) {
         while (true) {
-            cco_timer_await(&co->tm, 1 + rand() % 2);
+            cco_await_timer(&co->tm, 1 + rand() % 2);
             co->val = rand();
             cco_yield();
         }
@@ -46,7 +46,7 @@ int produce_items(struct produce_items* p, cco_runtime* rt)
         while (true)
         {
             // await for next CCO_YIELD (or CCO_DONE) in next_value
-            cco_task_await(&p->next, rt, CCO_YIELD);
+            cco_await_task(&p->next, rt, CCO_YIELD);
             cstr_printf(&p->str, "item %d", p->next.val);
             print_time();
             printf("produced %s\n", cstr_str(&p->str));
@@ -75,14 +75,14 @@ int consume_items(struct consume_items* c, cco_runtime* rt)
         for (c->i = 1; c->i <= c->n; ++c->i)
         {
             printf("consume #%d\n", c->i);
-            cco_task_await(&c->produce, rt, CCO_YIELD);
+            cco_await_task(&c->produce, rt, CCO_YIELD);
             print_time();
             printf("consumed %s\n", cstr_str(&c->produce.str));
         }
 
         cco_cleanup:
         cco_stop(&c->produce);
-        cco_task_resume(&c->produce, rt);
+        cco_resume_task(&c->produce, rt);
         puts("done consume");
     }
     return 0;
@@ -94,5 +94,5 @@ int main(void)
         .cco_func = consume_items,
         .n = 5,
     };
-    cco_task_blocking(&consume);
+    cco_blocking_task(&consume);
 }

@@ -64,7 +64,7 @@ int main(void)
     struct triples t = {.max_c = 100};
     int n = 0;
 
-    cco_call_blocking(triples_coro(&t)) {
+    cco_blocking_call(triples_coro(&t)) {
         if (gcd(t.a, t.b) > 1)
             continue;
         if (++n <= 20)
