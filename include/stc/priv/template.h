@@ -111,7 +111,7 @@
 
 #if defined i_key_str
   #define i_keyclass cstr
-  #define i_rawclass crawstr
+  #define i_rawclass ccharptr
   #ifndef i_tag
     #define i_tag str
   #endif
