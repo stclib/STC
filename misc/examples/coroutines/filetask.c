@@ -21,7 +21,7 @@ int file_read(struct file_read* co, cco_runtime* rt)
 
         while (true) {
             // emulate async io: await 10ms per line
-            cco_await_timer(&co->tm, 0.003);
+            cco_await_timer(&co->tm, 0.010);
 
             if (!cstr_getline(&co->line, co->fp))
                 break;

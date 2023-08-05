@@ -521,39 +521,90 @@ Define `i_type` instead of `i_tag`:
 #define i_key int
 #include <stc/cvec.h>
 
-myvec vec = MyVec_init();
-MyVec_push_back(&vec, 1);
+MyVec vec = {0};
+MyVec_push(&vec, 42);
 ...
 ```
 
 ---
 ## Forward declarations
 
-It is possible to forward declare containers. This is useful when a container is part of a struct, 
-but still not expose or include the full implementation / API of the container.
-```c
-// Dataset.h
-#include <stc/forward.h> // only include data structures
+There are two ways to pre-declare templated containers in header files:
 
-// declare cstack_pnt; struct Point may be an incomplete type.
-forward_cstack(cstack_pnt, struct Point);
+1. Include the templated container type instance as a header file. This also exposes all container
+functions, which can be used by client code. It requires that the element type is complete.
+2. Or, pre-declare the container type only. In this case, the container can be a "private" member of a
+user struct (the container functions will not be available to the user).
+
+### 1. Include as a header file
+
+Create a dedicated header for the container type instance:
+```c
+#ifndef PointVec_H_
+#define PointVec_H_
+// Do not to include user defined headers here if they use templated containers themselves
+
+#define i_type PointVec
+#define i_val struct Point // NB! Element type must be complete at this point!
+#define i_header           // Do not implement, only expose API
+#include <stc/cvec.h>
+
+#endif
+```
+Usage from e.g. other headers is trivial:
+```c
+#ifndef Dataset_H_
+#define Dataset_H_
+#include "Point.h"         // include element type separately
+#include "PointVec.h"
 
 typedef struct Dataset {
-    cstack_pnt vertices;
-    cstack_pnt colors;
+    PointVec vertices;
+    PointVec colors;
 } Dataset;
-
 ...
-// Dataset.c
-#include "Dataset.h"
-
-struct Point { int x, y, z; };            // Point must be defined here.
-#define i_is_forward                      // flag that the container was forward declared.
-#define i_key struct Point
-#define i_tag pnt
-#include <stc/cstack.h>
+#endif
 ```
 
+Implement PointVec in a c-file:
+```c
+#include "Point.h"
+#define i_implement        // define immediately before PointVec.h
+#include "PointVec.h"
+...
+```
+
+### 2. Forward declare only
+```c
+// Dataset.h
+#ifndef Dataset_H_
+#define Dataset_H_
+#include <stc/forward.h>   // include various container data structure templates
+
+// declare PointVec. Note: struct Point may be an incomplete/undeclared type.
+forward_cvec(PointVec, struct Point);
+
+typedef struct Dataset {
+    PointVec vertices;
+    PointVec colors;
+} Dataset;
+
+void Dataset_drop(Dataset* self);
+...
+#endif
+```
+Define and use the "private" container in the c-file:
+```c
+// Dataset.c
+#include "Dataset.h"
+#include "Point.h"                        // Point must be defined here.
+
+#define i_is_forward                      // flag that the container was forward declared. 
+#define i_type PointVec
+#define i_val struct Point
+#include <stc/cvec.h>                     // Implements PointVec with static linking by default
+...
+```
 ---
 ## Per container-instance customization
 Sometimes it is useful to extend a container type to store extra data, e.g. a comparison
