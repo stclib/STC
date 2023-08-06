@@ -68,7 +68,7 @@ List of contents
 - **Uniform, easy-to-learn API** - Just include the headers and you are good. The API and functionality resembles c++ STL and is fully listed in the docs. Intuitive method/type names and uniform usage across the various containers.
 - **No signed/unsigned mixing** - Unsigned sizes and indices mixed with signed for comparison and calculation is asking for trouble. STC only uses signed numbers in the API for this reason.
 - **Small footprint** - Small source code and generated executables. The executable from the example below using *four different* container types is only ***19 Kb in size*** compiled with gcc -O3 -s on Linux.
-- **Dual mode compilation** - By default it is a simple header-only library with inline and static methods only, but you can easily switch to create a traditional library with shared symbols, without changing existing source files. See the Installation section.
+- **Dual mode compilation** - By default it is a simple header-only library with inline and static methods only, but you can easily switch to create a traditional library with shared symbols, without changing existing source files. See the [installation section](#installation).
 - **No callback functions** - All passed template argument functions/macros are directly called from the implementation, no slow callbacks which requires storage.
 - **Compiles with C++ and C99** - C code can be compiled with C++ (container element types must be POD).
 - **Forward declaration** - Templated containers may be [forward declared](#forward-declarations) without including the full API/implementation.
@@ -333,49 +333,29 @@ After erasing the elements found:
 ---
 ## Installation
 
-*NEEDS REWRITE!*
-Because it is headers-only, headers can simply be included in your program. By default, functions are static
-(some inlined). You may add the *include* folder to the **CPATH** environment variable to
-let GCC, Clang, and TinyC locate the headers.
+STC is primarily a "headers-only" library, so most headers can simply be included in your program. By default,
+all "templated" functions are static (many inlined). If you add the STC *include* folder to the **CPATH**
+environment variable, GCC, Clang, and TinyC will locate the headers automatically.
 
-If containers are used across several translation units with common instantiated container types, it is 
-recommended to build as a "library" with external linking to minimize executable size. To enable this,
-specify `-DSTC_HEADER` as compiler option in your build environment. Next, place all the instantiations
-of the containers used inside a single C-source file as in the example below, and `#define STC_IMPLEMENT` at top. 
-You may also cherry-pick shared linking mode on individual containers by `#define i_header` and
-`#define i_implement`, or force static symbols by `#define i_static` before container includes.
-
-As a special case, there may be non-templated functions in templated containers that should be implemented only
-once and if needed. Currently, define `i_import` before including **cregex** or **utf8** to implement them.
-
-It is possible to generate single headers by executing the python script `src/singleheader.py header-file > single`.
-
-Conveniently, `src\libstc.c` implements non-templated functions as shared symbols for **cstr**, **csview**,
-**cbits** and **crand**. When building in shared mode (-DSTC_HEADER), you may include this file in your project,
-or define your own, e.g.:
+The templated container functions are defined with static linking by default, which is normally optimal
+for both performance and compiled binary size. However, some common container type instances, e.g. `cvec_int`
+may be used in several translation units. When they are used in more than 3-4, consider creating a separate
+header file for them [as described here](#1-include-as-a-header-file). Now it will use shared
+linking, so *one* c-file must implement the templated container, e.g.:
 ```c
-// stc_libs.c
-#define STC_IMPLEMENT // implement all the following as shared objects
 #define i_implement
-#include <stc/cstr.h>
-#include "Point.h"
-
-#define i_key int
-#define i_val int
-#define i_tag ii
-#include <stc/cmap.h>  // cmap_ii: int => int
-
-#define i_key int64_t
-#define i_tag ix
-#include <stc/cset.h>  // cset_ix
-
-#define i_key int
-#include <stc/cvec.h>  // cvec_int
-
-#define i_key Point
-#define i_tag pnt
-#include <stc/clist.h> // clist_pnt
+#include "cvec_int.h"
 ```
+The non-templated string type **cstr** uses shared linking by default, but can have static linking instead by
+`#define i_static`. Same for the string-view type **csview**, but most of its functions are static inlined, so
+linking specifications and implementation are only needed for a few lesser used functions.
+
+Conveniently, `src\libstc.c` implements all the non-templated functions with shared linking for **cstr**,
+**csview**, **cregex**, **utf8**, and **crand**.
+
+As a special case, you can `#define i_import` before including **cregex** or **cstr** to implement the dependent
+**utf8** functions (proper utf8 case conversions, etc.). Or link with src\libstc.
+
 ---
 ## Specifying template parameters
 

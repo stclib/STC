@@ -179,7 +179,7 @@ extern void cstr_lowercase(cstr* self);
 extern void cstr_uppercase(cstr* self);
 extern bool cstr_valid_utf8(const cstr* self);
 
-// other utf8 
+// utf8 functions not depending on src/utf8code.c:
 
 STC_INLINE intptr_t cstr_u8_size(const cstr* self) 
     { return utf8_size(cstr_str(self)); }
