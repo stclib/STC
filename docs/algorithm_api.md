@@ -275,12 +275,13 @@ int* ip = c_const_cast(int*, cs);  // issues a warning!
 
 ### Predefined template parameter functions
 
-**crawstr** - Non-owned `const char*` "class" element type: `#define i_keyclass crawstr`
+**ccharptr** - Non-owning `const char*` "class" element type: `#define i_keyclass ccharptr`
 ```c
-typedef     const char* crawstr;
-int         crawstr_cmp(const crawstr* x, const crawstr* y);
-bool        crawstr_eq(const crawstr* x, const crawstr* y);
-uint64_t    crawstr_hash(const crawstr* x);
+typedef     const char* ccharptr;
+int         ccharptr_cmp(const ccharptr* x, const ccharptr* y);
+uint64_t    ccharptr_hash(const ccharptr* x);
+ccharptr    ccharptr_clone(ccharptr sp);
+void        ccharptr_drop(ccharptr* x);
 ```
 Default implementations
 ```c

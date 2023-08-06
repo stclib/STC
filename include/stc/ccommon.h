@@ -124,12 +124,12 @@ typedef long long _llong;
 #define c_litstrlen(literal) (c_sizeof("" literal) - 1)
 #define c_arraylen(a) (intptr_t)(sizeof(a)/sizeof 0[a])
 
-// Non-owning c-string
-typedef const char* crawstr;
-#define crawstr_clone(s) (s)
-#define crawstr_drop(p) ((void)p)
-#define crawstr_cmp(xp, yp) strcmp(*(xp), *(yp))
-#define crawstr_hash(p) cstrhash(*(p))
+// Non-owning c-string "class"
+typedef const char* ccharptr;
+#define ccharptr_cmp(xp, yp) strcmp(*(xp), *(yp))
+#define ccharptr_hash(p) cstrhash(*(p))
+#define ccharptr_clone(s) (s)
+#define ccharptr_drop(p) ((void)p)
 
 #define c_sv(...) c_MACRO_OVERLOAD(c_sv, __VA_ARGS__)
 #define c_sv_1(lit) c_sv_2(lit, c_litstrlen(lit))
