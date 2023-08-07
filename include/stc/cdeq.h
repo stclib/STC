@@ -158,12 +158,14 @@ _cx_MEMB(_insert_uninit)(_cx_Self* self, const intptr_t idx, const intptr_t n) {
     if (len + n > self->capmask)
         if (!_cx_MEMB(_reserve)(self, len*5/4 + n))
             return it;
-    for (intptr_t i = len - 1, j = i + n; i >= idx; --i, --j)
-        *_cx_MEMB(_at_mut)(self, j) = *_cx_MEMB(_at)(self, i);
-
-    self->end = (self->end + n) & self->capmask;
     it.pos = _cdeq_topos(self, idx);
     it.ref = self->data + it.pos;
+    self->end = (self->end + n) & self->capmask;
+
+    if (it.pos < self->end) // common case because of reserve policy
+        c_memmove(it.ref + n, it.ref, (len - idx)*c_sizeof *it.ref);
+    else for (intptr_t i = len - 1, j = i + n; i >= idx; --i, --j)
+        *_cx_MEMB(_at_mut)(self, j) = *_cx_MEMB(_at)(self, i);
     return it;
 }
 
