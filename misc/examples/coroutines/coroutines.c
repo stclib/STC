@@ -34,7 +34,7 @@ int prime(struct prime* g) {
                 cco_yield();
             }
         }
-        cco_cleanup:
+        cco_final:
         printf("final prm\n");
     }
     return 0;
@@ -68,7 +68,7 @@ int fibonacci(struct fibonacci* g) {
             }
             cco_yield();
         }
-        cco_cleanup:
+        cco_final:
         printf("final fib\n");
     }
     return 0;
@@ -92,7 +92,7 @@ int combined(struct combined* g) {
         cco_reset(&g->prm);
         cco_await_call(prime(&g->prm));
 
-        cco_cleanup:
+        cco_final:
         puts("final combined");
     }
     return 0;

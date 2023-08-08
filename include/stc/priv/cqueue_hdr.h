@@ -96,8 +96,8 @@ STC_INLINE void _cx_MEMB(_copy)(_cx_Self* self, const _cx_Self* other) {
 
 STC_INLINE _cx_iter _cx_MEMB(_begin)(const _cx_Self* self) {
     return c_LITERAL(_cx_iter){
-        _cx_MEMB(_empty)(self) ? NULL : self->data + self->start,
-        self->start, self
+        .ref=_cx_MEMB(_empty)(self) ? NULL : self->data + self->start,
+        .pos=self->start, ._s=self
     };
 }
 

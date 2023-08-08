@@ -306,7 +306,7 @@ STC_INLINE void _cx_MEMB(_wipe_)(_cx_Self* self) {
     if (self->size == 0)
         return;
     _cx_value* d = self->data, *_end = d + self->bucket_count;
-    chash_slot* s = self->slot;
+    struct chash_slot* s = self->slot;
     for (; d != _end; ++d)
         if ((s++)->hashx)
             _cx_MEMB(_value_drop)(d);
@@ -321,7 +321,7 @@ STC_DEF void _cx_MEMB(_drop)(_cx_Self* self) {
 STC_DEF void _cx_MEMB(_clear)(_cx_Self* self) {
     _cx_MEMB(_wipe_)(self);
     self->size = 0;
-    c_memset(self->slot, 0, c_sizeof(chash_slot)*self->bucket_count);
+    c_memset(self->slot, 0, c_sizeof(struct chash_slot)*self->bucket_count);
 }
 
 #ifdef _i_ismap
@@ -359,7 +359,7 @@ _cx_MEMB(_bucket_)(const _cx_Self* self, const _cx_keyraw* rkeyptr) {
     intptr_t _cap = self->bucket_count;
     intptr_t _idx = fastrange_2(_hash, _cap);
     _cx_result b = {NULL, true, (uint8_t)(_hash | 0x80)};
-    const chash_slot* s = self->slot;
+    const struct chash_slot* s = self->slot;
     while (s[_idx].hashx) {
         if (s[_idx].hashx == b.hashx) {
             const _cx_keyraw _raw = i_keyto(_i_keyref(self->data + _idx));
@@ -394,8 +394,8 @@ _cx_MEMB(_clone)(_cx_Self m) {
     if (m.data) {
         _cx_value *d = (_cx_value *)i_malloc(c_sizeof(_cx_value)*m.bucket_count),
                   *_dst = d, *_end = m.data + m.bucket_count;
-        const intptr_t _mem = c_sizeof(chash_slot)*(m.bucket_count + 1);
-        chash_slot *s = (chash_slot *)c_memcpy(i_malloc(_mem), m.slot, _mem);
+        const intptr_t _mem = c_sizeof(struct chash_slot)*(m.bucket_count + 1);
+        struct chash_slot *s = (struct chash_slot *)c_memcpy(i_malloc(_mem), m.slot, _mem);
         if (!(d && s)) 
             { i_free(d), i_free(s), d = 0, s = 0, m.bucket_count = 0; }
         else
@@ -417,14 +417,14 @@ _cx_MEMB(_reserve)(_cx_Self* self, const intptr_t _newcap) {
     _newbucks = cnextpow2(_newbucks);
     _cx_Self m = {
         (_cx_value *)i_malloc(_newbucks*c_sizeof(_cx_value)),
-        (chash_slot *)i_calloc(_newbucks + 1, sizeof(chash_slot)),
+        (struct chash_slot *)i_calloc(_newbucks + 1, sizeof(struct chash_slot)),
         self->size, _newbucks
     };
     bool ok = m.data && m.slot;
     if (ok) {  // Rehash:
         m.slot[_newbucks].hashx = 0xff;
         const _cx_value* d = self->data;
-        const chash_slot* s = self->slot;
+        const struct chash_slot* s = self->slot;
         for (intptr_t i = 0; i < _oldbucks; ++i, ++d) if ((s++)->hashx) {
             _cx_keyraw r = i_keyto(_i_keyref(d));
             _cx_result b = _cx_MEMB(_bucket_)(&m, &r);
@@ -441,7 +441,7 @@ _cx_MEMB(_reserve)(_cx_Self* self, const intptr_t _newcap) {
 STC_DEF void
 _cx_MEMB(_erase_entry)(_cx_Self* self, _cx_value* _val) {
     _cx_value* d = self->data;
-    chash_slot* s = self->slot;
+    struct chash_slot* s = self->slot;
     intptr_t i = _val - d, j = i, k;
     const intptr_t _cap = self->bucket_count;
     _cx_MEMB(_value_drop)(_val);

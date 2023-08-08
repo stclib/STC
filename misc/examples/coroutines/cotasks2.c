@@ -53,7 +53,7 @@ int produce_items(struct produce_items* p, cco_runtime* rt)
             cco_yield();
         }
 
-        cco_cleanup:
+        cco_final:
         cstr_drop(&p->str);
         puts("done produce");
     }
@@ -80,7 +80,7 @@ int consume_items(struct consume_items* c, cco_runtime* rt)
             printf("consumed %s\n", cstr_str(&c->produce.str));
         }
 
-        cco_cleanup:
+        cco_final:
         cco_stop(&c->produce);
         cco_resume_task(&c->produce, rt);
         puts("done consume");
