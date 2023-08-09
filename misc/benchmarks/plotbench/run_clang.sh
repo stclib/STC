@@ -1,10 +1,10 @@
 exe=''
 if [ "$OS" = "Windows_NT" ] ; then exe=".exe" ; fi
-clang++ -DNDEBUG -I../../include -O3 -o cdeq_benchmark$exe   cdeq_benchmark.cpp
-clang++ -DNDEBUG -I../../include -O3 -o clist_benchmark$exe  clist_benchmark.cpp
-clang++ -DNDEBUG -I../../include -O3 -o cmap_benchmark$exe   cmap_benchmark.cpp
-clang++ -DNDEBUG -I../../include -O3 -o csmap_benchmark$exe  csmap_benchmark.cpp
-clang++ -DNDEBUG -I../../include -O3 -o cvec_benchmark$exe   cvec_benchmark.cpp
+clang -DNDEBUG -I../../include -O3 -o cdeq_benchmark$exe   cdeq_benchmark.cpp -lstdc++
+clang -DNDEBUG -I../../include -O3 -o clist_benchmark$exe  clist_benchmark.cpp -lstdc++
+clang -DNDEBUG -I../../include -O3 -o cmap_benchmark$exe   cmap_benchmark.cpp -lstdc++
+clang -DNDEBUG -I../../include -O3 -o csmap_benchmark$exe  csmap_benchmark.cpp -lstdc++
+clang -DNDEBUG -I../../include -O3 -o cvec_benchmark$exe   cvec_benchmark.cpp -lstdc++
 
 c='Win-Clang-16.0.5'
 ./cdeq_benchmark$exe $c
