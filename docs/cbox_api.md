@@ -19,7 +19,7 @@ See similar c++ class [std::unique_ptr](https://en.cppreference.com/w/cpp/memory
 #define i_cmp <f>       // three-way compareison. REQUIRED IF i_key is a non-integral type
                         // Note that containers of carcs will "inherit" i_cmp
                         // when using carc in containers with i_valboxed MyArc - ie. the i_type.
-#define i_cmp_native    // define instead of i_cmp only when i_key is an integral/native-type.
+#define i_use_cmp       // define instead of i_cmp only when i_key is an integral/native-type.
 #define i_keydrop <f>   // destroy element func - defaults to empty destruct
 #define i_keyclone <f>  // REQUIRED if i_keydrop is defined, unless 'i_opt c_no_clone' is defined.
 

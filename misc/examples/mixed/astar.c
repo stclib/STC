@@ -61,7 +61,6 @@ point_key_cmp(const point* a, const point* b)
 #include <stc/cpque.h>
 
 #define i_key point
-#define i_opt c_no_cmp
 #include <stc/cdeq.h>
 
 #define i_key point

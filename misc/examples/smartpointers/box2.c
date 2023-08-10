@@ -22,7 +22,6 @@ typedef struct {
 // Box in box:
 #define i_type BoxBoxPoint
 #define i_keyboxed cbox_Point // NB: use i_keyboxed when value is a cbox or carc!
-#define i_no_cmp
 #include <stc/cbox.h> // BoxBoxPoint
 
 Point origin(void) {

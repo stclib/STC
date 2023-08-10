@@ -23,7 +23,7 @@ void Song_drop(Song* s) {
 // Define the shared pointer:
 #define i_type SongArc
 #define i_keyclass Song
-#define i_no_hash          // no hash fn for Song, fallback hash pointer to Song.
+#define i_opt c_use_cmp|c_no_hash
 #include <stc/carc.h>
 
 // ... and a vector of them

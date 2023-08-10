@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 #define i_key int
-#define i_cmp_native
+#define i_use_cmp
 #include <stc/cvec.h>
 
 #define i_key int

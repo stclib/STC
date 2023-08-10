@@ -67,7 +67,7 @@
 #undef i_realloc
 #undef i_free
 
-#undef i_cmp_native
+#undef i_use_cmp
 #undef i_no_cmp
 #undef i_no_hash
 #undef i_no_clone
