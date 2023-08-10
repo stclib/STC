@@ -14,7 +14,6 @@
 
 #define i_type StackList
 #define i_keyclass FloatStack  // "class" picks up _clone, _drop, _cmp
-#define i_opt c_no_cmp         // exclude FloatStack_cmp(): not defined
 #include <stc/clist.h>
 
 #define i_type ListMap

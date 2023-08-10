@@ -41,6 +41,7 @@ void OlympicLoc_drop(OlympicLoc* self);
 
 // Create a clist<OlympicLoc>, can be sorted by year.
 #define i_keyclass OlympicLoc // binds _cmp, _clone and _drop.
+#define i_use_cmp
 #define i_tag OL
 #include <stc/clist.h>
 

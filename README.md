@@ -251,7 +251,7 @@ struct Point { float x, y; };
 #include <stc/cvec.h>   // cvec_pnt: vector of struct Point
 
 #define i_key int
-#define i_cmp_native    // enable sort/search. Use native `<` and `==` operators
+#define i_use_cmp       // enable sort/search. Use native `<` and `==` operators
 #include <stc/clist.h>  // clist_int: singly linked list
 
 #define i_key int
@@ -658,7 +658,7 @@ STC is generally very memory efficient. Memory usage for the different container
     - Removed deprecated <stc/crandom.h>. Use `<stc/crand.h>` with the new API.
         - Reverted names _unif and _norm back to `_uniform` and `_normal`.
     - Removed default comparison for **clist**, **cvec** and **cdeq**:
-        - Define `i_cmp_native` to enable comparison for built-in i_key types (<, ==).
+        - Define `i_use_cmp` to enable comparison for built-in i_key types (<, ==).
         - Use of `i_keyclass` still expects comparison functions to be defined. 
         - Use of `i_keyboxed` compares stored pointers instead of pointed to values if comparison not defined.
     - Renamed input enum flags for ***cregex***-functions.

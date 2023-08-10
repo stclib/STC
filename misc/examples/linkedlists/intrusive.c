@@ -4,7 +4,7 @@
 
 #define i_type List
 #define i_key int
-#define i_cmp_native
+#define i_use_cmp
 #include <stc/clist.h>
 
 void printList(List list) {

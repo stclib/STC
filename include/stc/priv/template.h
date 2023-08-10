@@ -102,8 +102,8 @@
 #if c_option(c_no_emplace)
   #define i_no_emplace
 #endif
-#if c_option(c_native_cmp)
-  #define i_cmp_native
+#if c_option(c_use_cmp) || defined _i_ismap || defined _i_isset || defined _i_ispque
+  #define i_use_cmp
 #endif
 #if c_option(c_no_clone) || defined _i_carc
   #define i_no_clone
@@ -127,7 +127,7 @@
 #elif defined i_keyboxed
   #define i_keyclass i_keyboxed
   #define i_rawclass c_PASTE(i_keyboxed, _raw)
-  #ifndef i_no_cmp
+  #if !defined i_no_cmp && defined i_use_cmp
     #define i_eq c_PASTE(i_keyboxed, _raw_eq)
   #endif
 #endif
@@ -138,7 +138,7 @@
   #define i_rawclass i_key
 #endif
 
-#ifdef i_keyclass
+#if defined i_keyclass
   #define i_key i_keyclass
   #ifndef i_keyclone
     #define i_keyclone c_PASTE(i_key, _clone)
@@ -154,8 +154,8 @@
   #endif
 #endif
 
-#ifdef i_rawclass
-  #if !(defined i_cmp || defined i_no_cmp)
+#if defined i_rawclass && defined i_use_cmp
+  #if !(defined i_cmp || defined i_less || defined i_no_cmp)
     #define i_cmp c_PASTE(i_keyraw, _cmp)
   #endif
   #if !(defined i_hash || defined i_no_hash || defined i_no_cmp)
@@ -171,13 +171,16 @@
   #endif
 #endif
 
-#ifndef i_no_cmp
-  #if defined i_cmp || defined i_less || defined i_cmp_native
+#if !defined i_no_cmp
+  #if defined i_cmp || defined i_less || defined i_use_cmp
     #define _i_has_cmp
   #endif
-  #if defined i_eq || defined i_cmp_native
+  #if defined i_eq || defined i_use_cmp
     #define _i_has_eq
   #endif
+#endif
+#if !(defined i_hash || defined i_no_hash || defined i_no_cmp)
+  #define i_hash c_default_hash
 #endif
 
 #if !defined i_key
@@ -185,12 +188,12 @@
 #elif defined i_keyraw ^ defined i_keyto
   #error "Both i_keyraw/i_valraw and i_keyto/i_valto must be defined, if any"
 #elif !defined i_no_clone && (defined i_keyclone ^ defined i_keydrop)
-  #error "Both i_keyclone/i_valclone and i_keydrop/i_valdrop must be defined, if any"
+  #error "Both i_keyclone/i_valclone and i_keydrop/i_valdrop must be defined, if any (unless i_no_clone defined)."
 #elif defined i_from || defined i_drop
   #error "i_from / i_drop not supported. Define i_keyfrom/i_valfrom and/or i_keydrop/i_valdrop instead"
 #elif defined i_keyraw && defined _i_ishash && !(defined i_hash && (defined _i_has_cmp || defined i_eq))
   #error "For cmap/cset, both i_hash and i_eq (or i_less or i_cmp) must be defined when i_keyraw is defined."
-#elif defined i_keyraw && (defined _i_ismap || defined _i_isset || defined _i_ispque) && !defined _i_has_cmp
+#elif defined i_keyraw && defined i_use_cmp && !defined _i_has_cmp
   #error "For csmap/csset/cpque, i_cmp or i_less must be defined when i_keyraw is defined."
 #endif
 
@@ -232,10 +235,6 @@
   #ifndef i_cmp
     #define i_cmp(x, y) (i_less(y, x)) - (i_less(x, y))
   #endif
-#endif
-
-#if !defined i_hash && (!(defined _i_cbox || defined _i_carc) || defined i_cmp_native)
-  #define i_hash c_default_hash
 #endif
 
 #if defined _i_ismap // ---- process cmap/csmap value i_val, ... ----

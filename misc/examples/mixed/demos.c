@@ -53,6 +53,7 @@ void vectordemo1(void)
 }
 
 #define i_key_str
+#define i_use_cmp
 #include <stc/cvec.h>
 
 void vectordemo2(void)
@@ -74,7 +75,7 @@ void vectordemo2(void)
 
 #define i_key int
 #define i_tag ix
-#define i_cmp_native
+#define i_use_cmp
 #include <stc/clist.h>
 
 void listdemo1(void)

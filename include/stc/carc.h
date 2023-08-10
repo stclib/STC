@@ -176,50 +176,40 @@ STC_INLINE void _cx_MEMB(_assign)(_cx_Self* self, _cx_Self ptr) {
     *self = ptr;
 }
 
-#if defined _i_has_cmp
+#if defined i_use_cmp
     STC_INLINE int _cx_MEMB(_raw_cmp)(const _cx_raw* rx, const _cx_raw* ry)
         { return i_cmp(rx, ry); }
 
-    STC_INLINE int _cx_MEMB(_cmp)(const _cx_Self* self, const _cx_Self* other) {
-        _cx_raw rx = i_keyto(self->get), ry = i_keyto(other->get);
-        return i_cmp((&rx), (&ry));
-    }
-#else
-    STC_INLINE int _cx_MEMB(_raw_cmp)(const _cx_raw* rx, const _cx_raw* ry)
-        { return c_default_cmp(&rx, &ry); }
-
-    STC_INLINE int _cx_MEMB(_cmp)(const _cx_Self* self, const _cx_Self* other) {
-        return c_default_cmp(&self->get, &other->get);
-    }
-#endif
-#if defined _i_has_eq || defined _i_has_cmp
     STC_INLINE bool _cx_MEMB(_raw_eq)(const _cx_raw* rx, const _cx_raw* ry)
         { return i_eq(rx, ry); }
-
-    STC_INLINE bool _cx_MEMB(_eq)(const _cx_Self* self, const _cx_Self* other) {
-        _cx_raw rx = i_keyto(self->get), ry = i_keyto(other->get);
-        return i_eq((&rx), (&ry));
-    }
-#else
-    STC_INLINE bool _cx_MEMB(_raw_eq)(const _cx_raw* rx, const _cx_raw* ry)
-        { return rx == ry; }
-
-    STC_INLINE bool _cx_MEMB(_eq)(const _cx_Self* self, const _cx_Self* other) {
-        return self->get == other->get;
-    }
-#endif
-#if defined i_hash
+    #ifndef i_no_hash
     STC_INLINE uint64_t _cx_MEMB(_raw_hash)(const _cx_raw* rx)
         { return i_hash(rx); }
+    #endif // i_no_hash
 
-    STC_INLINE uint64_t _cx_MEMB(_hash)(const _cx_Self* self)
-        { _cx_raw rx = i_keyto(self->get); return i_hash(&rx); }
-#else
-    STC_INLINE uint64_t _cx_MEMB(_raw_hash)(const _cx_raw* rx)
-        { return c_default_hash(&rx); }
-
-    STC_INLINE uint64_t _cx_MEMB(_hash)(const _cx_Self* self)
-        { return c_default_hash(&self->get); }
+    #if defined i_ptr_cmp
+        STC_INLINE int _cx_MEMB(_cmp)(const _cx_Self* self, const _cx_Self* other) {
+            return c_default_cmp(&self->get, &other->get);
+        }
+        STC_INLINE bool _cx_MEMB(_eq)(const _cx_Self* self, const _cx_Self* other) {
+            return self->get == other->get;
+        }
+        STC_INLINE uint64_t _cx_MEMB(_hash)(const _cx_Self* self)
+            { return c_default_hash(&self->get); }
+    #else
+        STC_INLINE int _cx_MEMB(_cmp)(const _cx_Self* self, const _cx_Self* other) {
+            _cx_raw rx = i_keyto(self->get), ry = i_keyto(other->get);
+            return i_cmp((&rx), (&ry));
+        }
+        STC_INLINE bool _cx_MEMB(_eq)(const _cx_Self* self, const _cx_Self* other) {
+            _cx_raw rx = i_keyto(self->get), ry = i_keyto(other->get);
+            return i_eq((&rx), (&ry));
+        }
+        #ifndef i_no_hash
+        STC_INLINE uint64_t _cx_MEMB(_hash)(const _cx_Self* self)
+            { _cx_raw rx = i_keyto(self->get); return i_hash(&rx); }
+        #endif // i_no_hash
+    #endif // i_ptr_cmp
 #endif
 
 #undef _i_atomic_inc
