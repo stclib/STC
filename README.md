@@ -194,8 +194,13 @@ int main(void)
     Floats_drop(&nums);
 }
 ```
-For user-defined struct elements, `i_cmp` compare function should be defined because the default `<` and `==`
-only works for integral types. *Alternatively, `#define i_opt c_no_cmp` to disable sorting and searching*. Similarily, if an element destructor `i_keydrop` is defined, `i_keyclone` function is required.
+Comparison/lookup functions are enabled by default for associative containers and priority queue (cmap, cset, csmap, csset, cpque). To enable it for the remaining containers, define `i_cmp` or `i_less` (and optionally `i_eq`) on the element type. If the element is an integral type, simply define `i_use_cmp` to use `<` and `==` operators for comparisons.
+
+Note that for `#define i_keyclass Type`, defining `i_use_cmp` means that *Type_cmp()* function is expected to exist (along with *Type_clone()* and *Type_drop()*).
+
+To summarize, `i_use_cmp` is only needed to enable comparison (sort/search) functions when defining cstack, cvec, cqueue, cdeq, carc, cbox. With built-in types, it enables the comparison operators, whereas for keyclass types, it binds comparison to its Type_cmp() function.
+
+If an element destructor `i_keydrop` is defined, `i_keyclone` function is required.
 *Alternatively `#define i_opt c_no_clone` to disable container cloning.*
 
 Let's make a vector of vectors, which can be cloned. All of its element vectors will be destroyed when destroying the Vec2D.

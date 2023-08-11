@@ -180,37 +180,38 @@ STC_INLINE void _cx_MEMB(_assign)(_cx_Self* self, _cx_Self ptr) {
     STC_INLINE int _cx_MEMB(_raw_cmp)(const _cx_raw* rx, const _cx_raw* ry)
         { return i_cmp(rx, ry); }
 
+    STC_INLINE int _cx_MEMB(_cmp)(const _cx_Self* self, const _cx_Self* other) {
+        _cx_raw rx = i_keyto(self->get), ry = i_keyto(other->get);
+        return i_cmp((&rx), (&ry));
+    }
+
     STC_INLINE bool _cx_MEMB(_raw_eq)(const _cx_raw* rx, const _cx_raw* ry)
         { return i_eq(rx, ry); }
+
+    STC_INLINE bool _cx_MEMB(_eq)(const _cx_Self* self, const _cx_Self* other) {
+        _cx_raw rx = i_keyto(self->get), ry = i_keyto(other->get);
+        return i_eq((&rx), (&ry));
+    }
+
     #ifndef i_no_hash
     STC_INLINE uint64_t _cx_MEMB(_raw_hash)(const _cx_raw* rx)
         { return i_hash(rx); }
+
+    STC_INLINE uint64_t _cx_MEMB(_hash)(const _cx_Self* self)
+        { _cx_raw rx = i_keyto(self->get); return i_hash(&rx); }
     #endif // i_no_hash
 
-    #if defined i_ptr_cmp
-        STC_INLINE int _cx_MEMB(_cmp)(const _cx_Self* self, const _cx_Self* other) {
-            return c_default_cmp(&self->get, &other->get);
-        }
-        STC_INLINE bool _cx_MEMB(_eq)(const _cx_Self* self, const _cx_Self* other) {
-            return self->get == other->get;
-        }
-        STC_INLINE uint64_t _cx_MEMB(_hash)(const _cx_Self* self)
-            { return c_default_hash(&self->get); }
-    #else
-        STC_INLINE int _cx_MEMB(_cmp)(const _cx_Self* self, const _cx_Self* other) {
-            _cx_raw rx = i_keyto(self->get), ry = i_keyto(other->get);
-            return i_cmp((&rx), (&ry));
-        }
-        STC_INLINE bool _cx_MEMB(_eq)(const _cx_Self* self, const _cx_Self* other) {
-            _cx_raw rx = i_keyto(self->get), ry = i_keyto(other->get);
-            return i_eq((&rx), (&ry));
-        }
-        #ifndef i_no_hash
-        STC_INLINE uint64_t _cx_MEMB(_hash)(const _cx_Self* self)
-            { _cx_raw rx = i_keyto(self->get); return i_hash(&rx); }
-        #endif // i_no_hash
-    #endif // i_ptr_cmp
-#endif
+#else
+
+    STC_INLINE int _cx_MEMB(_cmp)(const _cx_Self* self, const _cx_Self* other) {
+        return c_default_cmp(&self->get, &other->get);
+    }
+    STC_INLINE bool _cx_MEMB(_eq)(const _cx_Self* self, const _cx_Self* other) {
+        return self->get == other->get;
+    }
+    STC_INLINE uint64_t _cx_MEMB(_hash)(const _cx_Self* self)
+        { return c_default_hash(&self->get); }
+#endif // i_use_cmp
 
 #undef _i_atomic_inc
 #undef _i_atomic_dec_and_test

@@ -93,9 +93,6 @@
 #if c_option(c_is_forward)
   #define i_is_forward
 #endif
-#if c_option(c_no_cmp)
-  #define i_no_cmp
-#endif
 #if c_option(c_no_hash)
   #define i_no_hash
 #endif
@@ -127,7 +124,7 @@
 #elif defined i_keyboxed
   #define i_keyclass i_keyboxed
   #define i_rawclass c_PASTE(i_keyboxed, _raw)
-  #if !defined i_no_cmp && defined i_use_cmp
+  #if defined i_use_cmp
     #define i_eq c_PASTE(i_keyboxed, _raw_eq)
   #endif
 #endif
@@ -152,34 +149,27 @@
   #ifndef i_keydrop
     #define i_keydrop c_PASTE(i_key, _drop)
   #endif
+  #if !defined i_keyraw && (defined i_cmp || defined i_less || defined i_eq || defined i_hash)
+    #define i_use_cmp
+  #endif
 #endif
 
 #if defined i_rawclass && defined i_use_cmp
-  #if !(defined i_cmp || defined i_less || defined i_no_cmp)
+  #if !(defined i_cmp || defined i_less)
     #define i_cmp c_PASTE(i_keyraw, _cmp)
   #endif
-  #if !(defined i_hash || defined i_no_hash || defined i_no_cmp)
+  #if !(defined i_hash || defined i_no_hash)
     #define i_hash c_PASTE(i_keyraw, _hash)
   #endif
 #endif
 
-#if !defined i_keyraw && !defined i_no_clone
-  #if !defined i_keyfrom && defined i_keyclone
-    #define i_keyfrom i_keyclone
-  #elif !defined i_keyclone && defined i_keyfrom
-    #define i_keyclone i_keyfrom
-  #endif
+#if defined i_cmp || defined i_less || defined i_use_cmp
+  #define _i_has_cmp
 #endif
-
-#if !defined i_no_cmp
-  #if defined i_cmp || defined i_less || defined i_use_cmp
-    #define _i_has_cmp
-  #endif
-  #if defined i_eq || defined i_use_cmp
-    #define _i_has_eq
-  #endif
+#if defined i_eq || defined i_use_cmp
+  #define _i_has_eq
 #endif
-#if !(defined i_hash || defined i_no_hash || defined i_no_cmp)
+#if !(defined i_hash || defined i_no_hash)
   #define i_hash c_default_hash
 #endif
 
@@ -218,23 +208,21 @@
   #define i_keydrop c_default_drop
 #endif
 
-#ifndef i_no_cmp
-  // i_eq, i_less, i_cmp
-  #if !defined i_eq && (defined i_cmp || defined i_less)
-    #define i_eq(x, y) !(i_cmp(x, y))
-  #elif !defined i_eq
-    #define i_eq(x, y) *x == *y
-  #endif
-  #if defined i_cmp && defined i_less
-    #error "Only one of i_cmp and i_less may be defined"
-  #elif defined i_cmp
-    #define i_less(x, y) (i_cmp(x, y)) < 0
-  #elif !defined i_less
-    #define i_less(x, y) *x < *y
-  #endif
-  #ifndef i_cmp
-    #define i_cmp(x, y) (i_less(y, x)) - (i_less(x, y))
-  #endif
+// i_eq, i_less, i_cmp
+#if !defined i_eq && (defined i_cmp || defined i_less)
+  #define i_eq(x, y) !(i_cmp(x, y))
+#elif !defined i_eq
+  #define i_eq(x, y) *x == *y
+#endif
+#if defined i_cmp && defined i_less
+  #error "Only one of i_cmp and i_less may be defined"
+#elif defined i_cmp
+  #define i_less(x, y) (i_cmp(x, y)) < 0
+#elif !defined i_less
+  #define i_less(x, y) *x < *y
+#endif
+#ifndef i_cmp
+  #define i_cmp(x, y) (i_less(y, x)) - (i_less(x, y))
 #endif
 
 #if defined _i_ismap // ---- process cmap/csmap value i_val, ... ----

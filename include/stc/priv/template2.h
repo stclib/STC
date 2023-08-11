@@ -68,7 +68,6 @@
 #undef i_free
 
 #undef i_use_cmp
-#undef i_no_cmp
 #undef i_no_hash
 #undef i_no_clone
 #undef i_no_emplace
