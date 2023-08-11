@@ -131,16 +131,19 @@ typedef enum {
     (void)((co)->cco_state = 0)
 
 /*
- * Generators
+ * Iterator (for generators)
+ * User define: Gen must be an existing typedef struct:
+ *     Gen_iter Gen_begin(Gen* g);      // function
+ *     int      Gen_next(Gen_iter* it); // coroutine
  */
 
-#define cco_iter_struct(Name, ...) \
-    typedef Name Name##_value; \
-    typedef struct { \
-        Name##_value* ref; \
+#define cco_iter_struct(Gen, ...) \
+    typedef Gen Gen##_value; \
+    typedef struct Gen##_iter { \
+        Gen##_value* ref; \
         int cco_state; \
         __VA_ARGS__ \
-    } Name##_iter
+    } Gen##_iter
 
 /*
  * Tasks
@@ -148,9 +151,9 @@ typedef enum {
 
 struct cco_runtime;
 
-#define cco_task_struct(Name, ...) \
-    struct Name { \
-        int (*cco_func)(struct Name*, struct cco_runtime*); \
+#define cco_task_struct(Task, ...) \
+    struct Task { \
+        int (*cco_func)(struct Task*, struct cco_runtime*); \
         int cco_state, cco_expect; \
         __VA_ARGS__ \
     }

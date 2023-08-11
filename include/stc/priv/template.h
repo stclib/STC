@@ -140,14 +140,14 @@
   #ifndef i_keyclone
     #define i_keyclone c_PASTE(i_key, _clone)
   #endif
-  #if !defined i_keyto && defined i_keyraw
-    #define i_keyto c_PASTE(i_key, _toraw)
+  #ifndef i_keydrop
+    #define i_keydrop c_PASTE(i_key, _drop)
   #endif
   #if !defined i_keyfrom && defined i_keyraw
     #define i_keyfrom c_PASTE(i_key, _from)
   #endif
-  #ifndef i_keydrop
-    #define i_keydrop c_PASTE(i_key, _drop)
+  #if !defined i_keyto && defined i_keyraw
+    #define i_keyto c_PASTE(i_key, _toraw)
   #endif
   #if !defined i_keyraw && (defined i_cmp || defined i_less || defined i_eq || defined i_hash)
     #define i_use_cmp
@@ -245,22 +245,14 @@
   #ifndef i_valclone
     #define i_valclone c_PASTE(i_val, _clone)
   #endif
-  #if !defined i_valto && defined i_valraw
-    #define i_valto c_PASTE(i_val, _toraw)
+  #ifndef i_valdrop
+    #define i_valdrop c_PASTE(i_val, _drop)
   #endif
   #if !defined i_valfrom && defined i_valraw
     #define i_valfrom c_PASTE(i_val, _from)
   #endif
-  #ifndef i_valdrop
-    #define i_valdrop c_PASTE(i_val, _drop)
-  #endif
-#endif
-
-#if !defined i_valraw && !defined i_no_clone
-  #if !defined i_valfrom && defined i_valclone
-    #define i_valfrom i_valclone
-  #elif !defined i_valclone && defined i_valfrom
-    #define i_valclone i_valfrom
+  #if !defined i_valto && defined i_valraw
+    #define i_valto c_PASTE(i_val, _toraw)
   #endif
 #endif
 
