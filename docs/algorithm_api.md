@@ -128,7 +128,7 @@ Iterate a container or a crange with chained `&&` filtering.
 | `c_flt_counter(it)`               | Increment current and return count         |
 | `c_flt_getcount(it)`              | Number of items passed skip*/take*/counter |
 
-[ [Run this example](https://godbolt.org/z/n9aYrYPv8) ]
+[ [Run this example](https://godbolt.org/z/exqYEK6qa) ]
 ```c
 #include <stc/algorithm.h>
 #include <stdio.h>
