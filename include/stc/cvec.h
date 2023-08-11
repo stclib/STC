@@ -82,7 +82,6 @@ STC_API void            _cx_MEMB(_drop)(_cx_Self* self);
 STC_API void            _cx_MEMB(_clear)(_cx_Self* self);
 STC_API bool            _cx_MEMB(_reserve)(_cx_Self* self, intptr_t cap);
 STC_API bool            _cx_MEMB(_resize)(_cx_Self* self, intptr_t size, i_key null);
-STC_API _cx_value*      _cx_MEMB(_push)(_cx_Self* self, i_key value);
 STC_API _cx_iter        _cx_MEMB(_erase_n)(_cx_Self* self, intptr_t idx, intptr_t n);
 STC_API _cx_iter        _cx_MEMB(_insert_uninit)(_cx_Self* self, intptr_t idx, intptr_t n);
 #if defined _i_has_eq || defined _i_has_cmp
@@ -93,6 +92,15 @@ STC_API int             _cx_MEMB(_value_cmp)(const _cx_value* x, const _cx_value
 STC_API _cx_iter        _cx_MEMB(_binary_search_in)(_cx_iter it1, _cx_iter it2, _cx_raw raw, _cx_iter* lower_bound);
 #endif
 STC_INLINE void         _cx_MEMB(_value_drop)(_cx_value* val) { i_keydrop(val); }
+
+STC_INLINE _cx_value*   _cx_MEMB(_push)(_cx_Self* self, i_key value) {
+    if (self->_len == self->_cap)
+        if (!_cx_MEMB(_reserve)(self, self->_len*3/2 + 4))
+            return NULL;
+    _cx_value *v = self->data + self->_len++;
+    *v = value;
+    return v;
+}
 
 #if !defined i_no_emplace
 STC_API _cx_iter
@@ -311,16 +319,6 @@ _cx_MEMB(_resize)(_cx_Self* self, const intptr_t len, i_key null) {
         self->data[i] = null;
     self->_len = len;
     return true;
-}
-
-STC_DEF _cx_value*
-_cx_MEMB(_push)(_cx_Self* self, i_key value) {
-    if (self->_len == self->_cap)
-        if (!_cx_MEMB(_reserve)(self, self->_len*2 + 4))
-            return NULL;
-    _cx_value *v = self->data + self->_len++;
-    *v = value;
-    return v;
 }
 
 STC_DEF _cx_iter
