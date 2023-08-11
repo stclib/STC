@@ -116,9 +116,8 @@ typedef long long _llong;
 #define c_no_atomic             (1<<1)
 #define c_no_clone              (1<<2)
 #define c_no_emplace            (1<<3)
-#define c_no_cmp                (1<<4)
+#define c_no_hash               (1<<4)
 #define c_use_cmp               (1<<5)
-#define c_no_hash               (1<<6)
 /* Function macros and others */
 
 #define c_litstrlen(literal) (c_sizeof("" literal) - 1)

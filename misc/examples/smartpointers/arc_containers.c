@@ -12,7 +12,7 @@
 #define i_key Map
 #define i_keydrop(p) (printf("drop Arc:\n"), Map_drop(p))
 // no need for atomic ref. count in single thread:
-#define i_opt c_no_atomic|c_no_cmp
+#define i_opt c_no_atomic
 #include <stc/carc.h>
 
 #define i_type Stack

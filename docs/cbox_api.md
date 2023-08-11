@@ -34,7 +34,7 @@ See similar c++ class [std::unique_ptr](https://en.cppreference.com/w/cpp/memory
 #include <stc/cbox.h>    
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.
-Define `i_opt` with `c_no_cmp` if comparison between i_key's is not needed/available. Will then
+Unless `c_use_cmp` is defined, comparison between i_key's is not needed/available. Will then
 compare the pointer addresses when used. Additionally, `c_no_clone` or `i_is_fwd` may be defined.
 
 ## Methods

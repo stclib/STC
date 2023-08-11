@@ -215,7 +215,6 @@ Let's make a vector of vectors, which can be cloned. All of its element vectors 
 
 #define i_type Vec2D
 #define i_keyclass Vec  // Use i_keyclass instead i_key when element type has "members" _clone(), _drop() and _cmp().
-#define i_opt c_no_cmp  // Disable cmp (search/sort) for Vec2D because Vec_cmp() does not exist.
 #include <stc/cvec.h>
 
 int main(void)
@@ -370,14 +369,14 @@ The list of template parameters:
 
 - `i_key` *Type* - Element key type. **[required]**. Note: `i_val` *may* be used instead for non-maps (not recommended).
 - `i_val` *Type* - Element value type. **[required for]** cmap/csmap as the mapped value type.
-- `i_cmp` *Func* - Three-way comparison of two *i_keyraw*\* or *i_valraw*\* - **[required for]** non-integral *i_keyraw* elements unless *i_opt* is defined with *c_no_cmp*.
+- `i_cmp` *Func* - Three-way comparison of two *i_keyraw*\* or *i_valraw*\* - **[required for]** non-integral *i_keyraw* elements.
 - `i_hash` *Func* - Hash function taking *i_keyraw*\* - defaults to *c_default_hash*. **[required for]** ***cmap/cset*** with non-POD *i_keyraw* elements.
 - `i_eq` *Func* - Equality comparison of two *i_keyraw*\* - defaults to *!i_cmp*. Companion with *i_hash*.
 
 Properties:
 - `i_tag` *Name* - Container type name tag. Defaults to *i_key* name.
 - `i_type` *Name* - Full container type name. Alternative to *i_tag*.
-- `i_opt` *Flags* - Boolean properties: may combine *c_no_cmp*, *c_no_clone*, *c_no_atomic*, *c_is_forward*, *c_static*, *c_header* with the *|* separator.
+- `i_opt` *Flags* - Boolean properties: may combine *c_no_clone*, *c_no_atomic*, *c_is_forward*, *c_static*, *c_header* with the *|* separator.
 
 Key:
 - `i_keydrop` *Func* - Destroy map/set key func - defaults to empty destructor.
@@ -398,7 +397,7 @@ Specials: Meta-template parameters. Use instead of `i_key` / `i_val`.
 If `i_keyraw` is defined, it sets `i_keyto` = *Type_toraw()* and `i_keyfrom` = *Type_from()*.
 Only functions required by the container type is required to be defined. E.g.:
     - *Type_hash()* and *Type_eq()* are only required by **cmap**, **cset** and smart pointers.
-    - *Type_cmp()* is not used by **cstack** and **cmap/cset**, or if *#define i_opt c_no_cmp* is specified.
+    - *Type_cmp()* is not used by **cstack** and **cmap/cset**.
     - *Type_clone()* is not used if *#define i_opt c_no_clone* is specified.
 - `i_key_str` - Sets `i_keyclass` = *cstr*, `i_tag` = *str*, and `i_keyraw` = *const char*\*. Defines both type convertion 
 `i_keyfrom`, `i_keyto`, and sets `i_cmp`, `i_eq`, `i_hash` functions with *const char\*\** as argument.
@@ -409,7 +408,6 @@ NB: Do not use when defining carc/cbox types themselves.
 - `i_valclass` *Type*, `i_val_str`, `i_val_ssv`, `i_valboxed` - Similar rules as for ***key***.
 
 **Notes**:
-- Instead of defining `i_cmp`, you may define *i_opt c_no_cmp* to disable *searching and sorting* functions.
 - Instead of defining `i_*clone`, you may define *i_opt c_no_clone* to disable *clone* functionality.
 - For `i_keyclass`, if *i_keyraw* is defined along with it, *i_keyfrom* may also be defined to enable the *emplace*-functions. NB: the signature for ***cmp***, ***eq***, and ***hash*** uses *i_keyraw* as input.
 
@@ -764,6 +762,6 @@ Major changes:
 - Replaced: *csview_first_token()* and *csview_next_token()* with one function: `csview_token()`.
 - Added: **checkauto** tool for checking that c-source files uses `c_auto*` macros correctly.
 - Added: general `i_keyclass` / `i_valclass` template parameters which auto-binds template functions.
-- Added: `i_opt` template parameter: compile-time options: `c_no_cmp`, `c_no_clone`, `c_no_atomic`, `c_is_forward`; may be combined with `|`
+- Added: `i_opt` template parameter: compile-time options: `c_no_clone`, `c_no_atomic`, `c_is_forward`; may be combined with `|`
 - Added: [**cbox**](docs/cbox_api.md) type: smart pointer, similar to [Rust Box](https://doc.rust-lang.org/rust-by-example/std/box.html) and [std::unique_ptr](https://en.cppreference.com/w/cpp/memory/unique_ptr).
 - Added: [**c_forpair**](docs/algorithm_api.md) macro: for-loop with "structured binding"

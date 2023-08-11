@@ -43,7 +43,6 @@ void Person_drop(Person* p) {
 
 #define i_type ArcPers
 #define i_valclass Person    // clone, drop, cmp, hash
-#define i_opt c_no_cmp|c_no_hash  // exclude cmp, hash
 #include <stc/carc.h>
 
 int main(void) {
@@ -86,7 +85,10 @@ int main(void) {
 #include "priv/template.h"
 typedef i_keyraw _cx_raw;
 
-#if !c_option(c_no_atomic)
+#if c_option(c_no_atomic)
+  #define i_no_atomic
+#endif
+#if !defined i_no_atomic
   #define _i_atomic_inc(v)          c_atomic_inc(v)
   #define _i_atomic_dec_and_test(v) c_atomic_dec_and_test(v)
 #else
@@ -213,7 +215,8 @@ STC_INLINE void _cx_MEMB(_assign)(_cx_Self* self, _cx_Self ptr) {
         { return c_default_hash(&self->get); }
 #endif // i_use_cmp
 
+#include "priv/template2.h"
+#undef i_no_atomic
 #undef _i_atomic_inc
 #undef _i_atomic_dec_and_test
-#include "priv/template2.h"
 #undef _i_carc
