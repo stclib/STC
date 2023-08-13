@@ -63,8 +63,8 @@ int main(void) {
     time_t now = time(NULL);
     struct tm t1 = *localtime(&now), t2 = t1;
     t2.tm_year += 2;
-    fmt_print(1, "Dates:\n  {}\n  {}\n", fmt_tm("%Y-%m-%d %X %Z", &t1), 
-                                         fmt_tm("%Y-%m-%d %X %Z", &t2));
+    fmt_print("Dates:\n  {}\n  {}\n", fmt_tm("%Y-%m-%d %X %Z", &t1), 
+                                      fmt_tm("%Y-%m-%d %X %Z", &t2));
 }
 */
 #include <stdio.h>
@@ -208,7 +208,7 @@ void fmt_close(fmt_stream* ss) {
 }
 
 const char* fmt_tm(const char *fmt, const struct tm *tp) {
-    static char buf[2][64], i = 0;
+    static char buf[2][64], i = 1;
     i = !i;
     strftime(buf[i], 64, fmt, tp);
     return buf[i];
