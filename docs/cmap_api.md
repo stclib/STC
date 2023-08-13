@@ -282,7 +282,7 @@ typedef struct {
     cstr country;
 } Viking;
 
-#define Viking_init() ((Viking){cstr_null, cstr_null})
+#define Viking_init() ((Viking){.name={0}, .country={0}})
 
 static inline int Viking_cmp(const Viking* a, const Viking* b) {
     int c = cstr_cmp(&a->name, &b->name);

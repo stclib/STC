@@ -130,11 +130,15 @@ typedef const char* ccharptr;
 #define ccharptr_clone(s) (s)
 #define ccharptr_drop(p) ((void)p)
 
+#define c_ss(...) c_MACRO_OVERLOAD(c_ss, __VA_ARGS__)
+#define c_ss_1(literal) c_ss_2(literal, c_litstrlen(literal))
+#define c_ss_2(str, n) (c_LITERAL(csubstr){str, n})
+#define c_SS(ss) (int)(ss).size, (ss).str // printf("%.*s\n", c_SS(ss));
+
 #define c_sv(...) c_MACRO_OVERLOAD(c_sv, __VA_ARGS__)
-#define c_sv_1(lit) c_sv_2(lit, c_litstrlen(lit))
+#define c_sv_1(literal) c_sv_2(literal, c_litstrlen(literal))
 #define c_sv_2(str, n) (c_LITERAL(csview){str, n})
 
-#define c_SV(sv) (int)(sv).size, (sv).str // print csview: use format "%.*s"
 #define c_ROTL(x, k) (x << (k) | x >> (8*sizeof(x) - (k)))
 
 STC_INLINE uint64_t cfasthash(const void* key, intptr_t len) {

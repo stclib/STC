@@ -17,12 +17,12 @@ python singleheader.py $d/include/stc/cqueue.h  $d/../stcsingle/stc/cqueue.h
 python singleheader.py $d/include/stc/crand.h   $d/../stcsingle/stc/crand.h
 python singleheader.py $d/include/stc/cregex.h  $d/../stcsingle/stc/cregex.h
 python singleheader.py $d/include/stc/cset.h    $d/../stcsingle/stc/cset.h
-
 python singleheader.py $d/include/stc/csmap.h   $d/../stcsingle/stc/csmap.h
 python singleheader.py $d/include/stc/cspan.h   $d/../stcsingle/stc/cspan.h
 python singleheader.py $d/include/stc/csset.h   $d/../stcsingle/stc/csset.h
 python singleheader.py $d/include/stc/cstack.h  $d/../stcsingle/stc/cstack.h
 python singleheader.py $d/include/stc/cstr.h    $d/../stcsingle/stc/cstr.h
+python singleheader.py $d/include/stc/csubstr.h  $d/../stcsingle/stc/csubstr.h
 python singleheader.py $d/include/stc/csview.h  $d/../stcsingle/stc/csview.h
 python singleheader.py $d/include/stc/cvec.h    $d/../stcsingle/stc/cvec.h
 python singleheader.py $d/include/stc/extend.h  $d/../stcsingle/stc/extend.h

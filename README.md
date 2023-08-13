@@ -26,7 +26,7 @@ Containers
 - [***csset*** - **std::set** sorted set alike type](docs/csset_api.md)
 - [***cstack*** - **std::stack** alike type](docs/cstack_api.md)
 - [***cstr*** - **std::string** alike type](docs/cstr_api.md)
-- [***csview*** - **std::string_view** alike type](docs/csview_api.md)
+- [***csubstr*** - **std::string_view** alike type](docs/csubstr_api.md)
 - [***cspan*** - **std::span/std::mdspan** alike type](docs/cspan_api.md)
 - [***cdeq*** - **std::deque** alike type](docs/cdeq_api.md)
 - [***cvec*** - **std::vector** alike type](docs/cvec_api.md)
@@ -351,11 +351,11 @@ linking, so *one* c-file must implement the templated container, e.g.:
 #include "cvec_int.h"
 ```
 The non-templated string type **cstr** uses shared linking by default, but can have static linking instead by
-`#define i_static`. Same for the string-view type **csview**, but most of its functions are static inlined, so
+`#define i_static`. Same for the string-view type **csubstr**, but most of its functions are static inlined, so
 linking specifications and implementation are only needed for a few lesser used functions.
 
 Conveniently, `src\libstc.c` implements all the non-templated functions with shared linking for **cstr**,
-**csview**, **cregex**, **utf8**, and **crand**.
+**csubstr**, **cregex**, **utf8**, and **crand**.
 
 As a special case, you can `#define i_import` before including **cregex** or **cstr** to implement the dependent
 **utf8** functions (proper utf8 case conversions, etc.). Or link with src\libstc.
@@ -401,8 +401,8 @@ Only functions required by the container type is required to be defined. E.g.:
     - *Type_clone()* is not used if *#define i_opt c_no_clone* is specified.
 - `i_key_str` - Sets `i_keyclass` = *cstr*, `i_tag` = *str*, and `i_keyraw` = *const char*\*. Defines both type convertion 
 `i_keyfrom`, `i_keyto`, and sets `i_cmp`, `i_eq`, `i_hash` functions with *const char\*\** as argument.
-- `i_key_ssv` - Sets `i_keyclass` = *cstr*, `i_tag` = *ssv*, and `i_keyraw` = *csview\**. Defines both type convertion 
-`i_keyfrom`, `i_keyto`, and sets `i_cmp`, `i_eq`, `i_hash` functions with *csview\** as argument.
+- `i_key_ssv` - Sets `i_keyclass` = *cstr*, `i_tag` = *ssv*, and `i_keyraw` = *csubstr\**. Defines both type convertion 
+`i_keyfrom`, `i_keyto`, and sets `i_cmp`, `i_eq`, `i_hash` functions with *csubstr\** as argument.
 - `i_keyboxed` *Type* - Use when *Type* is a smart pointer **carc** or **cbox**. Defines *i_keyclass = Type*, and *i_keyraw = Type\**.
 NB: Do not use when defining carc/cbox types themselves.
 - `i_valclass` *Type*, `i_val_str`, `i_val_ssv`, `i_valboxed` - Similar rules as for ***key***.
@@ -640,7 +640,7 @@ void maptest()
 
 STC is generally very memory efficient. Memory usage for the different containers:
 - **cstr**, **cvec**, **cstack**, **cpque**: 1 pointer, 2 intptr_t + memory for elements.
-- **csview**, 1 pointer, 1 intptr_t. Does not own data!
+- **csubstr**, 1 pointer, 1 intptr_t. Does not own data!
 - **cspan**, 1 pointer and 2 \* dimension \* int32_t. Does not own data!
 - **clist**: Type size: 1 pointer. Each node allocates a struct to store its value and a next pointer.
 - **cdeq**, **cqueue**:  Type size: 2 pointers, 2 intptr_t. Otherwise like *cvec*.
@@ -654,7 +654,7 @@ STC is generally very memory efficient. Memory usage for the different container
 
 ## Version 4.3
 - Breaking changes:
-    - **cstr** and **csview** now uses *shared linking* by default. Implement by either defining `i_implement` or `i_static` before including.
+    - **cstr** and **csubstr** now uses *shared linking* by default. Implement by either defining `i_implement` or `i_static` before including.
     - Renamed <stc/calgo.h> => `<stc/algorithm.h>`
     - Moved <stc/algo/coroutine.h> => `<stc/coroutine.h>`
         - Much improved with some new API and added features.
@@ -686,7 +686,7 @@ STC is generally very memory efficient. Memory usage for the different container
 - Renamed c_flt_count(i) => `c_flt_counter(i)`
 - Renamed c_flt_last(i) => `c_flt_getcount(i)`
 - Renamed c_ARRAYLEN() => c_arraylen()
-- Removed deprecated c_ARGSV(). Use c_SV()
+- Removed deprecated c_ARGSV(). Use c_SS()
 - Removed c_PAIR
 
 ## Version 4.1.1
@@ -699,7 +699,7 @@ Major changes:
     - [crange](docs/algorithm_api.md#crange) - similar to [boost::irange](https://www.boost.org/doc/libs/release/libs/range/doc/html/range/reference/ranges/irange.html) integer range generator.
     - [c_forfilter](docs/algorithm_api.md#c_forfilter) - ranges-like view filtering.
     - [csort](include/stc/algo/sort.h) - [fast quicksort](misc/benchmarks/various/csort_bench.c) with custom inline comparison.
-- Renamed `c_ARGSV()` => `c_SV()`: **csview** print arg. Note `c_sv()` is shorthand for *csview_from()*.
+- Renamed `c_ARGSV()` => `c_SS()`: **csubstr** print arg. Note `c_ss()` is shorthand for *csubstr_from()*.
 - Support for [uppercase flow-control](include/stc/priv/altnames.h) macro names in ccommon.h.
 - Some API changes in **cregex** and **cstr**.
 - Create single header container versions with python script.
@@ -713,18 +713,18 @@ Major changes:
 - New + renamed loop iteration/scope macros:
     - `c_forlist`: macro replacing `c_forarray` and `c_apply`. Iterate a compound literal list.
     - `c_forrange`: macro replacing `c_forrange`. Iterate a `long long` type number sequence.
-- Updated **cstr**, now always takes self as pointer, like all containers except csview.
+- Updated **cstr**, now always takes self as pointer, like all containers except csubstr.
 - Updated **cvec**, **cdeq**, changed `*_range*` function names.
 
 ## Changes version 3.8
-- Overhauled some **cstr** and **csview** API:
+- Overhauled some **cstr** and **csubstr** API:
     - Changed cstr_replace*() => `cstr_replace_at*(self, pos, len, repl)`: Replace at specific position.
     - Changed `cstr_replace_all() cstr_replace*(self, search, repl, count)`: Replace count occurences.
     - Renamed `cstr_find_from()` => `cstr_find_at()`
     - Renamed `cstr_*_u8()` => `cstr_u8_*()`
-    - Renamed `csview_*_u8()` => `csview_u8_*()`
-    - Added cstr_u8_slice() and csview_u8_slice().
-    - Removed `csview_from_s()`: Use `cstr_sv(s)` instead.
+    - Renamed `csubstr_*_u8()` => `csubstr_u8_*()`
+    - Added cstr_u8_slice() and csubstr_u8_slice().
+    - Removed `csubstr_from_s()`: Use `cstr_ss(s)` instead.
     - Added back file coption.h
     - Simplified **cbits** usage: all inlined.
     - Updated docs.
@@ -759,7 +759,7 @@ Major changes:
 - Renamed: *cstr_new()* to `cstr_lit(literal)`, and *cstr_assign_fmt()* to `cstr_printf()`.
 - Renamed: *c_default_fromraw()* to `c_default_from()`.
 - Changed: the [**c_apply**](docs/algorithm_api.md) macros API.
-- Replaced: *csview_first_token()* and *csview_next_token()* with one function: `csview_token()`.
+- Replaced: *csubstr_first_token()* and *csubstr_next_token()* with one function: `csubstr_token()`.
 - Added: **checkauto** tool for checking that c-source files uses `c_auto*` macros correctly.
 - Added: general `i_keyclass` / `i_valclass` template parameters which auto-binds template functions.
 - Added: `i_opt` template parameter: compile-time options: `c_no_clone`, `c_no_atomic`, `c_is_forward`; may be combined with `|`

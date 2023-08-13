@@ -114,10 +114,10 @@
   #endif
 #elif defined i_key_ssv
   #define i_keyclass cstr
-  #define i_rawclass csview
-  #define i_keyfrom cstr_from_sv
-  #define i_keyto cstr_sv
-  #define i_eq csview_eq
+  #define i_rawclass csubstr
+  #define i_keyfrom cstr_from_ss
+  #define i_keyto cstr_ss
+  #define i_eq csubstr_eq
   #ifndef i_tag
     #define i_tag ssv
   #endif
@@ -232,9 +232,9 @@
   #define i_valraw const char*
 #elif defined i_val_ssv
   #define i_valclass cstr
-  #define i_valraw csview
-  #define i_valfrom cstr_from_sv
-  #define i_valto cstr_sv
+  #define i_valraw csubstr
+  #define i_valfrom cstr_from_ss
+  #define i_valto cstr_ss
 #elif defined i_valboxed
   #define i_valclass i_valboxed
   #define i_valraw c_PASTE(i_valboxed, _raw)

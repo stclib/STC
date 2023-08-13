@@ -48,7 +48,7 @@ extern uint32_t utf8_toupper(uint32_t c);
 extern bool     utf8_iscased(uint32_t c);
 extern bool     utf8_isword(uint32_t c);
 extern bool     utf8_valid_n(const char* s, intptr_t nbytes);
-extern int      utf8_icmp_sv(csview s1, csview s2);
+extern int      utf8_icmp_ss(csubstr s1, csubstr s2);
 extern int      utf8_encode(char *out, uint32_t c);
 extern uint32_t utf8_peek_off(const char *s, int offset);
 
@@ -92,7 +92,7 @@ STC_INLINE uint32_t utf8_peek(const char* s) {
 
 /* case-insensitive utf8 string comparison */
 STC_INLINE int utf8_icmp(const char* s1, const char* s2) {
-    return utf8_icmp_sv(c_sv(s1, INTPTR_MAX), c_sv(s2, INTPTR_MAX));
+    return utf8_icmp_ss(c_ss(s1, INTPTR_MAX), c_ss(s2, INTPTR_MAX));
 }
 
 STC_INLINE bool utf8_valid(const char* s) {

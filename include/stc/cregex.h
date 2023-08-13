@@ -34,7 +34,7 @@ THE SOFTWARE.
  */
 #include <stdbool.h>
 #include <string.h>
-#include "forward.h" // csview 
+#include "forward.h" // csubstr 
 #include "ccommon.h"
 
 enum {
@@ -82,7 +82,7 @@ typedef struct {
 typedef struct {
     const cregex* re;
     const char* input;
-    csview match[CREG_MAX_CAPTURES];
+    csubstr match[CREG_MAX_CAPTURES];
 } cregex_iter;
 
 #define c_formatch(it, Re, Input) \
@@ -115,11 +115,11 @@ int cregex_captures(const cregex* re);
 /* return CREG_OK, CREG_NOMATCH or CREG_MATCHERROR. */
 #define cregex_find(...) c_MACRO_OVERLOAD(cregex_find, __VA_ARGS__)
 #define cregex_find_3(re, input, match) cregex_find_4(re, input, match, CREG_DEFAULT)
-int cregex_find_4(const cregex* re, const char* input, csview match[], int mflags);
+int cregex_find_4(const cregex* re, const char* input, csubstr match[], int mflags);
 
-/* find with csview as input. */
-STC_INLINE int cregex_find_sv(const cregex* re, csview input, csview match[]) {
-    csview *mp = NULL;
+/* find with csubstr as input. */
+STC_INLINE int cregex_find_ss(const cregex* re, csubstr input, csubstr match[]) {
+    csubstr *mp = NULL;
     if (match) { match[0] = input; mp = match; }
     return cregex_find(re, input.str, mp, CREG_STARTEND);
 }
@@ -129,27 +129,27 @@ STC_INLINE int cregex_find_sv(const cregex* re, csview input, csview match[]) {
 #define cregex_find_pattern_3(pattern, input, match) \
     cregex_find_pattern_4(pattern, input, match, CREG_DEFAULT)
 int cregex_find_pattern_4(const char* pattern, const char* input,
-                          csview match[], int cmflags);
+                          csubstr match[], int cmflags);
 
 STC_INLINE bool cregex_is_match(const cregex* re, const char* input)
     { return cregex_find_4(re, input, NULL, CREG_DEFAULT) == CREG_OK; }
 
-/* replace csview input with replace using regular expression pattern */
-#define cregex_replace_sv(...) c_MACRO_OVERLOAD(cregex_replace_sv, __VA_ARGS__)
-#define cregex_replace_sv_3(pattern, input, replace) \
-    cregex_replace_sv_4(pattern, input, replace, INT32_MAX)
-#define cregex_replace_sv_4(pattern, input, replace, count) \
-    cregex_replace_sv_6(pattern, input, replace, count, NULL, CREG_DEFAULT)
-cstr cregex_replace_sv_6(const cregex* re, csview input, const char* replace, int count,
-                         bool (*transform)(int group, csview match, cstr* result), int rflags);
+/* replace csubstr input with replace using regular expression pattern */
+#define cregex_replace_ss(...) c_MACRO_OVERLOAD(cregex_replace_ss, __VA_ARGS__)
+#define cregex_replace_ss_3(pattern, input, replace) \
+    cregex_replace_ss_4(pattern, input, replace, INT32_MAX)
+#define cregex_replace_ss_4(pattern, input, replace, count) \
+    cregex_replace_ss_6(pattern, input, replace, count, NULL, CREG_DEFAULT)
+cstr cregex_replace_ss_6(const cregex* re, csubstr input, const char* replace, int count,
+                         bool (*transform)(int group, csubstr match, cstr* result), int rflags);
 
 /* replace input with replace using regular expression */
 #define cregex_replace(...) c_MACRO_OVERLOAD(cregex_replace, __VA_ARGS__)
 #define cregex_replace_3(re, input, replace) cregex_replace_4(re, input, replace, INT32_MAX)
 
 STC_INLINE cstr cregex_replace_4(const cregex* re, const char* input, const char* replace, int count) { 
-    csview sv = {input, c_strlen(input)};
-    return cregex_replace_sv_4(re, sv, replace, count);
+    csubstr ss = {input, c_strlen(input)};
+    return cregex_replace_ss_4(re, ss, replace, count);
 }
 
 /* replace + compile RE pattern, and extra arguments */
@@ -159,7 +159,7 @@ STC_INLINE cstr cregex_replace_4(const cregex* re, const char* input, const char
 #define cregex_replace_pattern_4(pattern, input, replace, count) \
     cregex_replace_pattern_6(pattern, input, replace, count, NULL, CREG_DEFAULT)
 cstr cregex_replace_pattern_6(const char* pattern, const char* input, const char* replace, int count,
-                              bool (*transform)(int group, csview match, cstr* result), int crflags);
+                              bool (*transform)(int group, csubstr match, cstr* result), int crflags);
 
 /* destroy regex */
 void cregex_drop(cregex* re);

@@ -33,11 +33,11 @@ int         cregex_compile(cregex *self, const char* pattern, int cflags = CREG_
 int         cregex_captures(const cregex* self); 
 
             // return CREG_OK, CREG_NOMATCH, or CREG_MATCHERROR
-int         cregex_find(const cregex* re, const char* input, csview match[], int mflags = CREG_DEFAULT);
+int         cregex_find(const cregex* re, const char* input, csubstr match[], int mflags = CREG_DEFAULT);
             // Search inside input string-view only
-int         cregex_find_sv(const cregex* re, csview input, csview match[]);
+int         cregex_find_ss(const cregex* re, csubstr input, csubstr match[]);
             // All-in-one search (compile + find + drop)
-int         cregex_find_pattern(const char* pattern, const char* input, csview match[], int cmflags = CREG_DEFAULT);
+int         cregex_find_pattern(const char* pattern, const char* input, csubstr match[], int cmflags = CREG_DEFAULT);
 
             // Check if there are matches in input
 bool        cregex_is_match(const cregex* re, const char* input);
@@ -45,14 +45,14 @@ bool        cregex_is_match(const cregex* re, const char* input);
             // Replace all matches in input
 cstr        cregex_replace(const cregex* re, const char* input, const char* replace, int count = INT_MAX);
             // Replace count matches in input string-view. Optionally transform replacement.
-cstr        cregex_replace_sv(const cregex* re, csview input, const char* replace, int count = INT_MAX);
-cstr        cregex_replace_sv(const cregex* re, csview input, const char* replace, int count,
-                              bool(*transform)(int group, csview match, cstr* result), int rflags);
+cstr        cregex_replace_ss(const cregex* re, csubstr input, const char* replace, int count = INT_MAX);
+cstr        cregex_replace_ss(const cregex* re, csubstr input, const char* replace, int count,
+                              bool(*transform)(int group, csubstr match, cstr* result), int rflags);
 
             // All-in-one replacement (compile + find/replace + drop)
 cstr        cregex_replace_pattern(const char* pattern, const char* input, const char* replace, int count = INT_MAX);
 cstr        cregex_replace_pattern(const char* pattern, const char* input, const char* replace, int count,
-                                   bool(*transform)(int group, csview match, cstr* result), int rflags);
+                                   bool(*transform)(int group, csubstr match, cstr* result), int rflags);
             // destroy
 void        cregex_drop(cregex* self);
 ```
@@ -109,9 +109,9 @@ int main(void) {
     cregex re = cregex_from(pattern);
 
     // Lets find the first date in the string:
-    csview match[4]; // full-match, year, month, date.
+    csubstr match[4]; // full-match, year, month, date.
     if (cregex_find(&re, input, match) == CREG_OK)
-        printf("Found date: %.*s\n", c_SV(match[0]));
+        printf("Found date: %.*s\n", c_SS(match[0]));
     else
         printf("Could not find any date\n");
 
@@ -127,7 +127,7 @@ int main(void) {
 For a single match you may use the all-in-one function:
 ```c
 if (cregex_find_pattern(pattern, input, match))
-    printf("Found date: %.*s\n", c_SV(match[0]));
+    printf("Found date: %.*s\n", c_SS(match[0]));
 ```
 
 To use: `gcc first_match.c src/cregex.c src/utf8code.c`.
@@ -137,16 +137,16 @@ In order to use a callback function in the replace call, see `examples/regex_rep
 
 To iterate multiple matches in an input string, you may use
 ```c
-csview match[5] = {0};
+csubstr match[5] = {0};
 while (cregex_find(&re, input, match, CREG_NEXT) == CREG_OK)
     for (int k = 1; i <= cregex_captures(&re); ++k)
-        printf("submatch %d: %.*s\n", k, c_SV(match[k]));
+        printf("submatch %d: %.*s\n", k, c_SS(match[k]));
 ```
 There is also a for-loop macro to simplify it:
 ```c
 c_formatch (it, &re, input)
     for (int k = 1; i <= cregex_captures(&re); ++k)
-        printf("submatch %d: %.*s\n", k, c_SV(it.match[k]));
+        printf("submatch %d: %.*s\n", k, c_SS(it.match[k]));
 ```
 
 ## Using cregex in a project
@@ -154,7 +154,7 @@ c_formatch (it, &re, input)
 The easiest is to `#define i_import` before `#include <stc/cregex.h>`. Make sure to do that in one translation unit only.
 
 For reference, **cregex** uses the following files: 
-- `stc/cregex.h`, `stc/utf8.h`, `stc/csview.h`, `stc/cstr.h`, `stc/ccommon.h`, `stc/forward.h`
+- `stc/cregex.h`, `stc/utf8.h`, `stc/csubstr.h`, `stc/cstr.h`, `stc/ccommon.h`, `stc/forward.h`
 - `src/cregex.c`, `src/utf8code.c`.
 
 ## Regex Cheatsheet
