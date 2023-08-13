@@ -59,6 +59,11 @@ STC_API bool            _cx_MEMB(_eq)(const _cx_Self* self, const _cx_Self* othe
 STC_API _cx_Self        _cx_MEMB(_clone)(_cx_Self cx);
 STC_INLINE i_key        _cx_MEMB(_value_clone)(i_key val)
                             { return i_keyclone(val); }
+STC_INLINE void         _cx_MEMB(_copy)(_cx_Self* self, const _cx_Self* other) {
+                            if (self->data == other->data) return;
+                            _cx_MEMB(_drop)(self);
+                            *self = _cx_MEMB(_clone)(*other);
+                        }
 #endif // !i_no_clone
 STC_INLINE intptr_t     _cx_MEMB(_size)(const _cx_Self* self) 
                             { return _cdeq_toidx(self, self->end); }
@@ -86,12 +91,6 @@ STC_INLINE _cx_value _cx_MEMB(_pull)(_cx_Self* self) { // move front out of queu
     intptr_t s = self->start;
     self->start = (s + 1) & self->capmask;
     return self->data[s];
-}
-
-STC_INLINE void _cx_MEMB(_copy)(_cx_Self* self, const _cx_Self* other) {
-    if (self->data == other->data) return;
-    _cx_MEMB(_drop)(self);
-    *self = _cx_MEMB(_clone)(*other);
 }
 
 STC_INLINE _cx_iter _cx_MEMB(_begin)(const _cx_Self* self) {

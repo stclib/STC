@@ -94,13 +94,13 @@ STC_API _cx_iter        _cx_MEMB(_binary_search_in)(_cx_iter it1, _cx_iter it2, 
 STC_INLINE void         _cx_MEMB(_value_drop)(_cx_value* val) { i_keydrop(val); }
 
 STC_INLINE _cx_value*   _cx_MEMB(_push)(_cx_Self* self, i_key value) {
-    if (self->_len == self->_cap)
-        if (!_cx_MEMB(_reserve)(self, self->_len*3/2 + 4))
-            return NULL;
-    _cx_value *v = self->data + self->_len++;
-    *v = value;
-    return v;
-}
+                            if (self->_len == self->_cap)
+                            if (!_cx_MEMB(_reserve)(self, self->_len*2 + 4))
+                                return NULL;
+                            _cx_value *v = self->data + self->_len++;
+                            *v = value;
+                            return v;
+                        }
 
 #if !defined i_no_emplace
 STC_API _cx_iter
