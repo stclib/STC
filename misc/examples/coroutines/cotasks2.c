@@ -41,7 +41,7 @@ cco_task_struct (produce_items,
 int produce_items(struct produce_items* p, cco_runtime* rt)
 {
     cco_routine (p) {
-        p->str = cstr_null;
+        p->str = cstr_init();
         p->next.cco_func = next_value;
         while (true)
         {

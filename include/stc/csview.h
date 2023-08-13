@@ -27,11 +27,9 @@
 #ifndef CSVIEW_H_INCLUDED
 #define CSVIEW_H_INCLUDED
 
-#define             csview_null c_sv_1("")
-#define             csview_init() csview_null
+#define             csview_init() c_sv_1("")
 #define             csview_drop(p) c_default_drop(p)
 #define             csview_clone(sv) c_default_clone(sv)
-#define             csview_lit(literal) c_sv_1(literal)
 #define             csview_from_n(str, n) c_sv_2(str, n)
 
 STC_API csview_iter csview_advance(csview_iter it, intptr_t pos);
@@ -43,7 +41,7 @@ STC_API csview      csview_token(csview sv, const char* sep, intptr_t* start);
 
 STC_INLINE csview   csview_from(const char* str)
                         { return c_LITERAL(csview){str, c_strlen(str)}; }
-STC_INLINE void     csview_clear(csview* self) { *self = csview_null; }
+STC_INLINE void     csview_clear(csview* self) { *self = csview_init(); }
 
 STC_INLINE intptr_t   csview_size(csview sv) { return sv.size; }
 STC_INLINE bool     csview_empty(csview sv) { return sv.size == 0; }
@@ -52,7 +50,7 @@ STC_INLINE bool csview_equals(csview sv, const char* str)
     { intptr_t n = c_strlen(str); return sv.size == n && !c_memcmp(sv.str, str, n); }
 
 STC_INLINE intptr_t csview_find(csview sv, const char* str)
-    { return csview_find_sv(sv, c_sv(str, c_strlen(str))); }
+    { return csview_find_sv(sv, c_sv_2(str, c_strlen(str))); }
 
 STC_INLINE bool csview_contains(csview sv, const char* str)
     { return csview_find(sv, str) != c_NPOS; }

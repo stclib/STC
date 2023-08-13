@@ -29,7 +29,6 @@ All csview definitions and prototypes are available by including a single header
 ```c
 csview          c_sv(const char literal_only[]);                        // construct from literal, no strlen()
 csview          c_sv(const char* str, intptr_t n);                      // construct from str and length n
-csview          csview_lit(const char literal_only[]);                  // alias for c_sv(lit)
 csview          csview_from(const char* str);                           // construct from const char*
 csview          csview_from_n(const char* str, intptr_t n);             // alias for c_sv(str, n)
 
@@ -112,7 +111,6 @@ uint64_t        csview_hash(const csview* x);
 
 | Name           | Value                | Usage                                        |
 |:---------------|:---------------------|:---------------------------------------------|
-| `csview_null`  | same as `c_sv("")`   | `sview = csview_null;`                       |
 | `c_SV(sv)`     | printf argument      | `printf("sv: %.*s\n", c_SV(sv));`            |
 
 ## Example

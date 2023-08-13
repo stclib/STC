@@ -43,7 +43,7 @@ struct produce_items {
 int produce_items(struct produce_items* p)
 {
     cco_routine (p) {
-        p->str = cstr_null;
+        p->str = cstr_init();
         while (true)
         {
             cco_await(next_value(&p->next) != CCO_AWAIT);

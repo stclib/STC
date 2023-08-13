@@ -17,7 +17,7 @@ int file_read(struct file_read* co, cco_runtime* rt)
 {
     cco_routine (co) {
         co->fp = fopen(co->path, "r");
-        co->line = cstr_null;
+        co->line = cstr_init();
 
         while (true) {
             // emulate async io: await 10ms per line
