@@ -45,8 +45,11 @@ STC_INLINE void     csubstr_clear(csubstr* self) { *self = csubstr_init(); }
 STC_INLINE intptr_t csubstr_size(csubstr ss) { return ss.size; }
 STC_INLINE bool     csubstr_empty(csubstr ss) { return ss.size == 0; }
 
+STC_INLINE bool csubstr_equals_ss(csubstr ss1, csubstr ss2)
+    { return ss1.size == ss2.size && !c_memcmp(ss1.str, ss2.str, ss1.size); }
+
 STC_INLINE bool csubstr_equals(csubstr ss, const char* str)
-    { intptr_t n = c_strlen(str); return ss.size == n && !c_memcmp(ss.str, str, n); }
+    { return csubstr_equals_ss(ss, c_ss_2(str, c_strlen(str))); }
 
 STC_INLINE intptr_t csubstr_find(csubstr ss, const char* str)
     { return csubstr_find_ss(ss, c_ss_2(str, c_strlen(str))); }

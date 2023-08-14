@@ -26,13 +26,12 @@
 #ifndef CSVIEW_H_INCLUDED
 #define CSVIEW_H_INCLUDED
 
-#define             csview_init() c_sv_1("")
+#define             csview_init() c_sv("")
 #define             csview_drop(p) c_default_drop(p)
 #define             csview_clone(sv) c_default_clone(sv)
-#define             csview_from_n(str, n) c_sv_2(str, n)
 
 STC_INLINE csview   csview_from(const char* str)
-                        { return csview_from_n(str, c_strlen(str)); }
+                        { return c_sv_2(str, c_strlen(str)); }
 STC_INLINE void     csview_clear(csview* self) { *self = csview_init(); }
 STC_INLINE csubstr  csview_ss(csview sv) { return c_ss_2(sv.str, sv.size); }
 
@@ -44,13 +43,10 @@ STC_INLINE bool csview_equals(csview sv, const char* str) {
     return sv.size == n && !c_memcmp(sv.str, str, n);
 }
 
-STC_INLINE intptr_t csview_find_v(csview sv, csview search) {
-    char* res = cstrnstrn(sv.str, search.str, sv.size, search.size);
+STC_INLINE intptr_t csview_find(csview sv, const char* search) {
+    char* res = cstrnstrn(sv.str, search, sv.size, c_strlen(search));
     return res ? (res - sv.str) : c_NPOS;
 }
-
-STC_INLINE intptr_t csview_find(csview sv, const char* str)
-    { return csview_find_v(sv, c_sv_2(str, c_strlen(str))); }
 
 STC_INLINE bool csview_contains(csview sv, const char* str)
     { return csview_find(sv, str) != c_NPOS; }

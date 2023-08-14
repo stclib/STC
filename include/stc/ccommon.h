@@ -135,9 +135,9 @@ typedef const char* ccharptr;
 #define c_ss_2(str, n) (c_LITERAL(csubstr){str, n})
 #define c_SS(ss) (int)(ss).size, (ss).str // printf("%.*s\n", c_SS(ss));
 
-#define c_sv(...) c_MACRO_OVERLOAD(c_sv, __VA_ARGS__)
-#define c_sv_1(literal) c_sv_2(literal, c_litstrlen(literal))
+#define c_sv(literal) c_sv_2(literal, c_litstrlen(literal))
 #define c_sv_2(str, n) (c_LITERAL(csview){str, n})
+#define c_SV(sv) c_SS(sv) // [deprecated] - unneeded
 
 #define c_ROTL(x, k) (x << (k) | x >> (8*sizeof(x) - (k)))
 

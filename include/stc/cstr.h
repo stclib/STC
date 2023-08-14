@@ -115,7 +115,7 @@ STC_INLINE cstr cstr_from(const char* str)
 STC_INLINE cstr cstr_from_ss(csubstr sv)
     { return cstr_from_n(sv.str, sv.size); }
 
-STC_INLINE cstr cstr_from_v(csview sv)
+STC_INLINE cstr cstr_from_sv(csview sv)
     { return cstr_from_n(sv.str, sv.size); }
 
 STC_INLINE cstr cstr_with_size(const intptr_t size, const char value) {
@@ -250,9 +250,6 @@ STC_INLINE bool cstr_equals(const cstr* self, const char* str)
     { return !strcmp(cstr_str(self), str); }
 
 STC_INLINE bool cstr_equals_ss(const cstr* self, csubstr sv)
-    { return sv.size == cstr_size(self) && !c_memcmp(cstr_str(self), sv.str, sv.size); }
-
-STC_INLINE bool cstr_equals_sv(const cstr* self, csview sv)
     { return sv.size == cstr_size(self) && !c_memcmp(cstr_str(self), sv.str, sv.size); }
 
 STC_INLINE bool cstr_equals_s(const cstr* self, cstr s)

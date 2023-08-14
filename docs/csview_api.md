@@ -23,17 +23,15 @@ All csview definitions and prototypes are available by including a single header
 
 ```c
 csview          c_sv(const char literal_only[]);                        // construct from literal, no strlen()
-csview          c_sv(const char* str, intptr_t n);                      // construct from str and length n
 csview          csview_from(const char* str);                           // construct from const char*
-csview          csview_from_n(const char* str, intptr_t n);             // alias for c_sv(str, n)
 
 intptr_t        csview_size(csview sv);
-bool            csview_empty(csview sv);
+bool            csview_empty(csview sv);                                // check if size == 0
 void            csview_clear(csview* self);
+csubstr         csview_ss(csview sv);                                   // convert to csubstr type
 
-bool            csview_equals(csview sv, csview sv2);
+bool            csview_equals(csview sv, const char* str);
 intptr_t        csview_find(csview sv, const char* str);
-intptr_t        csview_find_sv(csview sv, csview find);
 bool            csview_contains(csview sv, const char* str);
 bool            csview_starts_with(csview sv, const char* str);
 bool            csview_ends_with(csview sv, const char* str);
