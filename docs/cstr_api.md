@@ -22,7 +22,7 @@ cstr        cstr_init(void);                                        // construct
 cstr        cstr_lit(const char literal_only[]);                    // cstr from literal; no strlen() call.
 cstr        cstr_from(const char* str);                             // constructor using strlen()
 cstr        cstr_from_n(const char* str, intptr_t n);               // constructor with n first bytes of str
-cstr        cstr_from_sv(csview ss);                                // construct cstr from csview
+cstr        cstr_from_sv(csview sv);                                // construct cstr from csview
 cstr        cstr_from_rs(crawstr rs);                               // construct cstr from crawstr
 cstr        cstr_with_capacity(intptr_t cap);
 cstr        cstr_with_size(intptr_t len, char fill);                // repeat fill len times
@@ -50,7 +50,7 @@ void        cstr_clear(cstr* self);
 
 char*       cstr_assign(cstr* self, const char* str);
 char*       cstr_assign_n(cstr* self, const char* str, intptr_t n); // assign n first bytes of str
-char*       cstr_assign_sv(cstr* self, csview ss);
+char*       cstr_assign_sv(cstr* self, csview sv);
 char*       cstr_copy(cstr* self, cstr s);                          // copy-assign a cstr
 int         cstr_printf(cstr* self, const char* fmt, ...);          // source and target must not overlap.
 
@@ -77,7 +77,7 @@ void        cstr_replace_at_sv(cstr* self, intptr_t pos, intptr_t len, const csv
 void        cstr_replace_at_s(cstr* self, intptr_t pos, intptr_t len, cstr repl);
 
 bool        cstr_equals(const cstr* self, const char* str);
-bool        cstr_equals_sv(const cstr* self, csview ss);
+bool        cstr_equals_sv(const cstr* self, csview sv);
 bool        cstr_equals_s(const cstr* self, cstr s);
 
 intptr_t    cstr_find(const cstr* self, const char* search);
@@ -85,11 +85,11 @@ intptr_t    cstr_find_at(const cstr* self, intptr_t pos, const char* search); //
 bool        cstr_contains(const cstr* self, const char* search);
 
 bool        cstr_starts_with(const cstr* self, const char* str);
-bool        cstr_starts_with_sv(const cstr* self, csview ss);
+bool        cstr_starts_with_sv(const cstr* self, csview sv);
 bool        cstr_starts_with_s(const cstr* self, cstr s);
 
 bool        cstr_ends_with(const cstr* self, const char* str);
-bool        cstr_ends_with_sv(const cstr* self, csview ss);
+bool        cstr_ends_with_sv(const cstr* self, csview sv);
 bool        cstr_ends_with_s(const cstr* self, cstr s);
 
 bool        cstr_getline(cstr *self, FILE *stream);                 // cstr_getdelim(self, '\n', stream)
@@ -102,7 +102,7 @@ intptr_t    cstr_u8_size(const cstr* self);                         // number of
 intptr_t    cstr_u8_size_n(const cstr self, intptr_t nbytes);       // utf8 size within n bytes  
 intptr_t    cstr_u8_to_pos(const cstr* self, intptr_t u8idx);       // byte pos offset at utf8 codepoint index
 const char* cstr_u8_at(const cstr* self, intptr_t u8idx);           // char* position at utf8 codepoint index
-csview     cstr_u8_chr(const cstr* self, intptr_t u8idx);          // get utf8 character as a csview
+csview      cstr_u8_chr(const cstr* self, intptr_t u8idx);          // get utf8 character as a csview
 void        cstr_u8_replace_at(cstr* self, intptr_t bytepos, intptr_t u8len, csview repl); // replace u8len utf8 chars
 void        cstr_u8_erase(cstr* self, intptr_t bytepos, intptr_t u8len); // erase u8len codepoints from pos
 
@@ -114,14 +114,14 @@ cstr_iter   cstr_advance(cstr_iter it, intptr_t n);
 
 // utf8 functions requires linking with src/utf8code.c symbols:
 bool        cstr_valid_utf8(const cstr* self);                      // check if str is valid utf8
-cstr        cstr_casefold_sv(csview ss);                           // returns new casefolded utf8 cstr
+cstr        cstr_casefold_sv(csview sv);                           // returns new casefolded utf8 cstr
 
 cstr        cstr_tolower(const char* str);                          // returns new lowercase utf8 cstr
-cstr        cstr_tolower_sv(csview ss);                            // returns new lowercase utf8 cstr
+cstr        cstr_tolower_sv(csview sv);                            // returns new lowercase utf8 cstr
 void        cstr_lowercase(cstr* self);                             // transform cstr to lowercase utf8
 
 cstr        cstr_toupper(const char* str);                          // returns new uppercase utf8 cstr
-cstr        cstr_toupper_sv(csview ss);                            // returns new uppercase utf8 cstr
+cstr        cstr_toupper_sv(csview sv);                            // returns new uppercase utf8 cstr
 void        cstr_uppercase(cstr* self);                             // transform cstr to uppercase utf8
  
 int         cstr_icmp(const cstr* s1, const cstr* s2);              // utf8 case-insensitive comparison
