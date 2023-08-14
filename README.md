@@ -18,18 +18,19 @@ Containers
 - [***cbox*** - **std::unique_ptr** alike type](docs/cbox_api.md)
 - [***cbits*** - **std::bitset** alike type](docs/cbits_api.md)
 - [***clist*** - **std::forward_list** alike type](docs/clist_api.md)
+- [***cstack*** - **std::stack** alike type](docs/cstack_api.md)
+- [***cvec*** - **std::vector** alike type](docs/cvec_api.md)
 - [***cqueue*** - **std::queue** alike type](docs/cqueue_api.md)
+- [***cdeq*** - **std::deque** alike type](docs/cdeq_api.md)
 - [***cpque*** - **std::priority_queue** alike type](docs/cpque_api.md)
 - [***cmap*** - **std::unordered_map** alike type](docs/cmap_api.md)
 - [***cset*** - **std::unordered_set** alike type](docs/cset_api.md)
 - [***csmap*** - **std::map** sorted map alike type](docs/csmap_api.md)
 - [***csset*** - **std::set** sorted set alike type](docs/csset_api.md)
-- [***cstack*** - **std::stack** alike type](docs/cstack_api.md)
 - [***cstr*** - **std::string** alike type](docs/cstr_api.md)
 - [***csubstr*** - **std::string_view** alike type](docs/csubstr_api.md)
-- [***cspan*** - **std::span/std::mdspan** alike type](docs/cspan_api.md)
-- [***cdeq*** - **std::deque** alike type](docs/cdeq_api.md)
-- [***cvec*** - **std::vector** alike type](docs/cvec_api.md)
+- [***csview*** - null-terminated string view type](docs/csview_api.md)
+- [***cspan*** - **std::span** + **std::mdspan** alike type](docs/cspan_api.md)
 
 Algorithms
 ----------  

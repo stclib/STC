@@ -1,4 +1,4 @@
-# STC [csview](../include/stc/csview.h): String View
+# STC [csview](../include/stc/csview.h): Null-terminated UTF8 String View
 ![String](pics/string.jpg)
 
 The type **csview** is a ***null-terminated*** string view and refers to a constant contiguous sequence of
@@ -6,9 +6,9 @@ char-elements with the first element of the sequence at position zero. The imple
 members: a pointer to constant char and a size. See [csubstr](csubstr_api.md) for a ***non null-terminated***
 string view/span type.
 
-Because **csview** is null-terminated, it can be a more efficient replacent for `const char*`. It never
-allocates memory, and need therefore not be destructed. Its lifetime is limited by the source string
-storage. It keeps the length of the string, and does not call *strlen()* when passing it around.
+Because **csview** is null-terminated, it can be an efficient replacent for `const char*`. It never
+allocates memory, and therefore need not be destructed. Its lifetime is limited by the source string
+storage. It keeps the length of the string, i.e. no need to call *strlen()* for various operations.
 
 ## Header file
 

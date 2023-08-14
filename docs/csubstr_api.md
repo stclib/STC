@@ -1,18 +1,19 @@
-# STC [csubstr](../include/stc/csubstr.h): String View
+# STC [csubstr](../include/stc/csubstr.h): Sub-string View
 ![String](pics/string.jpg)
 
 The type **csubstr** is a non-null terminated string view and can refer to a constant contiguous sequence of
 char-elements with the first element of the sequence at position zero. The implementation holds two members:
 a pointer to constant char and a size.
 
-Because **csubstr** is non-null terminated, it is not a replacent for `const char*` - see [csview](csview_api.md)
+Because **csubstr** is non-null terminated, it is not a replacent view for `const char*` - see [csview](csview_api.md)
 for that. **csubstr** never allocates memory, and therefore need not be destructed. Its lifetime is limited by
 the source string storage. It keeps the length of the string, and does not need to call *strlen()* to acquire
 the length.
 
-Note: a **csubstr** must be printed the following way:
+- **csubstr** iterators works on UTF8 codepoints - like **cstr** and **csview** (see Example 2).
+- Because it is null-terminated, it must be printed the following way:
 ```c
-printf("%.*s", c_SS(sstr))
+printf("%.*s", c_SS(sstr));
 ```
 
 See the c++ class [std::basic_string_view](https://en.cppreference.com/w/cpp/string/basic_string_view) for a functional
