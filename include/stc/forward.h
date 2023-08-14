@@ -39,21 +39,8 @@
 #define forward_cqueue(CX, VAL) _c_cdeq_types(CX, VAL)
 #define forward_cvec(CX, VAL) _c_cvec_types(CX, VAL)
 
-// csubstr : non-null terminated string view
-typedef const char csubstr_value;
-typedef struct csubstr { 
-    csubstr_value* str; 
-    intptr_t size;
-} csubstr;
-
-typedef union { 
-    csubstr_value* ref; 
-    struct { csubstr chr; csubstr_value* end; } u8;
-} csubstr_iter;
-
-
-// csview : null-terminated string view
-typedef csubstr_value csview_value;
+// csview : non-null terminated string view
+typedef const char csview_value;
 typedef struct csview { 
     csview_value* str; 
     intptr_t size;
@@ -61,8 +48,21 @@ typedef struct csview {
 
 typedef union { 
     csview_value* ref; 
-    struct { csubstr chr; } u8;
+    struct { csview chr; csview_value* end; } u8;
 } csview_iter;
+
+
+// crawstr : null-terminated string view
+typedef csview_value crawstr_value;
+typedef struct crawstr { 
+    crawstr_value* str; 
+    intptr_t size;
+} crawstr;
+
+typedef union { 
+    crawstr_value* ref; 
+    struct { csview chr; } u8;
+} crawstr_iter;
 
 
 // cstr : null-terminated string (short string optimized - sso)
@@ -75,7 +75,7 @@ typedef union cstr {
 
 typedef union { 
     cstr_value* ref; 
-    struct { csubstr chr; } u8;
+    struct { csview chr; } u8;
 } cstr_iter;
 
 

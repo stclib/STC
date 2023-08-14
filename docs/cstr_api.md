@@ -22,8 +22,8 @@ cstr        cstr_init(void);                                        // construct
 cstr        cstr_lit(const char literal_only[]);                    // cstr from literal; no strlen() call.
 cstr        cstr_from(const char* str);                             // constructor using strlen()
 cstr        cstr_from_n(const char* str, intptr_t n);               // constructor with n first bytes of str
-cstr        cstr_from_sv(csview sv);                                // construct cstr from csview
-cstr        cstr_from_ss(csubstr ss);                               // construct cstr from csubstr
+cstr        cstr_from_sv(csview ss);                                // construct cstr from csview
+cstr        cstr_from_rs(crawstr rs);                               // construct cstr from crawstr
 cstr        cstr_with_capacity(intptr_t cap);
 cstr        cstr_with_size(intptr_t len, char fill);                // repeat fill len times
 cstr        cstr_from_fmt(const char* fmt, ...);                    // printf() formatting
@@ -35,7 +35,7 @@ void        cstr_drop(cstr* self);                                  // destructo
 
 const char* cstr_str(const cstr* self);                             // to const char*
 csview      cstr_sv(const cstr* self);                              // to csview
-csubstr     cstr_ss(const cstr* self);                              // to csubstr
+crawstr     cstr_rs(const cstr* self);                              // to crawstr
 char*       cstr_data(cstr* self);                                  // to mutable char*
 cstr_buf    cstr_buffer(cstr* self);                                // to mutable buffer (with capacity)
 
@@ -50,13 +50,13 @@ void        cstr_clear(cstr* self);
 
 char*       cstr_assign(cstr* self, const char* str);
 char*       cstr_assign_n(cstr* self, const char* str, intptr_t n); // assign n first bytes of str
-char*       cstr_assign_ss(cstr* self, csubstr ss);
+char*       cstr_assign_sv(cstr* self, csview ss);
 char*       cstr_copy(cstr* self, cstr s);                          // copy-assign a cstr
 int         cstr_printf(cstr* self, const char* fmt, ...);          // source and target must not overlap.
 
 char*       cstr_append(cstr* self, const char* str);
 char*       cstr_append_n(cstr* self, const char* str, intptr_t n); // append n first bytes of str
-char*       cstr_append_ss(cstr* self, csubstr str);
+char*       cstr_append_sv(cstr* self, csview str);
 char*       cstr_append_s(cstr* self, cstr str);
 int         cstr_append_fmt(cstr* self, const char* fmt, ...);      // printf() formatting
 char*       cstr_append_uninit(cstr* self, intptr_t len);           // return ptr to start of uninited data
@@ -65,19 +65,19 @@ void        cstr_push(cstr* self, const char* chr);                 // append on
 void        cstr_pop(cstr* self);                                   // pop one utf8 char
 
 void        cstr_insert(cstr* self, intptr_t pos, const char* ins);
-void        cstr_insert_ss(cstr* self, intptr_t pos, csubstr ins);
+void        cstr_insert_sv(cstr* self, intptr_t pos, csview ins);
 void        cstr_insert_s(cstr* self, intptr_t pos, cstr ins);
 
 void        cstr_erase(cstr* self, intptr_t pos, intptr_t len);     // erase len bytes from pos
 
 void        cstr_replace(cstr* self, const char* search, const char* repl, unsigned count = MAX_INT);
-cstr        cstr_replace_ss(csubstr in, csubstr search, csubstr repl, unsigned count);
+cstr        cstr_replace_sv(csview in, csview search, csview repl, unsigned count);
 void        cstr_replace_at(cstr* self, intptr_t pos, intptr_t len, const char* repl); // replace at a pos
-void        cstr_replace_at_ss(cstr* self, intptr_t pos, intptr_t len, const csubstr repl);
+void        cstr_replace_at_sv(cstr* self, intptr_t pos, intptr_t len, const csview repl);
 void        cstr_replace_at_s(cstr* self, intptr_t pos, intptr_t len, cstr repl);
 
 bool        cstr_equals(const cstr* self, const char* str);
-bool        cstr_equals_ss(const cstr* self, csubstr ss);
+bool        cstr_equals_sv(const cstr* self, csview ss);
 bool        cstr_equals_s(const cstr* self, cstr s);
 
 intptr_t    cstr_find(const cstr* self, const char* search);
@@ -85,11 +85,11 @@ intptr_t    cstr_find_at(const cstr* self, intptr_t pos, const char* search); //
 bool        cstr_contains(const cstr* self, const char* search);
 
 bool        cstr_starts_with(const cstr* self, const char* str);
-bool        cstr_starts_with_ss(const cstr* self, csubstr ss);
+bool        cstr_starts_with_sv(const cstr* self, csview ss);
 bool        cstr_starts_with_s(const cstr* self, cstr s);
 
 bool        cstr_ends_with(const cstr* self, const char* str);
-bool        cstr_ends_with_ss(const cstr* self, csubstr ss);
+bool        cstr_ends_with_sv(const cstr* self, csview ss);
 bool        cstr_ends_with_s(const cstr* self, cstr s);
 
 bool        cstr_getline(cstr *self, FILE *stream);                 // cstr_getdelim(self, '\n', stream)
@@ -102,8 +102,8 @@ intptr_t    cstr_u8_size(const cstr* self);                         // number of
 intptr_t    cstr_u8_size_n(const cstr self, intptr_t nbytes);       // utf8 size within n bytes  
 intptr_t    cstr_u8_to_pos(const cstr* self, intptr_t u8idx);       // byte pos offset at utf8 codepoint index
 const char* cstr_u8_at(const cstr* self, intptr_t u8idx);           // char* position at utf8 codepoint index
-csubstr     cstr_u8_chr(const cstr* self, intptr_t u8idx);          // get utf8 character as a csubstr
-void        cstr_u8_replace_at(cstr* self, intptr_t bytepos, intptr_t u8len, csubstr repl); // replace u8len utf8 chars
+csview     cstr_u8_chr(const cstr* self, intptr_t u8idx);          // get utf8 character as a csview
+void        cstr_u8_replace_at(cstr* self, intptr_t bytepos, intptr_t u8len, csview repl); // replace u8len utf8 chars
 void        cstr_u8_erase(cstr* self, intptr_t bytepos, intptr_t u8len); // erase u8len codepoints from pos
 
 // iterate utf8 codepoints
@@ -114,14 +114,14 @@ cstr_iter   cstr_advance(cstr_iter it, intptr_t n);
 
 // utf8 functions requires linking with src/utf8code.c symbols:
 bool        cstr_valid_utf8(const cstr* self);                      // check if str is valid utf8
-cstr        cstr_casefold_ss(csubstr ss);                           // returns new casefolded utf8 cstr
+cstr        cstr_casefold_sv(csview ss);                           // returns new casefolded utf8 cstr
 
 cstr        cstr_tolower(const char* str);                          // returns new lowercase utf8 cstr
-cstr        cstr_tolower_ss(csubstr ss);                            // returns new lowercase utf8 cstr
+cstr        cstr_tolower_sv(csview ss);                            // returns new lowercase utf8 cstr
 void        cstr_lowercase(cstr* self);                             // transform cstr to lowercase utf8
 
 cstr        cstr_toupper(const char* str);                          // returns new uppercase utf8 cstr
-cstr        cstr_toupper_ss(csubstr ss);                            // returns new uppercase utf8 cstr
+cstr        cstr_toupper_sv(csview ss);                            // returns new uppercase utf8 cstr
 void        cstr_uppercase(cstr* self);                             // transform cstr to uppercase utf8
  
 int         cstr_icmp(const cstr* s1, const cstr* s2);              // utf8 case-insensitive comparison
@@ -146,7 +146,7 @@ char*       cstrnstrn(const char* str, const char* search, intptr_t slen, intptr
 |:----------------|:---------------------------------------------|:---------------------|
 | `cstr`          | `struct { ... }`                             | The string type      |
 | `cstr_value`    | `char`                                       | String element type  |
-| `csubstr`       | `struct { const char *str; intptr_t size; }` | String view type     |
+| `csview`        | `struct { const char *str; intptr_t size; }` | String view type     |
 | `cstr_buf`      | `struct { char *data; intptr_t size, cap; }` | String buffer type   |
 
 ## Constants and macros

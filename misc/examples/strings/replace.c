@@ -20,13 +20,13 @@ int main(void)
     cstr_replace_at(&s, 9, 5, s2);                     // "this is an example string." (1)
     printf("(1) %s\n", cstr_str(&s));
 
-    cstr_replace_at_ss(&s, 19, 6, c_ss(s3+7, 6));      // "this is an example phrase." (2)
+    cstr_replace_at_sv(&s, 19, 6, c_sv(s3+7, 6));      // "this is an example phrase." (2)
     printf("(2) %s\n", cstr_str(&s));
 
     cstr_replace_at(&s, 8, 10, "just a");              // "this is just a phrase."     (3)
     printf("(3) %s\n", cstr_str(&s));
 
-    cstr_replace_at_ss(&s, 8, 6, c_ss("a shorty", 7)); // "this is a short phrase."    (4)
+    cstr_replace_at_sv(&s, 8, 6, c_sv("a shorty", 7)); // "this is a short phrase."    (4)
     printf("(4) %s\n", cstr_str(&s));
 
     cstr_replace_at(&s, 22, 1, "!!!");                 // "this is a short phrase!!!"  (5)

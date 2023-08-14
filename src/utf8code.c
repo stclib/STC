@@ -101,7 +101,7 @@ uint32_t utf8_toupper(uint32_t c) {
     return c;
 }
 
-int utf8_icmp_ss(const csubstr s1, const csubstr s2) {
+int utf8_icmp_sv(const csview s1, const csview s2) {
     utf8_decode_t d1 = {.state=0}, d2 = {.state=0};
     intptr_t j1 = 0, j2 = 0;
     while ((j1 < s1.size) & (j2 < s2.size)) {

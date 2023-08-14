@@ -1,20 +1,20 @@
 #define i_implement
 #include <stc/cstr.h>
 #define i_implement
-#include <stc/csubstr.h>
+#include <stc/csview.h>
 
 int main(void)
 {
     // No memory allocations or string length calculations!
-    const csubstr date = c_ss("2021/03/12");
+    const csview date = c_sv("2021/03/12");
     intptr_t pos = 0;
-    const csubstr year = csubstr_token(date, "/", &pos);
-    const csubstr month = csubstr_token(date, "/", &pos);
-    const csubstr day = csubstr_token(date, "/", &pos);
+    const csview year = csview_token(date, "/", &pos);
+    const csview month = csview_token(date, "/", &pos);
+    const csview day = csview_token(date, "/", &pos);
 
-    printf("%.*s, %.*s, %.*s\n", c_SS(year), c_SS(month), c_SS(day));
+    printf("%.*s, %.*s, %.*s\n", c_SV(year), c_SV(month), c_SV(day));
 
-    cstr y = cstr_from_ss(year), m = cstr_from_ss(month), d = cstr_from_ss(day);
+    cstr y = cstr_from_sv(year), m = cstr_from_sv(month), d = cstr_from_sv(day);
     printf("%s, %s, %s\n", cstr_str(&y), cstr_str(&m), cstr_str(&d));
     c_drop(cstr, &y, &m, &d);
 }

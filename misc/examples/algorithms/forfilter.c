@@ -2,7 +2,7 @@
 #define i_import
 #include <stc/cstr.h>
 #define i_implement
-#include <stc/csubstr.h>
+#include <stc/csview.h>
 #include <stc/algorithm.h>
 
 #define i_type IVec
@@ -82,7 +82,7 @@ fn main() {
 }
 */
 #define i_type SVec
-#define i_keyclass csubstr
+#define i_keyclass csview
 #include <stc/cstack.h>
 
 void demo3(void)
@@ -94,11 +94,11 @@ void demo3(void)
 
     SVec words_containing_i = {0};
     c_forfilter (w, SVec, words, 
-                    csubstr_contains(*w.ref, "i"))
+                    csview_contains(*w.ref, "i"))
         SVec_push(&words_containing_i, *w.ref);
 
     c_foreach (w, SVec, words_containing_i)
-        printf(" %.*s", c_SS(*w.ref));
+        printf(" %.*s", c_SV(*w.ref));
 
     puts("");
     c_drop(SVec, &words, &words_containing_i);
@@ -107,10 +107,10 @@ void demo3(void)
 void demo4(void)
 {
     // Keep only uppercase letters and convert them to lowercase:
-    csubstr s = c_ss("ab123cReAghNGnΩoEp"); // Ω = multi-byte
+    csview s = c_sv("ab123cReAghNGnΩoEp"); // Ω = multi-byte
     cstr out = {0};
 
-    c_forfilter (i, csubstr, s, utf8_isupper(utf8_peek(i.ref))) {
+    c_forfilter (i, csview, s, utf8_isupper(utf8_peek(i.ref))) {
         char chr[4];
         utf8_encode(chr, utf8_tolower(utf8_peek(i.ref)));
         cstr_push(&out, chr);

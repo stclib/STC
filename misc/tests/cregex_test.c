@@ -1,6 +1,6 @@
 #define i_import
 #include <stc/cregex.h>
-#include <stc/csubstr.h>
+#include <stc/csview.h>
 #include <stc/algo/raii.h>
 #include "ctest.h"
 
@@ -14,7 +14,7 @@ CTEST(cregex, compile_match_char)
     cregex re = cregex_from("äsdf");
     ASSERT_EQ(re.error, 0);
 
-    csubstr match;
+    csview match;
     ASSERT_EQ(cregex_find(&re, inp="äsdf", &match, CREG_FULLMATCH), CREG_OK);
     ASSERT_EQ(M_START(match), 0);
     ASSERT_EQ(M_END(match), 5); // ä is two bytes wide
@@ -32,7 +32,7 @@ CTEST(cregex, compile_match_anchors)
     cregex re = cregex_from(inp="^äs.f$");
     ASSERT_EQ(re.error, 0);
 
-    csubstr match;
+    csview match;
     ASSERT_EQ(cregex_find(&re, inp="äsdf", &match), CREG_OK);
     ASSERT_EQ(M_START(match), 0);
     ASSERT_EQ(M_END(match), 5);
@@ -50,7 +50,7 @@ CTEST(cregex, compile_match_quantifiers1)
         re = cregex_from("ä+");
         ASSERT_EQ(re.error, 0);
 
-        csubstr match;
+        csview match;
         ASSERT_EQ(cregex_find(&re, inp="ääb", &match), CREG_OK);
         ASSERT_EQ(M_START(match), 0);
         ASSERT_EQ(M_END(match), 4);
@@ -70,7 +70,7 @@ CTEST(cregex, compile_match_quantifiers2)
         re = cregex_from("bä*");
         ASSERT_EQ(re.error, 0);
 
-        csubstr match;
+        csview match;
         ASSERT_EQ(cregex_find(&re, inp="bääb", &match), CREG_OK);
         ASSERT_EQ(M_START(match), 0);
         ASSERT_EQ(M_END(match), 5);
@@ -90,7 +90,7 @@ CTEST(cregex, compile_match_escaped_chars)
     cregex re = cregex_from("\\n\\r\\t\\{");
     ASSERT_EQ(re.error, 0);
 
-    csubstr match;
+    csview match;
     ASSERT_EQ(cregex_find(&re, "\n\r\t{", &match), CREG_OK);
     ASSERT_EQ(cregex_find(&re, "\n\r\t", &match), CREG_NOMATCH);
 
@@ -108,7 +108,7 @@ CTEST(cregex, compile_match_class_simple)
         re3 = cregex_from("\\D");
         ASSERT_EQ(re3.error, 0);
 
-        csubstr match;
+        csview match;
         ASSERT_EQ(cregex_find(&re1, " " , &match), CREG_OK);
         ASSERT_EQ(cregex_find(&re1, "\r", &match), CREG_OK);
         ASSERT_EQ(cregex_find(&re1, "\n", &match), CREG_OK);
@@ -129,7 +129,7 @@ CTEST(cregex, compile_match_or)
         re = cregex_from("as|df");
         ASSERT_EQ(re.error, 0);
 
-        csubstr match[4];
+        csview match[4];
         ASSERT_EQ(cregex_find(&re, "as", match), CREG_OK);
         ASSERT_EQ(cregex_find(&re, "df", match), CREG_OK);
 
@@ -146,7 +146,7 @@ CTEST(cregex, compile_match_class_complex_0)
     cregex re = cregex_from("[asdf]");
     ASSERT_EQ(re.error, 0);
 
-    csubstr match;
+    csview match;
     ASSERT_EQ(cregex_find(&re, "a", &match), CREG_OK);
     ASSERT_EQ(cregex_find(&re, "s", &match), CREG_OK);
     ASSERT_EQ(cregex_find(&re, "d", &match), CREG_OK);
@@ -160,7 +160,7 @@ CTEST(cregex, compile_match_class_complex_1)
     cregex re = cregex_from("[a-zä0-9öA-Z]");
     ASSERT_EQ(re.error, 0);
 
-    csubstr match;
+    csview match;
     ASSERT_EQ(cregex_find(&re, "a", &match), CREG_OK);
     ASSERT_EQ(cregex_find(&re, "5", &match), CREG_OK);
     ASSERT_EQ(cregex_find(&re, "A", &match), CREG_OK);
@@ -175,7 +175,7 @@ CTEST(cregex, compile_match_cap)
     cregex re = cregex_from("(abc)d");
     ASSERT_EQ(re.error, 0);
 
-    csubstr match[4];
+    csview match[4];
     ASSERT_EQ(cregex_find(&re, "abcd", match), CREG_OK);
     ASSERT_EQ(cregex_find(&re, "llljabcdkk", match), CREG_OK);
     ASSERT_EQ(cregex_find(&re, "abc", match), CREG_NOMATCH);
@@ -189,7 +189,7 @@ CTEST(cregex, search_all)
     c_auto (cregex, re)
     {
         re = cregex_from("ab");
-        csubstr m = {0};
+        csview m = {0};
         int res;
         ASSERT_EQ(re.error, CREG_OK);
         inp="ab,ab,ab";
@@ -220,9 +220,9 @@ CTEST(cregex, captures_cap)
         re = cregex_from("(ab)((cd)+)");
         ASSERT_EQ(cregex_captures(&re), 3);
 
-        csubstr cap[5];
+        csview cap[5];
         ASSERT_EQ(cregex_find(&re, inp="xxabcdcde", cap), CREG_OK);
-        ASSERT_TRUE(csubstr_equals(cap[0], "abcdcd"));
+        ASSERT_TRUE(csview_equals(cap[0], "abcdcd"));
 
         ASSERT_EQ(M_END(cap[0]), 8);
         ASSERT_EQ(M_START(cap[1]), 2);
@@ -235,7 +235,7 @@ CTEST(cregex, captures_cap)
     }
 }
 
-static bool add_10_years(int i, csubstr match, cstr* out) {
+static bool add_10_years(int i, csview match, cstr* out) {
     if (i == 1) { // group 1 matches year
         int year;
         sscanf(match.str, "%4d", &year); // scan 4 chars only
@@ -280,7 +280,7 @@ CTEST(cregex, replace)
         ASSERT_STREQ(cstr_str(&str), "start date: 31.12.2015, end date: 28.02.2022");
 
         // Strip out everything but the matches
-        cstr_take(&str, cregex_replace_ss(&re, csubstr_from(input), "$3.$2.$1;", 0, NULL, CREG_STRIP));
+        cstr_take(&str, cregex_replace_sv(&re, csview_from(input), "$3.$2.$1;", 0, NULL, CREG_STRIP));
         ASSERT_STREQ(cstr_str(&str), "31.12.2015;28.02.2022;");
     }
 }

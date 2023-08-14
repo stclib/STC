@@ -7,16 +7,16 @@
 #define i_implement
 #include <stc/cstr.h>   // string
 #define i_implement
-#include <stc/csubstr.h> // string_view
+#include <stc/csview.h> // string_view
 #include <stc/algo/raii.h>
 
 #define i_key_str
 #include <stc/cvec.h>   // vec of cstr with const char* lookup
 
-#define i_type cvec_ss  // override default type name (cvec_csubstr)
-#define i_key csubstr
-#define i_cmp csubstr_cmp
-#include <stc/cvec.h>   // cvec_vs: vec of csubstr
+#define i_type cvec_sv  // override default type name (cvec_csview)
+#define i_key csview
+#define i_cmp csview_cmp
+#include <stc/cvec.h>   // cvec_vs: vec of csview
 
 #define i_key_str
 #define i_val size_t
@@ -24,7 +24,7 @@
 
 #define i_key_ssv
 #define i_val size_t
-#include <stc/csmap.h>  // sorted map of cstr, csubstr lookup
+#include <stc/csmap.h>  // sorted map of cstr, csview lookup
 
 #define i_key_str
 #define i_val size_t
@@ -32,7 +32,7 @@
 
 #define i_key_ssv
 #define i_val size_t
-#include <stc/cmap.h>   // unordered map of cstr, csubstr lookup
+#include <stc/cmap.h>   // unordered map of cstr, csview lookup
 
 
 cvec_str read_file(const char* name)
@@ -67,7 +67,7 @@ private:
     std::chrono::high_resolution_clock::time_point begin;
 };
 
-void initShortStringVec(cvec_str* vs, cvec_ss* vsv)
+void initShortStringVec(cvec_str* vs, cvec_sv* vsv)
 {
     cvec_str_drop(vs);
     cvec_sv_clear(vsv);
@@ -101,14 +101,14 @@ void initShortStringVec(cvec_str* vs, cvec_ss* vsv)
     size_t num = 0;
     c_foreach (i, cvec_str, *vs)
     {
-        cvec_sv_push_back(vsv, cstr_ss(i.ref));
+        cvec_sv_push_back(vsv, cstr_sv(i.ref));
         num += cstr_size(i.ref);
     }
     std::cout << "num strings: " << cvec_sv_size(vsv) << std::endl;
     std::cout << "avg str len: " << num / (float)cvec_sv_size(vsv) << std::endl;
 }
 
-void initLongStringVec(cvec_str* vs, cvec_ss* vsv)
+void initLongStringVec(cvec_str* vs, cvec_sv* vsv)
 {
     cvec_str_drop(vs);
     cvec_sv_clear(vsv);
@@ -147,7 +147,7 @@ void initLongStringVec(cvec_str* vs, cvec_ss* vsv)
     size_t num = 0;
     c_foreach (i, cvec_str, *vs)
     {
-        cvec_sv_push_back(vsv, cstr_ss(i.ref));
+        cvec_sv_push_back(vsv, cstr_sv(i.ref));
         num += cstr_size(i.ref);
     }
     std::cout << "num strings: " << cvec_sv_size(vsv) << std::endl;
@@ -175,7 +175,7 @@ void initMaps(const cvec_str* vs, csmap_str* mapTrans, csmap_ssv* mapSview,
 
 void benchmark(
     const cvec_str* vec_string,
-    const cvec_ss* vec_stringview,
+    const cvec_sv* vec_stringview,
     const csmap_str* mapTrans,
     const csmap_ssv* mapSview,
     const cmap_str* unordmapTrans,
@@ -187,7 +187,7 @@ const size_t MAX_LOOP = 2000;
 int main(void)
 {
     c_auto (cvec_str, vec_string)
-    c_auto (cvec_ss, vec_stringview)
+    c_auto (cvec_sv, vec_stringview)
     c_auto (csmap_str, mapTrans)
     c_auto (csmap_ssv, mapSview)
     c_auto (cmap_str, unordmapTrans)
@@ -229,7 +229,7 @@ int main(void)
 
 void benchmark(
     const cvec_str* vec_string,
-    const cvec_ss* vec_stringview,
+    const cvec_sv* vec_stringview,
     const csmap_str* mapTrans,
     const csmap_ssv*  mapSview,
     const cmap_str* unordmapTrans,
@@ -258,7 +258,7 @@ void benchmark(
     stopwatch.start("Trans Map with string_view");
     for (size_t i = 0; i < MAX_LOOP; ++i)
     {
-        c_foreach (j, cvec_ss, *vec_stringview)
+        c_foreach (j, cvec_sv, *vec_stringview)
         {
             const csmap_ssv_value* v = csmap_ssv_get(mapSview, *j.ref);
             if (v)
@@ -286,7 +286,7 @@ void benchmark(
     stopwatch.start("Trans Unord Map with string_view");
     for (size_t i = 0; i < MAX_LOOP; ++i)
     {
-        c_foreach (j, cvec_ss, *vec_stringview)
+        c_foreach (j, cvec_sv, *vec_stringview)
         {
             const cmap_ssv_value* v = cmap_ssv_get(unordmapSview, *j.ref);
             if (v)

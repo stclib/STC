@@ -1,8 +1,8 @@
 #define i_import
 #include <stc/cregex.h>
-#include <stc/csubstr.h>
+#include <stc/csview.h>
 
-bool add_10_years(int i, csubstr match, cstr* out) {
+bool add_10_years(int i, csview match, cstr* out) {
     if (i == 1) { // group 1 matches year
         int year;
         sscanf(match.str, "%4d", &year); // scan 4 chars only
@@ -47,7 +47,7 @@ int main(void)
         printf("euros: %s\n", cstr_str(&str));
 
         /* Strip out everything but the matches */
-        cstr_take(&str, cregex_replace_ss(&re, csubstr_from(input), "$3.$2.$1;", 0, NULL, CREG_STRIP));
+        cstr_take(&str, cregex_replace_sv(&re, csview_from(input), "$3.$2.$1;", 0, NULL, CREG_STRIP));
         printf("strip: %s\n", cstr_str(&str));
 
         /* Wrap all words in ${} */

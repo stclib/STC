@@ -1,6 +1,6 @@
 #define i_implement
 #include <stc/cstr.h>
-#include <stc/csubstr.h>
+#include <stc/csview.h>
 #include <stdio.h>
 
 int main(void)
@@ -16,11 +16,11 @@ int main(void)
     printf("ends_with: %d\n", cstr_ends_with(&ss, ".JPG"));
 
     cstr s1 = cstr_lit("hell😀 w😀rl🐨");
-    csubstr ch1 = cstr_u8_chr(&s1, 7);
-    csubstr ch2 = cstr_u8_chr(&s1, 10);
+    csview ch1 = cstr_u8_chr(&s1, 7);
+    csview ch2 = cstr_u8_chr(&s1, 10);
     printf("%s\nsize: %" c_ZI ", %" c_ZI "\n", cstr_str(&s1), cstr_u8_size(&s1), cstr_size(&s1));
-    printf("ch1: %.*s\n", c_SS(ch1));
-    printf("ch2: %.*s\n", c_SS(ch2));
+    printf("ch1: %.*s\n", c_SV(ch1));
+    printf("ch2: %.*s\n", c_SV(ch2));
 
     c_drop(cstr, &ss, &s1);
 }
