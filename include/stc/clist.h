@@ -385,17 +385,17 @@ STC_DEF int _cx_MEMB(_sort_cmp_)(const _cx_value* x, const _cx_value* y) {
 }
 
 STC_DEF bool _cx_MEMB(_sort_with)(_cx_Self* self, int(*cmp)(const _cx_value*, const _cx_value*)) {
-    size_t len = 0, cap = 0;
+    intptr_t len = 0, cap = 0;
     _cx_value *a = NULL, *p = NULL;
     _cx_iter i;
     for (i = _cx_MEMB(_begin)(self); i.ref; _cx_MEMB(_next)(&i)) {
         if (len == cap) {
-            if ((p = (_cx_value *)i_realloc(a, (cap += cap/2 + 4)*sizeof *a))) a = p; 
+            if ((p = (_cx_value *)i_realloc(a, (cap += cap/2 + 4)*c_sizeof *a))) a = p; 
             else { i_free(a); return false; }
         }
         a[len++] = *i.ref;
     }
-    qsort(a, len, sizeof *a, (int(*)(const void*, const void*))cmp);
+    qsort(a, (size_t)len, sizeof *a, (int(*)(const void*, const void*))cmp);
     for (i = _cx_MEMB(_begin)(self); i.ref; _cx_MEMB(_next)(&i), ++p) 
         *i.ref = *p;
     i_free(a); return true;

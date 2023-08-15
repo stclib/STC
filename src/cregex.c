@@ -362,7 +362,7 @@ typedef struct _Parser
     bool lastwasand;     /* Last token was _operand */
     short nbra;
     short nclass;
-    size_t instcap;
+    intptr_t instcap;
     _Rune yyrune;         /* last lex'd rune */
     _Reclass *yyclassp;   /* last lex'd class */
     _Reclass* classp;
@@ -562,11 +562,11 @@ _optimize(_Parser *par, _Reprog *pp)
      *  necessary.  Reallocate to the actual space used
      *  and then relocate the code.
      */
-    if ((par->freep - pp->firstinst)*2 > (ptrdiff_t)par->instcap)
+    if ((par->freep - pp->firstinst)*2 > par->instcap)
         return pp;
 
-    intptr_t ipp = (intptr_t)pp;
-    size_t size = sizeof(_Reprog) + (size_t)(par->freep - pp->firstinst)*sizeof(_Reinst);
+    intptr_t ipp = (intptr_t)pp; // convert pointer to intptr_t!
+    intptr_t size = c_sizeof(_Reprog) + (par->freep - pp->firstinst)*c_sizeof(_Reinst);
     _Reprog *npp = (_Reprog *)c_realloc(pp, size);
     ptrdiff_t diff = (intptr_t)npp - ipp;
 
@@ -862,9 +862,9 @@ _regcomp1(_Reprog *pp, _Parser *par, const char *s, int cflags)
     _Token token;
 
     /* get memory for the program. estimated max usage */
-    par->instcap = 5U + 6*strlen(s);
+    par->instcap = 5 + 6*c_strlen(s);
     _Reprog* old_pp = pp;
-    pp = (_Reprog *)c_realloc(pp, sizeof(_Reprog) + par->instcap*sizeof(_Reinst));
+    pp = (_Reprog *)c_realloc(pp, c_sizeof(_Reprog) + par->instcap*c_sizeof(_Reinst));
     if (! pp) {
         c_free(old_pp);
         par->error = CREG_OUTOFMEMORY;
@@ -1152,7 +1152,7 @@ _regexec2(const _Reprog *progp,    /* program to run */
     _Relist *relists;
 
     /* mark space */
-    relists = (_Relist *)c_malloc(2 * _BIGLISTSIZE*sizeof(_Relist));
+    relists = (_Relist *)c_malloc(2 * _BIGLISTSIZE*c_sizeof(_Relist));
     if (relists == NULL)
         return -1;
 

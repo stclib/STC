@@ -417,7 +417,7 @@ _cx_MEMB(_reserve)(_cx_Self* self, const intptr_t _newcap) {
     _newbucks = cnextpow2(_newbucks);
     _cx_Self m = {
         (_cx_value *)i_malloc(_newbucks*c_sizeof(_cx_value)),
-        (struct chash_slot *)i_calloc(_newbucks + 1, sizeof(struct chash_slot)),
+        (struct chash_slot *)i_calloc(_newbucks + 1, c_sizeof(struct chash_slot)),
         self->size, _newbucks
     };
     bool ok = m.data && m.slot;

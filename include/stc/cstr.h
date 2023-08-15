@@ -509,7 +509,7 @@ STC_DEF char* cstr_reserve(cstr* self, const intptr_t cap) {
         char* data = (char *)c_malloc(cap + 1);
         const intptr_t len = cstr_s_size(self);
         /* copy full short buffer to emulate realloc() */
-        c_memcpy(data, self->sml.data, sizeof self->sml);
+        c_memcpy(data, self->sml.data, c_sizeof self->sml);
         self->lon.data = data;
         self->lon.size = (size_t)len;
         cstr_l_set_cap(self, cap);
