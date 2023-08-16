@@ -208,9 +208,9 @@ void fmt_close(fmt_stream* ss) {
 }
 
 const char* fmt_tm(const char *fmt, const struct tm *tp) {
-    static char buf[2][64], i = 1;
-    i = !i;
-    strftime(buf[i], 64, fmt, tp);
+    static char buf[2][64];
+    static  int i;
+    strftime(buf[(i = !i)], sizeof buf[0], fmt, tp);
     return buf[i];
 }
 

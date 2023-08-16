@@ -65,155 +65,179 @@ OutSpanN        cspan_submd4(const SpanType4* parent, intptr_t x, ...);   // num
                 // {i}: reduce rank. {i,c_END}: slice to end. {c_ALL}: use full extent.
 OutSpanN        cspan_slice(TYPE OutSpanN, const SpanTypeM* parent, {x0,x1}, {y0,y1}.., {N0,N1});
 ```
-## TypesPd
+## Types
 | Type name         | Type definition / usage                             | Used to represent... |
 |:------------------|:----------------------------------------------------|:---------------------|
 | SpanTypeN         | `struct { ValueType *data; uint32_t shape[N]; .. }` | SpanType with rank N |
 | SpanTypeN`_value` | `ValueType`                                         | The ValueType        |
 | `c_ALL`           | Use with `cspan_slice()`.                           | Full extent          |
 | `c_END`           |            "                                        | End of extent        |
-     
+
 ## Example 1
 
-Dimension slicing in python, C, and C++:
+[ [Run this code](https://godbolt.org/z/Tv9d1T3TM) ]
+```c
+#include <stdio.h>
+#define i_key int
+#include <stc/cvec.h>
+
+#define i_key int
+#include <stc/cstack.h>
+
+#include <stc/cspan.h>
+using_cspan(intspan, int);
+
+void printMe(intspan container) {
+    printf("%d:", (int)cspan_size(&container));
+    c_foreach (e, intspan, container)
+        printf(" %d", *e.ref);
+    puts("");
+}
+
+int main(void)
+{
+    printMe( c_init(intspan, {1, 2, 3, 4}) );
+
+    int arr[] = {1, 2, 3, 4, 5};
+    printMe( (intspan)cspan_from_array(arr) );
+
+    cvec_int vec = c_init(cvec_int, {1, 2, 3, 4, 5, 6});
+    printMe( (intspan)cspan_from(&vec) );
+
+    cstack_int stk = c_init(cstack_int, {1, 2, 3, 4, 5, 6, 7});
+    printMe( (intspan)cspan_from(&stk) );
+
+    intspan spn = c_init(intspan, {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12});
+    printMe( (intspan)cspan_subspan(&spn, 2, 8) );
+
+    // cleanup
+    cvec_int_drop(&vec);
+    cstack_int_drop(&stk);
+}
+```
+
+## Example 2
+
+Multi-dimension slicing (first in python):
 ```py
 import numpy as np
+
+def print_span(s2):
+    for i in range(s2.shape[0]):
+        for j in range(s2.shape[1]):
+            print(" {}".format(s2[i, j]), end='')
+        print('')
+    print('')
 
 if __name__ == '__main__':
     ms3 = np.array((1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24), int)
 
-    ms3 = np.reshape(ms3, (2, 3, 4))
-    ss3 = ms3[:, 1:3, 2:]
-    ss2 = ss3[1]
+    ms3 = np.reshape(ms3, (2, 3, 4), order='C')
+    ss3 = ms3[:, 0:3, 2:]
+    a = ss3[1]
+    b = np.transpose(a)
 
-    for i in range(ss2.shape[0]):
-        for j in range(ss2.shape[1]):
-            print(" {}".format(ss2[i, j]), end='')
+    print_span(ms3[1])
+    print_span(a)
+    print_span(b)
+
+    for i in a.flat: print(" {}".format(i), end='')
     print('')
+    # prints row-wise
+    for i in b.flat: print(" {}".format(i), end='')
+'''
+ 13 14 15 16
+ 17 18 19 20
+ 21 22 23 24
 
-    for i in ss2.flat:
-        print(" {}".format(i), end='')
+ 15 16
+ 19 20
+ 23 24
 
-# 19 20 23 24
-# 19 20 23 24
+ 15 19 23
+ 16 20 24
+
+ 15 16 19 20 23 24
+ 15 19 23 16 20 24
+'''
 ```
-... can be written in C using cspan:
+... in C with STC cspan:
+
+[ [Run this code](https://godbolt.org/z/e3PeWe7e9) ]
 ```c
 #include <stdio.h>
 #include <stc/cspan.h>
+
 using_cspan3(myspan, int); // define myspan, myspan2, myspan3.
 
-int main(void) {
-    int arr[] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24};
-
-    myspan3 ms3 = cspan_md(arr, 2, 3, 4); // C-order, i.e. row-major.
-    myspan3 ss3 = cspan_slice(myspan3, &ms3, {c_ALL}, {1,3}, {2,c_END});
-    myspan2 ss2 = cspan_submd3(&ss3, 1);
-
-    c_forrange (i, ss2.shape[0])
-        c_forrange (j, ss2.shape[1])
-            printf(" %d", *cspan_at(&ss2, i, j));
+void print_span(myspan2 ms) {
+    for (int i=0; i < ms.shape[0]; ++i) {
+        for (int j=0; j < ms.shape[1]; ++j)
+            printf(" %2d", *cspan_at(&ms, i, j));
+        puts("");
+    }
     puts("");
-
-    c_foreach (i, myspan2, ss2)
-        printf(" %d", *i.ref);
 }
-```
-... and (almost) in C++23:
-```c++
-#include <print>
-#include <mdspan>
-#include <tuple>
 
 int main(void) {
     int arr[] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24};
 
-    std::mdspan ms3(arr, 2, 3, 4);
-    auto ss3 = std::submdspan(ms3, std::full_extent, std::tuple{1,3}, std::tuple{2,4});
-    auto ss2 = std::submdspan(ss3, 1, std::full_extent, std::full_extent);
+    myspan3 ms3 = cspan_md_order('C', arr, 2, 3, 4); // row-major ('F' column-major)
+    myspan3 ss3 = cspan_slice(myspan3, &ms3, {c_ALL}, {0,3}, {2,c_END});
+    myspan2 a = cspan_submd3(&ss3, 1);
+    myspan2 b = a;
+    cspan_transpose(&b);
 
-    for (std::size_t i = 0; i < ss2.extent(0); ++i)
-        for (std::size_t j = 0; j < ss2.extent(1); ++j)
-            std::print(" {}", ss2[i, j]);
-    std::println();
+    print_span((myspan2)cspan_submd3(&ms3, 1));
+    print_span(a);
+    print_span(b);
 
-    // std::mdspan can't be iterated joined/flat!
+    c_foreach (i, myspan2, a) printf(" %d", *i.ref);
+    puts("");
+    // prints in storage order, same as a.
+    c_foreach (i, myspan2, b) printf(" %d", *i.ref);
 }
 ```
-## Example 2
+
+## Example 3
 Slicing cspan without and with reducing the rank:
+
+[ [Run this code](https://godbolt.org/z/jjzcvPPxW) ]
 ```c
-#define i_implement
-#include <c11/fmt.h>
-#include <stc/algorithm.h>
+#include <stdio.h>
 #include <stc/cspan.h>
+#define i_key int
+#include <stc/cvec.h>
+#define i_key int
+#include <stc/cstack.h>
 
 using_cspan3(Span, int); // Shorthand to define Span, Span2, and Span3
 
 int main(void)
 {
-    // c_init() can create any STC container/span from an initializer list:
     Span span = c_init(Span, {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
                               14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24});
-    // create a 3d cspan:
     Span3 span3 = cspan_md(span.data, 2, 4, 3);
-
-    // reduce rank: (i.e. span3[1])
-    Span2 span2 = cspan_submd3(&span3, 1);
-
-    puts("\niterate span2 flat:");
-    c_foreach (i, Span2, span2)
-        fmt_print(" {}", *i.ref);
-    puts("");
-
-    // create span on-the-fly
-    int array[] = {3, 65, 4, 3, 7, 87, 45};
-    c_forfilter (i, ISpan, (ISpan)cspan_from_array(array),
-                    c_flt_skip(i, 2) &&
-                    c_flt_take(i, 3))
-        fmt_print(" {}", *i.ref);
-    puts("");
 
     // slice without reducing rank:
     Span3 ss3 = cspan_slice(Span3, &span3, {c_ALL}, {3,4}, {c_ALL});
 
-    puts("\niterate ss3 by dimensions:");
     c_forrange (i, ss3.shape[0]) {
         c_forrange (j, ss3.shape[1]) {
             c_forrange (k, ss3.shape[2])
-                fmt_print(" {:2}", *cspan_at(&ss3, i, j, k));
-            fmt_print(" |");
+                printf(" %2d", *cspan_at(&ss3, i, j, k));
+            puts("");
         }
+        puts("");
     }
+
     // slice and reduce rank:
     Span2 ss2 = cspan_slice(Span2, &span3, {c_ALL}, {3}, {c_ALL});
 
-    puts("\niterate ss2 by dimensions:");
     c_forrange (i, ss2.shape[0]) {
         c_forrange (j, ss2.shape[1])
-            fmt_print(" {:2}", *cspan_at(&ss2, i, j));
-        fmt_print(" |");
+            printf(" %2d", *cspan_at(&ss2, i, j));
+        puts("");
     }
-
-    puts("\niterate ss2 flat:");
-    c_foreach (i, Span2, ss2)
-        fmt_print(" {:2}", *i.ref);
-    puts("");
 }
-```
-Output:
-```
-iterate span2 flat:
- 13 14 15 16 17 18 19 20 21 22 23 24
-
-iterate ss3 by dimensions:
- 10 11 12 |
- 22 23 24 |
-
-iterate ss2 by dimensions:
- 10 | 11 | 12 |
- 22 | 23 | 24 |
-
-iterate ss2 flat:
- 10 11 12 22 23 24
 ```
