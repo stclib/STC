@@ -67,7 +67,7 @@ int main(void)
 
   Values values = {0};
   for (int i=0; i < N*D1*D2; ++i)
-      Values_push(&values, (crandf() - 0.5f)*4.0f);
+      Values_push(&values, (crandf() - 0.5)*4.0);
 
   double out[D1*D2];
   Mat3 data = cspan_md_order('C', values.data, N, D1, D2);
@@ -85,6 +85,6 @@ int main(void)
   }
 
   t = clock() - t;
-  printf("%.16g: %f\n", sum, (float)t*1000.0f/CLOCKS_PER_SEC);
+  printf("%.16g: %f\n", sum, (double)t*1000.0/CLOCKS_PER_SEC);
   Values_drop(&values);
 }
