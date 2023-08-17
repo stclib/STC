@@ -149,7 +149,7 @@ int main(void)
     printf("%s\n", cstr_str(&s1));
 
     c_foreach (i, cstr, s1)
-        printf("%.*s,", c_SV(i.u8.chr));
+        printf("%.*s,", c_SV(i.chr));
 
     cstr_drop(&s1);
 }

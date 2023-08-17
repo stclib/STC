@@ -85,7 +85,7 @@ int main(void)
     printf("%s\n", rs.str);
 
     c_foreach (i, crawstr, rs)
-        printf("%.*s ", c_SV(i.u8.chr));
+        printf("%.*s ", c_SV(i.chr));
     puts("");
 
     cstr str = cstr_toupper_sv(crawstr_sv(rs));

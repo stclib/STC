@@ -217,15 +217,15 @@ STC_INLINE cstr_iter cstr_end(const cstr* self) {
     (void)self; return c_LITERAL(cstr_iter){NULL};
 }
 STC_INLINE void cstr_next(cstr_iter* it) {
-    it->ref += it->u8.chr.size;
-    it->u8.chr.size = utf8_chr_size(it->ref);
+    it->ref += it->chr.size;
+    it->chr.size = utf8_chr_size(it->ref);
     if (!*it->ref) it->ref = NULL;
 }
 STC_INLINE cstr_iter cstr_advance(cstr_iter it, intptr_t pos) {
     int inc = -1;
     if (pos > 0) pos = -pos, inc = 1;
     while (pos && *it.ref) pos += (*(it.ref += inc) & 0xC0) != 0x80;
-    it.u8.chr.size = utf8_chr_size(it.ref);
+    it.chr.size = utf8_chr_size(it.ref);
     if (!*it.ref) it.ref = NULL;
     return it;
 }

@@ -89,8 +89,8 @@ STC_INLINE csview_iter csview_end(const csview* self) {
     return c_LITERAL(csview_iter){.u8 = {{NULL}, self->buf + self->size}};
 }
 STC_INLINE void csview_next(csview_iter* it) {
-    it->ref += it->u8.chr.size;
-    it->u8.chr.size = utf8_chr_size(it->ref);
+    it->ref += it->chr.size;
+    it->chr.size = utf8_chr_size(it->ref);
     if (it->ref == it->u8.end) it->ref = NULL;
 }
 
@@ -159,7 +159,7 @@ STC_DEF csview_iter csview_advance(csview_iter it, intptr_t pos) {
     int inc = -1;
     if (pos > 0) pos = -pos, inc = 1;
     while (pos && it.ref != it.u8.end) pos += (*(it.ref += inc) & 0xC0) != 0x80;
-    it.u8.chr.size = utf8_chr_size(it.ref);
+    it.chr.size = utf8_chr_size(it.ref);
     if (it.ref == it.u8.end) it.ref = NULL;
     return it;
 }

@@ -15,7 +15,7 @@ int main(void)
     printf("%s\n", cstr_str(&hello));
 
     c_foreach (c, cstr, hello)
-        printf("%.*s,", c_SV(c.u8.chr));
+        printf("%.*s,", c_SV(c.chr));
     
     cstr str = cstr_lit("scooby, dooby doo");
     cstr_replace(&str, "oo", "00");

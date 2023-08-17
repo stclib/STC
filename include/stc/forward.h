@@ -48,6 +48,7 @@ typedef struct csview {
 
 typedef union { 
     csview_value* ref; 
+    csview chr;
     struct { csview chr; csview_value* end; } u8;
 } csview_iter;
 
@@ -61,7 +62,8 @@ typedef struct crawstr {
 
 typedef union { 
     crawstr_value* ref; 
-    struct { csview chr; } u8;
+    csview chr;
+    struct { csview chr; } u8; // [deprecated]
 } crawstr_iter;
 
 
@@ -75,7 +77,8 @@ typedef union cstr {
 
 typedef union { 
     cstr_value* ref; 
-    struct { csview chr; } u8;
+    csview chr;
+    struct { csview chr; } u8; // [deprecated]
 } cstr_iter;
 
 

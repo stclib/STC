@@ -27,12 +27,13 @@
 #define CRAWSTR_H_INCLUDED
 
 #define             crawstr_init() c_rs("")
-#define             crawstr_drop(p) c_default_drop(p)
 #define             crawstr_clone(rs) c_default_clone(rs)
+#define             crawstr_drop(self) c_default_drop(self)
+#define             crawstr_toraw(self) (self)->str
 
 STC_INLINE crawstr  crawstr_from(const char* str)
                         { return c_rs_2(str, c_strlen(str)); }
-STC_INLINE void     crawstr_clear(crawstr* self) { *self = crawstr_init(); }
+STC_INLINE void     crawstr_clear(crawstr* self) { *self = c_rs(""); }
 STC_INLINE csview   crawstr_sv(crawstr rs) { return c_sv_2(rs.str, rs.size); }
 
 STC_INLINE intptr_t crawstr_size(crawstr rs) { return rs.size; }
@@ -70,15 +71,15 @@ STC_INLINE crawstr_iter crawstr_end(const crawstr* self) {
     (void)self; return c_LITERAL(crawstr_iter){.ref = NULL};
 }
 STC_INLINE void crawstr_next(crawstr_iter* it) {
-    it->ref += it->u8.chr.size;
-    it->u8.chr.size = utf8_chr_size(it->ref);
+    it->ref += it->chr.size;
+    it->chr.size = utf8_chr_size(it->ref);
     if (!*it->ref) it->ref = NULL;
 }
 STC_INLINE crawstr_iter crawstr_advance(crawstr_iter it, intptr_t pos) {
     int inc = -1;
     if (pos > 0) pos = -pos, inc = 1;
     while (pos && *it.ref) pos += (*(it.ref += inc) & 0xC0) != 0x80;
-    it.u8.chr.size = utf8_chr_size(it.ref);
+    it.chr.size = utf8_chr_size(it.ref);
     if (!*it.ref) it.ref = NULL;
     return it;
 }
