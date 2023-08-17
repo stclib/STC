@@ -1,11 +1,17 @@
 # STC [cstr](../include/stc/cstr.h): String
 ![String](pics/string.jpg)
 
-A **cstr** object represent sequences of characters. It supports an interface similar to that of a standard container of bytes, but adding features specifically designed to operate with strings of single-byte characters, terminated by the null character.
+A **cstr** object represent sequences of characters. It supports an interface similar
+to that of a standard container of bytes, but adding features specifically designed to
+operate with strings of single-byte characters, terminated by the null character.
 
-**cstr** has basic support for *UTF8* encoded strings, and has a set of compact and efficient functions for handling case-foldings and comparisons of UTF strings.
+**cstr** has basic support for *UTF8* encoded strings, and has a set of compact and
+efficient functions for handling case-conversion, iteration and indexing into UTF8
+codepoints.
 
-**cstr** uses short strings optimization (sso), which eliminates heap memory allocation for string capacity less than 24 bytes. `sizeof(cstr)` is also 24. In comparison, c++ `sizeof(std::string)` is typically 32, but sso capacity is only 15 bytes.
+**cstr** uses short strings optimization (sso), which eliminates heap memory allocation
+for string capacity up to 22 bytes. `sizeof(cstr)` is 24. In comparison, C++ 
+`sizeof(std::string)` is typically 32, but sso capacity is only 15 bytes.
 
 ## Header file
 

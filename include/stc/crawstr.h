@@ -83,18 +83,9 @@ STC_INLINE crawstr_iter crawstr_advance(crawstr_iter it, intptr_t pos) {
     return it;
 }
 
-/* utf8 size */
-STC_INLINE intptr_t crawstr_u8_size(crawstr rs)
-    { return utf8_size_n(rs.str, rs.size); }
-
-/* utf8 validation: depends on src/utf8code.c */
-STC_INLINE bool crawstr_valid_utf8(crawstr rs)
-    { return utf8_valid_n(rs.str, rs.size); }
-
 /* utf8 ignore case cmp: depends on src/utf8code.c */
 STC_INLINE int crawstr_icmp(const crawstr* x, const crawstr* y)
     { return utf8_icmp_sv(c_sv_2(x->str, x->size), c_sv_2(y->str, y->size)); }
-
 
 STC_INLINE int crawstr_cmp(const crawstr* x, const crawstr* y) {
     intptr_t n = x->size < y->size ? x->size : y->size;

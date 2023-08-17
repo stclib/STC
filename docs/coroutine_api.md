@@ -231,25 +231,25 @@ void print_time()
 // PRODUCER
 cco_task_struct (produce_items,
     struct next_value next;
-    cstr str;
+    cstr text;
 );
 
 int produce_items(struct produce_items* p, cco_runtime* rt)
 {
     cco_routine (p) {
-        p->str = cstr_init();
+        p->text = cstr_init();
         p->next.cco_func = next_value;
         while (true)
         {
             // await for CCO_YIELD (or CCO_DONE)
             cco_await_task(&p->next, rt, CCO_YIELD);
-            cstr_printf(&p->str, "item %d", p->next.val);
+            cstr_printf(&p->text, "item %d", p->next.val);
             print_time();
-            printf("produced %s\n", cstr_str(&p->str));
+            printf("produced %s\n", cstr_str(&p->text));
             cco_yield();
         }
         cco_final:
-        cstr_drop(&p->str);
+        cstr_drop(&p->text);
         puts("done produce");
     }
     return 0;
@@ -271,7 +271,7 @@ int consume_items(struct consume_items* c, cco_runtime* rt)
             printf("consume #%d\n", c->i);
             cco_await_task(&c->produce, rt, CCO_YIELD);
             print_time();
-            printf("consumed %s\n", cstr_str(&c->produce.str));
+            printf("consumed %s\n", cstr_str(&c->produce.text));
         }
         cco_final:
             cco_stop(&c->produce);

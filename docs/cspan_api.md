@@ -222,9 +222,9 @@ int main(void)
     // slice without reducing rank:
     Span3 ss3 = cspan_slice(Span3, &span3, {c_ALL}, {3,4}, {c_ALL});
 
-    c_forrange (i, ss3.shape[0]) {
-        c_forrange (j, ss3.shape[1]) {
-            c_forrange (k, ss3.shape[2])
+    for (int i=0; i < ss3.shape[0]; ++i) {
+        for (int j=0; j < ss3.shape[1]; ++j) {
+            for (int k=0; k < ss3.shape[2]; ++k)
                 printf(" %2d", *cspan_at(&ss3, i, j, k));
             puts("");
         }
@@ -234,8 +234,8 @@ int main(void)
     // slice and reduce rank:
     Span2 ss2 = cspan_slice(Span2, &span3, {c_ALL}, {3}, {c_ALL});
 
-    c_forrange (i, ss2.shape[0]) {
-        c_forrange (j, ss2.shape[1])
+    for (int i=0; i < ss2.shape[0]; ++i) {
+        for (int j=0; j < ss2.shape[1]; ++j)
             printf(" %2d", *cspan_at(&ss2, i, j));
         puts("");
     }

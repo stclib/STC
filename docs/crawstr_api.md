@@ -22,31 +22,37 @@ All crawstr definitions and prototypes are available by including a single heade
 ## Methods
 
 ```c
-crawstr         crawstr_from(const char* str);                          // construct from const char*
-crawstr         c_rs(const char literal_only[]);                        // construct from literal, no strlen()
+crawstr         crawstr_from(const char* str);                      // construct from const char*
+crawstr         c_rs(const char literal_only[]);                    // construct from literal, no strlen()
 
 intptr_t        crawstr_size(crawstr rs);
-bool            crawstr_empty(crawstr rs);                              // check if size == 0
+bool            crawstr_empty(crawstr rs);                          // check if size == 0
 void            crawstr_clear(crawstr* self);
-csview          crawstr_sv(crawstr rs);                                 // convert to csview type
+csview          crawstr_sv(crawstr rs);                             // convert to csview type
+const char*     crawstr_str(crawstr rs);                            // get null-terminated const char*
 
 bool            crawstr_equals(crawstr rs, const char* str);
 intptr_t        crawstr_find(crawstr rs, const char* str);
 bool            crawstr_contains(crawstr rs, const char* str);
 bool            crawstr_starts_with(crawstr rs, const char* str);
 bool            crawstr_ends_with(crawstr rs, const char* str);
+
+crawstr_iter    crawstr_begin(const crawstr* self);
+crawstr_iter    crawstr_end(const crawstr* self);
+void            crawstr_next(crawstr_iter* it);                     // utf8 codepoint step, not byte!
+crawstr_iter    crawstr_advance(crawstr_iter it, intptr_t n);
+```
+
+#### Helper methods for usage in containers
+```c
+int             crawstr_cmp(const crawstr* x, const crawstr* y);
+int             crawstr_icmp(const crawstr* x, const crawstr* y);   // depends on src/utf8code.c:
+bool            crawstr_eq(const crawstr* x, const crawstr* y);
+uint64_t        crawstr_hash(const crawstr* x);
 ```
 
 #### UTF8 methods
 ```c
-intptr_t        crawstr_u8_size(crawstr rs);
-bool            crawstr_valid_utf8(crawstr rs);                         // depends on src/utf8code.c
-
-crawstr_iter    crawstr_begin(const crawstr* self);
-crawstr_iter    crawstr_end(const crawstr* self);
-void            crawstr_next(crawstr_iter* it);                         // utf8 codepoint step, not byte!
-crawstr_iter    crawstr_advance(crawstr_iter it, intptr_t n);
-
                 // from utf8.h
 intptr_t        utf8_size(const char *s);
 intptr_t        utf8_size_n(const char *s, intptr_t nbytes);            // number of UTF8 codepoints within n bytes
@@ -60,14 +66,6 @@ uint32_t        utf8_decode(utf8_decode_t *d, uint8_t byte);            // decod
 unsigned        utf8_encode(char *out, uint32_t codepoint);             // encode unicode cp into out buffer
 uint32_t        utf8_peek(const char* s);                               // codepoint value of character at s
 uint32_t        utf8_peek_off(const char* s, int offset);               // codepoint value at utf8 pos (may be negative)
-```
-
-#### Helper methods
-```c
-int             crawstr_cmp(const crawstr* x, const crawstr* y);
-int             crawstr_icmp(const crawstr* x, const crawstr* y);       // depends on src/utf8code.c:
-bool            crawstr_eq(const crawstr* x, const crawstr* y);
-uint64_t        crawstr_hash(const crawstr* x);
 ```
 
 ## Types
@@ -86,14 +84,14 @@ uint64_t        crawstr_hash(const crawstr* x);
 
 int main(void)
 {
-    cstr str = cstr_from("Liberté, égalité, fraternité.");
-    crawstr rs = cstr_rs(&str);
+    crawstr rs = c_rs("Liberté, égalité, fraternité.");
+    printf("%s\n", rs.str);
 
     c_foreach (i, crawstr, rs)
         printf("%.*s ", c_SV(i.u8.chr));
     puts("");
 
-    cstr_uppercase(&str);
+    cstr str = cstr_toupper_sv(crawstr_sv(rs));
     printf("%s\n", cstr_str(&str));
 
     cstr_drop(&str);
@@ -101,6 +99,7 @@ int main(void)
 ```
 Output:
 ```
+Liberté, égalité, fraternité.
 L i b e r t é ,   é g a l i t é ,   f r a t e r n i t é . 
 LIBERTÉ, ÉGALITÉ, FRATERNITÉ.
 ```
