@@ -152,7 +152,7 @@ char*       cstrnstrn(const char* str, const char* search, intptr_t slen, intptr
 |:----------------|:---------------------------------------------|:---------------------|
 | `cstr`          | `struct { ... }`                             | The string type      |
 | `cstr_value`    | `char`                                       | String element type  |
-| `csview`        | `struct { const char *str; intptr_t size; }` | String view type     |
+| `cstr_iter`     | `union { cstr_value *ref; csview chr; }`     | String iterator      |
 | `cstr_buf`      | `struct { char *data; intptr_t size, cap; }` | String buffer type   |
 
 ## Constants and macros

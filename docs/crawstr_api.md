@@ -67,11 +67,11 @@ uint32_t        utf8_peek_off(const char* s, int offset);               // codep
 
 ## Types
 
-| Type name       | Type definition                            | Used to represent...     |
-|:----------------|:-------------------------------------------|:-------------------------|
-| `crawstr`       | `struct { const char *str; intptr_t size; }` | Raw string view type   |
-| `crawstr_value` | `char`                                     | Raw string element type  |
-| `crawstr_iter`  | `struct { crawstr_value *ref; }`           | UTF8 iterator            |
+| Type name       | Type definition                              | Used to represent...     |
+|:----------------|:---------------------------------------------|:-------------------------|
+| `crawstr`       | `struct { const char *str; intptr_t size; }` | The string view type   |
+| `crawstr_value` | `const char`                                 | The element type         |
+| `crawstr_iter`  | `union { crawstr_value *ref; csview chr; }`  | UTF8 iterator           |
 
 ## Example: UTF8 iteration and case conversion
 ```c

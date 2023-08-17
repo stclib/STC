@@ -96,8 +96,8 @@ uint64_t       csview_hash(const csview* x);
 | Type name       | Type definition                            | Used to represent...     |
 |:----------------|:-------------------------------------------|:-------------------------|
 | `csview`        | `struct { const char *buf; intptr_t size; }` | The string view type   |
-| `csview_value`  | `char`                                     | The string element type  |
-| `csview_iter`   | `struct { csview_value *ref; }`            | UTF8 iterator            |
+| `csview_value`  | `const char`                               | The string element type  |
+| `csview_iter`   | `union { csview_value *ref; csview chr; }` | UTF8 iterator            |
 
 ## Constants and macros
 
