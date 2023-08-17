@@ -1,14 +1,14 @@
 # STC [csview](../include/stc/csview.h): Sub-string View
 ![String](pics/string.jpg)
 
-The type **csview** is a non-null terminated string view and can refer to a constant contiguous sequence of
-char-elements with the first element of the sequence at position zero. The implementation holds two members:
-a pointer to constant char and a size.
+The type **csview** is a non-null terminated string view and can refer to a constant contiguous
+sequence of char-elements with the first element of the sequence at position zero. The implementation
+holds two members: a pointer to constant char and a size.
 
-Because **csview** is non-null terminated, it is not an ideal replacent view for `const char*` - see [crawstr](crawstr_api.md)
-for that. **csview** never allocates memory, and therefore need not be destructed. Its lifetime is limited by
-the source string storage. It keeps the length of the string, and does not need to call *strlen()* to acquire
-the length.
+Because **csview** is non-null terminated, it cannot be a replacent view for `const char*` - 
+see [crawstr](crawstr_api.md) for that. **csview** never allocates memory, and therefore need not be
+destructed. Its lifetime is limited by the source string storage. It keeps the length of the string,
+and does not need to call *strlen()* to acquire the length.
 
 - **csview** iterators works on UTF8 codepoints - like **cstr** and **crawstr** (see Example 2).
 - Because it is null-terminated, it must be printed the following way:
@@ -16,8 +16,8 @@ the length.
 printf("%.*s", c_SV(sstr));
 ```
 
-See the c++ class [std::basic_string_view](https://en.cppreference.com/w/cpp/string/basic_string_view) for a functional
-description.
+See the c++ class [std::basic_string_view](https://en.cppreference.com/w/cpp/string/basic_string_view)
+for a functional description.
 
 ## Header file
 
@@ -95,7 +95,7 @@ uint64_t       csview_hash(const csview* x);
 
 | Type name       | Type definition                            | Used to represent...     |
 |:----------------|:-------------------------------------------|:-------------------------|
-| `csview`        | `struct { const char *str; intptr_t size; }` | The string view type     |
+| `csview`        | `struct { const char *buf; intptr_t size; }` | The string view type   |
 | `csview_value`  | `char`                                     | The string element type  |
 | `csview_iter`   | `struct { csview_value *ref; }`            | UTF8 iterator            |
 

@@ -46,7 +46,7 @@ STC_INLINE intptr_t csview_size(csview sv) { return sv.size; }
 STC_INLINE bool     csview_empty(csview sv) { return sv.size == 0; }
 
 STC_INLINE bool csview_equals_sv(csview sv1, csview sv2)
-    { return sv1.size == sv2.size && !c_memcmp(sv1.str, sv2.str, sv1.size); }
+    { return sv1.size == sv2.size && !c_memcmp(sv1.buf, sv2.buf, sv1.size); }
 
 STC_INLINE bool csview_equals(csview sv, const char* str)
     { return csview_equals_sv(sv, c_sv_2(str, c_strlen(str))); }
@@ -59,34 +59,34 @@ STC_INLINE bool csview_contains(csview sv, const char* str)
 
 STC_INLINE bool csview_starts_with(csview sv, const char* str) {
     intptr_t n = c_strlen(str);
-    return n > sv.size ? false : !c_memcmp(sv.str, str, n);
+    return n > sv.size ? false : !c_memcmp(sv.buf, str, n);
 }
 
 STC_INLINE bool csview_ends_with(csview sv, const char* str) {
     intptr_t n = c_strlen(str);
-    return n > sv.size ? false : !c_memcmp(sv.str + sv.size - n, str, n);
+    return n > sv.size ? false : !c_memcmp(sv.buf + sv.size - n, str, n);
 }
 
 STC_INLINE csview csview_substr(csview sv, intptr_t pos, intptr_t n) {
     if (pos + n > sv.size) n = sv.size - pos;
-    sv.str += pos, sv.size = n;
+    sv.buf += pos, sv.size = n;
     return sv;
 }
 
 STC_INLINE csview csview_slice(csview sv, intptr_t p1, intptr_t p2) {
     if (p2 > sv.size) p2 = sv.size;
-    sv.str += p1, sv.size = p2 > p1 ? p2 - p1 : 0;
+    sv.buf += p1, sv.size = p2 > p1 ? p2 - p1 : 0;
     return sv;
 }
 
 /* utf8 iterator */
 STC_INLINE csview_iter csview_begin(const csview* self) { 
     if (!self->size) return c_LITERAL(csview_iter){NULL};
-    return c_LITERAL(csview_iter){.u8 = {{self->str, utf8_chr_size(self->str)},
-                                          self->str + self->size}};
+    return c_LITERAL(csview_iter){.u8 = {{self->buf, utf8_chr_size(self->buf)},
+                                          self->buf + self->size}};
 }
 STC_INLINE csview_iter csview_end(const csview* self) {
-    return c_LITERAL(csview_iter){.u8 = {{NULL}, self->str + self->size}};
+    return c_LITERAL(csview_iter){.u8 = {{NULL}, self->buf + self->size}};
 }
 STC_INLINE void csview_next(csview_iter* it) {
     it->ref += it->u8.chr.size;
@@ -96,21 +96,21 @@ STC_INLINE void csview_next(csview_iter* it) {
 
 /* utf8 */
 STC_INLINE intptr_t csview_u8_size(csview sv)
-    { return utf8_size_n(sv.str, sv.size); }
+    { return utf8_size_n(sv.buf, sv.size); }
 
 STC_INLINE csview csview_u8_substr(csview sv, intptr_t bytepos, intptr_t u8len) {
-    sv.str += bytepos;
-    sv.size = utf8_pos(sv.str, u8len);
+    sv.buf += bytepos;
+    sv.size = utf8_pos(sv.buf, u8len);
     return sv;
 }
 
 STC_INLINE bool csview_valid_utf8(csview sv) // depends on src/utf8code.c
-    { return utf8_valid_n(sv.str, sv.size); }
+    { return utf8_valid_n(sv.buf, sv.size); }
 
 #define c_fortoken_sv(it, inputsv, sep) \
     for (struct { csview _inp, token, *ref; const char *_sep; intptr_t pos; } \
           it = {._inp=inputsv, .token=it._inp, .ref=&it.token, ._sep=sep} \
-        ; it.pos <= it._inp.size && (it.token = csview_token(it._inp, it._sep, &it.pos)).str ; )
+        ; it.pos <= it._inp.size && (it.token = csview_token(it._inp, it._sep, &it.pos)).buf ; )
 
 #define c_fortoken(it, input, sep) \
     c_fortoken_sv(it, csview_from(input), sep)
@@ -119,7 +119,7 @@ STC_INLINE bool csview_valid_utf8(csview sv) // depends on src/utf8code.c
 
 STC_INLINE int csview_cmp(const csview* x, const csview* y) {
     intptr_t n = x->size < y->size ? x->size : y->size;
-    int c = c_memcmp(x->str, y->str, n);
+    int c = c_memcmp(x->buf, y->buf, n);
     return c ? c : (int)(x->size - y->size);
 }
 
@@ -127,7 +127,7 @@ STC_INLINE int csview_icmp(const csview* x, const csview* y)
     { return utf8_icmp_sv(*x, *y); }
 
 STC_INLINE bool csview_eq(const csview* x, const csview* y)
-    { return x->size == y->size && !c_memcmp(x->str, y->str, x->size); }
+    { return x->size == y->size && !c_memcmp(x->buf, y->buf, x->size); }
 
 #endif // CSVIEW_H_INCLUDED
 
@@ -165,12 +165,12 @@ STC_DEF csview_iter csview_advance(csview_iter it, intptr_t pos) {
 }
 
 STC_DEF intptr_t csview_find_sv(csview sv, csview search) {
-    char* res = cstrnstrn(sv.str, search.str, sv.size, search.size);
-    return res ? (res - sv.str) : c_NPOS;
+    char* res = cstrnstrn(sv.buf, search.buf, sv.size, search.size);
+    return res ? (res - sv.buf) : c_NPOS;
 }
 
 STC_DEF uint64_t csview_hash(const csview *self)
-    { return cfasthash(self->str, self->size); }
+    { return cfasthash(self->buf, self->size); }
 
 STC_DEF csview csview_substr_ex(csview sv, intptr_t pos, intptr_t n) {
     if (pos < 0) { 
@@ -179,7 +179,7 @@ STC_DEF csview csview_substr_ex(csview sv, intptr_t pos, intptr_t n) {
     }
     if (pos > sv.size) pos = sv.size;
     if (pos + n > sv.size) n = sv.size - pos;
-    sv.str += pos, sv.size = n;
+    sv.buf += pos, sv.size = n;
     return sv;
 }
 
@@ -190,15 +190,15 @@ STC_DEF csview csview_slice_ex(csview sv, intptr_t p1, intptr_t p2) {
     }
     if (p2 < 0) p2 += sv.size;
     if (p2 > sv.size) p2 = sv.size;
-    sv.str += p1, sv.size = (p2 > p1 ? p2 - p1 : 0);
+    sv.buf += p1, sv.size = (p2 > p1 ? p2 - p1 : 0);
     return sv;
 }
 
 STC_DEF csview csview_token(csview sv, const char* sep, intptr_t* start) {
     intptr_t sep_size = c_strlen(sep);
-    csview slice = {sv.str + *start, sv.size - *start};
-    const char* res = cstrnstrn(slice.str, sep, slice.size, sep_size);
-    csview tok = {slice.str, res ? (res - slice.str) : slice.size};
+    csview slice = {sv.buf + *start, sv.size - *start};
+    const char* res = cstrnstrn(slice.buf, sep, slice.size, sep_size);
+    csview tok = {slice.buf, res ? (res - slice.buf) : slice.size};
     *start += tok.size + sep_size;
     return tok;
 }

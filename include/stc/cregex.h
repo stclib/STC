@@ -121,7 +121,7 @@ int cregex_find_4(const cregex* re, const char* input, csview match[], int mflag
 STC_INLINE int cregex_find_sv(const cregex* re, csview input, csview match[]) {
     csview *mp = NULL;
     if (match) { match[0] = input; mp = match; }
-    return cregex_find(re, input.str, mp, CREG_STARTEND);
+    return cregex_find(re, input.buf, mp, CREG_STARTEND);
 }
 
 /* match + compile RE pattern */

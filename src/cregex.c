@@ -264,8 +264,8 @@ _renewmatch(_Resub *mp, int ms, _Resublist *sp, int nsubids)
 {
     if (mp==NULL || ms==0)
         return;
-    if (mp[0].str == NULL || sp->m[0].str < mp[0].str ||
-       (sp->m[0].str == mp[0].str && sp->m[0].size > mp[0].size)) {
+    if (mp[0].buf == NULL || sp->m[0].buf < mp[0].buf ||
+       (sp->m[0].buf == mp[0].buf && sp->m[0].size > mp[0].size)) {
         for (int i=0; i<ms && i<=nsubids; i++)
             mp[i] = sp->m[i];
     }
@@ -286,7 +286,7 @@ _renewthread(_Relist *lp,  /* _relist to add to */
 
     for (p=lp; p->inst; p++) {
         if (p->inst == ip) {
-            if (sep->m[0].str < p->se.m[0].str) {
+            if (sep->m[0].buf < p->se.m[0].buf) {
                 if (ms > 1)
                     p->se = *sep;
                 else
@@ -318,10 +318,10 @@ _renewemptythread(_Relist *lp,   /* _relist to add to */
 
     for (p=lp; p->inst; p++) {
         if (p->inst == ip) {
-            if (sp < p->se.m[0].str) {
+            if (sp < p->se.m[0].buf) {
                 if (ms > 1)
                     memset(&p->se, 0, sizeof(p->se));
-                p->se.m[0].str = sp;
+                p->se.m[0].buf = sp;
             }
             return 0;
         }
@@ -329,7 +329,7 @@ _renewemptythread(_Relist *lp,   /* _relist to add to */
     p->inst = ip;
     if (ms > 1)
         memset(&p->se, 0, sizeof(p->se));
-    p->se.m[0].str = sp;
+    p->se.m[0].buf = sp;
     (++p)->inst = NULL;
     return p;
 }
@@ -1005,7 +1005,7 @@ _regexec1(const _Reprog *progp,  /* program to run */
     checkstart = j->starttype;
     if (mp)
         for (i=0; i<ms; i++) {
-            mp[i].str = NULL;
+            mp[i].buf = NULL;
             mp[i].size = 0;
         }
     j->relist[0][0].inst = NULL;
@@ -1066,10 +1066,10 @@ _regexec1(const _Reprog *progp,  /* program to run */
                     icase = inst->type == TOK_ICASE;
                     continue;
                 case TOK_LBRA:
-                    tlp->se.m[inst->r.subid].str = s;
+                    tlp->se.m[inst->r.subid].buf = s;
                     continue;
                 case TOK_RBRA:
-                    tlp->se.m[inst->r.subid].size = (s - tlp->se.m[inst->r.subid].str);
+                    tlp->se.m[inst->r.subid].size = (s - tlp->se.m[inst->r.subid].buf);
                     continue;
                 case TOK_ANY:
                     ok = (r != '\n');
@@ -1118,8 +1118,8 @@ _regexec1(const _Reprog *progp,  /* program to run */
                 case TOK_END:    /* Match! */
                     match = !(mflags & CREG_FULLMATCH) ||
                             ((s == j->eol || r == 0 || r == '\n') &&
-                            (tlp->se.m[0].str == bol || tlp->se.m[0].str[-1] == '\n'));
-                    tlp->se.m[0].size = (s - tlp->se.m[0].str);
+                            (tlp->se.m[0].buf == bol || tlp->se.m[0].buf[-1] == '\n'));
+                    tlp->se.m[0].size = (s - tlp->se.m[0].buf);
                     if (mp != NULL)
                         _renewmatch(mp, ms, &tlp->se, progp->nsubids);
                     break;
@@ -1185,9 +1185,9 @@ _regexec(const _Reprog *progp,    /* program to run */
 
     if (mp && mp[0].size) {
         if (mflags & CREG_STARTEND)
-            j.starts = mp[0].str, j.eol = mp[0].str + mp[0].size;
+            j.starts = mp[0].buf, j.eol = mp[0].buf + mp[0].size;
         else if (mflags & CREG_NEXT)
-            j.starts = mp[0].str + mp[0].size;
+            j.starts = mp[0].buf + mp[0].size;
     }
 
     j.starttype = 0;
@@ -1237,7 +1237,7 @@ _build_subst(const char* replace, int nmatch, const csview match[],
                     if (len + m.size > cap)
                         dst = cstr_reserve(subst, cap += cap/2 + m.size);
                     for (int i = 0; i < m.size; ++i)
-                        dst[len++] = m.str[i];
+                        dst[len++] = m.buf[i];
                 }
                 ++replace;
             case '\0':
@@ -1302,10 +1302,10 @@ cregex_replace_sv_6(const cregex* re, csview input, const char* replace, int cou
 
     while (count-- && cregex_find_sv(re, input, match) == CREG_OK) {
         _build_subst(replace, nmatch, match, mfun, &subst);
-        const intptr_t mpos = (match[0].str - input.str);
-        if (copy & (mpos > 0)) cstr_append_n(&out, input.str, mpos);
+        const intptr_t mpos = (match[0].buf - input.buf);
+        if (copy & (mpos > 0)) cstr_append_n(&out, input.buf, mpos);
         cstr_append_s(&out, subst);
-        input.str = match[0].str + match[0].size;
+        input.buf = match[0].buf + match[0].size;
         input.size -= mpos + match[0].size;
     }
     if (copy) cstr_append_sv(&out, input);

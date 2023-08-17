@@ -15,8 +15,6 @@ storage. It keeps the length of the string, i.e. no need to call *strlen()* for 
 All crawstr definitions and prototypes are available by including a single header file.
 
 ```c
-#define i_implement
-#include <stc/cstr.h>
 #include <stc/crawstr.h>
 ```
 ## Methods
@@ -29,7 +27,6 @@ intptr_t        crawstr_size(crawstr rs);
 bool            crawstr_empty(crawstr rs);                          // check if size == 0
 void            crawstr_clear(crawstr* self);
 csview          crawstr_sv(crawstr rs);                             // convert to csview type
-const char*     crawstr_str(crawstr rs);                            // get null-terminated const char*
 
 bool            crawstr_equals(crawstr rs, const char* str);
 intptr_t        crawstr_find(crawstr rs, const char* str);
@@ -72,8 +69,8 @@ uint32_t        utf8_peek_off(const char* s, int offset);               // codep
 
 | Type name       | Type definition                            | Used to represent...     |
 |:----------------|:-------------------------------------------|:-------------------------|
-| `crawstr`       | `struct { const char *str; intptr_t size; }` | The string view type     |
-| `crawstr_value` | `char`                                     | The string element type  |
+| `crawstr`       | `struct { const char *str; intptr_t size; }` | Raw string view type   |
+| `crawstr_value` | `char`                                     | Raw string element type  |
 | `crawstr_iter`  | `struct { crawstr_value *ref; }`           | UTF8 iterator            |
 
 ## Example: UTF8 iteration and case conversion
@@ -93,7 +90,6 @@ int main(void)
 
     cstr str = cstr_toupper_sv(crawstr_sv(rs));
     printf("%s\n", cstr_str(&str));
-
     cstr_drop(&str);
 }
 ```
@@ -102,28 +98,4 @@ Output:
 Liberté, égalité, fraternité.
 L i b e r t é ,   é g a l i t é ,   f r a t e r n i t é . 
 LIBERTÉ, ÉGALITÉ, FRATERNITÉ.
-```
-
-### Example 2: UTF8 replace
-```c
-#define i_import // include dependent utf8 definitions.
-#include <stc/cstr.h>
-
-int main(void)
-{
-    cstr s1 = cstr_lit("hell😀 w😀rld");
-
-    cstr_u8_replace_at(&s1, cstr_find(&s1, "😀rld"), 1, c_rs("ø"));
-    printf("%s\n", cstr_str(&s1));
-
-    c_foreach (i, cstr, s1)
-        printf("%.*s,", c_SV(i.u8.chr)); // u8.chr is a csview
-
-    cstr_drop(&s1);
-}
-```
-Output:
-```
-hell😀 wørld
-h,e,l,l,😀, ,w,ø,r,l,d,
 ```

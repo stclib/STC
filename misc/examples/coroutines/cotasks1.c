@@ -36,24 +36,24 @@ void print_time()
 
 struct produce_items {
     struct next_value next;
-    cstr str;
+    cstr text;
     int cco_state;
 };
 
 int produce_items(struct produce_items* p)
 {
     cco_routine (p) {
-        p->str = cstr_init();
+        p->text = cstr_init();
         while (true)
         {
             cco_await(next_value(&p->next) != CCO_AWAIT);
-            cstr_printf(&p->str, "item %d", p->next.val);
+            cstr_printf(&p->text, "item %d", p->next.val);
             print_time();
-            printf("produced %s\n", cstr_str(&p->str));
+            printf("produced %s\n", cstr_str(&p->text));
             cco_yield();
         }
         cco_final:
-            cstr_drop(&p->str);
+            cstr_drop(&p->text);
             puts("done produce");
     }
     return 0;
@@ -74,7 +74,7 @@ int consume_items(struct consume_items* c, struct produce_items* p)
             printf("consume #%d\n", c->i);
             cco_await(produce_items(p) != CCO_AWAIT);
             print_time();
-            printf("consumed %s\n", cstr_str(&p->str));
+            printf("consumed %s\n", cstr_str(&p->text));
         }
         cco_final:
         puts("done consume");

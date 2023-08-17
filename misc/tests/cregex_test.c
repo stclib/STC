@@ -4,7 +4,7 @@
 #include <stc/algo/raii.h>
 #include "ctest.h"
 
-#define M_START(m) ((m).str - inp)
+#define M_START(m) ((m).buf - inp)
 #define M_END(m) (M_START(m) + (m).size)
 
 
@@ -238,7 +238,7 @@ CTEST(cregex, captures_cap)
 static bool add_10_years(int i, csview match, cstr* out) {
     if (i == 1) { // group 1 matches year
         int year;
-        sscanf(match.str, "%4d", &year); // scan 4 chars only
+        sscanf(match.buf, "%4d", &year); // scan 4 chars only
         cstr_printf(out, "%04d", year + 10);
         return true;
     }
