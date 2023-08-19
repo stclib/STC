@@ -120,14 +120,14 @@ cstr_iter   cstr_advance(cstr_iter it, intptr_t n);
 
 // utf8 functions requires linking with src/utf8code.c symbols:
 bool        cstr_valid_utf8(const cstr* self);                      // check if str is valid utf8
-cstr        cstr_casefold_sv(csview sv);                           // returns new casefolded utf8 cstr
+cstr        cstr_casefold_sv(csview sv);                            // returns new casefolded utf8 cstr
 
 cstr        cstr_tolower(const char* str);                          // returns new lowercase utf8 cstr
-cstr        cstr_tolower_sv(csview sv);                            // returns new lowercase utf8 cstr
+cstr        cstr_tolower_sv(csview sv);                             // returns new lowercase utf8 cstr
 void        cstr_lowercase(cstr* self);                             // transform cstr to lowercase utf8
 
 cstr        cstr_toupper(const char* str);                          // returns new uppercase utf8 cstr
-cstr        cstr_toupper_sv(csview sv);                            // returns new uppercase utf8 cstr
+cstr        cstr_toupper_sv(csview sv);                             // returns new uppercase utf8 cstr
 void        cstr_uppercase(cstr* self);                             // transform cstr to uppercase utf8
  
 int         cstr_icmp(const cstr* s1, const cstr* s2);              // utf8 case-insensitive comparison
