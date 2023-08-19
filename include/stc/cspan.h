@@ -223,18 +223,7 @@ STC_INLINE intptr_t _cspan_idxN(int rank, const int32_t shape[], const int32_t s
     return off;
 }
 
-STC_INLINE intptr_t _cspan_next2(int32_t pos[], const int32_t shape[], const int32_t stride[], int rank, int* done) {
-    int i, inc;
-    if (stride[0] < stride[rank - 1]) i = rank - 1, inc = -1; else i = 0, inc = 1;
-    intptr_t off = stride[i];
-    ++pos[i];
-    for (; --rank && pos[i] == shape[i]; i += inc) {
-        pos[i] = 0; ++pos[i + inc];
-        off += stride[i + inc] - stride[i]*shape[i];
-    }
-    *done = pos[i] == shape[i];
-    return off;
-}
+STC_API intptr_t _cspan_next2(int32_t pos[], const int32_t shape[], const int32_t stride[], int rank, int* done);
 #define _cspan_next1(pos, shape, stride, rank, done) (*done = ++pos[0]==shape[0], stride[0])
 #define _cspan_next3 _cspan_next2
 #define _cspan_next4 _cspan_next2
@@ -252,6 +241,19 @@ STC_API int32_t* _cspan_shape2stride(char order, int32_t shape[], int rank);
 
 /* --------------------- IMPLEMENTATION --------------------- */
 #if defined(i_implement) || defined(i_static)
+
+STC_DEF intptr_t _cspan_next2(int32_t pos[], const int32_t shape[], const int32_t stride[], int rank, int* done) {
+    int i, inc;
+    if (stride[0] < stride[rank - 1]) i = rank - 1, inc = -1; else i = 0, inc = 1;
+    intptr_t off = stride[i];
+    ++pos[i];
+    for (; --rank && pos[i] == shape[i]; i += inc) {
+        pos[i] = 0; ++pos[i + inc];
+        off += stride[i + inc] - stride[i]*shape[i];
+    }
+    *done = pos[i] == shape[i];
+    return off;
+}
 
 STC_DEF int32_t* _cspan_shape2stride(char order, int32_t shape[], int rank) {
     int32_t k = 1, i, j, inc, s1, s2;

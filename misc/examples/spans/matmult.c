@@ -41,7 +41,7 @@ void recursive_matrix_product(Mat2 A, Mat2 B, OutMat C)
   if (C.shape[0] <= recursion_threshold || C.shape[1] <= recursion_threshold) {
     base_case_matrix_product(A, B, C);
   } else {
-    Partition c = partition(C), 
+    Partition c = partition(C),
               a = partition(A),
               b = partition(B);
     recursive_matrix_product(a.m00, b.m00, c.m00);
