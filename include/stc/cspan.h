@@ -97,8 +97,9 @@ int demo2() {
         return it; \
     } \
     STC_INLINE void Self##_next(Self##_iter* it) { \
-        int done; \
-        it->ref += _cspan_next##RANK(it->pos, it->_s->shape, it->_s->stride.d, RANK, &done); \
+        int i, inc, done; \
+        if (it->_s->stride.d[0] < it->_s->stride.d[RANK - 1]) i=0, inc=1; else i=RANK-1, inc=-1; \
+        it->ref += _cspan_next##RANK(it->pos, it->_s->shape, it->_s->stride.d, RANK, i, inc, &done); \
         if (done) it->ref = NULL; \
     } \
     struct stc_nostruct
@@ -223,8 +224,8 @@ STC_INLINE intptr_t _cspan_idxN(int rank, const int32_t shape[], const int32_t s
     return off;
 }
 
-STC_API intptr_t _cspan_next2(int32_t pos[], const int32_t shape[], const int32_t stride[], int rank, int* done);
-#define _cspan_next1(pos, shape, stride, rank, done) (*done = ++pos[0]==shape[0], stride[0])
+STC_API intptr_t _cspan_next2(int32_t pos[], const int32_t shape[], const int32_t stride[], int rank, int i, int inc, int* done);
+#define _cspan_next1(pos, shape, stride, rank, i, inc, done) (*done = ++pos[0]==shape[0], stride[0])
 #define _cspan_next3 _cspan_next2
 #define _cspan_next4 _cspan_next2
 #define _cspan_next5 _cspan_next2
@@ -242,11 +243,7 @@ STC_API int32_t* _cspan_shape2stride(char order, int32_t shape[], int rank);
 /* --------------------- IMPLEMENTATION --------------------- */
 #if defined(i_implement) || defined(i_static)
 
-STC_DEF intptr_t _cspan_next2(int32_t pos[], const int32_t shape[], const int32_t stride[], int rank, int* done) {
-    int i, inc;
-    if (stride[0] < stride[rank - 1]) i = rank - 1, inc = -1;
-    else /* order 'C' */ i = 0, inc = 1;
-
+STC_DEF intptr_t _cspan_next2(int32_t pos[], const int32_t shape[], const int32_t stride[], int rank, int i, int inc, int* done) {
     intptr_t off = stride[i];
     ++pos[i];
     while (--rank && pos[i] == shape[i]) {
