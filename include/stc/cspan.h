@@ -97,11 +97,9 @@ int demo2() {
         return it; \
     } \
     STC_INLINE void Self##_next(Self##_iter* it) { \
-        static const struct { int8_t i, j, inc; } t[2] = {{RANK - 1, 0, -1}, {0, RANK - 1, 1}}; \
-        const int order = (it->_s->stride.d[0] < it->_s->stride.d[RANK - 1]); /* 0='C', 1='F' */ \
-        it->ref += _cspan_next##RANK(it->pos, it->_s->shape, it->_s->stride.d, RANK, t[order].i, t[order].inc); \
-        if (it->pos[t[order].j] == it->_s->shape[t[order].j]) \
-            it->ref = NULL; \
+        int done; \
+        it->ref += _cspan_next##RANK(it->pos, it->_s->shape, it->_s->stride.d, RANK, &done); \
+        if (done) it->ref = NULL; \
     } \
     struct stc_nostruct
 
@@ -225,16 +223,19 @@ STC_INLINE intptr_t _cspan_idxN(int rank, const int32_t shape[], const int32_t s
     return off;
 }
 
-STC_INLINE intptr_t _cspan_next2(int32_t pos[], const int32_t shape[], const int32_t stride[], int rank, int i, int inc) {
+STC_INLINE intptr_t _cspan_next2(int32_t pos[], const int32_t shape[], const int32_t stride[], int rank, int* done) {
+    int i, inc;
+    if (stride[0] < stride[rank - 1]) i = rank - 1, inc = -1; else i = 0, inc = 1;
     intptr_t off = stride[i];
     ++pos[i];
     for (; --rank && pos[i] == shape[i]; i += inc) {
         pos[i] = 0; ++pos[i + inc];
         off += stride[i + inc] - stride[i]*shape[i];
     }
+    *done = pos[i] == shape[i];
     return off;
 }
-#define _cspan_next1(pos, shape, stride, rank, i, inc) (++pos[0], stride[0])
+#define _cspan_next1(pos, shape, stride, rank, done) (*done = ++pos[0]==shape[0], stride[0])
 #define _cspan_next3 _cspan_next2
 #define _cspan_next4 _cspan_next2
 #define _cspan_next5 _cspan_next2
