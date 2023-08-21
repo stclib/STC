@@ -147,7 +147,6 @@ if __name__ == '__main__':
 
     for i in a.flat: print(" {}".format(i), end='')
     print('')
-    # prints row-wise
     for i in b.flat: print(" {}".format(i), end='')
 '''
  13 14 15 16
@@ -198,7 +197,6 @@ int main(void) {
 
     c_foreach (i, myspan2, a) printf(" %d", *i.ref);
     puts("");
-    // prints in storage order, same as a.
     c_foreach (i, myspan2, b) printf(" %d", *i.ref);
 }
 ```

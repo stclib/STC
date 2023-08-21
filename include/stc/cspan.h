@@ -97,9 +97,8 @@ int demo2() {
         return it; \
     } \
     STC_INLINE void Self##_next(Self##_iter* it) { \
-        int i, inc, done; \
-        if (cspan_is_colmajor(it->_s)) i=0, inc=1; else i=RANK-1, inc=-1; \
-        it->ref += _cspan_next##RANK(it->pos, it->_s->shape, it->_s->stride.d, RANK, i, inc, &done); \
+        int done; \
+        it->ref += _cspan_next##RANK(it->pos, it->_s->shape, it->_s->stride.d, RANK, &done); \
         if (done) it->ref = NULL; \
     } \
     struct stc_nostruct
@@ -227,8 +226,8 @@ STC_INLINE intptr_t _cspan_idxN(int rank, const int32_t shape[], const int32_t s
     return off;
 }
 
-STC_API intptr_t _cspan_next2(int32_t pos[], const int32_t shape[], const int32_t stride[], int rank, int i, int inc, int* done);
-#define _cspan_next1(pos, shape, stride, rank, i, inc, done) (*done = ++pos[0]==shape[0], (void)(i|inc), stride[0])
+STC_API intptr_t _cspan_next2(int32_t pos[], const int32_t shape[], const int32_t stride[], int rank, int* done);
+#define _cspan_next1(pos, shape, stride, rank, done) (*done = ++pos[0]==shape[0], stride[0])
 #define _cspan_next3 _cspan_next2
 #define _cspan_next4 _cspan_next2
 #define _cspan_next5 _cspan_next2
@@ -246,16 +245,15 @@ STC_API int32_t* _cspan_shape2stride(cspan_layout layout, int32_t shape[], int r
 /* --------------------- IMPLEMENTATION --------------------- */
 #if defined(i_implement) || defined(i_static)
 
-STC_DEF intptr_t _cspan_next2(int32_t pos[], const int32_t shape[], const int32_t stride[], int rank, int i, int inc, int* done) {
-    intptr_t off = stride[i];
-    ++pos[i];
+STC_DEF intptr_t _cspan_next2(int32_t pos[], const int32_t shape[], const int32_t stride[], int r, int* done) {
+    intptr_t off = stride[--r];
+    ++pos[r];
 
-    while (--rank && pos[i] == shape[i]) {
-        pos[i] = 0; ++pos[i + inc];
-        off += stride[i + inc] - stride[i]*shape[i];
-        i += inc;
+    for (; r && pos[r] == shape[r]; --r) {
+        pos[r] = 0; ++pos[r - 1];
+        off += stride[r - 1] - stride[r]*shape[r];
     }
-    *done = pos[i] == shape[i];
+    *done = pos[r] == shape[r];
     return off;
 }
 
