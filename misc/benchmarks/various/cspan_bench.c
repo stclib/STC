@@ -49,9 +49,8 @@ static void TraditionalForLoop(intptr_t n)
         for (int x = lx; x < hx; ++x) {
             for (int y = ly; y < hy; ++y) {
                 for (int z = lz; z < hz; ++z) {
-                    int i = nz*(ny*x + y) + z;
-                    double d = Vin[i];
-                    Vout[i] += d;
+                    double d = Vin[nz*(ny*x + y) + z];
+                    Vout[nz*(ny*x + y) + z] += d;
                     sum += d;
                 }
             }
