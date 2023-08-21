@@ -3,11 +3,11 @@
 #include <stdio.h>
 #include <stc/cspan.h>
 
-using_cspan3(span, double); // define span, span2, span3
+using_cspan3(span, double); // shorthand for defining span, span2, span3
 
 // Set all elements of a rank-2 mdspan to zero.
 void zero_2d(span2 grid2d) {
-  c_static_assert(cspan_rank(&grid2d) == 2);
+  (void)c_static_assert(cspan_rank(&grid2d) == 2);
   for (int i = 0; i < grid2d.shape[0]; ++i) {
     for (int j = 0; j < grid2d.shape[1]; ++j) {
       *cspan_at(&grid2d, i,j) = 0;
@@ -16,7 +16,7 @@ void zero_2d(span2 grid2d) {
 }
 
 void zero_surface(span3 grid3d) {
-  c_static_assert(cspan_rank(&grid3d) == 3);
+  (void)c_static_assert(cspan_rank(&grid3d) == 3);
   zero_2d(cspan_slice(span2, &grid3d, {0}, {c_ALL}, {c_ALL}));
   zero_2d(cspan_slice(span2, &grid3d, {c_ALL}, {0}, {c_ALL}));
   zero_2d(cspan_slice(span2, &grid3d, {c_ALL}, {c_ALL}, {0}));

@@ -41,13 +41,13 @@
 
 // csview : non-null terminated string view
 typedef const char csview_value;
-typedef struct csview { 
-    csview_value* buf; 
+typedef struct csview {
+    csview_value* buf;
     intptr_t size;
 } csview;
 
-typedef union { 
-    csview_value* ref; 
+typedef union {
+    csview_value* ref;
     csview chr;
     struct { csview chr; csview_value* end; } u8;
 } csview_iter;
@@ -55,13 +55,13 @@ typedef union {
 
 // crawstr : null-terminated string view
 typedef csview_value crawstr_value;
-typedef struct crawstr { 
-    crawstr_value* str; 
+typedef struct crawstr {
+    crawstr_value* str;
     intptr_t size;
 } crawstr;
 
-typedef union { 
-    crawstr_value* ref; 
+typedef union {
+    crawstr_value* ref;
     csview chr;
     struct { csview chr; } u8; // [deprecated]
 } crawstr_iter;
@@ -75,8 +75,8 @@ typedef union cstr {
     struct { cstr_value* data; size_t size, ncap; } lon;
 } cstr;
 
-typedef union { 
-    cstr_value* ref; 
+typedef union {
+    cstr_value* ref;
     csview chr;
     struct { csview chr; } u8; // [deprecated]
 } cstr_iter;
