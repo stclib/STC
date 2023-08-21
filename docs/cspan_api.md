@@ -44,12 +44,15 @@ SpanTypeN_iter  SpanType_begin(const SpanTypeN* self);
 SpanTypeN_iter  SpanType_end(const SpanTypeN* self);
 void            SpanType_next(SpanTypeN_iter* it);
 
-SpanTypeN       cspan_md(ValueType* data, d1, d2, ...);                   // make a multi-dim cspan, row-major order.
-SpanTypeN       cspan_md_order(char order, ValueType* data, d1, d2, ...); // order='C': row-major, 'F': column-major (FORTRAN).
+                // make a multi-dim cspan
+SpanTypeN       cspan_md(ValueType* data, d1, d2, ...); // row-major
+SpanTypeN       cspan_md_layout(cspan_layout layout, ValueType* data, d1, d2, ...);
 
-                // transpose a md span (inverse axes). No changes to the underlying array.
+                // transpose a md span. Inverses layout and axes only.
 void            cspan_transpose(const SpanTypeN* self);
-bool            cspan_is_order_F(const SpanTypeN* self);
+cspan_layout    cspan_get_layout(const SpanTypeN* self);
+bool            cspan_is_rowmajor(const SpanTypeN* self);
+bool            cspan_is_colmajor(const SpanTypeN* self);
 
                 // create a subspan of input span rank. Like e.g. cspan_slice(Span3, &ms3, {off,off+count}, {c_ALL}, {c_ALL});
 SpanType        cspan_subspan(const SpanType* span, intptr_t offset, intptr_t count);
@@ -70,8 +73,9 @@ OutSpanN        cspan_slice(TYPE OutSpanN, const SpanTypeM* parent, {x0,x1}, {y0
 |:------------------|:----------------------------------------------------|:---------------------|
 | SpanTypeN         | `struct { ValueType *data; uint32_t shape[N]; .. }` | SpanType with rank N |
 | SpanTypeN`_value` | `ValueType`                                         | The ValueType        |
-| `c_ALL`           | Use with `cspan_slice()`.                           | Full extent          |
-| `c_END`           |            "                                        | End of extent        |
+| `c_ALL`           | `cspan_slice(&md, {1,3}, {c_ALL})`                  | Full extent          |
+| `c_END`           | `cspan_slice(&md, {1,c_END}, {2,c_END})`            | End of extent        |
+| `cspan_layout`    | `enum { c_ROWMAJOR, c_COLMAJOR }`                   | Multi-dim layout     |
 
 ## Example 1
 
@@ -182,7 +186,7 @@ void print_span(myspan2 ms) {
 int main(void) {
     int arr[] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24};
 
-    myspan3 ms3 = cspan_md_order('C', arr, 2, 3, 4); // row-major ('F' column-major)
+    myspan3 ms3 = cspan_md(arr, 2, 3, 4); // row-major layout
     myspan3 ss3 = cspan_slice(myspan3, &ms3, {c_ALL}, {0,3}, {2,c_END});
     myspan2 a = cspan_submd3(&ss3, 1);
     myspan2 b = a;

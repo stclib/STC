@@ -70,8 +70,8 @@ int main(void)
       Values_push(&values, (crandf() - 0.5)*4.0);
 
   double out[D1*D2];
-  Mat3 data = cspan_md_order('C', values.data, N, D1, D2);
-  OutMat c = cspan_md_order('C', out, D1, D2);
+  Mat3 data = cspan_md_layout(c_ROWMAJOR, values.data, N, D1, D2);
+  OutMat c = cspan_md_layout(c_ROWMAJOR, out, D1, D2);
   Mat2 a = cspan_submd3(&data, 0);
   double sum = 0.0;
   clock_t t = clock();

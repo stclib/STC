@@ -98,7 +98,7 @@ int demo2() {
     } \
     STC_INLINE void Self##_next(Self##_iter* it) { \
         int i, inc, done; \
-        if (it->_s->stride.d[0] < it->_s->stride.d[RANK - 1]) i=0, inc=1; else i=RANK-1, inc=-1; \
+        if (cspan_is_colmajor(it->_s)) i=0, inc=1; else i=RANK-1, inc=-1; \
         it->ref += _cspan_next##RANK(it->pos, it->_s->shape, it->_s->stride.d, RANK, i, inc, &done); \
         if (done) it->ref = NULL; \
     } \
@@ -115,6 +115,7 @@ using_cspan_tuple(7); using_cspan_tuple(8);
 
 #define c_END -1
 #define c_ALL 0,c_END
+typedef enum {c_ROWMAJOR, c_COLMAJOR} cspan_layout;
 
 /* Use cspan_init() for static initialization only. c_init() for non-static init. */
 #define cspan_init(SpanType, ...) \
@@ -132,7 +133,9 @@ using_cspan_tuple(7); using_cspan_tuple(8);
 
 #define cspan_size(self) _cspan_size((self)->shape, cspan_rank(self))
 #define cspan_rank(self) c_arraylen((self)->shape)
-#define cspan_is_order_F(self) ((self)->stride.d[0] < (self)->stride.d[cspan_rank(self) - 1])
+#define cspan_is_colmajor(self) ((self)->stride.d[0] < (self)->stride.d[cspan_rank(self) - 1])
+#define cspan_is_rowmajor(self) (!cspan_is_colmajor(self))
+#define cspan_get_layout(self) (cspan_is_colmajor(self) ? c_COLMAJOR : c_ROWMAJOR)
 #define cspan_index(self, ...) c_PASTE(cspan_idx_, c_NUMARGS(__VA_ARGS__))(self, __VA_ARGS__)
 #define cspan_at(self, ...) ((self)->data + cspan_index(self, __VA_ARGS__))
 #define cspan_front(self) ((self)->data)
@@ -165,10 +168,10 @@ using_cspan_tuple(7); using_cspan_tuple(8);
 #define cspan_submd4_4(self, x, y, z) \
     {.data=cspan_at(self, x, y, z, 0), .shape={(self)->shape[3]}, .stride=(cspan_tuple1){.d={(self)->stride.d[3]}}}
 
-#define cspan_md(array, ...) cspan_md_order('C', array, __VA_ARGS__)
-#define cspan_md_order(order, array, ...) /* order='C' or 'F' */ \
+#define cspan_md(array, ...) cspan_md_layout(c_ROWMAJOR, array, __VA_ARGS__)
+#define cspan_md_layout(layout, array, ...) \
     {.data=array, .shape={__VA_ARGS__}, \
-     .stride=*(c_PASTE(cspan_tuple, c_NUMARGS(__VA_ARGS__))*)_cspan_shape2stride(order, ((int32_t[]){__VA_ARGS__}), c_NUMARGS(__VA_ARGS__))}
+     .stride=*(c_PASTE(cspan_tuple, c_NUMARGS(__VA_ARGS__))*)_cspan_shape2stride(layout, ((int32_t[]){__VA_ARGS__}), c_NUMARGS(__VA_ARGS__))}
 
 #define cspan_transpose(self) \
     _cspan_transpose((self)->shape, (self)->stride.d, cspan_rank(self))
@@ -225,7 +228,7 @@ STC_INLINE intptr_t _cspan_idxN(int rank, const int32_t shape[], const int32_t s
 }
 
 STC_API intptr_t _cspan_next2(int32_t pos[], const int32_t shape[], const int32_t stride[], int rank, int i, int inc, int* done);
-#define _cspan_next1(pos, shape, stride, rank, i, inc, done) (*done = ++pos[0]==shape[0], stride[0])
+#define _cspan_next1(pos, shape, stride, rank, i, inc, done) (*done = ++pos[0]==shape[0], (void)(i|inc), stride[0])
 #define _cspan_next3 _cspan_next2
 #define _cspan_next4 _cspan_next2
 #define _cspan_next5 _cspan_next2
@@ -237,7 +240,7 @@ STC_API intptr_t _cspan_slice(int32_t oshape[], int32_t ostride[], int* orank,
                               const int32_t shape[], const int32_t stride[],
                               int rank, const int32_t a[][2]);
 
-STC_API int32_t* _cspan_shape2stride(char order, int32_t shape[], int rank);
+STC_API int32_t* _cspan_shape2stride(cspan_layout layout, int32_t shape[], int rank);
 #endif // STC_CSPAN_H_INCLUDED
 
 /* --------------------- IMPLEMENTATION --------------------- */
@@ -246,6 +249,7 @@ STC_API int32_t* _cspan_shape2stride(char order, int32_t shape[], int rank);
 STC_DEF intptr_t _cspan_next2(int32_t pos[], const int32_t shape[], const int32_t stride[], int rank, int i, int inc, int* done) {
     intptr_t off = stride[i];
     ++pos[i];
+
     while (--rank && pos[i] == shape[i]) {
         pos[i] = 0; ++pos[i + inc];
         off += stride[i + inc] - stride[i]*shape[i];
@@ -255,9 +259,9 @@ STC_DEF intptr_t _cspan_next2(int32_t pos[], const int32_t shape[], const int32_
     return off;
 }
 
-STC_DEF int32_t* _cspan_shape2stride(char order, int32_t shape[], int rank) {
+STC_DEF int32_t* _cspan_shape2stride(cspan_layout layout, int32_t shape[], int rank) {
     int i, inc;
-    if (order == 'F') i = 0, inc = 1;
+    if (layout == c_COLMAJOR) i = 0, inc = 1;
     else i = rank - 1, inc = -1;
     int32_t k = 1, s1 = shape[i], s2;
 
@@ -277,6 +281,7 @@ STC_DEF intptr_t _cspan_slice(int32_t oshape[], int32_t ostride[], int* orank,
     intptr_t off = 0;
     int i = 0, oi = 0;
     int32_t end;
+
     for (; i < rank; ++i) {
         off += stride[i]*a[i][0];
         switch (a[i][1]) {
