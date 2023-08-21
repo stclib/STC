@@ -209,7 +209,7 @@
 #endif
 
 // i_eq, i_less, i_cmp
-#if !defined i_eq && (defined i_cmp || defined i_less)
+#if !defined i_eq && defined i_cmp
   #define i_eq(x, y) !(i_cmp(x, y))
 #elif !defined i_eq
   #define i_eq(x, y) *x == *y
