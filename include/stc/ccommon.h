@@ -198,8 +198,7 @@ STC_INLINE intptr_t cnextpow2(intptr_t n) {
          ; _.it.ref && (_.key = &_.it.ref->first, _.val = &_.it.ref->second) \
          ; C##_next(&_.it))
 
-#define c_forint(...) c_for(int, __VA_ARGS__)
-#define c_forrange(...) c_for(_llong, __VA_ARGS__)
+#define c_forrange(...) c_for(long long, __VA_ARGS__)
 #define c_for(...) c_MACRO_OVERLOAD(c_for, __VA_ARGS__)
 #define c_for_2(T, stop) c_for_4(T, _c_i, 0, stop)
 #define c_for_3(T, i, stop) c_for_4(T, i, 0, stop)
