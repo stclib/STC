@@ -63,12 +63,6 @@ int demo2() {
 #include "priv/linkage.h"
 #include "ccommon.h"
 
-#ifdef i_ndebug
-  #define cspan_assert(x) ((void)0)
-#else
-  #define cspan_assert(x) c_assert(x)
-#endif
-
 #define using_cspan(...) c_MACRO_OVERLOAD(using_cspan, __VA_ARGS__)
 #define using_cspan_2(Self, T) \
     using_cspan_3(Self, T, 1); \
@@ -91,7 +85,7 @@ int demo2() {
                                   const int rank, const int32_t a[][2]) { \
         Self s; int outrank; \
         s.data = d + _cspan_slice(s.shape, s.stride.d, &outrank, shape, stri, rank, a); \
-        cspan_assert(outrank == RANK); \
+        c_assert(outrank == RANK); \
         return s; \
     } \
     STC_INLINE Self##_iter Self##_begin(const Self* self) { \
@@ -193,7 +187,7 @@ typedef enum {c_ROWMAJOR, c_COLMAJOR} cspan_layout;
 
 STC_INLINE intptr_t _cspan_size(const int32_t shape[], int rank) {
     intptr_t sz = shape[0];
-    while (--rank > 0) sz *= shape[rank];
+    while (--rank) sz *= shape[rank];
     return sz;
 }
 
@@ -207,14 +201,15 @@ STC_INLINE void _cspan_transpose(int32_t shape[], int32_t stride[], int rank) {
 STC_INLINE intptr_t _cspan_index(int rank, const int32_t shape[], const int32_t stride[], const int32_t a[]) {
     intptr_t off = 0;
     while (rank--) {
-        cspan_assert(c_LTu(a[rank], shape[rank]));
+        c_assert(c_LTu(a[rank], shape[rank]));
         off += stride[rank]*a[rank];
     }
     return off;
 }
 
-STC_API intptr_t _cspan_next2(int32_t pos[], const int32_t shape[], const int32_t stride[], int rank, int* done);
 #define _cspan_next1(pos, shape, stride, rank, done) (*done = ++pos[0]==shape[0], stride[0])
+STC_API intptr_t 
+        _cspan_next2(int32_t pos[], const int32_t shape[], const int32_t stride[], int rank, int* done);
 #define _cspan_next3 _cspan_next2
 #define _cspan_next4 _cspan_next2
 #define _cspan_next5 _cspan_next2
@@ -270,13 +265,13 @@ STC_DEF intptr_t _cspan_slice(int32_t oshape[], int32_t ostride[], int* orank,
     for (; i < rank; ++i) {
         off += stride[i]*a[i][0];
         switch (a[i][1]) {
-            case 0: cspan_assert(c_LTu(a[i][0], shape[i])); continue;
+            case 0: c_assert(c_LTu(a[i][0], shape[i])); continue;
             case -1: end = shape[i]; break;
             default: end = a[i][1];
         }
         oshape[oi] = end - a[i][0];
         ostride[oi] = stride[i];
-        cspan_assert(c_LTu(0, oshape[oi]) & !c_LTu(shape[i], end));
+        c_assert((oshape[oi] > 0) & !c_LTu(shape[i], end));
         ++oi;
     }
     *orank = oi;
@@ -284,7 +279,6 @@ STC_DEF intptr_t _cspan_slice(int32_t oshape[], int32_t ostride[], int* orank,
 }
 
 #endif
-#undef i_ndebug
 #undef i_opt
 #undef i_header
 #undef i_implement

@@ -42,6 +42,29 @@ static void Traditional_for_loop(intptr_t n)
     printf("forloop : %.1f ms, %f\n", 1000.0f*t / CLOCKS_PER_SEC, sum);
 }
 
+static void MDRanges_loop_over_joined(intptr_t n)
+{
+    clock_t t = clock();
+    MD3 r_in = cspan_md(Vin, nx, ny, nz);
+    MD3 r_out = cspan_md(Vout, nx, ny, nz);
+    r_in = cspan_slice(MD3, &r_in, {lx, hx}, {ly, hy}, {lz, hz});
+    r_out = cspan_slice(MD3, &r_out, {lx, hx}, {ly, hy}, {lz, hz});
+    double sum = 0;
+
+    for (intptr_t s = 0; s < n; ++s) {
+        MD3_iter i = MD3_begin(&r_in);
+        MD3_iter o = MD3_begin(&r_out);
+
+        for (; i.ref; MD3_next(&i), MD3_next(&o))
+        {
+            *o.ref += *i.ref;
+            sum += *i.ref;
+        }
+    }
+    t = clock() - t;
+    printf("joined  : %.1f ms, %f\n", 1000.0f*t / CLOCKS_PER_SEC, sum);
+}
+
 static void MDRanges_nested_loop(intptr_t n)
 {
     clock_t t = clock();
@@ -67,28 +90,6 @@ static void MDRanges_nested_loop(intptr_t n)
     printf("nested  : %.1f ms, %f\n", 1000.0f*t / CLOCKS_PER_SEC, sum);
 }
 
-static void MDRanges_loop_over_joined(intptr_t n)
-{
-    clock_t t = clock();
-    MD3 r_in = cspan_md(Vin, nx, ny, nz);
-    MD3 r_out = cspan_md(Vout, nx, ny, nz);
-    r_in = cspan_slice(MD3, &r_in, {lx, hx}, {ly, hy}, {lz, hz});
-    r_out = cspan_slice(MD3, &r_out, {lx, hx}, {ly, hy}, {lz, hz});
-    double sum = 0;
-
-    for (intptr_t s = 0; s < n; ++s) {
-        MD3_iter i = MD3_begin(&r_in);
-        MD3_iter o = MD3_begin(&r_out);
-
-        for (; i.ref; MD3_next(&i), MD3_next(&o))
-        {
-            *o.ref += *i.ref;
-            sum += *i.ref;
-        }
-    }
-    t = clock() - t;
-    printf("joined  : %.1f ms, %f\n", 1000.0f*t / CLOCKS_PER_SEC, sum);
-}
 
 int main(void)
 {
@@ -97,6 +98,6 @@ int main(void)
         Vin[i] = i + 1.23;
 
     Traditional_for_loop(n);
-    MDRanges_nested_loop(n);
     MDRanges_loop_over_joined(n);
+    MDRanges_nested_loop(n);
 }

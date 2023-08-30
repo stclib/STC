@@ -37,7 +37,7 @@ void base_case_matrix_product(Mat2 A, Mat2 B, OutMat C)
 void recursive_matrix_product(Mat2 A, Mat2 B, OutMat C)
 {
   // Some hardware-dependent constant
-  enum {recursion_threshold = 16};
+  enum {recursion_threshold = 32};
   if (C.shape[0] <= recursion_threshold || C.shape[1] <= recursion_threshold) {
     base_case_matrix_product(A, B, C);
   } else {
@@ -63,28 +63,28 @@ void recursive_matrix_product(Mat2 A, Mat2 B, OutMat C)
 
 int main(void)
 {
-  enum {N = 10, D1 = 256, D2 = D1};
+  enum {N = 10, D = 256};
 
   Values values = {0};
-  for (int i=0; i < N*D1*D2; ++i)
+  for (int i=0; i < N*D*D; ++i)
       Values_push(&values, (crandf() - 0.5)*4.0);
 
-  double out[D1*D2];
-  Mat3 data = cspan_md_layout(c_ROWMAJOR, values.data, N, D1, D2);
-  OutMat c = cspan_md_layout(c_ROWMAJOR, out, D1, D2);
+  double out[D*D];
+  Mat3 data = cspan_md_layout(c_ROWMAJOR, values.data, N, D, D);
+  OutMat c = cspan_md_layout(c_COLMAJOR, out, D, D);
   Mat2 a = cspan_submd3(&data, 0);
-  double sum = 0.0;
-  clock_t t = clock();
 
+  clock_t t = clock();
   for (int i=1; i<N; ++i) {
     Mat2 b = cspan_submd3(&data, i);
     memset(out, 0, sizeof out);
     recursive_matrix_product(a, b, c);
     //base_case_matrix_product(a, b, c);
-    sum += *cspan_at(&c, 0, 1);
   }
-
   t = clock() - t;
-  printf("%.16g: %f\n", sum, (double)t*1000.0/CLOCKS_PER_SEC);
+
+  double sum = 0.0;
+  c_foreach (i, Mat2, c) sum += *i.ref;
+  printf("sum=%.16g, %f ms\n", sum, (double)t*1000.0/CLOCKS_PER_SEC);
   Values_drop(&values);
 }
