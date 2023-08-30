@@ -66,6 +66,10 @@ int main(void)
 
     puts("\nOriginal ms3 span with updated data:");
     print3d(ms3);
+
+    puts("col = ms3[1, :, 2]");
+    ispan col = cspan_slice(ispan, &ms3, {1}, {c_ALL}, {2});
+    c_foreach (i, ispan, col) printf(" %d", *i.ref);
     puts("");
 
     cstack_int_drop(&v);

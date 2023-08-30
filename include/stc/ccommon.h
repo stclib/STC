@@ -69,16 +69,14 @@ typedef long long _llong;
   #define c_new(T, ...)         ((T*)memcpy(malloc(sizeof(T)), ((T[]){__VA_ARGS__}), sizeof(T)))
   #define c_LITERAL(T)          (T)
 #endif
-#define c_new_n(T, n)           ((T*)malloc(sizeof(T)*(size_t)(n)))
+#define c_new_n(T, n)           ((T*)malloc(sizeof(T)*c_i2u(n)))
 #define c_malloc(sz)            malloc(c_i2u(sz))
 #define c_calloc(n, sz)         calloc(c_i2u(n), c_i2u(sz))
 #define c_realloc(p, sz)        realloc(p, c_i2u(sz))
 #define c_free(p)               free(p)
 #define c_delete(T, ptr)        do { T *_tp = ptr; T##_drop(_tp); free(_tp); } while (0)
 
-#define c_static_assert(...)    c_MACRO_OVERLOAD(c_static_assert, __VA_ARGS__)
-#define c_static_assert_1(b)    ((int)(0*sizeof(int[(b) ? 1 : -1])))
-#define c_static_assert_2(b, m) c_static_assert_1(b)
+#define c_static_assert(expr)   (1 ? 0 : (int)sizeof(int[(expr) ? 1 : -1]))
 #if defined STC_NDEBUG || defined NDEBUG
   #define c_assert(expr)        ((void)0)
 #else
