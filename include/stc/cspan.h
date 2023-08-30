@@ -202,7 +202,7 @@ STC_INLINE intptr_t _cspan_index(int rank, const int32_t shape[], const int32_t 
     intptr_t off = 0;
     while (rank--) {
         c_assert(c_LTu(a[rank], shape[rank]));
-        off += stride[rank]*a[rank];
+        off += (intptr_t)stride[rank]*a[rank];
     }
     return off;
 }
@@ -233,7 +233,7 @@ STC_DEF intptr_t _cspan_next2(int32_t pos[], const int32_t shape[], const int32_
 
     for (; r && pos[r] == shape[r]; --r) {
         pos[r] = 0; ++pos[r - 1];
-        off += stride[r - 1] - stride[r]*shape[r];
+        off += stride[r - 1] - (intptr_t)stride[r]*shape[r];
     }
     *done = pos[r] == shape[r];
     return off;
@@ -263,7 +263,7 @@ STC_DEF intptr_t _cspan_slice(int32_t oshape[], int32_t ostride[], int* orank,
     int32_t end;
 
     for (; i < rank; ++i) {
-        off += stride[i]*a[i][0];
+        off += (intptr_t)stride[i]*a[i][0];
         switch (a[i][1]) {
             case 0: c_assert(c_LTu(a[i][0], shape[i])); continue;
             case -1: end = shape[i]; break;
