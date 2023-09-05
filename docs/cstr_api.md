@@ -142,8 +142,9 @@ Note that all methods with arguments `(..., const char* str, intptr_t n)`, `n` m
 ```c
 int         cstr_cmp(const cstr* s1, const cstr* s2);
 bool        cstr_eq(const cstr* s1, const cstr* s2);
-bool        cstr_hash(const cstr* self);
-char*       cstrnstrn(const char* str, const char* search, intptr_t slen, intptr_t nlen);
+uint64_t    cstr_hash(const cstr* self);
+
+char*       stc_strnstrn(const char* str, const char* search, intptr_t slen, intptr_t nlen);
 ```
 
 ## Types

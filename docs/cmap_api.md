@@ -72,7 +72,7 @@ cmap_X_result         cmap_X_push(cmap_X* self, cmap_X_value entry);            
 
 cmap_X_result         cmap_X_emplace(cmap_X* self, i_keyraw rkey, i_valraw rmapped);    // no change if rkey in map
 cmap_X_result         cmap_X_emplace_or_assign(cmap_X* self, i_keyraw rkey, i_valraw rmapped); // always update mapped
-cmap_X_result         cmap_X_emplace_key(cmap_X* self, i_keyraw rkey);                 // see example 1.
+cmap_X_result         cmap_X_emplace_key(cmap_X* self, i_keyraw rkey);                  // see example 1.
 
 int                   cmap_X_erase(cmap_X* self, i_keyraw rkey);                        // return 0 or 1
 cmap_X_iter           cmap_X_erase_at(cmap_X* self, cmap_X_iter it);                    // return iter after it
@@ -86,13 +86,14 @@ cmap_X_iter           cmap_X_advance(cmap_X_iter it, cmap_X_ssize n);
 cmap_X_value          cmap_X_value_clone(cmap_X_value val);
 cmap_X_raw            cmap_X_value_toraw(cmap_X_value* pval);
 ```
-Helpers:
+Free helper functions:
 ```c
-uint64_t              cbytehash(const void *data, intptr_t len);            // base hash function
-uint64_t              cstrhash(const char *str);                            // string hash funcion, uses strlen()
-uint64_t              c_default_hash(const X *obj);                         // macro, calls cbytehash(obj, sizeof *obj)
+uint64_t              stc_hash(const void *data, intptr_t len);             // base hash function
+uint64_t              stc_strhash(const char *str);                         // string hash funcion, uses strlen()
+uint64_t              stc_nextpow2(intptr_t i);                             // get next power of 2 >= i
 
-// equalto template parameter functions:
+// hash/equal template default functions:
+uint64_t              c_default_hash(const X *obj);                         // macro, calls stc_hash(obj, sizeof *obj)
 bool                  c_default_eq(const i_keyraw* a, const i_keyraw* b);   // *a == *b
 bool                  c_memcmp_eq(const i_keyraw* a, const i_keyraw* b);    // !memcmp(a, b, sizeof *a)
 ```
@@ -381,7 +382,7 @@ static inline RViking Viking_toraw(const Viking* vp) {
 #define i_keyraw    RViking
 #define i_keyfrom   Viking_from
 #define i_opt       c_no_clone // disable map cloning
-#define i_hash(rp)  (cstrhash(rp->name) ^ cstrhash(rp->country))
+#define i_hash(rp)  (stc_strhash(rp->name) ^ stc_strhash(rp->country))
 #define i_val       int
 #include <stc/cmap.h>
 

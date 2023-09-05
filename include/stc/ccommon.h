@@ -103,7 +103,7 @@ typedef long long _llong;
 #define c_default_less(x, y)    (*(x) < *(y))
 #define c_default_eq(x, y)      (*(x) == *(y))
 #define c_memcmp_eq(x, y)       (memcmp(x, y, sizeof *(x)) == 0)
-#define c_default_hash(x)       cbytehash(x, c_sizeof(*(x)))
+#define c_default_hash(x)       stc_hash(x, c_sizeof(*(x)))
 
 #define c_default_clone(v)      (v)
 #define c_default_toraw(vp)     (*(vp))
@@ -124,7 +124,7 @@ typedef long long _llong;
 // Non-owning c-string "class"
 typedef const char* ccharptr;
 #define ccharptr_cmp(xp, yp) strcmp(*(xp), *(yp))
-#define ccharptr_hash(p) cstrhash(*(p))
+#define ccharptr_hash(p) stc_strhash(*(p))
 #define ccharptr_clone(s) (s)
 #define ccharptr_drop(p) ((void)p)
 
@@ -138,7 +138,7 @@ typedef const char* ccharptr;
 
 #define c_ROTL(x, k) (x << (k) | x >> (8*sizeof(x) - (k)))
 
-STC_INLINE uint64_t cbytehash(const void* key, intptr_t len) {
+STC_INLINE uint64_t stc_hash(const void* key, intptr_t len) {
     uint32_t u4; uint64_t u8;
     switch (len) {
         case 8: memcpy(&u8, key, 8); return u8*0xc6a4a7935bd1e99d;
@@ -156,11 +156,11 @@ STC_INLINE uint64_t cbytehash(const void* key, intptr_t len) {
     return h ^ c_ROTL(h, 26);
 }
 
-STC_INLINE uint64_t cstrhash(const char *str)
-    { return cbytehash(str, c_strlen(str)); }
+STC_INLINE uint64_t stc_strhash(const char *str)
+    { return stc_hash(str, c_strlen(str)); }
 
-STC_INLINE char* cstrnstrn(const char *str, const char *needle,
-                           intptr_t slen, const intptr_t nlen) {
+STC_INLINE char* stc_strnstrn(const char *str, const char *needle,
+                              intptr_t slen, const intptr_t nlen) {
     if (!nlen) return (char *)str;
     if (nlen > slen) return NULL;
     slen -= nlen;
@@ -172,7 +172,7 @@ STC_INLINE char* cstrnstrn(const char *str, const char *needle,
     return NULL;
 }
 
-STC_INLINE intptr_t cnextpow2(intptr_t n) {
+STC_INLINE intptr_t stc_nextpow2(intptr_t n) {
     n--;
     n |= n >> 1, n |= n >> 2;
     n |= n >> 4, n |= n >> 8;

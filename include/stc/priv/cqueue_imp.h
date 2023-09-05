@@ -54,7 +54,7 @@ STC_DEF bool
 _cx_MEMB(_reserve)(_cx_Self* self, const intptr_t n) {
     if (n <= self->capmask)
         return true;
-    intptr_t oldcap = self->capmask + 1, newcap = cnextpow2(n + 1);
+    intptr_t oldcap = self->capmask + 1, newcap = stc_nextpow2(n + 1);
     _cx_value* d = (_cx_value *)i_realloc(self->data, newcap*c_sizeof *self->data);
     if (!d)
         return false;

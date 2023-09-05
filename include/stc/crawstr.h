@@ -45,7 +45,7 @@ STC_INLINE bool crawstr_equals(crawstr rs, const char* str) {
 }
 
 STC_INLINE intptr_t crawstr_find(crawstr rs, const char* search) {
-    char* res = cstrnstrn(rs.str, search, rs.size, c_strlen(search));
+    char* res = strstr(rs.str, search);
     return res ? (res - rs.str) : c_NPOS;
 }
 
@@ -98,7 +98,7 @@ STC_INLINE bool crawstr_eq(const crawstr* x, const crawstr* y)
     { return x->size == y->size && !c_memcmp(x->str, y->str, x->size); }
 
 STC_INLINE uint64_t crawstr_hash(const crawstr *self)
-    { return cbytehash(self->str, self->size); }
+    { return stc_hash(self->str, self->size); }
 
 #endif // CRAWSTR_H_INCLUDED
 #undef i_static

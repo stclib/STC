@@ -450,12 +450,12 @@ bool cstr_valid_utf8(const cstr* self)
 
 STC_DEF uint64_t cstr_hash(const cstr *self) {
     csview sv = cstr_sv(self);
-    return cbytehash(sv.buf, sv.size);
+    return stc_hash(sv.buf, sv.size);
 }
 
 STC_DEF intptr_t cstr_find_sv(const cstr* self, csview search) {
     csview sv = cstr_sv(self);
-    char* res = cstrnstrn(sv.buf, search.buf, sv.size, search.size);
+    char* res = stc_strnstrn(sv.buf, search.buf, sv.size, search.size);
     return res ? (res - sv.buf) : c_NPOS;
 }
 
@@ -588,7 +588,7 @@ STC_DEF cstr cstr_replace_sv(csview in, csview search, csview repl, int32_t coun
     intptr_t from = 0; char* res;
     if (!count) count = INT32_MAX;
     if (search.size)
-        while (count-- && (res = cstrnstrn(in.buf + from, search.buf, in.size - from, search.size))) {
+        while (count-- && (res = stc_strnstrn(in.buf + from, search.buf, in.size - from, search.size))) {
             const intptr_t pos = (res - in.buf);
             cstr_append_n(&out, in.buf + from, pos - from);
             cstr_append_n(&out, repl.buf, repl.size);
