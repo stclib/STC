@@ -103,7 +103,7 @@ typedef long long _llong;
 #define c_default_less(x, y)    (*(x) < *(y))
 #define c_default_eq(x, y)      (*(x) == *(y))
 #define c_memcmp_eq(x, y)       (memcmp(x, y, sizeof *(x)) == 0)
-#define c_default_hash(x)       cfasthash(x, c_sizeof(*(x)))
+#define c_default_hash(x)       cbytehash(x, c_sizeof(*(x)))
 
 #define c_default_clone(v)      (v)
 #define c_default_toraw(vp)     (*(vp))
@@ -138,7 +138,7 @@ typedef const char* ccharptr;
 
 #define c_ROTL(x, k) (x << (k) | x >> (8*sizeof(x) - (k)))
 
-STC_INLINE uint64_t cfasthash(const void* key, intptr_t len) {
+STC_INLINE uint64_t cbytehash(const void* key, intptr_t len) {
     uint32_t u4; uint64_t u8;
     switch (len) {
         case 8: memcpy(&u8, key, 8); return u8*0xc6a4a7935bd1e99d;
@@ -157,7 +157,7 @@ STC_INLINE uint64_t cfasthash(const void* key, intptr_t len) {
 }
 
 STC_INLINE uint64_t cstrhash(const char *str)
-    { return cfasthash(str, c_strlen(str)); }
+    { return cbytehash(str, c_strlen(str)); }
 
 STC_INLINE char* cstrnstrn(const char *str, const char *needle,
                            intptr_t slen, const intptr_t nlen) {

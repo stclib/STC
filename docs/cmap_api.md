@@ -88,9 +88,9 @@ cmap_X_raw            cmap_X_value_toraw(cmap_X_value* pval);
 ```
 Helpers:
 ```c
-uint64_t              c_default_hash(const X *obj);                         // macro, calls cfasthash(obj, sizeof *obj)
+uint64_t              cbytehash(const void *data, intptr_t len);            // base hash function
 uint64_t              cstrhash(const char *str);                            // string hash funcion, uses strlen()
-uint64_t              cfasthash(const void *data, intptr_t len);            // base hash function
+uint64_t              c_default_hash(const X *obj);                         // macro, calls cbytehash(obj, sizeof *obj)
 
 // equalto template parameter functions:
 bool                  c_default_eq(const i_keyraw* a, const i_keyraw* b);   // *a == *b

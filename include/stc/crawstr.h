@@ -98,7 +98,7 @@ STC_INLINE bool crawstr_eq(const crawstr* x, const crawstr* y)
     { return x->size == y->size && !c_memcmp(x->str, y->str, x->size); }
 
 STC_INLINE uint64_t crawstr_hash(const crawstr *self)
-    { return cfasthash(self->str, self->size); }
+    { return cbytehash(self->str, self->size); }
 
 #endif // CRAWSTR_H_INCLUDED
 #undef i_static

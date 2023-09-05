@@ -170,7 +170,7 @@ STC_DEF intptr_t csview_find_sv(csview sv, csview search) {
 }
 
 STC_DEF uint64_t csview_hash(const csview *self)
-    { return cfasthash(self->buf, self->size); }
+    { return cbytehash(self->buf, self->size); }
 
 STC_DEF csview csview_substr_ex(csview sv, intptr_t pos, intptr_t n) {
     if (pos < 0) { 

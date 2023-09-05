@@ -450,7 +450,7 @@ bool cstr_valid_utf8(const cstr* self)
 
 STC_DEF uint64_t cstr_hash(const cstr *self) {
     csview sv = cstr_sv(self);
-    return cfasthash(sv.buf, sv.size);
+    return cbytehash(sv.buf, sv.size);
 }
 
 STC_DEF intptr_t cstr_find_sv(const cstr* self, csview search) {
