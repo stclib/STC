@@ -159,8 +159,8 @@ STC_INLINE uint64_t stc_hash(const void* key, intptr_t len) {
 STC_INLINE uint64_t stc_strhash(const char *str)
     { return stc_hash(str, c_strlen(str)); }
 
-STC_INLINE char* stc_strnstrn(const char *str, const char *needle,
-                              intptr_t slen, const intptr_t nlen) {
+STC_INLINE char* stc_strnstrn(const char *str, intptr_t slen, 
+                              const char *needle, intptr_t nlen) {
     if (!nlen) return (char *)str;
     if (nlen > slen) return NULL;
     slen -= nlen;
