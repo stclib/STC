@@ -69,10 +69,10 @@ typedef long long _llong;
   #define c_new(T, ...)         ((T*)memcpy(malloc(sizeof(T)), ((T[]){__VA_ARGS__}), sizeof(T)))
   #define c_LITERAL(T)          (T)
 #endif
-#define c_new_n(T, n)           ((T*)malloc(sizeof(T)*c_i2u(n)))
-#define c_malloc(sz)            malloc(c_i2u(sz))
-#define c_calloc(n, sz)         calloc(c_i2u(n), c_i2u(sz))
-#define c_realloc(p, sz)        realloc(p, c_i2u(sz))
+#define c_new_n(T, n)           ((T*)malloc(sizeof(T)*c_i2u_size(n)))
+#define c_malloc(sz)            malloc(c_i2u_size(sz))
+#define c_calloc(n, sz)         calloc(c_i2u_size(n), c_i2u_size(sz))
+#define c_realloc(p, sz)        realloc(p, c_i2u_size(sz))
 #define c_free(p)               free(p)
 #define c_delete(T, ptr)        do { T *_tp = ptr; T##_drop(_tp); free(_tp); } while (0)
 
@@ -86,17 +86,17 @@ typedef long long _llong;
 #define c_const_cast(T, p)      ((T)(1 ? (p) : (T)0))
 #define c_swap(T, xp, yp)       do { T *_xp = xp, *_yp = yp, \
                                     _tv = *_xp; *_xp = *_yp; *_yp = _tv; } while (0)
-// use with gcc -Wsign-conversion
+// use with gcc -Wconversion
 #define c_sizeof                (intptr_t)sizeof
 #define c_strlen(s)             (intptr_t)strlen(s)
-#define c_strncmp(a, b, ilen)   strncmp(a, b, c_i2u(ilen))
-#define c_memcpy(d, s, ilen)    memcpy(d, s, c_i2u(ilen))
-#define c_memmove(d, s, ilen)   memmove(d, s, c_i2u(ilen))
-#define c_memset(d, val, ilen)  memset(d, val, c_i2u(ilen))
-#define c_memcmp(a, b, ilen)    memcmp(a, b, c_i2u(ilen))
-#define c_u2i(u)                (intptr_t)(1 ? (u) : (size_t)1)
-#define c_i2u(i)                (size_t)(1 ? (i) : -1)
-#define c_LTu(a, b)             ((size_t)(a) < (size_t)(b))
+#define c_strncmp(a, b, ilen)   strncmp(a, b, c_i2u_size(ilen))
+#define c_memcpy(d, s, ilen)    memcpy(d, s, c_i2u_size(ilen))
+#define c_memmove(d, s, ilen)   memmove(d, s, c_i2u_size(ilen))
+#define c_memset(d, val, ilen)  memset(d, val, c_i2u_size(ilen))
+#define c_memcmp(a, b, ilen)    memcmp(a, b, c_i2u_size(ilen))
+#define c_u2i_size(u)           (intptr_t)(1 ? (u) : (size_t)1)
+#define c_i2u_size(i)           (size_t)(1 ? (i) : -1)
+#define c_less_unsigned(a, b)   ((size_t)(a) < (size_t)(b))
 
 // x and y are i_keyraw* type, defaults to i_key*:
 #define c_default_cmp(x, y)     (c_default_less(y, x) - c_default_less(x, y))

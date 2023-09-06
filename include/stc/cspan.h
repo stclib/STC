@@ -201,7 +201,7 @@ STC_INLINE void _cspan_transpose(int32_t shape[], intptr_t stride[], int rank) {
 STC_INLINE intptr_t _cspan_index(int rank, const int32_t shape[], const intptr_t stride[], const int32_t a[]) {
     intptr_t off = 0;
     while (rank--) {
-        c_assert(c_LTu(a[rank], shape[rank]));
+        c_assert(c_less_unsigned(a[rank], shape[rank]));
         off += stride[rank]*a[rank];
     }
     return off;
@@ -265,13 +265,13 @@ STC_DEF intptr_t _cspan_slice(int32_t oshape[], intptr_t ostride[], int* orank,
     for (; i < rank; ++i) {
         off += stride[i]*a[i][0];
         switch (a[i][1]) {
-            case 0: c_assert(c_LTu(a[i][0], shape[i])); continue;
+            case 0: c_assert(c_less_unsigned(a[i][0], shape[i])); continue;
             case -1: end = shape[i]; break;
             default: end = a[i][1];
         }
         oshape[oi] = end - a[i][0];
         ostride[oi] = stride[i];
-        c_assert((oshape[oi] > 0) & !c_LTu(shape[i], end));
+        c_assert((oshape[oi] > 0) & !c_less_unsigned(shape[i], end));
         ++oi;
     }
     *orank = oi;
