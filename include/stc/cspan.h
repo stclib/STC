@@ -82,9 +82,9 @@ int demo2() {
     typedef struct { Self##_value *ref; int32_t pos[RANK]; const Self *_s; } Self##_iter; \
     \
     STC_INLINE Self Self##_slice_(Self##_value* d, const int32_t shape[], const intptr_t stri[], \
-                                  const int rank, const int32_t a[][3]) { \
+                                  const int32_t a[][3], const int rank) { \
         Self s; int outrank; \
-        s.data = d + _cspan_slice(s.shape, s.stride.d, &outrank, shape, stri, rank, a); \
+        s.data = d + _cspan_slice(s.shape, s.stride.d, &outrank, shape, stri, a, rank); \
         c_assert(outrank == RANK); \
         return s; \
     } \
@@ -112,15 +112,15 @@ using_cspan_tuple(3); using_cspan_tuple(4);
 using_cspan_tuple(5); using_cspan_tuple(6);
 using_cspan_tuple(7); using_cspan_tuple(8);
 
-#define c_END INT32_MAX
-#define c_ALL 0,c_END
-typedef enum {c_ROWMAJOR, c_COLMAJOR} cspan_layout;
-
-/* Use cspan_init() for static initialization only. c_init() for non-static init. */
+// cspan_init for static initialization only, else use c_init macro
+//
 #define cspan_init(SpanType, ...) \
-    {.data=(SpanType##_value[])__VA_ARGS__, .shape={sizeof((SpanType##_value[])__VA_ARGS__)/sizeof(SpanType##_value)}, .stride={.d={1}}}
+    {.data=(SpanType##_value[])__VA_ARGS__, \
+     .shape={sizeof((SpanType##_value[])__VA_ARGS__)/sizeof(SpanType##_value)}, \
+     .stride={.d={1}}}
 
-/* create a cspan from a cvec, cstack, or cpque (heap) */
+// cspan from a cvec, cstack or c-arrays
+//
 #define cspan_from(container) \
     {.data=(container)->data, .shape={(int32_t)(container)->_len}, .stride={.d={1}}}
 
@@ -142,49 +142,77 @@ typedef enum {c_ROWMAJOR, c_COLMAJOR} cspan_layout;
     _cspan_index((self)->shape, (self)->stride.d, ((const int32_t[]){__VA_ARGS__}), \
                  cspan_rank(self) + c_static_assert(cspan_rank(self) == c_NUMARGS(__VA_ARGS__)))
 
-// cspan_subspanX: (X <= 3) optimized. Similar to cspan_slice(Span3, &ms3, {off,off+count}, {c_ALL}, {c_ALL});
+// Transpose and swap axes
+//
+#define cspan_transpose(self) \
+    _cspan_transpose((self)->shape, (self)->stride.d, cspan_rank(self))
+
+#define cspan_swap_axes(self, ax1, ax2) \
+    _cspan_swap_axes((self)->shape, (self)->stride.d, ax1, ax2, cspan_rank(self))
+
+
+// Multi-dimensional span constructors
+//
+typedef enum {c_ROWMAJOR, c_COLMAJOR} cspan_layout;
+
+#define cspan_md(array, ...) cspan_md_layout(c_ROWMAJOR, array, __VA_ARGS__)
+#define cspan_md_layout(layout, array, ...) \
+    {.data=array, \
+     .shape={__VA_ARGS__}, \
+     .stride=*(c_PASTE(cspan_tuple,c_NUMARGS(__VA_ARGS__))*) \
+             _cspan_shape2stride(layout, ((intptr_t[]){__VA_ARGS__}), c_NUMARGS(__VA_ARGS__))}
+
+// Extract a slice of a cspan (slicing all dimensions)
+//
+#define c_END INT32_MAX
+#define c_ALL 0,c_END
+
+#define cspan_slice(OutSpan, inspan, ...) \
+    OutSpan##_slice_((inspan)->data, (inspan)->shape, (inspan)->stride.d, \
+                     ((const int32_t[][3]){__VA_ARGS__}), cspan_rank(inspan) + \
+                     c_static_assert(cspan_rank(inspan) == sizeof((int32_t[][3]){__VA_ARGS__})/sizeof(int32_t[3])))
+
+// SubspanX: (X <= 3) optimized. Like e.g. cspan_slice(Span3, &ms3, {off,off+count}, {c_ALL}, {c_ALL});
+//
 #define cspan_subspan(self, offset, count) \
     {.data=cspan_at(self, offset), .shape={count}, .stride=(self)->stride}
 #define cspan_subspan2(self, offset, count) \
     {.data=cspan_at(self, offset, 0), .shape={count, (self)->shape[1]}, .stride=(self)->stride}
 #define cspan_subspan3(self, offset, count) \
-    {.data=cspan_at(self, offset, 0, 0), .shape={count, (self)->shape[1], (self)->shape[2]}, .stride=(self)->stride}
+    {.data=cspan_at(self, offset, 0, 0), \
+     .shape={count, (self)->shape[1], (self)->shape[2]}, \
+     .stride=(self)->stride}
 
-// cspan_submd(): Reduce rank (N <= 4) Optimized, same as e.g. cspan_slice(Span2, &ms4, {x}, {y}, {c_ALL}, {c_ALL});
+// SubmdX: Reduce rank (X <= 4), optimized, like e.g. cspan_slice(Span2, &ms4, {x}, {y}, {c_ALL}, {c_ALL});
+//
 #define cspan_submd2(self, x) \
-    {.data=cspan_at(self, x, 0), .shape={(self)->shape[1]}, .stride=(cspan_tuple1){.d={(self)->stride.d[1]}}}
+    {.data=cspan_at(self, x, 0), \
+     .shape={(self)->shape[1]}, \
+     .stride=(cspan_tuple1){.d={(self)->stride.d[1]}}}
+
 #define cspan_submd3(...) c_MACRO_OVERLOAD(cspan_submd3, __VA_ARGS__)
 #define cspan_submd3_2(self, x) \
-    {.data=cspan_at(self, x, 0, 0), .shape={(self)->shape[1], (self)->shape[2]}, \
-                                    .stride=(cspan_tuple2){.d={(self)->stride.d[1], (self)->stride.d[2]}}}
+    {.data=cspan_at(self, x, 0, 0), \
+     .shape={(self)->shape[1], (self)->shape[2]}, \
+     .stride=(cspan_tuple2){.d={(self)->stride.d[1], (self)->stride.d[2]}}}
 #define cspan_submd3_3(self, x, y) \
-    {.data=cspan_at(self, x, y, 0), .shape={(self)->shape[2]}, .stride=(cspan_tuple1){.d={(self)->stride.d[2]}}}
+    {.data=cspan_at(self, x, y, 0), \
+     .shape={(self)->shape[2]}, \
+     .stride=(cspan_tuple1){.d={(self)->stride.d[2]}}}
+
 #define cspan_submd4(...) c_MACRO_OVERLOAD(cspan_submd4, __VA_ARGS__)
 #define cspan_submd4_2(self, x) \
-    {.data=cspan_at(self, x, 0, 0, 0), .shape={(self)->shape[1], (self)->shape[2], (self)->shape[3]}, \
-                                       .stride=(cspan_tuple3){.d={(self)->stride.d[1], (self)->stride.d[2], (self)->stride.d[3]}}}
+    {.data=cspan_at(self, x, 0, 0, 0), \
+     .shape={(self)->shape[1], (self)->shape[2], (self)->shape[3]}, \
+     .stride=(cspan_tuple3){.d={(self)->stride.d[1], (self)->stride.d[2], (self)->stride.d[3]}}}
 #define cspan_submd4_3(self, x, y) \
-    {.data=cspan_at(self, x, y, 0, 0), .shape={(self)->shape[2], (self)->shape[3]}, \
-                                       .stride=(cspan_tuple2){.d={(self)->stride.d[2], (self)->stride.d[3]}}}
+    {.data=cspan_at(self, x, y, 0, 0), \
+     .shape={(self)->shape[2], (self)->shape[3]}, \
+     .stride=(cspan_tuple2){.d={(self)->stride.d[2], (self)->stride.d[3]}}}
 #define cspan_submd4_4(self, x, y, z) \
-    {.data=cspan_at(self, x, y, z, 0), .shape={(self)->shape[3]}, .stride=(cspan_tuple1){.d={(self)->stride.d[3]}}}
-
-#define cspan_md(array, ...) cspan_md_layout(c_ROWMAJOR, array, __VA_ARGS__)
-#define cspan_md_layout(layout, array, ...) \
-    {.data=array, .shape={__VA_ARGS__}, \
-     .stride=*(c_PASTE(cspan_tuple,c_NUMARGS(__VA_ARGS__))*)_cspan_shape2stride(layout, ((intptr_t[]){__VA_ARGS__}), c_NUMARGS(__VA_ARGS__))}
-
-#define cspan_transpose(self) \
-    _cspan_transpose((self)->shape, (self)->stride.d, cspan_rank(self))
-
-#define cspan_swap_axes(self, i, j) \
-    _cspan_swap_axes((self)->shape, (self)->stride.d, i, j, cspan_rank(self))
-
-// General slicing function;
-#define cspan_slice(OutSpan, parent, ...) \
-    OutSpan##_slice_((parent)->data, (parent)->shape, (parent)->stride.d, cspan_rank(parent) + \
-                     c_static_assert(cspan_rank(parent) == sizeof((int32_t[][3]){__VA_ARGS__})/sizeof(int32_t[3])), \
-                     (const int32_t[][3]){__VA_ARGS__})
+    {.data=cspan_at(self, x, y, z, 0), \
+     .shape={(self)->shape[3]}, \
+     .stride=(cspan_tuple1){.d={(self)->stride.d[3]}}}
 
 /* ------------------- PRIVAT DEFINITIONS ------------------- */
 
@@ -228,7 +256,7 @@ STC_API intptr_t
 
 STC_API intptr_t _cspan_slice(int32_t oshape[], intptr_t ostride[], int* orank,
                               const int32_t shape[], const intptr_t stride[],
-                              int rank, const int32_t a[][3]);
+                              const int32_t a[][3], int rank);
 
 STC_API intptr_t* _cspan_shape2stride(cspan_layout layout, intptr_t shape[], int rank);
 #endif // STC_CSPAN_H_INCLUDED
@@ -266,7 +294,7 @@ STC_DEF intptr_t* _cspan_shape2stride(cspan_layout layout, intptr_t stride[], in
 
 STC_DEF intptr_t _cspan_slice(int32_t oshape[], intptr_t ostride[], int* orank, 
                               const int32_t shape[], const intptr_t stride[], 
-                              int rank, const int32_t a[][3]) {
+                              const int32_t a[][3], int rank) {
     intptr_t off = 0;
     int i = 0, oi = 0;
     int32_t end;
