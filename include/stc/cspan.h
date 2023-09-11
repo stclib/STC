@@ -112,7 +112,7 @@ using_cspan_tuple(3); using_cspan_tuple(4);
 using_cspan_tuple(5); using_cspan_tuple(6);
 using_cspan_tuple(7); using_cspan_tuple(8);
 
-#define c_END -1
+#define c_END INT32_MAX
 #define c_ALL 0,c_END
 typedef enum {c_ROWMAJOR, c_COLMAJOR} cspan_layout;
 
@@ -139,8 +139,8 @@ typedef enum {c_ROWMAJOR, c_COLMAJOR} cspan_layout;
 #define cspan_front(self) ((self)->data)
 #define cspan_back(self) ((self)->data + cspan_size(self) - 1)
 #define cspan_index(self, ...) \
-    (_cspan_index(c_NUMARGS(__VA_ARGS__), (self)->shape, (self)->stride.d, (const int32_t[]){__VA_ARGS__}) + \
-     c_static_assert(cspan_rank(self) == c_NUMARGS(__VA_ARGS__))) // general
+    _cspan_index((self)->shape, (self)->stride.d, ((const int32_t[]){__VA_ARGS__}), \
+                 cspan_rank(self) + c_static_assert(cspan_rank(self) == c_NUMARGS(__VA_ARGS__)))
 
 // cspan_subspanX: (X <= 3) optimized. Similar to cspan_slice(Span3, &ms3, {off,off+count}, {c_ALL}, {c_ALL});
 #define cspan_subspan(self, offset, count) \
@@ -177,6 +177,9 @@ typedef enum {c_ROWMAJOR, c_COLMAJOR} cspan_layout;
 #define cspan_transpose(self) \
     _cspan_transpose((self)->shape, (self)->stride.d, cspan_rank(self))
 
+#define cspan_swap_axes(self, i, j) \
+    _cspan_swap_axes((self)->shape, (self)->stride.d, i, j, cspan_rank(self))
+
 // General slicing function;
 #define cspan_slice(OutSpan, parent, ...) \
     OutSpan##_slice_((parent)->data, (parent)->shape, (parent)->stride.d, cspan_rank(parent) + \
@@ -191,6 +194,12 @@ STC_INLINE intptr_t _cspan_size(const int32_t shape[], int rank) {
     return sz;
 }
 
+STC_INLINE void _cspan_swap_axes(int32_t shape[], intptr_t stride[], int i, int j, int rank) {
+    c_assert(c_less_unsigned(i, rank) & c_less_unsigned(j, rank));
+    c_swap(int32_t, shape + i, shape + j);
+    c_swap(intptr_t, stride + i, stride + j);
+}
+
 STC_INLINE void _cspan_transpose(int32_t shape[], intptr_t stride[], int rank) {
     for (int i = 0; i < --rank; ++i) {
         c_swap(int32_t, shape + i, shape + rank);
@@ -198,7 +207,7 @@ STC_INLINE void _cspan_transpose(int32_t shape[], intptr_t stride[], int rank) {
     }
 }
 
-STC_INLINE intptr_t _cspan_index(int rank, const int32_t shape[], const intptr_t stride[], const int32_t a[]) {
+STC_INLINE intptr_t _cspan_index(const int32_t shape[], const intptr_t stride[], const int32_t a[], int rank) {
     intptr_t off = 0;
     while (rank--) {
         c_assert(c_less_unsigned(a[rank], shape[rank]));
@@ -266,13 +275,13 @@ STC_DEF intptr_t _cspan_slice(int32_t oshape[], intptr_t ostride[], int* orank,
         off += stride[i]*a[i][0];
         switch (a[i][1]) {
             case 0: c_assert(c_less_unsigned(a[i][0], shape[i])); continue;
-            case -1: end = shape[i]; break;
+            case c_END: end = shape[i]; break;
             default: end = a[i][1];
         }
         oshape[oi] = end - a[i][0];
         ostride[oi] = stride[i];
         c_assert((oshape[oi] > 0) & !c_less_unsigned(shape[i], end));
-        if (a[i][2]) {
+        if (a[i][2] > 0) {
             ostride[oi] *= a[i][2];
             oshape[oi] = (oshape[oi] - 1)/a[i][2] + 1;
         }

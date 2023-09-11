@@ -55,6 +55,7 @@ SpanTypeN       cspan_md_layout(cspan_layout layout, ValueType* data, int32_t d1
 
                 // transpose a md span. Inverses layout and axes only.
 void            cspan_transpose(const SpanTypeN* self);
+void            cspan_swap_axes(const SpanTypeN* self, int ax1, int ax2);
 cspan_layout    cspan_get_layout(const SpanTypeN* self);
 bool            cspan_is_rowmajor(const SpanTypeN* self);
 bool            cspan_is_colmajor(const SpanTypeN* self);
