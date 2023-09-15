@@ -47,9 +47,9 @@ typedef long long _llong;
 
 /* Macro overloading feature support based on: https://rextester.com/ONP80107 */
 #define c_MACRO_OVERLOAD(name, ...) \
-    c_PASTE(c_CONCAT(name,_), c_NUMARGS(__VA_ARGS__))(__VA_ARGS__)
-#define c_CONCAT(a, b) a ## b
-#define c_PASTE(a, b) c_CONCAT(a, b)
+    c_JOIN(c_JOIN0(name,_),c_NUMARGS(__VA_ARGS__))(__VA_ARGS__)
+#define c_JOIN0(a, b) a ## b
+#define c_JOIN(a, b) c_JOIN0(a, b)
 #define c_EXPAND(...) __VA_ARGS__
 #define c_NUMARGS(...) _c_APPLY_ARG_N((__VA_ARGS__, _c_RSEQ_N))
 #define _c_APPLY_ARG_N(args) c_EXPAND(_c_ARG_N args)
@@ -78,12 +78,13 @@ typedef long long _llong;
 
 #define c_static_assert(expr)   (1 ? 0 : (int)sizeof(int[(expr) ? 1 : -1]))
 #if defined STC_NDEBUG || defined NDEBUG
-  #define c_assert(expr)        ((void)0)
+  #define c_assert(expr)        (0)
 #else
   #define c_assert(expr)        assert(expr)
 #endif
 #define c_container_of(p, C, m) ((C*)((char*)(1 ? (p) : &((C*)0)->m) - offsetof(C, m)))
-#define c_const_cast(T, p)      ((T)(1 ? (p) : (T)0))
+#define c_const_cast(Tp, p)     ((Tp)(1 ? (p) : (Tp)0))
+#define c_safe_cast(T, F, x)    ((T)(1 ? (x) : *(F*)0))
 #define c_swap(T, xp, yp)       do { T *_xp = xp, *_yp = yp, \
                                     _tv = *_xp; *_xp = *_yp; *_yp = _tv; } while (0)
 // use with gcc -Wconversion
@@ -188,7 +189,7 @@ STC_INLINE intptr_t stc_nextpow2(intptr_t n) {
 #define c_foreach_3(it, C, cnt) \
     for (C##_iter it = C##_begin(&cnt); it.ref; C##_next(&it))
 #define c_foreach_4(it, C, start, finish) \
-    for (C##_iter it = start, *_endref = (C##_iter*)(finish).ref \
+    for (C##_iter it = (start), *_endref = c_safe_cast(C##_iter*, C##_value*, (finish).ref) \
          ; it.ref != (C##_value*)_endref; C##_next(&it))
 
 #define c_forpair(key, val, C, cnt) /* structured binding */ \

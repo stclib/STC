@@ -6,11 +6,11 @@ if [ "$(uname)" = 'Linux' ]; then
     oflag='-o '
 fi
 
-cc=gcc; cflags="-std=c99 -s -O3 -Wall -Wextra -Wpedantic -Wconversion -Wwrite-strings -Wdouble-promotion -Wno-unused-parameter -Wno-maybe-uninitialized -Wno-implicit-fallthrough -Wno-missing-field-initializers"
+cc=gcc; cflags="-std=c99 -s -O3 -fmax-errors=3 -Werror -Wall -Wextra -Wpedantic -Wconversion -Wdouble-promotion -Wwrite-strings -Wno-unused-parameter -Wno-maybe-uninitialized -Wno-implicit-fallthrough -Wno-missing-field-initializers"
 #cc=gcc; cflags="-std=c99 -g -Werror -Wfatal-errors -Wpedantic -Wall $sanitize"
-#cc=tcc; cflags="-std=c99 -Wall"
-#cc=clang; cflags="-std=c99 -s -O3 -Wall -Wextra -Wpedantic -Wconversion -Wwrite-strings -Wdouble-promotion -Wno-unused-parameter -Wno-unused-function -Wno-implicit-fallthrough -Wno-missing-field-initializers"
 #cc=gcc; cflags="-x c++ -std=c++20 -O2 -s -Wall"
+#cc=clang; cflags="-std=c99 -s -O3 -Wfatal-errors -Werror -Wall -Wextra -Wpedantic -Wconversion -Wdouble-promotion -Wwrite-strings -Wno-newline-eof -Wno-unused-parameter -Wno-unused-function -Wno-implicit-fallthrough -Wno-missing-field-initializers"
+#cc=tcc; cflags="-std=c99 -Wall"
 #cc=cl; cflags="-nologo -O2 -MD -W3 -wd4003"
 #cc=cl; cflags="-nologo -TP -std:c++20 -wd4003"
 #cc=cl; cflags="-nologo -std:c11 -wd4003"

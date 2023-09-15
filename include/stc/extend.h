@@ -44,17 +44,17 @@
 #endif
 
 #if defined _i_key && defined _i_val
-  c_PASTE(forward_, i_base)(i_type, _i_key, _i_val);
+  c_JOIN(forward_, i_base)(i_type, _i_key, _i_val);
 #elif defined _i_key
-  c_PASTE(forward_, i_base)(i_type, _i_key);
+  c_JOIN(forward_, i_base)(i_type, _i_key);
 #else
-  c_PASTE(forward_, i_base)(i_type, _i_val);
+  c_JOIN(forward_, i_base)(i_type, _i_val);
 #endif
 
 typedef struct {
     i_extend
     i_type get;
-} c_PASTE(i_type, _ext);
+} c_JOIN(i_type, _ext);
 
 #define c_extend() c_container_of(self, _cx_MEMB(_ext), get)
 // Note: i_less: c_extend() accessible for cpque types

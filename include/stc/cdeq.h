@@ -156,7 +156,7 @@ _cx_MEMB(_insert_uninit)(_cx_Self* self, const intptr_t idx, const intptr_t n) {
     const intptr_t len = _cx_MEMB(_size)(self);
     _cx_iter it = {._s=self};
     if (len + n > self->capmask)
-        if (!_cx_MEMB(_reserve)(self, len*5/4 + n))
+        if (!_cx_MEMB(_reserve)(self, len + n + 3)) // minimum 2x expand
             return it;
     it.pos = _cdeq_topos(self, idx);
     it.ref = self->data + it.pos;

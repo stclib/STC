@@ -26,7 +26,7 @@
 #ifndef STC_TEMPLATE_H_INCLUDED
 #define STC_TEMPLATE_H_INCLUDED
   #define _cx_Self i_type
-  #define _cx_MEMB(name) c_PASTE(_cx_Self, name)
+  #define _cx_MEMB(name) c_JOIN(_cx_Self, name)
   #define _cx_DEFTYPES(macro, SELF, ...) c_EXPAND(macro(SELF, __VA_ARGS__))
   #define _cx_value _cx_MEMB(_value)
   #define _cx_key _cx_MEMB(_key)
@@ -39,17 +39,17 @@
 #endif
 
 #ifndef i_type
-  #define i_type c_PASTE(_i_prefix, i_tag)
+  #define i_type c_JOIN(_i_prefix, i_tag)
 #endif
 
 #ifndef i_allocator
   #define i_allocator c
 #endif
 #ifndef i_malloc
-  #define i_malloc c_PASTE(i_allocator, _malloc)
-  #define i_calloc c_PASTE(i_allocator, _calloc)
-  #define i_realloc c_PASTE(i_allocator, _realloc)
-  #define i_free c_PASTE(i_allocator, _free)
+  #define i_malloc c_JOIN(i_allocator, _malloc)
+  #define i_calloc c_JOIN(i_allocator, _calloc)
+  #define i_realloc c_JOIN(i_allocator, _realloc)
+  #define i_free c_JOIN(i_allocator, _free)
 #endif
 
 #if !(defined i_key || defined i_key_str || defined i_key_ssv || \
@@ -123,9 +123,9 @@
   #endif
 #elif defined i_keyboxed
   #define i_keyclass i_keyboxed
-  #define i_rawclass c_PASTE(i_keyboxed, _raw)
+  #define i_rawclass c_JOIN(i_keyboxed, _raw)
   #if defined i_use_cmp
-    #define i_eq c_PASTE(i_keyboxed, _raw_eq)
+    #define i_eq c_JOIN(i_keyboxed, _raw_eq)
   #endif
 #endif
 
@@ -138,16 +138,16 @@
 #if defined i_keyclass
   #define i_key i_keyclass
   #ifndef i_keyclone
-    #define i_keyclone c_PASTE(i_key, _clone)
+    #define i_keyclone c_JOIN(i_key, _clone)
   #endif
   #ifndef i_keydrop
-    #define i_keydrop c_PASTE(i_key, _drop)
+    #define i_keydrop c_JOIN(i_key, _drop)
   #endif
   #if !defined i_keyfrom && defined i_keyraw
-    #define i_keyfrom c_PASTE(i_key, _from)
+    #define i_keyfrom c_JOIN(i_key, _from)
   #endif
   #if !defined i_keyto && defined i_keyraw
-    #define i_keyto c_PASTE(i_key, _toraw)
+    #define i_keyto c_JOIN(i_key, _toraw)
   #endif
   #if !defined i_keyraw && (defined i_cmp || defined i_less || defined i_eq || defined i_hash)
     #define i_use_cmp
@@ -156,10 +156,10 @@
 
 #if defined i_rawclass && defined i_use_cmp
   #if !(defined i_cmp || defined i_less)
-    #define i_cmp c_PASTE(i_keyraw, _cmp)
+    #define i_cmp c_JOIN(i_keyraw, _cmp)
   #endif
   #if !(defined i_hash || defined i_no_hash)
-    #define i_hash c_PASTE(i_keyraw, _hash)
+    #define i_hash c_JOIN(i_keyraw, _hash)
   #endif
 #endif
 
@@ -237,22 +237,22 @@
   #define i_valto cstr_sv
 #elif defined i_valboxed
   #define i_valclass i_valboxed
-  #define i_valraw c_PASTE(i_valboxed, _raw)
+  #define i_valraw c_JOIN(i_valboxed, _raw)
 #endif
 
 #ifdef i_valclass
   #define i_val i_valclass
   #ifndef i_valclone
-    #define i_valclone c_PASTE(i_val, _clone)
+    #define i_valclone c_JOIN(i_val, _clone)
   #endif
   #ifndef i_valdrop
-    #define i_valdrop c_PASTE(i_val, _drop)
+    #define i_valdrop c_JOIN(i_val, _drop)
   #endif
   #if !defined i_valfrom && defined i_valraw
-    #define i_valfrom c_PASTE(i_val, _from)
+    #define i_valfrom c_JOIN(i_val, _from)
   #endif
   #if !defined i_valto && defined i_valraw
-    #define i_valto c_PASTE(i_val, _toraw)
+    #define i_valto c_JOIN(i_val, _toraw)
   #endif
 #endif
 

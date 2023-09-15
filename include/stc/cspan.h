@@ -114,10 +114,10 @@ using_cspan_tuple(7); using_cspan_tuple(8);
 
 // cspan_init for static initialization only, else use c_init macro
 //
-#define cspan_init(SpanType, ...) \
-    {.data=(SpanType##_value[])__VA_ARGS__, \
-     .shape={sizeof((SpanType##_value[])__VA_ARGS__)/sizeof(SpanType##_value)}, \
-     .stride={.d={1}}}
+#define cspan_init(Span, ...) \
+    ((Span){.data=(Span##_value[])__VA_ARGS__, \
+            .shape={sizeof((Span##_value[])__VA_ARGS__)/sizeof(Span##_value)}, \
+            .stride={.d={1}}})
 
 // cspan from a cvec, cstack or c-arrays
 //
@@ -159,7 +159,7 @@ typedef enum {c_ROWMAJOR, c_COLMAJOR} cspan_layout;
 #define cspan_md_layout(layout, array, ...) \
     {.data=array, \
      .shape={__VA_ARGS__}, \
-     .stride=*(c_PASTE(cspan_tuple,c_NUMARGS(__VA_ARGS__))*) \
+     .stride=*(c_JOIN(cspan_tuple,c_NUMARGS(__VA_ARGS__))*) \
              _cspan_shape2stride(layout, ((intptr_t[]){__VA_ARGS__}), c_NUMARGS(__VA_ARGS__))}
 
 // Extract a slice of a cspan (slicing all dimensions)
@@ -175,9 +175,13 @@ typedef enum {c_ROWMAJOR, c_COLMAJOR} cspan_layout;
 // SubspanX: (X <= 3) optimized. Like e.g. cspan_slice(Span3, &ms3, {off,off+count}, {c_ALL}, {c_ALL});
 //
 #define cspan_subspan(self, offset, count) \
-    {.data=cspan_at(self, offset), .shape={count}, .stride=(self)->stride}
+    {.data=cspan_at(self, offset), \
+     .shape={count}, \
+     .stride=(self)->stride}
 #define cspan_subspan2(self, offset, count) \
-    {.data=cspan_at(self, offset, 0), .shape={count, (self)->shape[1]}, .stride=(self)->stride}
+    {.data=cspan_at(self, offset, 0), \
+     .shape={count, (self)->shape[1]}, \
+     .stride=(self)->stride}
 #define cspan_subspan3(self, offset, count) \
     {.data=cspan_at(self, offset, 0, 0), \
      .shape={count, (self)->shape[1], (self)->shape[2]}, \
