@@ -117,15 +117,15 @@ using_cspan_tuple(7); using_cspan_tuple(8);
 #define cspan_init(Span, ...) \
     ((Span){.data=(Span##_value[])__VA_ARGS__, \
             .shape={sizeof((Span##_value[])__VA_ARGS__)/sizeof(Span##_value)}, \
-            .stride={.d={1}}})
+            .stride=(cspan_tuple1){.d={1}}})
 
 // cspan from a cvec, cstack or c-arrays
 //
 #define cspan_from(container) \
-    {.data=(container)->data, .shape={(int32_t)(container)->_len}, .stride={.d={1}}}
+    {.data=(container)->data, .shape={(int32_t)(container)->_len}, .stride=(cspan_tuple1){.d={1}}}
 
 #define cspan_from_n(ptr, n) \
-    {.data=(ptr), .shape={n}, .stride={.d={1}}}
+    {.data=(ptr), .shape={n}, .stride=(cspan_tuple1){.d={1}}}
 
 #define cspan_from_array(array) \
     cspan_from_n(array, c_arraylen(array))
@@ -144,6 +144,11 @@ using_cspan_tuple(7); using_cspan_tuple(8);
 
 // Transpose and swap axes
 //
+#define cspan_transposed2(self) \
+    {.data=(self)->data + c_static_assert(cspan_rank(self) == 2), \
+     .shape={(self)->shape[1], (self)->shape[0]}, \
+     .stride=(cspan_tuple2){.d={(self)->stride.d[1], (self)->stride.d[0]}}}
+
 #define cspan_transpose(self) \
     _cspan_transpose((self)->shape, (self)->stride.d, cspan_rank(self))
 
@@ -167,12 +172,12 @@ typedef enum {c_ROWMAJOR, c_COLMAJOR} cspan_layout;
 #define c_END INT32_MAX
 #define c_ALL 0,c_END
 
-#define cspan_slice(OutSpan, inspan, ...) \
-    OutSpan##_slice_((inspan)->data, (inspan)->shape, (inspan)->stride.d, \
-                     ((const int32_t[][3]){__VA_ARGS__}), cspan_rank(inspan) + \
-                     c_static_assert(cspan_rank(inspan) == sizeof((int32_t[][3]){__VA_ARGS__})/sizeof(int32_t[3])))
+#define cspan_slice(OutSpan, self, ...) \
+    OutSpan##_slice_((self)->data, (self)->shape, (self)->stride.d, \
+                     ((const int32_t[][3]){__VA_ARGS__}), cspan_rank(self) + \
+                     c_static_assert(cspan_rank(self) == sizeof((int32_t[][3]){__VA_ARGS__})/sizeof(int32_t[3])))
 
-// SubspanX: (X <= 3) optimized. Like e.g. cspan_slice(Span3, &ms3, {off,off+count}, {c_ALL}, {c_ALL});
+// subspan#(): # <= 3 optimized. Like e.g. cspan_slice(Span3, &ms3, {off,off+count}, {c_ALL}, {c_ALL});
 //
 #define cspan_subspan(self, offset, count) \
     {.data=cspan_at(self, offset), \
@@ -187,7 +192,7 @@ typedef enum {c_ROWMAJOR, c_COLMAJOR} cspan_layout;
      .shape={count, (self)->shape[1], (self)->shape[2]}, \
      .stride=(self)->stride}
 
-// SubmdX: Reduce rank (X <= 4), optimized, like e.g. cspan_slice(Span2, &ms4, {x}, {y}, {c_ALL}, {c_ALL});
+// submd#(): # <= 4 optimized. Reduce rank, like e.g. cspan_slice(Span2, &ms3, {x}, {c_ALL}, {c_ALL});
 //
 #define cspan_submd2(self, x) \
     {.data=cspan_at(self, x, 0), \

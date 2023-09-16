@@ -32,16 +32,16 @@ it may be expanded multiple times. However, all index arguments are safe, e.g.
 of arguments does not match the span rank, a compile error is issued. Runtime bounds checks are enabled
 by default (define `STC_NDEBUG` or `NDEBUG` to disable).
 ```c
-SpanType        cspan_init(TYPE SpanType, {v1, v2, ...});           // make a 1-d cspan from values
-SpanType        cspan_from(STCContainer* cnt);                      // make a 1-d cspan from a cvec, cstack, cpque (heap)
+SpanType        cspan_init(TYPE SpanType, {v1, v2, ...});           // make a 1-d cspan from value list
 SpanType        cspan_from_n(ValueType* ptr, int32_t n);            // make a 1-d cspan from a pointer and length
 SpanType        cspan_from_array(ValueType array[]);                // make a 1-d cspan from a C array
+SpanType        cspan_from(STCContainer* cnt);                      // make a 1-d cspan from a cvec or cstack
 
 intptr_t        cspan_size(const SpanTypeN* self);                  // return number of elements
-intptr_t        cspan_rank(const SpanTypeN* self);                  // dimensions; compile time constant
-intptr_t        cspan_index(const SpanTypeN* self, int32_t x, ..);  // offset index at i, j, ..
+intptr_t        cspan_rank(const SpanTypeN* self);                  // num dimensions; compile time constant
+intptr_t        cspan_index(const SpanTypeN* self, int32_t i, j..); // offset index at i, j,...
 
-ValueType*      cspan_at(const SpanTypeN* self, int32_t x, ...);    // num args is compile-time checked
+ValueType*      cspan_at(const SpanTypeN* self, int32_t i, j..);    // num args is compile-time checked
 ValueType*      cspan_front(const SpanTypeN* self);
 ValueType*      cspan_back(const SpanTypeN* self);
 
@@ -49,30 +49,31 @@ SpanTypeN_iter  SpanType_begin(const SpanTypeN* self);
 SpanTypeN_iter  SpanType_end(const SpanTypeN* self);
 void            SpanType_next(SpanTypeN_iter* it);
 
-                // make a multi-dim cspan
-SpanTypeN       cspan_md(ValueType* data, int32_t d1, int32_t d2, ...); // row-major layout
-SpanTypeN       cspan_md_layout(cspan_layout layout, ValueType* data, int32_t d1, d2, ...);
+                // construct a multi-dim span
+SpanTypeN       cspan_md(ValueType* data, int32_t d1, d2...); // row-major layout
+SpanTypeN       cspan_md_layout(cspan_layout layout, ValueType* data, int32_t d1, d2...);
 
-                // transpose a md span. Inverses layout and axes only.
-void            cspan_transpose(const SpanTypeN* self);
-void            cspan_swap_axes(const SpanTypeN* self, int ax1, int ax2);
+                // transpose an md span. Inverses layout and axes only.
+void            cspan_swap_axes(SpanTypeN* self, int ax1, int ax2);
+void            cspan_transpose(SpanTypeN* self);
+SpanType2       cspan_transposed2(const SpanType2* self);     // constructor
 cspan_layout    cspan_get_layout(const SpanTypeN* self);
 bool            cspan_is_rowmajor(const SpanTypeN* self);
 bool            cspan_is_colmajor(const SpanTypeN* self);
 
-                // create a subspan of input span rank. Like e.g. cspan_slice(Span3, &ms3, {off,off+count}, {c_ALL}, {c_ALL});
-SpanType        cspan_subspan(const SpanType* span, int32_t offset, int32_t count);
-SpanType2       cspan_subspan2(const SpanType2* span, int32_t offset, int32_t count);
-SpanType3       cspan_subspan3(const SpanType3* span, int32_t offset, int32_t count);
+                // construct a subspan (same rank). Like e.g. cspan_slice(Span3, &ms3, {off,off+cnt}, {c_ALL}, {c_ALL});
+SpanType        cspan_subspan(const SpanType* self, int32_t offset, int32_t count);
+SpanType2       cspan_subspan2(const SpanType2* self, int32_t offset, int32_t count);
+SpanType3       cspan_subspan3(const SpanType3* self, int32_t offset, int32_t count);
 
-                // create a sub md span of lower rank. Like e.g. cspan_slice(Span2, &ms4, {x}, {y}, {c_ALL}, {c_ALL});
-OutSpan         cspan_submd2(const SpanType2* parent, int32_t x);        // return a 1d subspan from a 2d span.
-OutSpanN        cspan_submd3(const SpanType3* parent, int32_t x, ...);   // return a 1d or 2d subspan from a 3d span.
-OutSpanN        cspan_submd4(const SpanType4* parent, int32_t x, ...);   // number of args decides rank of output span.
+                // construct submd span of lower rank. Like e.g. cspan_slice(Span2, &ms4, {i}, {j}, {c_ALL}, {c_ALL});
+OutSpan         cspan_submd2(const SpanType2* self, int32_t i);       // construct a 1d subspan from a 2d span.
+OutSpanN        cspan_submd3(const SpanType3* self, int32_t i,...);   // construct a 2d or 1d subspan from a 3d span.
+OutSpanN        cspan_submd4(const SpanType4* self, int32_t i,...);   // construct a 3d, 2d or 1d subspan from a 4d span.
 
-                // general slicing of an md span.
-                // {i}: reduce rank. {i,c_END}: slice to end. {c_ALL}: use full extent.
-OutSpanN        cspan_slice(TYPE OutSpanN, const SpanTypeM* parent, {x0,x1}, {y0,y1}.., {N0,N1});
+                // general span slicing function.
+                // {i}: reduce rank. {i,j}: from i to j-1. {i,c_END}: from i to last. {c_ALL}: use full extent.
+OutSpanN        cspan_slice(TYPE OutSpanN, const SpanTypeM* self, {x0,x1}, {y0,y1}.., {N0,N1});
 ```
 ## Types
 | Type name         | Type definition / usage                             | Used to represent... |
@@ -195,8 +196,7 @@ int main(void) {
     myspan3 ms3 = cspan_md(arr, 2, 3, 4); // row-major layout
     myspan3 ss3 = cspan_slice(myspan3, &ms3, {c_ALL}, {0,3}, {2,c_END});
     myspan2 a = cspan_submd3(&ss3, 1);
-    myspan2 b = a;
-    cspan_transpose(&b);
+    myspan2 b = cspan_transposed2(&a);
 
     print_span((myspan2)cspan_submd3(&ms3, 1));
     print_span(a);
@@ -205,6 +205,7 @@ int main(void) {
     c_foreach (i, myspan2, a) printf(" %d", *i.ref);
     puts("");
     c_foreach (i, myspan2, b) printf(" %d", *i.ref);
+    puts("");
 }
 ```
 
