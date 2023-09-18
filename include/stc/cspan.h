@@ -82,9 +82,9 @@ int demo2() {
     typedef struct { Self##_value *ref; int32_t pos[RANK]; const Self *_s; } Self##_iter; \
     \
     STC_INLINE Self Self##_slice_(Self##_value* d, const int32_t shape[], const intptr_t stri[], \
-                                  const int32_t a[][3], const int rank) { \
+                                  const int32_t args[][3], const int rank) { \
         Self s; int outrank; \
-        s.data = d + _cspan_slice(s.shape, s.stride.d, &outrank, shape, stri, a, rank); \
+        s.data = d + _cspan_slice(s.shape, s.stride.d, &outrank, shape, stri, args, rank); \
         c_assert(outrank == RANK); \
         return s; \
     } \
@@ -112,26 +112,35 @@ using_cspan_tuple(3); using_cspan_tuple(4);
 using_cspan_tuple(5); using_cspan_tuple(6);
 using_cspan_tuple(7); using_cspan_tuple(8);
 
-// cspan_init for static initialization only, else use c_init macro
+// cspan_init with initialization list
 //
 #define cspan_init(Span, ...) \
     ((Span){.data=(Span##_value[])__VA_ARGS__, \
             .shape={sizeof((Span##_value[])__VA_ARGS__)/sizeof(Span##_value)}, \
             .stride=(cspan_tuple1){.d={1}}})
 
-// cspan from a cvec, cstack or c-arrays
-//
 #define cspan_from(container) \
     {.data=(container)->data, .shape={(int32_t)(container)->_len}, .stride=(cspan_tuple1){.d={1}}}
 
+// cspan_from* a cvec, cstack or c-array
+//
 #define cspan_from_n(ptr, n) \
     {.data=(ptr), .shape={n}, .stride=(cspan_tuple1){.d={1}}}
 
 #define cspan_from_array(array) \
     cspan_from_n(array, c_arraylen(array))
 
+// cspan_subspan on 1d spans
+//
+#define cspan_subspan(self, offset, count) \
+    {.data=cspan_at(self, offset), \
+     .shape={count}, \
+     .stride=(self)->stride}
+
+// Accessors
+//
 #define cspan_size(self) _cspan_size((self)->shape, cspan_rank(self))
-#define cspan_rank(self) c_arraylen((self)->shape)
+#define cspan_rank(self) c_arraylen((self)->shape) // constexpr
 #define cspan_is_colmajor(self) ((self)->stride.d[0] < (self)->stride.d[cspan_rank(self) - 1])
 #define cspan_is_rowmajor(self) (!cspan_is_colmajor(self))
 #define cspan_get_layout(self) (cspan_is_colmajor(self) ? c_COLMAJOR : c_ROWMAJOR)
@@ -141,6 +150,19 @@ using_cspan_tuple(7); using_cspan_tuple(8);
 #define cspan_index(self, ...) \
     _cspan_index((self)->shape, (self)->stride.d, ((const int32_t[]){__VA_ARGS__}), \
                  cspan_rank(self) + c_static_assert(cspan_rank(self) == c_NUMARGS(__VA_ARGS__)))
+
+// Multi-dimensional span constructors
+//
+typedef enum {c_ROWMAJOR, c_COLMAJOR} cspan_layout;
+
+#define cspan_md(array, ...) \
+    cspan_md_layout(c_ROWMAJOR, array, __VA_ARGS__)
+
+#define cspan_md_layout(layout, array, ...) \
+    {.data=array, \
+     .shape={__VA_ARGS__}, \
+     .stride=*(c_JOIN(cspan_tuple,c_NUMARGS(__VA_ARGS__))*) \
+             _cspan_shape2stride(layout, ((intptr_t[]){__VA_ARGS__}), c_NUMARGS(__VA_ARGS__))}
 
 // Transpose and swap axes
 //
@@ -155,19 +177,7 @@ using_cspan_tuple(7); using_cspan_tuple(8);
 #define cspan_swap_axes(self, ax1, ax2) \
     _cspan_swap_axes((self)->shape, (self)->stride.d, ax1, ax2, cspan_rank(self))
 
-
-// Multi-dimensional span constructors
-//
-typedef enum {c_ROWMAJOR, c_COLMAJOR} cspan_layout;
-
-#define cspan_md(array, ...) cspan_md_layout(c_ROWMAJOR, array, __VA_ARGS__)
-#define cspan_md_layout(layout, array, ...) \
-    {.data=array, \
-     .shape={__VA_ARGS__}, \
-     .stride=*(c_JOIN(cspan_tuple,c_NUMARGS(__VA_ARGS__))*) \
-             _cspan_shape2stride(layout, ((intptr_t[]){__VA_ARGS__}), c_NUMARGS(__VA_ARGS__))}
-
-// Extract a slice of a cspan (slicing all dimensions)
+// General slicing function.
 //
 #define c_END INT32_MAX
 #define c_ALL 0,c_END
@@ -176,21 +186,6 @@ typedef enum {c_ROWMAJOR, c_COLMAJOR} cspan_layout;
     OutSpan##_slice_((self)->data, (self)->shape, (self)->stride.d, \
                      ((const int32_t[][3]){__VA_ARGS__}), cspan_rank(self) + \
                      c_static_assert(cspan_rank(self) == sizeof((int32_t[][3]){__VA_ARGS__})/sizeof(int32_t[3])))
-
-// subspan#(): # <= 3 optimized. Like e.g. cspan_slice(Span3, &ms3, {off,off+count}, {c_ALL}, {c_ALL});
-//
-#define cspan_subspan(self, offset, count) \
-    {.data=cspan_at(self, offset), \
-     .shape={count}, \
-     .stride=(self)->stride}
-#define cspan_subspan2(self, offset, count) \
-    {.data=cspan_at(self, offset, 0), \
-     .shape={count, (self)->shape[1]}, \
-     .stride=(self)->stride}
-#define cspan_subspan3(self, offset, count) \
-    {.data=cspan_at(self, offset, 0, 0), \
-     .shape={count, (self)->shape[1], (self)->shape[2]}, \
-     .stride=(self)->stride}
 
 // submd#(): # <= 4 optimized. Reduce rank, like e.g. cspan_slice(Span2, &ms3, {x}, {c_ALL}, {c_ALL});
 //
@@ -244,11 +239,11 @@ STC_INLINE void _cspan_transpose(int32_t shape[], intptr_t stride[], int rank) {
     }
 }
 
-STC_INLINE intptr_t _cspan_index(const int32_t shape[], const intptr_t stride[], const int32_t a[], int rank) {
+STC_INLINE intptr_t _cspan_index(const int32_t shape[], const intptr_t stride[], const int32_t args[], int rank) {
     intptr_t off = 0;
     while (rank--) {
-        c_assert(c_less_unsigned(a[rank], shape[rank]));
-        off += stride[rank]*a[rank];
+        c_assert(c_less_unsigned(args[rank], shape[rank]));
+        off += stride[rank]*args[rank];
     }
     return off;
 }
@@ -265,7 +260,7 @@ STC_API intptr_t
 
 STC_API intptr_t _cspan_slice(int32_t oshape[], intptr_t ostride[], int* orank,
                               const int32_t shape[], const intptr_t stride[],
-                              const int32_t a[][3], int rank);
+                              const int32_t args[][3], int rank);
 
 STC_API intptr_t* _cspan_shape2stride(cspan_layout layout, intptr_t shape[], int rank);
 #endif // STC_CSPAN_H_INCLUDED
@@ -285,42 +280,42 @@ STC_DEF intptr_t _cspan_next2(int32_t pos[], const int32_t shape[], const intptr
     return off;
 }
 
-STC_DEF intptr_t* _cspan_shape2stride(cspan_layout layout, intptr_t stride[], int rank) {
+STC_DEF intptr_t* _cspan_shape2stride(cspan_layout layout, intptr_t shpstri[], int rank) {
     int i, inc;
     if (layout == c_COLMAJOR) i = 0, inc = 1;
     else i = rank - 1, inc = -1;
-    intptr_t k = 1, s1 = stride[i], s2;
+    intptr_t k = 1, s1 = shpstri[i], s2;
 
-    stride[i] = 1;
+    shpstri[i] = 1;
     while (--rank) {
         i += inc;
-        s2 = stride[i];
-        stride[i] = (k *= s1);
+        s2 = shpstri[i];
+        shpstri[i] = (k *= s1);
         s1 = s2;
     }
-    return stride;
+    return shpstri;
 }
 
 STC_DEF intptr_t _cspan_slice(int32_t oshape[], intptr_t ostride[], int* orank, 
                               const int32_t shape[], const intptr_t stride[], 
-                              const int32_t a[][3], int rank) {
+                              const int32_t args[][3], int rank) {
     intptr_t off = 0;
     int i = 0, oi = 0;
     int32_t end;
 
     for (; i < rank; ++i) {
-        off += stride[i]*a[i][0];
-        switch (a[i][1]) {
-            case 0: c_assert(c_less_unsigned(a[i][0], shape[i])); continue;
+        off += stride[i]*args[i][0];
+        switch (args[i][1]) {
+            case 0: c_assert(c_less_unsigned(args[i][0], shape[i])); continue;
             case c_END: end = shape[i]; break;
-            default: end = a[i][1];
+            default: end = args[i][1];
         }
-        oshape[oi] = end - a[i][0];
+        oshape[oi] = end - args[i][0];
         ostride[oi] = stride[i];
         c_assert((oshape[oi] > 0) & !c_less_unsigned(shape[i], end));
-        if (a[i][2] > 0) {
-            ostride[oi] *= a[i][2];
-            oshape[oi] = (oshape[oi] - 1)/a[i][2] + 1;
+        if (args[i][2] > 0) {
+            ostride[oi] *= args[i][2];
+            oshape[oi] = (oshape[oi] - 1)/args[i][2] + 1;
         }
         ++oi;
     }
@@ -329,8 +324,6 @@ STC_DEF intptr_t _cspan_slice(int32_t oshape[], intptr_t ostride[], int* orank,
 }
 
 #endif
-#undef i_opt
 #undef i_header
 #undef i_implement
 #undef i_static
-#undef i_import
