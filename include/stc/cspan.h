@@ -57,17 +57,16 @@ int demo2() {
     puts("");
 }
 */
+#ifndef STC_CSPAN_INDEX_TYPE
+  #define STC_CSPAN_INDEX_TYPE int32_t
+#endif
+
 #ifndef STC_CSPAN_H_INCLUDED
 #define STC_CSPAN_H_INCLUDED
 
 #include "priv/linkage.h"
 #include "ccommon.h"
-#ifndef cextent_t
-  #define cextent_t int32_t
-#endif
-#ifndef cstride_t
-  #define cstride_t cextent_t
-#endif
+typedef STC_CSPAN_INDEX_TYPE cextent_t, cstride_t;
 
 #define using_cspan(...) c_MACRO_OVERLOAD(using_cspan, __VA_ARGS__)
 #define using_cspan_2(Self, T) \
@@ -129,13 +128,13 @@ using_cspan_tuple(7); using_cspan_tuple(8);
             .shape={sizeof((Span##_value[])__VA_ARGS__)/sizeof(Span##_value)}, \
             .stride=(cspan_tuple1){.d={1}}})
 
+// cspan_from* a cvec, cstack, pointer+size or c-array
+//
 #define cspan_from(container) \
     {.data=(container)->data, \
      .shape={(cextent_t)(container)->_len}, \
      .stride=(cspan_tuple1){.d={1}}}
 
-// cspan_from* a cvec, cstack or c-array
-//
 #define cspan_from_n(ptr, n) \
     {.data=(ptr), .shape={n}, .stride=(cspan_tuple1){.d={1}}}
 
