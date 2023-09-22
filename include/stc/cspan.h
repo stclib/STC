@@ -71,13 +71,14 @@ typedef STC_CSPAN_INDEX_TYPE cextent_t, cstride_t;
 #define using_cspan(...) c_MACRO_OVERLOAD(using_cspan, __VA_ARGS__)
 #define using_cspan_2(Self, T) \
     using_cspan_3(Self, T, 1); \
-    STC_INLINE Self Self##_from_n(Self##_raw* raw, cextent_t n) { \
-        return (Self){.data=raw, .shape={n}, .stride={.d={1}}}; \
+    STC_INLINE Self Self##_from_n(Self##_value* values, intptr_t n) { \
+        return (Self)cspan_from_n(values, n); \
     } \
     struct stc_nostruct
 
 #define using_cspan_3(Self, T, RANK) \
-    typedef T Self##_value; typedef T Self##_raw; \
+    typedef T Self##_value; \
+    typedef T Self##_raw; \
     typedef struct { \
         Self##_value *data; \
         cextent_t shape[RANK]; \
@@ -121,33 +122,31 @@ using_cspan_tuple(3); using_cspan_tuple(4);
 using_cspan_tuple(5); using_cspan_tuple(6);
 using_cspan_tuple(7); using_cspan_tuple(8);
 
-// cspan_init with initialization list
+// cspan_init: static construction from initialization list
 //
 #define cspan_init(Span, ...) \
     ((Span){.data=(Span##_value[])__VA_ARGS__, \
             .shape={sizeof((Span##_value[])__VA_ARGS__)/sizeof(Span##_value)}, \
             .stride=(cspan_tuple1){.d={1}}})
 
-// cspan_from* a cvec, cstack, pointer+size or c-array
+// cspan_from* a pointer+size, c-array, or a cvec/cstack container
 //
-#define cspan_from(container) \
-    {.data=(container)->data, \
-     .shape={(cextent_t)(container)->_len}, \
-     .stride=(cspan_tuple1){.d={1}}}
-
 #define cspan_from_n(ptr, n) \
     {.data=(ptr), \
-     .shape={n}, \
+     .shape={(cextent_t)(n)}, \
      .stride=(cspan_tuple1){.d={1}}}
 
 #define cspan_from_array(array) \
     cspan_from_n(array, c_arraylen(array))
 
+#define cspan_from(container) \
+    cspan_from_n((container)->data, (container)->_len)
+
 // cspan_subspan on 1d spans
 //
 #define cspan_subspan(self, offset, count) \
     {.data=cspan_at(self, offset), \
-     .shape={count}, \
+     .shape={(cextent_t)(count)}, \
      .stride=(self)->stride}
 
 // Accessors
@@ -328,7 +327,7 @@ STC_DEF intptr_t _cspan_slice(cextent_t oshape[], cstride_t ostride[], int* oran
         ostride[oi] = stride[i];
         c_assert((oshape[oi] > 0) & !c_less_unsigned(shape[i], end));
         if (args[i][2] > 0) {
-            ostride[oi] *= (cstride_t)args[i][2];
+            ostride[oi] *= (cextent_t)args[i][2];
             oshape[oi] = (oshape[oi] - 1)/(cextent_t)args[i][2] + 1;
         }
         ++oi;
