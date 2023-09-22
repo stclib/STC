@@ -91,7 +91,7 @@ typedef STC_CSPAN_INDEX_TYPE cextent_t, cstride_t;
     } Self##_iter; \
     \
     STC_INLINE Self Self##_slice_(Self##_value* d, const cextent_t shape[], const cstride_t stri[], \
-                                  const cextent_t args[][3], const int rank) { \
+                                  const intptr_t args[][3], const int rank) { \
         Self s; int outrank; \
         s.data = d + _cspan_slice(s.shape, s.stride.d, &outrank, shape, stri, args, rank); \
         c_assert(outrank == RANK); \
@@ -136,7 +136,9 @@ using_cspan_tuple(7); using_cspan_tuple(8);
      .stride=(cspan_tuple1){.d={1}}}
 
 #define cspan_from_n(ptr, n) \
-    {.data=(ptr), .shape={n}, .stride=(cspan_tuple1){.d={1}}}
+    {.data=(ptr), \
+     .shape={n}, \
+     .stride=(cspan_tuple1){.d={1}}}
 
 #define cspan_from_array(array) \
     cspan_from_n(array, c_arraylen(array))
@@ -159,7 +161,7 @@ using_cspan_tuple(7); using_cspan_tuple(8);
 #define cspan_front(self) ((self)->data)
 #define cspan_back(self) ((self)->data + cspan_size(self) - 1)
 #define cspan_index(self, ...) \
-    _cspan_index((self)->shape, (self)->stride.d, ((const cextent_t[]){__VA_ARGS__}), \
+    _cspan_index((self)->shape, (self)->stride.d, ((const intptr_t[]){__VA_ARGS__}), \
                  cspan_rank(self) + c_static_assert(cspan_rank(self) == c_NUMARGS(__VA_ARGS__)))
 
 // Multi-dimensional span constructors
@@ -190,12 +192,12 @@ typedef enum {c_ROWMAJOR, c_COLMAJOR} cspan_layout;
 
 // General slicing function.
 //
-#define c_END (cextent_t)(((size_t)1 << sizeof(cextent_t)*8 - 1) - 1)
+#define c_END (cextent_t)(((size_t)1 << (sizeof(cextent_t)*8 - 1)) - 1)
 #define c_ALL 0,c_END
 
 #define cspan_slice(OutSpan, self, ...) \
     OutSpan##_slice_((self)->data, (self)->shape, (self)->stride.d, \
-                     ((const cextent_t[][3]){__VA_ARGS__}), cspan_rank(self) + \
+                     ((const intptr_t[][3]){__VA_ARGS__}), cspan_rank(self) + \
                      c_static_assert(cspan_rank(self) == sizeof((cextent_t[][3]){__VA_ARGS__})/sizeof(cextent_t[3])))
 
 // submd#(): # <= 4 optimized. Reduce rank, like e.g. cspan_slice(Span2, &ms3, {x}, {c_ALL}, {c_ALL});
@@ -231,10 +233,10 @@ typedef enum {c_ROWMAJOR, c_COLMAJOR} cspan_layout;
 
 /* ------------------- PRIVAT DEFINITIONS ------------------- */
 
-STC_INLINE cstride_t _cspan_size(const cextent_t shape[], int rank) {
-    cstride_t sz = shape[0];
-    while (--rank) sz *= shape[rank];
-    return sz;
+STC_INLINE intptr_t _cspan_size(const cextent_t shape[], int rank) {
+    intptr_t size = shape[0];
+    while (--rank) size *= shape[rank];
+    return size;
 }
 
 STC_INLINE void _cspan_swap_axes(cextent_t shape[], cstride_t stride[], int i, int j, int rank) {
@@ -250,19 +252,19 @@ STC_INLINE void _cspan_transpose(cextent_t shape[], cstride_t stride[], int rank
     }
 }
 
-STC_INLINE cstride_t _cspan_index(const cextent_t shape[], const cstride_t stride[],
-                                  const cextent_t args[], int rank) {
-    cstride_t off = 0;
+STC_INLINE intptr_t _cspan_index(const cextent_t shape[], const cstride_t stride[],
+                                 const intptr_t args[], int rank) {
+    intptr_t off = 0;
     while (rank--) {
         c_assert(c_less_unsigned(args[rank], shape[rank]));
-        off += stride[rank]*args[rank];
+        off += args[rank]*stride[rank];
     }
     return off;
 }
 
+STC_API intptr_t _cspan_next2(cextent_t pos[], const cextent_t shape[], const cstride_t stride[],
+                              int rank, int* done);
 #define _cspan_next1(pos, shape, stride, rank, done) (*done = ++pos[0]==shape[0], stride[0])
-STC_API cstride_t    _cspan_next2(cextent_t pos[], const cextent_t shape[], const cstride_t stride[],
-                                  int rank, int* done);
 #define _cspan_next3 _cspan_next2
 #define _cspan_next4 _cspan_next2
 #define _cspan_next5 _cspan_next2
@@ -270,9 +272,9 @@ STC_API cstride_t    _cspan_next2(cextent_t pos[], const cextent_t shape[], cons
 #define _cspan_next7 _cspan_next2
 #define _cspan_next8 _cspan_next2
 
-STC_API cstride_t _cspan_slice(cextent_t oshape[], cstride_t ostride[], int* orank,
-                               const cextent_t shape[], const cstride_t stride[],
-                               const cextent_t args[][3], int rank);
+STC_API intptr_t _cspan_slice(cextent_t oshape[], cstride_t ostride[], int* orank,
+                              const cextent_t shape[], const cstride_t stride[],
+                              const intptr_t args[][3], int rank);
 
 STC_API cstride_t* _cspan_shape2stride(cspan_layout layout, cstride_t shape[], int rank);
 #endif // STC_CSPAN_H_INCLUDED
@@ -280,14 +282,14 @@ STC_API cstride_t* _cspan_shape2stride(cspan_layout layout, cstride_t shape[], i
 /* --------------------- IMPLEMENTATION --------------------- */
 #if defined(i_implement) || defined(i_static)
 
-STC_DEF cstride_t _cspan_next2(cextent_t pos[], const cextent_t shape[], const cstride_t stride[],
-                               int r, int* done) {
-    cstride_t off = stride[--r];
+STC_DEF intptr_t _cspan_next2(cextent_t pos[], const cextent_t shape[], const cstride_t stride[],
+                              int r, int* done) {
+    intptr_t off = stride[--r];
     ++pos[r];
 
     for (; r && pos[r] == shape[r]; --r) {
         pos[r] = 0; ++pos[r - 1];
-        off += stride[r - 1] - stride[r]*shape[r];
+        off += stride[r - 1] - (intptr_t)shape[r]*stride[r];
     }
     *done = pos[r] == shape[r];
     return off;
@@ -309,26 +311,25 @@ STC_DEF cstride_t* _cspan_shape2stride(cspan_layout layout, cstride_t shpstri[],
     return shpstri;
 }
 
-STC_DEF cstride_t _cspan_slice(cextent_t oshape[], cstride_t ostride[], int* orank, 
-                               const cextent_t shape[], const cstride_t stride[], 
-                               const cextent_t args[][3], int rank) {
-    cstride_t off = 0;
+STC_DEF intptr_t _cspan_slice(cextent_t oshape[], cstride_t ostride[], int* orank, 
+                              const cextent_t shape[], const cstride_t stride[], 
+                              const intptr_t args[][3], int rank) {
+    intptr_t end, off = 0;
     int i = 0, oi = 0;
-    cextent_t end;
 
     for (; i < rank; ++i) {
-        off += stride[i]*args[i][0];
+        off += args[i][0]*stride[i];
         switch (args[i][1]) {
             case 0: c_assert(c_less_unsigned(args[i][0], shape[i])); continue;
             case c_END: end = shape[i]; break;
             default: end = args[i][1];
         }
-        oshape[oi] = end - args[i][0];
+        oshape[oi] = (cextent_t)(end - args[i][0]);
         ostride[oi] = stride[i];
         c_assert((oshape[oi] > 0) & !c_less_unsigned(shape[i], end));
         if (args[i][2] > 0) {
-            ostride[oi] *= args[i][2];
-            oshape[oi] = (oshape[oi] - 1)/args[i][2] + 1;
+            ostride[oi] *= (cstride_t)args[i][2];
+            oshape[oi] = (oshape[oi] - 1)/(cextent_t)args[i][2] + 1;
         }
         ++oi;
     }
