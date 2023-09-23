@@ -174,7 +174,7 @@ Note that `i_val*` template parameters can be used instead of `i_key*` for *non-
 
 Switching to a different container type, e.g. a sorted set (csset):
 
-[ [Run this code](https://godbolt.org/z/qznfa65e1) ]
+[ [Run this code](https://godbolt.org/z/fYWbEx4fa) ]
 ```c
 #define i_type Floats
 #define i_key float
@@ -241,7 +241,7 @@ int main(void)
 ```
 This example uses four different container types:
 
-[ [Run this code](https://godbolt.org/z/j68od14hv) ]
+[ [Run this code](https://godbolt.org/z/Kdrc5b7ec) ]
 ```c
 #include <stdio.h>
 

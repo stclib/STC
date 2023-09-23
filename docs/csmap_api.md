@@ -149,7 +149,7 @@ Translate a
 [C++ example using *insert* and *emplace*](https://en.cppreference.com/w/cpp/container/map/try_emplace)
  to STC:
 
-[ [Run this code](https://godbolt.org/z/b46W5Ezrb) ]
+[ [Run this code](https://godbolt.org/z/o6qqsE9K9) ]
 ```c
 #define i_implement
 #include <stc/cstr.h>

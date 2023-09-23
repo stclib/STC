@@ -91,7 +91,7 @@ OutSpanN        cspan_slice(TYPE OutSpanN, const SpanTypeM* self, {x0,x1}, {y0,y
 
 ## Example 1
 
-[ [Run this code](https://godbolt.org/z/Tv9d1T3TM) ]
+[ [Run this code](https://godbolt.org/z/85GGq8naq) ]
 ```c
 #include <stdio.h>
 #define i_key int
@@ -178,7 +178,7 @@ if __name__ == '__main__':
 ```
 ... in C with STC cspan:
 
-[ [Run this code](https://godbolt.org/z/e3PeWe7e9) ]
+[ [Run this code](https://godbolt.org/z/66315qdG7) ]
 ```c
 #include <stdio.h>
 #include <stc/cspan.h>
@@ -216,7 +216,7 @@ int main(void) {
 ## Example 3
 Slicing cspan without and with reducing the rank:
 
-[ [Run this code](https://godbolt.org/z/jjzcvPPxW) ]
+[ [Run this code](https://godbolt.org/z/bMxdcMW9W) ]
 ```c
 #include <stdio.h>
 #include <stc/cspan.h>
@@ -229,19 +229,22 @@ int main(void)
                               14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24});
     Span3 span3 = cspan_md(span.data, 2, 4, 3);
 
-    // slice without reducing rank:
+    // numpy style printout
+    puts("span3:");
+    cspan_print(Span3, &span3, "d");
+    
+    puts("Slice without reducing rank:");
     Span3 ss3 = cspan_slice(Span3, &span3, {c_ALL}, {3,4}, {c_ALL});
-    // slice and reduce rank:
+    cspan_print(Span3, &ss3, "d");
+    
+    puts("Slice with reducing rank:");
     Span2 ss2 = cspan_slice(Span2, &span3, {c_ALL}, {3}, {c_ALL});
+    cspan_print(Span2, &ss2, "d");
 
+    puts("Swapped:");
     Span3 swapped = span3;
     cspan_swap_axes(&swapped, 0, 1);
     cspan_swap_axes(&swapped, 1, 2);
-
-    // numpy style printout
-    cspan_print(Span3, &span3, "d");
     cspan_print(Span3, &swapped, "d");
-    cspan_print(Span3, &ss3, "d");
-    cspan_print(Span2, &ss2, "d");
 }
 ```

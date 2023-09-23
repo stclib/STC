@@ -74,6 +74,9 @@ int main(void)
   OutMat c = cspan_md_layout(c_COLMAJOR, out, D, D);
   Mat2 a = cspan_submd3(&data, 0);
 
+  Mat2 slice = cspan_slice(Mat2, &a, {c_ALL,16}, {c_ALL,16});
+  cspan_print(Mat2, &slice, ".2f", stdout, true);
+
   clock_t t = clock();
   for (int i=1; i<N; ++i) {
     Mat2 b = cspan_submd3(&data, i);
