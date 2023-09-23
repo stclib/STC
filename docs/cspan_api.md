@@ -45,9 +45,10 @@ ValueType*      cspan_at(const SpanTypeN* self, cextent_t i, j..);  // num args 
 ValueType*      cspan_front(const SpanTypeN* self);
 ValueType*      cspan_back(const SpanTypeN* self);
 
-                // print numpy style output. A) fp is optional. B) fmt must 
-                // not contain "%" or width specifier. Just use e.g. "d" or ".2f"
-void            cspan_print(TYPE Span, Span* self, const char* fmt, FILE* fp = stdout);
+                // print numpy style output. NOTE: fmt must not contain
+                // "%" and/or width specifier. Just use e.g. "d" or ".2f"
+void            cspan_print(TYPE Span, Span* self, const char* fmt);
+void            cspan_print(TYPE Span, Span* self, const char* fmt, FILE* fp, bool comma);
 
 SpanTypeN_iter  SpanType_begin(const SpanTypeN* self);
 SpanTypeN_iter  SpanType_end(const SpanTypeN* self);

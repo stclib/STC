@@ -26,10 +26,10 @@ void zero_surface(span3 grid3d) {
 }
 
 int main(void) {
-  double arr[3*4*5];
+  double arr[4*4*5];
   for (int i=0; i<c_arraylen(arr); ++i) arr[i] = i + i/77.0;
 
-  span3 md = cspan_md(arr, 3, 4, 5);
+  span3 md = cspan_md(arr, 4, 4, 5);
 
   zero_surface(md);
 
@@ -43,7 +43,7 @@ int main(void) {
     puts("");
   }
 #else
-  cspan_print(span3, &md, ".3g");
+  cspan_print(span3, &md, ".3g", stdout, true);
 #endif
   puts("done");
 }

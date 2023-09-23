@@ -232,9 +232,9 @@ typedef enum {c_ROWMAJOR, c_COLMAJOR} cspan_layout;
 
 #define cspan_print(...) c_MACRO_OVERLOAD(cspan_print, __VA_ARGS__)
 #define cspan_print_3(Span, self, fmt) \
-    cspan_print_4(Span, self, fmt, stdout)
+    cspan_print_5(Span, self, fmt, stdout, false)
 
-#define cspan_print_4(Span, self, fmt, fp) do { \
+#define cspan_print_5(Span, self, fmt, fp, comma) do { \
     const Span* _s = self; \
     const char* _f = fmt; \
     FILE* _fp = fp; \
@@ -247,7 +247,7 @@ typedef enum {c_ROWMAJOR, c_COLMAJOR} cspan_layout;
     } \
     sprintf(_fmt, "%%s%%*%s%%s", _f); \
     c_foreach_3 (_it, Span, *_s) { \
-        _cspan_print_assist(_it.pos, _s->shape, cspan_rank(_s), _res); \
+        _cspan_print_assist(_it.pos, _s->shape, cspan_rank(_s), _res, comma); \
         _w = _max + (_it.pos[cspan_rank(_s) - 1] > 0); \
         fprintf(_fp, _fmt, _res[0], _w, *_it.ref, _res[1]); \
     } \
@@ -285,7 +285,7 @@ STC_INLINE intptr_t _cspan_index(const cextent_t shape[], const cstride_t stride
 }
 
 STC_API void _cspan_print_assist(cextent_t pos[], const cextent_t shape[],
-                                 const int rank, char result[2][16]);
+                                 const int rank, char result[2][16], bool comma);
 
 STC_API intptr_t _cspan_next2(cextent_t pos[], const cextent_t shape[], const cstride_t stride[],
                               int rank, int* done);
@@ -308,20 +308,19 @@ STC_API cstride_t* _cspan_shape2stride(cspan_layout layout, cstride_t shape[], i
 #if defined(i_implement) || defined(i_static)
 
 STC_DEF void _cspan_print_assist(cextent_t pos[], const cextent_t shape[],
-                                 const int rank, char result[2][16]) {
-    int i = 0, j = 0, r = rank - 1;
+                                 const int rank, char result[2][16], bool comma) {
+    int n = 0, j = 0, r = rank - 1;
     memset(result, 0, 32);
 
-    while (i <= r && pos[r - i] == 0) ++i;
-    if (i) for (; j < rank; ++j)
-        result[0][j] = j < rank - i ? ' ' : '[';
+    while (n <= r && pos[r - n] == 0) ++n;
+    if (n) for (; j < rank; ++j)
+        result[0][j] = j < rank - n ? ' ' : '[';
+    for (j = 0; r >= 0 && pos[r] + 1 == shape[r]; --r, ++j)
+        result[1][j] = ']';
 
-    j = 0;
-    for (; r >= 0 && pos[r] + 1 == shape[r]; --r)
-        result[1][j++] = ']';
-
-    i = (j > 0) + (j > 1);
-    while (i--) result[1][j++] = '\n';
+    n = (j > 0) + (j > 1 /*&& j < rank*/); // newlines
+    if (comma && j < rank) result[1][j++] = ',';
+    while (n--) result[1][j++] = '\n';
 }
 
 STC_DEF intptr_t _cspan_next2(cextent_t pos[], const cextent_t shape[], const cstride_t stride[],
