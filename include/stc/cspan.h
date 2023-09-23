@@ -236,7 +236,6 @@ typedef enum {c_ROWMAJOR, c_COLMAJOR} cspan_layout;
 
 #define cspan_print_4(Span, self, fmt, fp) do { \
     char _result[2][16], _fmt[32]; \
-    Span##_iter _it = Span##_begin(self); \
     sprintf(_fmt, "%%s %s%%s", fmt); \
     \
     c_foreach_3 (_it, Span, *(self)) { \
