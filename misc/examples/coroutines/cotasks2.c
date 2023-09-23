@@ -23,7 +23,7 @@ int next_value(struct next_value* co, cco_runtime* rt)
     return 0;
 }
 
-void print_time()
+void print_time(void)
 {
     time_t now = time(NULL);
     char mbstr[64];

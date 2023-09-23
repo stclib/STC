@@ -32,8 +32,8 @@
   #define STC_DEF
 #else
   #define i_static
-  #define STC_API static inline
-  #define STC_DEF static inline
+  #define STC_API static
+  #define STC_DEF STC_API
 #endif
 #if defined(STC_IMPLEMENT) || defined(i_import)
   #define i_implement

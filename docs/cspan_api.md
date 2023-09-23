@@ -45,7 +45,8 @@ ValueType*      cspan_at(const SpanTypeN* self, cextent_t i, j..);  // num args 
 ValueType*      cspan_front(const SpanTypeN* self);
 ValueType*      cspan_back(const SpanTypeN* self);
 
-                // print numpy style output; fp is optional.
+                // print numpy style output. A) fp is optional. B) fmt must 
+                // not contain "%" or width specifier. Just use e.g. "d" or ".2f"
 void            cspan_print(TYPE Span, Span* self, const char* fmt, FILE* fp = stdout);
 
 SpanTypeN_iter  SpanType_begin(const SpanTypeN* self);
@@ -237,9 +238,9 @@ int main(void)
     cspan_swap_axes(&swapped, 1, 2);
 
     // numpy style printout
-    cspan_print(Span3, &span3, "%2d");
-    cspan_print(Span3, &swapped, "%2d");
-    cspan_print(Span3, &ss3, "%2d");
-    cspan_print(Span2, &ss2, "%2d");
+    cspan_print(Span3, &span3, "d");
+    cspan_print(Span3, &swapped, "d");
+    cspan_print(Span3, &ss3, "d");
+    cspan_print(Span2, &ss2, "d");
 }
 ```

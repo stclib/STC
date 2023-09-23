@@ -25,14 +25,15 @@ void zero_surface(span3 grid3d) {
   zero_2d(cspan_slice(span2, &grid3d, {c_ALL}, {c_ALL}, {grid3d.shape[2]-1}));
 }
 
-int main() {
+int main(void) {
   double arr[3*4*5];
-  for (int i=0; i<c_arraylen(arr); ++i) arr[i] = i + 1.0;
+  for (int i=0; i<c_arraylen(arr); ++i) arr[i] = i + i/77.0;
 
   span3 md = cspan_md(arr, 3, 4, 5);
 
   zero_surface(md);
 
+#if 0
   for (int i = 0; i < md.shape[0]; i++) {
     for (int j = 0; j < md.shape[1]; j++) {
       for (int k = 0; k < md.shape[2]; k++)
@@ -41,4 +42,8 @@ int main() {
     }
     puts("");
   }
+#else
+  cspan_print(span3, &md, ".3g");
+#endif
+  puts("done");
 }

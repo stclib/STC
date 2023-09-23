@@ -235,12 +235,21 @@ typedef enum {c_ROWMAJOR, c_COLMAJOR} cspan_layout;
     cspan_print_4(Span, self, fmt, stdout)
 
 #define cspan_print_4(Span, self, fmt, fp) do { \
-    char _result[2][16], _fmt[32]; \
-    sprintf(_fmt, "%%s %s%%s", fmt); \
-    \
-    c_foreach_3 (_it, Span, *(self)) { \
-        _cspan_print_item(_it.pos, (self)->shape, cspan_rank(self), _result); \
-        fprintf(fp, _fmt, _result[0], *_it.ref, _result[1]); \
+    const Span* _s = self; \
+    const char* _f = fmt; \
+    FILE* _fp = fp; \
+    int _w, _max = 0; \
+    char _res[2][16], _fmt[32]; \
+    sprintf(_fmt, "%%%s", _f); \
+    c_foreach_3 (_it, Span, *_s) { \
+        _w = snprintf(NULL, 0ULL, _fmt, *_it.ref); \
+        if (_w > _max) _max = _w; \
+    } \
+    sprintf(_fmt, "%%s%%*%s%%s", _f); \
+    c_foreach_3 (_it, Span, *_s) { \
+        _cspan_print_assist(_it.pos, _s->shape, cspan_rank(_s), _res); \
+        _w = _max + (_it.pos[cspan_rank(_s) - 1] > 0); \
+        fprintf(_fp, _fmt, _res[0], _w, *_it.ref, _res[1]); \
     } \
 } while (0)
 
@@ -275,8 +284,8 @@ STC_INLINE intptr_t _cspan_index(const cextent_t shape[], const cstride_t stride
     return off;
 }
 
-STC_API void _cspan_print_item(cextent_t pos[], const cextent_t shape[],
-                               const int rank, char result[2][16]);
+STC_API void _cspan_print_assist(cextent_t pos[], const cextent_t shape[],
+                                 const int rank, char result[2][16]);
 
 STC_API intptr_t _cspan_next2(cextent_t pos[], const cextent_t shape[], const cstride_t stride[],
                               int rank, int* done);
@@ -298,7 +307,8 @@ STC_API cstride_t* _cspan_shape2stride(cspan_layout layout, cstride_t shape[], i
 /* --------------------- IMPLEMENTATION --------------------- */
 #if defined(i_implement) || defined(i_static)
 
-STC_DEF void _cspan_print_item(cextent_t pos[], const cextent_t shape[], const int rank, char result[2][16]) {
+STC_DEF void _cspan_print_assist(cextent_t pos[], const cextent_t shape[],
+                                 const int rank, char result[2][16]) {
     int i = 0, j = 0, r = rank - 1;
     memset(result, 0, 32);
 
