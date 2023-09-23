@@ -45,6 +45,9 @@ ValueType*      cspan_at(const SpanTypeN* self, cextent_t i, j..);  // num args 
 ValueType*      cspan_front(const SpanTypeN* self);
 ValueType*      cspan_back(const SpanTypeN* self);
 
+                // print numpy style output; fp is optional.
+void            cspan_print(TYPE Span, Span* self, const char* fmt, FILE* fp = stdout);
+
 SpanTypeN_iter  SpanType_begin(const SpanTypeN* self);
 SpanTypeN_iter  SpanType_end(const SpanTypeN* self);
 void            SpanType_next(SpanTypeN_iter* it);
@@ -215,10 +218,6 @@ Slicing cspan without and with reducing the rank:
 ```c
 #include <stdio.h>
 #include <stc/cspan.h>
-#define i_key int
-#include <stc/cvec.h>
-#define i_key int
-#include <stc/cstack.h>
 
 using_cspan3(Span, int); // Shorthand to define Span, Span2, and Span3
 
@@ -230,23 +229,17 @@ int main(void)
 
     // slice without reducing rank:
     Span3 ss3 = cspan_slice(Span3, &span3, {c_ALL}, {3,4}, {c_ALL});
-
-    for (int i=0; i < ss3.shape[0]; ++i) {
-        for (int j=0; j < ss3.shape[1]; ++j) {
-            for (int k=0; k < ss3.shape[2]; ++k)
-                printf(" %2d", *cspan_at(&ss3, i, j, k));
-            puts("");
-        }
-        puts("");
-    }
-
     // slice and reduce rank:
     Span2 ss2 = cspan_slice(Span2, &span3, {c_ALL}, {3}, {c_ALL});
 
-    for (int i=0; i < ss2.shape[0]; ++i) {
-        for (int j=0; j < ss2.shape[1]; ++j)
-            printf(" %2d", *cspan_at(&ss2, i, j));
-        puts("");
-    }
+    Span3 swapped = span3;
+    cspan_swap_axes(&swapped, 0, 1);
+    cspan_swap_axes(&swapped, 1, 2);
+
+    // numpy style printout
+    cspan_print(Span3, &span3, "%2d");
+    cspan_print(Span3, &swapped, "%2d");
+    cspan_print(Span3, &ss3, "%2d");
+    cspan_print(Span2, &ss2, "%2d");
 }
 ```

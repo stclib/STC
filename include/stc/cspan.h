@@ -230,6 +230,21 @@ typedef enum {c_ROWMAJOR, c_COLMAJOR} cspan_layout;
      .shape={(self)->shape[3]}, \
      .stride=(cspan_tuple1){.d={(self)->stride.d[3]}}}
 
+#define cspan_print(...) c_MACRO_OVERLOAD(cspan_print, __VA_ARGS__)
+#define cspan_print_3(Span, self, fmt) \
+    cspan_print_4(Span, self, fmt, stdout)
+
+#define cspan_print_4(Span, self, fmt, fp) do { \
+    char _result[2][16], _fmt[32]; \
+    Span##_iter _it = Span##_begin(self); \
+    sprintf(_fmt, "%%s %s%%s", fmt); \
+    \
+    c_foreach_3 (_it, Span, *(self)) { \
+        _cspan_print_item(_it.pos, (self)->shape, cspan_rank(self), _result); \
+        fprintf(fp, _fmt, _result[0], *_it.ref, _result[1]); \
+    } \
+} while (0)
+
 /* ------------------- PRIVAT DEFINITIONS ------------------- */
 
 STC_INLINE intptr_t _cspan_size(const cextent_t shape[], int rank) {
@@ -261,6 +276,9 @@ STC_INLINE intptr_t _cspan_index(const cextent_t shape[], const cstride_t stride
     return off;
 }
 
+STC_API void _cspan_print_item(cextent_t pos[], const cextent_t shape[],
+                               const int rank, char result[2][16]);
+
 STC_API intptr_t _cspan_next2(cextent_t pos[], const cextent_t shape[], const cstride_t stride[],
                               int rank, int* done);
 #define _cspan_next1(pos, shape, stride, rank, done) (*done = ++pos[0]==shape[0], stride[0])
@@ -280,6 +298,22 @@ STC_API cstride_t* _cspan_shape2stride(cspan_layout layout, cstride_t shape[], i
 
 /* --------------------- IMPLEMENTATION --------------------- */
 #if defined(i_implement) || defined(i_static)
+
+STC_DEF void _cspan_print_item(cextent_t pos[], const cextent_t shape[], const int rank, char result[2][16]) {
+    int i = 0, j = 0, r = rank - 1;
+    memset(result, 0, 32);
+
+    while (i <= r && pos[r - i] == 0) ++i;
+    if (i) for (; j < rank; ++j)
+        result[0][j] = j < rank - i ? ' ' : '[';
+
+    j = 0;
+    for (; r >= 0 && pos[r] + 1 == shape[r]; --r)
+        result[1][j++] = ']';
+
+    i = (j > 0) + (j > 1);
+    while (i--) result[1][j++] = '\n';
+}
 
 STC_DEF intptr_t _cspan_next2(cextent_t pos[], const cextent_t shape[], const cstride_t stride[],
                               int r, int* done) {
