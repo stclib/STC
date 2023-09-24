@@ -158,7 +158,7 @@ STC_INLINE void _cx_MEMB(_assign)(_cx_Self* self, _cx_Self* moved) {
     moved->get = NULL;
 }
 
-#if defined i_use_cmp
+#if defined _i_has_cmp
     STC_INLINE int _cx_MEMB(_raw_cmp)(const _cx_raw* rx, const _cx_raw* ry)
         { return i_cmp(rx, ry); }
 
@@ -166,7 +166,12 @@ STC_INLINE void _cx_MEMB(_assign)(_cx_Self* self, _cx_Self* moved) {
         _cx_raw rx = i_keyto(self->get), ry = i_keyto(other->get);
         return i_cmp((&rx), (&ry));
     }
+#else
+    STC_INLINE int _cx_MEMB(_cmp)(const _cx_Self* self, const _cx_Self* other)
+        { return c_default_cmp(&self->get, &other->get); }
+#endif
 
+#if defined _i_has_eq
     STC_INLINE bool _cx_MEMB(_raw_eq)(const _cx_raw* rx, const _cx_raw* ry)
         { return i_eq(rx, ry); }
 
@@ -174,26 +179,23 @@ STC_INLINE void _cx_MEMB(_assign)(_cx_Self* self, _cx_Self* moved) {
         _cx_raw rx = i_keyto(self->get), ry = i_keyto(other->get);
         return i_eq((&rx), (&ry));
     }
+#else
+    STC_INLINE bool _cx_MEMB(_eq)(const _cx_Self* self, const _cx_Self* other)
+        { return self->get == other->get; }
+#endif
 
-    #ifndef i_no_hash
+#ifndef i_no_hash
     STC_INLINE uint64_t _cx_MEMB(_raw_hash)(const _cx_raw* rx)
         { return i_hash(rx); }
 
-    STC_INLINE uint64_t _cx_MEMB(_hash)(const _cx_Self* self)
-        { _cx_raw rx = i_keyto(self->get); return i_hash((&rx)); }
-    #endif // i_no_hash
-
+    STC_INLINE uint64_t _cx_MEMB(_hash)(const _cx_Self* self) { 
+        _cx_raw rx = i_keyto(self->get); 
+        return i_hash((&rx));
+    }
 #else
-
-    STC_INLINE int _cx_MEMB(_cmp)(const _cx_Self* self, const _cx_Self* other) {
-        return c_default_cmp(&self->get, &other->get);
-    }
-    STC_INLINE bool _cx_MEMB(_eq)(const _cx_Self* self, const _cx_Self* other) {
-        return self->get == other->get;
-    }
     STC_INLINE uint64_t _cx_MEMB(_hash)(const _cx_Self* self)
         { return c_default_hash(&self->get); }
-#endif // i_use_cmp
+#endif // i_no_hash
 
 #undef _i_cbox
 #include "priv/template2.h"
