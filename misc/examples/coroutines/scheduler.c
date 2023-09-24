@@ -28,6 +28,7 @@ int cco_scheduler_run(cco_scheduler* sched) {
 }
 
 static int taskA(cco_task* task, cco_runtime* rt) {
+    (void)rt;
     cco_routine(task) {
         puts("Hello, from task A");
         cco_yield();
@@ -41,6 +42,7 @@ static int taskA(cco_task* task, cco_runtime* rt) {
 }
 
 static int taskB(cco_task* task, cco_runtime* rt) {
+    (void)rt;
     cco_routine(task) {
         puts("Hello, from task B");
         cco_yield();

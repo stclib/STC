@@ -5,13 +5,11 @@ if [ "$(uname)" = 'Linux' ]; then
     clibs='-lm' # -pthread
     oflag='-o '
 fi
-common="-std=c99 -Werror -Wall -Wextra -Wpedantic -Wconversion -Wdouble-promotion -Wwrite-strings -Wno-unused-parameter -Wno-unused-function -Wno-implicit-fallthrough -Wno-missing-field-initializers"
-common_gcc="-Wno-maybe-uninitialized"
-common_clang="-Wno-newline-eof"
-cc=gcc; cflags="-s -O3 -fmax-errors=3 $common $common_gcc"
-#cc=gcc; cflags="-g -Wfatal-errors $sanitize $common $common_gcc"
+common="-std=c99 -Werror -Wall"
+#cc=clang; cflags="-s -O3 $common"
+cc=gcc; cflags="-s -O3 $common"
+#cc=gcc; cflags="-g $sanitize $common"
 #cc=gcc; cflags="-x c++ -std=c++20 -O2 -s -Wall"
-#cc=clang; cflags="-s -O3 -Wfatal-errors $common $common_clang"
 #cc=tcc; cflags="-std=c99 -Wall"
 #cc=cl; cflags="-nologo -O2 -MD -W3 -wd4003"
 #cc=cl; cflags="-nologo -TP -std:c++20 -wd4003"

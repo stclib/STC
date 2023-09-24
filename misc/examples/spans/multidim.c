@@ -1,9 +1,9 @@
 // Example based on https://en.cppreference.com/w/cpp/container/mdspan
+#include <stdio.h>
 #define i_val int
 #include <stc/cstack.h>
 #define i_implement
 #include <stc/cspan.h>
-#include <stdio.h>
 
 using_cspan3(ispan, int);
 

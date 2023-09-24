@@ -195,5 +195,6 @@ STC_INLINE void _cx_MEMB(_assign)(_cx_Self* self, _cx_Self* moved) {
         { return c_default_hash(&self->get); }
 #endif // i_use_cmp
 
-#include "priv/template2.h"
 #undef _i_cbox
+#include "priv/template2.h"
+#include "priv/linkage2.h"

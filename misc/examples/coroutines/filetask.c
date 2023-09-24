@@ -15,6 +15,7 @@ cco_task_struct(file_read,
 
 int file_read(struct file_read* co, cco_runtime* rt)
 {
+    (void)rt;
     cco_routine (co) {
         co->fp = fopen(co->path, "r");
         co->line = cstr_init();

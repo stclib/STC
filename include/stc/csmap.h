@@ -196,8 +196,8 @@ STC_API _cx_result _cx_MEMB(_insert_entry_)(_cx_Self* self, _cx_keyraw rkey);
 
 STC_INLINE _cx_iter
 _cx_MEMB(_end)(const _cx_Self* self) {
-    (void)self;
-    _cx_iter it; it.ref = NULL, it._top = 0, it._tn = 0;
+    _cx_iter it; (void)self; 
+    it.ref = NULL, it._top = 0, it._tn = 0;
     return it;
 }
 
@@ -599,3 +599,5 @@ _cx_MEMB(_drop)(_cx_Self* self) {
 #undef _i_SET_ONLY
 #define CSMAP_H_INCLUDED
 #include "priv/template2.h"
+#include "priv/linkage2.h"
+

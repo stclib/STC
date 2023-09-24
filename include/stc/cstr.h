@@ -26,7 +26,7 @@
  */
 #define i_header // external linkage by default. override with i_static.
 #define _i_inc_utf8
-#include "utf8.h"
+#include "utf8.h" // includes linkage.h
 
 #ifndef CSTR_H_INCLUDED
 #define CSTR_H_INCLUDED
@@ -38,9 +38,9 @@
 /**************************** PRIVATE API **********************************/
 
 #if defined __GNUC__ && !defined __clang__
-#  pragma GCC diagnostic push
-#  pragma GCC diagnostic ignored "-Warray-bounds"
-#  pragma GCC diagnostic ignored "-Wstringop-overflow="
+  // linkage.h already does diagnostic push
+  // Warns wrongfully on -O3 on cstr_assign(&str, "literal longer than 23 ...");
+  #pragma GCC diagnostic ignored "-Warray-bounds"
 #endif
 
 enum  { cstr_s_cap =            sizeof(cstr_buf) - 2 };
@@ -538,7 +538,7 @@ STC_DEF intptr_t cstr_find_at(const cstr* self, const intptr_t pos, const char* 
 
 STC_DEF char* cstr_assign_n(cstr* self, const char* str, const intptr_t len) {
     char* d = cstr_reserve(self, len);
-    if (d) { c_memmove(d, str, len); _cstr_set_size(self, len); }
+    if (d) { _cstr_set_size(self, len); c_memmove(d, str, len); }
     return d;
 }
 
@@ -612,14 +612,6 @@ STC_DEF void cstr_u8_erase(cstr* self, const intptr_t bytepos, const intptr_t u8
     _cstr_set_size(self, r.size - len);
 }
 
-#if defined(__clang__)
-#  pragma clang diagnostic push
-#  pragma clang diagnostic ignored "-Wdeprecated-declarations"
-#elif defined(_MSC_VER)
-#  pragma warning(push)
-#  pragma warning(disable: 4996)
-#endif
-
 STC_DEF intptr_t cstr_vfmt(cstr* self, intptr_t start, const char* fmt, va_list args) {
     va_list args2;
     va_copy(args2, args);
@@ -629,11 +621,6 @@ STC_DEF intptr_t cstr_vfmt(cstr* self, intptr_t start, const char* fmt, va_list 
     _cstr_set_size(self, start + n);
     return n;
 }
-#if defined(__clang__)
-#  pragma clang diagnostic pop
-#elif defined(_MSC_VER)
-#  pragma warning(pop)
-#endif
 
 STC_DEF cstr cstr_from_fmt(const char* fmt, ...) {
     cstr s = cstr_null;
@@ -662,12 +649,4 @@ STC_DEF intptr_t cstr_printf(cstr* self, const char* fmt, ...) {
 }
 #endif // CSTR_C_INCLUDED
 #endif // i_implement
-
-#if defined __GNUC__ && !defined __clang__
-#  pragma GCC diagnostic pop
-#endif
-#undef i_opt
-#undef i_header
-#undef i_static
-#undef i_implement
-#undef i_import
+#include "priv/linkage2.h"

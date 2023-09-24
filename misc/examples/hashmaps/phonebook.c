@@ -36,7 +36,7 @@ void print_phone_book(cmap_str phone_book)
         printf("%s\t- %s\n", cstr_str(&i.ref->first), cstr_str(&i.ref->second));
 }
 
-int main(int argc, char **argv)
+int main(void)
 {
     cmap_str phone_book = c_init(cmap_str, {
         {"Lilia Friedman", "(892) 670-4739"},

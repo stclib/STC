@@ -20,24 +20,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#include "priv/linkage.h"
 
-#ifndef CQUEUE_H_INCLUDED
-#include "ccommon.h"
-#include "forward.h"
-#include <stdlib.h>
-#include <string.h>
-#endif // CQUEUE_H_INCLUDED
+#undef i_static
+#undef i_header
+#undef i_implement
+#undef i_import
+#undef i_opt
 
-#ifndef _i_prefix
-#define _i_prefix cqueue_
+#if defined __clang__
+  #pragma clang diagnostic pop
+#elif defined __GNUC__
+  #pragma GCC diagnostic pop
+#elif defined _MSC_VER
+#  pragma warning(pop)
 #endif
-#include "priv/cqueue_hdr.h"
-
-/* -------------------------- IMPLEMENTATION ------------------------- */
-#if defined(i_implement) || defined(i_static)
-#include "priv/cqueue_imp.h"
-#endif // IMPLEMENTATION
-#define CQUEUE_H_INCLUDED
-#include "priv/template2.h"
-#include "priv/linkage2.h"

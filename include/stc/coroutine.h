@@ -88,6 +88,7 @@ typedef enum {
 #define cco_await_and_return(promise, ret) \
     do { \
         *_state = __LINE__; \
+        /* fall through */ \
         case __LINE__: if (!(promise)) {return ret; goto _resume;} \
     } while (0)
 
@@ -97,6 +98,7 @@ typedef enum {
 #define cco_await_call_2(corocall, awaitbits) \
     do { \
         *_state = __LINE__; \
+        /* fall through */ \
         case __LINE__: { int _r = corocall; if (_r & ~(awaitbits)) {return _r; goto _resume;} } \
     } while (0)
 
@@ -105,7 +107,9 @@ typedef enum {
 
 #define cco_cleanup cco_final // [deprecated]
 #define cco_final \
-    *_state = CCO_STATE_CLEANUP; case CCO_STATE_CLEANUP
+    *_state = CCO_STATE_CLEANUP; \
+    /* fall through */ \
+    case CCO_STATE_CLEANUP
 
 #define cco_return \
     do { \

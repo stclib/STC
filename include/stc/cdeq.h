@@ -201,3 +201,4 @@ _cx_MEMB(_find_in)(_cx_iter i1, _cx_iter i2, _cx_raw raw) {
 #endif // IMPLEMENTATION
 #define CDEQ_H_INCLUDED
 #include "priv/template2.h"
+#include "priv/linkage2.h"

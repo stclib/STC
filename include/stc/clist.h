@@ -167,7 +167,7 @@ _cx_MEMB(_begin)(const _cx_Self* self) {
 
 STC_INLINE _cx_iter
 _cx_MEMB(_end)(const _cx_Self* self)
-    { return c_LITERAL(_cx_iter){NULL}; }
+    { (void)self; return c_LITERAL(_cx_iter){NULL}; }
 
 STC_INLINE void
 _cx_MEMB(_next)(_cx_iter* it) {
@@ -404,3 +404,4 @@ STC_DEF bool _cx_MEMB(_sort_with)(_cx_Self* self, int(*cmp)(const _cx_value*, co
 #endif // i_implement
 #define CLIST_H_INCLUDED
 #include "priv/template2.h"
+#include "priv/linkage2.h"

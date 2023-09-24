@@ -3,6 +3,7 @@
 
 int main(int argc, char* argv[])
 {
+    (void)argv;
     if (argc <= 1) {
         printf("Usage: regex1 -i\n");
         return 0;

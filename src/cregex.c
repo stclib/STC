@@ -455,6 +455,7 @@ _pushator(_Parser *par, _Token t)
 static _Node*
 _popand(_Parser *par, _Token op)
 {
+    (void)op;
     _Reinst *inst;
 
     if (par->andp <= &par->andstack[0]) {
@@ -924,6 +925,11 @@ out:
     return pp;
 }
 
+#if defined __clang__
+  #pragma clang diagnostic ignored "-Wimplicit-fallthrough"
+#elif defined __GNUC__
+  #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
+#endif
 
 static int
 _runematch(_Rune s, _Rune r)
@@ -1058,7 +1064,7 @@ _regexec1(const _Reprog *progp,  /* program to run */
 
                 switch (inst->type) {
                 case TOK_IRUNE:
-                    r = utf8_casefold(r); /* nobreak */
+                    r = utf8_casefold(r); /* fall through */
                 case TOK_RUNE:
                     ok = _runematch(inst->r.rune, r);
                     break;
@@ -1084,23 +1090,23 @@ _regexec1(const _Reprog *progp,  /* program to run */
                     if (s == bol) continue;
                     break;
                 case TOK_EOL:
-                    if (r == '\n') continue;
-                case TOK_EOS: /* fallthrough */
+                    if (r == '\n') continue; /* fall through */
+                case TOK_EOS:
                     if (s == j->eol || r == 0) continue;
                     break;
                 case TOK_EOZ:
                     if (s == j->eol || r == 0 || (r == '\n' && s[1] == 0)) continue;
                     break;
                 case TOK_NWBOUND:
-                    ok = true;
-                case TOK_WBOUND: /* fallthrough */
+                    ok = true; /* fall through */
+                case TOK_WBOUND:
                     if (ok ^ (s == bol || s == j->eol || (utf8_isword(utf8_peek_off(s, -1))
                                                         ^ utf8_isword(utf8_peek(s)))))
                         continue;
                     break;
                 case TOK_NCCLASS:
-                    ok = true;
-                case TOK_CCLASS: /* fallthrough */
+                    ok = true; /* fall through */
+                case TOK_CCLASS:
                     ep = inst->r.classp->end;
                     if (icase) r = utf8_casefold(r);
                     for (rp = inst->r.classp->spans; rp < ep; rp += 2) {

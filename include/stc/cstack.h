@@ -86,7 +86,7 @@ STC_INLINE intptr_t _cx_MEMB(_capacity)(const _cx_Self* self) {
 #ifndef i_capacity
     return self->_cap; 
 #else
-    return i_capacity;
+    (void)self; return i_capacity;
 #endif
 }
 STC_INLINE void _cx_MEMB(_value_drop)(_cx_value* val)
@@ -206,3 +206,4 @@ _cx_MEMB(_eq)(const _cx_Self* self, const _cx_Self* other) {
 }
 #endif
 #include "priv/template2.h"
+#include "priv/linkage2.h"

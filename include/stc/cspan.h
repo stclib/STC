@@ -99,12 +99,11 @@ typedef STC_CSPAN_INDEX_TYPE cextent_t, cstride_t;
         return s; \
     } \
     STC_INLINE Self##_iter Self##_begin(const Self* self) { \
-        Self##_iter it = {.ref=self->data, ._s=self}; \
-        return it; \
+        return (Self##_iter){.ref=self->data, ._s=self}; \
     } \
     STC_INLINE Self##_iter Self##_end(const Self* self) { \
-        Self##_iter it = {0}; \
-        return it; \
+        (void)self; \
+        return (Self##_iter){0}; \
     } \
     STC_INLINE void Self##_next(Self##_iter* it) { \
         int done; \
@@ -378,7 +377,5 @@ STC_DEF intptr_t _cspan_slice(cextent_t oshape[], cstride_t ostride[], int* oran
     return off;
 }
 
+#include "priv/linkage2.h"
 #endif
-#undef i_header
-#undef i_implement
-#undef i_static

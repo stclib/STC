@@ -86,7 +86,7 @@ typedef struct {
 } cregex_iter;
 
 #define c_formatch(it, Re, Input) \
-    for (cregex_iter it = {Re, Input}; \
+    for (cregex_iter it = {Re, Input, {{0}}}; \
          cregex_find_4(it.re, it.input, it.match, CREG_NEXT) == CREG_OK; )
 
 STC_INLINE cregex cregex_init(void) {
@@ -171,8 +171,4 @@ void cregex_drop(cregex* re);
 #if defined i_import
 #  include "../../src/utf8code.c"
 #endif
-#undef i_opt
-#undef i_header
-#undef i_static
-#undef i_import
-#undef i_implement
+#include "priv/linkage2.h"

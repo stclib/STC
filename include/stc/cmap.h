@@ -212,7 +212,7 @@ STC_INLINE _cx_Self _cx_MEMB(_from_n)(const _cx_raw* raw, intptr_t n)
 STC_API _cx_iter _cx_MEMB(_begin)(const _cx_Self* self);
 
 STC_INLINE _cx_iter _cx_MEMB(_end)(const _cx_Self* self)
-    { return c_LITERAL(_cx_iter){NULL}; }
+    { (void)self; return c_LITERAL(_cx_iter){NULL}; }
 
 STC_INLINE void _cx_MEMB(_next)(_cx_iter* it) { 
     while ((++it->ref, (++it->sref)->hashx == 0)) ;
@@ -289,7 +289,7 @@ STC_DEF _cx_iter _cx_MEMB(_begin)(const _cx_Self* self) {
 }
 
 STC_DEF float _cx_MEMB(_max_load_factor)(const _cx_Self* self) {
-    return (float)(i_max_load_factor);
+    (void)self; return (float)(i_max_load_factor);
 }
 
 STC_DEF intptr_t _cx_MEMB(_capacity)(const _cx_Self* map) {
@@ -470,3 +470,4 @@ _cx_MEMB(_erase_entry)(_cx_Self* self, _cx_value* _val) {
 #undef _i_SET_ONLY
 #define CMAP_H_INCLUDED
 #include "priv/template2.h"
+#include "priv/linkage2.h"

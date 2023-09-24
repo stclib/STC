@@ -51,6 +51,7 @@ int main(void) {
 */
 #ifndef CBITS_H_INCLUDED
 #include "ccommon.h"
+#include "priv/linkage.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -58,32 +59,27 @@ int main(void) {
 #define _cbits_words(n) (_llong)(((n) + 63)>>6)
 #define _cbits_bytes(n) (_cbits_words(n) * c_sizeof(uint64_t))
 
-#if defined(__GNUC__)
-    STC_INLINE int cpopcount64(uint64_t x) {return __builtin_popcountll(x);}
-    #ifndef __clang__
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wstringop-overflow="
-    #pragma GCC diagnostic ignored "-Walloc-size-larger-than="
-    #endif
-#elif defined(_MSC_VER) && defined(_WIN64)
-    #include <intrin.h>
-    STC_INLINE int cpopcount64(uint64_t x) {return (int)__popcnt64(x);}
+#if defined __GNUC__
+  STC_INLINE int stc_popcount64(uint64_t x) { return __builtin_popcountll(x); }
+#elif defined _MSC_VER && defined _WIN64
+  #include <intrin.h>
+  STC_INLINE int stc_popcount64(uint64_t x) { return (int)__popcnt64(x); }
 #else
-    STC_INLINE int cpopcount64(uint64_t x) { /* http://en.wikipedia.org/wiki/Hamming_weight */
-        x -= (x >> 1) & 0x5555555555555555;
-        x = (x & 0x3333333333333333) + ((x >> 2) & 0x3333333333333333);
-        x = (x + (x >> 4)) & 0x0f0f0f0f0f0f0f0f;
-        return (int)((x * 0x0101010101010101) >> 56);
-    }
+  STC_INLINE int stc_popcount64(uint64_t x) { /* http://en.wikipedia.org/wiki/Hamming_weight */
+    x -= (x >> 1) & 0x5555555555555555;
+    x = (x & 0x3333333333333333) + ((x >> 2) & 0x3333333333333333);
+    x = (x + (x >> 4)) & 0x0f0f0f0f0f0f0f0f;
+    return (int)((x * 0x0101010101010101) >> 56);
+  }
 #endif
 
 STC_INLINE _llong _cbits_count(const uint64_t* set, const _llong sz) {
     const _llong n = sz>>6;
     _llong count = 0;
     for (_llong i = 0; i < n; ++i)
-        count += cpopcount64(set[i]);
+        count += stc_popcount64(set[i]);
     if (sz & 63)
-        count += cpopcount64(set[n] & (_cbits_bit(sz) - 1));
+        count += stc_popcount64(set[n] & (_cbits_bit(sz) - 1));
     return count;
 }
 
@@ -199,8 +195,8 @@ STC_INLINE cbits cbits_with_pattern(const _llong size, const uint64_t pattern) {
 typedef struct { uint64_t data64[(i_capacity - 1)/64 + 1]; } i_type;
 
 STC_INLINE void     _i_memb(_init)(i_type* self) { memset(self->data64, 0, i_capacity*8); }
-STC_INLINE void     _i_memb(_drop)(i_type* self) {}
-STC_INLINE _llong   _i_memb(_size)(const i_type* self) { return i_capacity; }
+STC_INLINE void     _i_memb(_drop)(i_type* self) { (void)self; }
+STC_INLINE _llong   _i_memb(_size)(const i_type* self) { (void)self; return i_capacity; }
 STC_INLINE i_type   _i_memb(_move)(i_type* self) { return *self; }
 
 STC_INLINE i_type*  _i_memb(_take)(i_type* self, i_type other)
@@ -303,16 +299,10 @@ STC_INLINE bool _i_memb(_disjoint)(const i_type* self, const i_type* other) {
     _i_assert(self->_size == other->_size);
     return _cbits_disjoint(self->data64, other->data64, _i_memb(_size)(self));
 }
-#if defined __GNUC__ && !defined __clang__
-#pragma GCC diagnostic pop
-#endif
+
 #define CBITS_H_INCLUDED
+#include "priv/linkage2.h"
 #undef _i_memb
 #undef _i_assert
 #undef i_capacity
 #undef i_type
-#undef i_opt
-#undef i_header
-#undef i_implement
-#undef i_static
-#undef i_exterm

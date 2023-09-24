@@ -215,8 +215,9 @@ STC_INLINE void _cx_MEMB(_assign)(_cx_Self* self, _cx_Self ptr) {
         { return c_default_hash(&self->get); }
 #endif // i_use_cmp
 
-#include "priv/template2.h"
 #undef i_no_atomic
 #undef _i_atomic_inc
 #undef _i_atomic_dec_and_test
 #undef _i_carc
+#include "priv/template2.h"
+#include "priv/linkage2.h"

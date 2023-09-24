@@ -160,5 +160,6 @@ _cx_MEMB(_push)(_cx_Self* self, _cx_value value) {
 
 #endif
 #define CPQUE_H_INCLUDED
-#include "priv/template2.h"
 #undef _i_ispque
+#include "priv/template2.h"
+#include "priv/linkage2.h"

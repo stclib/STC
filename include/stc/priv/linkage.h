@@ -23,18 +23,40 @@
 #undef STC_API
 #undef STC_DEF
 
-#ifdef i_extern // [deprecated]
-#  define i_import
-#endif
 #if !defined(i_static) && !defined(STC_STATIC) && (defined(i_header) || defined(STC_HEADER) || \
                                                    defined(i_implement) || defined(STC_IMPLEMENT))
   #define STC_API extern
   #define STC_DEF
 #else
   #define i_static
-  #define STC_API static
-  #define STC_DEF STC_API
+  #define STC_API static __attribute__((unused))
+  #define STC_DEF static
 #endif
 #if defined(STC_IMPLEMENT) || defined(i_import)
   #define i_implement
+#endif
+
+#if defined __clang__
+  #pragma clang diagnostic push
+  #pragma clang diagnostic warning "-Wall"
+  #pragma clang diagnostic warning "-Wextra"
+  #pragma clang diagnostic warning "-Wpedantic"
+  #pragma clang diagnostic warning "-Wconversion"
+  #pragma clang diagnostic warning "-Wdouble-promotion"
+  #pragma clang diagnostic warning "-Wwrite-strings"
+  // ignored
+  #pragma clang diagnostic ignored "-Wmissing-field-initializers"
+#elif defined __GNUC__
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic warning "-Wall"
+  #pragma GCC diagnostic warning "-Wextra"
+  #pragma GCC diagnostic warning "-Wpedantic"
+  #pragma GCC diagnostic warning "-Wconversion"
+  #pragma GCC diagnostic warning "-Wdouble-promotion"
+  #pragma GCC diagnostic warning "-Wwrite-strings"
+  // ignored
+  #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+#elif defined _MSC_VER
+  #pragma warning(push)
+  #pragma warning(disable: 4116 4996) // unnamed type definition in parentheses
 #endif

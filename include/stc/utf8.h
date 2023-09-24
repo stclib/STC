@@ -142,10 +142,6 @@ STC_INLINE intptr_t utf8_pos(const char* s, intptr_t index)
 #  include "../../src/utf8code.c"
 #endif
 #ifndef _i_inc_utf8
-#undef i_static
-#undef i_header
-#undef i_implement
-#undef i_import
-#undef i_opt
+#include "priv/linkage2.h"
 #endif
 #undef _i_inc_utf8

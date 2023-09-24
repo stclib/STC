@@ -13,6 +13,7 @@ cco_task_struct (next_value,
 
 int next_value(struct next_value* co, cco_runtime* rt)
 {
+    (void)rt;
     cco_routine (co) {
         while (true) {
             cco_await_timer(&co->tm, 1 + rand() % 2);

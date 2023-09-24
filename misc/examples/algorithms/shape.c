@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stc/ccommon.h>
+#include <stc/priv/linkage.h>
 
 #define DYN_CAST(T, s) \
     (&T##_api == (s)->api ? (T*)(s) : (T*)0)
@@ -31,6 +32,7 @@ struct Shape {
 
 void Shape_drop(Shape* shape)
 {
+    (void)shape;
     printf("shape destructed\n");
 }
 

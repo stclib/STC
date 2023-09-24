@@ -3,11 +3,10 @@
 #include <stdio.h>
 #define i_key int
 #include <stc/cvec.h>
-
 #define i_key int
 #include <stc/cstack.h>
-
 #include <stc/cspan.h>
+
 using_cspan(intspan, int);
 
 

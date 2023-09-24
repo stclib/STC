@@ -154,8 +154,4 @@ STC_DEF double crand_normal(crand_t* rng, crand_normal_t* dist) {
 }
 #endif
 #endif
-#undef i_opt
-#undef i_static
-#undef i_header
-#undef i_implement
-#undef i_import
+#include "priv/linkage2.h"

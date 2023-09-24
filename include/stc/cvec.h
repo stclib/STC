@@ -415,3 +415,5 @@ STC_DEF int _cx_MEMB(_value_cmp)(const _cx_value* x, const _cx_value* y) {
 #endif // i_implement
 #define CVEC_H_INCLUDED
 #include "priv/template2.h"
+#include "priv/linkage2.h"
+
