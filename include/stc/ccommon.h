@@ -23,7 +23,9 @@
 #ifndef CCOMMON_H_INCLUDED
 #define CCOMMON_H_INCLUDED
 
-#define _CRT_SECURE_NO_WARNINGS
+#ifdef _MSC_VER
+  #pragma warning(disable: 4116 4996) // unnamed type definition in parentheses
+#endif
 #include <inttypes.h>
 #include <stddef.h>
 #include <stdbool.h>

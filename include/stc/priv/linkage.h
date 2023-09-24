@@ -29,7 +29,11 @@
   #define STC_DEF
 #else
   #define i_static
-  #define STC_API static __attribute__((unused))
+  #ifdef __GNUC__
+    #define STC_API static __attribute__((unused))
+  #else
+    #define STC_API static
+  #endif
   #define STC_DEF static
 #endif
 #if defined(STC_IMPLEMENT) || defined(i_import)
@@ -56,8 +60,4 @@
   #pragma GCC diagnostic warning "-Wwrite-strings"
   // ignored
   #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
-  #pragma GCC diagnostic ignored "-Wstringop-overflow="
-#elif defined _MSC_VER
-  #pragma warning(push)
-  #pragma warning(disable: 4116 4996) // unnamed type definition in parentheses
 #endif

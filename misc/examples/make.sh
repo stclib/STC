@@ -7,7 +7,7 @@ if [ "$(uname)" = 'Linux' ]; then
 fi
 common="-std=c99 -Werror -Wall"
 #cc=clang; cflags="-s -O3 $common"
-cc=gcc; cflags="-s -O3 $common"
+cc=gcc; cflags="-s -O3 $common -Wno-stringop-overflow"
 #cc=gcc; cflags="-g $sanitize $common"
 #cc=gcc; cflags="-x c++ -std=c++20 -O2 -s -Wall"
 #cc=tcc; cflags="-std=c99 -Wall"
