@@ -56,6 +56,7 @@
   #pragma GCC diagnostic warning "-Wwrite-strings"
   // ignored
   #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+  #pragma GCC diagnostic ignored "-Werror=stringop-overflow="
 #elif defined _MSC_VER
   #pragma warning(push)
   #pragma warning(disable: 4116 4996) // unnamed type definition in parentheses
