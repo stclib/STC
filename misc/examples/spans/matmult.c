@@ -10,8 +10,8 @@ typedef struct { Mat2 m00, m01, m10, m11; } Partition;
 
 Partition partition(Mat2 A)
 {
-  int32_t M = A.shape[0];
-  int32_t N = A.shape[1];
+  intptr_t M = A.shape[0];
+  intptr_t N = A.shape[1];
   return (Partition){
     .m00 = cspan_slice(Mat2, &A, {0, M/2}, {0, N/2}),
     .m01 = cspan_slice(Mat2, &A, {0, M/2}, {N/2, N}),
@@ -23,10 +23,10 @@ Partition partition(Mat2 A)
 // Slow generic implementation
 void base_case_matrix_product(Mat2 A, Mat2 B, OutMat C)
 {
-  for (int j = 0; j < C.shape[1]; ++j) {
-    for (int i = 0; i < C.shape[0]; ++i) {
+  for (intptr_t j = 0; j < C.shape[1]; ++j) {
+    for (intptr_t i = 0; i < C.shape[0]; ++i) {
       Mat2_value C_ij = 0;
-      for (int k = 0; k < A.shape[1]; ++k) {
+      for (intptr_t k = 0; k < A.shape[1]; ++k) {
         C_ij += *cspan_at(&A, i,k) * *cspan_at(&B, k,j);
       }
       *cspan_at(&C, i,j) += C_ij;
@@ -37,7 +37,7 @@ void base_case_matrix_product(Mat2 A, Mat2 B, OutMat C)
 void recursive_matrix_product(Mat2 A, Mat2 B, OutMat C)
 {
   // Some hardware-dependent constant
-  enum {recursion_threshold = 32};
+  enum {recursion_threshold = 16};
   if (C.shape[0] <= recursion_threshold || C.shape[1] <= recursion_threshold) {
     base_case_matrix_product(A, B, C);
   } else {
@@ -63,31 +63,33 @@ void recursive_matrix_product(Mat2 A, Mat2 B, OutMat C)
 
 int main(void)
 {
-  enum {N = 10, D = 256};
+  enum {N = 10, D1 = 256, D2 = D1};
 
   Values values = {0};
-  for (int i=0; i < N*D*D; ++i)
+  for (int i=0; i < N*D1*D2; ++i)
       Values_push(&values, (crandf() - 0.5)*4.0);
 
-  double out[D*D];
-  Mat3 data = cspan_md_layout(c_ROWMAJOR, values.data, N, D, D);
-  OutMat c = cspan_md_layout(c_COLMAJOR, out, D, D);
+  double out[D1*D2];
+  Mat3 data = cspan_md_layout(c_ROWMAJOR, values.data, N, D1, D2);
+  OutMat c = cspan_md_layout(c_COLMAJOR, out, D1, D2);
   Mat2 a = cspan_submd3(&data, 0);
-
-  Mat2 slice = cspan_slice(Mat2, &a, {c_ALL,16}, {c_ALL,16});
-  cspan_print(Mat2, &slice, ".2f", stdout, true);
-
+  double sum = 0.0;
   clock_t t = clock();
+
   for (int i=1; i<N; ++i) {
     Mat2 b = cspan_submd3(&data, i);
     memset(out, 0, sizeof out);
     recursive_matrix_product(a, b, c);
     //base_case_matrix_product(a, b, c);
+    sum += *cspan_at(&c, 0, 1);
   }
+
   t = clock() - t;
 
-  double sum = 0.0;
-  c_foreach (i, Mat2, c) sum += *i.ref;
-  printf("sum=%.16g, %f ms\n", sum, (double)t*1000.0/CLOCKS_PER_SEC);
+  // print upper 10x10 sub-matrix of result
+  cspan_print(Mat2, cspan_slice(Mat2, &c, {0,10}, {0,10}), ".4f");
+
+  // print time and checksum
+  printf("%.16g: %f\n", sum, (double)t*1000.0/CLOCKS_PER_SEC);
   Values_drop(&values);
 }

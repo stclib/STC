@@ -33,7 +33,7 @@ of arguments does not match the span rank, a compile error is issued. Runtime bo
 by default (define `STC_NDEBUG` or `NDEBUG` to disable).
 ```c
 SpanType        cspan_init(TYPE SpanType, {v1, v2, ...});           // make a 1-d cspan from value list
-SpanType        cspan_from_n(ValueType* ptr, cextent_t n);            // make a 1-d cspan from a pointer and length
+SpanType        cspan_from_n(ValueType* ptr, cextent_t n);          // make a 1-d cspan from a pointer and length
 SpanType        cspan_from_array(ValueType array[]);                // make a 1-d cspan from a C array
 SpanType        cspan_from(STCContainer* cnt);                      // make a 1-d cspan from a cvec or cstack
 
@@ -45,10 +45,12 @@ ValueType*      cspan_at(const SpanTypeN* self, cextent_t i, j..);  // num args 
 ValueType*      cspan_front(const SpanTypeN* self);
 ValueType*      cspan_back(const SpanTypeN* self);
 
-                // print numpy style output. NOTE: fmt must not contain
-                // "%" and/or width specifier. Just use e.g. "d" or ".2f"
-void            cspan_print(TYPE Span, Span* self, const char* fmt);
-void            cspan_print(TYPE Span, Span* self, const char* fmt, FILE* fp, bool comma);
+                // print numpy style output. NOTE: fmt must *not* contain
+                // "%" and/or WIDTH specifier. Just use e.g. "d" or ".2f"
+                // brackets is default "[]". Comma may be added, e.g. "{},"
+                // cspan_print() is a side-effect safe (function like) macro.
+void            cspan_print(TYPE SpanTypeN, SpanTypeN span, const char* fmt);
+void            cspan_print(TYPE SpanTypeN, SpanTypeN span, const char* fmt, const char* brackets, FILE* fp);
 
 SpanTypeN_iter  SpanType_begin(const SpanTypeN* self);
 SpanTypeN_iter  SpanType_end(const SpanTypeN* self);
@@ -61,7 +63,7 @@ SpanTypeN       cspan_md_layout(cspan_layout layout, ValueType* data, cextent_t 
                 // transpose an md span. Inverses layout and axes only.
 void            cspan_swap_axes(SpanTypeN* self, int ax1, int ax2);
 void            cspan_transpose(SpanTypeN* self);
-SpanType2       cspan_transposed2(const SpanType2* self);     // constructor
+SpanType2       cspan_transposed2(const SpanType2* self);       // constructor
 cspan_layout    cspan_get_layout(const SpanTypeN* self);
 bool            cspan_is_rowmajor(const SpanTypeN* self);
 bool            cspan_is_colmajor(const SpanTypeN* self);
@@ -75,13 +77,17 @@ OutSpanN        cspan_submd3(const SpanType3* self, cextent_t i,...); // constru
 OutSpanN        cspan_submd4(const SpanType4* self, cextent_t i,...); // construct a 3d, 2d or 1d subspan from a 4d span.
 
                 // general span slicing function.
-                // {i}: reduce rank. {i,j}: from i to j-1. {i,c_END}: from i to last. {c_ALL}: use full extent.
-OutSpanN        cspan_slice(TYPE OutSpanN, const SpanTypeM* self, {x0,x1}, {y0,y1}.., {N0,N1});
+                //       {i}: select i'th column. reduce rank.
+                //     {i,j}: from i to j-1.
+                //   {i,j,s}: every s column only (default s=1)
+                // {i,c_END}: from i to last.
+                //   {c_ALL}: select full extent, like {0,c_END}.
+OutSpanN        cspan_slice(TYPE OutSpanN, const SpanTypeM* self, {x0,x1,xs}, {y0,y1,ys}.., {N0,N1,Ns});
 ```
 ## Types
 | Type name         | Type definition / usage                             | Used to represent... |
 |:------------------|:----------------------------------------------------|:---------------------|
-| STC_CSPAN_INDEX_TYPE | User definable, default `int32_t`          | Defines `cextent_t`, `cstride_t` |
+| STC_CSPAN_INDEX_TYPE | User definable, default `int32_t`                | Defines `cextent_t`, `cstride_t` |
 | SpanTypeN_value   | `ValueType`                                         | The ValueType        |
 | SpanTypeN         | `struct { ValueType *data; cextent_t shape[N]; .. }`| SpanType with rank N |
 | `cspan_tupleN`    | `struct { cstride_t d[N]; }`                        | Strides for each rank |
@@ -138,7 +144,7 @@ Multi-dimension slicing (first in python):
 ```py
 import numpy as np
 
-def print_span(s2):
+def print_myspan2(s2):
     for i in range(s2.shape[0]):
         for j in range(s2.shape[1]):
             print(" {}".format(s2[i, j]), end='')
@@ -153,9 +159,9 @@ if __name__ == '__main__':
     a = ss3[1]
     b = np.transpose(a)
 
-    print_span(ms3[1])
-    print_span(a)
-    print_span(b)
+    print_myspan2(ms3[1])
+    print_myspan2(a)
+    print_myspan2(b)
 
     for i in a.flat: print(" {}".format(i), end='')
     print('')
@@ -185,7 +191,7 @@ if __name__ == '__main__':
 
 using_cspan3(myspan, int); // define myspan, myspan2, myspan3.
 
-void print_span(myspan2 ms) {
+void print_myspan2(myspan2 ms) {
     for (int i=0; i < ms.shape[0]; ++i) {
         for (int j=0; j < ms.shape[1]; ++j)
             printf(" %2d", *cspan_at(&ms, i, j));
@@ -202,9 +208,9 @@ int main(void) {
     myspan2 a = cspan_submd3(&ss3, 1);
     myspan2 b = cspan_transposed2(&a);
 
-    print_span((myspan2)cspan_submd3(&ms3, 1));
-    print_span(a);
-    print_span(b);
+    print_myspan2((myspan2)cspan_submd3(&ms3, 1));
+    print_myspan2(a);
+    print_myspan2(b);
 
     c_foreach (i, myspan2, a) printf(" %d", *i.ref);
     puts("");
@@ -231,20 +237,18 @@ int main(void)
 
     // numpy style printout
     puts("span3:");
-    cspan_print(Span3, &span3, "d");
+    cspan_print(Span3, span3, "d");
     
     puts("Slice without reducing rank:");
-    Span3 ss3 = cspan_slice(Span3, &span3, {c_ALL}, {3,4}, {c_ALL});
-    cspan_print(Span3, &ss3, "d");
+    cspan_print(Span3, cspan_slice(Span3, &span3, {c_ALL}, {3,4}, {c_ALL}), "d");
     
     puts("Slice with reducing rank:");
-    Span2 ss2 = cspan_slice(Span2, &span3, {c_ALL}, {3}, {c_ALL});
-    cspan_print(Span2, &ss2, "d");
+    cspan_print(Span2, cspan_slice(Span2, &span3, {c_ALL}, {3}, {c_ALL}), "d");
 
     puts("Swapped:");
     Span3 swapped = span3;
     cspan_swap_axes(&swapped, 0, 1);
     cspan_swap_axes(&swapped, 1, 2);
-    cspan_print(Span3, &swapped, "d");
+    cspan_print(Span3, swapped, "d", "{},", stdout); // C-array style.
 }
 ```

@@ -230,24 +230,24 @@ typedef enum {c_ROWMAJOR, c_COLMAJOR} cspan_layout;
      .stride=(cspan_tuple1){.d={(self)->stride.d[3]}}}
 
 #define cspan_print(...) c_MACRO_OVERLOAD(cspan_print, __VA_ARGS__)
-#define cspan_print_3(Span, self, fmt) \
-    cspan_print_5(Span, self, fmt, stdout, false)
+#define cspan_print_3(Span, span, fmt) \
+    cspan_print_5(Span, span, fmt, "[]", stdout)
 
-#define cspan_print_5(Span, self, fmt, fp, comma) do { \
-    const Span* _s = self; \
-    const char* _f = fmt; \
+#define cspan_print_5(Span, span, fmt, brackets, fp) do { \
+    const Span _s = span; \
+    const char *_f = fmt, *_b = brackets; \
     FILE* _fp = fp; \
     int _w, _max = 0; \
     char _res[2][16], _fmt[32]; \
     sprintf(_fmt, "%%%s", _f); \
-    c_foreach_3 (_it, Span, *_s) { \
+    c_foreach_3 (_it, Span, _s) { \
         _w = snprintf(NULL, 0ULL, _fmt, *_it.ref); \
         if (_w > _max) _max = _w; \
     } \
     sprintf(_fmt, "%%s%%*%s%%s", _f); \
-    c_foreach_3 (_it, Span, *_s) { \
-        _cspan_print_assist(_it.pos, _s->shape, cspan_rank(_s), _res, comma); \
-        _w = _max + (_it.pos[cspan_rank(_s) - 1] > 0); \
+    c_foreach_3 (_it, Span, _s) { \
+        _cspan_print_assist(_it.pos, _s.shape, cspan_rank(&_s), _res, _b); \
+        _w = _max + (_it.pos[cspan_rank(&_s) - 1] > 0); \
         fprintf(_fp, _fmt, _res[0], _w, *_it.ref, _res[1]); \
     } \
 } while (0)
@@ -283,8 +283,8 @@ STC_INLINE intptr_t _cspan_index(const cextent_t shape[], const cstride_t stride
     return off;
 }
 
-STC_API void _cspan_print_assist(cextent_t pos[], const cextent_t shape[],
-                                 const int rank, char result[2][16], bool comma);
+STC_API void _cspan_print_assist(cextent_t pos[], const cextent_t shape[], const int rank,
+                                 char result[2][16], const char* brackets);
 
 STC_API intptr_t _cspan_next2(cextent_t pos[], const cextent_t shape[], const cstride_t stride[],
                               int rank, int* done);
@@ -306,19 +306,19 @@ STC_API cstride_t* _cspan_shape2stride(cspan_layout layout, cstride_t shape[], i
 /* --------------------- IMPLEMENTATION --------------------- */
 #if defined(i_implement) || defined(i_static)
 
-STC_DEF void _cspan_print_assist(cextent_t pos[], const cextent_t shape[],
-                                 const int rank, char result[2][16], bool comma) {
+STC_DEF void _cspan_print_assist(cextent_t pos[], const cextent_t shape[], const int rank,
+                                 char result[2][16], const char* brackets) {
     int n = 0, j = 0, r = rank - 1;
     memset(result, 0, 32);
 
     while (n <= r && pos[r - n] == 0) ++n;
     if (n) for (; j < rank; ++j)
-        result[0][j] = j < rank - n ? ' ' : '[';
+        result[0][j] = j < rank - n ? ' ' : brackets[0];
     for (j = 0; r >= 0 && pos[r] + 1 == shape[r]; --r, ++j)
-        result[1][j] = ']';
+        result[1][j] = brackets[1];
 
-    n = (j > 0) + (j > 1 /*&& j < rank*/); // newlines
-    if (comma && j < rank) result[1][j++] = ',';
+    n = (j > 0) + (j > 1 /*& j < rank*/); // newlines
+    if (brackets[2] && j < rank) result[1][j++] = brackets[2]; // comma
     while (n--) result[1][j++] = '\n';
 }
 

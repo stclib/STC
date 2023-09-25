@@ -37,13 +37,13 @@ int main(void) {
   for (int i = 0; i < md.shape[0]; i++) {
     for (int j = 0; j < md.shape[1]; j++) {
       for (int k = 0; k < md.shape[2]; k++)
-        printf(" %2g", *cspan_at(&md, i,j,k));
+        printf(" %.2f", *cspan_at(&md, i,j,k));
       puts("");
     }
     puts("");
   }
 #else
-  cspan_print(span3, &md, ".3g", stdout, true);
+  cspan_print(span3, md, ".2f");
 #endif
   puts("done");
 }
