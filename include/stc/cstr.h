@@ -172,7 +172,7 @@ STC_INLINE intptr_t cstr_size(const cstr* self)
     { return SSO_CALL(self, size(self)); }
 
 STC_INLINE intptr_t cstr_capacity(const cstr* self)
-    { return cstr_is_long(self) ? cstr_l_cap(self) : cstr_s_cap; }
+    { return cstr_is_long(self) ? cstr_l_cap(self) : (intptr_t)cstr_s_cap; }
 
 // utf8 methods defined in/depending on src/utf8code.c:
 

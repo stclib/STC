@@ -40,7 +40,7 @@
   #define i_implement
 #endif
 
-#if defined __clang__
+#if defined __clang__ && !defined __cplusplus
   #pragma clang diagnostic push
   #pragma clang diagnostic warning "-Wall"
   #pragma clang diagnostic warning "-Wextra"
@@ -50,7 +50,7 @@
   #pragma clang diagnostic warning "-Wwrite-strings"
   // ignored
   #pragma clang diagnostic ignored "-Wmissing-field-initializers"
-#elif defined __GNUC__
+#elif defined __GNUC__ && !defined __cplusplus
   #pragma GCC diagnostic push
   #pragma GCC diagnostic warning "-Wall"
   #pragma GCC diagnostic warning "-Wextra"
