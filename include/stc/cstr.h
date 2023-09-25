@@ -43,9 +43,10 @@
   #pragma GCC diagnostic ignored "-Warray-bounds"
 #endif
 
-enum  { cstr_s_cap =            sizeof(cstr_buf) - 2 };
-#define cstr_s_size(s)          ((intptr_t)(s)->sml.size)
-#define cstr_s_set_size(s, len) ((s)->sml.size = (uint8_t)(len), (s)->sml.data[len] = 0)
+enum  { cstr_s_last = sizeof(cstr_buf) - 1, 
+        cstr_s_cap = cstr_s_last - 1 };
+#define cstr_s_size(s)          ((intptr_t)(s)->sml.data[cstr_s_last])
+#define cstr_s_set_size(s, len) ((s)->sml.data[len] = 0, (s)->sml.data[cstr_s_last] = (char)(len))
 #define cstr_s_data(s)          (s)->sml.data
 
 #if defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -61,7 +62,7 @@ enum  { cstr_s_cap =            sizeof(cstr_buf) - 2 };
 #define cstr_l_data(s)          (s)->lon.data
 #define cstr_l_drop(s)          c_free((s)->lon.data)
 
-#define cstr_is_long(s)         ((s)->sml.size > 127)
+#define cstr_is_long(s)         (((s)->sml.data[cstr_s_last] & 128) != 0)
 STC_API char* _cstr_init(cstr* self, intptr_t len, intptr_t cap);
 STC_API char* _cstr_internal_move(cstr* self, intptr_t pos1, intptr_t pos2);
 
@@ -165,7 +166,7 @@ STC_INLINE const char* cstr_str(const cstr* self)
     { return SSO_CALL(self, data(self)); }
 
 STC_INLINE bool cstr_empty(const cstr* self) 
-    { return self->sml.size == 0; }
+    { return cstr_s_size(self) == 0; }
 
 STC_INLINE intptr_t cstr_size(const cstr* self)
     { return SSO_CALL(self, size(self)); }
