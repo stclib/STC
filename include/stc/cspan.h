@@ -231,9 +231,11 @@ typedef enum {c_ROWMAJOR, c_COLMAJOR} cspan_layout;
 
 #define cspan_print(...) c_MACRO_OVERLOAD(cspan_print, __VA_ARGS__)
 #define cspan_print_3(Span, span, fmt) \
-    cspan_print_5(Span, span, fmt, "[]", stdout)
+    cspan_print_4(Span, span, fmt, stdout)
+#define cspan_print_4(Span, span, fmt, fp) \
+    cspan_print_5(Span, span, fmt, fp, "[]")
 
-#define cspan_print_5(Span, span, fmt, brackets, fp) do { \
+#define cspan_print_5(Span, span, fmt, fp, brackets) do { \
     const Span _s = span; \
     const char *_f = fmt, *_b = brackets; \
     FILE* _fp = fp; \
