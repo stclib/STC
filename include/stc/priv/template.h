@@ -99,7 +99,8 @@
 #if c_option(c_no_emplace)
   #define i_no_emplace
 #endif
-#if c_option(c_use_cmp) || defined _i_ismap || defined _i_isset || defined _i_ispque
+#if c_option(c_use_cmp) || defined i_cmp || defined i_less || defined i_eq || defined i_hash || \
+                           defined _i_ismap || defined _i_isset || defined _i_ispque
   #define i_use_cmp
 #endif
 #if c_option(c_no_clone) || defined _i_carc
@@ -148,9 +149,6 @@
   #endif
   #if !defined i_keyto && defined i_keyraw
     #define i_keyto c_JOIN(i_key, _toraw)
-  #endif
-  #if !defined i_keyraw && (defined i_cmp || defined i_less || defined i_eq || defined i_hash)
-    #define i_use_cmp
   #endif
 #endif
 
