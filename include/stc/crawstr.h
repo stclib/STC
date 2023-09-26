@@ -65,7 +65,7 @@ STC_INLINE bool crawstr_ends_with(crawstr rs, const char* str) {
 /* utf8 iterator */
 STC_INLINE crawstr_iter crawstr_begin(const crawstr* self) { 
     if (!self->size) return c_LITERAL(crawstr_iter){.ref = NULL};
-    return c_LITERAL(crawstr_iter){.u8 = {{self->str, utf8_chr_size(self->str)}}};
+    return c_LITERAL(crawstr_iter){.chr = {self->str, utf8_chr_size(self->str)}};
 }
 STC_INLINE crawstr_iter crawstr_end(const crawstr* self) {
     (void)self; return c_LITERAL(crawstr_iter){.ref = NULL};

@@ -212,7 +212,7 @@ STC_INLINE csview cstr_u8_chr(const cstr* self, intptr_t u8idx) {
 STC_INLINE cstr_iter cstr_begin(const cstr* self) { 
     csview sv = cstr_sv(self);
     if (!sv.size) return c_LITERAL(cstr_iter){.ref = NULL};
-    return c_LITERAL(cstr_iter){.u8 = {{sv.buf, utf8_chr_size(sv.buf)}}};
+    return c_LITERAL(cstr_iter){.chr = {sv.buf, utf8_chr_size(sv.buf)}};
 }
 STC_INLINE cstr_iter cstr_end(const cstr* self) {
     (void)self; return c_LITERAL(cstr_iter){NULL};

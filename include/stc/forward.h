@@ -63,11 +63,10 @@ typedef struct crawstr {
 typedef union {
     crawstr_value* ref;
     csview chr;
-    struct { csview chr; } u8; // [deprecated]
 } crawstr_iter;
 
 
-// cstr : null-terminated string (short string optimized - sso)
+// cstr : null-terminated owning string (short string optimized - sso)
 typedef char cstr_value;
 typedef struct { cstr_value* data; intptr_t size, cap; } cstr_buf;
 typedef union cstr {
@@ -77,8 +76,7 @@ typedef union cstr {
 
 typedef union {
     cstr_value* ref;
-    csview chr;
-    struct { csview chr; } u8; // [deprecated]
+    csview chr; // utf8 character/codepoint
 } cstr_iter;
 
 

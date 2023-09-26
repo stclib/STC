@@ -86,7 +86,7 @@ STC_INLINE csview_iter csview_begin(const csview* self) {
                                           self->buf + self->size}};
 }
 STC_INLINE csview_iter csview_end(const csview* self) {
-    return c_LITERAL(csview_iter){.u8 = {{NULL}, self->buf + self->size}};
+    return c_LITERAL(csview_iter){.u8 = {{0}, self->buf + self->size}};
 }
 STC_INLINE void csview_next(csview_iter* it) {
     it->ref += it->chr.size;
