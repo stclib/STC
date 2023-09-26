@@ -102,7 +102,7 @@ typedef union {
     typedef VAL SELF##_value; \
 \
     typedef struct SELF { \
-        SELF##_value *data; \
+        SELF##_value *cbuf; \
         intptr_t start, end, capmask; \
     } SELF; \
 \
@@ -141,11 +141,11 @@ typedef union {
 \
     typedef struct { \
         SELF##_value *ref, *_end; \
-        struct chash_slot* sref; \
+        struct chash_slot *_sref; \
     } SELF##_iter; \
 \
     typedef struct SELF { \
-        SELF##_value* data; \
+        SELF##_value* table; \
         struct chash_slot* slot; \
         intptr_t size, bucket_count; \
     } SELF

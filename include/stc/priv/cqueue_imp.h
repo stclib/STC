@@ -40,7 +40,7 @@ _cx_MEMB(_clear)(_cx_Self* self) {
 STC_DEF void
 _cx_MEMB(_drop)(_cx_Self* self) {
     _cx_MEMB(_clear)(self);
-    i_free(self->data);
+    i_free(self->cbuf);
 }
 
 STC_DEF _cx_Self
@@ -55,7 +55,7 @@ _cx_MEMB(_reserve)(_cx_Self* self, const intptr_t n) {
     if (n <= self->capmask)
         return true;
     intptr_t oldcap = self->capmask + 1, newcap = stc_nextpow2(n + 1);
-    _cx_value* d = (_cx_value *)i_realloc(self->data, newcap*c_sizeof *self->data);
+    _cx_value* d = (_cx_value *)i_realloc(self->cbuf, newcap*c_sizeof *self->cbuf);
     if (!d)
         return false;
     intptr_t head = oldcap - self->start;
@@ -69,7 +69,7 @@ _cx_MEMB(_reserve)(_cx_Self* self, const intptr_t n) {
         self->end += oldcap;
     }
     self->capmask = newcap - 1;
-    self->data = d;
+    self->cbuf = d;
     return true;
 }
 
@@ -80,7 +80,7 @@ _cx_MEMB(_push)(_cx_Self* self, i_key value) { // push_back
         _cx_MEMB(_reserve)(self, self->capmask + 3); // => 2x expand
         end = (self->end + 1) & self->capmask;
     }
-    _cx_value *v = self->data + self->end;
+    _cx_value *v = self->cbuf + self->end;
     self->end = end;
     *v = value;
     return v;
@@ -92,12 +92,12 @@ _cx_MEMB(_shrink_to_fit)(_cx_Self *self) {
     if (sz > self->capmask/2)
         return;
     _cx_Self out = _cx_MEMB(_with_capacity)(sz);
-    if (!out.data)
+    if (!out.cbuf)
         return;
     c_foreach (i, _cx_Self, *self)
-        out.data[j++] = *i.ref;
+        out.cbuf[j++] = *i.ref;
     out.end = sz;
-    i_free(self->data);
+    i_free(self->cbuf);
     *self = out;
 }
 
@@ -106,9 +106,9 @@ STC_DEF _cx_Self
 _cx_MEMB(_clone)(_cx_Self cx) {
     intptr_t sz = _cx_MEMB(_size)(&cx), j = 0;
     _cx_Self out = _cx_MEMB(_with_capacity)(sz);
-    if (out.data)
+    if (out.cbuf)
         c_foreach (i, _cx_Self, cx)
-            out.data[j++] = i_keyclone((*i.ref));
+            out.cbuf[j++] = i_keyclone((*i.ref));
     out.end = sz;
     return out;
 }

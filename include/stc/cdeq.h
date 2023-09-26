@@ -43,11 +43,11 @@ STC_API void       _cx_MEMB(_erase_n)(_cx_Self* self, intptr_t idx, intptr_t n);
 
 STC_INLINE const _cx_value*
 _cx_MEMB(_at)(const _cx_Self* self, intptr_t idx)
-    { return self->data + _cdeq_topos(self, idx); }
+    { return self->cbuf + _cdeq_topos(self, idx); }
 
 STC_INLINE _cx_value*
 _cx_MEMB(_at_mut)(_cx_Self* self, intptr_t idx)
-    { return self->data + _cdeq_topos(self, idx); }
+    { return self->cbuf + _cdeq_topos(self, idx); }
 
 STC_INLINE _cx_value*
 _cx_MEMB(_push_back)(_cx_Self* self, _cx_value val)
@@ -57,13 +57,13 @@ STC_INLINE void
 _cx_MEMB(_pop_back)(_cx_Self* self) {
     c_assert(!_cx_MEMB(_empty)(self));
     self->end = (self->end - 1) & self->capmask;
-    i_keydrop((self->data + self->end));
+    i_keydrop((self->cbuf + self->end));
 }
 
 STC_INLINE _cx_value _cx_MEMB(_pull_back)(_cx_Self* self) { // move back out of deq
     c_assert(!_cx_MEMB(_empty)(self));
     self->end = (self->end - 1) & self->capmask;
-    return self->data[self->end];
+    return self->cbuf[self->end];
 }
 
 STC_INLINE _cx_iter
@@ -135,7 +135,7 @@ _cx_MEMB(_push_front)(_cx_Self* self, i_key value) {
         _cx_MEMB(_reserve)(self, self->capmask + 3); // => 2x expand
         start = (self->start - 1) & self->capmask;
     }
-    _cx_value *v = self->data + start;
+    _cx_value *v = self->cbuf + start;
     self->start = start;
     *v = value;
     return v;
@@ -159,7 +159,7 @@ _cx_MEMB(_insert_uninit)(_cx_Self* self, const intptr_t idx, const intptr_t n) {
         if (!_cx_MEMB(_reserve)(self, len + n + 3)) // minimum 2x expand
             return it;
     it.pos = _cdeq_topos(self, idx);
-    it.ref = self->data + it.pos;
+    it.ref = self->cbuf + it.pos;
     self->end = (self->end + n) & self->capmask;
 
     if (it.pos < self->end) // common case because of reserve policy

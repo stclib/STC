@@ -60,7 +60,7 @@ STC_API _cx_Self        _cx_MEMB(_clone)(_cx_Self cx);
 STC_INLINE i_key        _cx_MEMB(_value_clone)(i_key val)
                             { return i_keyclone(val); }
 STC_INLINE void         _cx_MEMB(_copy)(_cx_Self* self, const _cx_Self* other) {
-                            if (self->data == other->data) return;
+                            if (self->cbuf == other->cbuf) return;
                             _cx_MEMB(_drop)(self);
                             *self = _cx_MEMB(_clone)(*other);
                         }
@@ -75,14 +75,14 @@ STC_INLINE _cx_raw      _cx_MEMB(_value_toraw)(const _cx_value* pval)
                             { return i_keyto(pval); }
 
 STC_INLINE _cx_value*   _cx_MEMB(_front)(const _cx_Self* self) 
-                            { return self->data + self->start; }
+                            { return self->cbuf + self->start; }
 
 STC_INLINE _cx_value*   _cx_MEMB(_back)(const _cx_Self* self)
-                            { return self->data + ((self->end - 1) & self->capmask); }
+                            { return self->cbuf + ((self->end - 1) & self->capmask); }
 
 STC_INLINE void _cx_MEMB(_pop)(_cx_Self* self) { // pop_front
     c_assert(!_cx_MEMB(_empty)(self));
-    i_keydrop((self->data + self->start));
+    i_keydrop((self->cbuf + self->start));
     self->start = (self->start + 1) & self->capmask;
 }
 
@@ -90,12 +90,12 @@ STC_INLINE _cx_value _cx_MEMB(_pull)(_cx_Self* self) { // move front out of queu
     c_assert(!_cx_MEMB(_empty)(self));
     intptr_t s = self->start;
     self->start = (s + 1) & self->capmask;
-    return self->data[s];
+    return self->cbuf[s];
 }
 
 STC_INLINE _cx_iter _cx_MEMB(_begin)(const _cx_Self* self) {
     return c_LITERAL(_cx_iter){
-        .ref=_cx_MEMB(_empty)(self) ? NULL : self->data + self->start,
+        .ref=_cx_MEMB(_empty)(self) ? NULL : self->cbuf + self->start,
         .pos=self->start, ._s=self
     };
 }

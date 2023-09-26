@@ -128,7 +128,7 @@ STC_INLINE bool         _cx_MEMB(_contains)(const _cx_Self* self, _cx_keyraw rke
 
 #if !defined i_no_clone
 STC_INLINE void _cx_MEMB(_copy)(_cx_Self *self, const _cx_Self* other) {
-    if (self->data == other->data)
+    if (self->table == other->table)
         return;
     _cx_MEMB(_drop)(self);
     *self = _cx_MEMB(_clone)(*other);
@@ -215,7 +215,7 @@ STC_INLINE _cx_iter _cx_MEMB(_end)(const _cx_Self* self)
     { (void)self; return c_LITERAL(_cx_iter){NULL}; }
 
 STC_INLINE void _cx_MEMB(_next)(_cx_iter* it) { 
-    while ((++it->ref, (++it->sref)->hashx == 0)) ;
+    while ((++it->ref, (++it->_sref)->hashx == 0)) ;
     if (it->ref == it->_end) it->ref = NULL;
 }
 
@@ -229,8 +229,8 @@ _cx_MEMB(_find)(const _cx_Self* self, _cx_keyraw rkey) {
     _cx_result b;
     if (self->size && !(b = _cx_MEMB(_bucket_)(self, &rkey)).inserted)
         return c_LITERAL(_cx_iter){b.ref, 
-                                   self->data + self->bucket_count,
-                                   self->slot + (b.ref - self->data)};
+                                   self->table + self->bucket_count,
+                                   self->slot + (b.ref - self->table)};
     return _cx_MEMB(_end)(self);
 }
 
@@ -257,7 +257,7 @@ _cx_MEMB(_erase)(_cx_Self* self, _cx_keyraw rkey) {
 STC_INLINE _cx_iter
 _cx_MEMB(_erase_at)(_cx_Self* self, _cx_iter it) {
     _cx_MEMB(_erase_entry)(self, it.ref);
-    if (it.sref->hashx == 0)
+    if (it._sref->hashx == 0)
         _cx_MEMB(_next)(&it);
     return it;
 }
@@ -280,10 +280,10 @@ _cx_MEMB(_eq)(const _cx_Self* self, const _cx_Self* other) {
 #define fastrange_2(x, n) (intptr_t)((x) & (size_t)((n) - 1)) // n power of 2.
 
 STC_DEF _cx_iter _cx_MEMB(_begin)(const _cx_Self* self) {
-    _cx_iter it = {self->data, self->data+self->bucket_count, self->slot};
-    if (it.sref)
-        while (it.sref->hashx == 0)
-            ++it.ref, ++it.sref;
+    _cx_iter it = {self->table, self->table+self->bucket_count, self->slot};
+    if (it._sref)
+        while (it._sref->hashx == 0)
+            ++it.ref, ++it._sref;
     if (it.ref == it._end) it.ref = NULL;
     return it;
 }
@@ -305,7 +305,7 @@ STC_DEF _cx_Self _cx_MEMB(_with_capacity)(const intptr_t cap) {
 STC_INLINE void _cx_MEMB(_wipe_)(_cx_Self* self) {
     if (self->size == 0)
         return;
-    _cx_value* d = self->data, *_end = d + self->bucket_count;
+    _cx_value* d = self->table, *_end = d + self->bucket_count;
     struct chash_slot* s = self->slot;
     for (; d != _end; ++d)
         if ((s++)->hashx)
@@ -315,7 +315,7 @@ STC_INLINE void _cx_MEMB(_wipe_)(_cx_Self* self) {
 STC_DEF void _cx_MEMB(_drop)(_cx_Self* self) {
     _cx_MEMB(_wipe_)(self);
     i_free(self->slot);
-    i_free(self->data);
+    i_free(self->table);
 }
 
 STC_DEF void _cx_MEMB(_clear)(_cx_Self* self) {
@@ -362,7 +362,7 @@ _cx_MEMB(_bucket_)(const _cx_Self* self, const _cx_keyraw* rkeyptr) {
     const struct chash_slot* s = self->slot;
     while (s[_idx].hashx) {
         if (s[_idx].hashx == b.hashx) {
-            const _cx_keyraw _raw = i_keyto(_i_keyref(self->data + _idx));
+            const _cx_keyraw _raw = i_keyto(_i_keyref(self->table + _idx));
             if (i_eq((&_raw), rkeyptr)) {
                 b.inserted = false; 
                 break;
@@ -370,7 +370,7 @@ _cx_MEMB(_bucket_)(const _cx_Self* self, const _cx_keyraw* rkeyptr) {
         }
         if (++_idx == _cap) _idx = 0;
     }
-    b.ref = self->data + _idx;
+    b.ref = self->table + _idx;
     return b;
 }
 
@@ -382,7 +382,7 @@ _cx_MEMB(_insert_entry_)(_cx_Self* self, _cx_keyraw rkey) {
 
     _cx_result b = _cx_MEMB(_bucket_)(self, &rkey);
     if (b.inserted) {
-        self->slot[b.ref - self->data].hashx = b.hashx;
+        self->slot[b.ref - self->table].hashx = b.hashx;
         ++self->size;
     }
     return b;
@@ -391,18 +391,18 @@ _cx_MEMB(_insert_entry_)(_cx_Self* self, _cx_keyraw rkey) {
 #if !defined i_no_clone
 STC_DEF _cx_Self
 _cx_MEMB(_clone)(_cx_Self m) {
-    if (m.data) {
+    if (m.table) {
         _cx_value *d = (_cx_value *)i_malloc(c_sizeof(_cx_value)*m.bucket_count),
-                  *_dst = d, *_end = m.data + m.bucket_count;
+                  *_dst = d, *_end = m.table + m.bucket_count;
         const intptr_t _mem = c_sizeof(struct chash_slot)*(m.bucket_count + 1);
         struct chash_slot *s = (struct chash_slot *)c_memcpy(i_malloc(_mem), m.slot, _mem);
         if (!(d && s)) 
             { i_free(d), i_free(s), d = 0, s = 0, m.bucket_count = 0; }
         else
-            for (; m.data != _end; ++m.data, ++m.slot, ++_dst)
+            for (; m.table != _end; ++m.table, ++m.slot, ++_dst)
                 if (m.slot->hashx)
-                    *_dst = _cx_MEMB(_value_clone)(*m.data);
-        m.data = d, m.slot = s;
+                    *_dst = _cx_MEMB(_value_clone)(*m.table);
+        m.table = d, m.slot = s;
     }
     return m;
 }
@@ -420,27 +420,27 @@ _cx_MEMB(_reserve)(_cx_Self* self, const intptr_t _newcap) {
         (struct chash_slot *)i_calloc(_newbucks + 1, c_sizeof(struct chash_slot)),
         self->size, _newbucks
     };
-    bool ok = m.data && m.slot;
+    bool ok = m.table && m.slot;
     if (ok) {  // Rehash:
         m.slot[_newbucks].hashx = 0xff;
-        const _cx_value* d = self->data;
+        const _cx_value* d = self->table;
         const struct chash_slot* s = self->slot;
         for (intptr_t i = 0; i < _oldbucks; ++i, ++d) if ((s++)->hashx) {
             _cx_keyraw r = i_keyto(_i_keyref(d));
             _cx_result b = _cx_MEMB(_bucket_)(&m, &r);
-            m.slot[b.ref - m.data].hashx = b.hashx;
+            m.slot[b.ref - m.table].hashx = b.hashx;
             *b.ref = *d; // move
         }
         c_swap(_cx_Self, self, &m);
     }
     i_free(m.slot);
-    i_free(m.data);
+    i_free(m.table);
     return ok;
 }
 
 STC_DEF void
 _cx_MEMB(_erase_entry)(_cx_Self* self, _cx_value* _val) {
-    _cx_value* d = self->data;
+    _cx_value* d = self->table;
     struct chash_slot* s = self->slot;
     intptr_t i = _val - d, j = i, k;
     const intptr_t _cap = self->bucket_count;
