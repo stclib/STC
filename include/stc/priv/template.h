@@ -90,6 +90,14 @@
   #endif
 #endif
 
+#define c_option(flag)          ((i_opt) & (flag))
+#define c_is_forward            (1<<0)
+#define c_no_atomic             (1<<1)
+#define c_no_clone              (1<<2)
+#define c_no_emplace            (1<<3)
+#define c_no_hash               (1<<4)
+#define c_use_cmp               (1<<5)
+
 #if c_option(c_is_forward)
   #define i_is_forward
 #endif
@@ -99,7 +107,7 @@
 #if c_option(c_no_emplace)
   #define i_no_emplace
 #endif
-#if c_option(c_use_cmp) || defined i_cmp || defined i_less || defined i_eq || defined i_hash || \
+#if c_option(c_use_cmp) || defined i_cmp || defined i_less || \
                            defined _i_ismap || defined _i_isset || defined _i_ispque
   #define i_use_cmp
 #endif
@@ -118,7 +126,6 @@
   #define i_rawclass csview
   #define i_keyfrom cstr_from_sv
   #define i_keyto cstr_sv
-  #define i_eq csview_eq
   #ifndef i_tag
     #define i_tag ssv
   #endif
@@ -152,8 +159,8 @@
   #endif
 #endif
 
-#if defined i_rawclass && defined i_use_cmp
-  #if !(defined i_cmp || defined i_less)
+#if defined i_rawclass
+  #if !(defined i_cmp || defined i_less) && defined i_use_cmp
     #define i_cmp c_JOIN(i_keyraw, _cmp)
   #endif
   #if !(defined i_hash || defined i_no_hash)

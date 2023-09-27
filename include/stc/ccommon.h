@@ -108,13 +108,6 @@ typedef long long _llong;
 #define c_default_toraw(vp)     (*(vp))
 #define c_default_drop(vp)      ((void) (vp))
 
-#define c_option(flag)          ((i_opt) & (flag))
-#define c_is_forward            (1<<0)
-#define c_no_atomic             (1<<1)
-#define c_no_clone              (1<<2)
-#define c_no_emplace            (1<<3)
-#define c_no_hash               (1<<4)
-#define c_use_cmp               (1<<5)
 /* Function macros and others */
 
 #define c_litstrlen(literal) (c_sizeof("" literal) - 1)
