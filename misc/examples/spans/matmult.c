@@ -79,17 +79,19 @@ int main(void)
   for (int i=1; i<N; ++i) {
     Mat2 b = cspan_submd3(&data, i);
     memset(out, 0, sizeof out);
-    recursive_matrix_product(a, b, c);
+    recursive_matrix_product(a, b, c); // > 2x faster
     //base_case_matrix_product(a, b, c);
     sum += *cspan_at(&c, 0, 1);
   }
 
   t = clock() - t;
 
-  // print upper 10x10 sub-matrix of result
+  puts("upper 10x10 sub-matrix of input a");
+  cspan_print(Mat2, cspan_slice(Mat2, &a, {0,10}, {0,10}), ".4f");
+  puts("upper 10x10 sub-matrix of result c");
   cspan_print(Mat2, cspan_slice(Mat2, &c, {0,10}, {0,10}), ".4f");
 
-  // print time and checksum
+  puts("checksum and time");
   printf("%.16g: %f\n", sum, (double)t*1000.0/CLOCKS_PER_SEC);
   Values_drop(&values);
 }
