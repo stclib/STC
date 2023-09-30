@@ -204,8 +204,4 @@ STC_DEF csview csview_token(csview sv, const char* sep, intptr_t* start) {
 }
 #endif // CSVIEW_C_INCLUDED
 #endif // i_implement
-#undef i_static
-#undef i_header
-#undef i_implement
-#undef i_import
-#undef i_opt
+#include "priv/linkage2.h"

@@ -52,6 +52,7 @@ List of contents
 - [Usage](#usage)
 - [Installation](#installation)
 - [Specifying template parameters](#specifying-template-parameters)
+- [Specifying comparison parameters](#specifying-comparison-parameters)
 - [The *emplace* methods](#the-emplace-methods)
 - [The *erase* methods](#the-erase-methods)
 - [User-defined container type name](#user-defined-container-type-name)
@@ -412,6 +413,21 @@ NB: Do not use when defining carc/cbox types themselves.
 - Instead of defining `i_*clone`, you may define *i_opt c_no_clone* to disable *clone* functionality.
 - For `i_keyclass`, if *i_keyraw* is defined along with it, *i_keyfrom* may also be defined to enable the *emplace*-functions. NB: the signature for ***cmp***, ***eq***, and ***hash*** uses *i_keyraw* as input.
 
+## Specifying comparison parameters
+
+The table below shows the template parameters which must be defined to support element search and sort for various containers versus element types.
+
+For the containers marked ***optional***, the features are disabled if the template parameter(s) are not defined. Note that the ***(integral type)*** columns also applies to "special" types, specified with `i_key_str`, `i_keyboxed`, and `i_keyclass`, and not only true integral types like `int` or `float`.
+
+| Container            | find (integral type) | sort (integral type) |\|| find (struct elem) | sort (struct elem) | optional |
+|:---------------------|:---------------------|:---------------------|:-|:-------------------|:-------------------|:---------|
+| cstack, cqueue       | n/a                  | n/a                  || n/a                | n/a                | n/a      |
+| cvec, cdeq, clist    | `i_use_cmp`          | `i_use_cmp`          || `i_eq`             | `i_cmp` / `i_less` | yes      |
+| cbox, carc           | `i_use_cmp`          | `i_use_cmp`          || `i_eq` + `i_hash`  | `i_cmp` / `i_less` | yes      |
+| cmap, cset           |                      | n/a                  || `i_eq` + `i_hash`  | n/a                | no       |
+| csmap, csset         |                      |                      || `i_cmp` / `i_less` | `i_cmp` / `i_less` | no       |
+| cpque                | n/a                  |                      || n/a                | `i_cmp` / `i_less` | no       |
+  
 ---
 ## The *emplace* methods
 

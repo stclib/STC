@@ -214,17 +214,15 @@
 #endif
 
 // i_eq, i_less, i_cmp
-#if !defined i_eq && (defined i_cmp || defined i_less)
+#if !defined i_eq && defined i_cmp
   #define i_eq(x, y) !(i_cmp(x, y))
 #elif !defined i_eq
-  #define i_eq(x, y) *x == *y
+  #define i_eq(x, y) *x == *y // for integral types, else define i_eq or i_cmp yourself
 #endif
-#if defined i_cmp && defined i_less
-  #error "Only one of i_cmp and i_less may be defined"
-#elif defined i_cmp
+#if !defined i_less && defined i_cmp
   #define i_less(x, y) (i_cmp(x, y)) < 0
 #elif !defined i_less
-  #define i_less(x, y) *x < *y
+  #define i_less(x, y) *x < *y // for integral types, else define i_less or i_cmp yourself
 #endif
 #ifndef i_cmp
   #define i_cmp(x, y) (i_less(y, x)) - (i_less(x, y))

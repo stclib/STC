@@ -101,8 +101,4 @@ STC_INLINE uint64_t crawstr_hash(const crawstr *self)
     { return stc_hash(self->str, self->size); }
 
 #endif // CRAWSTR_H_INCLUDED
-#undef i_static
-#undef i_header
-#undef i_implement
-#undef i_import
-#undef i_opt
+#include "priv/linkage2.h"
