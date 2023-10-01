@@ -21,11 +21,14 @@
  * SOFTWARE.
  */
 #define i_header // external linkage by default. override with i_static.
-#define _i_inc_utf8
-#include "utf8.h"
+#include "priv/linkage.h"
 
 #ifndef CSVIEW_H_INCLUDED
 #define CSVIEW_H_INCLUDED
+
+#include "ccommon.h"
+#include "forward.h"
+#include "priv/utf8_hdr.h"
 
 #define             csview_init() c_sv_1("")
 #define             csview_drop(p) c_default_drop(p)
@@ -204,4 +207,8 @@ STC_DEF csview csview_token(csview sv, const char* sep, intptr_t* start) {
 }
 #endif // CSVIEW_C_INCLUDED
 #endif // i_implement
+
+#if defined i_import
+  #include "../../src/utf8code.c"
+#endif
 #include "priv/linkage2.h"

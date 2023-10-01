@@ -23,8 +23,8 @@
 #undef STC_API
 #undef STC_DEF
 
-#if !defined(i_static) && !defined(STC_STATIC) && (defined(i_header) || defined(STC_HEADER) || \
-                                                   defined(i_implement) || defined(STC_IMPLEMENT))
+#if !defined i_static  && !defined STC_STATIC  && (defined i_header || defined STC_HEADER  || \
+                                                   defined i_implement || defined STC_IMPLEMENT)
   #define STC_API extern
   #define STC_DEF
 #else
@@ -36,7 +36,7 @@
   #endif
   #define STC_DEF static
 #endif
-#if defined(STC_IMPLEMENT) || defined(i_import)
+#if defined STC_IMPLEMENT || defined i_import
   #define i_implement
 #endif
 

@@ -23,6 +23,7 @@
 #include "priv/linkage.h"
 
 #ifndef CQUEUE_H_INCLUDED
+#define CQUEUE_H_INCLUDED
 #include "ccommon.h"
 #include "forward.h"
 #include <stdlib.h>
@@ -32,12 +33,12 @@
 #ifndef _i_prefix
 #define _i_prefix cqueue_
 #endif
+#include "priv/template.h"
 #include "priv/cqueue_hdr.h"
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if defined(i_implement) || defined(i_static)
+#if defined i_implement || defined i_static
 #include "priv/cqueue_imp.h"
 #endif // IMPLEMENTATION
-#define CQUEUE_H_INCLUDED
 #include "priv/template2.h"
 #include "priv/linkage2.h"

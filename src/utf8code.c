@@ -1,8 +1,8 @@
 #ifndef UTF8_C_INCLUDED
 #define UTF8_C_INCLUDED
 
-#ifndef UTF8_H_INCLUDED
-#include "../include/stc/utf8.h" /* header only */
+#ifndef UTF8_HDR_H
+  #include "../include/stc/utf8.h"
 #endif
 #include "utf8tabs.inc"
 

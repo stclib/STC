@@ -20,11 +20,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#define _i_inc_utf8
-#include "utf8.h"
+#define i_header // external linkage by default. override with i_static.
+#include "priv/linkage.h"
 
 #ifndef CRAWSTR_H_INCLUDED
 #define CRAWSTR_H_INCLUDED
+
+#include "ccommon.h"
+#include "forward.h"
+#include "priv/utf8_hdr.h"
 
 #define             crawstr_init() c_rs("")
 #define             crawstr_clone(rs) c_default_clone(rs)
@@ -101,4 +105,8 @@ STC_INLINE uint64_t crawstr_hash(const crawstr *self)
     { return stc_hash(self->str, self->size); }
 
 #endif // CRAWSTR_H_INCLUDED
+
+#if defined i_import
+  #include "../../src/utf8code.c"
+#endif
 #include "priv/linkage2.h"

@@ -21,7 +21,6 @@
  * SOFTWARE.
  */
 
-#include "template.h"
 #ifndef i_is_forward
 _cx_DEFTYPES(_c_cdeq_types, _cx_Self, i_key);
 #endif

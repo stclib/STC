@@ -25,8 +25,7 @@
  * optimization (22 characters with 24 bytes string).
  */
 #define i_header // external linkage by default. override with i_static.
-#define _i_inc_utf8
-#include "utf8.h" // includes linkage.h
+#include "priv/linkage.h"
 
 #ifndef CSTR_H_INCLUDED
 #define CSTR_H_INCLUDED
@@ -34,6 +33,9 @@
 #include <stdlib.h> /* malloc */
 #include <stdarg.h>
 #include <stdio.h> /* vsnprintf */
+#include "ccommon.h"
+#include "forward.h"
+#include "priv/utf8_hdr.h"
 
 /**************************** PRIVATE API **********************************/
 
@@ -650,4 +652,8 @@ STC_DEF intptr_t cstr_printf(cstr* self, const char* fmt, ...) {
 }
 #endif // CSTR_C_INCLUDED
 #endif // i_implement
+
+#if defined i_import
+  #include "../../src/utf8code.c"
+#endif
 #include "priv/linkage2.h"

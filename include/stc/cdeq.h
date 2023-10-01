@@ -23,6 +23,7 @@
 #include "priv/linkage.h"
 
 #ifndef CDEQ_H_INCLUDED
+#define CDEQ_H_INCLUDED
 #include "ccommon.h"
 #include "forward.h"
 #include <stdlib.h>
@@ -32,6 +33,7 @@
 #define _i_prefix cdeq_
 #define _pop _pop_front
 #define _pull _pull_front
+#include "priv/template.h"
 #include "priv/cqueue_hdr.h"
 #undef _pop
 #undef _pull
@@ -199,6 +201,5 @@ _cx_MEMB(_find_in)(_cx_iter i1, _cx_iter i2, _cx_raw raw) {
 }
 #endif
 #endif // IMPLEMENTATION
-#define CDEQ_H_INCLUDED
 #include "priv/template2.h"
 #include "priv/linkage2.h"

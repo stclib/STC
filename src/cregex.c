@@ -27,21 +27,11 @@ THE SOFTWARE.
 #define CREGEX_C_INCLUDED
 
 #include <setjmp.h>
-#ifdef i_import
-#  define _i_import
-#endif
 #ifndef CREGEX_H_INCLUDED
-#  include "../include/stc/cregex.h"
+  #include "../include/stc/cregex.h"
 #endif
-#ifdef _i_import
-#  include "utf8code.c"
-#endif
-#ifdef _i_import
-#  define i_implement
-#else
-#  undef i_implement
-#endif
-#undef _i_import
+#undef i_implement 
+// implement cstr and utf8 if i_import was defined:
 #include "../include/stc/cstr.h"
 
 typedef uint32_t _Rune; /* Utf8 code point */
