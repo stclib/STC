@@ -43,7 +43,7 @@ int main(void) {
     puts("");
   }
 #else
-  cspan_print(span3, md, ".2f");
+  cspan_print(span3, md, "%.2f");
 #endif
   puts("done");
 }

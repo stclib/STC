@@ -45,13 +45,19 @@ ValueType*      cspan_at(const SpanTypeN* self, intptr_t i, j..);  // num args i
 ValueType*      cspan_front(const SpanTypeN* self);
 ValueType*      cspan_back(const SpanTypeN* self);
 
-                // print numpy style output. NOTE: fmt must *not* contain "%" or WIDTH specifier.
-                // Use e.g. "d" or ".2f". fp and brackets are optional with default values.
-                // Comma may be added to brackets, e.g. "{},". Note that span is passed by value.
-                // Usage ex: cspan_print(Span2, ((Span2)cspan_transposed2(&sp2)), ".3f");
-                //           cspan_print(Span2, cspan_slice(Span2, &sp3, {c_ALL}, {3}, {c_ALL}), ".3f");
+                // print numpy style output. 
+                //  span     : any dimension. Note that span is passed by value.
+                //  fmt      : printf format specifier.
+                //  fp       : optional output file pointer, default stdout.
+                //  brackets : optional brackets and comma. Example "{},". Default "[]".
+                //  itemfn   : optional macro function
+                //    Example: #define complexnum(e) e.real, e.imag
+                //    Default: itemfn(e) e
+                //    Note that fmt must match the arguments passed via itemfn().
+                // Usage ex: cspan_print(Span2, ((Span2)cspan_transposed2(&sp2)), "%.3f");
+                //           cspan_print(Span2, cspan_slice(Span2, &sp3, {c_ALL}, {3}, {c_ALL}), "%.3f");
 void            cspan_print(<TYPE> SpanTypeN, SpanTypeN span, const char* fmt, 
-                            FILE* fp = stdout, const char* brackets = "[]");
+                            FILE* fp = stdout, const char* brackets = "[]", itemfn = c_EXPAND);
 
 SpanTypeN_iter  SpanType_begin(const SpanTypeN* self);
 SpanTypeN_iter  SpanType_end(const SpanTypeN* self);
@@ -77,7 +83,7 @@ OutSpan1        cspan_submd2(const SpanType2* self, intptr_t i);     // construc
 OutSpanM        cspan_submd3(const SpanType3* self, intptr_t i,...); // construct a 2d or 1d subspan from a 3d span.
 OutSpanM        cspan_submd4(const SpanType4* self, intptr_t i,...); // construct a 3d, 2d or 1d subspan from a 4d span.
 
-                // Multi-dim span slicing function.
+                // multi-dim span slicing function.
                 //       {i}: select i'th column. reduce output rank.
                 //     {i,j}: from i to j-1.
                 //   {i,j,s}: every s column only (default s=1)
@@ -238,18 +244,18 @@ int main(void)
 
     // numpy style printout
     puts("span3:");
-    cspan_print(Span3, span3, "d");
+    cspan_print(Span3, span3, "%d");
     
     puts("Slice without reducing rank:");
-    cspan_print(Span3, cspan_slice(Span3, &span3, {c_ALL}, {3,4}, {c_ALL}), "d");
+    cspan_print(Span3, cspan_slice(Span3, &span3, {c_ALL}, {3,4}, {c_ALL}), "%d");
     
     puts("Slice with reducing rank:");
-    cspan_print(Span2, cspan_slice(Span2, &span3, {c_ALL}, {3}, {c_ALL}), "d");
+    cspan_print(Span2, cspan_slice(Span2, &span3, {c_ALL}, {3}, {c_ALL}), "%d");
 
     puts("Swapped:");
     Span3 swapped = span3;
     cspan_swap_axes(&swapped, 0, 1);
     cspan_swap_axes(&swapped, 1, 2);
-    cspan_print(Span3, swapped, "d", stdout, "{},"); // C-array style.
+    cspan_print(Span3, swapped, "%d", stdout, "{},"); // C-array style.
 }
 ```

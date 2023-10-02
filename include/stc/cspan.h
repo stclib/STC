@@ -234,23 +234,24 @@ typedef enum {c_ROWMAJOR, c_COLMAJOR} cspan_layout;
     cspan_print_4(Span, span, fmt, stdout)
 #define cspan_print_4(Span, span, fmt, fp) \
     cspan_print_5(Span, span, fmt, fp, "[]")
+#define cspan_print_5(Span, span, fmt, fp, brackets) \
+    cspan_print_6(Span, span, fmt, fp, brackets, c_EXPAND)
 
-#define cspan_print_5(Span, span, fmt, fp, brackets) do { \
+#define cspan_print_6(Span, span, fmt, fp, brackets, field) do { \
     const Span _s = span; \
     const char *_f = fmt, *_b = brackets; \
     FILE* _fp = fp; \
     int _w, _max = 0; \
-    char _res[2][16], _fmt[32]; \
-    sprintf(_fmt, "%%%s", _f); \
+    char _res[2][16], _fld[128]; \
     c_foreach_3 (_it, Span, _s) { \
-        _w = snprintf(NULL, 0ULL, _fmt, *_it.ref); \
+        _w = snprintf(NULL, 0ULL, _f, field(_it.ref[0])); \
         if (_w > _max) _max = _w; \
     } \
-    sprintf(_fmt, "%%s%%*%s%%s", _f); \
     c_foreach_3 (_it, Span, _s) { \
         _cspan_print_assist(_it.pos, _s.shape, cspan_rank(&_s), _res, _b); \
         _w = _max + (_it.pos[cspan_rank(&_s) - 1] > 0); \
-        fprintf(_fp, _fmt, _res[0], _w, *_it.ref, _res[1]); \
+        sprintf(_fld, _f, field(_it.ref[0])); \
+        fprintf(_fp, "%s%*s%s", _res[0], _w, _fld, _res[1]); \
     } \
 } while (0)
 
