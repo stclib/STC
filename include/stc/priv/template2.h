@@ -56,11 +56,6 @@
 #undef i_keyto
 #undef i_keydrop
 
-#undef i_header
-#undef i_implement
-#undef i_static
-#undef i_import
-
 #undef i_allocator
 #undef i_malloc
 #undef i_calloc

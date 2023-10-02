@@ -25,7 +25,6 @@
 #undef i_header
 #undef i_implement
 #undef i_import
-#undef i_opt
 
 #if defined __clang__
   #pragma clang diagnostic pop
