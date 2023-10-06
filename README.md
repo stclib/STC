@@ -198,7 +198,7 @@ int main(void)
 ```
 Comparison/lookup functions are enabled by default for associative containers and priority queue (cmap, cset, csmap, csset, cpque). To enable it for the remaining containers, define `i_cmp` or `i_less` (and optionally `i_eq`) on the element type. If the element is an integral type, simply define `i_use_cmp` to use `<` and `==` operators for comparisons.
 
-Note that for `#define i_keyclass Type`, defining `i_use_cmp` means that *Type_cmp()* function is expected to exist (along with *Type_clone()* and *Type_drop()*).
+Note that for `#define i_key_class Type`, defining `i_use_cmp` means that *Type_cmp()* function is expected to exist (along with *Type_clone()* and *Type_drop()*).
 
 To summarize, `i_use_cmp` is only needed to enable comparison (sort/search) functions when defining cstack, cvec, cqueue, cdeq, carc, cbox. With built-in types, it enables the comparison operators, whereas for keyclass types, it binds comparison to its Type_cmp() function.
 
@@ -216,7 +216,7 @@ Let's make a vector of vectors, which can be cloned. All of its element vectors 
 #include <stc/cvec.h>
 
 #define i_type Vec2D
-#define i_keyclass Vec  // Use i_keyclass instead i_key when element type has "members" _clone(), _drop() and _cmp().
+#define i_key_class Vec  // Use i_key_class instead i_key when element type has "members" _clone(), _drop() and _cmp().
 #include <stc/cvec.h>
 
 int main(void)
@@ -395,29 +395,29 @@ Val:
 - `i_valto` *Func* - Convertion func *i_val*\* => *i_valraw*.
 
 Specials: Meta-template parameters. Use instead of `i_key` / `i_val`.
-- `i_keyclass` *Type* - Auto-set standard named functions: *Type_clone()*, *Type_drop()*, *Type_cmp()*, *Type_eq()*, *Type_hash()*.
+- `i_key_class` *Type* - Auto-set standard named functions: *Type_clone()*, *Type_drop()*, *Type_cmp()*, *Type_eq()*, *Type_hash()*.
 If `i_keyraw` is defined, it sets `i_keyto` = *Type_toraw()* and `i_keyfrom` = *Type_from()*.
 Only functions required by the container type is required to be defined. E.g.:
     - *Type_hash()* and *Type_eq()* are only required by **cmap**, **cset** and smart pointers.
     - *Type_cmp()* is not used by **cstack** and **cmap/cset**.
     - *Type_clone()* is not used if *#define i_opt c_no_clone* is specified.
-- `i_key_str` - Sets `i_keyclass` = *cstr*, `i_tag` = *str*, and `i_keyraw` = *const char*\*. Defines both type convertion 
+- `i_key_str` - Sets `i_key_class` = *cstr*, `i_tag` = *str*, and `i_keyraw` = *const char*\*. Defines both type convertion 
 `i_keyfrom`, `i_keyto`, and sets `i_cmp`, `i_eq`, `i_hash` functions with *const char\*\** as argument.
-- `i_key_ssv` - Sets `i_keyclass` = *cstr*, `i_tag` = *ssv*, and `i_keyraw` = *csview\**. Defines both type convertion 
+- `i_key_ssv` - Sets `i_key_class` = *cstr*, `i_tag` = *ssv*, and `i_keyraw` = *csview\**. Defines both type convertion 
 `i_keyfrom`, `i_keyto`, and sets `i_cmp`, `i_eq`, `i_hash` functions with *csview\** as argument.
-- `i_keyboxed` *Type* - Use when *Type* is a smart pointer **carc** or **cbox**. Defines *i_keyclass = Type*, and *i_keyraw = Type\**.
+- `i_key_arcbox` *Type* - Use when *Type* is a smart pointer **carc** or **cbox**. Defines *i_key_class = Type*, and *i_keyraw = Type\**.
 NB: Do not use when defining carc/cbox types themselves.
-- `i_valclass` *Type*, `i_val_str`, `i_val_ssv`, `i_valboxed` - Similar rules as for ***key***.
+- `i_val_class` *Type*, `i_val_str`, `i_val_ssv`, `i_val_arcbox` - Similar rules as for ***key***.
 
 **Notes**:
 - Instead of defining `i_*clone`, you may define *i_opt c_no_clone* to disable *clone* functionality.
-- For `i_keyclass`, if *i_keyraw* is defined along with it, *i_keyfrom* may also be defined to enable the *emplace*-functions. NB: the signature for ***cmp***, ***eq***, and ***hash*** uses *i_keyraw* as input.
+- For `i_key_class`, if *i_keyraw* is defined along with it, *i_keyfrom* may also be defined to enable the *emplace*-functions. NB: the signature for ***cmp***, ***eq***, and ***hash*** uses *i_keyraw* as input.
 
 ## Specifying comparison parameters
 
 The table below shows the template parameters which must be defined to support element search and sort for various containers versus element types.
 
-For the containers marked ***optional***, the features are disabled if the template parameter(s) are not defined. Note that the ***(integral type)*** columns also applies to "special" types, specified with `i_key_str`, `i_keyboxed`, and `i_keyclass`, and not only true integral types like `int` or `float`.
+For the containers marked ***optional***, the features are disabled if the template parameter(s) are not defined. Note that the ***(integral type)*** columns also applies to "special" types, specified with `i_key_str`, `i_key_arcbox`, and `i_key_class`, and not only true integral types like `int` or `float`.
 
 | Container            | find (integral type) | sort (integral type) |\|| find (struct elem) | sort (struct elem) | optional |
 |:---------------------|:---------------------|:---------------------|:-|:-------------------|:-------------------|:---------|
@@ -679,8 +679,8 @@ STC is generally very memory efficient. Memory usage for the different container
         - Reverted names _unif and _norm back to `_uniform` and `_normal`.
     - Removed default comparison for **clist**, **cvec** and **cdeq**:
         - Define `i_use_cmp` to enable comparison for built-in i_key types (<, ==).
-        - Use of `i_keyclass` still expects comparison functions to be defined. 
-        - Use of `i_keyboxed` compares stored pointers instead of pointed to values if comparison not defined.
+        - Use of `i_key_class` still expects comparison functions to be defined. 
+        - Use of `i_key_arcbox` compares stored pointers instead of pointed to values if comparison not defined.
     - Renamed input enum flags for ***cregex***-functions.
 - **cspan**: Added **column-major** order (fortran) multidimensional spans and transposed views (changed representation of strides).
 - All new faster and smaller **cqueue** and **cdeq** implementations, using a circular buffer.
@@ -771,14 +771,14 @@ Major changes:
 - Renamed: ***i_equ*** to `i_eq`, and ***_equalto*** to `_eq`.
 - Renamed: ***i_cnt*** to `i_type` for defining the complete container type name.
 - Renamed: type **csptr** to [**carc**](docs/carc_api.md) (atomic reference counted) smart pointer.
-- Renamed: ***i_key_csptr*** / ***i_val_csptr*** to `i_keyboxed` / `i_valboxed` for specifying **carc** and **cbox** values in containers.
+- Renamed: ***i_key_csptr*** / ***i_val_csptr*** to `i_key_arcbox` / `i_val_arcbox` for specifying **carc** and **cbox** values in containers.
 - Renamed: *csptr_X_make()* to `carc_X_from()`.
 - Renamed: *cstr_new()* to `cstr_lit(literal)`, and *cstr_assign_fmt()* to `cstr_printf()`.
 - Renamed: *c_default_fromraw()* to `c_default_from()`.
 - Changed: the [**c_apply**](docs/algorithm_api.md) macros API.
 - Replaced: *csview_first_token()* and *csview_next_token()* with one function: `csview_token()`.
 - Added: **checkauto** tool for checking that c-source files uses `c_auto*` macros correctly.
-- Added: general `i_keyclass` / `i_valclass` template parameters which auto-binds template functions.
+- Added: general `i_key_class` / `i_val_class` template parameters which auto-binds template functions.
 - Added: `i_opt` template parameter: compile-time options: `c_no_clone`, `c_no_atomic`, `c_is_forward`; may be combined with `|`
 - Added: [**cbox**](docs/cbox_api.md) type: smart pointer, similar to [Rust Box](https://doc.rust-lang.org/rust-by-example/std/box.html) and [std::unique_ptr](https://en.cppreference.com/w/cpp/memory/unique_ptr).
 - Added: [**c_forpair**](docs/algorithm_api.md) macro: for-loop with "structured binding"

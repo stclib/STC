@@ -5,7 +5,7 @@ be empty. The *cbox_X_cmp()*, *cbox_X_drop()* methods are defined based on the `
 and `i_keydrop` macros specified. Use *cbox_X_clone(p)* to make a deep copy, which uses the
 `i_keyclone` macro if defined.
 
-When declaring a container of **cbox** values, define `i_keyboxed` with the
+When declaring a container of **cbox** values, define `i_key_arcbox` with the
 cbox type instead of defining `i_key`. This will auto-set `i_keydrop`, `i_keyclone`, and `i_cmp` using 
 functions defined by the specified **cbox**.
 
@@ -18,7 +18,7 @@ See similar c++ class [std::unique_ptr](https://en.cppreference.com/w/cpp/memory
 #define i_type <t>      // cbox container type name
 #define i_cmp <f>       // three-way compareison. REQUIRED IF i_key is a non-integral type
                         // Note that containers of carcs will "inherit" i_cmp
-                        // when using carc in containers with i_valboxed MyArc - ie. the i_type.
+                        // when using carc in containers with i_val_arcbox MyArc - ie. the i_type.
 #define i_use_cmp       // define instead of i_cmp only when i_key is an integral/native-type.
 #define i_keydrop <f>   // destroy element func - defaults to empty destruct
 #define i_keyclone <f>  // REQUIRED if i_keydrop is defined, unless 'i_opt c_no_clone' is defined.
@@ -28,9 +28,9 @@ See similar c++ class [std::unique_ptr](https://en.cppreference.com/w/cpp/memory
 #define i_keyfrom <f>   // from-raw func.
 
 #define i_tag <s>       // alternative typename: cbox_{i_tag}. i_tag defaults to i_key
-#define i_keyclass <t>  // Use instead of i_key when functions {i_key}_clone, 
+#define i_key_class <t>  // Use instead of i_key when functions {i_key}_clone, 
                         // {i_key}_drop and {i_keyraw}_cmp exist.
-#define i_keyboxed <t>  // Use instead of i_key when key is a carc- or a cbox-type.
+#define i_key_arcbox <t>  // Use instead of i_key when key is a carc- or a cbox-type.
 #include <stc/cbox.h>    
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.
@@ -88,11 +88,11 @@ void int_drop(int* x) {
 #include <stc/cbox.h>
 
 #define i_type ISet
-#define i_keyboxed IBox       // NB: use i_keyboxed instead of i_key
+#define i_key_arcbox IBox       // NB: use i_key_arcbox instead of i_key
 #include <stc/csset.h>        // ISet : std::set<std::unique_ptr<int>>
 
 #define i_type IVec
-#define i_keyboxed IBox       // NB: use i_keyboxed instead of i_key
+#define i_key_arcbox IBox       // NB: use i_key_arcbox instead of i_key
 #include <stc/cvec.h>         // IVec : std::vector<std::unique_ptr<int>>
 
 int main(void)

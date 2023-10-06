@@ -26,18 +26,31 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#define forward_carc(CX, VAL) _c_carc_types(CX, VAL)
-#define forward_cbox(CX, VAL) _c_cbox_types(CX, VAL)
-#define forward_cdeq(CX, VAL) _c_cdeq_types(CX, VAL)
-#define forward_clist(CX, VAL) _c_clist_types(CX, VAL)
-#define forward_cmap(CX, KEY, VAL) _c_chash_types(CX, KEY, VAL, c_true, c_false)
-#define forward_cset(CX, KEY) _c_chash_types(CX, cset, KEY, KEY, c_false, c_true)
-#define forward_csmap(CX, KEY, VAL) _c_aatree_types(CX, KEY, VAL, c_true, c_false)
-#define forward_csset(CX, KEY) _c_aatree_types(CX, KEY, KEY, c_false, c_true)
-#define forward_cstack(CX, VAL) _c_cstack_types(CX, VAL)
-#define forward_cpque(CX, VAL) _c_cpque_types(CX, VAL)
-#define forward_cqueue(CX, VAL) _c_cdeq_types(CX, VAL)
-#define forward_cvec(CX, VAL) _c_cvec_types(CX, VAL)
+#define forward_carc(C, VAL) _c_carc_types(C, VAL)
+#define forward_cbox(C, VAL) _c_cbox_types(C, VAL)
+#define forward_cdeq(C, VAL) _c_cdeq_types(C, VAL)
+#define forward_clist(C, VAL) _c_clist_types(C, VAL)
+#define forward_cmap(C, KEY, VAL) _c_chash_types(C, KEY, VAL, c_true, c_false)
+#define forward_cset(C, KEY) _c_chash_types(C, cset, KEY, KEY, c_false, c_true)
+#define forward_csmap(C, KEY, VAL) _c_aatree_types(C, KEY, VAL, c_true, c_false)
+#define forward_csset(C, KEY) _c_aatree_types(C, KEY, KEY, c_false, c_true)
+#define forward_cstack(C, VAL) _c_cstack_types(C, VAL)
+#define forward_cpque(C, VAL) _c_cpque_types(C, VAL)
+#define forward_cqueue(C, VAL) _c_cdeq_types(C, VAL)
+#define forward_cvec(C, VAL) _c_cvec_types(C, VAL)
+// alternative names (include/stx):
+#define forward_arc forward_carc
+#define forward_box forward_cbox
+#define forward_deq forward_cdeq
+#define forward_list forward_clist
+#define forward_hmap forward_cmap
+#define forward_hset forward_cset
+#define forward_smap forward_csmap
+#define forward_sset forward_csset
+#define forward_stack forward_cstack
+#define forward_pque forward_cpque
+#define forward_queue forward_cqueue
+#define forward_vec forward_cvec
 
 // csview : non-null terminated string view
 typedef const char csview_value;

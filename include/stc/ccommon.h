@@ -188,14 +188,13 @@ STC_INLINE intptr_t stc_nextpow2(intptr_t n) {
          ; _.it.ref && (_.key = &_.it.ref->first, _.val = &_.it.ref->second) \
          ; C##_next(&_.it))
 
-#define c_forrange(...) c_for(long long, __VA_ARGS__)
-#define c_for(...) c_MACRO_OVERLOAD(c_for, __VA_ARGS__)
-#define c_for_2(T, stop) c_for_4(T, _c_i, 0, stop)
-#define c_for_3(T, i, stop) c_for_4(T, i, 0, stop)
-#define c_for_4(T, i, start, stop) \
-    for (T i=start, _end=stop; i < _end; ++i)
-#define c_for_5(T, i, start, stop, step) \
-    for (T i=start, _inc=step, _end=(T)(stop) - (_inc > 0) \
+#define c_forrange(...) c_MACRO_OVERLOAD(c_forrange, __VA_ARGS__)
+#define c_forrange_1(stop) c_forrange_3(_i, 0, stop)
+#define c_forrange_2(i, stop) c_forrange_3(i, 0, stop)
+#define c_forrange_3(i, start, stop) \
+    for (_llong i=start, _end=stop; i < _end; ++i)
+#define c_forrange_4(i, start, stop, step) \
+    for (_llong i=start, _inc=step, _end=(_llong)(stop) - (_inc > 0) \
          ; (_inc > 0) ^ (i > _end); i += _inc)
 
 #ifndef __cplusplus
@@ -220,6 +219,11 @@ STC_INLINE intptr_t stc_nextpow2(intptr_t n) {
 
 #define c_defer(...) \
     for (int _i = 1; _i; _i = 0, __VA_ARGS__)
+#define c_with(...) c_MACRO_OVERLOAD(c_with, __VA_ARGS__)
+#define c_with_2(declvar, drop) \
+    for (declvar, *_i, **_ip = &_i; _ip; _ip = 0, drop)
+#define c_with_3(declvar, pred, drop) \
+    for (declvar, *_i, **_ip = &_i; _ip && (pred); _ip = 0, drop)
 #define c_drop(C, ...) \
     do { c_forlist (_i, C*, {__VA_ARGS__}) C##_drop(*_i.ref); } while(0)
 

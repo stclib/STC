@@ -306,7 +306,7 @@ static inline void Viking_drop(Viking* vk) {
 }
 
 #define i_type Vikings
-#define i_keyclass Viking
+#define i_key_class Viking
 #define i_val int
 #include <stc/cmap.h>
 
@@ -378,7 +378,7 @@ static inline RViking Viking_toraw(const Viking* vp) {
 
 // With this in place, we define the Viking => int hash map type:
 #define i_type      Vikings
-#define i_keyclass  Viking
+#define i_key_class  Viking
 #define i_keyraw    RViking
 #define i_keyfrom   Viking_from
 #define i_opt       c_no_clone // disable map cloning

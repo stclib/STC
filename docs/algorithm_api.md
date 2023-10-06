@@ -275,7 +275,7 @@ int* ip = c_const_cast(int*, cs);  // issues a warning!
 
 ### Predefined template parameter functions
 
-**ccharptr** - Non-owning `const char*` "class" element type: `#define i_keyclass ccharptr`
+**ccharptr** - Non-owning `const char*` "class" element type: `#define i_key_class ccharptr`
 ```c
 typedef     const char* ccharptr;
 int         ccharptr_cmp(const ccharptr* x, const ccharptr* y);

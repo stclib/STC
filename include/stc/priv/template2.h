@@ -31,14 +31,14 @@
 #undef i_cmp
 #undef i_eq
 #undef i_hash
-#undef i_rawclass
 #undef i_capacity
+#undef i_raw_class
 
 #undef i_val
 #undef i_val_str
 #undef i_val_ssv
-#undef i_valboxed
-#undef i_valclass
+#undef i_val_arcbox
+#undef i_val_class
 #undef i_valraw
 #undef i_valclone
 #undef i_valfrom
@@ -48,8 +48,8 @@
 #undef i_key
 #undef i_key_str
 #undef i_key_ssv
-#undef i_keyboxed
-#undef i_keyclass
+#undef i_key_arcbox
+#undef i_key_class
 #undef i_keyraw
 #undef i_keyclone
 #undef i_keyfrom
@@ -74,4 +74,10 @@
 #undef _i_prefix
 #undef _i_expandby
 #undef _i_template
+
+#undef i_keyclass // [deprecated]
+#undef i_valclass // [deprecated]
+#undef i_rawclass // [deprecated]
+#undef i_keyboxed // [deprecated]
+#undef i_valboxed // [deprecated]
 #endif

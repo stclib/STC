@@ -16,11 +16,11 @@
 #include <stc/carc.h>
 
 #define i_type Stack
-#define i_keyboxed Arc // use i_keyboxed for carc/cbox key
+#define i_key_arcbox Arc // use i_key_arcbox for carc/cbox key
 #include <stc/cvec.h>
 
 #define i_type List
-#define i_keyboxed Arc // as above
+#define i_key_arcbox Arc // as above
 #include <stc/clist.h>
 
 int main(void)

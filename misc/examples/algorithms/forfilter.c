@@ -82,7 +82,7 @@ fn main() {
 }
 */
 #define i_type SVec
-#define i_keyclass csview
+#define i_key_class csview
 #include <stc/cstack.h>
 
 void demo3(void)

@@ -29,7 +29,9 @@
 #include "forward.h"
 #endif // CSTACK_H_INCLUDED
 
-#define _i_prefix cstack_
+#ifndef _i_prefix
+  #define _i_prefix cstack_
+#endif
 #include "priv/template.h"
 
 #ifndef i_is_forward

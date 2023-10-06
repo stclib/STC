@@ -42,7 +42,7 @@ void Person_drop(Person* p) {
 }
 
 #define i_type ArcPers
-#define i_valclass Person    // clone, drop, cmp, hash
+#define i_val_class Person    // clone, drop, cmp, hash
 #include <stc/carc.h>
 
 int main(void) {
@@ -80,7 +80,9 @@ int main(void) {
 #define carc_null {0}
 #endif // CARC_H_INCLUDED
 
-#define _i_prefix carc_
+#ifndef _i_prefix
+  #define _i_prefix carc_
+#endif
 #define _i_carc
 #include "priv/template.h"
 typedef i_keyraw _cx_raw;

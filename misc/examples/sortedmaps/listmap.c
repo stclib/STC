@@ -10,7 +10,7 @@
 // Map of int => clist_str.
 #define i_type Multimap
 #define i_key int
-#define i_valclass clist_str // set i_val = clist_str, bind clist_str_clone and clist_str_drop
+#define i_val_class clist_str // set i_val = clist_str, bind clist_str_clone and clist_str_drop
 #define i_cmp -c_default_cmp // like std::greater<int>
 #include <stc/csmap.h>
 

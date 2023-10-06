@@ -30,7 +30,9 @@
 #include <string.h>
 #endif // CDEQ_H_INCLUDED
 
-#define _i_prefix cdeq_
+#ifndef _i_prefix
+  #define _i_prefix cdeq_
+#endif
 #define _pop _pop_front
 #define _pull _pull_front
 #include "priv/template.h"

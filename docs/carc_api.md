@@ -13,7 +13,7 @@ All **carc** functions can be called by multiple threads on different instances 
 additional synchronization even if these instances are copies and share ownership of the same object.
 **carc** uses thread-safe atomic reference counting, through the *carc_X_clone()* and *carc_X_drop()* methods.
 
-When declaring a container with shared pointers, define `i_keyboxed` with the carc type, see example.
+When declaring a container with shared pointers, define `i_key_arcbox` with the carc type, see example.
 
 See similar c++ class [std::shared_ptr](https://en.cppreference.com/w/cpp/memory/shared_ptr) for a functional reference, or Rust [std::sync::Arc](https://doc.rust-lang.org/std/sync/struct.Arc.html) / [std::rc::Rc](https://doc.rust-lang.org/std/rc/struct.Rc.html).
 
@@ -24,7 +24,7 @@ See similar c++ class [std::shared_ptr](https://en.cppreference.com/w/cpp/memory
 #define i_type <t>         // carc container type name
 #define i_cmp <f>          // three-way compareison. REQUIRED IF i_key is a non-integral type
                            // Note that containers of carcs will "inherit" i_cmp
-                           // when using carc in containers with i_valboxed MyArc - ie. the i_type.
+                           // when using carc in containers with i_val_arcbox MyArc - ie. the i_type.
 #define i_use_cmp          // define instead of i_cmp only when i_key is an integral/native-type.
 #define i_keydrop <f>      // destroy element func - defaults to empty destruct
 #define i_keyclone <f>     // REQUIRED if i_keydrop is defined, unless 'i_opt c_no_clone' is defined.
@@ -100,7 +100,7 @@ bool        carc_X_value_eq(const i_key* x, const i_key* y);
 #include <stc/carc.h>
 
 #define i_type Stack
-#define i_keyboxed Arc // Note: use i_keyboxed for carc or cbox value types
+#define i_key_arcbox Arc // Note: use i_key_arcbox for carc or cbox value types
 #include <stc/cstack.h>
 
 int main(void)

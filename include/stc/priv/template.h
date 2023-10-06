@@ -52,8 +52,24 @@
   #define i_free c_JOIN(i_allocator, _free)
 #endif
 
+#ifdef i_keyclass // [deprecated]
+  #define i_key_class i_keyclass
+#endif
+#ifdef i_valclass // [deprecated]
+  #define i_val_class i_valclass
+#endif
+#ifdef i_rawclass // [deprecated]
+  #define i_raw_class i_rawclass
+#endif
+#ifdef i_keyboxed // [deprecated]
+  #define i_key_arcbox i_keyboxed
+#endif
+#ifdef i_valboxed // [deprecated]
+  #define i_val_arcbox i_valboxed
+#endif
+
 #if !(defined i_key || defined i_key_str || defined i_key_ssv || \
-      defined i_keyclass || defined i_keyboxed)
+      defined i_key_class || defined i_key_arcbox)
   #if defined _i_ismap
     #error "i_key* must be defined for maps"
   #endif
@@ -64,11 +80,11 @@
   #if defined i_val_ssv
     #define i_key_ssv i_val_ssv
   #endif  
-  #if defined i_valboxed
-    #define i_keyboxed i_valboxed
+  #if defined i_val_arcbox
+    #define i_key_arcbox i_val_arcbox
   #endif
-  #if defined i_valclass
-    #define i_keyclass i_valclass
+  #if defined i_val_class
+    #define i_key_class i_val_class
   #endif
   #if defined i_val
     #define i_key i_val
@@ -116,35 +132,35 @@
 #endif
 
 #if defined i_key_str
-  #define i_keyclass cstr
-  #define i_rawclass ccharptr
+  #define i_key_class cstr
+  #define i_raw_class ccharptr
   #ifndef i_tag
     #define i_tag str
   #endif
 #elif defined i_key_ssv
-  #define i_keyclass cstr
-  #define i_rawclass csview
+  #define i_key_class cstr
+  #define i_raw_class csview
   #define i_keyfrom cstr_from_sv
   #define i_keyto cstr_sv
   #ifndef i_tag
     #define i_tag ssv
   #endif
-#elif defined i_keyboxed
-  #define i_keyclass i_keyboxed
-  #define i_rawclass c_JOIN(i_keyboxed, _raw)
+#elif defined i_key_arcbox
+  #define i_key_class i_key_arcbox
+  #define i_raw_class c_JOIN(i_key_arcbox, _raw)
   #if defined i_use_cmp
-    #define i_eq c_JOIN(i_keyboxed, _raw_eq)
+    #define i_eq c_JOIN(i_key_arcbox, _raw_eq)
   #endif
 #endif
 
-#if defined i_rawclass
-  #define i_keyraw i_rawclass
-#elif defined i_keyclass && !defined i_keyraw
-  #define i_rawclass i_key
+#if defined i_raw_class
+  #define i_keyraw i_raw_class
+#elif defined i_key_class && !defined i_keyraw
+  #define i_raw_class i_key
 #endif
 
-#if defined i_keyclass
-  #define i_key i_keyclass
+#if defined i_key_class
+  #define i_key i_key_class
   #ifndef i_keyclone
     #define i_keyclone c_JOIN(i_key, _clone)
   #endif
@@ -159,7 +175,7 @@
   #endif
 #endif
 
-#if defined i_rawclass
+#if defined i_raw_class
   #if !(defined i_cmp || defined i_less) && defined i_use_cmp
     #define i_cmp c_JOIN(i_keyraw, _cmp)
   #endif
@@ -231,20 +247,20 @@
 #if defined _i_ismap // ---- process cmap/csmap value i_val, ... ----
 
 #ifdef i_val_str
-  #define i_valclass cstr
+  #define i_val_class cstr
   #define i_valraw const char*
 #elif defined i_val_ssv
-  #define i_valclass cstr
+  #define i_val_class cstr
   #define i_valraw csview
   #define i_valfrom cstr_from_sv
   #define i_valto cstr_sv
-#elif defined i_valboxed
-  #define i_valclass i_valboxed
-  #define i_valraw c_JOIN(i_valboxed, _raw)
+#elif defined i_val_arcbox
+  #define i_val_class i_val_arcbox
+  #define i_valraw c_JOIN(i_val_arcbox, _raw)
 #endif
 
-#ifdef i_valclass
-  #define i_val i_valclass
+#ifdef i_val_class
+  #define i_val i_val_class
   #ifndef i_valclone
     #define i_valclone c_JOIN(i_val, _clone)
   #endif

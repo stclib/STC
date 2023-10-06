@@ -31,7 +31,7 @@
 #endif // CQUEUE_H_INCLUDED
 
 #ifndef _i_prefix
-#define _i_prefix cqueue_
+  #define _i_prefix cqueue_
 #endif
 #include "priv/template.h"
 #include "priv/cqueue_hdr.h"

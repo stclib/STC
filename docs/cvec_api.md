@@ -208,7 +208,7 @@ User User_clone(User user) {
 
 // Declare a managed, clonable vector of users.
 #define i_type UVec
-#define i_keyclass User // User is a "class" as it has _cmp, _clone and _drop functions.
+#define i_key_class User // User is a "class" as it has _cmp, _clone and _drop functions.
 #include <stc/cvec.h>
 
 int main(void) {

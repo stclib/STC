@@ -14,10 +14,10 @@ void int_drop(int* x) {
 #define i_use_cmp           // use int comparison (x < y, x == y).
 #include <stc/carc.h>       // Arc
 
-#define i_keyboxed Arc      // note: use i_keyboxed instead of i_key for carc/cbox elements
+#define i_key_arcbox Arc      // note: use i_key_arcbox instead of i_key for carc/cbox elements
 #include <stc/csset.h>      // csset_Arc (like: std::set<std::shared_ptr<int>>)
 
-#define i_keyboxed Arc      // note: as above.
+#define i_key_arcbox Arc      // note: as above.
 #define i_use_cmp
 #include <stc/cvec.h>       // cvec_Arc (like: std::vector<std::shared_ptr<int>>)
 

@@ -43,7 +43,7 @@ void Person_drop(Person* p) {
 }
 
 #define i_type PBox
-#define i_valclass Person // bind Person clone+drop fn's
+#define i_val_class Person // bind Person clone+drop fn's
 #include <stc/cbox.h>
 
 int main(void) {
@@ -70,7 +70,9 @@ int main(void) {
 #define cbox_null {0}
 #endif // CBOX_H_INCLUDED
 
-#define _i_prefix cbox_
+#ifndef _i_prefix
+  #define _i_prefix cbox_
+#endif
 #define _i_cbox
 #include "priv/template.h"
 typedef i_keyraw _cx_raw;

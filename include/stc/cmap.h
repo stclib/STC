@@ -59,12 +59,13 @@ struct chash_slot { uint8_t hashx; };
 
 #ifndef _i_prefix
   #define _i_prefix cmap_
+#endif
+#ifndef _i_isset
   #define _i_ismap
   #define _i_MAP_ONLY c_true
   #define _i_SET_ONLY c_false
   #define _i_keyref(vp) (&(vp)->first)
 #else
-  #define _i_isset
   #define _i_MAP_ONLY c_false
   #define _i_SET_ONLY c_true
   #define _i_keyref(vp) (vp)

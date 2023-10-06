@@ -28,7 +28,9 @@
 #include "forward.h"
 #endif
 
-#define _i_prefix cpque_
+#ifndef _i_prefix
+  #define _i_prefix cpque_
+#endif
 #define _i_ispque
 #include "priv/template.h"
 #ifndef i_is_forward

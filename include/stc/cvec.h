@@ -70,7 +70,9 @@ int main(void) {
 #define _it_ptr(it) (it.ref ? it.ref : it.end)
 #endif // CVEC_H_INCLUDED
 
-#define _i_prefix cvec_
+#ifndef _i_prefix
+  #define _i_prefix cvec_
+#endif
 #include "priv/template.h"
 
 #ifndef i_is_forward

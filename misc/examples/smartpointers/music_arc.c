@@ -22,13 +22,13 @@ void Song_drop(Song* s) {
 
 // Define the shared pointer:
 #define i_type SongArc
-#define i_keyclass Song
+#define i_key_class Song
 #define i_opt c_use_cmp|c_no_hash
 #include <stc/carc.h>
 
 // ... and a vector of them
 #define i_type SongVec
-#define i_keyboxed SongArc // use i_keyboxed on carc / cbox (instead of i_key)
+#define i_key_arcbox SongArc // use i_key_arcbox on carc / cbox (instead of i_key)
 #include <stc/cvec.h>
 
 void example3(void)

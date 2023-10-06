@@ -25,20 +25,20 @@
 
 #ifdef i_key_str
   #define _i_key cstr
-#elif defined i_keyclass
-  #define _i_key i_keyclass
-#elif defined i_keyboxed
-  #define _i_key i_keyboxed
+#elif defined i_key_class
+  #define _i_key i_key_class
+#elif defined i_key_arcbox
+  #define _i_key i_key_arcbox
 #elif defined i_key
   #define _i_key i_key
 #endif
 
 #ifdef i_val_str
   #define _i_val cstr
-#elif defined i_valclass
-  #define _i_val i_valclass
-#elif defined i_valboxed
-  #define _i_val i_valboxed
+#elif defined i_val_class
+  #define _i_val i_val_class
+#elif defined i_val_arcbox
+  #define _i_val i_val_arcbox
 #elif defined i_val
   #define _i_val i_val
 #endif
