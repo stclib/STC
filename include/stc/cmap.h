@@ -28,7 +28,7 @@
 #define i_tag ichar  // Map int => char
 #define i_key int
 #define i_val char
-#include <stc/cmap.h>
+#include "stc/cmap.h"
 
 int main(void) {
     cmap_ichar m = {0};

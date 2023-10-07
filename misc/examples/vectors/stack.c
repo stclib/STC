@@ -4,11 +4,11 @@
 #define i_tag i
 #define i_capacity 100
 #define i_key int
-#include <stc/cstack.h>
+#include "stc/cstack.h"
 
 #define i_tag c
 #define i_key char
-#include <stc/cstack.h>
+#include "stc/cstack.h"
 
 int main(void) {
     cstack_i stack = {0};

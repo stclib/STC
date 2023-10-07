@@ -2,7 +2,7 @@
 // C99:
 #include <stdio.h>
 #include <time.h>
-#include <stc/cspan.h>
+#include "stc/cspan.h"
 
 using_cspan3(Mat, double);
 typedef Mat2 OutMat;
@@ -58,8 +58,8 @@ void recursive_matrix_product(Mat2 A, Mat2 B, OutMat C)
 
 #define i_type Values
 #define i_val double
-#include <stc/cstack.h>
-#include <stc/crand.h>
+#include "stc/cstack.h"
+#include "stc/crand.h"
 
 int main(void)
 {

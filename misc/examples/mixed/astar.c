@@ -5,7 +5,7 @@
 //     https://github.com/glouw/ctl/blob/master/examples/astar.c
 //     https://www.redblobgames.com/pathfinding/a-star/introduction.html
 #define i_implement
-#include <stc/cstr.h>
+#include "stc/cstr.h"
 #include <stdio.h>
 
 typedef struct
@@ -58,22 +58,22 @@ point_key_cmp(const point* a, const point* b)
 
 #define i_key point
 #define i_cmp point_cmp_priority
-#include <stc/cpque.h>
+#include "stc/cpque.h"
 
 #define i_key point
-#include <stc/cdeq.h>
+#include "stc/cdeq.h"
 
 #define i_key point
 #define i_val int
 #define i_cmp point_key_cmp
 #define i_tag pcost
-#include <stc/csmap.h>
+#include "stc/csmap.h"
 
 #define i_key point
 #define i_val point
 #define i_cmp point_key_cmp
 #define i_tag pstep
-#include <stc/csmap.h>
+#include "stc/csmap.h"
 
 cdeq_point
 astar(cstr* maze, int width)

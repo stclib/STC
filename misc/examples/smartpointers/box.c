@@ -1,6 +1,6 @@
 /* cbox: heap allocated boxed type */
 #define i_implement
-#include <stc/cstr.h>
+#include "stc/cstr.h"
 
 typedef struct { cstr name, last; } Person;
 
@@ -31,11 +31,11 @@ void Person_drop(Person* p) {
 #define i_type PBox
 #define i_key_class Person // "class" binds _cmp, _clone, _drop functions.
 #define i_use_cmp
-#include <stc/cbox.h>
+#include "stc/cbox.h"
 
 #define i_type Persons
 #define i_key_arcbox PBox // "arcbox" informs that PBox is a smart pointer.
-#include <stc/csset.h>
+#include "stc/csset.h"
 
 int main(void)
 {

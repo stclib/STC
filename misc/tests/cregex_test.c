@@ -1,7 +1,7 @@
 #define i_import
-#include <stc/cregex.h>
-#include <stc/csview.h>
-#include <stc/algo/raii.h>
+#include "stc/cregex.h"
+#include "stc/csview.h"
+#include "stc/algo/raii.h"
 #include "ctest.h"
 
 #define M_START(m) ((m).buf - inp)

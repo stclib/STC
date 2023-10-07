@@ -5,34 +5,34 @@
 #include <iomanip>
 #include <chrono>
 #define i_implement
-#include <stc/cstr.h>   // string
+#include "stc/cstr.h"   // string
 #define i_implement
-#include <stc/csview.h> // string_view
-#include <stc/algo/raii.h>
+#include "stc/csview.h" // string_view
+#include "stc/algo/raii.h"
 
 #define i_key_str
-#include <stc/cvec.h>   // vec of cstr with const char* lookup
+#include "stc/cvec.h"   // vec of cstr with const char* lookup
 
 #define i_type cvec_sv  // override default type name (cvec_csview)
 #define i_key csview
 #define i_cmp csview_cmp
-#include <stc/cvec.h>   // cvec_vs: vec of csview
+#include "stc/cvec.h"   // cvec_vs: vec of csview
 
 #define i_key_str
 #define i_val size_t
-#include <stc/csmap.h>  // sorted map of cstr, const char* lookup
+#include "stc/csmap.h"  // sorted map of cstr, const char* lookup
 
 #define i_key_ssv
 #define i_val size_t
-#include <stc/csmap.h>  // sorted map of cstr, csview lookup
+#include "stc/csmap.h"  // sorted map of cstr, csview lookup
 
 #define i_key_str
 #define i_val size_t
-#include <stc/cmap.h>   // unordered map of cstr, const char* lookup
+#include "stc/cmap.h"   // unordered map of cstr, const char* lookup
 
 #define i_key_ssv
 #define i_val size_t
-#include <stc/cmap.h>   // unordered map of cstr, csview lookup
+#include "stc/cmap.h"   // unordered map of cstr, csview lookup
 
 
 cvec_str read_file(const char* name)

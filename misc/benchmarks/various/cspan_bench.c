@@ -1,6 +1,6 @@
 // ref: https://stackoverflow.com/questions/74382366/why-is-iterating-over-stdrangesviewsjoin-so-slow
 #define NDEBUG
-#include <stc/cspan.h>
+#include "stc/cspan.h"
 #include <stdio.h>
 #include <time.h>
 

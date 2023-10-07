@@ -1,5 +1,5 @@
-#include <stc/crand.h>
-#include <stc/forward.h>
+#include "stc/crand.h"
+#include "stc/forward.h"
 #include <stdio.h>
 #include <time.h>
 
@@ -14,11 +14,11 @@ int point_cmp(const Point* a, const Point* b) {
 #define i_cmp point_cmp
 #define i_is_forward
 #define i_tag pnt
-#include <stc/cqueue.h>
+#include "stc/cqueue.h"
 
 #define i_type IQ
 #define i_key int
-#include <stc/cqueue.h>
+#include "stc/cqueue.h"
 
 int main(void) {
     int n = 50000000;

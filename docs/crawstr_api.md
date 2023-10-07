@@ -15,7 +15,7 @@ storage. It keeps the length of the string, i.e. no need to call *strlen()* for 
 All crawstr definitions and prototypes are available by including a single header file.
 
 ```c
-#include <stc/crawstr.h>
+#include "stc/crawstr.h"
 ```
 ## Methods
 
@@ -76,8 +76,8 @@ uint32_t        utf8_peek_off(const char* s, int offset);               // codep
 ## Example: UTF8 iteration and case conversion
 ```c
 #define i_import
-#include <stc/cstr.h>
-#include <stc/crawstr.h>
+#include "stc/cstr.h"
+#include "stc/crawstr.h"
 
 int main(void)
 {

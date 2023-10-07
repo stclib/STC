@@ -2,13 +2,13 @@
 #include <iostream>
 #include <chrono>
 
-#include <stc/crand.h>
+#include "stc/crand.h"
 #define i_static
-#include <stc/cstr.h>
+#include "stc/cstr.h"
 
 #define i_type StcVec
 #define i_val_str
-#include <stc/cstack.h>
+#include "stc/cstack.h"
 
 #include <vector>
 using StdVec = std::vector<std::string>;
@@ -35,7 +35,7 @@ using StdSet = robin_hood::unordered_flat_set<std::string, string_hash, std::equ
 #define i_type StcSet
 #define i_val_str
 //#define i_hash(txtp) std::hash<std::string_view>{}(*txtp)
-#include <stc/cset.h>
+#include "stc/cset.h"
 
 
 static const int BENCHMARK_SIZE = 250000;

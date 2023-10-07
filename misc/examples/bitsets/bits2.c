@@ -3,7 +3,7 @@
 
 #define i_type Bits
 #define i_capacity 80 // enable fixed bitset on the stack
-#include <stc/cbits.h>
+#include "stc/cbits.h"
 
 int main(void) 
 {

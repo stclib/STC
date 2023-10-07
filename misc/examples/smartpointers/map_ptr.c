@@ -1,7 +1,7 @@
-#include <stc/ccommon.h>
+#include "stc/ccommon.h"
 #include <stdio.h>
 #define i_implement
-#include <stc/cstr.h>
+#include "stc/cstr.h"
 
 // cmap of cstr => long*
 #define i_type Ptrmap
@@ -12,7 +12,7 @@
 #define i_valto(x) **x
 #define i_valclone(x) c_new(long, *x)
 #define i_valdrop(x) c_free(*x)
-#include <stc/cmap.h>
+#include "stc/cmap.h"
 
 int main(void)
 {

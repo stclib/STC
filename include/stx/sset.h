@@ -27,7 +27,7 @@
 
 #define i_tag i
 #define i_key int
-#include <stc/sset.h> // sorted set of int
+#include "stc/sset.h" // sorted set of int
 
 int main(void) {
     sset_i s = sset_i_init();

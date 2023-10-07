@@ -35,7 +35,7 @@ See similar c++ class [std::shared_ptr](https://en.cppreference.com/w/cpp/memory
 
 #define i_opt c_no_atomic  // Non-atomic reference counting, like Rust Rc.
 #define i_tag <s>          // alternative typename: carc_{i_tag}. i_tag defaults to i_key
-#include <stc/carc.h>
+#include "stc/carc.h"
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.
 
@@ -85,23 +85,23 @@ bool        carc_X_value_eq(const i_key* x, const i_key* y);
 // Demonstrate sharing and cloning of maps.
 // Show elements dropped.
 #define i_implement
-#include <stc/cstr.h>
+#include "stc/cstr.h"
 
 #define i_type Map
 #define i_key_str // i_key: cstr, i_keydrop: cstr_drop, etc..
 #define i_val int // year
 // override cstr_drop(p) by defining i_keydrop:
 #define i_keydrop(p) (printf("  drop name: %s\n", cstr_str(p)), cstr_drop(p))
-#include <stc/csmap.h>
+#include "stc/csmap.h"
 
 #define i_type Arc // (atomic) ref. counted pointer
 #define i_key Map
 #define i_keydrop(p) (printf("drop Arc:\n"), Map_drop(p))
-#include <stc/carc.h>
+#include "stc/carc.h"
 
 #define i_type Stack
 #define i_key_arcbox Arc // Note: use i_key_arcbox for carc or cbox value types
-#include <stc/cstack.h>
+#include "stc/cstack.h"
 
 int main(void)
 {

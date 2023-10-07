@@ -1,5 +1,5 @@
 #define i_implement
-#include <stc/cstr.h>
+#include "stc/cstr.h"
 
 // Olympics multimap example
 
@@ -43,13 +43,13 @@ void OlympicLoc_drop(OlympicLoc* self);
 #define i_key_class OlympicLoc // binds _cmp, _clone and _drop.
 #define i_use_cmp
 #define i_tag OL
-#include <stc/clist.h>
+#include "stc/clist.h"
 
 // Create a csmap<cstr, clist_OL> where key is country name
 #define i_key_str            // binds cstr_equ, cstr_hash, cstr_clone, ++
 #define i_val_class clist_OL // binds clist_OL_clone, clist_OL_drop
 #define i_tag OL
-#include <stc/csmap.h>
+#include "stc/csmap.h"
 
 int OlympicLoc_cmp(const OlympicLoc* a, const OlympicLoc* b) {
     return a->year - b->year;

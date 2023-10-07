@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <time.h>
-#include <stc/crand.h>
+#include "stc/crand.h"
 
 #define MAX_LOAD_FACTOR 80
 
@@ -38,7 +38,7 @@ KHASH_MAP_INIT_INT64(ii, IValue)
 #define i_tag ii
 //#define i_expandby 1
 #define i_max_load_factor MAX_LOAD_FACTOR / 100.0f
-#include <stc/cmap.h>
+#include "stc/cmap.h"
 
 #define SEED(s) rng = crand_init(s)
 #define RAND(N) (crand_u64(&rng) & (((uint64_t)1 << N) - 1))

@@ -40,7 +40,7 @@ int             coption_get(coption *opt, int argc, char *argv[],
 
 ```c
 #include <stdio.h>
-#include <stc/coption.h>
+#include "stc/coption.h"
 
 int main(int argc, char *argv[]) {
     coption_long longopts[] = {

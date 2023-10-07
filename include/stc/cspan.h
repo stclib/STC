@@ -23,8 +23,8 @@
  */
 /*
 #include <stdio.h>
-#include <stc/cspan.h>
-#include <stc/algorithm.h>
+#include "stc/cspan.h"
+#include "stc/algorithm.h"
 using_cspan(Span2f, float, 2);
 using_cspan(Intspan, int);
 

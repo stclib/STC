@@ -1,8 +1,8 @@
 #include <iostream>
 #define i_static
-#include <stc/crand.h>
+#include "stc/crand.h"
 #define i_static
-#include <stc/cstr.h>
+#include "stc/cstr.h"
 #include <cmath>
 #include <string>
 #include <map>
@@ -20,16 +20,16 @@ using omap_s = std::map<std::string, std::string>;
 #define i_key int
 #define i_val int
 #define i_tag i
-#include <stc/csmap.h>
+#include "stc/csmap.h"
 
 #define i_key size_t
 #define i_val size_t
 #define i_tag x
-#include <stc/csmap.h>
+#include "stc/csmap.h"
 
 #define i_key_str
 #define i_val_str
-#include <stc/csmap.h>
+#include "stc/csmap.h"
 
 PICOBENCH_SUITE("Map1");
 

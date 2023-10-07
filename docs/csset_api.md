@@ -19,7 +19,7 @@ See the c++ class [std::set](https://en.cppreference.com/w/cpp/container/set) fo
 #define i_keyto <f>    // convertion func i_key* => i_keyraw - defaults to plain copy
 
 #define i_tag <s>      // alternative typename: csset_{i_tag}. i_tag defaults to i_key
-#include <stc/csset.h>
+#include "stc/csset.h"
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.
 
@@ -77,11 +77,11 @@ csset_X_value        csset_X_value_clone(csset_X_value val);
 ## Example
 ```c
 #define i_implement
-#include <stc/cstr.h>
+#include "stc/cstr.h"
 
 #define i_type SSet
 #define i_key_str
-#include <stc/csset.h>
+#include "stc/csset.h"
 
 int main(void)
 {

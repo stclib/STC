@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 #define i_key int
-#include <stc/csset.h>
+#include "stc/csset.h"
 
 int main(void)
 {

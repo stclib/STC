@@ -3,18 +3,18 @@
 #define i_key int
 #define i_val int
 #define i_tag ii  // Map of int => int
-#include <stc/csmap.h>
+#include "stc/csmap.h"
 
 #define i_implement
-#include <stc/cstr.h>
+#include "stc/cstr.h"
 #define i_key int
 #define i_val_str
 #define i_tag istr // Map of int => cstr
-#include <stc/csmap.h>
+#include "stc/csmap.h"
 
 #define i_key csmap_ii_raw
 #define i_tag ii
-#include <stc/cvec.h>
+#include "stc/cvec.h"
 
 void print_ii(csmap_ii map) {
     c_foreach (e, csmap_ii, map)

@@ -1,5 +1,5 @@
 #define i_implement
-#include <stc/cstr.h>
+#include "stc/cstr.h"
 
 typedef struct Viking {
     cstr name;
@@ -39,7 +39,7 @@ static inline RViking Viking_toraw(const Viking* vp) {
 #define i_opt       c_no_clone
 #define i_hash(rp)  stc_strhash(rp->name) ^ stc_strhash(rp->country)
 #define i_val       int         // mapped type
-#include <stc/cmap.h>
+#include "stc/cmap.h"
 
 int main(void)
 {

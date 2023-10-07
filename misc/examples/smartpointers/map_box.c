@@ -1,17 +1,17 @@
-#include <stc/ccommon.h>
+#include "stc/ccommon.h"
 #include <stdio.h>
 #define i_implement
-#include <stc/cstr.h>
+#include "stc/cstr.h"
 
 #define i_type IBox
 #define i_key long
-#include <stc/cbox.h> // unique_ptr<long> alike.
+#include "stc/cbox.h" // unique_ptr<long> alike.
 
 // cmap of cstr => IBox
 #define i_type Boxmap
 #define i_key_str
 #define i_val_arcbox IBox // i_val_arcbox: use properties from IBox automatically
-#include <stc/cmap.h>
+#include "stc/cmap.h"
 
 
 int main(void)

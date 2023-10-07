@@ -1,15 +1,15 @@
 #define i_implement
-#include <stc/cstr.h>
+#include "stc/cstr.h"
 
 #define i_key int
 #define i_val_str
 #define i_tag id   // Map of int => cstr
-#include <stc/cmap.h>
+#include "stc/cmap.h"
 
 #define i_key_str
 #define i_val int
 #define i_tag cnt  // Map of cstr => int
-#include <stc/cmap.h>
+#include "stc/cmap.h"
 
 typedef struct {int x, y;} ipair_t;
 inline static int ipair_cmp(const ipair_t* a, const ipair_t* b) {
@@ -21,16 +21,16 @@ inline static int ipair_cmp(const ipair_t* a, const ipair_t* b) {
 #define i_key ipair_t
 #define i_cmp ipair_cmp
 #define i_tag ip
-#include <stc/cvec.h>
+#include "stc/cvec.h"
 
 #define i_key ipair_t
 #define i_cmp ipair_cmp
 #define i_tag ip
-#include <stc/clist.h>
+#include "stc/clist.h"
 
 #define i_key float
 #define i_tag f
-#include <stc/cpque.h>
+#include "stc/cpque.h"
 
 int main(void)
 {

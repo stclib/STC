@@ -5,7 +5,7 @@
 
 ### c_foreach, c_forpair
 ```c
-#include <stc/ccommon.h>
+#include "stc/ccommon.h"
 ```
 
 | Usage                                    | Description                               |
@@ -18,7 +18,7 @@
 #define i_key int
 #define i_val int
 #define i_tag ii
-#include <stc/csmap.h>
+#include "stc/csmap.h"
 ...
 csmap_ii map = c_init(csmap_ii, { {23,1}, {3,2}, {7,3}, {5,4}, {12,5} });
 
@@ -130,7 +130,7 @@ Iterate a container or a crange with chained `&&` filtering.
 
 [ [Run this example](https://godbolt.org/z/exqYEK6qa) ]
 ```c
-#include <stc/algorithm.h>
+#include "stc/algorithm.h"
 #include <stdio.h>
 
 bool isPrime(long long i) {
@@ -165,11 +165,11 @@ Note that `c_flt_take()` and `c_flt_takewhile()` breaks the loop on false.
 Make any container from an initializer list:
 ```c
 #define i_key_str // owned cstr string value type
-#include <stc/cset.h>
+#include "stc/cset.h"
 
 #define i_key int
 #define i_val int
-#include <stc/cmap.h>
+#include "stc/cmap.h"
 ...
 // Initializes with const char*, internally converted to cstr!
 cset_str myset = c_init(cset_str, {"This", "is", "the", "story"});
@@ -213,7 +213,7 @@ You may customize `i_tag` and the comparison function `i_cmp` or `i_less`.
 There is a [benchmark/test file here](../misc/benchmarks/various/csort_bench.c).
 ```c
 #define i_key int
-#include <stc/algo/sort.h>
+#include "stc/algo/sort.h"
 #include <stdio.h>
 
 int main(void) {
@@ -228,8 +228,8 @@ possible and very fast. Note that `i_more` must be defined to retain specified t
 #define i_type MyDeq
 #define i_key int
 #define i_more
-#include <stc/cdeq.h> // deque
-#include <stc/algo/sort.h>
+#include "stc/cdeq.h" // deque
+#include "stc/algo/sort.h"
 #include <stdio.h>
 
 int main(void) {
@@ -245,7 +245,7 @@ int main(void) {
 - `c_new(Type, val)` - Allocate *and init* a new object on the heap
 - `c_delete(Type, ptr)` - Drop *and free* an object allocated on the heap. NULL is OK.
 ```c
-#include <stc/cstr.h>
+#include "stc/cstr.h"
 
 cstr *str_p = c_new(cstr, cstr_from("Hello"));
 printf("%s\n", cstr_str(str_p));
@@ -359,10 +359,10 @@ return ok;
 ```c
 #include <errno.h>
 #define i_implement
-#include <stc/cstr.h>
+#include "stc/cstr.h"
 
 #define i_key_str
-#include <stc/cvec.h>
+#include "stc/cvec.h"
 
 // receiver should check errno variable
 cvec_str readFile(const char* name)

@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <math.h>
 #include <time.h>
-#include <stc/cbits.h>
-#include <stc/algorithm.h>
+#include "stc/cbits.h"
+#include "stc/algorithm.h"
 
 typedef long long llong;
 

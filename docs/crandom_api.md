@@ -30,7 +30,7 @@ correlation tests. The 16- and 32-bit variants also passes PractRand up to their
 
 All crand definitions and prototypes are available by including a single header file.
 ```c
-#include <stc/crand.h>
+#include "stc/crand.h"
 ```
 
 ## Methods
@@ -61,15 +61,15 @@ double              crand_normal(crand_t* rng, crand_normal_t* dist);
 ## Example
 ```c
 #include <time.h>
-#include <stc/crand.h>
+#include "stc/crand.h"
 #define i_implement
-#include <stc/cstr.h>
+#include "stc/cstr.h"
 
 // Declare int -> int sorted map. Uses typetag 'i' for ints.
 #define i_key int
 #define i_val intptr_t
 #define i_tag i
-#include <stc/csmap.h>
+#include "stc/csmap.h"
 
 int main(void)
 {

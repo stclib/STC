@@ -1,5 +1,5 @@
 #define i_import
-#include <stc/cregex.h>
+#include "stc/cregex.h"
 
 int main(void)
 {

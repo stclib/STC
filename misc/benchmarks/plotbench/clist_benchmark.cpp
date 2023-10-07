@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <time.h>
 #define i_static
-#include <stc/crand.h>
+#include "stc/crand.h"
 
 #ifdef __cplusplus
 #include <forward_list>
@@ -19,7 +19,7 @@ static float secs(Range s) { return (float)(s.t2 - s.t1) / CLOCKS_PER_SEC; }
 
 #define i_val size_t
 #define i_tag x
-#include <stc/clist.h>
+#include "stc/clist.h"
 
 #ifdef __cplusplus
 Sample test_std_forward_list() {

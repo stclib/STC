@@ -3,8 +3,8 @@
 #include <time.h>
 #include <stdio.h>
 #define i_static
-#include <stc/cstr.h>
-#include <stc/coroutine.h>
+#include "stc/cstr.h"
+#include "stc/coroutine.h"
 
 cco_task_struct (next_value,
     int val;

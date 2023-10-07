@@ -4,7 +4,7 @@
 #define i_val uint64_t
 #define i_tag u64
 #define i_max_load_factor 0.8f
-#include <stc/cmap.h>
+#include "stc/cmap.h"
 
 uint64_t romu_rotl(uint64_t val, uint32_t r) {
     return (val << r) | (val >> (64 - r));

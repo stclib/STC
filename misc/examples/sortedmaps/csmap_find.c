@@ -1,16 +1,16 @@
 // This implements the c++ std::map::find example at:
 // https://docs.microsoft.com/en-us/cpp/standard-library/map-class?view=msvc-160#example-17
 #define i_implement
-#include <stc/cstr.h>
+#include "stc/cstr.h"
 
 #define i_key int
 #define i_val_str
 #define i_tag istr
-#include <stc/csmap.h>
+#include "stc/csmap.h"
 
 #define i_key csmap_istr_raw
 #define i_tag istr
-#include <stc/cvec.h>
+#include "stc/cvec.h"
 
 void print_elem(csmap_istr_raw p) {
     printf("(%d, %s) ", p.first, p.second);

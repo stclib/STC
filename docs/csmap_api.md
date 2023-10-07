@@ -33,7 +33,7 @@ See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) fo
 #define i_valto <f>    // convertion func i_val* => i_valraw
 
 #define i_tag <s>      // alternative typename: csmap_{i_tag}. i_tag defaults to i_val
-#include <stc/csmap.h>
+#include "stc/csmap.h"
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.
 
@@ -104,10 +104,10 @@ void                  csmap_X_value_drop(csmap_X_value* pval);
 ## Examples
 ```c
 #define i_implement
-#include <stc/cstr.h>
+#include "stc/cstr.h"
 #define i_key_str // special macro for i_key = cstr, i_tag = str
 #define i_val_str // ditto
-#include <stc/csmap.h>
+#include "stc/csmap.h"
 
 int main(void)
 {
@@ -152,11 +152,11 @@ Translate a
 [ [Run this code](https://godbolt.org/z/o6qqsE9K9) ]
 ```c
 #define i_implement
-#include <stc/cstr.h>
+#include "stc/cstr.h"
 #define i_type strmap
 #define i_key_str
 #define i_val_str
-#include <stc/csmap.h>
+#include "stc/csmap.h"
  
 static void print_node(const strmap_value* node) {
     printf("[%s] = %s\n", cstr_str(&node->first), cstr_str(&node->second));
@@ -185,12 +185,12 @@ int main(void)
 This example uses a csmap with cstr as mapped value.
 ```c
 #define i_implement
-#include <stc/cstr.h>
+#include "stc/cstr.h"
 
 #define i_type IDSMap
 #define i_key int
 #define i_val_str
-#include <stc/csmap.h>
+#include "stc/csmap.h"
 
 int main(void)
 {
@@ -235,7 +235,7 @@ static int Vec3i_cmp(const Vec3i* a, const Vec3i* b) {
 #define i_val int
 #define i_cmp Vec3i_cmp
 #define i_tag vi
-#include <stc/csmap.h>
+#include "stc/csmap.h"
 #include <stdio.h>
 
 int main(void)

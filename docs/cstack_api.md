@@ -18,7 +18,7 @@ See the c++ class [std::stack](https://en.cppreference.com/w/cpp/container/stack
 #define i_keyto <f>    // convertion func i_key* => i_keyraw
 
 #define i_tag <s>      // alternative typename: cstack_{i_tag}. i_tag defaults to i_key
-#include <stc/cstack.h>
+#include "stc/cstack.h"
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.
 
@@ -74,7 +74,7 @@ void                cstack_X_value_drop(cvec_X_value* pval);
 ```c
 #define i_type IStack
 #define i_key int
-#include <stc/cstack.h>
+#include "stc/cstack.h"
 
 #include <stdio.h>
 

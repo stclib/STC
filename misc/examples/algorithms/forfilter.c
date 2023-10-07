@@ -1,13 +1,13 @@
 #include <stdio.h>
 #define i_import
-#include <stc/cstr.h>
+#include "stc/cstr.h"
 #define i_implement
-#include <stc/csview.h>
-#include <stc/algorithm.h>
+#include "stc/csview.h"
+#include "stc/algorithm.h"
 
 #define i_type IVec
 #define i_key int
-#include <stc/cstack.h>
+#include "stc/cstack.h"
 
 // filters and transforms:
 #define flt_skipValue(i, x) (*i.ref != (x))
@@ -83,7 +83,7 @@ fn main() {
 */
 #define i_type SVec
 #define i_key_class csview
-#include <stc/cstack.h>
+#include "stc/cstack.h"
 
 void demo3(void)
 {

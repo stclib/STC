@@ -23,8 +23,8 @@
 
 /*
 #define i_implement
-#include <stc/cstr.h>
-#include <stc/forward.h>
+#include "stc/cstr.h"
+#include "stc/forward.h"
 
 forward_cvec(cvec_i32, int);
 
@@ -34,15 +34,15 @@ struct MyStruct {
 } typedef MyStruct;
 
 #define i_key float
-#include <stc/cvec.h>
+#include "stc/cvec.h"
 
 #define i_key_str // special for cstr
-#include <stc/cvec.h>
+#include "stc/cvec.h"
 
 #define i_key int
 #define i_is_forward
 #define i_tag i32
-#include <stc/cvec.h>
+#include "stc/cvec.h"
 
 int main(void) {
     cvec_i32 vec = {0};

@@ -2,8 +2,8 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <stc/ccommon.h>
-#include <stc/priv/linkage.h>
+#include "stc/ccommon.h"
+#include "stc/priv/linkage.h"
 
 #define DYN_CAST(T, s) \
     (&T##_api == (s)->api ? (T*)(s) : (T*)0)
@@ -79,7 +79,7 @@ struct ShapeAPI Triangle_api = {
 
 #define i_type PointVec 
 #define i_key Point
-#include <stc/cstack.h>
+#include "stc/cstack.h"
 
 typedef struct {
     Shape shape;
@@ -127,7 +127,7 @@ struct ShapeAPI Polygon_api = {
 #define i_key Shape*
 #define i_keydrop(x) Shape_delete(*x)
 #define i_no_clone
-#include <stc/cstack.h>
+#include "stc/cstack.h"
 
 void testShape(const Shape* shape)
 {

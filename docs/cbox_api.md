@@ -31,7 +31,7 @@ See similar c++ class [std::unique_ptr](https://en.cppreference.com/w/cpp/memory
 #define i_key_class <t>  // Use instead of i_key when functions {i_key}_clone, 
                         // {i_key}_drop and {i_keyraw}_cmp exist.
 #define i_key_arcbox <t>  // Use instead of i_key when key is a carc- or a cbox-type.
-#include <stc/cbox.h>    
+#include "stc/cbox.h"    
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.
 Unless `c_use_cmp` is defined, comparison between i_key's is not needed/available. Will then
@@ -85,15 +85,15 @@ void int_drop(int* x) {
 #define i_key int
 #define i_keydrop int_drop    // optional func, just to display elements destroyed
 #define i_keyclone(x) x       // must specified when i_keydrop is defined.
-#include <stc/cbox.h>
+#include "stc/cbox.h"
 
 #define i_type ISet
 #define i_key_arcbox IBox       // NB: use i_key_arcbox instead of i_key
-#include <stc/csset.h>        // ISet : std::set<std::unique_ptr<int>>
+#include "stc/csset.h>        // ISet : std::set<std::unique_ptr<int>"
 
 #define i_type IVec
 #define i_key_arcbox IBox       // NB: use i_key_arcbox instead of i_key
-#include <stc/cvec.h>         // IVec : std::vector<std::unique_ptr<int>>
+#include "stc/cvec.h>         // IVec : std::vector<std::unique_ptr<int>"
 
 int main(void)
 {

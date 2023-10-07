@@ -1,10 +1,10 @@
 // https://doc.rust-lang.org/rust-by-example/std/hash.html
 #define i_implement
-#include <stc/cstr.h>
+#include "stc/cstr.h"
 #define i_key_str
 #define i_val_str
 #include <stdio.h>
-#include <stc/cmap.h>
+#include "stc/cmap.h"
 
 const char* call(const char* number) {
     if (!strcmp(number, "798-1364"))

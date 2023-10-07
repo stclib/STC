@@ -1,5 +1,5 @@
 #define i_implement
-#include <stc/cstr.h>
+#include "stc/cstr.h"
 
 void stringdemo1(void)
 {
@@ -30,7 +30,7 @@ void stringdemo1(void)
 
 #define i_key long long
 #define i_tag ll
-#include <stx/vec.h>
+#include "stx/vec.h"
 
 void vectordemo1(void)
 {
@@ -54,7 +54,7 @@ void vectordemo1(void)
 
 #define i_key_str
 #define i_use_cmp
-#include <stx/vec.h>
+#include "stx/vec.h"
 
 void vectordemo2(void)
 {
@@ -75,7 +75,7 @@ void vectordemo2(void)
 
 #define i_key int
 #define i_use_cmp
-#include <stx/list.h>
+#include "stx/list.h"
 
 void listdemo1(void)
 {
@@ -106,7 +106,7 @@ void listdemo1(void)
 }
 
 #define i_key int
-#include <stx/hset.h>
+#include "stx/hset.h"
 
 void setdemo1(void)
 {
@@ -122,7 +122,7 @@ void setdemo1(void)
 #define i_key int
 #define i_val int
 #define i_tag ii
-#include <stx/hmap.h>
+#include "stx/hmap.h"
 
 void mapdemo1(void)
 {
@@ -136,7 +136,7 @@ void mapdemo1(void)
 #define i_key_str
 #define i_val int
 #define i_tag si
-#include <stx/hmap.h>
+#include "stx/hmap.h"
 
 void mapdemo2(void)
 {
@@ -158,7 +158,7 @@ void mapdemo2(void)
 
 #define i_key_str
 #define i_val_str
-#include <stx/hmap.h>
+#include "stx/hmap.h"
 
 void mapdemo3(void)
 {

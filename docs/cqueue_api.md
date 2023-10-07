@@ -17,7 +17,7 @@ See the c++ class [std::queue](https://en.cppreference.com/w/cpp/container/queue
 #define i_keyto <f>    // convertion func i_key* => i_keyraw
 
 #define i_tag <s>      // alternative typename: cqueue_{i_tag}. i_tag defaults to i_key
-#include <stc/cqueue.h>
+#include "stc/cqueue.h"
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.
 
@@ -71,7 +71,7 @@ void                cqueue_X_value_drop(cqueue_X_value* pval);
 ```c
 #define i_key int
 #define i_tag i
-#include <stc/cqueue.h>
+#include "stc/cqueue.h"
 
 #include <stdio.h>
 

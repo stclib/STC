@@ -152,7 +152,7 @@ including the container.
 ```c
 #define i_type Floats  // Container type name (optional); if not defined name would be cvec_float
 #define i_key float    // Container element type
-#include <stc/cvec.h>  // "instantiate" the desired container type
+#include "stc/cvec.h"  // "instantiate" the desired container type
 #include <stdio.h>
 
 int main(void)
@@ -179,7 +179,7 @@ Switching to a different container type, e.g. a sorted set (csset):
 ```c
 #define i_type Floats
 #define i_key float
-#include <stc/csset.h> // Use a sorted set instead
+#include "stc/csset.h" // Use a sorted set instead
 #include <stdio.h>
 
 int main(void)
@@ -213,11 +213,11 @@ Let's make a vector of vectors, which can be cloned. All of its element vectors 
 
 #define i_type Vec
 #define i_key float
-#include <stc/cvec.h>
+#include "stc/cvec.h"
 
 #define i_type Vec2D
 #define i_key_class Vec  // Use i_key_class instead i_key when element type has "members" _clone(), _drop() and _cmp().
-#include <stc/cvec.h>
+#include "stc/cvec.h"
 
 int main(void)
 {
@@ -247,22 +247,22 @@ This example uses four different container types:
 #include <stdio.h>
 
 #define i_key int
-#include <stc/cset.h>  // cset_int: unordered set (assume i_key is basic type, uses `==` operator)
+#include "stc/cset.h"  // cset_int: unordered set (assume i_key is basic type, uses `==` operator)
 
 struct Point { float x, y; };
 // Define cvec_pnt with a less-comparison function for Point.
 #define i_key struct Point
 #define i_less(a, b) a->x < b->x || (a->x == b->x && a->y < b->y) // enable sort/search
 #define i_tag pnt
-#include <stc/cvec.h>   // cvec_pnt: vector of struct Point
+#include "stc/cvec.h"   // cvec_pnt: vector of struct Point
 
 #define i_key int
 #define i_use_cmp       // enable sort/search. Use native `<` and `==` operators
-#include <stc/clist.h>  // clist_int: singly linked list
+#include "stc/clist.h"  // clist_int: singly linked list
 
 #define i_key int
 #define i_val int
-#include <stc/csmap.h>  // csmap_int: sorted map int => int
+#include "stc/csmap.h>  // csmap_int: sorted map int =" int
 
 int main(void)
 {
@@ -456,10 +456,10 @@ definitions for cstr container elements, so they are fail-safe to use both with 
 and non-emplace methods:
 ```c
 #define i_implement     // define in ONE file to implement longer functions in cstr
-#include <stc/cstr.h>
+#include "stc/cstr.h"
 
 #define i_key_str       // special macro to enable container of cstr
-#include <stc/cvec.h>   // vector of string (cstr)
+#include "stc/cvec.h"   // vector of string (cstr)
 ...
 cvec_str vec = {0};
 cstr s = cstr_lit("a string literal");
@@ -519,7 +519,7 @@ Define `i_type` instead of `i_tag`:
 ```c
 #define i_type MyVec
 #define i_key int
-#include <stc/cvec.h>
+#include "stc/cvec.h"
 
 MyVec vec = {0};
 MyVec_push(&vec, 42);
@@ -547,7 +547,7 @@ Create a dedicated header for the container type instance:
 #define i_type PointVec
 #define i_val struct Point // NB! Element type must be complete at this point!
 #define i_header           // Do not implement, only expose API
-#include <stc/cvec.h>
+#include "stc/cvec.h"
 
 #endif
 ```
@@ -579,7 +579,7 @@ Implement PointVec in a c-file:
 // Dataset.h
 #ifndef Dataset_H_
 #define Dataset_H_
-#include <stc/forward.h>   // include various container data structure templates
+#include "stc/forward.h"   // include various container data structure templates
 
 // declare PointVec. Note: struct Point may be an incomplete/undeclared type.
 forward_cvec(PointVec, struct Point);
@@ -602,7 +602,7 @@ Define and use the "private" container in the c-file:
 #define i_is_forward                      // flag that the container was forward declared. 
 #define i_type PointVec
 #define i_val struct Point
-#include <stc/cvec.h>                     // Implements PointVec with static linking by default
+#include "stc/cvec.h"                     // Implements PointVec with static linking by default
 ...
 ```
 ---
@@ -618,7 +618,7 @@ technique.
 
 The example below shows how to customize containers to work with PostgreSQL memory management.
 It adds a MemoryContext to each container by defining the `i_extend` template parameter followed
-the by inclusion of `<stc/extend.h>`.
+the by inclusion of `"stc/extend.h"`.
 ```c
 // stcpgs.h
 #define pgs_malloc(sz) MemoryContextAlloc(c_extend(self)->memctx, sz)
@@ -629,7 +629,7 @@ the by inclusion of `<stc/extend.h>`.
 #define i_allocator pgs
 #define i_no_clone
 #define i_extend MemoryContext memctx;
-#include <stc/extend.h>
+#include "stc/extend.h"
 ```
 To use it, define both `i_type` and `i_base` (the container type) before including the custom header:
 ```c
@@ -672,10 +672,10 @@ STC is generally very memory efficient. Memory usage for the different container
 ## Version 4.3
 - Breaking changes:
     - **cstr** and **csview** now uses *shared linking* by default. Implement by either defining `i_implement` or `i_static` before including.
-    - Renamed <stc/calgo.h> => `<stc/algorithm.h>`
-    - Moved <stc/algo/coroutine.h> => `<stc/coroutine.h>`
+    - Renamed "stc/calgo.h> => `<stc/algorithm.h"`
+    - Moved "stc/algo/coroutine.h> => `<stc/coroutine.h"`
         - Much improved with some new API and added features.
-    - Removed deprecated <stc/crandom.h>. Use `<stc/crand.h>` with the new API.
+    - Removed deprecated "stc/crandom.h>. Use `<stc/crand.h"` with the new API.
         - Reverted names _unif and _norm back to `_uniform` and `_normal`.
     - Removed default comparison for **clist**, **cvec** and **cdeq**:
         - Define `i_use_cmp` to enable comparison for built-in i_key types (<, ==).
@@ -685,8 +685,8 @@ STC is generally very memory efficient. Memory usage for the different container
 - **cspan**: Added **column-major** order (fortran) multidimensional spans and transposed views (changed representation of strides).
 - All new faster and smaller **cqueue** and **cdeq** implementations, using a circular buffer.
 - Renamed i_extern => `i_import` (i_extern deprecated).
-    - Define `i_import` before `#include <stc/cstr.h>` will also define full utf8 case conversions.
-    - Define `i_import` before `#include <stc/cregex.h>` will also define cstr + utf8 tables.
+    - Define `i_import` before `#include "stc/cstr.h"` will also define full utf8 case conversions.
+    - Define `i_import` before `#include "stc/cregex.h"` will also define cstr + utf8 tables.
 - Renamed c_make() => ***c_init()*** macro for initializing containers with element lists. c_make deprecated.
 - Removed deprecated uppercase flow-control macro names.
 - Other smaller additions, bug fixes and improved documentation.

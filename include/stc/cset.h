@@ -25,7 +25,7 @@
 /*
 #define i_tag sx
 #define i_key int
-#include <stc/cset.h>
+#include "stc/cset.h"
 #include <stdio.h>
 
 int main(void) {

@@ -19,7 +19,7 @@ All cstr definitions and prototypes are available by including a single header f
 
 ```c
 #define i_implement   // define this to implement many functions as shared symbols!
-#include <stc/cstr.h>
+#include "stc/cstr.h"
 ```
 
 ## Methods
@@ -165,7 +165,7 @@ char*       stc_strnstrn(const char* str, intptr_t slen, const char* needle, int
 ## Example
 ```c
 #define i_implement
-#include <stc/cstr.h>
+#include "stc/cstr.h"
 
 int main(void) {
     cstr s0, s1, full_path;

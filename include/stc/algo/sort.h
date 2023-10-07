@@ -29,7 +29,7 @@ template params:
 // ex1:
 #include <stdio.h>
 #define i_key int
-#include <stc/algo/sort.h>
+#include "stc/algo/sort.h"
 
 int main(void) {
     int nums[] = {23, 321, 5434, 25, 245, 1, 654, 33, 543, 21};
@@ -45,8 +45,8 @@ int main(void) {
 #define i_key int
 #define i_type IDeq
 #define i_more // retain input template params to be reused by sort.h
-#include <stc/cdeq.h>
-#include <stc/algo/sort.h>
+#include "stc/cdeq.h"
+#include "stc/algo/sort.h"
 
 int main(void) {
     IDeq nums = c_init(IDeq, {5434, 25, 245, 1, 654, 33, 543, 21});

@@ -25,7 +25,7 @@
 /*
 #define i_tag sx
 #define i_key int
-#include <stc/hset.h>
+#include "stc/hset.h"
 #include <stdio.h>
 
 int main(void) {

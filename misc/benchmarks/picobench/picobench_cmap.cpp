@@ -1,7 +1,7 @@
 #define i_static
-#include <stc/crand.h>
+#include "stc/crand.h"
 #define i_static
-#include <stc/cstr.h>
+#include "stc/cstr.h"
 #include <cmath>
 #include <string>
 #include <unordered_map>
@@ -34,18 +34,18 @@ DEFMAP(map_s, <std::string, std::string>);
 #define i_val int32_t
 #define i_tag i
 #define i_max_load_factor float(MaxLoadFactor100) / 100.0f
-#include <stc/cmap.h>
+#include "stc/cmap.h"
 
 #define i_key uint64_t
 #define i_val uint64_t
 #define i_tag x
 #define i_max_load_factor float(MaxLoadFactor100) / 100.0f
-#include <stc/cmap.h>
+#include "stc/cmap.h"
 
 #define i_key_str
 #define i_val_str
 #define i_max_load_factor float(MaxLoadFactor100) / 100.0f
-#include <stc/cmap.h>
+#include "stc/cmap.h"
 
 PICOBENCH_SUITE("Map1");
 

@@ -5,7 +5,7 @@ typedef struct Point { int x, y; } Point;
 #define i_type PointQ
 #define i_key Point
 #define i_less(a, b) a->x < b->x || (a->x == b->x && a->y < b->y)
-#include <stc/cpque.h>
+#include "stc/cpque.h"
 
 
 int main(void)

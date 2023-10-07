@@ -3,7 +3,7 @@
 
 #define i_type IList
 #define i_key int
-#include <stc/clist.h>
+#include "stc/clist.h"
 
 int main(void)
 {

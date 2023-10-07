@@ -1,12 +1,12 @@
 #include <stdio.h>
 #include <time.h>
 #define i_static
-#include <stc/crand.h>
+#include "stc/crand.h"
 
 #define i_val float
 #define i_cmp -c_default_cmp
 #define i_tag f
-#include <stc/cpque.h>
+#include "stc/cpque.h"
 
 #include <queue>
 

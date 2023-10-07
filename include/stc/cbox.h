@@ -24,8 +24,8 @@
 
 /* cbox: heap allocated boxed type
 #define i_implement
-#include <stc/cstr.h>
-#include <stc/algo/raii.h> // c_auto
+#include "stc/cstr.h"
+#include "stc/algo/raii.h" // c_auto
 
 typedef struct { cstr name, email; } Person;
 
@@ -44,7 +44,7 @@ void Person_drop(Person* p) {
 
 #define i_type PBox
 #define i_val_class Person // bind Person clone+drop fn's
-#include <stc/cbox.h>
+#include "stc/cbox.h"
 
 int main(void) {
     c_auto (PBox, p, q)

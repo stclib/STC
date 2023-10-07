@@ -2,7 +2,7 @@
 
 #define i_key int
 #define i_tag i
-#include <stc/clist.h>
+#include "stc/clist.h"
 
 void print_ilist(const char* s, clist_i list)
 {

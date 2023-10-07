@@ -5,10 +5,10 @@
 
 enum{ N=1<<22 }; // 4.2 mill.
 #define i_static
-#include <stc/crand.h>
+#include "stc/crand.h"
 #define i_type cbits
 #define i_len N
-#include <stc/cbits.h>
+#include "stc/cbits.h"
 
 inline unsigned long get_time_in_ms()
 {

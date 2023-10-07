@@ -2,7 +2,7 @@
 #include <iostream>
 #include <ctime>
 #include <random>
-#include <stc/crand.h>
+#include "stc/crand.h"
 
 static inline uint64_t rotl64(const uint64_t x, const int k)
   { return (x << k) | (x >> (64 - k)); }

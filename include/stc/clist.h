@@ -26,11 +26,11 @@
     it also support both push_back() and push_front(), unlike std::forward_list:
 
     #include <stdio.h>
-    #include <stc/crand.h>
+    #include "stc/crand.h"
 
     #define i_key int64_t
     #define i_tag ix
-    #include <stc/clist.h>
+    #include "stc/clist.h"
 
     int main(void)
     {

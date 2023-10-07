@@ -21,14 +21,14 @@
 
 // Program to emulates the phone book.
 #define i_implement
-#include <stc/cstr.h>
+#include "stc/cstr.h"
 
 #define i_key_str
 #define i_val_str
-#include <stc/cmap.h>
+#include "stc/cmap.h"
 
 #define i_key_str
-#include <stc/cset.h>
+#include "stc/cset.h"
 
 void print_phone_book(cmap_str phone_book)
 {

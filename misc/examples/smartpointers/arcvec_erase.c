@@ -6,12 +6,12 @@ void show_drop(int* x) { printf("drop: %d\n", *x); }
 #define i_key int
 #define i_keydrop show_drop
 #define i_use_cmp           // enable sort/search for int type
-#include <stc/carc.h>       // Shared pointer to int
+#include "stc/carc.h"       // Shared pointer to int
 
 #define i_type Vec
 #define i_key_arcbox Arc
 #define i_use_cmp
-#include <stc/cvec.h>       // Vec: cvec<Arc>
+#include "stc/cvec.h"       // Vec: cvec<Arc>
 
 
 int main(void)

@@ -9,8 +9,8 @@
 #define i_type Ints
 #define i_key int
 #define i_more
-#include <stc/cvec.h>
-#include <stc/algo/sort.h>
+#include "stc/cvec.h"
+#include "stc/algo/sort.h"
 
 #define ROTL(d,bits) ((d<<(bits)) | (d>>(8*sizeof(d)-(bits))))
 uint64_t romutrio(uint64_t s[3]) {

@@ -1,14 +1,14 @@
 #include <stdio.h>
-#include <stc/algorithm.h>
+#include "stc/algorithm.h"
 
 #define i_type IVec
 #define i_key int
-#include <stc/cstack.h>
+#include "stc/cstack.h"
 
 #define i_type IMap
 #define i_key int
 #define i_val int
-#include <stc/cmap.h>
+#include "stc/cmap.h"
 
 
 int main(void)

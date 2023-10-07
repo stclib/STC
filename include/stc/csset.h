@@ -27,7 +27,7 @@
 
 #define i_tag i
 #define i_key int
-#include <stc/csset.h> // sorted set of int
+#include "stc/csset.h" // sorted set of int
 
 int main(void) {
     csset_i s = csset_i_init();

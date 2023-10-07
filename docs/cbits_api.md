@@ -14,7 +14,7 @@ All cbits definitions and prototypes are available by including a single header 
 ```c
 #define i_len N        // if defined, the bitset will be fixed-size of N bits on the stack.
 #define i_type name    // optional, specifies the name of the bitset type. Default to cbits or cbitsN
-#include <stc/cbits.h>
+#include "stc/cbits.h"
 ```
 ## Methods
 
@@ -65,7 +65,7 @@ void        cbits_xor(cbits* self, const cbits* other);             // set of di
 ## Example
 ```c
 #define i_implement // force shared implementation of some cbits functionn.
-#include <stc/cbits.h>
+#include "stc/cbits.h"
 #include <stdio.h>
 #include <math.h>
 #include <time.h>

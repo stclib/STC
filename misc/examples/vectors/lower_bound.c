@@ -2,10 +2,10 @@
 
 #define i_key int
 #define i_use_cmp
-#include <stc/cvec.h>
+#include "stc/cvec.h"
 
 #define i_key int
-#include <stc/csset.h>
+#include "stc/csset.h"
 
 int main(void)
 {

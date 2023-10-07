@@ -1,12 +1,12 @@
 // https://www.youtube.com/watch?v=8sEe-4tig_A
 #include <stdio.h>
-#include <stc/coroutine.h>
+#include "stc/coroutine.h"
 
 #define i_type cco_tasks
 #define i_key cco_task*
 #define i_keydrop(x) { puts("free task"); free(*x); }
 #define i_no_clone
-#include <stc/cqueue.h>
+#include "stc/cqueue.h"
 
 typedef struct {
     cco_tasks tasks;

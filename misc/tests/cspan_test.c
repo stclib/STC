@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <stc/cspan.h>
+#include "stc/cspan.h"
 #include "ctest.h"
 
 using_cspan3(intspan, int);
@@ -44,7 +44,7 @@ CTEST(cspan, slice) {
 }
 
 #define i_key int
-#include <stc/cstack.h>
+#include "stc/cstack.h"
 
 CTEST(cspan, slice2) {
     cstack_int stack = {0};
@@ -76,7 +76,7 @@ CTEST(cspan, slice2) {
 
 #define i_type Tiles
 #define i_key intspan3
-#include <stc/cstack.h>
+#include "stc/cstack.h"
 
 CTEST_FIXTURE(cspan_cube) {
     cstack_int stack;

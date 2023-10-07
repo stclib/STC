@@ -1,8 +1,8 @@
 #define i_implement
-#include <stc/cstr.h>
-#include <stc/algo/raii.h>
+#include "stc/cstr.h"
+#include "stc/algo/raii.h"
 #define i_key_str
-#include <stc/cvec.h>
+#include "stc/cvec.h"
 #include <errno.h>
 
 cvec_str read_file(const char* name)

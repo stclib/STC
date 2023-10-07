@@ -23,7 +23,7 @@
 
 /* carc: atomic reference counted shared_ptr
 #define i_implement
-#include <stc/cstr.h>
+#include "stc/cstr.h"
 
 typedef struct { cstr name, last; } Person;
 
@@ -43,7 +43,7 @@ void Person_drop(Person* p) {
 
 #define i_type ArcPers
 #define i_val_class Person    // clone, drop, cmp, hash
-#include <stc/carc.h>
+#include "stc/carc.h"
 
 int main(void) {
     ArcPers p = ArcPers_from(Person_make("John", "Smiths"));

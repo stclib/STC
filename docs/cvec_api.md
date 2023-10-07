@@ -24,7 +24,7 @@ See the c++ class [std::vector](https://en.cppreference.com/w/cpp/container/vect
 #define i_keyto <f>    // convertion func i_key* => i_keyraw
 
 #define i_tag <s>      // alternative typename: cvec_{i_tag}. i_tag defaults to i_key
-#include <stc/cvec.h>
+#include "stc/cvec.h"
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.
 
@@ -110,7 +110,7 @@ cvec_X_raw          cvec_X_value_drop(cvec_X_value* pval);
 ## Examples
 ```c
 #define i_key int
-#include <stc/cvec.h>
+#include "stc/cvec.h"
 
 #include <stdio.h>
 
@@ -150,10 +150,10 @@ sorted: 5 7 8 13 16 25
 ### Example 2
 ```c
 #define i_implement
-#include <stc/cstr.h>
+#include "stc/cstr.h"
 
 #define i_key_str
-#include <stc/cvec.h>
+#include "stc/cvec.h"
 
 int main(void) {
     cvec_str names = cvec_str_init();
@@ -187,7 +187,7 @@ item: 2 elements so far
 Container with elements of structs:
 ```c
 #define i_implement
-#include <stc/cstr.h>
+#include "stc/cstr.h"
 
 typedef struct {
     cstr name; // dynamic string
@@ -209,7 +209,7 @@ User User_clone(User user) {
 // Declare a managed, clonable vector of users.
 #define i_type UVec
 #define i_key_class User // User is a "class" as it has _cmp, _clone and _drop functions.
-#include <stc/cvec.h>
+#include "stc/cvec.h"
 
 int main(void) {
     UVec vec = {0};

@@ -1,6 +1,6 @@
 #define i_implement
-#include <stc/cstr.h>
-#include <stc/forward.h>
+#include "stc/cstr.h"
+#include "stc/forward.h"
 
 forward_cmap(cmap_pnt, struct Point, int);
 
@@ -12,7 +12,7 @@ typedef struct MyStruct {
 // int => int map
 #define i_key int
 #define i_val int
-#include <stc/cmap.h>
+#include "stc/cmap.h"
 
 // Point => int map
 typedef struct Point { int x, y; } Point;
@@ -29,16 +29,16 @@ int point_cmp(const Point* a, const Point* b) {
 #define i_hash c_default_hash
 #define i_is_forward
 #define i_tag pnt
-#include <stc/cmap.h>
+#include "stc/cmap.h"
 
 // cstr => cstr map
 #define i_key_str
 #define i_val_str
-#include <stc/cmap.h>
+#include "stc/cmap.h"
 
 // string set
 #define i_key_str
-#include <stc/cset.h>
+#include "stc/cset.h"
 
 
 int main(void)

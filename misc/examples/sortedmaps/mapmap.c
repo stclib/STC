@@ -1,19 +1,19 @@
 // create a structure like: std::map<std::string, std::map<std::string, std::string>>:
 #define i_implement
-#include <stc/cstr.h>
+#include "stc/cstr.h"
 
 // People: std::map<std::string, std::string>
 #define i_type People
 #define i_key_str // name
 #define i_val_str // email
 #define i_keydrop(p) (printf("kdrop: %s\n", cstr_str(p)), cstr_drop(p)) // override
-#include <stc/cmap.h>
+#include "stc/cmap.h"
 
 // Departments: std::map<std::string, People>
 #define i_type Departments
 #define i_key_str // dep. name
 #define i_val_class People
-#include <stc/cmap.h>
+#include "stc/cmap.h"
 
 
 void add(Departments* deps, const char* name, const char* email, const char* dep)

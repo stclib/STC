@@ -14,15 +14,15 @@ typedef struct {
 } Rectangle;
 
 #define i_key Point
-#include <stc/cbox.h> // cbox_Point
+#include "stc/cbox.h" // cbox_Point
 
 #define i_key Rectangle
-#include <stc/cbox.h> // cbox_Rectangle
+#include "stc/cbox.h" // cbox_Rectangle
 
 // Box in box:
 #define i_type BoxBoxPoint
 #define i_key_arcbox cbox_Point // NB: use i_key_arcbox when value is a cbox or carc!
-#include <stc/cbox.h> // BoxBoxPoint
+#include "stc/cbox.h" // BoxBoxPoint
 
 Point origin(void) {
     return c_LITERAL(Point){ .x=1.0, .y=2.0 };

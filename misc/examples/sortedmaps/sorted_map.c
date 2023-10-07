@@ -3,7 +3,7 @@
 #include <stdio.h>
 #define i_key int
 #define i_val int
-#include <stc/csmap.h>
+#include "stc/csmap.h"
 
 int main(void) 
 { 

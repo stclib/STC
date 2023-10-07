@@ -22,7 +22,7 @@ See the c++ class [std::deque](https://en.cppreference.com/w/cpp/container/deque
 #define i_keyto <f>    // convertion func i_key* => i_keyraw
 
 #define i_tag <s>      // alternative typename: cdeq_{i_tag}. i_tag defaults to i_key
-#include <stc/cdeq.h>
+#include "stc/cdeq.h"
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.
 
@@ -100,7 +100,7 @@ void                cdeq_X_value_drop(cdeq_X_value* pval);
 ```c
 #define i_key int
 #define i_tag i
-#include <stc/cdeq.h>
+#include "stc/cdeq.h"
 
 #include <stdio.h>
 

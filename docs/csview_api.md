@@ -25,8 +25,8 @@ All csview definitions and prototypes are available by including a single header
 
 ```c
 #define i_implement
-#include <stc/cstr.h>
-#include <stc/csview.h> // after cstr.h: include extra cstr-csview functions
+#include "stc/cstr.h"
+#include "stc/csview.h" // after cstr.h: include extra cstr-csview functions
 ```
 ## Methods
 
@@ -108,8 +108,8 @@ uint64_t       csview_hash(const csview* x);
 ## Example
 ```c
 #define i_implement
-#include <stc/cstr.h>
-#include <stc/csview.h>
+#include "stc/cstr.h"
+#include "stc/csview.h"
 
 int main(void)
 {
@@ -139,7 +139,7 @@ red Apples
 ### Example 2: UTF8 handling
 ```c
 #define i_import // include dependent cstr, utf8 and cregex function definitions.
-#include <stc/cstr.h>
+#include "stc/cstr.h"
 
 int main(void)
 {
@@ -165,7 +165,7 @@ Splits strings into tokens. *print_split()* makes **no** memory allocations or *
 and does not depend on null-terminated strings. *string_split()* function returns a vector of cstr.
 ```c
 #include <stdio.h>
-#include <stc/csview.h>
+#include "stc/csview.h"
 
 void print_split(csview input, const char* sep)
 {
@@ -174,9 +174,9 @@ void print_split(csview input, const char* sep)
     puts("");
 }
 #define i_implement
-#include <stc/cstr.h>
+#include "stc/cstr.h"
 #define i_key_str
-#include <stc/cstack.h>
+#include "stc/cstack.h"
 
 cstack_str string_split(csview input, const char* sep)
 {

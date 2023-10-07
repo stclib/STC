@@ -19,7 +19,7 @@ See the c++ class [std::priority_queue](https://en.cppreference.com/w/cpp/contai
 #define i_keyto <f>    // convertion func i_key* => i_keyraw.
 
 #define i_tag <s>      // alternative typename: cpque_{i_tag}. i_tag defaults to i_key
-#include <stc/cpque.h>
+#include "stc/cpque.h"
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.
 
@@ -60,13 +60,13 @@ i_key               cpque_X_value_clone(i_key value);
 
 ## Example
 ```c
-#include <stc/crand.h>
+#include "stc/crand.h"
 #include <stdio.h>
 
 #define i_key int64_t
 #define i_cmp -c_default_cmp // min-heap
 #define i_tag i
-#include <stc/cpque.h>
+#include "stc/cpque.h"
 
 int main(void)
 {

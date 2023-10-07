@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <time.h>
 #define i_static
-#include <stc/crand.h>
+#include "stc/crand.h"
 
 #ifdef __cplusplus
 #include <vector>
@@ -19,7 +19,7 @@ static float secs(Range s) { return (float)(s.t2 - s.t1) / CLOCKS_PER_SEC; }
 
 #define i_val size_t
 #define i_tag x
-#include <stc/cvec.h>
+#include "stc/cvec.h"
 
 #ifdef __cplusplus
 Sample test_std_vector() {

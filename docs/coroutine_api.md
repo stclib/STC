@@ -80,7 +80,7 @@ The first example is a generator of Pythagorian triples, and stops when diagonal
 
 [ [Run this code](https://godbolt.org/z/d5zW3f9Gv) ]
 ```c
-#include <stc/coroutine.h>
+#include "stc/coroutine.h"
 #include <stdio.h>
 #include <stdio.h>
 // https://quuxplusone.github.io/blog/2019/03/06/pythagorean-triples/
@@ -200,8 +200,8 @@ by awaiting a few seconds before producing a number, using a timer.
 #include <time.h>
 #include <stdio.h>
 #define i_static
-#include <stc/cstr.h>
-#include <stc/coroutine.h>
+#include "stc/cstr.h"
+#include "stc/coroutine.h"
 
 cco_task_struct (next_value,
     int val;

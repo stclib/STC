@@ -1,15 +1,15 @@
 #define i_implement
-#include <stc/cstr.h>
+#include "stc/cstr.h"
 
 #define i_key_str
 #define i_val_str
-#include <stc/cmap.h>
+#include "stc/cmap.h"
 
 #define i_key_str
-#include <stc/cvec.h>
+#include "stc/cvec.h"
 
 #define i_key_str
-#include <stc/clist.h>
+#include "stc/clist.h"
 
 int main(void)
 {

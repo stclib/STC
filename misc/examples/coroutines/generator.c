@@ -1,8 +1,8 @@
 // https://quuxplusone.github.io/blog/2019/03/06/pythagorean-triples/
 
 #include <stdio.h>
-#include <stc/coroutine.h>
-#include <stc/algorithm.h>
+#include "stc/coroutine.h"
+#include "stc/algorithm.h"
 
 typedef struct {
     int max_triples;

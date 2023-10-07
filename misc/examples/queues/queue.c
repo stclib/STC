@@ -1,9 +1,9 @@
-#include <stc/crand.h>
+#include "stc/crand.h"
 #include <stdio.h>
 
 #define i_key int
 #define i_tag i
-#include <stc/cqueue.h>
+#include "stc/cqueue.h"
 
 int main(void) {
     int n = 1000000;

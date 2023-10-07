@@ -33,7 +33,7 @@ See the c++ class [std::list](https://en.cppreference.com/w/cpp/container/list) 
 #define i_keyto <f>    // convertion func i_key* => i_keyraw
 #define i_keyfrom <f>  // convertion func i_keyraw => i_key
 #define i_tag <s>      // alternative typename: cpque_{i_tag}. i_tag defaults to i_key
-#include <stc/clist.h>
+#include "stc/clist.h"
 ```
 
 `X` should be replaced by the value of `i_tag` in all of the following documentation.
@@ -119,7 +119,7 @@ Interleave *push_front()* / *push_back()* then *sort()*:
 ```c
 #define i_type DList
 #define i_key double
-#include <stc/clist.h>
+#include "stc/clist.h"
 
 #include <stdio.h>
 
@@ -156,7 +156,7 @@ Use of *erase_at()* and *erase_range()*:
 // erasing from clist
 #define i_tag i
 #define i_key int
-#include <stc/clist.h>
+#include "stc/clist.h"
 
 #include <stdio.h>
 
@@ -191,7 +191,7 @@ Splice `[30, 40]` from *L2* into *L1* before `3`:
 ```c
 #define i_tag i
 #define i_key int
-#include <stc/clist.h>
+#include "stc/clist.h"
 
 #include <stdio.h>
 

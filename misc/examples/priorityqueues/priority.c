@@ -1,12 +1,12 @@
 
 #include <stdio.h>
 #include <time.h>
-#include <stc/crand.h>
+#include "stc/crand.h"
 
 #define i_key int64_t
 #define i_cmp -c_default_cmp  // min-heap (increasing values)
 #define i_tag i
-#include <stc/cpque.h>
+#include "stc/cpque.h"
 
 int main(void) {
     intptr_t N = 10000000;

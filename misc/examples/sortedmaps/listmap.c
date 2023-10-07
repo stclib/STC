@@ -3,16 +3,16 @@
 
 // Multimap entries
 #define i_implement
-#include <stc/cstr.h>
+#include "stc/cstr.h"
 #define i_key_str
-#include <stc/clist.h>
+#include "stc/clist.h"
 
 // Map of int => clist_str.
 #define i_type Multimap
 #define i_key int
 #define i_val_class clist_str // set i_val = clist_str, bind clist_str_clone and clist_str_drop
 #define i_cmp -c_default_cmp // like std::greater<int>
-#include <stc/csmap.h>
+#include "stc/csmap.h"
 
 void print(const char* lbl, const Multimap mmap)
 {

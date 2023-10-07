@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <stc/forward.h>
+#include "stc/forward.h"
 
 forward_clist(clist_i32, int);
 forward_clist(clist_pnt, struct Point);
@@ -12,7 +12,7 @@ typedef struct {
 #define i_key int
 #define i_tag i32
 #define i_is_forward
-#include <stc/clist.h>
+#include "stc/clist.h"
 
 typedef struct Point { int x, y; } Point;
 int point_cmp(const Point* a, const Point* b) {
@@ -24,18 +24,18 @@ int point_cmp(const Point* a, const Point* b) {
 #define i_cmp point_cmp
 #define i_is_forward
 #define i_tag pnt
-#include <stc/clist.h>
+#include "stc/clist.h"
 
 #define i_key float
 #define i_use_cmp               // use < and == operators for comparison 
-#include <stc/clist.h>
+#include "stc/clist.h"
 
 void MyStruct_drop(MyStruct* s);
 #define i_type MyList
 #define i_key MyStruct
 #define i_keydrop MyStruct_drop   // define drop function
 #define i_no_clone                // must explicitely exclude or define cloning support because of drop.
-#include <stc/clist.h>
+#include "stc/clist.h"
 
 void MyStruct_drop(MyStruct* s) {
     clist_i32_drop(&s->intlist);

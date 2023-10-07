@@ -2,13 +2,13 @@
 #include <time.h>
 
 #define i_implement
-#include <stc/cstr.h>
-#include <stc/crand.h>
+#include "stc/cstr.h"
+#include "stc/crand.h"
 
 // Declare int -> int sorted map.
 #define i_key int
 #define i_val int
-#include <stc/csmap.h>
+#include "stc/csmap.h"
 
 int main(void)
 {

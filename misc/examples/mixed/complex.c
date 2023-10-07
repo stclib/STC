@@ -6,25 +6,25 @@
 // using ListMap = std::unordered_map<int, std::forward_list<StackList>>;
 // using MapMap = std::unordered_map<std::string, ListMap>;
 #define i_implement
-#include <stc/cstr.h>
+#include "stc/cstr.h"
 
 #define i_type FloatStack
 #define i_key float
-#include <stc/cstack.h>
+#include "stc/cstack.h"
 
 #define i_type StackList
 #define i_key_class FloatStack  // "class" picks up _clone, _drop, _cmp
-#include <stc/clist.h>
+#include "stc/clist.h"
 
 #define i_type ListMap
 #define i_key int
 #define i_val_class StackList   // "class" picks up _clone, _drop
-#include <stc/cmap.h>
+#include "stc/cmap.h"
 
 #define i_type MapMap
 #define i_key_str
 #define i_val_class ListMap
-#include <stc/cmap.h>
+#include "stc/cmap.h"
 
 
 int main(void)

@@ -25,12 +25,12 @@
 /*
 #include <stdio.h>
 #define i_implement
-#include <stc/cstr.h>
+#include "stc/cstr.h"
 
 #define i_tag sx  // Sorted map<cstr, double>
 #define i_key_str
 #define i_val double
-#include <stc/csmap.h>
+#include "stc/csmap.h"
 
 int main(void) {
     csmap_sx m = {0};

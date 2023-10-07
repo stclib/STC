@@ -1,12 +1,12 @@
 #include <stdio.h>
 #include <time.h>
-#include <stc/algorithm.h>
-#include <stc/crand.h>
+#include "stc/algorithm.h"
+#include "stc/crand.h"
 
 #define i_type DList
 #define i_key double
 #define i_use_cmp
-#include <stc/clist.h>
+#include "stc/clist.h"
 
 int main(void) {
     const int n = 3000000;

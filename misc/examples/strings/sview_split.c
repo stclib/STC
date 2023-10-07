@@ -1,7 +1,7 @@
 #define i_implement
-#include <stc/cstr.h>
+#include "stc/cstr.h"
 #define i_implement
-#include <stc/csview.h>
+#include "stc/csview.h"
 
 int main(void)
 {

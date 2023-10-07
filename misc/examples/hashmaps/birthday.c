@@ -1,12 +1,12 @@
 #include <math.h>
 #include <stdio.h>
 #include <time.h>
-#include <stc/crand.h>
+#include "stc/crand.h"
 
 #define i_tag ic
 #define i_key uint64_t
 #define i_val int
-#include <stc/cmap.h>
+#include "stc/cmap.h"
 
 static uint64_t seed = 12345;
 
@@ -32,7 +32,7 @@ static void test_repeats(void)
 #define i_key uint32_t
 #define i_val uint64_t
 #define i_tag x
-#include <stc/cmap.h>
+#include "stc/cmap.h"
 
 void test_distribution(void)
 {

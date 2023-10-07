@@ -36,7 +36,7 @@ See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/contain
 #define i_valto <f>    // convertion func i_val* => i_valraw
 
 #define i_tag <s>      // alternative typename: cmap_{i_tag}. i_tag defaults to i_val
-#include <stc/cmap.h>
+#include "stc/cmap.h"
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.
 
@@ -116,11 +116,11 @@ bool                  c_memcmp_eq(const i_keyraw* a, const i_keyraw* b);    // !
 
 ```c
 #define i_implement
-#include <stc/cstr.h>
+#include "stc/cstr.h"
 
 #define i_key_str
 #define i_val_str
-#include <stc/cmap.h>
+#include "stc/cmap.h"
 
 int main(void)
 {
@@ -165,11 +165,11 @@ The HEX of color BLACK is:[#000000]
 This example uses a cmap with cstr as mapped value.
 ```c
 #define i_implement
-#include <stc/cstr.h>
+#include "stc/cstr.h"
 #define i_type IDMap
 #define i_key int
 #define i_val_str
-#include <stc/cmap.h>
+#include "stc/cmap.h"
 
 int main(void)
 {
@@ -212,7 +212,7 @@ typedef struct { int x, y, z; } Vec3i;
 #define i_val int
 #define i_eq c_memcmp_eq // bitwise equal, and use c_default_hash
 #define i_tag vi
-#include <stc/cmap.h>
+#include "stc/cmap.h"
 
 int main(void)
 {
@@ -247,7 +247,7 @@ typedef struct { int x, y, z; } Vec3i;
 #define i_key int
 #define i_val Vec3i
 #define i_tag iv
-#include <stc/cmap.h>
+#include "stc/cmap.h"
 
 int main(void)
 {
@@ -276,7 +276,7 @@ Output:
 Key type is struct.
 ```c
 #define i_implement
-#include <stc/cstr.h>
+#include "stc/cstr.h"
 
 typedef struct {
     cstr name;
@@ -308,7 +308,7 @@ static inline void Viking_drop(Viking* vk) {
 #define i_type Vikings
 #define i_key_class Viking
 #define i_val int
-#include <stc/cmap.h>
+#include "stc/cmap.h"
 
 int main(void)
 {
@@ -345,7 +345,7 @@ In this example we use rawtype feature to make it even simpler to use. Note that
 to add "raw" type entries (otherwise compile error):
 ```c
 #define i_implement
-#include <stc/cstr.h>
+#include "stc/cstr.h"
 
 typedef struct Viking {
     cstr name;
@@ -384,7 +384,7 @@ static inline RViking Viking_toraw(const Viking* vp) {
 #define i_opt       c_no_clone // disable map cloning
 #define i_hash(rp)  (stc_strhash(rp->name) ^ stc_strhash(rp->country))
 #define i_val       int
-#include <stc/cmap.h>
+#include "stc/cmap.h"
 
 int main(void)
 {

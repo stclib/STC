@@ -1,6 +1,6 @@
 #define i_implement
-#include <stc/cstr.h>
-#include <stc/forward.h>
+#include "stc/cstr.h"
+#include "stc/forward.h"
 
 forward_csmap(PMap, struct Point, int);
 
@@ -22,18 +22,18 @@ int point_cmp(const Point* a, const Point* b) {
 #define i_val int
 #define i_cmp point_cmp
 #define i_is_forward
-#include <stc/csmap.h>
+#include "stc/csmap.h"
 
 // cstr => cstr map
 #define i_type SMap
 #define i_key_str
 #define i_val_str
-#include <stc/csmap.h>
+#include "stc/csmap.h"
 
 // cstr set
 #define i_type SSet
 #define i_key_str
-#include <stc/csset.h>
+#include "stc/csset.h"
 
 
 int main(void)

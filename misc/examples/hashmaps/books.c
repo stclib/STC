@@ -1,9 +1,9 @@
 // https://doc.rust-lang.org/std/collections/struct.HashMap.html
 #define i_implement
-#include <stc/cstr.h>
+#include "stc/cstr.h"
 #define i_key_str
 #define i_val_str
-#include <stc/cmap.h>
+#include "stc/cmap.h"
 
 // Type inference lets us omit an explicit type signature (which
 // would be `HashMap<String, String>` in this example).

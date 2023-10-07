@@ -1,5 +1,5 @@
 #define i_implement
-#include <stc/cstr.h>
+#include "stc/cstr.h"
 
 typedef struct { cstr name, last; } Person;
 Person Person_make(const char* name, const char* last);
@@ -11,21 +11,21 @@ uint64_t Person_hash(const Person* p);
 #define i_type PersonArc
 #define i_key_class Person // "class" assume _clone, _drop, _cmp, _hash is defined.
 #define i_use_cmp
-#include <stc/carc.h>
+#include "stc/carc.h"
 
 #define i_type IPtr
 #define i_key int
 #define i_keydrop(x) printf("drop: %d\n", *x)
 #define i_use_cmp
-#include <stc/carc.h>
+#include "stc/carc.h"
 
 #define i_type IPStack
 #define i_key_arcbox IPtr
-#include <stc/cstack.h>
+#include "stc/cstack.h"
 
 #define i_type PASet
 #define i_key_arcbox PersonArc
-#include <stc/cset.h>
+#include "stc/cset.h"
 
 
 Person Person_make(const char* name, const char* last) {

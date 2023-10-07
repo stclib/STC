@@ -12,7 +12,7 @@
 // Note: i_less: c_extend() accessible for cpque types
 //       i_cmp: c_extend() accessible for csmap and csset types
 //       i_hash/i_eq: c_extend() accessible for cmap and cset types
-#include <stc/extend.h>
+#include "stc/extend.h"
 
 void print_queue(const char* name, IPQue_ext q) {
     // NB: make a clone because there is no way to traverse

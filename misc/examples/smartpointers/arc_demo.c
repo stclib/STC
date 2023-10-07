@@ -12,14 +12,14 @@ void int_drop(int* x) {
 #define i_key int
 #define i_keydrop int_drop  // optional, just to display the elements destroyed
 #define i_use_cmp           // use int comparison (x < y, x == y).
-#include <stc/carc.h>       // Arc
+#include "stc/carc.h"       // Arc
 
-#define i_key_arcbox Arc      // note: use i_key_arcbox instead of i_key for carc/cbox elements
-#include <stc/csset.h>      // csset_Arc (like: std::set<std::shared_ptr<int>>)
+#define i_key_arcbox Arc    // note: use i_key_arcbox instead of i_key for carc/cbox elements
+#include "stc/csset.h"      // csset_Arc (like: std::set<std::shared_ptr<int>>)
 
-#define i_key_arcbox Arc      // note: as above.
+#define i_key_arcbox Arc    // note: as above.
 #define i_use_cmp
-#include <stc/cvec.h>       // cvec_Arc (like: std::vector<std::shared_ptr<int>>)
+#include "stc/cvec.h"       // cvec_Arc (like: std::vector<std::shared_ptr<int>>)
 
 int main(void)
 {
