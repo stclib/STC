@@ -188,6 +188,9 @@ STC_INLINE intptr_t stc_nextpow2(intptr_t n) {
          ; _.it.ref && (_.key = &_.it.ref->first, _.val = &_.it.ref->second) \
          ; C##_next(&_.it))
 
+#define c_foriter(existing_it, C, cnt) \
+    for (existing_it = C##_begin(&cnt); (existing_it).ref; C##_next(&existing_it))
+
 #define c_forrange(...) c_MACRO_OVERLOAD(c_forrange, __VA_ARGS__)
 #define c_forrange_1(stop) c_forrange_3(_i, 0, stop)
 #define c_forrange_2(i, stop) c_forrange_3(i, 0, stop)
