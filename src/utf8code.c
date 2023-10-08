@@ -462,10 +462,10 @@ static const URange16 Latin_range16[] = {
 #define UNI_ENTRY(Code) \
     { Code##_range16, sizeof(Code##_range16)/sizeof(URange16) }
 #ifdef __cplusplus
-#define _e_arg(k, v) v
+    #define _e_arg(k, v) v
 #else
-#define _e_arg(k, v) [k] = v
-static
+    #define _e_arg(k, v) [k] = v
+    static
 #endif
 const UGroup _utf8_unicode_groups[U8G_SIZE] = {
     _e_arg(U8G_Cc, UNI_ENTRY(Cc)),

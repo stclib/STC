@@ -25,6 +25,49 @@
 
 #include <ctype.h>
 
+// The following functions assume valid utf8 strings:
+
+/* number of bytes in the utf8 codepoint from s */
+STC_INLINE int utf8_chr_size(const char *s) {
+    unsigned b = (uint8_t)*s;
+    if (b < 0x80) return 1;
+    /*if (b < 0xC2) return 0;*/
+    if (b < 0xE0) return 2;
+    if (b < 0xF0) return 3;
+    /*if (b < 0xF5)*/ return 4;
+    /*return 0;*/
+}
+
+/* number of codepoints in the utf8 string s */
+STC_INLINE intptr_t utf8_size(const char *s) {
+    intptr_t size = 0;
+    while (*s)
+        size += (*++s & 0xC0) != 0x80;
+    return size;
+}
+
+STC_INLINE intptr_t utf8_size_n(const char *s, intptr_t nbytes) {
+    intptr_t size = 0;
+    while ((nbytes-- != 0) & (*s != 0)) {
+        size += (*++s & 0xC0) != 0x80;
+    }
+    return size;
+}
+
+STC_INLINE const char* utf8_at(const char *s, intptr_t index) {
+    while ((index > 0) & (*s != 0))
+        index -= (*++s & 0xC0) != 0x80;
+    return s;
+}
+
+STC_INLINE intptr_t utf8_pos(const char* s, intptr_t index)
+    { return (intptr_t)(utf8_at(s, index) - s); }
+
+// ------------------------------------------------------
+// The following utf8 function depends on src/utf8code.c.
+// To call them, either define i_import before including
+// one of cstr, csview crawstr, or link with src/libstc.o.
+
 enum {
     U8G_Cc, U8G_Lt, U8G_Nd, U8G_Nl,
     U8G_Pc, U8G_Pd, U8G_Pf, U8G_Pi,
@@ -35,7 +78,6 @@ enum {
     U8G_SIZE
 };
 
-// utf8 methods defined in src/utf8code.c:
 extern bool     utf8_isgroup(int group, uint32_t c); 
 extern bool     utf8_isalpha(uint32_t c);
 extern uint32_t utf8_casefold(uint32_t c);
@@ -94,43 +136,5 @@ STC_INLINE int utf8_icmp(const char* s1, const char* s2) {
 STC_INLINE bool utf8_valid(const char* s) {
     return utf8_valid_n(s, INTPTR_MAX);
 }
-
-/* following functions are independent but assume valid utf8 strings: */
-
-/* number of bytes in the utf8 codepoint from s */
-STC_INLINE int utf8_chr_size(const char *s) {
-    unsigned b = (uint8_t)*s;
-    if (b < 0x80) return 1;
-    /*if (b < 0xC2) return 0;*/
-    if (b < 0xE0) return 2;
-    if (b < 0xF0) return 3;
-    /*if (b < 0xF5)*/ return 4;
-    /*return 0;*/
-}
-
-/* number of codepoints in the utf8 string s */
-STC_INLINE intptr_t utf8_size(const char *s) {
-    intptr_t size = 0;
-    while (*s)
-        size += (*++s & 0xC0) != 0x80;
-    return size;
-}
-
-STC_INLINE intptr_t utf8_size_n(const char *s, intptr_t nbytes) {
-    intptr_t size = 0;
-    while ((nbytes-- != 0) & (*s != 0)) {
-        size += (*++s & 0xC0) != 0x80;
-    }
-    return size;
-}
-
-STC_INLINE const char* utf8_at(const char *s, intptr_t index) {
-    while ((index > 0) & (*s != 0))
-        index -= (*++s & 0xC0) != 0x80;
-    return s;
-}
-
-STC_INLINE intptr_t utf8_pos(const char* s, intptr_t index)
-    { return (intptr_t)(utf8_at(s, index) - s); }
 
 #endif
