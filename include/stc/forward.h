@@ -93,6 +93,12 @@ typedef union {
 } cstr_iter;
 
 
+#if defined __GNUC__ || defined __clang__ || defined _MSC_VER
+    typedef long catomic_long;
+#else
+    typedef _Atomic(long) catomic_long;
+#endif
+
 #define c_true(...) __VA_ARGS__
 #define c_false(...)
 

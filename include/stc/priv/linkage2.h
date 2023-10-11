@@ -26,8 +26,8 @@
 #undef i_implement
 #undef i_import
 
-#if defined __clang__
+#if defined __clang__ && !defined __cplusplus
   #pragma clang diagnostic pop
-#elif defined __GNUC__
+#elif defined __GNUC__ && !defined __cplusplus
   #pragma GCC diagnostic pop
 #endif

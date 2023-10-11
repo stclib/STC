@@ -8,7 +8,7 @@
 #include "stc/cstr.h"   // string
 #define i_implement
 #include "stc/csview.h" // string_view
-#include "stc/algo/raii.h"
+#include "stc/algo/misc.h"
 
 #define i_key_str
 #include "stc/cvec.h"   // vec of cstr with const char* lookup
@@ -37,8 +37,8 @@
 
 cvec_str read_file(const char* name)
 {
-    cvec_str data = cvec_str_init();
-    c_auto (cstr, line)
+    cvec_str data = {0};
+    c_with (cstr line = {0}, cstr_drop(&line))
     c_with (FILE* f = fopen(name, "r"), fclose(f))
         while (cstr_getline(&line, f))
             cvec_str_emplace_back(&data, cstr_str(&line));

@@ -25,7 +25,6 @@
 /* cbox: heap allocated boxed type
 #define i_implement
 #include "stc/cstr.h"
-#include "stc/algo/raii.h" // c_auto
 
 typedef struct { cstr name, email; } Person;
 
@@ -47,15 +46,14 @@ void Person_drop(Person* p) {
 #include "stc/cbox.h"
 
 int main(void) {
-    c_auto (PBox, p, q)
-    {
-        p = PBox_from(Person_from("John Smiths", "josmiths@gmail.com"));
-        q = PBox_clone(p);
-        cstr_assign(&q.get->name, "Joe Smiths");
+    PBox p = PBox_from(Person_from("John Smiths", "josmiths@gmail.com"));
+    PBox q = PBox_clone(p);
+    cstr_assign(&q.get->name, "Joe Smiths");
 
-        printf("%s %s.\n", cstr_str(&p.get->name), cstr_str(&p.get->email));
-        printf("%s %s.\n", cstr_str(&q.get->name), cstr_str(&q.get->email));
-    }
+    printf("%s %s.\n", cstr_str(&p.get->name), cstr_str(&p.get->email));
+    printf("%s %s.\n", cstr_str(&q.get->name), cstr_str(&q.get->email));
+
+    c_drop(PBox, &p, &q);
 }
 */
 #include "priv/linkage.h"

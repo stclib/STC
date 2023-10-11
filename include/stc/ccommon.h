@@ -76,7 +76,7 @@ typedef long long _llong;
 
 #define c_static_assert(expr)   (1 ? 0 : (int)sizeof(int[(expr) ? 1 : -1]))
 #if defined STC_NDEBUG || defined NDEBUG
-  #define c_assert(expr)        (0)
+  #define c_assert(expr)        ((void)0)
 #else
   #define c_assert(expr)        assert(expr)
 #endif
@@ -222,11 +222,19 @@ STC_INLINE intptr_t stc_nextpow2(intptr_t n) {
 
 #define c_defer(...) \
     for (int _i = 1; _i; _i = 0, __VA_ARGS__)
+
 #define c_with(...) c_MACRO_OVERLOAD(c_with, __VA_ARGS__)
 #define c_with_2(declvar, drop) \
     for (declvar, *_i, **_ip = &_i; _ip; _ip = 0, drop)
 #define c_with_3(declvar, pred, drop) \
     for (declvar, *_i, **_ip = &_i; _ip && (pred); _ip = 0, drop)
+
+#define c_scope(...) c_MACRO_OVERLOAD(c_scope, __VA_ARGS__)
+#define c_scope_2(init, drop) \
+    for (int _i = (init, 1); _i; _i = 0, drop)
+#define c_scope_3(init, pred, drop) \
+    for (int _i = (init, 1); _i && (pred); _i = 0, drop)
+
 #define c_drop(C, ...) \
     do { c_forlist (_i, C*, {__VA_ARGS__}) C##_drop(*_i.ref); } while(0)
 

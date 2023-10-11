@@ -1,7 +1,7 @@
 #define i_import
 #include "stc/cregex.h"
 #include "stc/csview.h"
-#include "stc/algo/raii.h"
+#include "stc/algo/misc.h"
 #include "ctest.h"
 
 #define M_START(m) ((m).buf - inp)
@@ -46,7 +46,7 @@ CTEST(cregex, compile_match_anchors)
 CTEST(cregex, compile_match_quantifiers1)
 {
     const char* inp;
-    c_auto (cregex, re) {
+    c_with (cregex re = {0}, cregex_drop(&re)) {
         re = cregex_from("ä+");
         ASSERT_EQ(re.error, 0);
 

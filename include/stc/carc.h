@@ -61,18 +61,15 @@ int main(void) {
 #include "forward.h"
 #include <stdlib.h>
 
-#if defined(__GNUC__) || defined(__clang__)
-    typedef long catomic_long;
+#if defined __GNUC__
     #define c_atomic_inc(v) (void)__atomic_add_fetch(v, 1, __ATOMIC_SEQ_CST)
     #define c_atomic_dec_and_test(v) !__atomic_sub_fetch(v, 1, __ATOMIC_SEQ_CST)
-#elif defined(_MSC_VER)
+#elif defined _MSC_VER
     #include <intrin.h>
-    typedef long catomic_long;
     #define c_atomic_inc(v) (void)_InterlockedIncrement(v)
     #define c_atomic_dec_and_test(v) !_InterlockedDecrement(v)
 #else
     #include <stdatomic.h>
-    typedef _Atomic long catomic_long;
     #define c_atomic_inc(v) (void)atomic_fetch_add(v, 1)
     #define c_atomic_dec_and_test(v) (atomic_fetch_sub(v, 1) == 1)
 #endif

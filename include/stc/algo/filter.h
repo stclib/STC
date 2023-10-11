@@ -67,62 +67,6 @@ int main(void)
          C##_next(&i.it), i.ref = i.it.ref, i.b.s1top=0, i.b.s2top=0) \
       if (!(filter)) ; else
 
-
-// c_find_if, c_erase_if, c_eraseremove_if:
-
-#define c_find_if(...) c_MACRO_OVERLOAD(c_find_if, __VA_ARGS__)
-#define c_find_if_4(it, C, cnt, pred) do { \
-    intptr_t _index = 0; \
-    for (it = C##_begin(&cnt); it.ref && !(pred); C##_next(&it)) \
-        ++_index; \
-} while (0)
-
-#define c_find_if_5(it, C, start, end, pred) do { \
-    intptr_t _index = 0; \
-    const C##_value* _endref = (end).ref; \
-    for (it = start; it.ref != _endref && !(pred); C##_next(&it)) \
-        ++_index; \
-    if (it.ref == _endref) it.ref = NULL; \
-} while (0)
-
-#define c_all_of(boolptr, it, C, cnt, pred) do { \
-    C##_iter it; \
-    c_find_if_4(it, C, cnt, !(pred)); \
-    *(boolptr) = it.ref == NULL; \
-} while (0)
-#define c_any_of(boolptr, it, C, cnt, pred) do { \
-    C##_iter it; \
-    c_find_if_4(it, C, cnt, pred); \
-    *(boolptr) = it.ref != NULL; \
-} while (0)
-#define c_none_of(boolptr, it, C, cnt, pred) do { \
-    C##_iter it; \
-    c_find_if_4(it, C, cnt, pred); \
-    *(boolptr) = it.ref == NULL; \
-} while (0)
-
-// Use with: clist, cmap, cset, csmap, csset:
-#define c_erase_if(it, C, cnt, pred) do { \
-    C* _cnt = &cnt; \
-    for (C##_iter it = C##_begin(_cnt); it.ref; ) { \
-        if (pred) it = C##_erase_at(_cnt, it); \
-        else C##_next(&it); \
-    } \
-} while (0)
-
-// Use with: cstack, cvec, cdeq, cqueue:
-#define c_eraseremove_if(it, C, cnt, pred) do { \
-    C* _cnt = &cnt; \
-    intptr_t _n = 0; \
-    C##_iter it = C##_begin(_cnt), _i; \
-    while (it.ref && !(pred)) \
-        C##_next(&it); \
-    for (_i = it; it.ref; C##_next(&it)) \
-        if (pred) C##_value_drop(it.ref), ++_n; \
-        else *_i.ref = *it.ref, C##_next(&_i); \
-    C##_adjust_end_(_cnt, -_n); \
-} while (0)
-
 // ------------------------ private -------------------------
 #ifndef c_NFILTERS
 #define c_NFILTERS 32
