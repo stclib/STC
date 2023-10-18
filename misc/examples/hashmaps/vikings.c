@@ -33,12 +33,12 @@ static inline RViking Viking_toraw(const Viking* vp) {
 
 // With this in place, we define the Viking => int hash map type:
 #define i_type      Vikings
-#define i_key_class  Viking      // key type
-#define i_raw_class  RViking     // lookup type
+#define i_key_class Viking      // key type
+#define i_raw_class RViking     // lookup type
 #define i_keyfrom   Viking_from
-#define i_opt       c_no_clone
-#define i_hash(rp)  stc_strhash(rp->name) ^ stc_strhash(rp->country)
 #define i_val       int         // mapped type
+#define i_opt       c_no_clone
+#define i_hash(rp)  stc_hash_combine(stc_strhash(rp->name), stc_strhash(rp->country))
 #include "stc/cmap.h"
 
 int main(void)

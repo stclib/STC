@@ -88,12 +88,14 @@ cmap_X_raw            cmap_X_value_toraw(cmap_X_value* pval);
 ```
 Free helper functions:
 ```c
-uint64_t              stc_hash(const void *data, intptr_t len);             // base hash function
-uint64_t              stc_strhash(const char *str);                         // string hash funcion, uses strlen()
+uint64_t              stc_hash(const void *data, intptr_t n);               // base hash function
+uint64_t              stc_hash(const T* obj);                               // base hash function. n=sizeof(T)
+uint64_t              stc_strhash(const char *str);                         // string hash function, uses strlen()
+uint64_t              stc_hash_combine(uint64_t h1, uint64_t h2, ...);      // combine hashes
 uint64_t              stc_nextpow2(intptr_t i);                             // get next power of 2 >= i
 
 // hash/equal template default functions:
-uint64_t              c_default_hash(const X *obj);                         // macro, calls stc_hash(obj, sizeof *obj)
+uint64_t              c_default_hash(const T *obj);                         // alias for stc_hash(obj)
 bool                  c_default_eq(const i_keyraw* a, const i_keyraw* b);   // *a == *b
 bool                  c_memcmp_eq(const i_keyraw* a, const i_keyraw* b);    // !memcmp(a, b, sizeof *a)
 ```
@@ -210,7 +212,7 @@ typedef struct { int x, y, z; } Vec3i;
 
 #define i_key Vec3i
 #define i_val int
-#define i_eq c_memcmp_eq // bitwise equal, and use c_default_hash
+#define i_eq c_memcmp_eq // bitwise equal, and uses stc_hash()
 #define i_tag vi
 #include "stc/cmap.h"
 
