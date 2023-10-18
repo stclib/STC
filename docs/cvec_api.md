@@ -56,9 +56,9 @@ cvec_X_iter         cvec_X_find(const cvec_X* self, i_keyraw raw);
 cvec_X_iter         cvec_X_find_in(cvec_X_iter i1, cvec_X_iter i2, i_keyraw raw); // return cvec_X_end() if not found
                     // On sorted vectors:
 cvec_X_iter         cvec_X_binary_search(const cvec_X* self, i_keyraw raw); // at elem == raw, else end
+cvec_X_iter         cvec_X_binary_search_in(cvec_X_iter i1, cvec_X_iter i2, i_keyraw raw);
 cvec_X_iter         cvec_X_lower_bound(const cvec_X* self, i_keyraw raw);   // at first elem >= raw, else end
-cvec_X_iter         cvec_X_binary_search_in(cvec_X_iter i1, cvec_X_iter i2,
-                                            i_keyraw raw, cvec_X_iter* lower_bound);
+cvec_X_iter         cvec_X_lower_bound_in(cvec_X_iter i1, cvec_X_iter i2, i_keyraw raw);
 
 cvec_X_value*       cvec_X_front(const cvec_X* self);
 cvec_X_value*       cvec_X_back(const cvec_X* self);

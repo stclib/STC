@@ -91,7 +91,7 @@ STC_API _cx_iter        _cx_MEMB(_find_in)(_cx_iter it1, _cx_iter it2, _cx_raw r
 #endif
 #if defined _i_has_cmp
 STC_API int             _cx_MEMB(_value_cmp)(const _cx_value* x, const _cx_value* y);
-STC_API _cx_iter        _cx_MEMB(_binary_search_in)(_cx_iter it1, _cx_iter it2, _cx_raw raw, _cx_iter* lower_bound);
+STC_API _cx_iter        _cx_MEMB(_lower_bound_in)(_cx_iter it1, _cx_iter it2, _cx_raw raw);
 #endif
 STC_INLINE void         _cx_MEMB(_value_drop)(_cx_value* val) { i_keydrop(val); }
 
@@ -249,16 +249,23 @@ _cx_MEMB(_eq)(const _cx_Self* self, const _cx_Self* other) {
 #if defined _i_has_cmp
 
 STC_INLINE _cx_iter
-_cx_MEMB(_binary_search)(const _cx_Self* self, _cx_raw raw) {
-    _cx_iter lower;
-    return _cx_MEMB(_binary_search_in)(_cx_MEMB(_begin)(self), _cx_MEMB(_end)(self), raw, &lower);
+_cx_MEMB(_lower_bound)(const _cx_Self* self, _cx_raw raw) {
+    return _cx_MEMB(_lower_bound_in)(_cx_MEMB(_begin)(self), _cx_MEMB(_end)(self), raw);
 }
 
 STC_INLINE _cx_iter
-_cx_MEMB(_lower_bound)(const _cx_Self* self, _cx_raw raw) {
-    _cx_iter lower;
-    _cx_MEMB(_binary_search_in)(_cx_MEMB(_begin)(self), _cx_MEMB(_end)(self), raw, &lower);
-    return lower;
+_cx_MEMB(_binary_search_in)(_cx_iter it1, _cx_iter it2, const _cx_raw raw) {
+    it1 = _cx_MEMB(_lower_bound_in)(it1, it2, raw);
+    if (it1.ref) {
+        const _cx_raw rx = i_keyto(it1.ref);
+        if (i_less((&raw), (&rx))) it1.ref = NULL;
+    }
+    return it1;
+}
+
+STC_INLINE _cx_iter
+_cx_MEMB(_binary_search)(const _cx_Self* self, _cx_raw raw) {
+    return _cx_MEMB(_binary_search_in)(_cx_MEMB(_begin)(self), _cx_MEMB(_end)(self), raw);
 }
 
 STC_INLINE void
@@ -391,21 +398,24 @@ _cx_MEMB(_find_in)(_cx_iter i1, _cx_iter i2, _cx_raw raw) {
 #if defined _i_has_cmp
 
 STC_DEF _cx_iter
-_cx_MEMB(_binary_search_in)(_cx_iter i1, _cx_iter i2, const _cx_raw raw,
-                            _cx_iter* lower_bound) {
-    _cx_value* w[2] = {i1.ref, _it2_ptr(i1, i2)};
-    _cx_iter mid = i1;
-    while (w[0] != w[1]) {
-        mid.ref = w[0] + (w[1] - w[0])/2;
-        const _cx_raw m = i_keyto(mid.ref);
-        const int c = i_cmp((&raw), (&m));
+_cx_MEMB(_lower_bound_in)(_cx_iter first, _cx_iter last, const _cx_raw raw) {
+    const _cx_value* lastref = _it_ptr(last);
+    intptr_t step, count = lastref - first.ref;
 
-        if (!c) return *lower_bound = mid;
-        w[c < 0] = mid.ref + (c > 0);
+    while (count > 0) {
+        _cx_iter it = first;
+        step = count / 2;
+        it.ref += step;
+
+        const _cx_raw rx = i_keyto(it.ref);
+        if (i_less((&rx), (&raw))) {
+            first.ref = ++it.ref;
+            count -= step + 1;
+        } else
+            count = step;
     }
-    i1.ref = w[0] == i2.end ? NULL : w[0];
-    *lower_bound = i1;
-    i1.ref = NULL; return i1;
+    if (first.ref == lastref) first.ref = NULL;
+    return first;
 }
 
 STC_DEF int _cx_MEMB(_value_cmp)(const _cx_value* x, const _cx_value* y) {
@@ -418,4 +428,3 @@ STC_DEF int _cx_MEMB(_value_cmp)(const _cx_value* x, const _cx_value* y) {
 #define CVEC_H_INCLUDED
 #include "priv/template2.h"
 #include "priv/linkage2.h"
-
