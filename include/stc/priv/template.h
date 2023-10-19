@@ -113,6 +113,7 @@
 #define c_no_emplace            (1<<3)
 #define c_no_hash               (1<<4)
 #define c_use_cmp               (1<<5)
+#define c_more                  (1<<6)
 
 #if c_option(c_is_forward)
   #define i_is_forward
@@ -129,6 +130,9 @@
 #endif
 #if c_option(c_no_clone) || defined _i_carc
   #define i_no_clone
+#endif
+#if c_option(c_more)
+  #define i_more
 #endif
 
 #if defined i_key_str
@@ -208,6 +212,21 @@
   #error "For csmap/csset/cpque, i_cmp or i_less must be defined when i_keyraw is defined."
 #endif
 
+// i_eq, i_less, i_cmp
+#if !defined i_eq && defined i_cmp
+  #define i_eq(x, y) !(i_cmp(x, y))
+#elif !defined i_eq && !defined i_keyraw
+  #define i_eq(x, y) *x == *y // for integral types, else define i_eq or i_cmp yourself
+#endif
+#if !defined i_less && defined i_cmp
+  #define i_less(x, y) (i_cmp(x, y)) < 0
+#elif !defined i_less && !defined i_keyraw
+  #define i_less(x, y) *x < *y // for integral types, else define i_less or i_cmp yourself
+#endif
+#if !defined i_cmp && defined i_less
+  #define i_cmp(x, y) (i_less(y, x)) - (i_less(x, y))
+#endif
+
 #ifndef i_tag
   #define i_tag i_key
 #endif
@@ -227,21 +246,6 @@
 #endif
 #ifndef i_keydrop
   #define i_keydrop c_default_drop
-#endif
-
-// i_eq, i_less, i_cmp
-#if !defined i_eq && defined i_cmp
-  #define i_eq(x, y) !(i_cmp(x, y))
-#elif !defined i_eq
-  #define i_eq(x, y) *x == *y // for integral types, else define i_eq or i_cmp yourself
-#endif
-#if !defined i_less && defined i_cmp
-  #define i_less(x, y) (i_cmp(x, y)) < 0
-#elif !defined i_less
-  #define i_less(x, y) *x < *y // for integral types, else define i_less or i_cmp yourself
-#endif
-#ifndef i_cmp
-  #define i_cmp(x, y) (i_less(y, x)) - (i_less(x, y))
 #endif
 
 #if defined _i_ismap // ---- process cmap/csmap value i_val, ... ----

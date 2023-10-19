@@ -59,7 +59,7 @@ int main(void) {
 #include "ccommon.h"
 
 enum {
-    CCO_STATE_CLEANUP = -1,
+    CCO_STATE_FINAL = -1,
     CCO_STATE_DONE = -2,
 };
 typedef enum {
@@ -107,27 +107,30 @@ typedef enum {
 
 #define cco_cleanup cco_final // [deprecated]
 #define cco_final \
-    *_state = CCO_STATE_CLEANUP; \
+    *_state = CCO_STATE_FINAL; \
     /* fall through */ \
-    case CCO_STATE_CLEANUP
+    case CCO_STATE_FINAL
 
 #define cco_return \
     do { \
-        *_state = *_state >= 0 ? CCO_STATE_CLEANUP : CCO_STATE_DONE; \
+        *_state = *_state >= 0 ? CCO_STATE_FINAL : CCO_STATE_DONE; \
         goto _resume; \
     } while (0)
+
+#define cco_cancel \
+    do { *_state = CCO_STATE_DONE; goto _resume; } while (0)
 
 #define cco_yield_final() cco_yield_final_v(CCO_YIELD)
 #define cco_yield_final_v(value) \
     do { \
-        *_state = *_state >= 0 ? CCO_STATE_CLEANUP : CCO_STATE_DONE; \
+        *_state = *_state >= 0 ? CCO_STATE_FINAL : CCO_STATE_DONE; \
         return value; \
     } while (0)
 
 #define cco_stop(co) \
     do { \
         int* _s = &(co)->cco_state; \
-        if (*_s > 0) *_s = CCO_STATE_CLEANUP; \
+        if (*_s > 0) *_s = CCO_STATE_FINAL; \
         else if (*_s == 0) *_s = CCO_STATE_DONE; \
     } while (0)
 

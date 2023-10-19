@@ -53,6 +53,9 @@ int main(int argc, char *argv[]) {
     for (i = 0; i < 20; i++)
         printf(" %d", (int)*Ints_at(&a, i));
     puts("");
+    for (i = 1; i < size; i++)
+        assert(Ints_at(&a, i - 1) <= Ints_at(&a, i));
+    
     for (i = 0; i < size; i++)
         *Ints_at_mut(&a, i) = i;
     testsort(&a, size, "sorted");

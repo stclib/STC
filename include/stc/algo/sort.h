@@ -34,17 +34,24 @@ template params:
 int main(void) {
     int nums[] = {23, 321, 5434, 25, 245, 1, 654, 33, 543, 21};
     
-    intarray_sort_n(nums, c_arraylen(nums));
+    ints_sort_n(nums, c_arraylen(nums));
 
     for (int i = 0; i < c_arraylen(nums); i++)
         printf(" %d", nums[i]);
     puts("");
+
+    const int* found = ints_binary_search_n(nums, 25, c_arraylen(nums));
+    if (found) printf("found: %d\n", *found);
+
+    found = ints_lower_bound_n(nums, 200, c_arraylen(nums));
+    if (found) printf("found lower 200: %d\n", *found);
 }
 
-// ex2:
-#define i_key int
+// ex2: Test on a cdeque !!
+#include <stdio.h>
 #define i_type IDeq
-#define i_more // retain input template params to be reused by sort.h
+#define i_key int
+#define i_opt c_use_cmp | c_more // retain input template params to be reused by sort.h
 #include "stc/cdeq.h"
 #include "stc/algo/sort.h"
 
@@ -57,6 +64,14 @@ int main(void) {
 
     c_foreach (i, IDeq, nums)
         printf(" %d", *i.ref);
+    puts("");
+
+    const int* found = IDeq_binary_search_n(&nums, 25, IDeq_size(&nums));
+    if (found) printf("found: %d\n", *found);
+
+    found = IDeq_lower_bound_n(&nums, 200, IDeq_size(&nums));
+    if (found) printf("found lower 200: %d\n", *found);
+
     IDeq_drop(&nums);
 }
 */
@@ -67,40 +82,45 @@ int main(void) {
 #endif
 #ifndef i_type
   #define i_at(arr, idx) (&arr[idx])
+  #define i_at_mut i_at
   #ifndef i_tag
     #define i_tag i_key
   #endif
   #define i_type c_JOIN(i_tag, s)
-  typedef i_key i_type;
-#endif
-#ifndef i_at
-  #define i_at(arr, idx) _cx_MEMB(_at_mut)(arr, idx)
+  typedef i_key i_type, c_JOIN(i_type, _value), c_JOIN(i_type, _raw);
+#else
+  #define i_at(arr, idx) _cx_MEMB(_at)(arr, idx)
+  #define i_at_mut(arr, idx) _cx_MEMB(_at_mut)(arr, idx)
 #endif
 #include "../priv/template.h"
 
+// quick sort
 
-static inline void _cx_MEMB(_insertsort_ij)(_cx_Self* arr, intptr_t lo, intptr_t hi) {
+static inline void _cx_MEMB(_insertsort_ij)(i_type* arr, intptr_t lo, intptr_t hi) {
     for (intptr_t j = lo, i = lo + 1; i <= hi; j = i, ++i) {
-        i_key key = *i_at(arr, i);
-        while (j >= 0 && (i_less((&key), i_at(arr, j)))) {
-            *i_at(arr, j + 1) = *i_at(arr, j);
+        _cx_value x = *i_at(arr, i);
+        _cx_raw rx = i_keyto(&x);
+        while (j >= 0) {
+            _cx_raw ry = i_keyto(i_at(arr, j));
+            if (!(i_less((&rx), (&ry)))) break;
+            *i_at_mut(arr, j + 1) = *i_at(arr, j);
             --j;
         }
-        *i_at(arr, j + 1) = key;
+        *i_at_mut(arr, j + 1) = x;
     }
 }
 
-static inline void _cx_MEMB(_sort_ij)(_cx_Self* arr, intptr_t lo, intptr_t hi) {
+static inline void _cx_MEMB(_sort_ij)(i_type* arr, intptr_t lo, intptr_t hi) {
     intptr_t i = lo, j;
     while (lo < hi) {
-        i_key pivot = *i_at(arr, lo + (hi - lo)*7/16);
+        _cx_raw pivot = i_keyto(i_at(arr, lo + (hi - lo)*7/16)), rx;
         j = hi;
 
         while (i <= j) {
-            while (i_less(i_at(arr, i), (&pivot))) ++i;
-            while (i_less((&pivot), i_at(arr, j))) --j;
+            do { rx = i_keyto(i_at(arr, i)); } while (i_less((&rx), (&pivot)) && ++i);
+            do { rx = i_keyto(i_at(arr, j)); } while (i_less((&pivot), (&rx)) && --j);
             if (i <= j) {
-                c_swap(i_key, i_at(arr, i), i_at(arr, j));
+                c_swap(i_key, i_at_mut(arr, i), i_at_mut(arr, j));
                 ++i; --j;
             }
         }
@@ -115,9 +135,51 @@ static inline void _cx_MEMB(_sort_ij)(_cx_Self* arr, intptr_t lo, intptr_t hi) {
     }
 }
 
-static inline void _cx_MEMB(_sort_n)(_cx_Self* arr, intptr_t len) {
-    _cx_MEMB(_sort_ij)(arr, 0, len - 1);
+static inline void _cx_MEMB(_sort_n)(i_type* arr, intptr_t n)
+    { _cx_MEMB(_sort_ij)(arr, 0, n - 1); }
+
+// lower bound
+
+static inline const _cx_value*
+_cx_MEMB(_lower_bound_range)(const i_type* arr, const _cx_raw raw, intptr_t first, intptr_t last) {
+    intptr_t step, count = last - first;
+
+    while (count > 0) {
+        intptr_t it = first;
+        step = count / 2;
+        it += step;
+
+        const _cx_raw rx = i_keyto(i_at(arr, it));
+        if (i_less((&rx), (&raw))) {
+            first = ++it;
+            count -= step + 1;
+        } else
+            count = step;
+    }
+    return first == last ? NULL : i_at(arr, first);
 }
+
+static inline const _cx_value*
+_cx_MEMB(_lower_bound_n)(const i_type* arr, const _cx_raw raw, intptr_t n)
+    { return _cx_MEMB(_lower_bound_range)(arr, raw, 0, n); }
+
+// binary search
+
+static inline const _cx_value*
+_cx_MEMB(_binary_search_range)(const i_type* arr, const _cx_raw raw, intptr_t first, intptr_t last) {
+    const _cx_value* res = _cx_MEMB(_lower_bound_range)(arr, raw, first, last);
+    if (res) {
+        const _cx_raw rx = i_keyto(res);
+        if (i_less((&raw), (&rx))) res = NULL;
+    }
+    return res;
+}
+
+static inline const _cx_value*
+_cx_MEMB(_binary_search_n)(const i_type* arr, const _cx_raw raw, intptr_t n)
+    { return _cx_MEMB(_binary_search_range)(arr, raw, 0, n); }
+
 
 #include "../priv/template2.h"
 #undef i_at
+#undef i_at_mut
