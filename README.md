@@ -621,8 +621,8 @@ It adds a MemoryContext to each container by defining the `i_extend` template pa
 the by inclusion of `"stc/extend.h"`.
 ```c
 // stcpgs.h
-#define pgs_malloc(sz) MemoryContextAlloc(c_extend(self)->memctx, sz)
-#define pgs_calloc(n, sz) MemoryContextAllocZero(c_extend(self)->memctx, (n)*(sz))
+#define pgs_malloc(sz) MemoryContextAlloc(c_extend()->memctx, sz)
+#define pgs_calloc(n, sz) MemoryContextAllocZero(c_extend()->memctx, (n)*(sz))
 #define pgs_realloc(p, sz) (p ? repalloc(p, sz) : pgs_malloc(sz))
 #define pgs_free(p) (p ? pfree(p) : (void)0) // pfree/repalloc does not accept NULL.
 
