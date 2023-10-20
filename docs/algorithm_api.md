@@ -213,7 +213,7 @@ You may customize `i_tag` and the comparison function `i_cmp` or `i_less`.
 There is a [benchmark/test file here](../misc/benchmarks/various/csort_bench.c).
 ```c
 #define i_key int
-#include "stc/algo/sort.h"
+#include "stc/algo/quicksort.h"
 #include <stdio.h>
 
 int main(void) {
@@ -229,7 +229,7 @@ possible and very fast. Note that `i_more` must be defined to retain specified t
 #define i_key int
 #define i_more
 #include "stc/cdeq.h" // deque
-#include "stc/algo/sort.h"
+#include "stc/algo/quicksort.h"
 #include <stdio.h>
 
 int main(void) {

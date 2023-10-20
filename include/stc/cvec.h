@@ -89,10 +89,6 @@ STC_API _cx_iter        _cx_MEMB(_insert_uninit)(_cx_Self* self, intptr_t idx, i
 #if defined _i_has_eq || defined _i_has_cmp
 STC_API _cx_iter        _cx_MEMB(_find_in)(_cx_iter it1, _cx_iter it2, _cx_raw raw);
 #endif
-#if defined _i_has_cmp
-STC_API int             _cx_MEMB(_value_cmp)(const _cx_value* x, const _cx_value* y);
-STC_API _cx_iter        _cx_MEMB(_lower_bound_in)(_cx_iter it1, _cx_iter it2, _cx_raw raw);
-#endif
 STC_INLINE void         _cx_MEMB(_value_drop)(_cx_value* val) { i_keydrop(val); }
 
 STC_INLINE _cx_value*   _cx_MEMB(_push)(_cx_Self* self, i_key value) {
@@ -221,7 +217,6 @@ STC_INLINE void _cx_MEMB(_adjust_end_)(_cx_Self* self, intptr_t n)
     { self->_len += n; }
 
 #if defined _i_has_eq || defined _i_has_cmp
-
 STC_INLINE _cx_iter
 _cx_MEMB(_find)(const _cx_Self* self, _cx_raw raw) {
     return _cx_MEMB(_find_in)(_cx_MEMB(_begin)(self), _cx_MEMB(_end)(self), raw);
@@ -246,39 +241,23 @@ _cx_MEMB(_eq)(const _cx_Self* self, const _cx_Self* other) {
     return true;
 }
 #endif
+
 #if defined _i_has_cmp
-
-STC_INLINE _cx_iter
-_cx_MEMB(_lower_bound)(const _cx_Self* self, _cx_raw raw) {
-    return _cx_MEMB(_lower_bound_in)(_cx_MEMB(_begin)(self), _cx_MEMB(_end)(self), raw);
-}
-
-STC_INLINE _cx_iter
-_cx_MEMB(_binary_search_in)(_cx_iter it1, _cx_iter it2, const _cx_raw raw) {
-    it1 = _cx_MEMB(_lower_bound_in)(it1, it2, raw);
-    if (it1.ref) {
-        const _cx_raw rx = i_keyto(it1.ref);
-        if (i_less((&raw), (&rx))) it1.ref = NULL;
-    }
-    return it1;
-}
-
-STC_INLINE _cx_iter
-_cx_MEMB(_binary_search)(const _cx_Self* self, _cx_raw raw) {
-    return _cx_MEMB(_binary_search_in)(_cx_MEMB(_begin)(self), _cx_MEMB(_end)(self), raw);
-}
-
-STC_INLINE void
-_cx_MEMB(_sort_range)(_cx_iter i1, _cx_iter i2, int(*cmp)(const _cx_value*, const _cx_value*)) {
-    qsort(i1.ref, (size_t)(_it2_ptr(i1, i2) - i1.ref), sizeof(_cx_value),
-          (int(*)(const void*, const void*)) cmp);
-}
+STC_API int _cx_MEMB(_value_cmp)(const _cx_value* x, const _cx_value* y);
 
 STC_INLINE void
 _cx_MEMB(_sort)(_cx_Self* self) {
-    _cx_MEMB(_sort_range)(_cx_MEMB(_begin)(self), _cx_MEMB(_end)(self), _cx_MEMB(_value_cmp));
+    qsort(self->data, (size_t)self->_len, sizeof(_cx_value),
+          (int(*)(const void*, const void*))_cx_MEMB(_value_cmp));
+}
+
+STC_INLINE _cx_value*
+_cx_MEMB(_bsearch)(const _cx_Self* self, _cx_value key) {
+    return bsearch(self->data, &key, (size_t)self->_len, sizeof(_cx_value),
+                   (int(*)(const void*, const void*))_cx_MEMB(_value_cmp));
 }
 #endif // _i_has_cmp
+
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined(i_implement) || defined(i_static)
 
@@ -396,28 +375,6 @@ _cx_MEMB(_find_in)(_cx_iter i1, _cx_iter i2, _cx_raw raw) {
 }
 #endif
 #if defined _i_has_cmp
-
-STC_DEF _cx_iter
-_cx_MEMB(_lower_bound_in)(_cx_iter first, _cx_iter last, const _cx_raw raw) {
-    const _cx_value* lastref = _it_ptr(last);
-    intptr_t step, count = lastref - first.ref;
-
-    while (count > 0) {
-        _cx_iter it = first;
-        step = count / 2;
-        it.ref += step;
-
-        const _cx_raw rx = i_keyto(it.ref);
-        if (i_less((&rx), (&raw))) {
-            first.ref = ++it.ref;
-            count -= step + 1;
-        } else
-            count = step;
-    }
-    if (first.ref == lastref) first.ref = NULL;
-    return first;
-}
-
 STC_DEF int _cx_MEMB(_value_cmp)(const _cx_value* x, const _cx_value* y) {
     const _cx_raw rx = i_keyto(x);
     const _cx_raw ry = i_keyto(y);

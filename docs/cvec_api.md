@@ -54,11 +54,8 @@ cvec_X_value*       cvec_X_at_mut(cvec_X* self, intptr_t idx);              // r
 cvec_X_value*       cvec_X_get_mut(cvec_X* self, i_keyraw raw);             // find mutable value
 cvec_X_iter         cvec_X_find(const cvec_X* self, i_keyraw raw);
 cvec_X_iter         cvec_X_find_in(cvec_X_iter i1, cvec_X_iter i2, i_keyraw raw); // return cvec_X_end() if not found
-                    // On sorted vectors:
-cvec_X_iter         cvec_X_binary_search(const cvec_X* self, i_keyraw raw); // at elem == raw, else end
-cvec_X_iter         cvec_X_binary_search_in(cvec_X_iter i1, cvec_X_iter i2, i_keyraw raw);
-cvec_X_iter         cvec_X_lower_bound(const cvec_X* self, i_keyraw raw);   // at first elem >= raw, else end
-cvec_X_iter         cvec_X_lower_bound_in(cvec_X_iter i1, cvec_X_iter i2, i_keyraw raw);
+void                cvec_X_sort(cvec_X* self);                              // qsort() from stdlib.h
+cvec_X_iter         cvec_X_bsearch(const cvec_X* self, i_key value);        // bsearch(). Note: not i_keyraw 
 
 cvec_X_value*       cvec_X_front(const cvec_X* self);
 cvec_X_value*       cvec_X_back(const cvec_X* self);
@@ -83,9 +80,6 @@ cvec_X_iter         cvec_X_erase_n(cvec_X* self, intptr_t idx, intptr_t n);
 cvec_X_iter         cvec_X_erase_at(cvec_X* self, cvec_X_iter it);
 cvec_X_iter         cvec_X_erase_range(cvec_X* self, cvec_X_iter it1, cvec_X_iter it2);
 
-void                cvec_X_sort(cvec_X* self);
-void                cvec_X_sort_range(cvec_X_iter i1, cvec_X_iter i2,
-                                      int(*cmp)(const i_key*, const i_key*));
 
 cvec_X_iter         cvec_X_begin(const cvec_X* self);
 cvec_X_iter         cvec_X_end(const cvec_X* self);

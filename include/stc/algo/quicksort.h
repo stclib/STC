@@ -29,21 +29,21 @@ template params:
 // ex1:
 #include <stdio.h>
 #define i_key int
-#include "stc/algo/sort.h"
+#include "stc/algo/quicksort.h"
 
 int main(void) {
     int nums[] = {23, 321, 5434, 25, 245, 1, 654, 33, 543, 21};
     
-    ints_sort_n(nums, c_arraylen(nums));
+    ints_quicksort(nums, c_arraylen(nums));
 
     for (int i = 0; i < c_arraylen(nums); i++)
         printf(" %d", nums[i]);
     puts("");
 
-    const int* found = ints_binary_search_n(nums, 25, c_arraylen(nums));
+    const int* found = ints_binary_search(nums, 25, c_arraylen(nums));
     if (found) printf("found: %d\n", *found);
 
-    found = ints_lower_bound_n(nums, 200, c_arraylen(nums));
+    found = ints_lower_bound(nums, 200, c_arraylen(nums));
     if (found) printf("found lower 200: %d\n", *found);
 }
 
@@ -53,23 +53,23 @@ int main(void) {
 #define i_key int
 #define i_opt c_use_cmp | c_more // retain input template params to be reused by sort.h
 #include "stc/cdeq.h"
-#include "stc/algo/sort.h"
+#include "stc/algo/quicksort.h"
 
 int main(void) {
     IDeq nums = c_init(IDeq, {5434, 25, 245, 1, 654, 33, 543, 21});
     IDeq_push_front(&nums, 23);
     IDeq_push_front(&nums, 321);
     
-    IDeq_sort_n(&nums, IDeq_size(&nums));
+    IDeq_quicksort(&nums);
 
     c_foreach (i, IDeq, nums)
         printf(" %d", *i.ref);
     puts("");
 
-    const int* found = IDeq_binary_search_n(&nums, 25, IDeq_size(&nums));
+    const int* found = IDeq_binary_search(&nums, 25);
     if (found) printf("found: %d\n", *found);
 
-    found = IDeq_lower_bound_n(&nums, 200, IDeq_size(&nums));
+    found = IDeq_lower_bound(&nums, 200);
     if (found) printf("found lower 200: %d\n", *found);
 
     IDeq_drop(&nums);
@@ -81,6 +81,7 @@ int main(void) {
   #define i_key i_val
 #endif
 #ifndef i_type
+  #define _i_is_arr
   #define i_at(arr, idx) (&arr[idx])
   #define i_at_mut i_at
   #ifndef i_tag
@@ -110,7 +111,7 @@ static inline void _cx_MEMB(_insertsort_ij)(i_type* arr, intptr_t lo, intptr_t h
     }
 }
 
-static inline void _cx_MEMB(_sort_ij)(i_type* arr, intptr_t lo, intptr_t hi) {
+static inline void _cx_MEMB(_quicksort_ij)(i_type* arr, intptr_t lo, intptr_t hi) {
     intptr_t i = lo, j;
     while (lo < hi) {
         _cx_raw pivot = i_keyto(i_at(arr, lo + (hi - lo)*7/16)), rx;
@@ -129,14 +130,11 @@ static inline void _cx_MEMB(_sort_ij)(i_type* arr, intptr_t lo, intptr_t hi) {
             c_swap(intptr_t, &hi, &j);
         }
 
-        if (j - lo > 64) _cx_MEMB(_sort_ij)(arr, lo, j);
+        if (j - lo > 64) _cx_MEMB(_quicksort_ij)(arr, lo, j);
         else if (j > lo) _cx_MEMB(_insertsort_ij)(arr, lo, j);
         lo = i;
     }
 }
-
-static inline void _cx_MEMB(_sort_n)(i_type* arr, intptr_t n)
-    { _cx_MEMB(_sort_ij)(arr, 0, n - 1); }
 
 // lower bound
 
@@ -159,10 +157,6 @@ _cx_MEMB(_lower_bound_range)(const i_type* arr, const _cx_raw raw, intptr_t firs
     return first == last ? NULL : i_at(arr, first);
 }
 
-static inline const _cx_value*
-_cx_MEMB(_lower_bound_n)(const i_type* arr, const _cx_raw raw, intptr_t n)
-    { return _cx_MEMB(_lower_bound_range)(arr, raw, 0, n); }
-
 // binary search
 
 static inline const _cx_value*
@@ -175,11 +169,35 @@ _cx_MEMB(_binary_search_range)(const i_type* arr, const _cx_raw raw, intptr_t fi
     return res;
 }
 
+#ifdef _i_is_arr
+
+static inline void _cx_MEMB(_quicksort)(i_type* arr, intptr_t n)
+    { _cx_MEMB(_quicksort_ij)(arr, 0, n - 1); }
+
 static inline const _cx_value*
-_cx_MEMB(_binary_search_n)(const i_type* arr, const _cx_raw raw, intptr_t n)
+_cx_MEMB(_lower_bound)(const i_type* arr, const _cx_raw raw, intptr_t n)
+    { return _cx_MEMB(_lower_bound_range)(arr, raw, 0, n); }
+
+static inline const _cx_value*
+_cx_MEMB(_binary_search)(const i_type* arr, const _cx_raw raw, intptr_t n)
     { return _cx_MEMB(_binary_search_range)(arr, raw, 0, n); }
 
+#else
+
+static inline void _cx_MEMB(_quicksort)(i_type* arr)
+    { _cx_MEMB(_quicksort_ij)(arr, 0, _cx_MEMB(_size)(arr) - 1); }
+
+static inline _cx_value*
+_cx_MEMB(_lower_bound)(const i_type* arr, const _cx_raw raw)
+    { return (_cx_value*)_cx_MEMB(_lower_bound_range)(arr, raw, 0, _cx_MEMB(_size)(arr)); }
+
+static inline _cx_value*
+_cx_MEMB(_binary_search)(const i_type* arr, const _cx_raw raw)
+    { return (_cx_value*)_cx_MEMB(_binary_search_range)(arr, raw, 0, _cx_MEMB(_size)(arr)); }
+
+#endif
 
 #include "../priv/template2.h"
+#undef _i_is_arr
 #undef i_at
 #undef i_at_mut

@@ -2,7 +2,9 @@
 
 #define i_key int
 #define i_use_cmp
+#define i_more
 #include "stc/cvec.h"
+#include "stc/algo/quicksort.h"
 
 #define i_key int
 #include "stc/csset.h"
@@ -14,25 +16,25 @@ int main(void)
         int key, *res;
         cvec_int vec = c_init(cvec_int, {40, 600, 1, 7000, 2, 500, 30});
 
-        cvec_int_sort(&vec);
+        cvec_int_quicksort(&vec);
 
         key = 100;
-        res = cvec_int_lower_bound(&vec, key).ref;
+        res = cvec_int_lower_bound(&vec, key);
         if (res)
             printf("Sorted Vec %d: lower bound: %d\n", key, *res); // 500
 
         key = 10;
-        cvec_int_iter it1 = cvec_int_lower_bound(&vec, key);
-        if (it1.ref)
-            printf("Sorted Vec %3d: lower_bound: %d\n", key, *it1.ref); // 30
+        int* it1 = cvec_int_lower_bound(&vec, key);
+        if (it1)
+            printf("Sorted Vec %3d: lower_bound: %d\n", key, *it1); // 30
 
         key = 600;
-        cvec_int_iter it2 = cvec_int_binary_search(&vec, key);
-        if (it2.ref)
-            printf("Sorted Vec %d: bin. search: %d\n", key, *it2.ref); // 600
+        int* it2 = cvec_int_binary_search(&vec, key);
+        if (it2)
+            printf("Sorted Vec %d: bin. search: %d\n", key, *it2); // 600
 
-        c_foreach (i, cvec_int, it1, it2)
-            printf("  %d\n", *i.ref);
+        for (int* i = it1; i != it2; ++i)
+            printf("  %d\n", *i);
 
         puts("");
         cvec_int_drop(&vec);

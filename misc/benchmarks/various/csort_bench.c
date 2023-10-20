@@ -10,7 +10,7 @@
 #define i_key int
 #define i_more
 #include "stc/cvec.h"
-#include "stc/algo/sort.h"
+#include "stc/algo/quicksort.h"
 
 #define ROTL(d,bits) ((d<<(bits)) | (d>>(8*sizeof(d)-(bits))))
 uint64_t romutrio(uint64_t s[3]) {
@@ -32,7 +32,7 @@ void testsort(Ints *a, int size, const char *desc) {
 #elif defined QSORT
     printf("qsort: "); qsort(a->data, size, sizeof *a->data, cmp_int);
 #else
-    printf("STC sort_n: "); Ints_sort_n(a, size);
+    printf("STC sort_n: "); Ints_quicksort(a);
 #endif
     t = clock() - t;
 

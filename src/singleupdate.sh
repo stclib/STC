@@ -3,7 +3,7 @@ mkdir -p $d/../stcsingle/c11 $d/../stcsingle/stc/algo
 python singleheader.py $d/include/c11/fmt.h   $d/../stcsingle/c11/fmt.h
 python singleheader.py $d/include/stc/algorithm.h $d/../stcsingle/stc/algorithm.h
 python singleheader.py $d/include/stc/coroutine.h $d/../stcsingle/stc/coroutine.h
-python singleheader.py $d/include/stc/algo/sort.h $d/../stcsingle/stc/algo/sort.h
+python singleheader.py $d/include/stc/algo/quicksort.h $d/../stcsingle/stc/algo/quicksort.h
 python singleheader.py $d/include/stc/carc.h    $d/../stcsingle/stc/carc.h
 python singleheader.py $d/include/stc/cbits.h   $d/../stcsingle/stc/cbits.h
 python singleheader.py $d/include/stc/cbox.h    $d/../stcsingle/stc/cbox.h
