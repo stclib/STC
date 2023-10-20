@@ -205,12 +205,12 @@ if (it.ref) cmap_str_erase_at(&map, it);
 c_erase_if(i, csmap_str, map, cstr_contains(i.ref, "hello"));
 ```
 
-### sort_n_ - two times faster qsort
+### quicksort, binary_search, lower_bound - 2X faster qsort on arrays
 
-The **sort_n**, **sort_ij** algorithm is about twice as fast as *qsort()*, and often simpler to use.
+The **quicksort**, **quicksort_ij** algorithm is about twice as fast as *qsort()*, and often simpler to use.
 You may customize `i_tag` and the comparison function `i_cmp` or `i_less`.  
 
-There is a [benchmark/test file here](../misc/benchmarks/various/csort_bench.c).
+There is a [benchmark/test file here](../misc/benchmarks/various/quicksort_bench.c).
 ```c
 #define i_key int
 #include "stc/algo/quicksort.h"
@@ -218,12 +218,12 @@ There is a [benchmark/test file here](../misc/benchmarks/various/csort_bench.c).
 
 int main(void) {
     int nums[] = {5, 3, 5, 9, 7, 4, 7, 2, 4, 9, 3, 1, 2, 6, 4};
-    ints_sort_n(nums, c_arraylen(nums)); // note: function name derived from i_key
+    ints_quicksort(nums, c_arraylen(nums)); // note: function name derived from i_key
     c_forrange (i, c_arraylen(arr)) printf(" %d", arr[i]);
 }
 ```
 Containers with random access may also be sorted. Even sorting cdeq/cqueue (with ring buffer) is
-possible and very fast. Note that `i_more` must be defined to retain specified template parameters for use by sort:
+possible and very fast. Note that `i_more` must be defined to "extend" the specified template parameters for use by quicksort:
 ```c
 #define i_type MyDeq
 #define i_key int
@@ -233,8 +233,9 @@ possible and very fast. Note that `i_more` must be defined to retain specified t
 #include <stdio.h>
 
 int main(void) {
-    MyDeq deq = c_init(MyDeq, {5, 3, 5, 9, 7, 4, 7, 2, 4, 9, 3, 1, 2, 6, 4});
-    MyDeq_sort_n(&deq, MyDeq_size(&deq));
+    MyDeq deq = c_init(MyDeq, {5, 3, 5, 9, 7, 4, 7}); // pushed back
+    c_forlist (i, int, {2, 4, 9, 3, 1, 2, 6, 4}) MyDeq_push_front(&deq, *i.ref);
+    MyDeq_quicksort(&deq);
     c_foreach (i, MyDeq, deq) printf(" %d", *i.ref);
     MyDeq_drop(&deq);
 }
@@ -306,7 +307,7 @@ The **checkauto** utility described below, ensures that the `c_auto*` macros are
 | `c_scope (init, pred, drop)`           | Adds a predicate in order to exit early if init failed    |
 | `c_with (Type var=init, drop)`         | Declare `var`. Defer `drop...` to end of scope            |
 | `c_with (Type var=init, pred, drop)`   | Adds a predicate in order to exit early if init failed    |
-| `c_auto (Type, var1,...,var4)`         | `c_with (Type var1=Type_init(), Type_drop(&var1))` ...    |
+| `c_auto (Type, var1,...,var3)`         | `c_with (Type var1=Type_init(), Type_drop(&var1))` ...    |
 | `continue`                             | Exit a defer-block without resource leak                  |
 
 ```c

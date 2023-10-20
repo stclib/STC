@@ -13,28 +13,28 @@ int main(void)
 {
     // TEST SORTED VECTOR
     {
-        int key, *res;
+        int key;
         cvec_int vec = c_init(cvec_int, {40, 600, 1, 7000, 2, 500, 30});
 
         cvec_int_quicksort(&vec);
 
         key = 100;
-        res = cvec_int_lower_bound(&vec, key);
-        if (res)
-            printf("Sorted Vec %d: lower bound: %d\n", key, *res); // 500
+        intptr_t res = cvec_int_lower_bound(&vec, key);
+        if (res != -1)
+            printf("Sorted Vec %d: lower bound: %d\n", key, vec.data[res]); // 500
 
         key = 10;
-        int* it1 = cvec_int_lower_bound(&vec, key);
-        if (it1)
-            printf("Sorted Vec %3d: lower_bound: %d\n", key, *it1); // 30
+        intptr_t it1 = cvec_int_lower_bound(&vec, key);
+        if (it1 != -1)
+            printf("Sorted Vec %3d: lower_bound: %d\n", key, vec.data[it1]); // 30
 
         key = 600;
-        int* it2 = cvec_int_binary_search(&vec, key);
-        if (it2)
-            printf("Sorted Vec %d: bin. search: %d\n", key, *it2); // 600
+        intptr_t it2 = cvec_int_binary_search(&vec, key);
+        if (it2 != -1)
+            printf("Sorted Vec %d: bin. search: %d\n", key, vec.data[it2]); // 600
 
-        for (int* i = it1; i != it2; ++i)
-            printf("  %d\n", *i);
+        for (intptr_t i = it1; i != it2; ++i)
+            printf(" %d\n", vec.data[i]);
 
         puts("");
         cvec_int_drop(&vec);

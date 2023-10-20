@@ -55,7 +55,7 @@ cvec_X_value*       cvec_X_get_mut(cvec_X* self, i_keyraw raw);             // f
 cvec_X_iter         cvec_X_find(const cvec_X* self, i_keyraw raw);
 cvec_X_iter         cvec_X_find_in(cvec_X_iter i1, cvec_X_iter i2, i_keyraw raw); // return cvec_X_end() if not found
 void                cvec_X_sort(cvec_X* self);                              // qsort() from stdlib.h
-cvec_X_iter         cvec_X_bsearch(const cvec_X* self, i_key value);        // bsearch(). Note: not i_keyraw 
+cvec_X_value*       cvec_X_bsearch(const cvec_X* self, i_key value);        // bsearch() wrapper.
 
 cvec_X_value*       cvec_X_front(const cvec_X* self);
 cvec_X_value*       cvec_X_back(const cvec_X* self);

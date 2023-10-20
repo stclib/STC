@@ -138,7 +138,7 @@ static inline void _cx_MEMB(_quicksort_ij)(i_type* arr, intptr_t lo, intptr_t hi
 
 // lower bound
 
-static inline const _cx_value*
+static inline intptr_t // -1 = not found
 _cx_MEMB(_lower_bound_range)(const i_type* arr, const _cx_raw raw, intptr_t first, intptr_t last) {
     intptr_t step, count = last - first;
 
@@ -154,17 +154,17 @@ _cx_MEMB(_lower_bound_range)(const i_type* arr, const _cx_raw raw, intptr_t firs
         } else
             count = step;
     }
-    return first == last ? NULL : i_at(arr, first);
+    return first == last ? -1 : first;
 }
 
 // binary search
 
-static inline const _cx_value*
+static inline intptr_t // -1 = not found
 _cx_MEMB(_binary_search_range)(const i_type* arr, const _cx_raw raw, intptr_t first, intptr_t last) {
-    const _cx_value* res = _cx_MEMB(_lower_bound_range)(arr, raw, first, last);
-    if (res) {
-        const _cx_raw rx = i_keyto(res);
-        if (i_less((&raw), (&rx))) res = NULL;
+    intptr_t res = _cx_MEMB(_lower_bound_range)(arr, raw, first, last);
+    if (res != -1) {
+        const _cx_raw rx = i_keyto(i_at(arr, res));
+        if (i_less((&raw), (&rx))) res = -1;
     }
     return res;
 }
@@ -174,11 +174,11 @@ _cx_MEMB(_binary_search_range)(const i_type* arr, const _cx_raw raw, intptr_t fi
 static inline void _cx_MEMB(_quicksort)(i_type* arr, intptr_t n)
     { _cx_MEMB(_quicksort_ij)(arr, 0, n - 1); }
 
-static inline const _cx_value*
+static inline intptr_t // -1 = not found
 _cx_MEMB(_lower_bound)(const i_type* arr, const _cx_raw raw, intptr_t n)
     { return _cx_MEMB(_lower_bound_range)(arr, raw, 0, n); }
 
-static inline const _cx_value*
+static inline intptr_t // -1 = not found
 _cx_MEMB(_binary_search)(const i_type* arr, const _cx_raw raw, intptr_t n)
     { return _cx_MEMB(_binary_search_range)(arr, raw, 0, n); }
 
@@ -187,13 +187,13 @@ _cx_MEMB(_binary_search)(const i_type* arr, const _cx_raw raw, intptr_t n)
 static inline void _cx_MEMB(_quicksort)(i_type* arr)
     { _cx_MEMB(_quicksort_ij)(arr, 0, _cx_MEMB(_size)(arr) - 1); }
 
-static inline _cx_value*
+static inline intptr_t // -1 = not found
 _cx_MEMB(_lower_bound)(const i_type* arr, const _cx_raw raw)
-    { return (_cx_value*)_cx_MEMB(_lower_bound_range)(arr, raw, 0, _cx_MEMB(_size)(arr)); }
+    { return _cx_MEMB(_lower_bound_range)(arr, raw, 0, _cx_MEMB(_size)(arr)); }
 
-static inline _cx_value*
+static inline intptr_t // -1 = not found
 _cx_MEMB(_binary_search)(const i_type* arr, const _cx_raw raw)
-    { return (_cx_value*)_cx_MEMB(_binary_search_range)(arr, raw, 0, _cx_MEMB(_size)(arr)); }
+    { return _cx_MEMB(_binary_search_range)(arr, raw, 0, _cx_MEMB(_size)(arr)); }
 
 #endif
 
