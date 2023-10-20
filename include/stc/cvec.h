@@ -253,7 +253,7 @@ _cx_MEMB(_sort)(_cx_Self* self) {
 
 STC_INLINE _cx_value*
 _cx_MEMB(_bsearch)(const _cx_Self* self, _cx_value key) {
-    return bsearch(self->data, &key, (size_t)self->_len, sizeof(_cx_value),
+    return bsearch(&key, self->data, (size_t)self->_len, sizeof(_cx_value),
                    (int(*)(const void*, const void*))_cx_MEMB(_value_cmp));
 }
 #endif // _i_has_cmp
