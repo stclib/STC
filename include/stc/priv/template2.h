@@ -72,7 +72,6 @@
 #undef _i_has_cmp
 #undef _i_has_eq
 #undef _i_prefix
-#undef _i_expandby
 #undef _i_template
 
 #undef i_keyclass // [deprecated]

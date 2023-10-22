@@ -40,11 +40,11 @@ int main(void) {
         printf(" %d", nums[i]);
     puts("");
 
-    const int* found = ints_binary_search(nums, 25, c_arraylen(nums));
-    if (found) printf("found: %d\n", *found);
+    intptr_t idx = ints_binary_search(nums, 25, c_arraylen(nums));
+    if (idx != -1) printf("found: %d\n", nums[idx]);
 
-    found = ints_lower_bound(nums, 200, c_arraylen(nums));
-    if (found) printf("found lower 200: %d\n", *found);
+    idx = ints_lower_bound(nums, 200, c_arraylen(nums));
+    if (idx != -1) printf("found lower 200: %d\n", nums[idx]);
 }
 
 // ex2: Test on a cdeque !!
@@ -66,28 +66,27 @@ int main(void) {
         printf(" %d", *i.ref);
     puts("");
 
-    const int* found = IDeq_binary_search(&nums, 25);
-    if (found) printf("found: %d\n", *found);
+    intptr_t idx = IDeq_binary_search(&nums, 25);
+    if (idx != -1) printf("found: %d\n", *IDeq_at(&nums, idx));
 
-    found = IDeq_lower_bound(&nums, 200);
-    if (found) printf("found lower 200: %d\n", *found);
+    idx = IDeq_lower_bound(&nums, 200);
+    if (idx != -1) printf("found lower 200: %d\n", *IDeq_at(&nums, idx));
 
     IDeq_drop(&nums);
 }
 */
 #include "../ccommon.h"
 
-#if !defined i_key && defined i_val
-  #define i_key i_val
-#endif
-#ifndef i_type
+#ifndef _i_template
   #define _i_is_arr
+  #if !defined i_key && defined i_val
+    #define i_key i_val
+  #endif
   #define i_at(arr, idx) (&arr[idx])
   #define i_at_mut i_at
-  #ifndef i_tag
-    #define i_tag i_key
+  #ifndef i_type
+    #define i_type c_JOIN(i_key, s)
   #endif
-  #define i_type c_JOIN(i_tag, s)
   typedef i_key i_type, c_JOIN(i_type, _value), c_JOIN(i_type, _raw);
 #else
   #define i_at(arr, idx) _cx_MEMB(_at)(arr, idx)

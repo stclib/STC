@@ -162,7 +162,8 @@ Note that `c_flt_take()` and `c_flt_takewhile()` breaks the loop on false.
 
 ### c_init, c_drop
 
-Make any container from an initializer list:
+- **c_init** - construct any container from an initializer list:
+- **c_drop** - drop (destroy) multiple containers of the same type:
 ```c
 #define i_key_str // owned cstr string value type
 #include "stc/cset.h"
@@ -182,37 +183,56 @@ Drop multiple containers of the same type:
 c_drop(cset_str, &myset, &myset2);
 ```
 
-### c_find_if, c_erase_if, c_eraseremove_if
-Find or erase linearily in containers using a predicate
-- For `c_find_if(iter, C, c, pred)`, ***iter*** is in/out and must be declared prior to call.
-- Use `c_erase_if(iter, C, c, pred)` with **clist**, **cmap**, **cset**, **csmap**, and **csset**.
-- Use `c_eraseremove_if(iter, C, c, pred)` with **cstack**, **cvec**, **cdeq**, and **cqueue**.
+### stc_find_if, stc_erase_if, stc_eraseremove_if
+Find or erase linearily in containers using a predicate. `value` is a pointer to each element in predicate.
+- For `stc_find_if(Iter* result, CntType, cnt, pred)`, ***result*** is output and must be declared prior to call.
+- Use `stc_erase_if(CntType, cnt, pred)` with **clist**, **cmap**, **cset**, **csmap**, and **csset**.
+- Use `stc_eraseremove_if(CntType, cnt, pred)` with **cstack**, **cvec**, **cdeq**, and **cqueue** only.
 ```c
-// Search vec for first value > 2:
-cvec_i_iter i;
-c_find_if(i, cvec_i, vec, *i.ref > 2);
-if (i.ref) printf("%d\n", *i.ref);
+// Search vec for first value > 20. NOTE: `value` is a pointer to current element
+cvec_int_iter result;
+stc_find_if(&result, cvec_int, vec, *value > 20);
+if (result.ref) printf("%d\n", *result.ref);
 
-// Erase all values > 2 in vec:
-c_eraseremove_if(i, cvec_i, vec, *i.ref > 2);
+// Erase all values > 20 in a linked list:
+stc_erase_if(clist_int, &list, *value > 20);
 
-// Search map for a string containing "hello" and erase it:
-cmap_str_iter it, it1 = ..., it2 = ...;
-c_find_if(it, csmap_str, it1, it2, cstr_contains(it.ref, "hello"));
-if (it.ref) cmap_str_erase_at(&map, it);
+// Erase values (20 < value < 25) in vec:
+stc_eraseremove_if(cvec_int, &vec, *value > 20 && *value < 25);
+
+// Search a sorted map for the first string containing "hello" in range [it1, it2), and erase it:
+csmap_str_iter res, it1 = ..., it2 = ...;
+stc_find_if(&res, csmap_str, it1, it2, cstr_contains(value, "hello"));
+if (res.ref) csmap_str_erase_at(&map, res);
 
 // Erase all strings containing "hello" in a sorted map:
-c_erase_if(i, csmap_str, map, cstr_contains(i.ref, "hello"));
+stc_erase_if(csmap_str, &map, cstr_contains(value, "hello"));
+```
+
+### stc_all_of, stc_any_of, stc_none_of
+Test a container/range using a predicate. ***result*** is output and must be declared prior to call.
+- `void stc_all_of(bool* result, CntType, cnt, predicate`
+- `void stc_any_of(bool* result, CntType, cnt, predicate)`
+- `void stc_none_of(bool* result, CntType, cnt, predicate)`
+```c
+#define DivisibleBy(n) (*value % (n) == 0) // `value` refers to the current element
+
+bool result;
+stc_any_of(&result, cvec_int, vec, DivisibleBy(7));
+if (result)
+    puts("At least one number is divisible by 7");
 ```
 
 ### quicksort, binary_search, lower_bound - 2X faster qsort on arrays
 
-The **quicksort**, **quicksort_ij** algorithm is about twice as fast as *qsort()*, and often simpler to use.
-You may customize `i_tag` and the comparison function `i_cmp` or `i_less`.  
+The **quicksort**, **quicksort_ij** algorithm is about twice as fast as *qsort()*,
+and typically simpler to use. You may customize `i_type` and the comparison function
+`i_cmp` or `i_less`. All containers with random access may be sorted, including regular C-arrays.
+- `void MyType_quicksort(MyType* cnt, intptr_t n);`
 
 There is a [benchmark/test file here](../misc/benchmarks/various/quicksort_bench.c).
 ```c
-#define i_key int
+#define i_key int                    // note: "container" type becomes `ints` (i_type can override).
 #include "stc/algo/quicksort.h"
 #include <stdio.h>
 
@@ -222,8 +242,8 @@ int main(void) {
     c_forrange (i, c_arraylen(arr)) printf(" %d", arr[i]);
 }
 ```
-Containers with random access may also be sorted. Even sorting cdeq/cqueue (with ring buffer) is
-possible and very fast. Note that `i_more` must be defined to "extend" the specified template parameters for use by quicksort:
+Also sorting cdeq/cqueue (with ring buffer) is possible, and very fast. Note that `i_more`
+must be defined to "extend the life" of specified template parameters for use by quicksort:
 ```c
 #define i_type MyDeq
 #define i_key int

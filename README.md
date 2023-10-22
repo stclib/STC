@@ -36,7 +36,7 @@ Algorithms
 ----------  
 - [***Ranged for-loops*** - c_foreach, c_forpair, c_forlist](docs/algorithm_api.md#ranged-for-loops)
 - [***Range algorithms*** - c_forrange, crange, c_forfilter](docs/algorithm_api.md#range-algorithms)
-- [***Generic algorithms*** - c_init, c_find_if, c_erase_if, csort, etc.](docs/algorithm_api.md#generic-algorithms)
+- [***Generic algorithms*** - c_init, stc_find_if, stc_erase_if, X_quicksort, etc.](docs/algorithm_api.md#generic-algorithms)
 - [***Coroutines*** - ergonomic portable coroutines](docs/coroutine_api.md)
 - [***Regular expressions*** - Rob Pike's Plan 9 regexp modernized!](docs/cregex_api.md)
 - [***Random numbers*** - a very fast *PRNG* based on *SFC64*](docs/crandom_api.md)
@@ -715,7 +715,7 @@ Major changes:
 - Algorithms:
     - [crange](docs/algorithm_api.md#crange) - similar to [boost::irange](https://www.boost.org/doc/libs/release/libs/range/doc/html/range/reference/ranges/irange.html) integer range generator.
     - [c_forfilter](docs/algorithm_api.md#c_forfilter) - ranges-like view filtering.
-    - [csort](include/stc/algo/quicksort.h) - [fast quicksort](misc/benchmarks/various/csort_bench.c) with custom inline comparison.
+    - [csort](include/stc/algo/quicksort.h) - [fast quicksort](misc/benchmarks/various/quicksort_bench.c) with custom inline comparison.
 - Renamed `c_ARGSV()` => `c_SV()`: **csview** print arg. Note `c_sv()` is shorthand for *csview_from()*.
 - Support for [uppercase flow-control](include/stc/priv/altnames.h) macro names in ccommon.h.
 - Some API changes in **cregex** and **cstr**.
