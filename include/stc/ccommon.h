@@ -24,7 +24,7 @@
 #define CCOMMON_H_INCLUDED
 
 #ifdef _MSC_VER
-  #pragma warning(disable: 4116 4996) // unnamed type definition in parentheses
+    #pragma warning(disable: 4116 4996) // unnamed type definition in parentheses
 #endif
 #include <inttypes.h>
 #include <stddef.h>
@@ -38,9 +38,9 @@ typedef long long _llong;
 #define c_ZU PRIuPTR
 
 #if defined __GNUC__ // includes __clang__
-  #define STC_INLINE static inline __attribute((unused))
+    #define STC_INLINE static inline __attribute((unused))
 #else
-  #define STC_INLINE static inline
+    #define STC_INLINE static inline
 #endif
 
 /* Macro overloading feature support based on: https://rextester.com/ONP80107 */
@@ -55,17 +55,17 @@ typedef long long _llong;
 #define _c_ARG_N(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, \
                  _14, _15, _16, N, ...) N
 
-#ifdef __cplusplus 
-  #include <new>
-  #define _i_alloc(T)           static_cast<T*>(i_malloc(c_sizeof(T)))
-  #define _i_new(T, ...)        new (_i_alloc(T)) T(__VA_ARGS__)
-  #define c_new(T, ...)         new (malloc(sizeof(T))) T(__VA_ARGS__)
-  #define c_LITERAL(T)          T
+#ifndef __cplusplus 
+    #define _i_alloc(T)         ((T*)i_malloc(c_sizeof(T)))
+    #define _i_new(T, ...)      ((T*)memcpy(_i_alloc(T), ((T[]){__VA_ARGS__}), sizeof(T)))
+    #define c_new(T, ...)       ((T*)memcpy(malloc(sizeof(T)), ((T[]){__VA_ARGS__}), sizeof(T)))
+    #define c_LITERAL(T)        (T)
 #else
-  #define _i_alloc(T)           ((T*)i_malloc(c_sizeof(T)))
-  #define _i_new(T, ...)        ((T*)memcpy(_i_alloc(T), ((T[]){__VA_ARGS__}), sizeof(T)))
-  #define c_new(T, ...)         ((T*)memcpy(malloc(sizeof(T)), ((T[]){__VA_ARGS__}), sizeof(T)))
-  #define c_LITERAL(T)          (T)
+    #include <new>
+    #define _i_alloc(T)         static_cast<T*>(i_malloc(c_sizeof(T)))
+    #define _i_new(T, ...)      new (_i_alloc(T)) T(__VA_ARGS__)
+    #define c_new(T, ...)       new (malloc(sizeof(T))) T(__VA_ARGS__)
+    #define c_LITERAL(T)        T
 #endif
 #define c_new_n(T, n)           ((T*)malloc(sizeof(T)*c_i2u_size(n)))
 #define c_malloc(sz)            malloc(c_i2u_size(sz))
@@ -76,9 +76,9 @@ typedef long long _llong;
 
 #define c_static_assert(expr)   (1 ? 0 : (int)sizeof(int[(expr) ? 1 : -1]))
 #if defined STC_NDEBUG || defined NDEBUG
-  #define c_assert(expr)        ((void)0)
+    #define c_assert(expr)      ((void)0)
 #else
-  #define c_assert(expr)        assert(expr)
+    #define c_assert(expr)      assert(expr)
 #endif
 #define c_container_of(p, C, m) ((C*)((char*)(1 ? (p) : &((C*)0)->m) - offsetof(C, m)))
 #define c_const_cast(Tp, p)     ((Tp)(1 ? (p) : (Tp)0))
@@ -154,11 +154,8 @@ STC_INLINE uint64_t stc_hash_2(const void* key, intptr_t len) {
 STC_INLINE uint64_t stc_strhash(const char *str)
     { return stc_hash_2(str, c_strlen(str)); }
 
-#define stc_hash_combine(...) \
-    _stc_hash_combine((uint64_t[]){__VA_ARGS__}, c_NUMARGS(__VA_ARGS__))
-
-STC_INLINE uint64_t _stc_hash_combine(uint64_t h[], int n) { // n > 0
-    for (int i = 1; i < n; ++i) h[0] ^= h[0] - h[i]; // non-commutative!
+STC_INLINE uint64_t _stc_hash_mix(uint64_t h[], int n) { // n > 0
+    for (int i = 1; i < n; ++i) h[0] ^= h[0] + h[i]; // non-commutative!
     return h[0];
 }
 
@@ -212,23 +209,27 @@ STC_INLINE intptr_t stc_nextpow2(intptr_t n) {
          ; (_inc > 0) ^ (i > _end); i += _inc)
 
 #ifndef __cplusplus
-  #define c_init(C, ...) \
-      C##_from_n((C##_raw[])__VA_ARGS__, c_sizeof((C##_raw[])__VA_ARGS__)/c_sizeof(C##_raw))
-  #define c_forlist(it, T, ...) \
-      for (struct {T* ref; int size, index;} \
-           it = {.ref=(T[])__VA_ARGS__, .size=(int)(sizeof((T[])__VA_ARGS__)/sizeof(T))} \
-           ; it.index < it.size; ++it.ref, ++it.index)
+    #define c_init(C, ...) \
+        C##_from_n((C##_raw[])__VA_ARGS__, c_sizeof((C##_raw[])__VA_ARGS__)/c_sizeof(C##_raw))
+    #define c_forlist(it, T, ...) \
+        for (struct {T* ref; int size, index;} \
+             it = {.ref=(T[])__VA_ARGS__, .size=(int)(sizeof((T[])__VA_ARGS__)/sizeof(T))} \
+             ; it.index < it.size; ++it.ref, ++it.index)
+    #define stc_hash_mix(...) \
+        _stc_hash_mix((uint64_t[]){__VA_ARGS__}, c_NUMARGS(__VA_ARGS__))
 #else
     #include <initializer_list>
+    #include <array>
     template <class C, class T>
     inline C _from_n(C (*func)(const T[], intptr_t), std::initializer_list<T> il)
         { return func(&*il.begin(), il.size()); }
-
     #define c_init(C, ...) _from_n<C,C##_raw>(C##_from_n, __VA_ARGS__)
     #define c_forlist(it, T, ...) \
         for (struct {std::initializer_list<T> _il; std::initializer_list<T>::iterator ref; size_t size, index;} \
              it = {._il=__VA_ARGS__, .ref=it._il.begin(), .size=it._il.size()} \
              ; it.index < it.size; ++it.ref, ++it.index)
+    #define stc_hash_mix(...) \
+        _stc_hash_mix(std::array<uint64_t, c_NUMARGS(__VA_ARGS__)>{__VA_ARGS__}.data(), c_NUMARGS(__VA_ARGS__))
 #endif
 
 #define c_defer(...) \

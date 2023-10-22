@@ -181,8 +181,7 @@ typedef struct cco_runtime {
 #define cco_await_task_2(task, rt) cco_await_task_3(task, rt, CCO_DONE)
 #define cco_await_task_3(task, rt, awaitbits) \
     do { \
-        cco_runtime* _rt = rt; \
-        (_rt->stack[++_rt->top] = cco_cast_task(task))->cco_expect = (awaitbits); \
+        ((rt)->stack[++(rt)->top] = cco_cast_task(task))->cco_expect = (awaitbits); \
         cco_yield_v(CCO_AWAIT); \
     } while (0)
 

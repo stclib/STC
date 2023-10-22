@@ -91,7 +91,7 @@ Free helper functions:
 uint64_t              stc_hash(const void *data, intptr_t n);               // base hash function
 uint64_t              stc_hash(const T* obj);                               // base hash function. n=sizeof(T)
 uint64_t              stc_strhash(const char *str);                         // string hash function, uses strlen()
-uint64_t              stc_hash_combine(uint64_t h1, uint64_t h2, ...);      // combine hashes
+uint64_t              stc_hash_mix(uint64_t h1, uint64_t h2, ...);          // mix computed hashes
 uint64_t              stc_nextpow2(intptr_t i);                             // get next power of 2 >= i
 
 // hash/equal template default functions:
