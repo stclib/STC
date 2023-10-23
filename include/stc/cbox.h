@@ -91,8 +91,9 @@ STC_INLINE i_type _c_MEMB(_from_ptr)(_m_value* p)
 
 // c++: std::make_unique<i_key>(val)
 STC_INLINE i_type _c_MEMB(_make)(_m_value val) {
-    i_type ptr = {_i_alloc(_m_value)};
-    *ptr.get = val; return ptr;
+    i_type box = {_i_alloc(_m_value)};
+    *box.get = val;
+    return box;
 }
 
 STC_INLINE _m_raw _c_MEMB(_toraw)(const i_type* self)
@@ -107,9 +108,9 @@ STC_INLINE void _c_MEMB(_drop)(i_type* self) {
 }
 
 STC_INLINE i_type _c_MEMB(_move)(i_type* self) {
-    i_type ptr = *self; 
+    i_type box = *self; 
     self->get = NULL;
-    return ptr;
+    return box;
 }
 
 STC_INLINE _m_value* _c_MEMB(_release)(i_type* self)

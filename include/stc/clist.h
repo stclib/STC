@@ -186,7 +186,7 @@ _c_MEMB(_advance)(_m_iter it, size_t n) {
 
 STC_INLINE _m_iter
 _c_MEMB(_splice_range)(i_type* self, _m_iter it,
-                        i_type* other, _m_iter it1, _m_iter it2) {
+                       i_type* other, _m_iter it1, _m_iter it2) {
     i_type tmp = _c_MEMB(_split_off)(other, it1, it2);
     return _c_MEMB(_splice)(self, it, &tmp);
 }
@@ -344,7 +344,7 @@ _c_MEMB(_split_off)(i_type* self, _m_iter it1, _m_iter it2) {
     if (it1.ref == it2.ref)
         return lst;
     _m_node *p1 = it1.prev,
-             *p2 = it2.ref ? it2.prev : self->last;
+            *p2 = it2.ref ? it2.prev : self->last;
     p1->next = p2->next;
     p2->next = _clist_tonode(it1.ref);
     if (self->last == p2)

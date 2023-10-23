@@ -106,28 +106,28 @@ STC_INLINE long _c_MEMB(_use_count)(const i_type* self)
     { return self->use_count ? *self->use_count : 0; }
 
 STC_INLINE i_type _c_MEMB(_from_ptr)(_m_value* p) {
-    i_type ptr = {p};
+    i_type arc = {p};
     if (p) 
-        *(ptr.use_count = _i_alloc(catomic_long)) = 1;
-    return ptr;
+        *(arc.use_count = _i_alloc(catomic_long)) = 1;
+    return arc;
 }
 
 // c++: std::make_shared<_m_value>(val)
 STC_INLINE i_type _c_MEMB(_make)(_m_value val) {
-    i_type ptr;
+    i_type arc;
     struct _c_MEMB(_rep_)* rep = _i_alloc(struct _c_MEMB(_rep_));
-    *(ptr.use_count = &rep->counter) = 1;
-    *(ptr.get = &rep->value) = val;
-    return ptr;
+    *(arc.use_count = &rep->counter) = 1;
+    *(arc.get = &rep->value) = val;
+    return arc;
 }
 
 STC_INLINE _m_raw _c_MEMB(_toraw)(const i_type* self)
     { return i_keyto(self->get); }
 
 STC_INLINE i_type _c_MEMB(_move)(i_type* self) {
-    i_type ptr = *self;
+    i_type arc = *self;
     self->get = NULL, self->use_count = NULL;
-    return ptr;
+    return arc;
 }
 
 STC_INLINE void _c_MEMB(_drop)(i_type* self) {
@@ -158,10 +158,10 @@ STC_INLINE i_type _c_MEMB(_from)(_m_value val)
 #endif    
 
 // does not use i_keyclone, so OK to always define.
-STC_INLINE i_type _c_MEMB(_clone)(i_type ptr) {
-    if (ptr.use_count)
-        _i_atomic_inc(ptr.use_count);
-    return ptr;
+STC_INLINE i_type _c_MEMB(_clone)(i_type arc) {
+    if (arc.use_count)
+        _i_atomic_inc(arc.use_count);
+    return arc;
 }
 
 // take ownership of unowned
@@ -169,12 +169,12 @@ STC_INLINE void _c_MEMB(_take)(i_type* self, i_type unowned) {
     _c_MEMB(_drop)(self);
     *self = unowned;
 }
-// share ownership with ptr
-STC_INLINE void _c_MEMB(_assign)(i_type* self, i_type ptr) {
-    if (ptr.use_count)
-        _i_atomic_inc(ptr.use_count);
+// share ownership with arc
+STC_INLINE void _c_MEMB(_assign)(i_type* self, i_type arc) {
+    if (arc.use_count)
+        _i_atomic_inc(arc.use_count);
     _c_MEMB(_drop)(self);
-    *self = ptr;
+    *self = arc;
 }
 
 #if defined _i_has_cmp

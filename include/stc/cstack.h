@@ -178,7 +178,7 @@ STC_INLINE i_keyraw _c_MEMB(_value_toraw)(const _m_value* val)
 
 STC_INLINE _m_iter _c_MEMB(_begin)(const i_type* self) {
     return c_LITERAL(_m_iter){self->_len ? (_m_value*)self->data : NULL,
-                               (_m_value*)self->data + self->_len};
+                              (_m_value*)self->data + self->_len};
 }
 
 STC_INLINE _m_iter _c_MEMB(_end)(const i_type* self)

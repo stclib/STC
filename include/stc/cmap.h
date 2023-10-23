@@ -230,8 +230,8 @@ _c_MEMB(_find)(const i_type* self, _m_keyraw rkey) {
     _m_result b;
     if (self->size && !(b = _c_MEMB(_bucket_)(self, &rkey)).inserted)
         return c_LITERAL(_m_iter){b.ref, 
-                                   self->table + self->bucket_count,
-                                   self->slot + (b.ref - self->table)};
+                                  self->table + self->bucket_count,
+                                  self->slot + (b.ref - self->table)};
     return _c_MEMB(_end)(self);
 }
 
@@ -394,7 +394,7 @@ STC_DEF i_type
 _c_MEMB(_clone)(i_type m) {
     if (m.table) {
         _m_value *d = (_m_value *)i_malloc(c_sizeof(_m_value)*m.bucket_count),
-                  *_dst = d, *_end = m.table + m.bucket_count;
+                 *_dst = d, *_end = m.table + m.bucket_count;
         const intptr_t _mem = c_sizeof(struct chash_slot)*(m.bucket_count + 1);
         struct chash_slot *s = (struct chash_slot *)c_memcpy(i_malloc(_mem), m.slot, _mem);
         if (!(d && s)) 

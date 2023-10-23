@@ -254,7 +254,7 @@ _c_MEMB(_sort)(i_type* self) {
 STC_INLINE _m_value*
 _c_MEMB(_bsearch)(const i_type* self, _m_value key) {
     return (_m_value*)bsearch(&key, self->data, (size_t)self->_len, sizeof(_m_value),
-                               (int(*)(const void*, const void*))_c_MEMB(_value_cmp));
+                              (int(*)(const void*, const void*))_c_MEMB(_value_cmp));
 }
 #endif // _i_has_cmp
 
@@ -341,7 +341,7 @@ _c_MEMB(_clone)(i_type cx) {
 
 STC_DEF _m_iter
 _c_MEMB(_copy_n)(i_type* self, const intptr_t idx,
-                  const _m_value arr[], const intptr_t n) {
+                 const _m_value arr[], const intptr_t n) {
     _m_iter it = _c_MEMB(_insert_uninit)(self, idx, n);
     if (it.ref)
         for (_m_value* p = it.ref, *q = p + n; p != q; ++arr)
