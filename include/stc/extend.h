@@ -56,7 +56,7 @@ typedef struct {
     i_type get;
 } c_JOIN(i_type, _ext);
 
-#define c_extend() c_container_of(self, _cx_MEMB(_ext), get)
+#define c_extend() c_container_of(self, _c_MEMB(_ext), get)
 // Note: i_less: c_extend() accessible for cpque types
 //       i_cmp: c_extend() accessible for csmap and csset types
 //       i_hash/i_eq: c_extend() accessible for cmap and cset types

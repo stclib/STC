@@ -25,17 +25,17 @@
 
 #ifndef STC_TEMPLATE_H_INCLUDED
 #define STC_TEMPLATE_H_INCLUDED
-  #define _cx_Self i_type
-  #define _cx_MEMB(name) c_JOIN(_cx_Self, name)
-  #define _cx_DEFTYPES(macro, SELF, ...) c_EXPAND(macro(SELF, __VA_ARGS__))
-  #define _cx_value _cx_MEMB(_value)
-  #define _cx_key _cx_MEMB(_key)
-  #define _cx_mapped _cx_MEMB(_mapped)
-  #define _cx_raw _cx_MEMB(_raw)
-  #define _cx_keyraw _cx_MEMB(_keyraw)
-  #define _cx_iter _cx_MEMB(_iter)
-  #define _cx_result _cx_MEMB(_result)
-  #define _cx_node _cx_MEMB(_node)
+  #define _c_MEMB(name) c_JOIN(i_type, name)
+  #define _c_DEFTYPES(macro, SELF, ...) c_EXPAND(macro(SELF, __VA_ARGS__))
+  #define _m_value _c_MEMB(_value)
+  #define _m_key _c_MEMB(_key)
+  #define _m_mapped _c_MEMB(_mapped)
+  #define _m_rmapped _c_MEMB(_rmapped)
+  #define _m_raw _c_MEMB(_raw)
+  #define _m_keyraw _c_MEMB(_keyraw)
+  #define _m_iter _c_MEMB(_iter)
+  #define _m_result _c_MEMB(_result)
+  #define _m_node _c_MEMB(_node)
 #endif
 
 #ifndef i_type

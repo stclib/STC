@@ -82,7 +82,7 @@ int main(void) {
 #endif
 #define _i_carc
 #include "priv/template.h"
-typedef i_keyraw _cx_raw;
+typedef i_keyraw _m_raw;
 
 #if c_option(c_no_atomic)
   #define i_no_atomic
@@ -95,124 +95,124 @@ typedef i_keyraw _cx_raw;
   #define _i_atomic_dec_and_test(v) !(--*(v))
 #endif
 #ifndef i_is_forward
-_cx_DEFTYPES(_c_carc_types, _cx_Self, i_key);
+_c_DEFTYPES(_c_carc_types, i_type, i_key);
 #endif
-struct _cx_MEMB(_rep_) { catomic_long counter; i_key value; };
+struct _c_MEMB(_rep_) { catomic_long counter; i_key value; };
 
-STC_INLINE _cx_Self _cx_MEMB(_init)(void) 
-    { return c_LITERAL(_cx_Self){NULL, NULL}; }
+STC_INLINE i_type _c_MEMB(_init)(void) 
+    { return c_LITERAL(i_type){NULL, NULL}; }
 
-STC_INLINE long _cx_MEMB(_use_count)(const _cx_Self* self)
+STC_INLINE long _c_MEMB(_use_count)(const i_type* self)
     { return self->use_count ? *self->use_count : 0; }
 
-STC_INLINE _cx_Self _cx_MEMB(_from_ptr)(_cx_value* p) {
-    _cx_Self ptr = {p};
+STC_INLINE i_type _c_MEMB(_from_ptr)(_m_value* p) {
+    i_type ptr = {p};
     if (p) 
         *(ptr.use_count = _i_alloc(catomic_long)) = 1;
     return ptr;
 }
 
-// c++: std::make_shared<_cx_value>(val)
-STC_INLINE _cx_Self _cx_MEMB(_make)(_cx_value val) {
-    _cx_Self ptr;
-    struct _cx_MEMB(_rep_)* rep = _i_alloc(struct _cx_MEMB(_rep_));
+// c++: std::make_shared<_m_value>(val)
+STC_INLINE i_type _c_MEMB(_make)(_m_value val) {
+    i_type ptr;
+    struct _c_MEMB(_rep_)* rep = _i_alloc(struct _c_MEMB(_rep_));
     *(ptr.use_count = &rep->counter) = 1;
     *(ptr.get = &rep->value) = val;
     return ptr;
 }
 
-STC_INLINE _cx_raw _cx_MEMB(_toraw)(const _cx_Self* self)
+STC_INLINE _m_raw _c_MEMB(_toraw)(const i_type* self)
     { return i_keyto(self->get); }
 
-STC_INLINE _cx_Self _cx_MEMB(_move)(_cx_Self* self) {
-    _cx_Self ptr = *self;
+STC_INLINE i_type _c_MEMB(_move)(i_type* self) {
+    i_type ptr = *self;
     self->get = NULL, self->use_count = NULL;
     return ptr;
 }
 
-STC_INLINE void _cx_MEMB(_drop)(_cx_Self* self) {
+STC_INLINE void _c_MEMB(_drop)(i_type* self) {
     if (self->use_count && _i_atomic_dec_and_test(self->use_count)) {
         i_keydrop(self->get);
-        if ((char *)self->get != (char *)self->use_count + offsetof(struct _cx_MEMB(_rep_), value))
+        if ((char *)self->get != (char *)self->use_count + offsetof(struct _c_MEMB(_rep_), value))
             i_free(self->get);
         i_free((long*)self->use_count);
     }
 }
 
-STC_INLINE void _cx_MEMB(_reset)(_cx_Self* self) {
-    _cx_MEMB(_drop)(self);
+STC_INLINE void _c_MEMB(_reset)(i_type* self) {
+    _c_MEMB(_drop)(self);
     self->use_count = NULL, self->get = NULL;
 }
 
-STC_INLINE void _cx_MEMB(_reset_to)(_cx_Self* self, _cx_value* p) {
-    _cx_MEMB(_drop)(self);
-    *self = _cx_MEMB(_from_ptr)(p);
+STC_INLINE void _c_MEMB(_reset_to)(i_type* self, _m_value* p) {
+    _c_MEMB(_drop)(self);
+    *self = _c_MEMB(_from_ptr)(p);
 }
 
 #ifndef i_no_emplace
-STC_INLINE _cx_Self _cx_MEMB(_from)(_cx_raw raw)
-    { return _cx_MEMB(_make)(i_keyfrom(raw)); }
+STC_INLINE i_type _c_MEMB(_from)(_m_raw raw)
+    { return _c_MEMB(_make)(i_keyfrom(raw)); }
 #else
-STC_INLINE _cx_Self _cx_MEMB(_from)(_cx_value val)
-    { return _cx_MEMB(_make)(val); }
+STC_INLINE i_type _c_MEMB(_from)(_m_value val)
+    { return _c_MEMB(_make)(val); }
 #endif    
 
 // does not use i_keyclone, so OK to always define.
-STC_INLINE _cx_Self _cx_MEMB(_clone)(_cx_Self ptr) {
+STC_INLINE i_type _c_MEMB(_clone)(i_type ptr) {
     if (ptr.use_count)
         _i_atomic_inc(ptr.use_count);
     return ptr;
 }
 
 // take ownership of unowned
-STC_INLINE void _cx_MEMB(_take)(_cx_Self* self, _cx_Self unowned) {
-    _cx_MEMB(_drop)(self);
+STC_INLINE void _c_MEMB(_take)(i_type* self, i_type unowned) {
+    _c_MEMB(_drop)(self);
     *self = unowned;
 }
 // share ownership with ptr
-STC_INLINE void _cx_MEMB(_assign)(_cx_Self* self, _cx_Self ptr) {
+STC_INLINE void _c_MEMB(_assign)(i_type* self, i_type ptr) {
     if (ptr.use_count)
         _i_atomic_inc(ptr.use_count);
-    _cx_MEMB(_drop)(self);
+    _c_MEMB(_drop)(self);
     *self = ptr;
 }
 
 #if defined _i_has_cmp
-    STC_INLINE int _cx_MEMB(_raw_cmp)(const _cx_raw* rx, const _cx_raw* ry)
+    STC_INLINE int _c_MEMB(_raw_cmp)(const _m_raw* rx, const _m_raw* ry)
         { return i_cmp(rx, ry); }
 
-    STC_INLINE int _cx_MEMB(_cmp)(const _cx_Self* self, const _cx_Self* other) {
-        _cx_raw rx = i_keyto(self->get), ry = i_keyto(other->get);
+    STC_INLINE int _c_MEMB(_cmp)(const i_type* self, const i_type* other) {
+        _m_raw rx = i_keyto(self->get), ry = i_keyto(other->get);
         return i_cmp((&rx), (&ry));
     }
 #else
-    STC_INLINE int _cx_MEMB(_cmp)(const _cx_Self* self, const _cx_Self* other)
+    STC_INLINE int _c_MEMB(_cmp)(const i_type* self, const i_type* other)
         { return c_default_cmp(&self->get, &other->get); }
 #endif
 
 #if defined _i_has_eq
-    STC_INLINE bool _cx_MEMB(_raw_eq)(const _cx_raw* rx, const _cx_raw* ry)
+    STC_INLINE bool _c_MEMB(_raw_eq)(const _m_raw* rx, const _m_raw* ry)
         { return i_eq(rx, ry); }
 
-    STC_INLINE bool _cx_MEMB(_eq)(const _cx_Self* self, const _cx_Self* other) {
-        _cx_raw rx = i_keyto(self->get), ry = i_keyto(other->get);
+    STC_INLINE bool _c_MEMB(_eq)(const i_type* self, const i_type* other) {
+        _m_raw rx = i_keyto(self->get), ry = i_keyto(other->get);
         return i_eq((&rx), (&ry));
     }
 #else
-    STC_INLINE bool _cx_MEMB(_eq)(const _cx_Self* self, const _cx_Self* other)
+    STC_INLINE bool _c_MEMB(_eq)(const i_type* self, const i_type* other)
         { return self->get == other->get; }
 #endif
 
 #ifndef i_no_hash
-    STC_INLINE uint64_t _cx_MEMB(_raw_hash)(const _cx_raw* rx)
+    STC_INLINE uint64_t _c_MEMB(_raw_hash)(const _m_raw* rx)
         { return i_hash(rx); }
 
-    STC_INLINE uint64_t _cx_MEMB(_hash)(const _cx_Self* self) { 
-        _cx_raw rx = i_keyto(self->get); 
+    STC_INLINE uint64_t _c_MEMB(_hash)(const i_type* self) { 
+        _m_raw rx = i_keyto(self->get); 
         return i_hash((&rx));
     }
 #else
-    STC_INLINE uint64_t _cx_MEMB(_hash)(const _cx_Self* self)
+    STC_INLINE uint64_t _c_MEMB(_hash)(const i_type* self)
         { return c_default_hash(&self->get); }
 #endif // i_no_hash
 

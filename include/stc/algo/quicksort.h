@@ -89,19 +89,19 @@ int main(void) {
   #endif
   typedef i_key i_type, c_JOIN(i_type, _value), c_JOIN(i_type, _raw);
 #else
-  #define i_at(arr, idx) _cx_MEMB(_at)(arr, idx)
-  #define i_at_mut(arr, idx) _cx_MEMB(_at_mut)(arr, idx)
+  #define i_at(arr, idx) _c_MEMB(_at)(arr, idx)
+  #define i_at_mut(arr, idx) _c_MEMB(_at_mut)(arr, idx)
 #endif
 #include "../priv/template.h"
 
 // quick sort
 
-static inline void _cx_MEMB(_insertsort_ij)(i_type* arr, intptr_t lo, intptr_t hi) {
+static inline void _c_MEMB(_insertsort_ij)(i_type* arr, intptr_t lo, intptr_t hi) {
     for (intptr_t j = lo, i = lo + 1; i <= hi; j = i, ++i) {
-        _cx_value x = *i_at(arr, i);
-        _cx_raw rx = i_keyto(&x);
+        _m_value x = *i_at(arr, i);
+        _m_raw rx = i_keyto(&x);
         while (j >= 0) {
-            _cx_raw ry = i_keyto(i_at(arr, j));
+            _m_raw ry = i_keyto(i_at(arr, j));
             if (!(i_less((&rx), (&ry)))) break;
             *i_at_mut(arr, j + 1) = *i_at(arr, j);
             --j;
@@ -110,10 +110,10 @@ static inline void _cx_MEMB(_insertsort_ij)(i_type* arr, intptr_t lo, intptr_t h
     }
 }
 
-static inline void _cx_MEMB(_quicksort_ij)(i_type* arr, intptr_t lo, intptr_t hi) {
+static inline void _c_MEMB(_quicksort_ij)(i_type* arr, intptr_t lo, intptr_t hi) {
     intptr_t i = lo, j;
     while (lo < hi) {
-        _cx_raw pivot = i_keyto(i_at(arr, lo + (hi - lo)*7/16)), rx;
+        _m_raw pivot = i_keyto(i_at(arr, lo + (hi - lo)*7/16)), rx;
         j = hi;
 
         while (i <= j) {
@@ -129,8 +129,8 @@ static inline void _cx_MEMB(_quicksort_ij)(i_type* arr, intptr_t lo, intptr_t hi
             c_swap(intptr_t, &hi, &j);
         }
 
-        if (j - lo > 64) _cx_MEMB(_quicksort_ij)(arr, lo, j);
-        else if (j > lo) _cx_MEMB(_insertsort_ij)(arr, lo, j);
+        if (j - lo > 64) _c_MEMB(_quicksort_ij)(arr, lo, j);
+        else if (j > lo) _c_MEMB(_insertsort_ij)(arr, lo, j);
         lo = i;
     }
 }
@@ -138,7 +138,7 @@ static inline void _cx_MEMB(_quicksort_ij)(i_type* arr, intptr_t lo, intptr_t hi
 // lower bound
 
 static inline intptr_t // -1 = not found
-_cx_MEMB(_lower_bound_range)(const i_type* arr, const _cx_raw raw, intptr_t first, intptr_t last) {
+_c_MEMB(_lower_bound_range)(const i_type* arr, const _m_raw raw, intptr_t first, intptr_t last) {
     intptr_t step, count = last - first;
 
     while (count > 0) {
@@ -146,7 +146,7 @@ _cx_MEMB(_lower_bound_range)(const i_type* arr, const _cx_raw raw, intptr_t firs
         step = count / 2;
         it += step;
 
-        const _cx_raw rx = i_keyto(i_at(arr, it));
+        const _m_raw rx = i_keyto(i_at(arr, it));
         if (i_less((&rx), (&raw))) {
             first = ++it;
             count -= step + 1;
@@ -159,10 +159,10 @@ _cx_MEMB(_lower_bound_range)(const i_type* arr, const _cx_raw raw, intptr_t firs
 // binary search
 
 static inline intptr_t // -1 = not found
-_cx_MEMB(_binary_search_range)(const i_type* arr, const _cx_raw raw, intptr_t first, intptr_t last) {
-    intptr_t res = _cx_MEMB(_lower_bound_range)(arr, raw, first, last);
+_c_MEMB(_binary_search_range)(const i_type* arr, const _m_raw raw, intptr_t first, intptr_t last) {
+    intptr_t res = _c_MEMB(_lower_bound_range)(arr, raw, first, last);
     if (res != -1) {
-        const _cx_raw rx = i_keyto(i_at(arr, res));
+        const _m_raw rx = i_keyto(i_at(arr, res));
         if (i_less((&raw), (&rx))) res = -1;
     }
     return res;
@@ -170,29 +170,29 @@ _cx_MEMB(_binary_search_range)(const i_type* arr, const _cx_raw raw, intptr_t fi
 
 #ifdef _i_is_arr
 
-static inline void _cx_MEMB(_quicksort)(i_type* arr, intptr_t n)
-    { _cx_MEMB(_quicksort_ij)(arr, 0, n - 1); }
+static inline void _c_MEMB(_quicksort)(i_type* arr, intptr_t n)
+    { _c_MEMB(_quicksort_ij)(arr, 0, n - 1); }
 
 static inline intptr_t // -1 = not found
-_cx_MEMB(_lower_bound)(const i_type* arr, const _cx_raw raw, intptr_t n)
-    { return _cx_MEMB(_lower_bound_range)(arr, raw, 0, n); }
+_c_MEMB(_lower_bound)(const i_type* arr, const _m_raw raw, intptr_t n)
+    { return _c_MEMB(_lower_bound_range)(arr, raw, 0, n); }
 
 static inline intptr_t // -1 = not found
-_cx_MEMB(_binary_search)(const i_type* arr, const _cx_raw raw, intptr_t n)
-    { return _cx_MEMB(_binary_search_range)(arr, raw, 0, n); }
+_c_MEMB(_binary_search)(const i_type* arr, const _m_raw raw, intptr_t n)
+    { return _c_MEMB(_binary_search_range)(arr, raw, 0, n); }
 
 #else
 
-static inline void _cx_MEMB(_quicksort)(i_type* arr)
-    { _cx_MEMB(_quicksort_ij)(arr, 0, _cx_MEMB(_size)(arr) - 1); }
+static inline void _c_MEMB(_quicksort)(i_type* arr)
+    { _c_MEMB(_quicksort_ij)(arr, 0, _c_MEMB(_size)(arr) - 1); }
 
 static inline intptr_t // -1 = not found
-_cx_MEMB(_lower_bound)(const i_type* arr, const _cx_raw raw)
-    { return _cx_MEMB(_lower_bound_range)(arr, raw, 0, _cx_MEMB(_size)(arr)); }
+_c_MEMB(_lower_bound)(const i_type* arr, const _m_raw raw)
+    { return _c_MEMB(_lower_bound_range)(arr, raw, 0, _c_MEMB(_size)(arr)); }
 
 static inline intptr_t // -1 = not found
-_cx_MEMB(_binary_search)(const i_type* arr, const _cx_raw raw)
-    { return _cx_MEMB(_binary_search_range)(arr, raw, 0, _cx_MEMB(_size)(arr)); }
+_c_MEMB(_binary_search)(const i_type* arr, const _m_raw raw)
+    { return _c_MEMB(_binary_search_range)(arr, raw, 0, _c_MEMB(_size)(arr)); }
 
 #endif
 

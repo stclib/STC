@@ -21,8 +21,8 @@
  * SOFTWARE.
  */
 
-STC_DEF _cx_iter _cx_MEMB(_advance)(_cx_iter it, intptr_t n) {
-    intptr_t len = _cx_MEMB(_size)(it._s);
+STC_DEF _m_iter _c_MEMB(_advance)(_m_iter it, intptr_t n) {
+    intptr_t len = _c_MEMB(_size)(it._s);
     intptr_t pos = it.pos, idx = _cdeq_toidx(it._s, pos);
     it.pos = (pos + n) & it._s->capmask; 
     it.ref += it.pos - pos;
@@ -31,31 +31,31 @@ STC_DEF _cx_iter _cx_MEMB(_advance)(_cx_iter it, intptr_t n) {
 }
 
 STC_DEF void
-_cx_MEMB(_clear)(_cx_Self* self) {
-    c_foreach (i, _cx_Self, *self)
+_c_MEMB(_clear)(i_type* self) {
+    c_foreach (i, i_type, *self)
         { i_keydrop(i.ref); }
     self->start = 0, self->end = 0;
 }
 
 STC_DEF void
-_cx_MEMB(_drop)(_cx_Self* self) {
-    _cx_MEMB(_clear)(self);
+_c_MEMB(_drop)(i_type* self) {
+    _c_MEMB(_clear)(self);
     i_free(self->cbuf);
 }
 
-STC_DEF _cx_Self
-_cx_MEMB(_with_capacity)(const intptr_t n) {
-    _cx_Self cx = {0};
-    _cx_MEMB(_reserve)(&cx, n);
+STC_DEF i_type
+_c_MEMB(_with_capacity)(const intptr_t n) {
+    i_type cx = {0};
+    _c_MEMB(_reserve)(&cx, n);
     return cx;
 }
 
 STC_DEF bool
-_cx_MEMB(_reserve)(_cx_Self* self, const intptr_t n) {
+_c_MEMB(_reserve)(i_type* self, const intptr_t n) {
     if (n <= self->capmask)
         return true;
     intptr_t oldcap = self->capmask + 1, newcap = stc_nextpow2(n + 1);
-    _cx_value* d = (_cx_value *)i_realloc(self->cbuf, newcap*c_sizeof *self->cbuf);
+    _m_value* d = (_m_value *)i_realloc(self->cbuf, newcap*c_sizeof *self->cbuf);
     if (!d)
         return false;
     intptr_t head = oldcap - self->start;
@@ -73,28 +73,28 @@ _cx_MEMB(_reserve)(_cx_Self* self, const intptr_t n) {
     return true;
 }
 
-STC_DEF _cx_value*
-_cx_MEMB(_push)(_cx_Self* self, i_key value) { // push_back
+STC_DEF _m_value*
+_c_MEMB(_push)(i_type* self, _m_value value) { // push_back
     intptr_t end = (self->end + 1) & self->capmask;
     if (end == self->start) { // full
-        _cx_MEMB(_reserve)(self, self->capmask + 3); // => 2x expand
+        _c_MEMB(_reserve)(self, self->capmask + 3); // => 2x expand
         end = (self->end + 1) & self->capmask;
     }
-    _cx_value *v = self->cbuf + self->end;
+    _m_value *v = self->cbuf + self->end;
     self->end = end;
     *v = value;
     return v;
 }
 
 STC_DEF void
-_cx_MEMB(_shrink_to_fit)(_cx_Self *self) {
-    intptr_t sz = _cx_MEMB(_size)(self), j = 0;
+_c_MEMB(_shrink_to_fit)(i_type *self) {
+    intptr_t sz = _c_MEMB(_size)(self), j = 0;
     if (sz > self->capmask/2)
         return;
-    _cx_Self out = _cx_MEMB(_with_capacity)(sz);
+    i_type out = _c_MEMB(_with_capacity)(sz);
     if (!out.cbuf)
         return;
-    c_foreach (i, _cx_Self, *self)
+    c_foreach (i, i_type, *self)
         out.cbuf[j++] = *i.ref;
     out.end = sz;
     i_free(self->cbuf);
@@ -102,12 +102,12 @@ _cx_MEMB(_shrink_to_fit)(_cx_Self *self) {
 }
 
 #if !defined i_no_clone
-STC_DEF _cx_Self
-_cx_MEMB(_clone)(_cx_Self cx) {
-    intptr_t sz = _cx_MEMB(_size)(&cx), j = 0;
-    _cx_Self out = _cx_MEMB(_with_capacity)(sz);
+STC_DEF i_type
+_c_MEMB(_clone)(i_type cx) {
+    intptr_t sz = _c_MEMB(_size)(&cx), j = 0;
+    i_type out = _c_MEMB(_with_capacity)(sz);
     if (out.cbuf)
-        c_foreach (i, _cx_Self, cx)
+        c_foreach (i, i_type, cx)
             out.cbuf[j++] = i_keyclone((*i.ref));
     out.end = sz;
     return out;
@@ -116,12 +116,12 @@ _cx_MEMB(_clone)(_cx_Self cx) {
 
 #if defined _i_has_eq || defined _i_has_cmp
 STC_DEF bool
-_cx_MEMB(_eq)(const _cx_Self* self, const _cx_Self* other) {
-    if (_cx_MEMB(_size)(self) != _cx_MEMB(_size)(other)) return false;
-    for (_cx_iter i = _cx_MEMB(_begin)(self), j = _cx_MEMB(_begin)(other);
-         i.ref; _cx_MEMB(_next)(&i), _cx_MEMB(_next)(&j))
+_c_MEMB(_eq)(const i_type* self, const i_type* other) {
+    if (_c_MEMB(_size)(self) != _c_MEMB(_size)(other)) return false;
+    for (_m_iter i = _c_MEMB(_begin)(self), j = _c_MEMB(_begin)(other);
+         i.ref; _c_MEMB(_next)(&i), _c_MEMB(_next)(&j))
     {
-        const _cx_raw _rx = i_keyto(i.ref), _ry = i_keyto(j.ref);
+        const _m_raw _rx = i_keyto(i.ref), _ry = i_keyto(j.ref);
         if (!(i_eq((&_rx), (&_ry)))) return false;
     }
     return true;
