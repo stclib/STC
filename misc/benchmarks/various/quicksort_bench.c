@@ -43,7 +43,7 @@ void testsort(Ints *a, int size, const char *desc) {
 
 int main(int argc, char *argv[]) {
     size_t i, size = argc > 1 ? strtoull(argv[1], NULL, 0) : 10000000;
-    uint64_t s[3] = {123456789, 3456789123, 789123456};
+    uint64_t s[3] = {(uint64_t)time(NULL), 3456789123, 789123456};
 
     Ints a = Ints_with_capacity(size);
 
@@ -54,7 +54,8 @@ int main(int argc, char *argv[]) {
         printf(" %d", (int)*Ints_at(&a, i));
     puts("");
     for (i = 1; i < size; i++)
-        assert(Ints_at(&a, i - 1) <= Ints_at(&a, i));
+        if (Ints_at(&a, i - 1) > Ints_at(&a, i))
+            { printf("sort error\n"); exit(-1); };
     
     for (i = 0; i < size; i++)
         *Ints_at_mut(&a, i) = i;
