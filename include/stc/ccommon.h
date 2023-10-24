@@ -192,12 +192,16 @@ STC_INLINE intptr_t stc_nextpow2(intptr_t n) {
          ; it.ref != (C##_value*)_endref; C##_next(&it))
 
 #define c_forpair(key, val, C, cnt) /* structured binding */ \
-    for (struct {C##_iter it; const C##_key* key; C##_mapped* val;} _ = {.it=C##_begin(&cnt)} \
-         ; _.it.ref && (_.key = &_.it.ref->first, _.val = &_.it.ref->second) \
-         ; C##_next(&_.it))
+    for (struct {C##_iter iter; const C##_key* key; C##_mapped* val;} _ = {.iter=C##_begin(&cnt)} \
+         ; _.iter.ref && (_.key = &_.iter.ref->first, _.val = &_.iter.ref->second) \
+         ; C##_next(&_.iter))
 
-#define c_foriter(existing_it, C, cnt) \
-    for (existing_it = C##_begin(&cnt); (existing_it).ref; C##_next(&existing_it))
+#define c_forindexed(it, C, cnt) \
+    for (struct {C##_iter iter; C##_value* ref; intptr_t index;} it = {.iter=C##_begin(&cnt)} \
+         ; (it.ref = it.iter.ref) ; C##_next(&it.iter), ++it.index)
+
+#define c_foriter(existing_iter, C, cnt) \
+    for (existing_iter = C##_begin(&cnt); (existing_iter).ref; C##_next(&existing_iter))
 
 #define c_forrange(...) c_MACRO_OVERLOAD(c_forrange, __VA_ARGS__)
 #define c_forrange_1(stop) c_forrange_3(_i, 0, stop)

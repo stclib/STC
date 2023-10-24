@@ -3,7 +3,7 @@
 "No raw loops" - Sean Parent
 ## Ranged for-loops
 
-### c_foreach, c_forpair
+### c_foreach, c_forpair, c_foriter, c_forindexed
 ```c
 #include "stc/ccommon.h"
 ```
@@ -13,46 +13,57 @@
 | `c_foreach (it, ctype, container)`       | Iteratate all elements                    |
 | `c_foreach (it, ctype, it1, it2)`        | Iterate the range [it1, it2)              |
 | `c_forpair (key, val, ctype, container)` | Iterate with structured binding           |
+| `c_foriter (existing_iter, ctype, container)` | Iterate with an existing iterator    |
+| `c_forindexed (it, ctype, container)`    | Iterate with enumerate count in it.index  |
 
 ```c
+#define i_type IMap
 #define i_key int
 #define i_val int
-#define i_tag ii
 #include "stc/csmap.h"
-...
-csmap_ii map = c_init(csmap_ii, { {23,1}, {3,2}, {7,3}, {5,4}, {12,5} });
+// ...
+IMap map = c_init(IMap, { {23,1}, {3,2}, {7,3}, {5,4}, {12,5} });
 
-c_foreach (i, csmap_ii, map)
+c_foreach (i, IMap, map)
     printf(" %d", i.ref->first);
 // 3 5 7 12 23
-// same without using c_foreach:
-for (csmap_ii_iter i = csmap_ii_begin(&map); i.ref; csmap_ii_next(&i))
+
+// same, with raw for loop:
+for (IMap_iter i = IMap_begin(&map); i.ref; IMap_next(&i))
     printf(" %d", i.ref->first);
 
-csmap_ii_iter it = csmap_ii_find(&map, 7);
-// iterate from it to end
-c_foreach (i, csmap_ii, it, csmap_ii_end(&map))
+// iterate from iter to end
+IMap_iter iter = IMap_find(&map, 7);
+c_foreach (i, IMap, iter, IMap_end(&map))
     printf(" %d", i.ref->first);
 // 7 12 23
 
-// structured binding:
-c_forpair (id, count, csmap_ii, map)
+// iterate with an already declared iter (useful in coroutines)
+c_foriter (iter, IMap, map)
+    printf(" (%d %d)", iter.ref->first, iter.ref->second);
+
+// iterate with "structured binding":
+c_forpair (id, count, IMap, map)
     printf(" (%d %d)", *_.id, *_.count);
-// (3 2) (5 4) (7 3) (12 5) (23 1)
+
+// iterate with an index count enumeration
+c_forindexed (i, IMap, map)
+    printf(" %d:(%d %d)", i.index, i.ref->first, i.ref->second);
+// 0:(3 2) 1:(5 4) 2:(7 3) 3:(12 5) 4:(23 1)
 ```
 
 ### c_forlist
-Iterate compound literal array elements. Additional to `i.ref`, you can access `i.size` and `i.index` for the input list/element.
+Iterate compound literal array elements. In addition to `i.ref`, you can access `i.index` and `i.size`.
 ```c
 // apply multiple push_backs
-c_forlist (i, int, {1, 2, 3})
-    cvec_i_push_back(&vec, *i.ref);
+c_forlist (i, int, {4, 5, 6, 7})
+    clist_i_push_back(&lst, *i.ref);
 
 // insert in existing map
-c_forlist (i, cmap_ii_raw, { {4, 5}, {6, 7} })
+c_forlist (i, cmap_ii_value, { {4, 5}, {6, 7} })
     cmap_ii_insert(&map, i.ref->first, i.ref->second);
 
-// string literals pushed to a stack of cstr:
+// string literals pushed to a stack of cstr elements:
 c_forlist (i, const char*, {"Hello", "crazy", "world"})
     cstack_str_emplace(&stk, *i.ref);
 ```
