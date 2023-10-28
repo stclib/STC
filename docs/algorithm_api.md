@@ -285,7 +285,12 @@ c_delete(cstr, str_p);
 ```
 
 ### c_malloc, c_calloc, c_realloc, c_free
-Memory allocator wrappers that uses signed sizes.
+Memory allocator wrappers that uses signed sizes. Note that the signatures for *c_realloc()* and *c_free()*
+have an extra size parameter as well:
+- `void* c_malloc(intptr_t sz)`
+- `void* c_calloc(intptr_t sz)`
+- `void* c_realloc(void* old_p, intptr_t old_sz, intptr_t new_sz)`
+- `void c_free(void* p, intptr_t sz)`
 
 ### c_arraylen
 Return number of elements in an array. array must not be a pointer!

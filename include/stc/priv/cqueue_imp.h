@@ -55,7 +55,7 @@ _c_MEMB(_reserve)(i_type* self, const intptr_t n) {
     if (n <= self->capmask)
         return true;
     intptr_t oldcap = self->capmask + 1, newcap = stc_nextpow2(n + 1);
-    _m_value* d = (_m_value *)i_realloc(self->cbuf, newcap*c_sizeof *self->cbuf);
+    _m_value* d = (_m_value *)i_realloc(self->cbuf, oldcap*c_sizeof *d, newcap*c_sizeof *d);
     if (!d)
         return false;
     intptr_t head = oldcap - self->start;

@@ -62,7 +62,7 @@ enum  { cstr_s_last = sizeof(cstr_buf) - 1,
 #define cstr_l_size(s)          (intptr_t)((s)->lon.size)
 #define cstr_l_set_size(s, len) ((s)->lon.data[(s)->lon.size = (size_t)(len)] = 0)
 #define cstr_l_data(s)          (s)->lon.data
-#define cstr_l_drop(s)          c_free((s)->lon.data)
+#define cstr_l_drop(s)          i_free((s)->lon.data)
 
 #define cstr_is_long(s)         (((s)->sml.data[cstr_s_last] & 128) != 0)
 STC_API char* _cstr_init(cstr* self, intptr_t len, intptr_t cap);
@@ -476,7 +476,7 @@ STC_DEF char* _cstr_internal_move(cstr* self, const intptr_t pos1, const intptr_
 
 STC_DEF char* _cstr_init(cstr* self, const intptr_t len, const intptr_t cap) {
     if (cap > cstr_s_cap) { 
-        self->lon.data = (char *)c_malloc(cap + 1);
+        self->lon.data = (char *)i_malloc(cap + 1);
         cstr_l_set_size(self, len);
         cstr_l_set_cap(self, cap);
         return self->lon.data;
@@ -490,26 +490,26 @@ STC_DEF void cstr_shrink_to_fit(cstr* self) {
     if (r.size == r.cap)
         return;
     if (r.size > cstr_s_cap) {
-        self->lon.data = (char *)c_realloc(self->lon.data, r.size + 1);
+        self->lon.data = (char *)i_realloc(self->lon.data, cstr_l_cap(self) + 1, r.size + 1);
         cstr_l_set_cap(self, r.size);
     } else if (r.cap > cstr_s_cap) {
         c_memcpy(self->sml.data, r.data, r.size + 1);
         cstr_s_set_size(self, r.size);
-        c_free(r.data);
+        i_free(r.data);
     }
 }
 
 STC_DEF char* cstr_reserve(cstr* self, const intptr_t cap) {
     if (cstr_is_long(self)) {
         if (cap > cstr_l_cap(self)) {
-            self->lon.data = (char *)c_realloc(self->lon.data, cap + 1);
+            self->lon.data = (char *)i_realloc(self->lon.data, cstr_l_cap(self) + 1, cap + 1);
             cstr_l_set_cap(self, cap);
         }
         return self->lon.data;
     }
     /* from short to long: */
     if (cap > cstr_s_cap) {
-        char* data = (char *)c_malloc(cap + 1);
+        char* data = (char *)i_malloc(cap + 1);
         const intptr_t len = cstr_s_size(self);
         /* copy full short buffer to emulate realloc() */
         c_memcpy(data, self->sml.data, c_sizeof self->sml);

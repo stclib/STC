@@ -45,10 +45,10 @@ if [ $run = 0 ] ; then
     done
 else
     for i in */*.c ; do
-        echo $comp -I../../include $i $clibs
-        $comp -I../../include $i $clibs
         out=$(basename $i .c).exe
         #out=$(dirname $i)/$(basename $i .c).exe
+        echo $comp -I../../include $i $clibs $oflag$out
+        $comp -I../../include $i $clibs $oflag$out
         if [ -f $out ]; then ./$out; fi
     done
 fi

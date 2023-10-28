@@ -287,7 +287,8 @@ _c_MEMB(_drop)(i_type* self) {
 STC_DEF bool
 _c_MEMB(_reserve)(i_type* self, const intptr_t cap) {
     if (cap > self->_cap || (cap && cap == self->_len)) {
-        _m_value* d = (_m_value*)i_realloc(self->data, cap*c_sizeof(_m_value));
+        _m_value* d = (_m_value*)i_realloc(self->data, self->_cap*c_sizeof *d,
+                                                       cap*c_sizeof *d);
         if (!d)
             return false;
         self->data = d;

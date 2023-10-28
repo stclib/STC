@@ -93,7 +93,7 @@ int main(void)
 {
     struct consume_items consume = {
         .cco_func = consume_items,
-        .n = 5,
+        .n = 3,
     };
     cco_blocking_task(&consume);
 }

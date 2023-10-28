@@ -392,8 +392,10 @@ STC_DEF bool _c_MEMB(_sort_with)(i_type* self, int(*cmp)(const _m_value*, const 
     _m_value *arr = NULL, *p = NULL;
     c_foreach (i, i_type, *self) {
         if (len == cap) {
-            if ((p = (_m_value *)i_realloc(arr, (cap += cap/2 + 8)*c_sizeof *arr))) arr = p; 
-            else { i_free(arr); return false; }
+            intptr_t cap_n = cap + cap/2 + 8;
+            if (!(p = (_m_value *)i_realloc(arr, cap*c_sizeof *p, cap_n*c_sizeof *p)))
+                { i_free(arr); return false; }
+            arr = p, cap = cap_n;
         }
         arr[len++] = *i.ref;
     }

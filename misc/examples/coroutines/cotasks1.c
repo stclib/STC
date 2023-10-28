@@ -85,7 +85,7 @@ int consume_items(struct consume_items* c, struct produce_items* p)
 int main(void)
 {
     struct produce_items produce = {0};
-    struct consume_items consume = {.n=5};
+    struct consume_items consume = {.n=3};
     int count = 0;
 
     cco_blocking_call(consume_items(&consume, &produce))

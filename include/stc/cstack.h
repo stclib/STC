@@ -97,8 +97,8 @@ STC_INLINE void _c_MEMB(_value_drop)(_m_value* val)
 STC_INLINE bool _c_MEMB(_reserve)(i_type* self, intptr_t n) {
     if (n < self->_len) return true;
 #ifndef i_capacity
-    _m_value *t = (_m_value *)i_realloc(self->data, n*c_sizeof *t);
-    if (t) { self->_cap = n, self->data = t; return true; }
+    _m_value *d = (_m_value *)i_realloc(self->data, self->cap*c_sizeof *d, n*c_sizeof *d);
+    if (d) { self->_cap = n, self->data = d; return true; }
 #endif
     return false;
 }

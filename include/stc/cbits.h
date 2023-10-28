@@ -49,9 +49,10 @@ int main(void) {
     cbits_drop(&bset);
 }
 */
-#ifndef CBITS_H_INCLUDED
-#include "ccommon.h"
 #include "priv/linkage.h"
+#ifndef CBITS_H_INCLUDED
+#define CBITS_H_INCLUDED
+#include "ccommon.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -72,6 +73,9 @@ int main(void) {
     return (int)((x * 0x0101010101010101) >> 56);
   }
 #endif
+
+#pragma GCC diagnostic ignored "-Walloc-size-larger-than=" // gcc 11.4
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"     // gcc 11.4
 
 STC_INLINE _llong _cbits_count(const uint64_t* set, const _llong sz) {
     const _llong n = sz>>6;
@@ -124,7 +128,7 @@ STC_INLINE bool _cbits_disjoint(const uint64_t* set, const uint64_t* other, cons
 typedef struct { uint64_t *data64; _llong _size; } i_type;
 
 STC_INLINE cbits   cbits_init(void) { return c_LITERAL(cbits){NULL}; }
-STC_INLINE void    cbits_drop(cbits* self) { c_free(self->data64); }
+STC_INLINE void    cbits_drop(cbits* self) { i_free(self->data64); }
 STC_INLINE _llong  cbits_size(const cbits* self) { return self->_size; }
 
 STC_INLINE cbits* cbits_take(cbits* self, cbits other) {
@@ -137,7 +141,7 @@ STC_INLINE cbits* cbits_take(cbits* self, cbits other) {
 
 STC_INLINE cbits cbits_clone(cbits other) {
     const _llong bytes = _cbits_bytes(other._size);
-    cbits set = {(uint64_t *)c_memcpy(c_malloc(bytes), other.data64, bytes), other._size};
+    cbits set = {(uint64_t *)c_memcpy(i_malloc(bytes), other.data64, bytes), other._size};
     return set;
 }
 
@@ -152,7 +156,7 @@ STC_INLINE cbits* cbits_copy(cbits* self, const cbits* other) {
 
 STC_INLINE void cbits_resize(cbits* self, const _llong size, const bool value) {
     const _llong new_n = _cbits_words(size), osize = self->_size, old_n = _cbits_words(osize);
-    self->data64 = (uint64_t *)c_realloc(self->data64, new_n*8);
+    self->data64 = (uint64_t *)i_realloc(self->data64, old_n*8, new_n*8);
     self->_size = size;
     if (new_n >= old_n) {
         c_memset(self->data64 + old_n, -(int)value, (new_n - old_n)*8);
@@ -174,13 +178,13 @@ STC_INLINE cbits cbits_move(cbits* self) {
 }
 
 STC_INLINE cbits cbits_with_size(const _llong size, const bool value) {
-    cbits set = {(uint64_t *)c_malloc(_cbits_bytes(size)), size};
+    cbits set = {(uint64_t *)i_malloc(_cbits_bytes(size)), size};
     cbits_set_all(&set, value);
     return set;
 }
 
 STC_INLINE cbits cbits_with_pattern(const _llong size, const uint64_t pattern) {
-    cbits set = {(uint64_t *)c_malloc(_cbits_bytes(size)), size};
+    cbits set = {(uint64_t *)i_malloc(_cbits_bytes(size)), size};
     cbits_set_pattern(&set, pattern);
     return set;
 }
@@ -300,7 +304,6 @@ STC_INLINE bool _i_memb(_disjoint)(const i_type* self, const i_type* other) {
     return _cbits_disjoint(self->data64, other->data64, _i_memb(_size)(self));
 }
 
-#define CBITS_H_INCLUDED
 #include "priv/linkage2.h"
 #undef _i_memb
 #undef _i_assert

@@ -91,7 +91,7 @@ int main(void)
     struct Dining dine;
     cco_reset(&dine);
     int n=0;
-    cco_timer tm = cco_timer_from(15.0); // seconds
+    cco_timer tm = cco_timer_from(5.0); // seconds
     csrand((uint64_t)time(NULL));
 
     cco_blocking_call(dining(&dine))

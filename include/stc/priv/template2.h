@@ -56,12 +56,6 @@
 #undef i_keyto
 #undef i_keydrop
 
-#undef i_allocator
-#undef i_malloc
-#undef i_calloc
-#undef i_realloc
-#undef i_free
-
 #undef i_use_cmp
 #undef i_no_hash
 #undef i_no_clone

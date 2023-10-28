@@ -42,16 +42,6 @@
   #define i_type c_JOIN(_i_prefix, i_tag)
 #endif
 
-#ifndef i_allocator
-  #define i_allocator c
-#endif
-#ifndef i_malloc
-  #define i_malloc c_JOIN(i_allocator, _malloc)
-  #define i_calloc c_JOIN(i_allocator, _calloc)
-  #define i_realloc c_JOIN(i_allocator, _realloc)
-  #define i_free c_JOIN(i_allocator, _free)
-#endif
-
 #ifdef i_keyclass // [deprecated]
   #define i_key_class i_keyclass
 #endif

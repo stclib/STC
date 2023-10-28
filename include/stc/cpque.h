@@ -53,7 +53,7 @@ STC_INLINE i_type _c_MEMB(_from_n)(const _m_raw* raw, intptr_t n)
 
 STC_INLINE bool _c_MEMB(_reserve)(i_type* self, const intptr_t cap) {
     if (cap != self->_len && cap <= self->_cap) return true;
-    _m_value *d = (_m_value *)i_realloc(self->data, cap*c_sizeof *d);
+    _m_value *d = (_m_value *)i_realloc(self->data, self->cap*c_sizeof *d, cap*c_sizeof *d);
     return d ? (self->data = d, self->_cap = cap, true) : false;
 }
 

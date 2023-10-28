@@ -33,6 +33,7 @@ THE SOFTWARE.
 #undef i_implement 
 // implement cstr and utf8 if i_import was defined:
 #include "../include/stc/cstr.h"
+#include "../include/stc/priv/linkage.h"
 
 typedef uint32_t _Rune; /* Utf8 code point */
 typedef int32_t _Token;
@@ -557,9 +558,11 @@ _optimize(_Parser *par, _Reprog *pp)
         return pp;
 
     intptr_t ipp = (intptr_t)pp; // convert pointer to intptr_t!
-    intptr_t size = c_sizeof(_Reprog) + (par->freep - pp->firstinst)*c_sizeof(_Reinst);
-    _Reprog *npp = (_Reprog *)c_realloc(pp, size);
+    intptr_t old_cap = c_sizeof(_Reprog) + par->instcap*c_sizeof(_Reinst);
+    intptr_t cap = c_sizeof(_Reprog) + (par->freep - pp->firstinst)*c_sizeof(_Reinst);
+    _Reprog *npp = (_Reprog *)c_realloc(pp, old_cap, cap);
     ptrdiff_t diff = (intptr_t)npp - ipp;
+    (void)old_cap;
 
     if ((npp == NULL) | (diff == 0))
         return (_Reprog *)ipp;
@@ -853,9 +856,12 @@ _regcomp1(_Reprog *pp, _Parser *par, const char *s, int cflags)
     _Token token;
 
     /* get memory for the program. estimated max usage */
+    intptr_t old_instcap = par->instcap;
     par->instcap = 5 + 6*c_strlen(s);
     _Reprog* old_pp = pp;
-    pp = (_Reprog *)c_realloc(pp, c_sizeof(_Reprog) + par->instcap*c_sizeof(_Reinst));
+    pp = (_Reprog *)c_realloc(pp, c_sizeof(_Reprog) + old_instcap*c_sizeof(_Reinst),
+                                  c_sizeof(_Reprog) + par->instcap*c_sizeof(_Reinst));
+    (void)old_instcap;
     if (! pp) {
         c_free(old_pp);
         par->error = CREG_OUTOFMEMORY;
@@ -1325,4 +1331,6 @@ void
 cregex_drop(cregex* self) {
     c_free(self->prog);
 }
+
+#include "../include/stc/priv/linkage2.h"
 #endif
