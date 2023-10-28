@@ -73,9 +73,10 @@ int main(void) {
     return (int)((x * 0x0101010101010101) >> 56);
   }
 #endif
-
+#if defined __GNUC__ && !defined __clang__ && !defined __cplusplus
 #pragma GCC diagnostic ignored "-Walloc-size-larger-than=" // gcc 11.4
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"     // gcc 11.4
+#endif
 
 STC_INLINE _llong _cbits_count(const uint64_t* set, const _llong sz) {
     const _llong n = sz>>6;
@@ -128,7 +129,7 @@ STC_INLINE bool _cbits_disjoint(const uint64_t* set, const uint64_t* other, cons
 typedef struct { uint64_t *data64; _llong _size; } i_type;
 
 STC_INLINE cbits   cbits_init(void) { return c_LITERAL(cbits){NULL}; }
-STC_INLINE void    cbits_drop(cbits* self) { i_free(self->data64); }
+STC_INLINE void    cbits_drop(cbits* self) { i_free(self->data64, _cbits_bytes(self->_size)); }
 STC_INLINE _llong  cbits_size(const cbits* self) { return self->_size; }
 
 STC_INLINE cbits* cbits_take(cbits* self, cbits other) {

@@ -40,7 +40,7 @@ void Shape_delete(Shape* shape)
 {
     if (shape) {
         shape->api->drop(shape);
-        c_free(shape);
+        free(shape);
     }
 }
 

@@ -315,8 +315,8 @@ STC_INLINE void _c_MEMB(_wipe_)(i_type* self) {
 
 STC_DEF void _c_MEMB(_drop)(i_type* self) {
     _c_MEMB(_wipe_)(self);
-    i_free(self->slot);
-    i_free(self->table);
+    i_free(self->slot, (self->bucket_count + 1)*c_sizeof *self->slot);
+    i_free(self->table, self->bucket_count*c_sizeof *self->table);
 }
 
 STC_DEF void _c_MEMB(_clear)(i_type* self) {
@@ -393,13 +393,15 @@ _c_MEMB(_insert_entry_)(i_type* self, _m_keyraw rkey) {
 STC_DEF i_type
 _c_MEMB(_clone)(i_type m) {
     if (m.table) {
-        _m_value *d = (_m_value *)i_malloc(c_sizeof(_m_value)*m.bucket_count),
+        _m_value *d = (_m_value *)i_malloc(m.bucket_count*c_sizeof *d),
                  *_dst = d, *_end = m.table + m.bucket_count;
-        const intptr_t _mem = c_sizeof(struct chash_slot)*(m.bucket_count + 1);
-        struct chash_slot *s = (struct chash_slot *)c_memcpy(i_malloc(_mem), m.slot, _mem);
-        if (!(d && s)) 
-            { i_free(d), i_free(s), d = 0, s = 0, m.bucket_count = 0; }
-        else
+        const intptr_t _sbytes = (m.bucket_count + 1)*c_sizeof *m.slot;
+        struct chash_slot *s = (struct chash_slot *)c_memcpy(i_malloc(_sbytes), m.slot, _sbytes);
+        if (!(d && s)) {
+            i_free(d, m.bucket_count*c_sizeof *d);
+            i_free(s, _sbytes);
+            d = 0, s = 0, m.bucket_count = 0;
+        } else
             for (; m.table != _end; ++m.table, ++m.slot, ++_dst)
                 if (m.slot->hashx)
                     *_dst = _c_MEMB(_value_clone)(*m.table);
@@ -434,8 +436,8 @@ _c_MEMB(_reserve)(i_type* self, const intptr_t _newcap) {
         }
         c_swap(i_type, self, &m);
     }
-    i_free(m.slot);
-    i_free(m.table);
+    i_free(m.slot, (_oldbucks + 1)*c_sizeof *m.slot);
+    i_free(m.table, _oldbucks*c_sizeof *m.table);
     return ok;
 }
 

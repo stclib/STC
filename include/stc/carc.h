@@ -133,9 +133,12 @@ STC_INLINE i_type _c_MEMB(_move)(i_type* self) {
 STC_INLINE void _c_MEMB(_drop)(i_type* self) {
     if (self->use_count && _i_atomic_dec_and_test(self->use_count)) {
         i_keydrop(self->get);
-        if ((char *)self->get != (char *)self->use_count + offsetof(struct _c_MEMB(_rep_), value))
-            i_free(self->get);
-        i_free((long*)self->use_count);
+        if ((char *)self->get != (char *)self->use_count + offsetof(struct _c_MEMB(_rep_), value)) {
+            i_free(self->get, c_sizeof *self->get);
+            i_free(self->use_count, c_sizeof(long));
+        } else { // allocated combined counter+value with _make()
+            i_free(self->use_count, c_sizeof(struct _c_MEMB(_rep_)));
+        }
     }
 }
 

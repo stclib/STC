@@ -27,8 +27,8 @@ int main(void) {
         printf("%8d: %10f\n", c_flt_getcount(i), *i.ref);
 
     puts("sort");
-    DList_sort(&list); // qsort O(n*log n)
-    puts("sorted");
+    
+    printf("sorted %d\n", DList_sort(&list)); // qsort O(n*log n)
 
     c_forfilter (i, DList, list, c_flt_take(i, 10))
         printf("%8d: %10f\n", c_flt_getcount(i), *i.ref);

@@ -40,7 +40,7 @@ _c_MEMB(_clear)(i_type* self) {
 STC_DEF void
 _c_MEMB(_drop)(i_type* self) {
     _c_MEMB(_clear)(self);
-    i_free(self->cbuf);
+    i_free(self->cbuf, (self->capmask + 1)*c_sizeof(*self->cbuf));
 }
 
 STC_DEF i_type
@@ -97,7 +97,7 @@ _c_MEMB(_shrink_to_fit)(i_type *self) {
     c_foreach (i, i_type, *self)
         out.cbuf[j++] = *i.ref;
     out.end = sz;
-    i_free(self->cbuf);
+    i_free(self->cbuf, (self->capmask + 1)*c_sizeof(*self->cbuf));
     *self = out;
 }
 

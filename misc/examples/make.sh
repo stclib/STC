@@ -11,9 +11,9 @@ cc=gcc; cflags="-s -O3 $common -Wno-stringop-overflow"
 #cc=gcc; cflags="-g $sanitize $common"
 #cc=gcc; cflags="-x c++ -std=c++20 -O2 -s -Wall -Wno-stringop-overflow"
 #cc=tcc; cflags="-std=c99 -Wall"
+#cc=cl; cflags="-nologo -O2 -MD -W3 -std:c11 -wd4003"
 #cc=cl; cflags="-nologo -O2 -MD -W3 -wd4003"
 #cc=cl; cflags="-nologo -TP -std:c++20 -wd4003"
-#cc=cl; cflags="-nologo -std:c11 -wd4003"
 
 if [ "$cc" = "cl" ]; then
     oflag='/Fe:'

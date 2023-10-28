@@ -299,7 +299,7 @@ STC_DEF void
 _c_MEMB(_erase_after_node)(i_type* self, _m_node* ref) {
     _m_node* node = _c_MEMB(_unlink_after_node)(self, ref);
     i_keydrop((&node->value));
-    i_free(node);
+    i_free(node, c_sizeof *node);
 }
 
 STC_DEF _m_node*
@@ -394,7 +394,7 @@ STC_DEF bool _c_MEMB(_sort_with)(i_type* self, int(*cmp)(const _m_value*, const 
         if (len == cap) {
             intptr_t cap_n = cap + cap/2 + 8;
             if (!(p = (_m_value *)i_realloc(arr, cap*c_sizeof *p, cap_n*c_sizeof *p)))
-                { i_free(arr); return false; }
+                goto done;
             arr = p, cap = cap_n;
         }
         arr[len++] = *i.ref;
@@ -402,7 +402,8 @@ STC_DEF bool _c_MEMB(_sort_with)(i_type* self, int(*cmp)(const _m_value*, const 
     qsort(arr, (size_t)len, sizeof *arr, (int(*)(const void*, const void*))cmp);
     c_foreach (i, i_type, *self) 
         *i.ref = *p++;
-    i_free(arr); return true;
+    done: i_free(arr, cap*c_sizeof *arr);
+    return p != NULL;
 }
 #endif // _i_has_cmp
 #endif // i_implement

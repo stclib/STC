@@ -281,7 +281,7 @@ _c_MEMB(_drop)(i_type* self) {
     if (self->_cap == 0)
         return;
     _c_MEMB(_clear)(self);
-    i_free(self->data);
+    i_free(self->data, self->_cap*c_sizeof(*self->data));
 }
 
 STC_DEF bool

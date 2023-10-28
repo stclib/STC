@@ -589,7 +589,7 @@ STC_DEF void
 _c_MEMB(_drop)(i_type* self) {
     if (self->cap) {
         _c_MEMB(_drop_r_)(self->nodes, self->root);
-        i_free(self->nodes);
+        i_free(self->nodes, (self->cap + 1)*c_sizeof(_m_node));
     }
 }
 

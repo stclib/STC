@@ -11,7 +11,7 @@
 #define i_valfrom(raw) c_new(long, raw)
 #define i_valto(x) **x
 #define i_valclone(x) c_new(long, *x)
-#define i_valdrop(x) c_free(*x)
+#define i_valdrop(x) free(*x)
 #include "stc/cmap.h"
 
 int main(void)

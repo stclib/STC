@@ -285,8 +285,10 @@ c_delete(cstr, str_p);
 ```
 
 ### c_malloc, c_calloc, c_realloc, c_free
-Memory allocator wrappers that uses signed sizes. Note that the signatures for *c_realloc()* and *c_free()*
-have an extra size parameter as well:
+Memory allocator wrappers which uses signed sizes. Note that the signatures for
+*c_realloc()* and *c_free()* have an extra size parameter. These will be used as
+default unless `i_malloc`, `i_calloc`, `i_realloc`, and `i_free` are defined. See
+[Per container-instance customization](../README.md#per-container-instance-customization)
 - `void* c_malloc(intptr_t sz)`
 - `void* c_calloc(intptr_t sz)`
 - `void* c_realloc(void* old_p, intptr_t old_sz, intptr_t new_sz)`

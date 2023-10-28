@@ -618,7 +618,8 @@ technique.
 
 The example below shows how to customize containers to work with PostgreSQL memory management.
 It adds a MemoryContext to each container by defining the `i_extend` template parameter followed
-the by inclusion of `"stc/extend.h"`.
+the by inclusion of `"stc/extend.h"`. Note that `pgs_realloc` and `pgs_free` is also passed the
+allocated size of the given pointer, unlike standard `realloc` and `free`.
 ```c
 // stcpgs.h
 #define pgs_malloc(sz) MemoryContextAlloc(c_extend()->memctx, sz)

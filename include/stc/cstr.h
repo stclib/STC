@@ -62,7 +62,7 @@ enum  { cstr_s_last = sizeof(cstr_buf) - 1,
 #define cstr_l_size(s)          (intptr_t)((s)->lon.size)
 #define cstr_l_set_size(s, len) ((s)->lon.data[(s)->lon.size = (size_t)(len)] = 0)
 #define cstr_l_data(s)          (s)->lon.data
-#define cstr_l_drop(s)          i_free((s)->lon.data)
+#define cstr_l_drop(s)          i_free((s)->lon.data, cstr_l_cap(s) + 1)
 
 #define cstr_is_long(s)         (((s)->sml.data[cstr_s_last] & 128) != 0)
 STC_API char* _cstr_init(cstr* self, intptr_t len, intptr_t cap);
@@ -495,7 +495,7 @@ STC_DEF void cstr_shrink_to_fit(cstr* self) {
     } else if (r.cap > cstr_s_cap) {
         c_memcpy(self->sml.data, r.data, r.size + 1);
         cstr_s_set_size(self, r.size);
-        i_free(r.data);
+        i_free(r.data, r.cap + 1);
     }
 }
 

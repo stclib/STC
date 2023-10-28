@@ -84,6 +84,7 @@ typedef struct _Reprog
     _Reinst  *startinst;     /* start pc */
     _Reflags flags;
     int nsubids;
+    intptr_t allocsize;
     _Reclass cclass[_NCLASS]; /* .data */
     _Reinst  firstinst[];    /* .text : originally 5 elements? */
 } _Reprog;
@@ -558,14 +559,13 @@ _optimize(_Parser *par, _Reprog *pp)
         return pp;
 
     intptr_t ipp = (intptr_t)pp; // convert pointer to intptr_t!
-    intptr_t old_cap = c_sizeof(_Reprog) + par->instcap*c_sizeof(_Reinst);
-    intptr_t cap = c_sizeof(_Reprog) + (par->freep - pp->firstinst)*c_sizeof(_Reinst);
-    _Reprog *npp = (_Reprog *)c_realloc(pp, old_cap, cap);
+    intptr_t new_allocsize = c_sizeof(_Reprog) + (par->freep - pp->firstinst)*c_sizeof(_Reinst);
+    _Reprog *npp = (_Reprog *)i_realloc(pp, pp->allocsize, new_allocsize);
     ptrdiff_t diff = (intptr_t)npp - ipp;
-    (void)old_cap;
 
     if ((npp == NULL) | (diff == 0))
         return (_Reprog *)ipp;
+    npp->allocsize = new_allocsize;
     par->freep = (_Reinst *)((char *)par->freep + diff);
 
     for (inst = npp->firstinst; inst < par->freep; inst++) {
@@ -856,19 +856,17 @@ _regcomp1(_Reprog *pp, _Parser *par, const char *s, int cflags)
     _Token token;
 
     /* get memory for the program. estimated max usage */
-    intptr_t old_instcap = par->instcap;
-    par->instcap = 5 + 6*c_strlen(s);
-    _Reprog* old_pp = pp;
-    pp = (_Reprog *)c_realloc(pp, c_sizeof(_Reprog) + old_instcap*c_sizeof(_Reinst),
-                                  c_sizeof(_Reprog) + par->instcap*c_sizeof(_Reinst));
-    (void)old_instcap;
+    intptr_t instcap = 5 + 6*c_strlen(s);
+    intptr_t new_allocsize = c_sizeof(_Reprog) + instcap*c_sizeof(_Reinst);
+    pp = (_Reprog *)i_realloc(pp, pp ? pp->allocsize : 0, new_allocsize);
     if (! pp) {
-        c_free(old_pp);
         par->error = CREG_OUTOFMEMORY;
         return NULL;
     }
+    pp->allocsize = new_allocsize;
     pp->flags.icase = (cflags & CREG_ICASE) != 0;
     pp->flags.dotall = (cflags & CREG_DOTALL) != 0;
+    par->instcap = instcap;
     par->freep = pp->firstinst;
     par->classp = pp->cclass;
     par->error = 0;
@@ -915,7 +913,7 @@ _regcomp1(_Reprog *pp, _Parser *par, const char *s, int cflags)
     pp->nsubids = par->cursubid;
 out:
     if (par->error) {
-        c_free(pp);
+        i_free(pp, pp->allocsize);
         pp = NULL;
     }
     return pp;
@@ -1154,7 +1152,8 @@ _regexec2(const _Reprog *progp,    /* program to run */
     _Relist *relists;
 
     /* mark space */
-    relists = (_Relist *)c_malloc(2 * _BIGLISTSIZE*c_sizeof(_Relist));
+    intptr_t sz = 2 * _BIGLISTSIZE*c_sizeof(_Relist);
+    relists = (_Relist *)i_malloc(sz);
     if (relists == NULL)
         return -1;
 
@@ -1164,7 +1163,7 @@ _regexec2(const _Reprog *progp,    /* program to run */
     j->reliste[1] = relists + 2*_BIGLISTSIZE - 2;
 
     rv = _regexec1(progp, bol, mp, ms, j, mflags);
-    c_free(relists);
+    i_free(relists, sz);
     return rv;
 }
 
@@ -1329,7 +1328,7 @@ cregex_replace_pattern_6(const char* pattern, const char* input, const char* rep
 
 void
 cregex_drop(cregex* self) {
-    c_free(self->prog);
+    i_free(self->prog, self->prog->allocsize);
 }
 
 #include "../include/stc/priv/linkage2.h"

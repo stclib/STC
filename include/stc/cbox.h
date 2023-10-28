@@ -103,7 +103,7 @@ STC_INLINE _m_raw _c_MEMB(_toraw)(const i_type* self)
 STC_INLINE void _c_MEMB(_drop)(i_type* self) {
     if (self->get) {
         i_keydrop(self->get);
-        i_free(self->get);
+        i_free(self->get, c_sizeof *self->get);
     }
 }
 
