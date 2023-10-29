@@ -48,7 +48,7 @@ typedef i_keyraw _m_raw;
 STC_INLINE void _c_MEMB(_init)(i_type* self)
     { self->_len = 0; }
 #else
-STC_INLINE i_type _c_MEMB(_init)(void) { 
+STC_INLINE i_type _c_MEMB(_init)(void) {
     i_type out = {0};
     return out;
 }
@@ -84,9 +84,9 @@ STC_INLINE intptr_t _c_MEMB(_size)(const i_type* self)
 STC_INLINE bool _c_MEMB(_empty)(const i_type* self)
     { return !self->_len; }
 
-STC_INLINE intptr_t _c_MEMB(_capacity)(const i_type* self) { 
+STC_INLINE intptr_t _c_MEMB(_capacity)(const i_type* self) {
 #ifndef i_capacity
-    return self->_cap; 
+    return self->_cap;
 #else
     (void)self; return i_capacity;
 #endif
@@ -190,7 +190,7 @@ STC_INLINE void _c_MEMB(_next)(_m_iter* it)
 STC_INLINE _m_iter _c_MEMB(_advance)(_m_iter it, size_t n)
     { if ((it.ref += n) >= it.end) it.ref = NULL ; return it; }
 
-STC_INLINE intptr_t _c_MEMB(_index)(const i_type* self, _m_iter it) 
+STC_INLINE intptr_t _c_MEMB(_index)(const i_type* self, _m_iter it)
     { return (it.ref - self->data); }
 
 STC_INLINE void _c_MEMB(_adjust_end_)(i_type* self, intptr_t n)

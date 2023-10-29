@@ -31,7 +31,7 @@ using_cspan(Intspan, int);
 int demo1() {
     float raw[4*5];
     Span2f ms = cspan_md(raw, 4, 5);
-    
+
     for (int i=0; i<ms.shape[0]; i++)
         for (int j=0; j<ms.shape[1]; j++)
             *cspan_at(&ms, i, j) = i*1000 + j;
@@ -42,11 +42,11 @@ int demo1() {
 int demo2() {
     int array[] = {10, 20, 30, 23, 22, 21};
     Intspan span = cspan_from_array(array);
-    
+
     c_foreach (i, Intspan, span)
         printf(" %d", *i.ref);
     puts("");
-    
+
     c_forfilter (i, Intspan, span,
         c_flt_skipwhile(i, *i.ref < 25) &&
         (*i.ref & 1) == 0               && // even only
@@ -356,8 +356,8 @@ STC_DEF cstride_t* _cspan_shape2stride(cspan_layout layout, cstride_t shpstri[],
     return shpstri;
 }
 
-STC_DEF intptr_t _cspan_slice(cextent_t oshape[], cstride_t ostride[], int* orank, 
-                              const cextent_t shape[], const cstride_t stride[], 
+STC_DEF intptr_t _cspan_slice(cextent_t oshape[], cstride_t ostride[], int* orank,
+                              const cextent_t shape[], const cstride_t stride[],
                               const intptr_t args[][3], int rank) {
     intptr_t end, off = 0;
     int i = 0, oi = 0;

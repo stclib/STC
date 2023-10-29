@@ -196,21 +196,21 @@ _c_MEMB(_at_mut)(i_type* self, const intptr_t idx) {
 }
 
 
-STC_INLINE _m_iter _c_MEMB(_begin)(const i_type* self) { 
-    intptr_t n = self->_len; 
+STC_INLINE _m_iter _c_MEMB(_begin)(const i_type* self) {
+    intptr_t n = self->_len;
     return c_LITERAL(_m_iter){n ? self->data : NULL, self->data + n};
 }
 
-STC_INLINE _m_iter _c_MEMB(_end)(const i_type* self) 
+STC_INLINE _m_iter _c_MEMB(_end)(const i_type* self)
     { return c_LITERAL(_m_iter){NULL, self->data + self->_len}; }
 
-STC_INLINE void _c_MEMB(_next)(_m_iter* it) 
+STC_INLINE void _c_MEMB(_next)(_m_iter* it)
     { if (++it->ref == it->end) it->ref = NULL; }
 
 STC_INLINE _m_iter _c_MEMB(_advance)(_m_iter it, size_t n)
     { if ((it.ref += n) >= it.end) it.ref = NULL; return it; }
 
-STC_INLINE intptr_t _c_MEMB(_index)(const i_type* self, _m_iter it) 
+STC_INLINE intptr_t _c_MEMB(_index)(const i_type* self, _m_iter it)
     { return (it.ref - self->data); }
 
 STC_INLINE void _c_MEMB(_adjust_end_)(i_type* self, intptr_t n)

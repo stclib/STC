@@ -139,7 +139,7 @@ static int coption_get(coption *opt, int argc, char *argv[],
             if (o) {
                 opt->opt = optc = o->val;
                 if (o->type != coption_no_argument) {
-                    if (argv[opt->_i][j] == '=') 
+                    if (argv[opt->_i][j] == '=')
                         opt->arg = &argv[opt->_i][j + 1];
                     else if (argv[opt->_i][j] == '\0' && opt->_i < argc - 1 && (o->type == coption_required_argument ||
                                                                                 argv[opt->_i + 1][0] != '-'))
@@ -160,7 +160,7 @@ static int coption_get(coption *opt, int argc, char *argv[],
         } else if (p[1] == ':') {
             if (argv[opt->_i][opt->_pos] != '\0')
                 opt->arg = &argv[opt->_i][opt->_pos];
-            else if (opt->_i < argc - 1 && (p[2] != ':' || argv[opt->_i + 1][0] != '-')) 
+            else if (opt->_i < argc - 1 && (p[2] != ':' || argv[opt->_i + 1][0] != '-'))
                 opt->arg = argv[++opt->_i];
             else if (p[2] != ':')
                 optc = ':';
