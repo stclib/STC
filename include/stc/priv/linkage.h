@@ -29,7 +29,7 @@
   #define STC_DEF
 #else
   #define i_static
-  #ifdef __GNUC__
+  #if defined __GNUC__ || defined __clang__
     #define STC_API static __attribute__((unused))
   #else
     #define STC_API static
