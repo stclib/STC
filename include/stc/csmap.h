@@ -132,13 +132,13 @@ _c_MEMB(_with_capacity)(const intptr_t cap) {
 }
 
 STC_INLINE void
-_c_MEMB(_clear)(i_type* self) 
+_c_MEMB(_clear)(i_type* self)
     { _c_MEMB(_drop)(self); *self = _c_MEMB(_init)(); }
 
 STC_INLINE _m_raw
 _c_MEMB(_value_toraw)(const _m_value* val) {
     return _i_SET_ONLY( i_keyto(val) )
-           _i_MAP_ONLY( c_LITERAL(_m_raw){i_keyto((&val->first)), 
+           _i_MAP_ONLY( c_LITERAL(_m_raw){i_keyto((&val->first)),
                                         i_valto((&val->second))} );
 }
 
@@ -197,7 +197,7 @@ STC_API _m_result _c_MEMB(_insert_entry_)(i_type* self, _m_keyraw rkey);
 
 STC_INLINE _m_iter
 _c_MEMB(_end)(const i_type* self) {
-    _m_iter it; (void)self; 
+    _m_iter it; (void)self;
     it.ref = NULL, it._top = 0, it._tn = 0;
     return it;
 }
@@ -225,7 +225,7 @@ _c_MEMB(_insert)(i_type* self, _m_key _key _i_MAP_ONLY(, _m_mapped _mapped)) {
     _m_result _res = _c_MEMB(_insert_entry_)(self, i_keyto((&_key)));
     if (_res.inserted)
         { *_i_keyref(_res.ref) = _key; _i_MAP_ONLY( _res.ref->second = _mapped; )}
-    else 
+    else
         { i_keydrop((&_key)); _i_MAP_ONLY( i_valdrop((&_mapped)); )}
     return _res;
 }
@@ -242,7 +242,7 @@ _c_MEMB(_push)(i_type* self, _m_value _val) {
 
 STC_INLINE void
 _c_MEMB(_put_n)(i_type* self, const _m_raw* raw, intptr_t n) {
-    while (n--) 
+    while (n--)
 #if defined _i_isset && defined i_no_emplace
         _c_MEMB(_insert)(self, *raw++);
 #elif defined _i_isset
@@ -524,7 +524,7 @@ _c_MEMB(_erase_at)(i_type* self, _m_iter it) {
 
 STC_DEF _m_iter
 _c_MEMB(_erase_range)(i_type* self, _m_iter it1, _m_iter it2) {
-    if (!it2.ref) { 
+    if (!it2.ref) {
         while (it1.ref)
             it1 = _c_MEMB(_erase_at)(self, it1);
         return it1;

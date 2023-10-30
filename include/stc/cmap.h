@@ -195,7 +195,7 @@ STC_INLINE _m_value* _c_MEMB(_push)(i_type* self, _m_value _val) {
 }
 
 STC_INLINE void _c_MEMB(_put_n)(i_type* self, const _m_raw* raw, intptr_t n) {
-    while (n--) 
+    while (n--)
 #if defined _i_isset && defined i_no_emplace
         _c_MEMB(_insert)(self, *raw++);
 #elif defined _i_isset
@@ -215,7 +215,7 @@ STC_API _m_iter _c_MEMB(_begin)(const i_type* self);
 STC_INLINE _m_iter _c_MEMB(_end)(const i_type* self)
     { (void)self; return c_LITERAL(_m_iter){NULL}; }
 
-STC_INLINE void _c_MEMB(_next)(_m_iter* it) { 
+STC_INLINE void _c_MEMB(_next)(_m_iter* it) {
     while ((++it->ref, (++it->_sref)->hashx == 0)) ;
     if (it->ref == it->_end) it->ref = NULL;
 }
@@ -229,7 +229,7 @@ STC_INLINE _m_iter
 _c_MEMB(_find)(const i_type* self, _m_keyraw rkey) {
     _m_result b;
     if (self->size && !(b = _c_MEMB(_bucket_)(self, &rkey)).inserted)
-        return c_LITERAL(_m_iter){b.ref, 
+        return c_LITERAL(_m_iter){b.ref,
                                   self->table + self->bucket_count,
                                   self->slot + (b.ref - self->table)};
     return _c_MEMB(_end)(self);
@@ -334,7 +334,7 @@ STC_DEF void _c_MEMB(_clear)(i_type* self) {
         _m_mapped* _mp = _res.ref ? &_res.ref->second : &_mapped;
         if (_res.inserted)
             _res.ref->first = _key;
-        else 
+        else
             { i_keydrop((&_key)); i_valdrop(_mp); }
         *_mp = _mapped;
         return _res;
@@ -367,7 +367,7 @@ _c_MEMB(_bucket_)(const i_type* self, const _m_keyraw* rkeyptr) {
         if (s[_idx].hashx == b.hashx) {
             const _m_keyraw _raw = i_keyto(_i_keyref(self->table + _idx));
             if (i_eq((&_raw), rkeyptr)) {
-                b.inserted = false; 
+                b.inserted = false;
                 break;
             }
         }

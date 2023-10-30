@@ -99,7 +99,7 @@ _c_DEFTYPES(_c_carc_types, i_type, i_key);
 #endif
 struct _c_MEMB(_rep_) { catomic_long counter; i_key value; };
 
-STC_INLINE i_type _c_MEMB(_init)(void) 
+STC_INLINE i_type _c_MEMB(_init)(void)
     { return c_LITERAL(i_type){NULL, NULL}; }
 
 STC_INLINE long _c_MEMB(_use_count)(const i_type* self)
@@ -107,7 +107,7 @@ STC_INLINE long _c_MEMB(_use_count)(const i_type* self)
 
 STC_INLINE i_type _c_MEMB(_from_ptr)(_m_value* p) {
     i_type arc = {p};
-    if (p) 
+    if (p)
         *(arc.use_count = _i_alloc(catomic_long)) = 1;
     return arc;
 }
@@ -158,7 +158,7 @@ STC_INLINE i_type _c_MEMB(_from)(_m_raw raw)
 #else
 STC_INLINE i_type _c_MEMB(_from)(_m_value val)
     { return _c_MEMB(_make)(val); }
-#endif    
+#endif
 
 // does not use i_keyclone, so OK to always define.
 STC_INLINE i_type _c_MEMB(_clone)(i_type arc) {
@@ -210,8 +210,8 @@ STC_INLINE void _c_MEMB(_assign)(i_type* self, i_type arc) {
     STC_INLINE uint64_t _c_MEMB(_raw_hash)(const _m_raw* rx)
         { return i_hash(rx); }
 
-    STC_INLINE uint64_t _c_MEMB(_hash)(const i_type* self) { 
-        _m_raw rx = i_keyto(self->get); 
+    STC_INLINE uint64_t _c_MEMB(_hash)(const i_type* self) {
+        _m_raw rx = i_keyto(self->get);
         return i_hash((&rx));
     }
 #else

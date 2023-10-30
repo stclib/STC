@@ -26,13 +26,13 @@ THE SOFTWARE.
 #define CREGEX_H_INCLUDED
 /*
  * cregex.h
- * 
- * This is a extended version of regexp9, supporting UTF8 input, common 
+ *
+ * This is a extended version of regexp9, supporting UTF8 input, common
  * shorthand character classes, ++.
  */
 #include <stdbool.h>
 #include <string.h>
-#include "forward.h" // csview 
+#include "forward.h" // csview
 #include "ccommon.h"
 
 enum {
@@ -145,7 +145,7 @@ cstr cregex_replace_sv_6(const cregex* re, csview input, const char* replace, in
 #define cregex_replace(...) c_MACRO_OVERLOAD(cregex_replace, __VA_ARGS__)
 #define cregex_replace_3(re, input, replace) cregex_replace_4(re, input, replace, INT32_MAX)
 
-STC_INLINE cstr cregex_replace_4(const cregex* re, const char* input, const char* replace, int count) { 
+STC_INLINE cstr cregex_replace_4(const cregex* re, const char* input, const char* replace, int count) {
     csview sv = {input, c_strlen(input)};
     return cregex_replace_sv_4(re, sv, replace, count);
 }

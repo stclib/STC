@@ -108,7 +108,7 @@ STC_INLINE void _c_MEMB(_drop)(i_type* self) {
 }
 
 STC_INLINE i_type _c_MEMB(_move)(i_type* self) {
-    i_type box = *self; 
+    i_type box = *self;
     self->get = NULL;
     return box;
 }
@@ -189,8 +189,8 @@ STC_INLINE void _c_MEMB(_assign)(i_type* self, i_type* moved) {
     STC_INLINE uint64_t _c_MEMB(_raw_hash)(const _m_raw* rx)
         { return i_hash(rx); }
 
-    STC_INLINE uint64_t _c_MEMB(_hash)(const i_type* self) { 
-        _m_raw rx = i_keyto(self->get); 
+    STC_INLINE uint64_t _c_MEMB(_hash)(const i_type* self) {
+        _m_raw rx = i_keyto(self->get);
         return i_hash((&rx));
     }
 #else
