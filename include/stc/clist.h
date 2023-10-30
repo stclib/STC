@@ -66,7 +66,7 @@
     }
 
 #define _clist_tonode(vp) c_container_of(vp, _m_node, value)
-    
+
 #define _c_clist_insert_entry_after(ref, val) \
     _m_node *entry = (_m_node *)i_malloc(c_sizeof *entry); entry->value = val; \
     _c_clist_insert_after_node(ref, entry)
@@ -74,7 +74,7 @@
 #define _c_clist_insert_after_node(ref, entry) \
     if (ref) entry->next = ref->next, ref->next = entry; \
     else     entry->next = entry
-    // +: set self->last based on node 
+    // +: set self->last based on node
 
 #endif // CLIST_H_INCLUDED
 
@@ -400,7 +400,7 @@ STC_DEF bool _c_MEMB(_sort_with)(i_type* self, int(*cmp)(const _m_value*, const 
         arr[len++] = *i.ref;
     }
     qsort(arr, (size_t)len, sizeof *arr, (int(*)(const void*, const void*))cmp);
-    c_foreach (i, i_type, *self) 
+    c_foreach (i, i_type, *self)
         *i.ref = *p++;
     done: i_free(arr, cap*c_sizeof *arr);
     return p != NULL;

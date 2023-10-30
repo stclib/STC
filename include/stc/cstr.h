@@ -45,7 +45,7 @@
   #pragma GCC diagnostic ignored "-Warray-bounds"
 #endif
 
-enum  { cstr_s_last = sizeof(cstr_buf) - 1, 
+enum  { cstr_s_last = sizeof(cstr_buf) - 1,
         cstr_s_cap = cstr_s_last - 1 };
 #define cstr_s_size(s)          ((intptr_t)(s)->sml.data[cstr_s_last])
 #define cstr_s_set_size(s, len) ((s)->sml.data[len] = 0, (s)->sml.data[cstr_s_last] = (char)(len))
@@ -161,13 +161,13 @@ STC_INLINE void cstr_drop(cstr* self) {
 STC_INLINE void _cstr_set_size(cstr* self, intptr_t len)
     { SSO_CALL(self, set_size(self, len)); }
 
-STC_INLINE char* cstr_data(cstr* self) 
+STC_INLINE char* cstr_data(cstr* self)
     { return SSO_CALL(self, data(self)); }
 
 STC_INLINE const char* cstr_str(const cstr* self)
     { return SSO_CALL(self, data(self)); }
 
-STC_INLINE bool cstr_empty(const cstr* self) 
+STC_INLINE bool cstr_empty(const cstr* self)
     { return cstr_s_size(self) == 0; }
 
 STC_INLINE intptr_t cstr_size(const cstr* self)
@@ -189,16 +189,16 @@ extern bool cstr_valid_utf8(const cstr* self);
 
 // utf8 functions not depending on src/utf8code.c:
 
-STC_INLINE intptr_t cstr_u8_size(const cstr* self) 
+STC_INLINE intptr_t cstr_u8_size(const cstr* self)
     { return utf8_size(cstr_str(self)); }
 
-STC_INLINE intptr_t cstr_u8_size_n(const cstr* self, intptr_t nbytes) 
+STC_INLINE intptr_t cstr_u8_size_n(const cstr* self, intptr_t nbytes)
     { return utf8_size_n(cstr_str(self), nbytes); }
 
 STC_INLINE intptr_t cstr_u8_to_pos(const cstr* self, intptr_t u8idx)
     { return utf8_pos(cstr_str(self), u8idx); }
 
-STC_INLINE const char* cstr_u8_at(const cstr* self, intptr_t u8idx) 
+STC_INLINE const char* cstr_u8_at(const cstr* self, intptr_t u8idx)
     { return utf8_at(cstr_str(self), u8idx); }
 
 STC_INLINE csview cstr_u8_chr(const cstr* self, intptr_t u8idx) {
@@ -211,7 +211,7 @@ STC_INLINE csview cstr_u8_chr(const cstr* self, intptr_t u8idx) {
 
 // utf8 iterator
 
-STC_INLINE cstr_iter cstr_begin(const cstr* self) { 
+STC_INLINE cstr_iter cstr_begin(const cstr* self) {
     csview sv = cstr_sv(self);
     if (!sv.size) return c_LITERAL(cstr_iter){.ref = NULL};
     return c_LITERAL(cstr_iter){.chr = {sv.buf, utf8_chr_size(sv.buf)}};
@@ -237,7 +237,7 @@ STC_INLINE cstr_iter cstr_advance(cstr_iter it, intptr_t pos) {
 STC_INLINE void cstr_clear(cstr* self)
     { _cstr_set_size(self, 0); }
 
-STC_INLINE int cstr_cmp(const cstr* s1, const cstr* s2) 
+STC_INLINE int cstr_cmp(const cstr* s1, const cstr* s2)
     { return strcmp(cstr_str(s1), cstr_str(s2)); }
 
 STC_INLINE int cstr_icmp(const cstr* s1, const cstr* s2)
@@ -315,7 +315,7 @@ STC_INLINE bool cstr_ends_with(const cstr* self, const char* sub)
     { return cstr_ends_with_sv(self, c_sv(sub, c_strlen(sub))); }
 
 STC_INLINE bool cstr_iends_with(const cstr* self, const char* sub) {
-    csview sv = cstr_sv(self); 
+    csview sv = cstr_sv(self);
     intptr_t n = c_strlen(sub);
     return n <= sv.size && !utf8_icmp(sv.buf + sv.size - n, sub);
 }
@@ -430,16 +430,16 @@ cstr cstr_tolower_sv(csview sv)
 cstr cstr_toupper_sv(csview sv)
     { return cstr_tocase(sv, 2); }
 
-cstr cstr_tolower(const char* str) 
+cstr cstr_tolower(const char* str)
     { return cstr_tolower_sv(c_sv(str, c_strlen(str))); }
 
-cstr cstr_toupper(const char* str) 
+cstr cstr_toupper(const char* str)
     { return cstr_toupper_sv(c_sv(str, c_strlen(str))); }
 
-void cstr_lowercase(cstr* self) 
+void cstr_lowercase(cstr* self)
     { cstr_take(self, cstr_tolower_sv(cstr_sv(self))); }
 
-void cstr_uppercase(cstr* self) 
+void cstr_uppercase(cstr* self)
     { cstr_take(self, cstr_toupper_sv(cstr_sv(self))); }
 
 bool cstr_valid_utf8(const cstr* self)
@@ -475,7 +475,7 @@ STC_DEF char* _cstr_internal_move(cstr* self, const intptr_t pos1, const intptr_
 }
 
 STC_DEF char* _cstr_init(cstr* self, const intptr_t len, const intptr_t cap) {
-    if (cap > cstr_s_cap) { 
+    if (cap > cstr_s_cap) {
         self->lon.data = (char *)i_malloc(cap + 1);
         cstr_l_set_size(self, len);
         cstr_l_set_cap(self, cap);

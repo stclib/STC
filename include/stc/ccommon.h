@@ -55,7 +55,7 @@ typedef long long _llong;
 #define _c_ARG_N(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, \
                  _14, _15, _16, N, ...) N
 
-#ifndef __cplusplus 
+#ifndef __cplusplus
     #define _i_alloc(T)         ((T*)i_malloc(c_sizeof(T)))
     #define _i_new(T, ...)      ((T*)memcpy(_i_alloc(T), ((T[]){__VA_ARGS__}), sizeof(T)))
     #define c_new(T, ...)       ((T*)memcpy(malloc(sizeof(T)), ((T[]){__VA_ARGS__}), sizeof(T)))
@@ -159,7 +159,7 @@ STC_INLINE uint64_t _stc_hash_mix(uint64_t h[], int n) { // n > 0
     return h[0];
 }
 
-STC_INLINE char* stc_strnstrn(const char *str, intptr_t slen, 
+STC_INLINE char* stc_strnstrn(const char *str, intptr_t slen,
                               const char *needle, intptr_t nlen) {
     if (!nlen) return (char *)str;
     if (nlen > slen) return NULL;

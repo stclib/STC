@@ -167,7 +167,7 @@ struct cco_runtime;
 
 typedef cco_task_struct(cco_task, /**/) cco_task;
 
-typedef struct cco_runtime { 
+typedef struct cco_runtime {
     int result, top; cco_task* stack[];
 } cco_runtime;
 
@@ -218,7 +218,7 @@ typedef struct { intptr_t count; } cco_sem;
     #ifdef __cplusplus
       #define _c_LINKC extern "C" __declspec(dllimport)
     #else
-      #define _c_LINKC __declspec(dllimport) 
+      #define _c_LINKC __declspec(dllimport)
     #endif
     #if 1 // _WIN32_WINNT < _WIN32_WINNT_WIN8 || defined __TINYC__
       #define _c_getsystime GetSystemTimeAsFileTime

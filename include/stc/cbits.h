@@ -88,13 +88,13 @@ STC_INLINE _llong _cbits_count(const uint64_t* set, const _llong sz) {
     return count;
 }
 
-STC_INLINE char* _cbits_to_str(const uint64_t* set, const _llong sz, 
+STC_INLINE char* _cbits_to_str(const uint64_t* set, const _llong sz,
                                char* out, _llong start, _llong stop) {
     if (stop > sz) stop = sz;
     c_assert(start <= stop);
 
     c_memset(out, '0', stop - start);
-    for (_llong i = start; i < stop; ++i) 
+    for (_llong i = start; i < stop; ++i)
         if ((set[i>>6] & _cbits_bit(i)) != 0)
             out[i - start] = '1';
     out[stop - start] = '\0';
@@ -163,7 +163,7 @@ STC_INLINE void cbits_resize(cbits* self, const _llong size, const bool value) {
         c_memset(self->data64 + old_n, -(int)value, (new_n - old_n)*8);
         if (old_n > 0) {
             uint64_t mask = _cbits_bit(osize) - 1;
-            if (value) self->data64[old_n - 1] |= ~mask; 
+            if (value) self->data64[old_n - 1] |= ~mask;
             else       self->data64[old_n - 1] &= mask;
         }
     }
@@ -210,7 +210,7 @@ STC_INLINE i_type*  _i_memb(_take)(i_type* self, i_type other)
 STC_INLINE i_type _i_memb(_clone)(i_type other)
     { return other; }
 
-STC_INLINE i_type* _i_memb(_copy)(i_type* self, const i_type* other) 
+STC_INLINE i_type* _i_memb(_copy)(i_type* self, const i_type* other)
     { *self = *other; return self; }
 
 STC_INLINE void _i_memb(_set_all)(i_type *self, const bool value);
@@ -239,7 +239,7 @@ STC_INLINE void _i_memb(_set_pattern)(i_type *self, const uint64_t pattern) {
     while (n--) self->data64[n] = pattern;
 }
 
-STC_INLINE bool _i_memb(_test)(const i_type* self, const _llong i) 
+STC_INLINE bool _i_memb(_test)(const i_type* self, const _llong i)
     { return (self->data64[i>>6] & _cbits_bit(i)) != 0; }
 
 STC_INLINE bool _i_memb(_at)(const i_type* self, const _llong i)
@@ -295,7 +295,7 @@ STC_INLINE _llong _i_memb(_count)(const i_type* self)
 STC_INLINE char* _i_memb(_to_str)(const i_type* self, char* out, _llong start, _llong stop)
     { return _cbits_to_str(self->data64, _i_memb(_size)(self), out, start, stop); }
 
-STC_INLINE bool _i_memb(_subset_of)(const i_type* self, const i_type* other) { 
+STC_INLINE bool _i_memb(_subset_of)(const i_type* self, const i_type* other) {
     _i_assert(self->_size == other->_size);
     return _cbits_subset_of(self->data64, other->data64, _i_memb(_size)(self));
 }

@@ -105,7 +105,7 @@ _c_MEMB(_emplace_back)(i_type* self, const _m_raw raw)
     { return _c_MEMB(_push)(self, i_keyfrom(raw)); }
 
 STC_INLINE _m_iter
-_c_MEMB(_emplace_at)(i_type* self, _m_iter it, const _m_raw raw) 
+_c_MEMB(_emplace_at)(i_type* self, _m_iter it, const _m_raw raw)
     { return _c_MEMB(_insert_at)(self, it, i_keyfrom(raw)); }
 #endif
 
@@ -148,7 +148,7 @@ _c_MEMB(_push_front)(i_type* self, _m_value value) {
 STC_DEF void
 _c_MEMB(_erase_n)(i_type* self, const intptr_t idx, const intptr_t n) {
     const intptr_t len = _c_MEMB(_size)(self);
-    for (intptr_t i = idx + n - 1; i >= idx; --i) 
+    for (intptr_t i = idx + n - 1; i >= idx; --i)
         i_keydrop(_c_MEMB(_at_mut)(self, i));
     for (intptr_t i = idx, j = i + n; j < len; ++i, ++j)
         *_c_MEMB(_at_mut)(self, i) = *_c_MEMB(_at)(self, j);

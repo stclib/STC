@@ -83,7 +83,7 @@ STC_INLINE csview csview_slice(csview sv, intptr_t p1, intptr_t p2) {
 }
 
 /* utf8 iterator */
-STC_INLINE csview_iter csview_begin(const csview* self) { 
+STC_INLINE csview_iter csview_begin(const csview* self) {
     if (!self->size) return c_LITERAL(csview_iter){NULL};
     return c_LITERAL(csview_iter){.u8 = {{self->buf, utf8_chr_size(self->buf)},
                                           self->buf + self->size}};
@@ -176,7 +176,7 @@ STC_DEF uint64_t csview_hash(const csview *self)
     { return stc_hash(self->buf, self->size); }
 
 STC_DEF csview csview_substr_ex(csview sv, intptr_t pos, intptr_t n) {
-    if (pos < 0) { 
+    if (pos < 0) {
         pos += sv.size;
         if (pos < 0) pos = 0;
     }
@@ -187,7 +187,7 @@ STC_DEF csview csview_substr_ex(csview sv, intptr_t pos, intptr_t n) {
 }
 
 STC_DEF csview csview_slice_ex(csview sv, intptr_t p1, intptr_t p2) {
-    if (p1 < 0) { 
+    if (p1 < 0) {
         p1 += sv.size;
         if (p1 < 0) p1 = 0;
     }

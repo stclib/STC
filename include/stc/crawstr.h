@@ -43,8 +43,8 @@ STC_INLINE csview   crawstr_sv(crawstr rs) { return c_sv_2(rs.str, rs.size); }
 STC_INLINE intptr_t crawstr_size(crawstr rs) { return rs.size; }
 STC_INLINE bool     crawstr_empty(crawstr rs) { return rs.size == 0; }
 
-STC_INLINE bool crawstr_equals(crawstr rs, const char* str) { 
-    intptr_t n = c_strlen(str); 
+STC_INLINE bool crawstr_equals(crawstr rs, const char* str) {
+    intptr_t n = c_strlen(str);
     return rs.size == n && !c_memcmp(rs.str, str, n);
 }
 
@@ -67,7 +67,7 @@ STC_INLINE bool crawstr_ends_with(crawstr rs, const char* str) {
 }
 
 /* utf8 iterator */
-STC_INLINE crawstr_iter crawstr_begin(const crawstr* self) { 
+STC_INLINE crawstr_iter crawstr_begin(const crawstr* self) {
     if (!self->size) return c_LITERAL(crawstr_iter){.ref = NULL};
     return c_LITERAL(crawstr_iter){.chr = {self->str, utf8_chr_size(self->str)}};
 }
