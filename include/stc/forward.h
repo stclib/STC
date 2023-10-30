@@ -78,6 +78,10 @@ typedef union {
     csview chr;
 } crawstr_iter;
 
+typedef crawstr rsview;
+typedef crawstr_iter rsview_iter;
+typedef crawstr_value rsview_value;
+
 
 // cstr : null-terminated owning string (short string optimized - sso)
 typedef char cstr_value;
