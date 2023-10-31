@@ -78,9 +78,15 @@ STC_INLINE csview csview_substr(csview sv, intptr_t pos, intptr_t n) {
 
 STC_INLINE csview csview_slice(csview sv, intptr_t p1, intptr_t p2) {
     if (p2 > sv.size) p2 = sv.size;
-    sv.buf += p1, sv.size = p2 > p1 ? p2 - p1 : 0;
+    sv.buf += p1, sv.size = p2 - p1;
     return sv;
 }
+
+STC_INLINE csview csview_last(csview sv, intptr_t len)
+    { return csview_substr(sv, sv.size - len, len); }
+
+STC_INLINE const char* csview_at(csview sv, intptr_t idx)
+    { c_assert(c_uless(idx, sv.size)); return sv.buf + idx; }
 
 /* utf8 iterator */
 STC_INLINE csview_iter csview_begin(const csview* self) {
@@ -101,13 +107,22 @@ STC_INLINE void csview_next(csview_iter* it) {
 STC_INLINE intptr_t csview_u8_size(csview sv)
     { return utf8_size_n(sv.buf, sv.size); }
 
+STC_INLINE const char* csview_u8_at(csview sv, intptr_t u8idx)
+    { return utf8_at(sv.buf, u8idx); }
+
 STC_INLINE csview csview_u8_substr(csview sv, intptr_t bytepos, intptr_t u8len) {
     sv.buf += bytepos;
     sv.size = utf8_pos(sv.buf, u8len);
     return sv;
 }
 
-STC_INLINE bool csview_valid_utf8(csview sv) // depends on src/utf8code.c
+STC_INLINE csview csview_u8_last(csview sv, intptr_t u8len) {
+    const char* p = sv.buf + sv.size;
+    while (u8len && p != sv.buf) u8len -= (*--p & 0xC0) != 0x80;
+    return csview_substr(sv, p - sv.buf, sv.size);
+}
+
+STC_INLINE bool csview_u8_valid(csview sv) // depends on src/utf8code.c
     { return utf8_valid_n(sv.buf, sv.size); }
 
 #define c_fortoken_sv(it, inputsv, sep) \

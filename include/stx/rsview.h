@@ -68,11 +68,29 @@ STC_INLINE bool rsview_ends_with(rsview rs, const char* str) {
     return n > rs.size ? false : !c_memcmp(rs.str + rs.size - n, str, n);
 }
 
-STC_INLINE rsview rsview_substr(rsview rs, intptr_t start) {
-    if (start > rs.size) start = rs.size;
-    rs.str += start, rs.size -= start;
+STC_INLINE rsview rsview_substr(rsview rs, intptr_t pos) {
+    if (pos < rs.size) { rs.str += pos; rs.size -= pos; }
     return rs;
 }
+
+STC_INLINE rsview rsview_last(rsview rs, intptr_t count)
+    { return rsview_substr(rs, rs.size - count); }
+
+/* utf8 */
+STC_INLINE intptr_t rsview_u8_size(rsview rs)
+    { return utf8_size(rs.str); }
+
+STC_INLINE const char* rsview_u8_at(rsview rs, intptr_t u8idx)
+    { return utf8_at(rs.str, u8idx); }
+
+STC_INLINE rsview rsview_u8_last(rsview rs, intptr_t u8len) {
+    const char* p = rs.str + rs.size;
+    while (u8len && p != rs.str) u8len -= (*--p & 0xC0) != 0x80;
+    return rsview_substr(rs, p - rs.str);
+}
+
+STC_INLINE bool rsview_u8_valid(rsview rs) // depends on src/utf8code.c
+    { return utf8_valid_n(rs.str, rs.size); }
 
 /* utf8 iterator */
 STC_INLINE rsview_iter rsview_begin(const rsview* self) { 

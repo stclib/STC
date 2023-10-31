@@ -265,7 +265,7 @@ STC_INLINE intptr_t _cspan_size(const cextent_t shape[], int rank) {
 
 STC_INLINE void _cspan_swap_axes(cextent_t shape[], cstride_t stride[], int i, int j, int rank) {
     (void)rank;
-    c_assert(c_less_unsigned(i, rank) & c_less_unsigned(j, rank));
+    c_assert(c_uless(i, rank) & c_uless(j, rank));
     c_swap(cextent_t, shape + i, shape + j);
     c_swap(cstride_t, stride + i, stride + j);
 }
@@ -282,7 +282,7 @@ STC_INLINE intptr_t _cspan_index(const cextent_t shape[], const cstride_t stride
     intptr_t off = 0;
     (void)shape;
     while (rank--) {
-        c_assert(c_less_unsigned(args[rank], shape[rank]));
+        c_assert(c_uless(args[rank], shape[rank]));
         off += args[rank]*stride[rank];
     }
     return off;
@@ -365,13 +365,13 @@ STC_DEF intptr_t _cspan_slice(cextent_t oshape[], cstride_t ostride[], int* oran
     for (; i < rank; ++i) {
         off += args[i][0]*stride[i];
         switch (args[i][1]) {
-            case 0: c_assert(c_less_unsigned(args[i][0], shape[i])); continue;
+            case 0: c_assert(c_uless(args[i][0], shape[i])); continue;
             case c_END: end = shape[i]; break;
             default: end = args[i][1];
         }
         oshape[oi] = (cextent_t)(end - args[i][0]);
         ostride[oi] = stride[i];
-        c_assert((oshape[oi] > 0) & !c_less_unsigned(shape[i], end));
+        c_assert((oshape[oi] > 0) & !c_uless(shape[i], end));
         if (args[i][2] > 0) {
             ostride[oi] *= (cextent_t)args[i][2];
             oshape[oi] = (oshape[oi] - 1)/(cextent_t)args[i][2] + 1;

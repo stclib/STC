@@ -95,7 +95,7 @@ typedef long long _llong;
 #define c_memcmp(a, b, ilen)    memcmp(a, b, c_i2u_size(ilen))
 #define c_u2i_size(u)           (intptr_t)(1 ? (u) : (size_t)1)
 #define c_i2u_size(i)           (size_t)(1 ? (i) : -1)
-#define c_less_unsigned(a, b)   ((size_t)(a) < (size_t)(b))
+#define c_uless(a, b)           ((size_t)(a) < (size_t)(b))
 
 // x and y are i_keyraw* type, defaults to i_key*:
 #define c_default_cmp(x, y)     (c_default_less(y, x) - c_default_less(x, y))

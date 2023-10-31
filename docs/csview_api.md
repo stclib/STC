@@ -49,6 +49,8 @@ bool           csview_starts_with(csview sv, const char* str);
 bool           csview_ends_with(csview sv, const char* str);
 csview         csview_substr(csview sv, intptr_t pos, intptr_t n);
 csview         csview_slice(csview sv, intptr_t pos1, intptr_t pos2);
+csview         csview_last(csview sv, intptr_t len);
+const char*    csview_at(csview sv, intptr_t index);
 
 csview         csview_substr_ex(csview sv, intptr_t pos, intptr_t n);     // negative pos count from end
 csview         csview_slice_ex(csview sv, intptr_t pos1, intptr_t pos2);  // negative pos1, pos2 count from end
@@ -59,7 +61,9 @@ csview         csview_token(csview sv, const char* sep, intptr_t* start); // *st
 ```c
 intptr_t       csview_u8_size(csview sv);
 csview         csview_u8_substr(csview sv, intptr_t bytepos, intptr_t u8len);
-bool           csview_valid_utf8(csview sv);                              // requires linking with src/utf8code.c
+csview         csview_u8_last(csview sv, intptr_t u8len);
+const char*    csview_u8_at(csview sv, intptr_t u8idx);
+bool           csview_u8_valid(csview sv);                                // requires linking with src/utf8code.c
  
 csview_iter    csview_begin(const csview* self);
 csview_iter    csview_end(const csview* self);
