@@ -6,7 +6,7 @@ It supports both row-major and column-major layout efficiently, in a addition to
 capabilities similar to [python's numpy arrays](https://numpy.org/doc/stable/user/basics.indexing.html).
 Note that each dimension is currently limited to int32_t sizes and 8 dimensions (can be extended).
 
-See also C++ 
+See also C++
 [std::span](https://en.cppreference.com/w/cpp/container/span) /
 [std::mdspan](https://en.cppreference.com/w/cpp/container/mdspan) for similar functionality.
 
@@ -45,7 +45,7 @@ ValueType*      cspan_at(const SpanTypeN* self, intptr_t i, j..);  // num args i
 ValueType*      cspan_front(const SpanTypeN* self);
 ValueType*      cspan_back(const SpanTypeN* self);
 
-                // print numpy style output. 
+                // print numpy style output.
                 //  span     : any dimension. Note that span is passed by value.
                 //  fmt      : printf format specifier.
                 //  fp       : optional output file pointer, default stdout.
@@ -56,7 +56,7 @@ ValueType*      cspan_back(const SpanTypeN* self);
                 //    Note that fmt must match the arguments passed via itemfn().
                 // Usage ex: cspan_print(Span2, ((Span2)cspan_transposed2(&sp2)), "%.3f");
                 //           cspan_print(Span2, cspan_slice(Span2, &sp3, {c_ALL}, {3}, {c_ALL}), "%.3f");
-void            cspan_print(<TYPE> SpanTypeN, SpanTypeN span, const char* fmt, 
+void            cspan_print(<TYPE> SpanTypeN, SpanTypeN span, const char* fmt,
                             FILE* fp = stdout, const char* brackets = "[]", itemfn = c_EXPAND);
 
 SpanTypeN_iter  SpanType_begin(const SpanTypeN* self);
@@ -229,7 +229,7 @@ int main(void) {
 ## Example 3
 Slicing cspan without and with reducing the rank:
 
-[ [Run this code](https://godbolt.org/z/bMxdcMW9W) ]
+[ [Run this code](https://godbolt.org/z/EdGzxeM4b) ]
 ```c
 #include <stdio.h>
 #include "stc/cspan.h"
@@ -245,17 +245,19 @@ int main(void)
     // numpy style printout
     puts("span3:");
     cspan_print(Span3, span3, "%d");
-    
+
     puts("Slice without reducing rank:");
-    cspan_print(Span3, cspan_slice(Span3, &span3, {c_ALL}, {3,4}, {c_ALL}), "%d");
-    
+    Span3 ss3 = cspan_slice(Span3, &span3, {c_ALL}, {3,4}, {c_ALL});
+    cspan_print(Span3, ss3);
+
     puts("Slice with reducing rank:");
-    cspan_print(Span2, cspan_slice(Span2, &span3, {c_ALL}, {3}, {c_ALL}), "%d");
+    Span2 ss2 = cspan_slice(Span2, &span3, {c_ALL}, {3}, {c_ALL});
+    cspan_print(Span2, ss2);
 
     puts("Swapped:");
     Span3 swapped = span3;
     cspan_swap_axes(&swapped, 0, 1);
     cspan_swap_axes(&swapped, 1, 2);
-    cspan_print(Span3, swapped, "%d", stdout, "{},"); // C-array style.
+    cspan_print(Span3, swapped);
 }
 ```

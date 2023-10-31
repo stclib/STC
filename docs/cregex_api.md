@@ -30,7 +30,7 @@ cregex      cregex_from(const char* pattern, int cflags = CREG_DEFAULT);
 int         cregex_compile(cregex *self, const char* pattern, int cflags = CREG_DEFAULT);
 
             // num. of capture groups in regex, excluding the 0th group which is the full match
-int         cregex_captures(const cregex* self); 
+int         cregex_captures(const cregex* self);
 
             // return CREG_OK, CREG_NOMATCH, or CREG_MATCHERROR
 int         cregex_find(const cregex* re, const char* input, csview match[], int mflags = CREG_DEFAULT);
@@ -97,7 +97,7 @@ If an error occurs ```cregex_compile``` returns a negative error code stored in 
 
 ### Getting the first match and making text replacements
 
-[ [Run this code](https://godbolt.org/z/hK4hbbxoT) ]
+[ [Run this code](https://godbolt.org/z/c8as3oxj7) ]
 ```c
 #define i_import // include dependent cstr, utf8 and cregex function definitions.
 #include "stc/cregex.h"
@@ -153,7 +153,7 @@ c_formatch (it, &re, input)
 
 The easiest is to `#define i_import` before `#include "stc/cregex.h"`. Make sure to do that in one translation unit only.
 
-For reference, **cregex** uses the following files: 
+For reference, **cregex** uses the following files:
 - `stc/cregex.h`, `stc/utf8.h`, `stc/csview.h`, `stc/cstr.h`, `stc/ccommon.h`, `stc/forward.h`
 - `src/cregex.c`, `src/utf8code.c`.
 
