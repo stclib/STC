@@ -89,7 +89,7 @@ typedef crawstr zsview;
 typedef crawstr_iter zsview_iter;
 typedef crawstr_value zsview_value;
 #define c_zs(lit) c_rs(lit)
-#define c_zs_2(str, n) c_rs(str, n)
+#define c_zs_2(str, n) c_rs_2(str, n)
 
 // cstr : null-terminated owning string (short string optimized - sso)
 typedef char cstr_value;

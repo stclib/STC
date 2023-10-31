@@ -32,14 +32,14 @@
 #include "../stc/forward.h"
 #include "../stc/priv/utf8_hdr.h"
 
-#define             zsview_init() c_rs("")
+#define             zsview_init() c_zs("")
 #define             zsview_clone(rs) c_default_clone(rs)
 #define             zsview_drop(self) c_default_drop(self)
 #define             zsview_toraw(self) (self)->str
 
 STC_INLINE zsview   zsview_from(const char* str)
-                        { return c_rs_2(str, c_strlen(str)); }
-STC_INLINE void     zsview_clear(zsview* self) { *self = c_rs(""); }
+                        { return c_zs_2(str, c_strlen(str)); }
+STC_INLINE void     zsview_clear(zsview* self) { *self = c_zs(""); }
 STC_INLINE csview   zsview_sv(zsview rs) { return c_sv_2(rs.str, rs.size); }
 
 STC_INLINE intptr_t zsview_size(zsview rs) { return rs.size; }

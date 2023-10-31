@@ -230,12 +230,20 @@ typedef enum {c_ROWMAJOR, c_COLMAJOR} cspan_layout;
      .stride=(cspan_tuple1){.d={(self)->stride.d[3]}}}
 
 #define cspan_print(...) c_MACRO_OVERLOAD(cspan_print, __VA_ARGS__)
+#define cspan_print_2(Span, span) /* c11 */ \
+    cspan_print_3(Span, span, _Generic(*(span).data, \
+        float:"%g", double:"%g", \
+        uint8_t:"%d", int8_t:"%d", int16_t:"%d", \
+        int32_t:"%" PRIi32, int64_t:"%" PRIi64))
 #define cspan_print_3(Span, span, fmt) \
     cspan_print_4(Span, span, fmt, stdout)
 #define cspan_print_4(Span, span, fmt, fp) \
     cspan_print_5(Span, span, fmt, fp, "[]")
 #define cspan_print_5(Span, span, fmt, fp, brackets) \
     cspan_print_6(Span, span, fmt, fp, brackets, c_EXPAND)
+#define cspan_print_complex(Span, span, prec) \
+    cspan_print_6(Span, span, "%." #prec "f%+." #prec "fi", stdout, "[]", cspan_CMPLX_FLD)
+#define cspan_CMPLX_FLD(x) creal(x), cimag(x)
 
 #define cspan_print_6(Span, span, fmt, fp, brackets, field) do { \
     const Span _s = span; \
@@ -322,7 +330,7 @@ STC_DEF void _cspan_print_assist(cextent_t pos[], const cextent_t shape[], const
     for (j = 0; r >= 0 && pos[r] + 1 == shape[r]; --r, ++j)
         result[1][j] = brackets[1];
 
-    n = (j > 0) + (j > 1 /*& j < rank*/); // newlines
+    n = (j > 0) + ((j > 1) & (j < rank)); // newlines
     if (brackets[2] && j < rank) result[1][j++] = brackets[2]; // comma
     while (n--) result[1][j++] = '\n';
 }
