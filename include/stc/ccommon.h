@@ -120,14 +120,6 @@ typedef const char* ccharptr;
 #define ccharptr_clone(s) (s)
 #define ccharptr_drop(p) ((void)p)
 
-#define c_sv(...) c_MACRO_OVERLOAD(c_sv, __VA_ARGS__)
-#define c_sv_1(literal) c_sv_2(literal, c_litstrlen(literal))
-#define c_sv_2(str, n) (c_LITERAL(csview){str, n})
-#define c_SV(sv) (int)(sv).size, (sv).buf // printf("%.*s\n", c_SV(sv));
-
-#define c_rs(literal) c_rs_2(literal, c_litstrlen(literal))
-#define c_rs_2(str, n) (c_LITERAL(crawstr){str, n})
-
 #define c_ROTL(x, k) (x << (k) | x >> (8*sizeof(x) - (k)))
 
 #define stc_hash(...) c_MACRO_OVERLOAD(stc_hash, __VA_ARGS__)

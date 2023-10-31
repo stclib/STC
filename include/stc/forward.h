@@ -65,6 +65,10 @@ typedef union {
     struct { csview chr; csview_value* end; } u8;
 } csview_iter;
 
+#define c_sv(...) c_MACRO_OVERLOAD(c_sv, __VA_ARGS__)
+#define c_sv_1(literal) c_sv_2(literal, c_litstrlen(literal))
+#define c_sv_2(str, n) (c_LITERAL(csview){str, n})
+#define c_SV(sv) (int)(sv).size, (sv).buf // printf("%.*s\n", c_SV(sv));
 
 // crawstr : null-terminated string view
 typedef csview_value crawstr_value;
@@ -78,10 +82,14 @@ typedef union {
     csview chr;
 } crawstr_iter;
 
-typedef crawstr rsview;
-typedef crawstr_iter rsview_iter;
-typedef crawstr_value rsview_value;
+#define c_rs(literal) c_rs_2(literal, c_litstrlen(literal))
+#define c_rs_2(str, n) (c_LITERAL(crawstr){str, n})
 
+typedef crawstr zsview;
+typedef crawstr_iter zsview_iter;
+typedef crawstr_value zsview_value;
+#define c_zs(lit) c_rs(lit)
+#define c_zs_2(str, n) c_rs(str, n)
 
 // cstr : null-terminated owning string (short string optimized - sso)
 typedef char cstr_value;
