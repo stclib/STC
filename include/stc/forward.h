@@ -85,11 +85,11 @@ typedef union {
 #define c_rs(literal) c_rs_2(literal, c_litstrlen(literal))
 #define c_rs_2(str, n) (c_LITERAL(crawstr){str, n})
 
-typedef crawstr zsview;
-typedef crawstr_iter zsview_iter;
-typedef crawstr_value zsview_value;
-#define c_zs(lit) c_rs(lit)
-#define c_zs_2(str, n) c_rs_2(str, n)
+typedef crawstr czview;
+typedef crawstr_iter czview_iter;
+typedef crawstr_value czview_value;
+#define c_zv(lit) c_rs(lit)
+#define c_zv_2(str, n) c_rs_2(str, n)
 
 // cstr : null-terminated owning string (short string optimized - sso)
 typedef char cstr_value;
