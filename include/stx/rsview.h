@@ -68,13 +68,13 @@ STC_INLINE bool rsview_ends_with(rsview rs, const char* str) {
     return n > rs.size ? false : !c_memcmp(rs.str + rs.size - n, str, n);
 }
 
-STC_INLINE rsview rsview_substr(rsview rs, intptr_t pos) {
+STC_INLINE rsview rsview_start_at(rsview rs, intptr_t pos) {
     if (pos < rs.size) { rs.str += pos; rs.size -= pos; }
     return rs;
 }
 
 STC_INLINE rsview rsview_last(rsview rs, intptr_t count)
-    { return rsview_substr(rs, rs.size - count); }
+    { return rsview_start_at(rs, rs.size - count); }
 
 /* utf8 */
 STC_INLINE intptr_t rsview_u8_size(rsview rs)
@@ -83,10 +83,13 @@ STC_INLINE intptr_t rsview_u8_size(rsview rs)
 STC_INLINE const char* rsview_u8_at(rsview rs, intptr_t u8idx)
     { return utf8_at(rs.str, u8idx); }
 
+STC_INLINE rsview rsview_u8_start_at(rsview rs, intptr_t u8idx)
+    { return rsview_start_at(rs, utf8_pos(rs.str, u8idx)); }
+
 STC_INLINE rsview rsview_u8_last(rsview rs, intptr_t u8len) {
     const char* p = rs.str + rs.size;
     while (u8len && p != rs.str) u8len -= (*--p & 0xC0) != 0x80;
-    return rsview_substr(rs, p - rs.str);
+    return rsview_start_at(rs, p - rs.str);
 }
 
 STC_INLINE bool rsview_u8_valid(rsview rs) // depends on src/utf8code.c
