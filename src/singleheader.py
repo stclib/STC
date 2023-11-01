@@ -24,14 +24,14 @@ def process_file(
 ):
     out_lines += "// ### BEGIN_FILE_INCLUDE: " + basename(file_path) + '\n'
     comment_block = False
-    with open(file_path, "r") as f:
+    with open(file_path, "r", encoding="utf-8") as f:
         for line in f:
             is_comment = comment_block
-            if re.search('/\*.*?\*/', line):
+            if re.search('/\\*.*?\\*/', line):
                 pass
-            elif re.search('^\\s*/\*', line):
+            elif re.search('^\\s*/\\*', line):
                 comment_block, is_comment = True, True
-            elif re.search('\*/', line):
+            elif re.search('\\*/', line):
                 comment_block = False
 
             if is_comment:
@@ -68,7 +68,7 @@ def process_file(
 
 
 if __name__ == "__main__":
-    with open(sys.argv[2], "w", newline='\n') as f:
+    with open(sys.argv[2], "w", newline='\n', encoding="utf-8") as f:
         print(
             process_file(
                 abspath(sys.argv[1]),
