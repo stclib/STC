@@ -10,7 +10,7 @@ efficient functions for handling case-conversion, iteration and indexing into UT
 codepoints.
 
 **cstr** uses short strings optimization (sso), which eliminates heap memory allocation
-for string capacity up to 22 bytes. `sizeof(cstr)` is 24. In comparison, C++ 
+for string capacity up to 22 bytes. `sizeof(cstr)` is 24. In comparison, C++
 `sizeof(std::string)` is typically 32, but sso capacity is only 15 bytes.
 
 ## Header file
@@ -29,7 +29,7 @@ cstr        cstr_lit(const char literal_only[]);                    // cstr from
 cstr        cstr_from(const char* str);                             // constructor using strlen()
 cstr        cstr_from_n(const char* str, intptr_t n);               // constructor with n first bytes of str
 cstr        cstr_from_sv(csview sv);                                // construct cstr from csview
-cstr        cstr_from_rs(crawstr rs);                               // construct cstr from crawstr
+cstr        cstr_from_rs(czview rs);                               // construct cstr from czview
 cstr        cstr_with_capacity(intptr_t cap);
 cstr        cstr_with_size(intptr_t len, char fill);                // repeat fill len times
 cstr        cstr_from_fmt(const char* fmt, ...);                    // printf() formatting
@@ -41,7 +41,7 @@ void        cstr_drop(cstr* self);                                  // destructo
 
 const char* cstr_str(const cstr* self);                             // to const char*
 csview      cstr_sv(const cstr* self);                              // to csview
-crawstr     cstr_rs(const cstr* self);                              // to crawstr
+czview     cstr_rs(const cstr* self);                              // to czview
 char*       cstr_data(cstr* self);                                  // to mutable char*
 cstr_buf    cstr_buffer(cstr* self);                                // to mutable buffer (with capacity)
 
@@ -105,7 +105,7 @@ bool        cstr_getdelim(cstr *self, int delim, FILE *stream);     // does not 
 #### UTF8 methods
 ```c
 intptr_t    cstr_u8_size(const cstr* self);                         // number of utf8 codepoints
-intptr_t    cstr_u8_size_n(const cstr self, intptr_t nbytes);       // utf8 size within n bytes  
+intptr_t    cstr_u8_size_n(const cstr self, intptr_t nbytes);       // utf8 size within n bytes
 intptr_t    cstr_u8_to_pos(const cstr* self, intptr_t u8idx);       // byte pos offset at utf8 codepoint index
 const char* cstr_u8_at(const cstr* self, intptr_t u8idx);           // char* position at utf8 codepoint index
 csview      cstr_u8_chr(const cstr* self, intptr_t u8idx);          // get utf8 character as a csview
@@ -129,7 +129,7 @@ void        cstr_lowercase(cstr* self);                             // transform
 cstr        cstr_toupper(const char* str);                          // returns new uppercase utf8 cstr
 cstr        cstr_toupper_sv(csview sv);                             // returns new uppercase utf8 cstr
 void        cstr_uppercase(cstr* self);                             // transform cstr to uppercase utf8
- 
+
 int         cstr_icmp(const cstr* s1, const cstr* s2);              // utf8 case-insensitive comparison
 bool        cstr_iequals(const cstr* self, const char* str);        //   "
 bool        cstr_istarts_with(const cstr* self, const char* str);   //   "

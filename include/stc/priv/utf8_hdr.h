@@ -66,7 +66,7 @@ STC_INLINE intptr_t utf8_pos(const char* s, intptr_t index)
 // ------------------------------------------------------
 // The following utf8 function depends on src/utf8code.c.
 // To call them, either define i_import before including
-// one of cstr, csview crawstr, or link with src/libstc.o.
+// one of cstr, csview czview, or link with src/libstc.o.
 
 enum {
     U8G_Cc, U8G_Lt, U8G_Nd, U8G_Nl,
@@ -78,7 +78,7 @@ enum {
     U8G_SIZE
 };
 
-extern bool     utf8_isgroup(int group, uint32_t c); 
+extern bool     utf8_isgroup(int group, uint32_t c);
 extern bool     utf8_isalpha(uint32_t c);
 extern uint32_t utf8_casefold(uint32_t c);
 extern uint32_t utf8_tolower(uint32_t c);
@@ -90,10 +90,10 @@ extern int      utf8_icmp_sv(csview s1, csview s2);
 extern int      utf8_encode(char *out, uint32_t c);
 extern uint32_t utf8_peek_off(const char *s, int offset);
 
-STC_INLINE bool utf8_isupper(uint32_t c) 
+STC_INLINE bool utf8_isupper(uint32_t c)
     { return utf8_tolower(c) != c; }
 
-STC_INLINE bool utf8_islower(uint32_t c) 
+STC_INLINE bool utf8_islower(uint32_t c)
     { return utf8_toupper(c) != c; }
 
 STC_INLINE bool utf8_isalnum(uint32_t c) {

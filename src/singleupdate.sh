@@ -23,7 +23,7 @@ python singleheader.py $d/include/stc/csset.h   $d/../stcsingle/stc/csset.h
 python singleheader.py $d/include/stc/cstack.h  $d/../stcsingle/stc/cstack.h
 python singleheader.py $d/include/stc/cstr.h    $d/../stcsingle/stc/cstr.h
 python singleheader.py $d/include/stc/csview.h  $d/../stcsingle/stc/csview.h
-python singleheader.py $d/include/stc/crawstr.h  $d/../stcsingle/stc/crawstr.h
+python singleheader.py $d/include/stc/czview.h  $d/../stcsingle/stc/czview.h
 python singleheader.py $d/include/stc/cvec.h    $d/../stcsingle/stc/cvec.h
 python singleheader.py $d/include/stc/extend.h  $d/../stcsingle/stc/extend.h
 python singleheader.py $d/include/stc/forward.h $d/../stcsingle/stc/forward.h

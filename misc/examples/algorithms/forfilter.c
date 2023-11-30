@@ -5,8 +5,7 @@
 #include "stc/csview.h"
 #include "stc/algorithm.h"
 
-#define i_type IVec
-#define i_key int
+#define i_T IVec,int
 #include "stc/cstack.h"
 
 // filters and transforms:
@@ -88,12 +87,12 @@ fn main() {
 void demo3(void)
 {
     const char* sentence = "This is a sentence in C99.";
-    SVec words = {0}; 
+    SVec words = {0};
     c_fortoken (w, sentence, " ") // split words
         SVec_push(&words, *w.ref);
 
     SVec words_containing_i = {0};
-    c_forfilter (w, SVec, words, 
+    c_forfilter (w, SVec, words,
                     csview_contains(*w.ref, "i"))
         SVec_push(&words_containing_i, *w.ref);
 

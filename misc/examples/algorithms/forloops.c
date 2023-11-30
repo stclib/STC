@@ -1,13 +1,10 @@
 #include <stdio.h>
 #include "stc/algorithm.h"
 
-#define i_type IVec
-#define i_key int
+#define i_T IVec,int
 #include "stc/cstack.h"
 
-#define i_type IMap
-#define i_key int
-#define i_val int
+#define i_T IMap,int,int
 #include "stc/cmap.h"
 
 
@@ -48,11 +45,11 @@ int main(void)
     puts("\n\nc_forpair:");
     c_forpair (key, val, IMap, map)
         printf(" (%d %d)", *_.key, *_.val);
-    
+
     #define isOdd(i) (*i.ref & 1)
 
     puts("\n\nc_forfilter:");
-    c_forfilter (i, IVec, vec, 
+    c_forfilter (i, IVec, vec,
         isOdd(i)          &&
         c_flt_skip(i, 4)  &&
         c_flt_take(i, 4)

@@ -4,9 +4,9 @@
 #include "stc/cstr.h"
 #include <stdio.h>
 
+#define i_type mymap
 #define i_key int
 #define i_val_str
-#define i_type mymap
 #include "stc/csmap.h"
 
 void printmap(mymap m)
@@ -77,6 +77,6 @@ int main(void)
     printf("The number of elements removed from m3 is: %d\n", count);
     puts("After the element with a key of 2 is deleted, the map m3 is:");
     printmap(m3);
-    
+
     c_drop(mymap, &m1, &m2, &m3);
 }

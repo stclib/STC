@@ -30,7 +30,7 @@ void stringdemo1(void)
 
 #define i_key long long
 #define i_tag ll
-#include "stx/vec.h"
+#include "stc/vec.h"
 
 void vectordemo1(void)
 {
@@ -54,7 +54,7 @@ void vectordemo1(void)
 
 #define i_key_str
 #define i_use_cmp
-#include "stx/vec.h"
+#include "stc/vec.h"
 
 void vectordemo2(void)
 {
@@ -66,7 +66,7 @@ void vectordemo2(void)
     printf("names[1]: %s\n", cstr_str(&names.data[1]));
 
     vec_str_sort(&names);               // Sort the array
-    
+
     c_foreach (i, vec_str, names)
         printf("sorted: %s\n", cstr_str(i.ref));
 
@@ -75,7 +75,7 @@ void vectordemo2(void)
 
 #define i_key int
 #define i_use_cmp
-#include "stx/list.h"
+#include "stc/list.h"
 
 void listdemo1(void)
 {
@@ -106,7 +106,7 @@ void listdemo1(void)
 }
 
 #define i_key int
-#include "stx/hset.h"
+#include "stc/hset.h"
 
 void setdemo1(void)
 {
@@ -122,7 +122,7 @@ void setdemo1(void)
 #define i_key int
 #define i_val int
 #define i_tag ii
-#include "stx/hmap.h"
+#include "stc/hmap.h"
 
 void mapdemo1(void)
 {
@@ -136,7 +136,7 @@ void mapdemo1(void)
 #define i_key_str
 #define i_val int
 #define i_tag si
-#include "stx/hmap.h"
+#include "stc/hmap.h"
 
 void mapdemo2(void)
 {
@@ -158,7 +158,7 @@ void mapdemo2(void)
 
 #define i_key_str
 #define i_val_str
-#include "stx/hmap.h"
+#include "stc/hmap.h"
 
 void mapdemo3(void)
 {
@@ -176,7 +176,7 @@ void mapdemo3(void)
     printf("size %" c_ZI "\n", hmap_str_size(&table));
     c_foreach (i, hmap_str, table)
         printf("entry: %s: %s\n", cstr_str(&i.ref->first), cstr_str(&i.ref->second));
-    
+
     hmap_str_drop(&table); // frees key and value cstrs, and hash table.
 }
 

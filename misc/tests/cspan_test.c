@@ -8,7 +8,7 @@ using_cspan3(intspan, int);
 CTEST(cspan, subdim) {
     int array[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
     intspan3 m = cspan_md(array, 2, 2, 3);
-    
+
     for (int i = 0; i < m.shape[0]; ++i) {
         intspan2 sub_i = cspan_submd3(&m, i);
         for (int j = 0; j < m.shape[1]; ++j) {
@@ -74,8 +74,7 @@ CTEST(cspan, slice2) {
 }
 
 
-#define i_type Tiles
-#define i_key intspan3
+#define i_T Tiles,intspan3
 #include "stc/cstack.h"
 
 CTEST_FIXTURE(cspan_cube) {

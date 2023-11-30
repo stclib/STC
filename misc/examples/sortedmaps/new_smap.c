@@ -17,9 +17,7 @@ int point_cmp(const Point* a, const Point* b) {
     return c ? c : a->y - b->y;
 }
 
-#define i_type PMap
-#define i_key Point
-#define i_val int
+#define i_T PMap, Point,int
 #define i_cmp point_cmp
 #define i_is_forward
 #include "stc/csmap.h"

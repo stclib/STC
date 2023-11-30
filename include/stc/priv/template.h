@@ -25,6 +25,22 @@
 
 #ifndef STC_TEMPLATE_H_INCLUDED
 #define STC_TEMPLATE_H_INCLUDED
+  #define _c_SEL(sel, arg) sel arg
+  #define _c_SEL21(a, b) a
+  #define _c_SEL22(a, b) b
+  #define _c_SEL31(a, b, c) a
+  #define _c_SEL32(a, b, c) b
+  #define _c_SEL33(a, b, c) c
+
+  #define c_option(flag)          ((i_opt) & (flag))
+  #define c_is_forward            (1<<0)
+  #define c_no_atomic             (1<<1)
+  #define c_no_clone              (1<<2)
+  #define c_no_emplace            (1<<3)
+  #define c_no_hash               (1<<4)
+  #define c_use_cmp               (1<<5)
+  #define c_more                  (1<<6)
+
   #define _c_MEMB(name) c_JOIN(i_type, name)
   #define _c_DEFTYPES(macro, SELF, ...) c_EXPAND(macro(SELF, __VA_ARGS__))
   #define _m_value _c_MEMB(_value)
@@ -38,6 +54,14 @@
   #define _m_node _c_MEMB(_node)
 #endif
 
+#if defined i_T && defined _i_ismap
+  #define i_type _c_SEL(_c_SEL31, (i_T))
+  #define i_key _c_SEL(_c_SEL32, (i_T))
+  #define i_val _c_SEL(_c_SEL33, (i_T))
+#elif defined i_T
+  #define i_type _c_SEL(_c_SEL21, (i_T))
+  #define i_key _c_SEL(_c_SEL22, (i_T))
+#endif
 #ifndef i_type
   #define i_type c_JOIN(_i_prefix, i_tag)
 #endif
@@ -58,7 +82,8 @@
   #define i_val_arcbox i_valboxed
 #endif
 
-#if !(defined i_key || defined i_key_str || defined i_key_ssv || \
+#if !(defined i_key || \
+      defined i_key_str || defined i_key_ssv || \
       defined i_key_class || defined i_key_arcbox)
   #if defined _i_ismap
     #error "i_key* must be defined for maps"
@@ -69,7 +94,7 @@
   #endif
   #if defined i_val_ssv
     #define i_key_ssv i_val_ssv
-  #endif  
+  #endif
   #if defined i_val_arcbox
     #define i_key_arcbox i_val_arcbox
   #endif
@@ -95,15 +120,6 @@
     #define i_keydrop i_valdrop
   #endif
 #endif
-
-#define c_option(flag)          ((i_opt) & (flag))
-#define c_is_forward            (1<<0)
-#define c_no_atomic             (1<<1)
-#define c_no_clone              (1<<2)
-#define c_no_emplace            (1<<3)
-#define c_no_hash               (1<<4)
-#define c_use_cmp               (1<<5)
-#define c_more                  (1<<6)
 
 #if c_option(c_is_forward)
   #define i_is_forward

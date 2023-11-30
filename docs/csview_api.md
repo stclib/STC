@@ -5,12 +5,12 @@ The type **csview** is a non-null terminated string view and can refer to a cons
 sequence of char-elements with the first element of the sequence at position zero. The implementation
 holds two members: a pointer to constant char and a size.
 
-Because **csview** is non-null terminated, it cannot be a replacent view for `const char*` - 
-see [crawstr](crawstr_api.md) for that. **csview** never allocates memory, and therefore need not be
+Because **csview** is non-null terminated, it cannot be a replacent view for `const char*` -
+see [czview](czview_api.md) for that. **csview** never allocates memory, and therefore need not be
 destructed. Its lifetime is limited by the source string storage. It keeps the length of the string,
 and does not need to call *strlen()* to acquire the length.
 
-- **csview** iterators works on UTF8 codepoints - like **cstr** and **crawstr** (see Example 2).
+- **csview** iterators works on UTF8 codepoints - like **cstr** and **czview** (see Example 2).
 - Because it is null-terminated, it must be printed the following way:
 ```c
 printf("%.*s", c_SV(sstr));
@@ -31,8 +31,8 @@ All csview definitions and prototypes are available by including a single header
 ## Methods
 
 ```c
-csview         c_sv(const char literal_only[]);                         // construct from literal, no strlen()
-csview         c_sv(const char* str, intptr_t n);                       // construct from str and length n
+csview         c_sv(const char literal_only[]);                        // construct from literal, no strlen()
+csview         c_sv(const char* str, intptr_t n);                      // construct from str and length n
 csview         csview_from(const char* str);                           // construct from const char*
 csview         csview_from_n(const char* str, intptr_t n);             // alias for c_sv(str, n)
 
@@ -64,7 +64,7 @@ csview         csview_u8_substr(csview sv, intptr_t bytepos, intptr_t u8len);
 csview         csview_u8_last(csview sv, intptr_t u8len);
 const char*    csview_u8_at(csview sv, intptr_t u8idx);
 bool           csview_u8_valid(csview sv);                                // requires linking with src/utf8code.c
- 
+
 csview_iter    csview_begin(const csview* self);
 csview_iter    csview_end(const csview* self);
 void           csview_next(csview_iter* it);                              // utf8 codepoint step, not byte!
@@ -185,7 +185,7 @@ void print_split(csview input, const char* sep)
 cstack_str string_split(csview input, const char* sep)
 {
     cstack_str out = cstack_str_init();
-    
+
     c_fortoken_sv (i, input, sep)
         cstack_str_push(&out, cstr_from_sv(i.token));
 

@@ -3,8 +3,7 @@
 #define i_implement
 #include "stc/cstr.h"
 
-#define i_type IBox
-#define i_key long
+#define i_T IBox,long
 #include "stc/cbox.h" // unique_ptr<long> alike.
 
 // cmap of cstr => IBox
@@ -21,7 +20,7 @@ int main(void)
     puts("Map cstr => IBox:");
     Boxmap_insert(&map, cstr_from("Test1"), IBox_make(1));
     Boxmap_insert(&map, cstr_from("Test2"), IBox_make(2));
-    
+
     // Simpler: emplace() implicitly creates cstr from const char* and IBox from long!
     Boxmap_emplace(&map, "Test3", 3);
     Boxmap_emplace(&map, "Test4", 4);

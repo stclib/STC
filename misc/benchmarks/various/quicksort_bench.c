@@ -6,8 +6,7 @@
   #include <algorithm>
 #endif
 #define NDEBUG
-#define i_type Ints
-#define i_key int
+#define i_T Ints,int
 #define i_more
 #include "stc/cvec.h"
 #include "stc/algo/quicksort.h"
@@ -56,7 +55,7 @@ int main(int argc, char *argv[]) {
     for (i = 1; i < size; i++)
         if (Ints_at(&a, i - 1) > Ints_at(&a, i))
             { printf("sort error\n"); exit(-1); };
-    
+
     for (i = 0; i < size; i++)
         *Ints_at_mut(&a, i) = i;
     testsort(&a, size, "sorted");

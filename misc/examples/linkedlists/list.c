@@ -3,8 +3,7 @@
 #include "stc/algorithm.h"
 #include "stc/crand.h"
 
-#define i_type DList
-#define i_key double
+#define i_T DList,double
 #define i_use_cmp
 #include "stc/clist.h"
 
@@ -27,7 +26,7 @@ int main(void) {
         printf("%8d: %10f\n", c_flt_getcount(i), *i.ref);
 
     puts("sort");
-    
+
     printf("sorted %d\n", DList_sort(&list)); // qsort O(n*log n)
 
     c_forfilter (i, DList, list, c_flt_take(i, 10))

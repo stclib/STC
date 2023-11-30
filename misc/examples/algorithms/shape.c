@@ -77,8 +77,7 @@ struct ShapeAPI Triangle_api = {
 // Polygon implementation
 // ============================================================
 
-#define i_type PointVec 
-#define i_key Point
+#define i_T PointVec,Point
 #include "stc/cstack.h"
 
 typedef struct {
@@ -148,7 +147,7 @@ int main(void)
 
     c_forlist (i, Point, {{5, 7}, {12, 7}, {12, 20}, {82, 33}, {17, 56}})
         Polygon_addPoint(pol2, *i.ref);
-    
+
     Shapes_push(&shapes, &tri1->shape);
     Shapes_push(&shapes, &pol1->shape);
     Shapes_push(&shapes, &pol2->shape);

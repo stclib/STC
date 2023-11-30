@@ -21,16 +21,16 @@
  * SOFTWARE.
  */
 #define i_header // external linkage by default. override with i_static.
-#include "../stc/priv/linkage.h"
+#include "priv/linkage.h"
 
-// czview is a "zero-terminated string view". It replaces crawstr.
+// czview is a "zero-terminated string view". It replaces czview.
 
 #ifndef CZVIEW_H_INCLUDED
 #define CZVIEW_H_INCLUDED
 
-#include "../stc/ccommon.h"
-#include "../stc/forward.h"
-#include "../stc/priv/utf8_hdr.h"
+#include "ccommon.h"
+#include "forward.h"
+#include "priv/utf8_hdr.h"
 
 #define             czview_init() c_zv("")
 #define             czview_clone(rs) c_default_clone(rs)
@@ -45,8 +45,8 @@ STC_INLINE csview   czview_sv(czview rs) { return c_sv_2(rs.str, rs.size); }
 STC_INLINE intptr_t czview_size(czview rs) { return rs.size; }
 STC_INLINE bool     czview_empty(czview rs) { return rs.size == 0; }
 
-STC_INLINE bool czview_equals(czview rs, const char* str) { 
-    intptr_t n = c_strlen(str); 
+STC_INLINE bool czview_equals(czview rs, const char* str) {
+    intptr_t n = c_strlen(str);
     return rs.size == n && !c_memcmp(rs.str, str, n);
 }
 
@@ -68,13 +68,13 @@ STC_INLINE bool czview_ends_with(czview rs, const char* str) {
     return n > rs.size ? false : !c_memcmp(rs.str + rs.size - n, str, n);
 }
 
-STC_INLINE czview czview_start_at(czview rs, intptr_t pos) {
+STC_INLINE czview czview_from_pos(czview rs, intptr_t pos) {
     if (pos < rs.size) { rs.str += pos; rs.size -= pos; }
     return rs;
 }
 
 STC_INLINE czview czview_last(czview rs, intptr_t count)
-    { return czview_start_at(rs, rs.size - count); }
+    { return czview_from_pos(rs, rs.size - count); }
 
 /* utf8 */
 STC_INLINE intptr_t czview_u8_size(czview rs)
@@ -83,21 +83,20 @@ STC_INLINE intptr_t czview_u8_size(czview rs)
 STC_INLINE const char* czview_u8_at(czview rs, intptr_t u8idx)
     { return utf8_at(rs.str, u8idx); }
 
-STC_INLINE czview czview_u8_start_at(czview rs, intptr_t u8idx)
-    { return czview_start_at(rs, utf8_pos(rs.str, u8idx)); }
+STC_INLINE czview czview_u8_from_pos(czview rs, intptr_t u8idx)
+    { return czview_from_pos(rs, utf8_pos(rs.str, u8idx)); }
 
 STC_INLINE czview czview_u8_last(czview rs, intptr_t u8len) {
     const char* p = rs.str + rs.size;
     while (u8len && p != rs.str) u8len -= (*--p & 0xC0) != 0x80;
-    return czview_start_at(rs, p - rs.str);
+    return czview_from_pos(rs, p - rs.str);
 }
 
 STC_INLINE bool czview_u8_valid(czview rs) // depends on src/utf8code.c
     { return utf8_valid_n(rs.str, rs.size); }
 
 /* utf8 iterator */
-STC_INLINE czview_iter czview_begin(const czview* self) { 
-    if (!self->size) return c_LITERAL(czview_iter){.ref = NULL};
+STC_INLINE czview_iter czview_begin(const czview* self) {
     return c_LITERAL(czview_iter){.chr = {self->str, utf8_chr_size(self->str)}};
 }
 

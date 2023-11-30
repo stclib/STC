@@ -1,8 +1,7 @@
 // https://www.youtube.com/watch?v=8sEe-4tig_A
 #include <stdio.h>
 #include "stc/coroutine.h"
-#define i_type IVec
-#define i_key int
+#define i_T IVec,int
 #include "stc/cvec.h"
 
 struct GenValue {
@@ -26,7 +25,7 @@ struct Generator {
     int value;
 };
 
-cco_result interleaved(struct Generator* g) 
+cco_result interleaved(struct Generator* g)
 {
     cco_routine(g) {
         while (!(cco_done(&g->x) & cco_done(&g->y))) {

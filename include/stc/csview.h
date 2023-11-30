@@ -90,7 +90,6 @@ STC_INLINE const char* csview_at(csview sv, intptr_t idx)
 
 /* utf8 iterator */
 STC_INLINE csview_iter csview_begin(const csview* self) {
-    if (!self->size) return c_LITERAL(csview_iter){NULL};
     return c_LITERAL(csview_iter){.u8 = {{self->buf, utf8_chr_size(self->buf)},
                                           self->buf + self->size}};
 }
