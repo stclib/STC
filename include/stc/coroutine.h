@@ -56,7 +56,7 @@ int main(void) {
     return 0;
 }
 */
-#include "ccommon.h"
+#include "common.h"
 
 enum {
     CCO_STATE_FINAL = -1,

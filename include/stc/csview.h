@@ -26,7 +26,7 @@
 #ifndef CSVIEW_H_INCLUDED
 #define CSVIEW_H_INCLUDED
 
-#include "ccommon.h"
+#include "common.h"
 #include "forward.h"
 #include "priv/utf8_hdr.h"
 

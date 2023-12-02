@@ -711,7 +711,7 @@ Major changes:
     - [c_forfilter](docs/algorithm_api.md#c_forfilter) - ranges-like view filtering.
     - [csort](include/stc/algo/quicksort.h) - [fast quicksort](misc/benchmarks/various/quicksort_bench.c) with custom inline comparison.
 - Renamed `c_ARGSV()` => `c_SV()`: **csview** print arg. Note `c_sv()` is shorthand for *csview_from()*.
-- Support for [uppercase flow-control](include/stc/priv/altnames.h) macro names in ccommon.h.
+- Support for [uppercase flow-control](include/stc/priv/altnames.h) macro names in common.h.
 - Some API changes in **cregex** and **cstr**.
 - Create single header container versions with python script.
 

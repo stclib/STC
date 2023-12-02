@@ -25,12 +25,11 @@
 /*
 #include <stdio.h>
 
-#define i_tag i
-#define i_key int
+#define i_TYPE sset_i,int
 #include "stc/sset.h" // sorted set of int
 
 int main(void) {
-    sset_i s = sset_i_init();
+    sset_i s = {0};
     sset_i_insert(&s, 5);
     sset_i_insert(&s, 8);
     sset_i_insert(&s, 3);
@@ -44,4 +43,4 @@ int main(void) {
 
 #define _i_prefix sset_
 #define _i_isset
-#include "../stc/csmap.h"
+#include "smap.h"

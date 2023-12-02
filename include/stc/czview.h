@@ -28,7 +28,7 @@
 #ifndef CZVIEW_H_INCLUDED
 #define CZVIEW_H_INCLUDED
 
-#include "ccommon.h"
+#include "common.h"
 #include "forward.h"
 #include "priv/utf8_hdr.h"
 

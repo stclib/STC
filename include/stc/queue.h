@@ -20,6 +20,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+#include "priv/linkage.h"
 
-#define _i_prefix queue_
-#include "../stc/cqueue.h"
+#ifndef CQUEUE_H_INCLUDED
+#define CQUEUE_H_INCLUDED
+#include "common.h"
+#include "forward.h"
+#include <stdlib.h>
+#include <string.h>
+#endif // CQUEUE_H_INCLUDED
+
+#ifndef _i_prefix
+  #define _i_prefix queue_
+#endif
+#include "priv/template.h"
+#include "priv/cqueue_hdr.h"
+
+/* -------------------------- IMPLEMENTATION ------------------------- */
+#if defined i_implement || defined i_static
+#include "priv/cqueue_imp.h"
+#endif // IMPLEMENTATION
+#include "priv/template2.h"
+#include "priv/linkage2.h"

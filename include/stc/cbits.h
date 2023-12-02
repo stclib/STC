@@ -52,7 +52,7 @@ int main(void) {
 #include "priv/linkage.h"
 #ifndef CBITS_H_INCLUDED
 #define CBITS_H_INCLUDED
-#include "ccommon.h"
+#include "common.h"
 #include <stdlib.h>
 #include <string.h>
 

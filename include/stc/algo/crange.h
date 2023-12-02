@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
 */
-/* 
+/*
 #include <stdio.h>
 #include "stc/algo/filter.h"
 #include "stc/algo/crange.h"
@@ -46,7 +46,7 @@ int main(void)
 #define STC_CRANGE_H_INCLUDED
 
 #include "../priv/linkage.h"
-#include "../ccommon.h"
+#include "../common.h"
 
 typedef long long crange_value;
 typedef struct { crange_value start, end, step, value; } crange;

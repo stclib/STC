@@ -5,7 +5,7 @@
 
 ### c_foreach, c_forpair, c_foriter, c_forindexed
 ```c
-#include "stc/ccommon.h"
+#include "stc/common.h"
 ```
 
 | Usage                                    | Description                               |

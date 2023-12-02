@@ -33,7 +33,7 @@ THE SOFTWARE.
 #include <stdbool.h>
 #include <string.h>
 #include "forward.h" // csview
-#include "ccommon.h"
+#include "common.h"
 
 enum {
     CREG_DEFAULT = 0,

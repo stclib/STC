@@ -33,7 +33,7 @@
 #include <stdlib.h> /* malloc */
 #include <stdarg.h>
 #include <stdio.h> /* vsnprintf */
-#include "ccommon.h"
+#include "common.h"
 #include "forward.h"
 #include "priv/utf8_hdr.h"
 

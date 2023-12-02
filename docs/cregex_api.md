@@ -154,7 +154,7 @@ c_formatch (it, &re, input)
 The easiest is to `#define i_import` before `#include "stc/cregex.h"`. Make sure to do that in one translation unit only.
 
 For reference, **cregex** uses the following files:
-- `stc/cregex.h`, `stc/utf8.h`, `stc/csview.h`, `stc/cstr.h`, `stc/ccommon.h`, `stc/forward.h`
+- `stc/cregex.h`, `stc/utf8.h`, `stc/csview.h`, `stc/cstr.h`, `stc/common.h`, `stc/forward.h`
 - `src/cregex.c`, `src/utf8code.c`.
 
 ## Regex Cheatsheet

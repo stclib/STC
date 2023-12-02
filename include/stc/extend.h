@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#include "stc/ccommon.h"
+#include "stc/common.h"
 #include "stc/forward.h"
 
 #ifdef i_key_str

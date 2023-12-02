@@ -65,7 +65,7 @@ int demo2() {
 #define STC_CSPAN_H_INCLUDED
 
 #include "priv/linkage.h"
-#include "ccommon.h"
+#include "common.h"
 typedef STC_CSPAN_INDEX_TYPE cextent_t, cstride_t;
 
 #define using_cspan(...) c_MACRO_OVERLOAD(using_cspan, __VA_ARGS__)

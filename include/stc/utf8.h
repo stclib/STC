@@ -25,7 +25,7 @@
 #ifndef UTF8_H_INCLUDED
 #define UTF8_H_INCLUDED
 
-#include "ccommon.h"
+#include "common.h"
 #include "forward.h"
 #include "priv/utf8_hdr.h"
 

@@ -24,7 +24,7 @@
 
 #ifndef CRAND_H_INCLUDED
 #define CRAND_H_INCLUDED
-#include "ccommon.h"
+#include "common.h"
 /*
 // crand: Pseudo-random number generator
 #include "stc/crand.h"

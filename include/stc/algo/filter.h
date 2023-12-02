@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
 */
-/* 
+/*
 #include <stdio.h>
 #define i_val int
 #include "stc/cstack.h"
@@ -33,7 +33,7 @@ int main(void)
     c_foreach (i, cstack_int, stk)
         printf(" %d", *i.ref);
     puts("");
-   
+
     c_forfilter (i, cstack_int, stk,
                     c_flt_skipwhile(i, *i.ref < 3) &&
                     (*i.ref & 1) == 0              && // even only
@@ -47,7 +47,7 @@ int main(void)
 #ifndef STC_FILTER_H_INCLUDED
 #define STC_FILTER_H_INCLUDED
 
-#include "../ccommon.h"
+#include "../common.h"
 
 // c_forfilter:
 

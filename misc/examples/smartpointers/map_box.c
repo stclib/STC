@@ -1,4 +1,4 @@
-#include "stc/ccommon.h"
+#include "stc/common.h"
 #include <stdio.h>
 #define i_implement
 #include "stc/cstr.h"
