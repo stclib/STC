@@ -3,7 +3,7 @@
 STC - Smart Template Containers
 ===============================
 
-### [Version 4.3 Pre-release](#version-history)
+### [Version 5.0 beta 1](#version-history)
 - See details for breaking changes.
 ---
 Description
@@ -14,19 +14,19 @@ The library handles everything from trivial to highly complex data using *templa
 
 Containers
 ----------
-- [***carc*** - **std::shared_ptr** alike type](docs/carc_api.md)
-- [***cbox*** - **std::unique_ptr** alike type](docs/cbox_api.md)
+- [***arc*** - **std::shared_ptr** alike type](docs/arc_api.md)
+- [***box*** - **std::unique_ptr** alike type](docs/box_api.md)
 - [***cbits*** - **std::bitset** alike type](docs/cbits_api.md)
-- [***clist*** - **std::forward_list** alike type](docs/clist_api.md)
-- [***cstack*** - **std::stack** alike type](docs/cstack_api.md)
-- [***cvec*** - **std::vector** alike type](docs/cvec_api.md)
-- [***cqueue*** - **std::queue** alike type](docs/cqueue_api.md)
-- [***cdeq*** - **std::deque** alike type](docs/cdeq_api.md)
-- [***cpque*** - **std::priority_queue** alike type](docs/cpque_api.md)
-- [***cmap*** - **std::unordered_map** alike type](docs/cmap_api.md)
-- [***cset*** - **std::unordered_set** alike type](docs/cset_api.md)
-- [***csmap*** - **std::map** sorted map alike type](docs/csmap_api.md)
-- [***csset*** - **std::set** sorted set alike type](docs/csset_api.md)
+- [***list*** - **std::forward_list** alike type](docs/list_api.md)
+- [***stack*** - **std::stack** alike type](docs/stack_api.md)
+- [***vec*** - **std::vector** alike type](docs/vec_api.md)
+- [***queue*** - **std::queue** alike type](docs/queue_api.md)
+- [***deq*** - **std::deque** alike type](docs/deq_api.md)
+- [***pque*** - **std::priority_queue** alike type](docs/pque_api.md)
+- [***hmap*** - **std::unordered_map** alike type](docs/hmap_api.md)
+- [***hset*** - **std::unordered_set** alike type](docs/hset_api.md)
+- [***smap*** - **std::map** sorted map alike type](docs/smap_api.md)
+- [***sset*** - **std::set** sorted set alike type](docs/sset_api.md)
 - [***cstr*** - **std::string** alike type](docs/cstr_api.md)
 - [***csview*** - **std::string_view** alike type](docs/csview_api.md)
 - [***czview*** - null-terminated string view type](docs/czview_api.md)
@@ -66,7 +66,7 @@ List of contents
 - **Minimal boilerplate code** - Specify only the required template parameters, and leave the rest as defaults.
 - **Fully type safe** - Because of templating, it avoids error-prone casting of container types and elements back and forth from the containers.
 - **High performance** - Unordered maps and sets, queues and deques are significantly faster than the C++ STL containers, the remaining are similar or close to STL in speed (See graph below).
-- **Fully memory managed** - Containers destructs keys/values via default or user supplied drop function. They may be cloned if element types are clonable. Also, smart pointers are supported and can be stored in containers. See [***carc***](docs/carc_api.md) and [***cbox***](docs/cbox_api.md).
+- **Fully memory managed** - Containers destructs keys/values via default or user supplied drop function. They may be cloned if element types are clonable. Also, smart pointers are supported and can be stored in containers. See [***arc***](docs/arc_api.md) and [***box***](docs/box_api.md).
 - **Uniform, easy-to-learn API** - Just include the headers and you are good. The API and functionality resembles c++ STL and is fully listed in the docs. Intuitive method/type names and uniform usage across the various containers.
 - **No signed/unsigned mixing** - Unsigned sizes and indices mixed with signed for comparison and calculation is asking for trouble. STC only uses signed numbers in the API for this reason.
 - **Small footprint** - Small source code and generated executables. The executable from the example below using *four different* container types is only ***19 Kb in size*** compiled with gcc -O3 -s on Linux.
@@ -90,8 +90,8 @@ lookup in containers. E.g., containers with STC string elements (**cstr**) uses 
 as lookup type, so constructing a `cstr` (which may allocate memory) for the lookup
 *is not needed*. Hence, the alternative lookup key does not need to be destroyed after use,
 as it is normally a POD type. Finally, the key may be passed to an ***emplace***-function.
-So instead of calling e.g. `cvec_str_push(&vec, cstr_from("Hello"))`, you may call
-`cvec_str_emplace(&vec, "Hello")`, which is functionally identical, but more convenient.
+So instead of calling e.g. `vec_str_push(&vec, cstr_from("Hello"))`, you may call
+`vec_str_emplace(&vec, "Hello")`, which is functionally identical, but more convenient.
 3. ***Standardized container iterators***. All containers can be iterated in the same manner, and all use the
 same element access syntax. E.g.:
     - `c_foreach (it, MyInts, myints) *it.ref += 42;` works for any container defined as
@@ -117,31 +117,31 @@ Benchmark notes:
 ---
 ## Naming conventions
 
-- Container names are prefixed by `c`, e.g. `cvec`, `cstr`.
+- Container names are prefixed by `c`, e.g. `vec`, `cstr`.
 - Public STC macros are prefixed by `c_`, e.g. `c_foreach`, `c_init`.
 - Template parameter macros are prefixed by `i_`, e.g. `i_key`, `i_type`.
 - All containers can be initialized with `{0}`, i.e. no heap allocation used by default init.
-- Common types for a container type Con:
-    - Con
-    - Con_value
-    - Con_raw
-    - Con_iter
+- Common types for a container type Cont:
+    - Cont
+    - Cont_value
+    - Cont_raw
+    - Cont_iter
 - Some common function names:
-    - Con_init()
-    - Con_reserve(&con, capacity)
-    - Con_drop(&con)
-    - Con_empty(&con)
-    - Con_size(&con)
-    - Con_clone(con)
-    - Con_push(&con, value)
-    - Con_emplace(&con, rawval)
-    - Con_erase_at(&con, iter)
-    - Con_front(&con)
-    - Con_back(&con)
-    - Con_begin(&con)
-    - Con_end(&con)
-    - Con_next(&iter)
-    - Con_advance(iter, n)
+    - Cont_init()
+    - Cont_reserve(&con, capacity)
+    - Cont_drop(&con)
+    - Cont_empty(&con)
+    - Cont_size(&con)
+    - Cont_clone(con)
+    - Cont_push(&con, value)
+    - Cont_emplace(&con, rawval)
+    - Cont_erase_at(&con, iter)
+    - Cont_front(&con)
+    - Cont_back(&con)
+    - Cont_begin(&con)
+    - Cont_end(&con)
+    - Cont_next(&iter)
+    - Cont_advance(iter, n)
 
 ---
 ## Usage
@@ -150,9 +150,8 @@ like **cstr** and **cbits** are generic/templated. No type casting is used, so c
 templated types in C++. However, to specify template parameters with STC, you define them as macros prior to
 including the container.
 ```c
-#define i_type Floats  // Container type name (optional); if not defined name would be cvec_float
-#define i_key float    // Container element type
-#include "stc/cvec.h"  // "instantiate" the desired container type
+#define i_TYPE Floats,float // Container type (name, element type)
+#include "stc/vec.h"        // "instantiate" the desired container type
 #include <stdio.h>
 
 int main(void)
@@ -173,13 +172,12 @@ int main(void)
 ```
 Note that `i_val*` template parameters can be used instead of `i_key*` for *non-map* containers.
 
-Switching to a different container type, e.g. a sorted set (csset):
+Switching to a different container type, e.g. a sorted set (sset):
 
 [ [Run this code](https://godbolt.org/z/fYWbEx4fa) ]
 ```c
-#define i_type Floats
-#define i_key float
-#include "stc/csset.h" // Use a sorted set instead
+#define i_TYPE Floats,float
+#include "stc/sset.h" // Use a sorted set instead
 #include <stdio.h>
 
 int main(void)
@@ -196,11 +194,11 @@ int main(void)
     Floats_drop(&nums);
 }
 ```
-Comparison/lookup functions are enabled by default for associative containers and priority queue (cmap, cset, csmap, csset, cpque). To enable it for the remaining containers, define `i_cmp` or `i_less` (and optionally `i_eq`) on the element type. If the element is an integral type, simply define `i_use_cmp` to use `<` and `==` operators for comparisons.
+Comparison/lookup functions are enabled by default for associative containers and priority queue (hmap, hset, smap, sset, pque). To enable it for the remaining containers, define `i_cmp` or `i_less` (and optionally `i_eq`) on the element type. If the element is an integral type, simply define `i_use_cmp` to use `<` and `==` operators for comparisons.
 
 Note that for `#define i_key_class Type`, defining `i_use_cmp` means that *Type_cmp()* function is expected to exist (along with *Type_clone()* and *Type_drop()*).
 
-To summarize, `i_use_cmp` is only needed to enable comparison (sort/search) functions when defining cstack, cvec, cqueue, cdeq, carc, cbox. With built-in types, it enables the comparison operators, whereas for keyclass types, it binds comparison to its Type_cmp() function.
+To summarize, `i_use_cmp` is only needed to enable comparison (sort/search) functions when defining stack, vec, queue, deq, arc, box. With built-in types, it enables the comparison operators, whereas for keyclass types, it binds comparison to its Type_cmp() function.
 
 If an element destructor `i_keydrop` is defined, `i_keyclone` function is required.
 *Alternatively `#define i_opt c_no_clone` to disable container cloning.*
@@ -211,13 +209,12 @@ Let's make a vector of vectors, which can be cloned. All of its element vectors 
 ```c
 #include <stdio.h>
 
-#define i_type Vec
-#define i_key float
-#include "stc/cvec.h"
+#define i_TYPE Vec,float
+#include "stc/vec.h"
 
 #define i_type Vec2D
 #define i_key_class Vec  // Use i_key_class instead i_key when element type has "members" _clone(), _drop() and _cmp().
-#include "stc/cvec.h"
+#include "stc/vec.h"
 
 int main(void)
 {
@@ -247,36 +244,36 @@ This example uses four different container types:
 #include <stdio.h>
 
 #define i_key int
-#include "stc/cset.h"  // cset_int: unordered set (assume i_key is basic type, uses `==` operator)
+#include "stc/hset.h"  // hset_int: unordered/hash set (assume i_key is basic type, uses `==` operator)
 
 struct Point { float x, y; };
-// Define cvec_pnt with a less-comparison function for Point.
+// Define vec_pnt with a less-comparison function for Point.
 #define i_key struct Point
 #define i_less(a, b) a->x < b->x || (a->x == b->x && a->y < b->y) // enable sort/search
 #define i_tag pnt
-#include "stc/cvec.h"   // cvec_pnt: vector of struct Point
+#include "stc/vec.h"   // vec_pnt: vector of struct Point
 
 #define i_key int
 #define i_use_cmp       // enable sort/search. Use native `<` and `==` operators
-#include "stc/clist.h"  // clist_int: singly linked list
+#include "stc/list.h"  // list_int: singly linked list
 
 #define i_key int
 #define i_val int
-#include "stc/csmap.h>  // csmap_int: sorted map int =" int
+#include "stc/smap.h>  // smap_int: sorted map int =" int
 
 int main(void)
 {
     // Define four empty containers
-    cset_int set = {0};
-    cvec_pnt vec = {0};
-    clist_int lst = {0};
-    csmap_int map = {0};
+    hset_int set = {0};
+    vec_pnt vec = {0};
+    list_int lst = {0};
+    smap_int map = {0};
 
     c_defer( // Drop the containers at scope exit
-        cset_int_drop(&set),
-        cvec_pnt_drop(&vec),
-        clist_int_drop(&lst),
-        csmap_int_drop(&map)
+        hset_int_drop(&set),
+        vec_pnt_drop(&vec),
+        list_int_drop(&lst),
+        smap_int_drop(&map)
     ){
         enum{N = 5};
         int nums[N] = {10, 20, 30, 40, 50};
@@ -285,43 +282,43 @@ int main(void)
 
         // Add some elements to each container
         for (int i = 0; i < N; ++i) {
-            cset_int_insert(&set, nums[i]);
-            cvec_pnt_push(&vec, pts[i]);
-            clist_int_push_back(&lst, nums[i]);
-            csmap_int_insert(&map, pairs[i][0], pairs[i][1]);
+            hset_int_insert(&set, nums[i]);
+            vec_pnt_push(&vec, pts[i]);
+            list_int_push_back(&lst, nums[i]);
+            smap_int_insert(&map, pairs[i][0], pairs[i][1]);
         }
 
         // Find an element in each container
-        cset_int_iter i1 = cset_int_find(&set, 20);
-        cvec_pnt_iter i2 = cvec_pnt_find(&vec, (struct Point){20, 2});
-        clist_int_iter i3 = clist_int_find(&lst, 20);
-        csmap_int_iter i4 = csmap_int_find(&map, 20);
+        hset_int_iter i1 = hset_int_find(&set, 20);
+        vec_pnt_iter i2 = vec_pnt_find(&vec, (struct Point){20, 2});
+        list_int_iter i3 = list_int_find(&lst, 20);
+        smap_int_iter i4 = smap_int_find(&map, 20);
 
         printf("\nFound: %d, (%g, %g), %d, [%d: %d]\n",
                 *i1.ref, i2.ref->x, i2.ref->y, *i3.ref,
                 i4.ref->first, i4.ref->second);
 
         // Erase all the elements found
-        cset_int_erase_at(&set, i1);
-        cvec_pnt_erase_at(&vec, i2);
-        clist_int_erase_at(&lst, i3);
-        csmap_int_erase_at(&map, i4);
+        hset_int_erase_at(&set, i1);
+        vec_pnt_erase_at(&vec, i2);
+        list_int_erase_at(&lst, i3);
+        smap_int_erase_at(&map, i4);
 
         printf("After erasing the elements found:");
         printf("\n set:");
-        c_foreach (i, cset_int, set)
+        c_foreach (i, hset_int, set)
             printf(" %d", *i.ref);
 
         printf("\n vec:");
-        c_foreach (i, cvec_pnt, vec)
+        c_foreach (i, vec_pnt, vec)
             printf(" (%g, %g)", i.ref->x, i.ref->y);
 
         printf("\n lst:");
-        c_foreach (i, clist_int, lst)
+        c_foreach (i, list_int, lst)
             printf(" %d", *i.ref);
 
         printf("\n map:");
-        c_foreach (i, csmap_int, map)
+        c_foreach (i, smap_int, map)
             printf(" [%d: %d]", i.ref->first, i.ref->second);
     }
 }
@@ -340,27 +337,22 @@ After erasing the elements found:
 ## Installation
 
 STC is primarily a "headers-only" library, so most headers can simply be included in your program. By default,
-all "templated" functions are static (many inlined). If you add the STC *include* folder to the **CPATH**
-environment variable, GCC, Clang, and TinyC will locate the headers automatically.
-
-The templated container functions are defined with static linking by default, which is normally optimal
-for both performance and compiled binary size. However, some common container type instances, e.g. `cvec_int`
-may be used in several translation units. When they are used in more than 3-4, consider creating a separate
-header file for them [as described here](#1-include-as-a-header-file). Now it will use shared
-linking, so *one* c-file must implement the templated container, e.g.:
+all templated functions are static (many inlined). This is often optimal for both performance and compiled
+binary size. However, if container type instances, e.g. a `vec_int` is used used in several translation units,
+(e.g. more than 3-4 TUs), consider creating a separate header file for them and link it shared [as described here](#1-include-as-a-header-file). In this case, *one* (of the) c-file must implement the templated container, e.g.:
 ```c
-#define i_implement
-#include "cvec_int.h"
+#define i_implement // define shared symbols
+#include "vec_int.h"
 ```
-The non-templated string type **cstr** uses shared linking by default, but can have static linking instead by
-`#define i_static`. Same for the string-view type **csview**, but most of its functions are static inlined, so
-linking specifications and implementation are only needed for a few lesser used functions.
+Note that the non-templated string types **cstr**, **csview** uses shared linking by default (may use static linking by
+`#define i_static` before include). Most functions in **csview** are inlined though, and the zero-terminated string view,
+**czview** is fully inlined.
 
 Conveniently, `src\libstc.c` implements all the non-templated functions with shared linking for **cstr**,
 **csview**, **cregex**, **utf8**, and **crand**.
 
-As a special case, you can `#define i_import` before including **cregex** or **cstr** to implement the dependent
-**utf8** functions (proper utf8 case conversions, etc.). Or link with src\libstc.
+Additionally, `#define i_import` works as `i_implement` for **cregex** or **cstr**, but it will also implement
+the dependent **utf8** functions (utf8 case conversions, etc.). Or you can simply link with libstc.
 
 ---
 ## Specifying template parameters
@@ -369,25 +361,25 @@ Each templated type requires one `#include`, even if it's the same container bas
 The template parameters are given by a `#define i_xxxx` statement, where *xxxx* is the parameter name.
 The list of template parameters:
 
+- `i_TYPE` *ConType*, *KeyType*[, *ValType*] is a shorthand for defining `i_type`, `i_key` and `i_val` on one line.
+- `i_type` *ConType* - Custom container type name.
 - `i_key` *Type* - Element key type. **[required]**. Note: `i_val` *may* be used instead for non-maps (not recommended).
-- `i_val` *Type* - Element value type. **[required for]** cmap/csmap as the mapped value type.
-- `i_cmp` *Func* - Three-way comparison of two *i_keyraw*\* or *i_valraw*\* - **[required for]** non-integral *i_keyraw* elements.
-- `i_hash` *Func* - Hash function taking *i_keyraw*\* - defaults to *c_default_hash*. **[required for]** ***cmap/cset*** with non-POD *i_keyraw* elements.
+- `i_val` *Type* - Element value type. **[required for]** hmap/smap as the mapped value type.
+- `i_cmp` *Func* - Three-way comparison of two *i_keyraw*\* - **[required for]** non-integral *i_keyraw* elements, but also see `i_use_cmp`.
+- `i_hash` *Func* - Hash function taking *i_keyraw*\* - defaults to *c_default_hash*. **[required for]** ***hmap/hset*** with non-POD *i_keyraw* elements.
 - `i_eq` *Func* - Equality comparison of two *i_keyraw*\* - defaults to *!i_cmp*. Companion with *i_hash*.
 
 Properties:
-- `i_tag` *Name* - Container type name tag. Defaults to *i_key* name.
-- `i_type` *Name* - Full container type name. Alternative to *i_tag*.
 - `i_opt` *Flags* - Boolean properties: may combine *c_no_clone*, *c_no_atomic*, *c_is_forward*, *c_static*, *c_header* with the *|* separator.
 
 Key:
 - `i_keydrop` *Func* - Destroy map/set key func - defaults to empty destructor.
-- `i_keyclone` *Func* - **[required if]** *i_keydrop* is defined (exception for **carc**, as it shares).
+- `i_keyclone` *Func* - **[required if]** *i_keydrop* is defined (exception for **arc**, as it shares).
 - `i_keyraw` *Type* - Convertion "raw" type - defaults to *i_key*.
 - `i_keyfrom` *Func* - Convertion func *i_key* <= *i_keyraw*.
 - `i_keyto` *Func*  - Convertion func *i_key*\* => *i_keyraw*. **[required if]** *i_keyraw* is defined
 
-Val:
+Val: (hmap/smap mapped value only)
 - `i_valdrop` *Func* - Destroy mapped or value func - defaults to empty destruct.
 - `i_valclone` *Func* - **[required if]** *i_valdrop* is defined.
 - `i_valraw` *Type*  - Convertion "raw" type - defaults to *i_val*.
@@ -398,15 +390,15 @@ Specials: Meta-template parameters. Use instead of `i_key` / `i_val`.
 - `i_key_class` *Type* - Auto-set standard named functions: *Type_clone()*, *Type_drop()*, *Type_cmp()*, *Type_eq()*, *Type_hash()*.
 If `i_keyraw` is defined, it sets `i_keyto` = *Type_toraw()* and `i_keyfrom` = *Type_from()*.
 Only functions required by the container type is required to be defined. E.g.:
-    - *Type_hash()* and *Type_eq()* are only required by **cmap**, **cset** and smart pointers.
-    - *Type_cmp()* is not used by **cstack** and **cmap/cset**.
+    - *Type_hash()* and *Type_eq()* are only required by **hmap**, **hset** and smart pointers.
+    - *Type_cmp()* is not used by **stack** and **hmap/hset**.
     - *Type_clone()* is not used if *#define i_opt c_no_clone* is specified.
 - `i_key_str` - Sets `i_key_class` = *cstr*, `i_tag` = *str*, and `i_keyraw` = *const char*\*. Defines both type convertion
 `i_keyfrom`, `i_keyto`, and sets `i_cmp`, `i_eq`, `i_hash` functions with *const char\*\** as argument.
 - `i_key_ssv` - Sets `i_key_class` = *cstr*, `i_tag` = *ssv*, and `i_keyraw` = *csview\**. Defines both type convertion
 `i_keyfrom`, `i_keyto`, and sets `i_cmp`, `i_eq`, `i_hash` functions with *csview\** as argument.
-- `i_key_arcbox` *Type* - Use when *Type* is a smart pointer **carc** or **cbox**. Defines *i_key_class = Type*, and *i_keyraw = Type\**.
-NB: Do not use when defining carc/cbox types themselves.
+- `i_key_arcbox` *Type* - Use when *Type* is a smart pointer **arc** or **box**. Defines *i_key_class = Type*, and *i_keyraw = Type\**.
+NB: Do not use when defining arc/box types themselves.
 - `i_val_class` *Type*, `i_val_str`, `i_val_ssv`, `i_val_arcbox` - Similar rules as for ***key***.
 
 **Notes**:
@@ -419,21 +411,21 @@ The table below shows the template parameters which must be defined to support e
 
 For the containers marked ***optional***, the features are disabled if the template parameter(s) are not defined. Note that the ***(integral type)*** columns also applies to "special" types, specified with `i_key_str`, `i_key_arcbox`, and `i_key_class`, and not only true integral types like `int` or `float`.
 
-| Container            | find (integral type) | sort (integral type) |\|| find (struct elem) | sort (struct elem) | optional |
-|:---------------------|:---------------------|:---------------------|:-|:-------------------|:-------------------|:---------|
-| cstack, cqueue       | n/a                  | n/a                  || n/a                | n/a                | n/a      |
-| cvec, cdeq, clist    | `i_use_cmp`          | `i_use_cmp`          || `i_eq`             | `i_cmp` / `i_less` | yes      |
-| cbox, carc           | `i_use_cmp`          | `i_use_cmp`          || `i_eq` + `i_hash`  | `i_cmp` / `i_less` | yes      |
-| cmap, cset           |                      | n/a                  || `i_eq` + `i_hash`  | n/a                | no       |
-| csmap, csset         |                      |                      || `i_cmp` / `i_less` | `i_cmp` / `i_less` | no       |
-| cpque                | n/a                  |                      || n/a                | `i_cmp` / `i_less` | no       |
+| Container         | find (integral type) | sort (integral type) |\|| find (struct elem) | sort (struct elem) | optional |
+|:------------------|:---------------------|:---------------------|:-|:-----------------|:-------------------|:---------|
+| stack, queue      | n/a                  | n/a                  || n/a                | n/a                | n/a      |
+| vec, deq, list    | `i_use_cmp`          | `i_use_cmp`          || `i_eq`             | `i_cmp` / `i_less` | yes      |
+| box, arc          | `i_use_cmp`          | `i_use_cmp`          || `i_eq` + `i_hash`  | `i_cmp` / `i_less` | yes      |
+| hmap, hset        |                      | n/a                  || `i_eq` + `i_hash`  | n/a                | no       |
+| smap, sset        |                      |                      || `i_cmp` / `i_less` | `i_cmp` / `i_less` | no       |
+| pque              | n/a                  |                      || n/a                | `i_cmp` / `i_less` | no       |
 
 ---
 ## The *emplace* methods
 
 STC, like c++ STL, has two sets of methods for adding elements to containers. One set begins
-with **emplace**, e.g. *cvec_X_emplace_back()*. This is an ergonimic alternative to
-*cvec_X_push_back()* when dealing non-trivial container elements, e.g. strings, shared pointers or
+with **emplace**, e.g. *vec_X_emplace_back()*. This is an ergonimic alternative to
+*vec_X_push_back()* when dealing non-trivial container elements, e.g. strings, shared pointers or
 other elements using dynamic memory or shared resources.
 
 The **emplace** methods ***constructs*** / ***clones*** the given element when they are added
@@ -445,11 +437,11 @@ the **emplace** functions are ***not*** available (or needed), as it can easier 
 
 | non-emplace: Move          | emplace: Embedded copy         | Container                                   |
 |:---------------------------|:-------------------------------|:--------------------------------------------|
-| insert(), push()           | emplace()                      | cmap, csmap, cset, csset                    |
-| insert_or_assign()         | emplace_or_assign()            | cmap, csmap                                 |
-| push()                     | emplace()                      | cqueue, cpque, cstack                       |
-| push_back(), push()        | emplace_back()                 | cdeq, clist, cvec                           |
-| push_front()               | emplace_front()                | cdeq, clist                                 |
+| insert(), push()           | emplace()                      | hmap, smap, hset, sset                    |
+| insert_or_assign()         | emplace_or_assign()            | hmap, smap                                 |
+| push()                     | emplace()                      | queue, pque, stack                       |
+| push_back(), push()        | emplace_back()                 | deq, list, vec                           |
+| push_front()               | emplace_front()                | deq, list                                 |
 
 Strings are the most commonly used non-trivial data type. STC containers have proper pre-defined
 definitions for cstr container elements, so they are fail-safe to use both with the **emplace**
@@ -459,21 +451,21 @@ and non-emplace methods:
 #include "stc/cstr.h"
 
 #define i_key_str       // special macro to enable container of cstr
-#include "stc/cvec.h"   // vector of string (cstr)
+#include "stc/vec.h"   // vector of string (cstr)
 ...
-cvec_str vec = {0};
+vec_str vec = {0};
 cstr s = cstr_lit("a string literal");
 const char* hello = "Hello";
 
-cvec_str_push(&vec, cstr_from(hello);    // make a cstr from const char* and move it onto vec
-cvec_str_push(&vec, cstr_clone(s));      // make a cstr clone and move it onto vec
+vec_str_push(&vec, cstr_from(hello);    // make a cstr from const char* and move it onto vec
+vec_str_push(&vec, cstr_clone(s));      // make a cstr clone and move it onto vec
 
-cvec_str_emplace(&vec, "Yay, literal");  // internally make a cstr from const char*
-cvec_str_emplace(&vec, cstr_clone(s));   // <-- COMPILE ERROR: expects const char*
-cvec_str_emplace(&vec, cstr_str(&s));    // Ok: const char* input type.
+vec_str_emplace(&vec, "Yay, literal");  // internally make a cstr from const char*
+vec_str_emplace(&vec, cstr_clone(s));   // <-- COMPILE ERROR: expects const char*
+vec_str_emplace(&vec, cstr_str(&s));    // Ok: const char* input type.
 
 cstr_drop(&s)
-cvec_str_drop(&vec);
+vec_str_drop(&vec);
 ```
 This is made possible because the type configuration may be given an optional
 conversion/"rawvalue"-type as template parameter, along with a back and forth conversion
@@ -482,44 +474,45 @@ methods to the container value type.
 Rawvalues are primarily beneficial for **lookup** and **map insertions**, however the
 **emplace** methods constructs `cstr`-objects from the rawvalues, but only when required:
 ```c
-cmap_str_emplace(&map, "Hello", "world");
+hmap_str_emplace(&map, "Hello", "world");
 // Two cstr-objects were constructed by emplace
 
-cmap_str_emplace(&map, "Hello", "again");
+hmap_str_emplace(&map, "Hello", "again");
 // No cstr was constructed because "Hello" was already in the map.
 
-cmap_str_emplace_or_assign(&map, "Hello", "there");
+hmap_str_emplace_or_assign(&map, "Hello", "there");
 // Only cstr_lit("there") constructed. "world" was destructed and replaced.
 
-cmap_str_insert(&map, cstr_lit("Hello"), cstr_lit("you"));
+hmap_str_insert(&map, cstr_lit("Hello"), cstr_lit("you"));
 // Two cstr's constructed outside call, but both destructed by insert
 // because "Hello" existed. No mem-leak but less efficient.
 
-it = cmap_str_find(&map, "Hello");
+it = hmap_str_find(&map, "Hello");
 // No cstr constructed for lookup, although keys are cstr-type.
 ```
 Apart from strings, maps and sets are normally used with trivial value types. However, the
-last example on the **cmap** page demonstrates how to specify a map with non-trivial keys.
+last example on the **hmap** page demonstrates how to specify a map with non-trivial keys.
 
 ---
 ## The *erase* methods
 
 | Name                      | Description                  | Container                                   |
 |:--------------------------|:-----------------------------|:--------------------------------------------|
-| erase()                   | key based                    | csmap, csset, cmap, cset, cstr              |
-| erase_at()                | iterator based               | csmap, csset, cmap, cset, cvec, cdeq, clist |
-| erase_range()             | iterator based               | csmap, csset, cvec, cdeq, clist             |
-| erase_n()                 | index based                  | cvec, cdeq, cstr                            |
-| remove()                  | remove all matching values   | clist                                       |
+| erase()                   | key based                    | smap, sset, hmap, hset, cstr              |
+| erase_at()                | iterator based               | smap, sset, hmap, hset, vec, deq, list |
+| erase_range()             | iterator based               | smap, sset, vec, deq, list             |
+| erase_n()                 | index based                  | vec, deq, cstr                            |
+| remove()                  | remove all matching values   | list                                       |
 
 ---
 ## User-defined container type name
 
-Define `i_type` instead of `i_tag`:
+Define `i_type` instead of `i_tag`, or `i_TYPE` to define both `i_type` and `i_key`:
 ```c
 #define i_type MyVec
 #define i_key int
-#include "stc/cvec.h"
+// #define i_TYPE MyVec,int // shorthand
+#include "stc/vec.h"
 
 MyVec vec = {0};
 MyVec_push(&vec, 42);
@@ -544,10 +537,10 @@ Create a dedicated header for the container type instance:
 #define PointVec_H_
 // Do not to include user defined headers here if they use templated containers themselves
 
-#define i_type PointVec
-#define i_val struct Point // NB! Element type must be complete at this point!
-#define i_header           // Do not implement, only expose API
-#include "stc/cvec.h"
+// NB! struct Point must be complete at this point!
+#define i_TYPE PointVec,struct Point
+#define i_header    // Do not implement, only expose API
+#include "stc/vec.h"
 
 #endif
 ```
@@ -602,7 +595,7 @@ Define and use the "private" container in the c-file:
 #define i_is_forward                      // flag that the container was forward declared.
 #define i_type PointVec
 #define i_val struct Point
-#include "stc/cvec.h"                     // Implements PointVec with static linking by default
+#include "stc/vec.h"                     // Implements PointVec with static linking by default
 ...
 ```
 ---
@@ -635,7 +628,7 @@ allocated size of the given pointer, unlike standard `realloc` and `free`.
 To use it, define both `i_type` and `i_base` (the container type) before including the custom header:
 ```c
 #define i_type IMap
-#define i_base csmap
+#define i_base smap
 #define i_key int
 #define i_val int
 #include "stcpgs.h"
@@ -657,15 +650,15 @@ void maptest()
 ## Memory efficiency
 
 STC is generally very memory efficient. Memory usage for the different containers:
-- **cstr**, **cvec**, **cstack**, **cpque**: 1 pointer, 2 intptr_t + memory for elements.
+- **cstr**, **vec**, **stack**, **pque**: 1 pointer, 2 intptr_t + memory for elements.
 - **csview**, 1 pointer, 1 intptr_t. Does not own data!
 - **cspan**, 1 pointer and 2 \* dimension \* int32_t. Does not own data!
-- **clist**: Type size: 1 pointer. Each node allocates a struct to store its value and a next pointer.
-- **cdeq**, **cqueue**:  Type size: 2 pointers, 2 intptr_t. Otherwise like *cvec*.
-- **cmap/cset**: Type size: 2 pointers, 2 int32_t (default). *cmap* uses one table of keys+value, and one table of precomputed hash-value/used bucket, which occupies only one byte per bucket. The closed hashing has a default max load factor of 85%, and hash table scales by 1.5x when reaching that.
-- **csmap/csset**: Type size: 1 pointer. *csmap* manages its own ***array of tree-nodes*** for allocation efficiency. Each node uses two 32-bit ints for child nodes, and one byte for `level`, but has ***no parent node***.
-- **carc**: Type size: 1 pointer, 1 long for the reference counter + memory for the shared element.
-- **cbox**: Type size: 1 pointer + memory for the pointed-to element.
+- **list**: Type size: 1 pointer. Each node allocates a struct to store its value and a next pointer.
+- **deq**, **queue**:  Type size: 2 pointers, 2 intptr_t. Otherwise like *vec*.
+- **hmap/hset**: Type size: 2 pointers, 2 int32_t (default). *hmap* uses one table of keys+value, and one table of precomputed hash-value/used bucket, which occupies only one byte per bucket. The closed hashing has a default max load factor of 85%, and hash table scales by 1.5x when reaching that.
+- **smap/sset**: Type size: 1 pointer. *smap* manages its own ***array of tree-nodes*** for allocation efficiency. Each node uses two 32-bit ints for child nodes, and one byte for `level`, but has ***no parent node***.
+- **arc**: Type size: 1 pointer, 1 long for the reference counter + memory for the shared element.
+- **box**: Type size: 1 pointer + memory for the pointed-to element.
 
 ---
 # Version History
@@ -678,13 +671,13 @@ STC is generally very memory efficient. Memory usage for the different container
         - Much improved with some new API and added features.
     - Removed deprecated "stc/crandom.h>. Use `<stc/crand.h"` with the new API.
         - Reverted names _unif and _norm back to `_uniform` and `_normal`.
-    - Removed default comparison for **clist**, **cvec** and **cdeq**:
+    - Removed default comparison for **list**, **vec** and **deq**:
         - Define `i_use_cmp` to enable comparison for built-in i_key types (<, ==).
         - Use of `i_key_class` still expects comparison functions to be defined.
         - Use of `i_key_arcbox` compares stored pointers instead of pointed to values if comparison not defined.
     - Renamed input enum flags for ***cregex***-functions.
 - **cspan**: Added **column-major** order (fortran) multidimensional spans and transposed views (changed representation of strides).
-- All new faster and smaller **cqueue** and **cdeq** implementations, using a circular buffer.
+- All new faster and smaller **queue** and **deq** implementations, using a circular buffer.
 - Renamed i_extern => `i_import` (i_extern deprecated).
     - Define `i_import` before `#include "stc/cstr.h"` will also define full utf8 case conversions.
     - Define `i_import` before `#include "stc/cregex.h"` will also define cstr + utf8 tables.
@@ -695,7 +688,7 @@ STC is generally very memory efficient. Memory usage for the different container
 ## Version 4.2
 - New home! And online single headers for https://godbolt.org
     - Library: https://github.com/stclib/STC
-    - Headers, e.g. https://raw.githubusercontent.com/stclib/stcsingle/main/stc/cvec.h
+    - Headers, e.g. https://raw.githubusercontent.com/stclib/stcsingle/main/stc/vec.h
 - Much improved documentation
 - Added Coroutines + documentation
 - Added new crand.h API & header. Old crandom.h is deprecated.
@@ -732,7 +725,7 @@ Major changes:
     - `c_forlist`: macro replacing `c_forarray` and `c_apply`. Iterate a compound literal list.
     - `c_forrange`: macro replacing `c_forrange`. Iterate a `long long` type number sequence.
 - Updated **cstr**, now always takes self as pointer, like all containers except csview.
-- Updated **cvec**, **cdeq**, changed `*_range*` function names.
+- Updated **vec**, **deq**, changed `*_range*` function names.
 
 ## Changes version 3.8
 - Overhauled some **cstr** and **csview** API:
@@ -752,34 +745,16 @@ Major changes:
     - `CNT_size(const CNT *self)`
     - `CNT_capacity(const CNT *self)`
     - `CNT_empty(const CNT *self)`
-- Now both **cstack** and **cbits** can be used with template `i_capacity` parameter: `#define i_capacity <NUM>`. They then use fixed sized arrays, and no heap allocated memory.
+- Now both **stack** and **cbits** can be used with template `i_capacity` parameter: `#define i_capacity <NUM>`. They then use fixed sized arrays, and no heap allocated memory.
 - Renamed *cstr_rename_n()* => *cstr_rename_with_n()* as it could be confused with replacing n instances instead of n bytes.
-- Fixed bug in `csmap.h`: begin() on empty map was not fully initialized.
+- Fixed bug in `smap.h`: begin() on empty map was not fully initialized.
 
 ## Changes version 3.6
 - Swapped to new **cstr** (*short string optimized*, aka SSO). Note that `cstr_str(&s)` must be used, `s.str` is no longer usable.
 - Removed *redundant* size argument to `i_hash` template parameter and `c_default_hash`. Please update your code.
-- Added general `i_keyclone/i_valclone` template parameter: containers of smart pointers (**carc**, **cbox**) now correctly cloned.
-- Allows for `i_key*` template parameters instead of `i_val*` for all containers, not only for **cset** and **csset**.
+- Added general `i_keyclone/i_valclone` template parameter: containers of smart pointers (**arc**, **box**) now correctly cloned.
+- Allows for `i_key*` template parameters instead of `i_val*` for all containers, not only for **hset** and **sset**.
 - Optimized *c_default_hash()*. Therefore *c_hash32()* and *c_hash64()* are removed (same speed).
 - Added *.._push()* and *.._emplace()* function to all containers to allow for more generic coding.
 - Renamed global PRNGs *stc64_random()* and *stc64_srandom()* to *crand()* and *csrand()*.
 - Added some examples and benchmarks for SSO and heterogenous lookup comparison with c++20 (string_bench_*.cpp).
-
-## Brief summary of changes from version 2.x to 3.0
-- Renamed: all ***_del*** to `_drop` (like destructors in Rust).
-- Renamed: all ***_compare*** to `_cmp`
-- Renamed: ***i_equ*** to `i_eq`, and ***_equalto*** to `_eq`.
-- Renamed: ***i_cnt*** to `i_type` for defining the complete container type name.
-- Renamed: type **csptr** to [**carc**](docs/carc_api.md) (atomic reference counted) smart pointer.
-- Renamed: ***i_key_csptr*** / ***i_val_csptr*** to `i_key_arcbox` / `i_val_arcbox` for specifying **carc** and **cbox** values in containers.
-- Renamed: *csptr_X_make()* to `carc_X_from()`.
-- Renamed: *cstr_new()* to `cstr_lit(literal)`, and *cstr_assign_fmt()* to `cstr_printf()`.
-- Renamed: *c_default_fromraw()* to `c_default_from()`.
-- Changed: the [**c_apply**](docs/algorithm_api.md) macros API.
-- Replaced: *csview_first_token()* and *csview_next_token()* with one function: `csview_token()`.
-- Added: **checkauto** tool for checking that c-source files uses `c_auto*` macros correctly.
-- Added: general `i_key_class` / `i_val_class` template parameters which auto-binds template functions.
-- Added: `i_opt` template parameter: compile-time options: `c_no_clone`, `c_no_atomic`, `c_is_forward`; may be combined with `|`
-- Added: [**cbox**](docs/cbox_api.md) type: smart pointer, similar to [Rust Box](https://doc.rust-lang.org/rust-by-example/std/box.html) and [std::unique_ptr](https://en.cppreference.com/w/cpp/memory/unique_ptr).
-- Added: [**c_forpair**](docs/algorithm_api.md) macro: for-loop with "structured binding"

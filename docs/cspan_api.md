@@ -35,7 +35,7 @@ by default (define `STC_NDEBUG` or `NDEBUG` to disable).
 SpanType        cspan_init(<TYPE> SpanType, {v1, v2, ...});         // make a 1-d cspan from value list
 SpanType        cspan_from_n(ValueType* ptr, intptr_t n);           // make a 1-d cspan from a pointer and length
 SpanType        cspan_from_array(ValueType array[]);                // make a 1-d cspan from a C array
-SpanType        cspan_from(STCContainer* cnt);                      // make a 1-d cspan from a cvec or cstack
+SpanType        cspan_from(STCContainer* cnt);                      // make a 1-d cspan from a vec or stack
 
 int             cspan_rank(const SpanTypeN* self);                  // num dimensions; compile-time constant
 intptr_t        cspan_size(const SpanTypeN* self);                  // return number of elements
@@ -108,10 +108,10 @@ OutSpanM        cspan_slice(<TYPE> OutSpanM, const SpanTypeN* self, {x0,x1,xs}, 
 ```c
 #include <stdio.h>
 #define i_key int
-#include "stc/cvec.h"
+#include "stc/vec.h"
 
 #define i_key int
-#include "stc/cstack.h"
+#include "stc/stack.h"
 
 #include "stc/cspan.h"
 using_cspan(intspan, int);
@@ -130,18 +130,18 @@ int main(void)
     int arr[] = {1, 2, 3, 4, 5};
     printMe( (intspan)cspan_from_array(arr) );
 
-    cvec_int vec = c_init(cvec_int, {1, 2, 3, 4, 5, 6});
+    vec_int vec = c_init(vec_int, {1, 2, 3, 4, 5, 6});
     printMe( (intspan)cspan_from(&vec) );
 
-    cstack_int stk = c_init(cstack_int, {1, 2, 3, 4, 5, 6, 7});
+    stack_int stk = c_init(stack_int, {1, 2, 3, 4, 5, 6, 7});
     printMe( (intspan)cspan_from(&stk) );
 
     intspan spn = c_init(intspan, {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12});
     printMe( (intspan)cspan_subspan(&spn, 2, 8) );
 
     // cleanup
-    cvec_int_drop(&vec);
-    cstack_int_drop(&stk);
+    vec_int_drop(&vec);
+    stack_int_drop(&stk);
 }
 ```
 

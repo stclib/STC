@@ -7,13 +7,13 @@
 #define i_key_str // name
 #define i_val_str // email
 #define i_keydrop(p) (printf("kdrop: %s\n", cstr_str(p)), cstr_drop(p)) // override
-#include "stc/cmap.h"
+#include "stc/hmap.h"
 
 // Departments: std::map<std::string, People>
 #define i_type Departments
 #define i_key_str // dep. name
 #define i_val_class People
-#include "stc/cmap.h"
+#include "stc/hmap.h"
 
 
 void add(Departments* deps, const char* name, const char* email, const char* dep)

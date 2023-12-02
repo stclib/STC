@@ -8,7 +8,7 @@
 // Declare int -> int sorted map.
 #define i_key int
 #define i_val int
-#include "stc/csmap.h"
+#include "stc/smap.h"
 
 int main(void)
 {
@@ -24,16 +24,16 @@ int main(void)
     crand_normal_t dist = crand_normal_init(Mean, StdDev);
 
     // Create and init histogram map with defered destruct
-    csmap_int hist = {0};
+    smap_int hist = {0};
     cstr bar = {0};
 
     c_forrange (N) {
         int index = (int)round(crand_normal(&rng, &dist));
-        csmap_int_insert(&hist, index, 0).ref->second += 1;
+        smap_int_insert(&hist, index, 0).ref->second += 1;
     }
 
     // Print the gaussian bar chart
-    c_forpair (index, count, csmap_int, hist) {
+    c_forpair (index, count, smap_int, hist) {
         int n = (int)round((double)*_.count * StdDev * Scale * 2.5 / (double)N);
         if (n > 0) {
             cstr_resize(&bar, n, '*');
@@ -41,5 +41,5 @@ int main(void)
         }
     }
     cstr_drop(&bar);
-    csmap_int_drop(&hist);
+    smap_int_drop(&hist);
 }

@@ -1,7 +1,7 @@
 // Example based on https://en.cppreference.com/w/cpp/container/mdspan
 #include <stdio.h>
 #define i_val int
-#include "stc/cstack.h"
+#include "stc/stack.h"
 #define i_implement
 #include "stc/cspan.h"
 
@@ -28,7 +28,7 @@ void print3d(ispan3 ms3) {
 
 int main(void)
 {
-    cstack_int v = c_init(cstack_int, {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24});
+    stack_int v = c_init(stack_int, {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24});
 
     // Create 1d span from a compatibel container
     ispan ms1 = cspan_from(&v);
@@ -55,10 +55,10 @@ int main(void)
     for (int i=0; i != ms2.shape[0]; i++)
         for (int j=0; j != ms2.shape[1]; j++)
             *cspan_at(&ms2, i, j) = (i + 1)*100 + j;
-    
-    puts("\nms2 = ms3[1] with updated data:");    
+
+    puts("\nms2 = ms3[1] with updated data:");
     print2d(ms2);
-    puts("");    
+    puts("");
 
     puts("\nOriginal s1 span with updated data:");
     c_foreach (i, ispan, ms1) printf(" %d", *i.ref);
@@ -72,5 +72,5 @@ int main(void)
     c_foreach (i, ispan, col) printf(" %d", *i.ref);
     puts("");
 
-    cstack_int_drop(&v);
+    stack_int_drop(&v);
 }

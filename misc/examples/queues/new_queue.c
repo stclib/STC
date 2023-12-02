@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <time.h>
 
-forward_cqueue(cqueue_pnt, struct Point);
+forward_cqueue(queue_pnt, struct Point);
 
 typedef struct Point { int x, y; } Point;
 int point_cmp(const Point* a, const Point* b) {
@@ -14,11 +14,10 @@ int point_cmp(const Point* a, const Point* b) {
 #define i_cmp point_cmp
 #define i_is_forward
 #define i_tag pnt
-#include "stc/cqueue.h"
+#include "stc/queue.h"
 
-#define i_type IQ
-#define i_key int
-#include "stc/cqueue.h"
+#define i_TYPE IQ,int
+#include "stc/queue.h"
 
 int main(void) {
     int n = 50000000;
@@ -33,7 +32,7 @@ int main(void) {
 
     // Push or pop on the queue 50 million times
     printf("befor: size %" c_ZI ", capacity %" c_ZI "\n", IQ_size(&Q), IQ_capacity(&Q));
-    
+
     c_forrange (n) {
         int r = (int)crand_uniform(&rng, &dist);
         if (r & 3)

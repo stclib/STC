@@ -1,18 +1,18 @@
 #include <stdio.h>
 #include "stc/forward.h"
 
-forward_clist(clist_i32, int);
-forward_clist(clist_pnt, struct Point);
+forward_clist(list_i32, int);
+forward_clist(list_pnt, struct Point);
 
 typedef struct {
-    clist_i32 intlist;
-    clist_pnt pntlist;
+    list_i32 intlist;
+    list_pnt pntlist;
 } MyStruct;
 
 #define i_key int
 #define i_tag i32
 #define i_is_forward
-#include "stc/clist.h"
+#include "stc/list.h"
 
 typedef struct Point { int x, y; } Point;
 int point_cmp(const Point* a, const Point* b) {
@@ -24,47 +24,47 @@ int point_cmp(const Point* a, const Point* b) {
 #define i_cmp point_cmp
 #define i_is_forward
 #define i_tag pnt
-#include "stc/clist.h"
+#include "stc/list.h"
 
 #define i_key float
-#define i_use_cmp               // use < and == operators for comparison 
-#include "stc/clist.h"
+#define i_use_cmp               // use < and == operators for comparison
+#include "stc/list.h"
 
 void MyStruct_drop(MyStruct* s);
 #define i_type MyList
 #define i_key MyStruct
 #define i_keydrop MyStruct_drop   // define drop function
 #define i_no_clone                // must explicitely exclude or define cloning support because of drop.
-#include "stc/clist.h"
+#include "stc/list.h"
 
 void MyStruct_drop(MyStruct* s) {
-    clist_i32_drop(&s->intlist);
-    clist_pnt_drop(&s->pntlist);
+    list_i32_drop(&s->intlist);
+    list_pnt_drop(&s->pntlist);
 }
 
 
 int main(void)
 {
     MyStruct my = {0};
-    clist_i32_push_back(&my.intlist, 123);
-    clist_pnt_push_back(&my.pntlist, c_LITERAL(Point){123, 456});
+    list_i32_push_back(&my.intlist, 123);
+    list_pnt_push_back(&my.pntlist, c_LITERAL(Point){123, 456});
     MyStruct_drop(&my);
 
-    clist_pnt plist = c_init(clist_pnt, {{42, 14}, {32, 94}, {62, 81}});
-    clist_pnt_sort(&plist);
+    list_pnt plist = c_init(list_pnt, {{42, 14}, {32, 94}, {62, 81}});
+    list_pnt_sort(&plist);
 
-    c_foreach (i, clist_pnt, plist) 
+    c_foreach (i, list_pnt, plist)
         printf(" (%d %d)", i.ref->x, i.ref->y);
     puts("");
-    clist_pnt_drop(&plist);
+    list_pnt_drop(&plist);
 
 
-    clist_float flist = c_init(clist_float, {123.3f, 321.2f, -32.2f, 78.2f});
-    clist_float_sort(&flist);
+    list_float flist = c_init(list_float, {123.3f, 321.2f, -32.2f, 78.2f});
+    list_float_sort(&flist);
 
-    c_foreach (i, clist_float, flist)
+    c_foreach (i, list_float, flist)
         printf(" %g", (double)*i.ref);
 
     puts("");
-    clist_float_drop(&flist);
+    list_float_drop(&flist);
 }

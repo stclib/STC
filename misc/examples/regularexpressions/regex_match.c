@@ -4,7 +4,7 @@
 #include "stc/csview.h"
 
 #define i_key float
-#include "stc/cstack.h"
+#include "stc/stack.h"
 
 int main(void)
 {
@@ -14,7 +14,7 @@ int main(void)
                       " Boltzmann const: 1.38064852E-23, is very small."
                       " Bohrradius is 5.29177210903e-11, and Avogadros number is 6.02214076e23.";
     cregex re = {0};
-    cstack_float vec = {0};
+    stack_float vec = {0};
 
     const char* pattern = "[+-]?([0-9]*\\.)?\\d+([Ee][+-]?\\d+)?";
     int res = cregex_compile(&re, pattern);
@@ -22,9 +22,9 @@ int main(void)
 
     // extract and convert all numbers in str to floats
     c_formatch (i, &re, str)
-        cstack_float_push(&vec, (float)atof(i.match[0].buf));
+        stack_float_push(&vec, (float)atof(i.match[0].buf));
 
-    c_foreach (i, cstack_float, vec)
+    c_foreach (i, stack_float, vec)
         printf("  %g\n", (double)*i.ref);
 
     // extracts the numbers only to a comma separated string.
@@ -33,5 +33,5 @@ int main(void)
 
     cstr_drop(&nums);
     cregex_drop(&re);
-    cstack_float_drop(&vec);
+    stack_float_drop(&vec);
 }

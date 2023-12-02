@@ -33,7 +33,7 @@ template params:
 
 int main(void) {
     int nums[] = {23, 321, 5434, 25, 245, 1, 654, 33, 543, 21};
-    
+
     ints_quicksort(nums, c_arraylen(nums));
 
     for (int i = 0; i < c_arraylen(nums); i++)
@@ -59,7 +59,7 @@ int main(void) {
     IDeq nums = c_init(IDeq, {5434, 25, 245, 1, 654, 33, 543, 21});
     IDeq_push_front(&nums, 23);
     IDeq_push_front(&nums, 321);
-    
+
     IDeq_quicksort(&nums);
 
     c_foreach (i, IDeq, nums)
@@ -79,15 +79,15 @@ int main(void) {
 
 #ifndef _i_template
   #define _i_is_arr
-  #if !defined i_key && defined i_val
-    #define i_key i_val
-  #endif
-  #define i_at(arr, idx) (&arr[idx])
-  #define i_at_mut i_at
-  #ifndef i_type
+  #ifdef i_TYPE
+    #define i_type _c_SEL(_c_SEL21, (i_TYPE))
+    #define i_key _c_SEL(_c_SEL22, (i_TYPE))
+  #elif !defined i_type
     #define i_type c_JOIN(i_key, s)
   #endif
   typedef i_key i_type, c_JOIN(i_type, _value), c_JOIN(i_type, _raw);
+  #define i_at(arr, idx) (&arr[idx])
+  #define i_at_mut i_at
 #else
   #define i_at(arr, idx) _c_MEMB(_at)(arr, idx)
   #define i_at_mut(arr, idx) _c_MEMB(_at_mut)(arr, idx)

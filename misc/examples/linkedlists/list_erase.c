@@ -1,9 +1,9 @@
-// erasing from clist
+// erasing from list
 #include <stdio.h>
 
 #define i_type IList
 #define i_key int
-#include "stc/clist.h"
+#include "stc/list.h"
 
 int main(void)
 {

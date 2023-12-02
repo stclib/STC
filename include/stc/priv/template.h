@@ -25,13 +25,6 @@
 
 #ifndef STC_TEMPLATE_H_INCLUDED
 #define STC_TEMPLATE_H_INCLUDED
-  #define _c_SEL(sel, arg) sel arg
-  #define _c_SEL21(a, b) a
-  #define _c_SEL22(a, b) b
-  #define _c_SEL31(a, b, c) a
-  #define _c_SEL32(a, b, c) b
-  #define _c_SEL33(a, b, c) c
-
   #define c_option(flag)          ((i_opt) & (flag))
   #define c_is_forward            (1<<0)
   #define c_no_atomic             (1<<1)
@@ -54,13 +47,13 @@
   #define _m_node _c_MEMB(_node)
 #endif
 
-#if defined i_T && defined _i_ismap
-  #define i_type _c_SEL(_c_SEL31, (i_T))
-  #define i_key _c_SEL(_c_SEL32, (i_T))
-  #define i_val _c_SEL(_c_SEL33, (i_T))
-#elif defined i_T
-  #define i_type _c_SEL(_c_SEL21, (i_T))
-  #define i_key _c_SEL(_c_SEL22, (i_T))
+#if defined i_TYPE && defined _i_ismap
+  #define i_type _c_SEL(_c_SEL31, (i_TYPE))
+  #define i_key _c_SEL(_c_SEL32, (i_TYPE))
+  #define i_val _c_SEL(_c_SEL33, (i_TYPE))
+#elif defined i_TYPE
+  #define i_type _c_SEL(_c_SEL21, (i_TYPE))
+  #define i_key _c_SEL(_c_SEL22, (i_TYPE))
 #endif
 #ifndef i_type
   #define i_type c_JOIN(_i_prefix, i_tag)

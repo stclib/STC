@@ -2,17 +2,17 @@
 #include "stc/cstr.h"
 #include "stc/forward.h"
 
-forward_cmap(cmap_pnt, struct Point, int);
+forward_cmap(hmap_pnt, struct Point, int);
 
 typedef struct MyStruct {
-    cmap_pnt pntmap;
+    hmap_pnt pntmap;
     cstr name;
 } MyStruct;
 
 // int => int map
 #define i_key int
 #define i_val int
-#include "stc/cmap.h"
+#include "stc/hmap.h"
 
 // Point => int map
 typedef struct Point { int x, y; } Point;
@@ -29,47 +29,47 @@ int point_cmp(const Point* a, const Point* b) {
 #define i_hash c_default_hash
 #define i_is_forward
 #define i_tag pnt
-#include "stc/cmap.h"
+#include "stc/hmap.h"
 
 // cstr => cstr map
 #define i_key_str
 #define i_val_str
-#include "stc/cmap.h"
+#include "stc/hmap.h"
 
 // string set
 #define i_key_str
-#include "stc/cset.h"
+#include "stc/hset.h"
 
 
 int main(void)
 {
-    cmap_pnt pmap = c_init(cmap_pnt, {{{42, 14}, 1}, {{32, 94}, 2}, {{62, 81}, 3}});
+    hmap_pnt pmap = c_init(hmap_pnt, {{{42, 14}, 1}, {{32, 94}, 2}, {{62, 81}, 3}});
 
-    c_foreach (i, cmap_pnt, pmap)
+    c_foreach (i, hmap_pnt, pmap)
         printf(" (%d, %d: %d)", i.ref->first.x, i.ref->first.y, i.ref->second);
     puts("");
 
-    cmap_str smap = c_init(cmap_str, {
+    hmap_str smap = c_init(hmap_str, {
         {"Hello, friend", "long time no see"},
         {"So long", "see you around"},
     });
 
-    cset_str sset = c_init(cset_str, {
+    hset_str sset = c_init(hset_str, {
         "Hello, friend",
         "Nice to see you again",
         "So long",
     });
 
-    cmap_int map = {0};
-    cmap_int_insert(&map, 123, 321);
-    cmap_int_insert(&map, 456, 654);
-    cmap_int_insert(&map, 789, 987);
+    hmap_int map = {0};
+    hmap_int_insert(&map, 123, 321);
+    hmap_int_insert(&map, 456, 654);
+    hmap_int_insert(&map, 789, 987);
 
-    c_foreach (i, cset_str, sset)
+    c_foreach (i, hset_str, sset)
         printf(" %s\n", cstr_str(i.ref));
 
-    cmap_int_drop(&map);
-    cset_str_drop(&sset);
-    cmap_str_drop(&smap);
-    cmap_pnt_drop(&pmap);
+    hmap_int_drop(&map);
+    hset_str_drop(&sset);
+    hmap_str_drop(&smap);
+    hmap_pnt_drop(&pmap);
 }

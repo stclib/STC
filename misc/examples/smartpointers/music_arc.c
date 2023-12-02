@@ -24,12 +24,12 @@ void Song_drop(Song* s) {
 #define i_type SongArc
 #define i_key_class Song
 #define i_opt c_use_cmp|c_no_hash
-#include "stc/carc.h"
+#include "stc/arc.h"
 
 // ... and a vector of them
 #define i_type SongVec
-#define i_key_arcbox SongArc // use i_key_arcbox on carc / cbox (instead of i_key)
-#include "stc/cvec.h"
+#define i_key_arcbox SongArc // use i_key_arcbox on arc / box (instead of i_key)
+#include "stc/vec.h"
 
 void example3(void)
 {

@@ -39,17 +39,17 @@ int OlympicLoc_cmp(const OlympicLoc* a, const OlympicLoc* b);
 OlympicLoc OlympicLoc_clone(OlympicLoc loc);
 void OlympicLoc_drop(OlympicLoc* self);
 
-// Create a clist<OlympicLoc>, can be sorted by year.
+// Create a list<OlympicLoc>, can be sorted by year.
 #define i_key_class OlympicLoc // binds _cmp, _clone and _drop.
 #define i_use_cmp
 #define i_tag OL
-#include "stc/clist.h"
+#include "stc/list.h"
 
-// Create a csmap<cstr, clist_OL> where key is country name
+// Create a smap<cstr, list_OL> where key is country name
 #define i_key_str            // binds cstr_equ, cstr_hash, cstr_clone, ++
-#define i_val_class clist_OL // binds clist_OL_clone, clist_OL_drop
+#define i_val_class list_OL // binds list_OL_clone, list_OL_drop
 #define i_tag OL
-#include "stc/csmap.h"
+#include "stc/smap.h"
 
 int OlympicLoc_cmp(const OlympicLoc* a, const OlympicLoc* b) {
     return a->year - b->year;
@@ -70,8 +70,8 @@ void OlympicLoc_drop(OlympicLoc* self) {
 int main(void)
 {
     // Define the multimap with destructor defered to when block is completed.
-    csmap_OL multimap = {0};
-    const clist_OL empty = clist_OL_init();
+    smap_OL multimap = {0};
+    const list_OL empty = list_OL_init();
 
     for (size_t i = 0; i < c_arraylen(ol_data); ++i)
     {
@@ -81,23 +81,23 @@ int main(void)
                             .date = cstr_from(d->date)};
         // Insert an empty list for each new country, and append the entry to the list.
         // If country already exist in map, its list is returned from the insert function.
-        clist_OL* list = &csmap_OL_emplace(&multimap, d->country, empty).ref->second;
-        clist_OL_push_back(list, loc);
+        list_OL* list = &smap_OL_emplace(&multimap, d->country, empty).ref->second;
+        list_OL_push_back(list, loc);
     }
 
     // Sort locations by year for each country.
-    c_foreach (country, csmap_OL, multimap)
-        clist_OL_sort(&country.ref->second);
+    c_foreach (country, smap_OL, multimap)
+        list_OL_sort(&country.ref->second);
 
     // Print the multimap:
-    c_foreach (country, csmap_OL, multimap)
+    c_foreach (country, smap_OL, multimap)
     {
         // Loop the locations for a country sorted by year
-        c_foreach (loc, clist_OL, country.ref->second)
+        c_foreach (loc, list_OL, country.ref->second)
             printf("%s: %d, %s, %s\n", cstr_str(&country.ref->first),
                                                     loc.ref->year,
                                         cstr_str(&loc.ref->city),
                                         cstr_str(&loc.ref->date));
     }
-    csmap_OL_drop(&multimap);
+    smap_OL_drop(&multimap);
 }

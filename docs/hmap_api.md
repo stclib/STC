@@ -1,7 +1,7 @@
-# STC [cmap](../include/stc/cmap.h): Unordered Map
+# STC [hmap](../include/stc/hmap.h): Unordered Map
 ![Map](pics/map.jpg)
 
-A **cmap** is an associative container that contains key-value pairs with unique keys. Search, insertion, and removal of elements
+A **hmap** is an associative container that contains key-value pairs with unique keys. Search, insertion, and removal of elements
 have average constant-time complexity. Internally, the elements are not sorted in any particular order, but organized into
 buckets. Which bucket an element is placed into depends entirely on the hash of its key. This allows fast access to individual
 elements, since once the hash is computed, it refers to the exact bucket the element is placed into. It is implemented as closed
@@ -19,7 +19,7 @@ See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/contain
 ```c
 #define i_key <t>      // key type: REQUIRED.
 #define i_val <t>      // mapped value type: REQUIRED.
-#define i_type <t>     // container type name (default: cmap_{i_key})
+#define i_type <t>     // container type name (default: hmap_{i_key})
 #define i_hash <f>     // hash func i_keyraw*: REQUIRED IF i_keyraw is non-pod type
 #define i_eq <f>       // equality comparison two i_keyraw*: REQUIRED IF i_keyraw is a
                        // non-integral type. Three-way i_cmp may alternatively be specified.
@@ -35,56 +35,56 @@ See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/contain
 #define i_valfrom <f>  // convertion func i_valraw => i_val
 #define i_valto <f>    // convertion func i_val* => i_valraw
 
-#define i_tag <s>      // alternative typename: cmap_{i_tag}. i_tag defaults to i_val
-#include "stc/cmap.h"
+#define i_tag <s>      // alternative typename: hmap_{i_tag}. i_tag defaults to i_val
+#include "stc/hmap.h"
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.
 
 ## Methods
 
 ```c
-cmap_X                cmap_X_init(void);
-cmap_X                cmap_X_with_capacity(intptr_t cap);
-cmap_X                cmap_X_clone(cmap_x map);
+hmap_X                hmap_X_init(void);
+hmap_X                hmap_X_with_capacity(intptr_t cap);
+hmap_X                hmap_X_clone(hmap_x map);
 
-void                  cmap_X_clear(cmap_X* self);
-void                  cmap_X_copy(cmap_X* self, const cmap_X* other);
-float                 cmap_X_max_load_factor(const cmap_X* self);                       // default: 0.85f
-bool                  cmap_X_reserve(cmap_X* self, intptr_t size);
-void                  cmap_X_shrink_to_fit(cmap_X* self);
-void                  cmap_X_drop(cmap_X* self);                                        // destructor
+void                  hmap_X_clear(hmap_X* self);
+void                  hmap_X_copy(hmap_X* self, const hmap_X* other);
+float                 hmap_X_max_load_factor(const hmap_X* self);                       // default: 0.85f
+bool                  hmap_X_reserve(hmap_X* self, intptr_t size);
+void                  hmap_X_shrink_to_fit(hmap_X* self);
+void                  hmap_X_drop(hmap_X* self);                                        // destructor
 
-bool                  cmap_X_empty(const cmap_X* self );
-intptr_t              cmap_X_size(const cmap_X* self);
-intptr_t              cmap_X_capacity(const cmap_X* self);                              // buckets * max_load_factor
-intptr_t              cmap_X_bucket_count(const cmap_X* self);                          // num. of allocated buckets
+bool                  hmap_X_empty(const hmap_X* self );
+intptr_t              hmap_X_size(const hmap_X* self);
+intptr_t              hmap_X_capacity(const hmap_X* self);                              // buckets * max_load_factor
+intptr_t              hmap_X_bucket_count(const hmap_X* self);                          // num. of allocated buckets
 
-const cmap_X_mapped*  cmap_X_at(const cmap_X* self, i_keyraw rkey);                     // rkey must be in map
-cmap_X_mapped*        cmap_X_at_mut(cmap_X* self, i_keyraw rkey);                       // mutable at
-const cmap_X_value*   cmap_X_get(const cmap_X* self, i_keyraw rkey);                    // const get
-cmap_X_value*         cmap_X_get_mut(cmap_X* self, i_keyraw rkey);                      // mutable get
-bool                  cmap_X_contains(const cmap_X* self, i_keyraw rkey);
-cmap_X_iter           cmap_X_find(const cmap_X* self, i_keyraw rkey);                   // find element
+const hmap_X_mapped*  hmap_X_at(const hmap_X* self, i_keyraw rkey);                     // rkey must be in map
+hmap_X_mapped*        hmap_X_at_mut(hmap_X* self, i_keyraw rkey);                       // mutable at
+const hmap_X_value*   hmap_X_get(const hmap_X* self, i_keyraw rkey);                    // const get
+hmap_X_value*         hmap_X_get_mut(hmap_X* self, i_keyraw rkey);                      // mutable get
+bool                  hmap_X_contains(const hmap_X* self, i_keyraw rkey);
+hmap_X_iter           hmap_X_find(const hmap_X* self, i_keyraw rkey);                   // find element
 
-cmap_X_result         cmap_X_insert(cmap_X* self, i_key key, i_val mapped);             // no change if key in map
-cmap_X_result         cmap_X_insert_or_assign(cmap_X* self, i_key key, i_val mapped);   // always update mapped
-cmap_X_result         cmap_X_push(cmap_X* self, cmap_X_value entry);                    // similar to insert
+hmap_X_result         hmap_X_insert(hmap_X* self, i_key key, i_val mapped);             // no change if key in map
+hmap_X_result         hmap_X_insert_or_assign(hmap_X* self, i_key key, i_val mapped);   // always update mapped
+hmap_X_result         hmap_X_push(hmap_X* self, hmap_X_value entry);                    // similar to insert
 
-cmap_X_result         cmap_X_emplace(cmap_X* self, i_keyraw rkey, i_valraw rmapped);    // no change if rkey in map
-cmap_X_result         cmap_X_emplace_or_assign(cmap_X* self, i_keyraw rkey, i_valraw rmapped); // always update mapped
-cmap_X_result         cmap_X_emplace_key(cmap_X* self, i_keyraw rkey);                  // see example 1.
+hmap_X_result         hmap_X_emplace(hmap_X* self, i_keyraw rkey, i_valraw rmapped);    // no change if rkey in map
+hmap_X_result         hmap_X_emplace_or_assign(hmap_X* self, i_keyraw rkey, i_valraw rmapped); // always update mapped
+hmap_X_result         hmap_X_emplace_key(hmap_X* self, i_keyraw rkey);                  // see example 1.
 
-int                   cmap_X_erase(cmap_X* self, i_keyraw rkey);                        // return 0 or 1
-cmap_X_iter           cmap_X_erase_at(cmap_X* self, cmap_X_iter it);                    // return iter after it
-void                  cmap_X_erase_entry(cmap_X* self, cmap_X_value* entry);
+int                   hmap_X_erase(hmap_X* self, i_keyraw rkey);                        // return 0 or 1
+hmap_X_iter           hmap_X_erase_at(hmap_X* self, hmap_X_iter it);                    // return iter after it
+void                  hmap_X_erase_entry(hmap_X* self, hmap_X_value* entry);
 
-cmap_X_iter           cmap_X_begin(const cmap_X* self);
-cmap_X_iter           cmap_X_end(const cmap_X* self);
-void                  cmap_X_next(cmap_X_iter* it);
-cmap_X_iter           cmap_X_advance(cmap_X_iter it, cmap_X_ssize n);
+hmap_X_iter           hmap_X_begin(const hmap_X* self);
+hmap_X_iter           hmap_X_end(const hmap_X* self);
+void                  hmap_X_next(hmap_X_iter* it);
+hmap_X_iter           hmap_X_advance(hmap_X_iter it, hmap_X_ssize n);
 
-cmap_X_value          cmap_X_value_clone(cmap_X_value val);
-cmap_X_raw            cmap_X_value_toraw(cmap_X_value* pval);
+hmap_X_value          hmap_X_value_clone(hmap_X_value val);
+hmap_X_raw            hmap_X_value_toraw(hmap_X_value* pval);
 ```
 Free helper functions:
 ```c
@@ -104,15 +104,15 @@ bool                  c_memcmp_eq(const i_keyraw* a, const i_keyraw* b);    // !
 
 | Type name          | Type definition                                 | Used to represent...          |
 |:-------------------|:------------------------------------------------|:------------------------------|
-| `cmap_X`           | `struct { ... }`                                | The cmap type                 |
-| `cmap_X_key`       | `i_key`                                         | The key type                  |
-| `cmap_X_mapped`    | `i_val`                                         | The mapped type               |
-| `cmap_X_value`     | `struct { const i_key first; i_val second; }`   | The value: key is immutable   |
-| `cmap_X_keyraw`    | `i_keyraw`                                      | The raw key type              |
-| `cmap_X_rmapped`   | `i_valraw`                                      | The raw mapped type           |
-| `cmap_X_raw`       | `struct { i_keyraw first; i_valraw second; }`   | i_keyraw + i_valraw type      |
-| `cmap_X_result`    | `struct { cmap_X_value *ref; bool inserted; }`  | Result of insert/emplace      |
-| `cmap_X_iter`      | `struct { cmap_X_value *ref; ... }`             | Iterator type                 |
+| `hmap_X`           | `struct { ... }`                                | The hmap type                 |
+| `hmap_X_key`       | `i_key`                                         | The key type                  |
+| `hmap_X_mapped`    | `i_val`                                         | The mapped type               |
+| `hmap_X_value`     | `struct { const i_key first; i_val second; }`   | The value: key is immutable   |
+| `hmap_X_keyraw`    | `i_keyraw`                                      | The raw key type              |
+| `hmap_X_rmapped`   | `i_valraw`                                      | The raw mapped type           |
+| `hmap_X_raw`       | `struct { i_keyraw first; i_valraw second; }`   | i_keyraw + i_valraw type      |
+| `hmap_X_result`    | `struct { hmap_X_value *ref; bool inserted; }`  | Result of insert/emplace      |
+| `hmap_X_iter`      | `struct { hmap_X_value *ref; ... }`             | Iterator type                 |
 
 ## Examples
 
@@ -122,36 +122,36 @@ bool                  c_memcmp_eq(const i_keyraw* a, const i_keyraw* b);    // !
 
 #define i_key_str
 #define i_val_str
-#include "stc/cmap.h"
+#include "stc/hmap.h"
 
 int main(void)
 {
     // Create an unordered_map of three strings (that map to strings)
-    cmap_str umap = c_init(cmap_str, {
+    hmap_str umap = c_init(hmap_str, {
         {"RED", "#FF0000"},
         {"GREEN", "#00FF00"},
         {"BLUE", "#0000FF"}
     });
 
     // Iterate and print keys and values of unordered map
-    c_foreach (n, cmap_str, umap) {
+    c_foreach (n, hmap_str, umap) {
         printf("Key:[%s] Value:[%s]\n", cstr_str(&n.ref->first), cstr_str(&n.ref->second));
     }
 
     // Add two new entries to the unordered map
-    cmap_str_emplace(&umap, "BLACK", "#000000");
-    cmap_str_emplace(&umap, "WHITE", "#FFFFFF");
+    hmap_str_emplace(&umap, "BLACK", "#000000");
+    hmap_str_emplace(&umap, "WHITE", "#FFFFFF");
 
     // Insert only if "CYAN" is not in the map: create mapped value when needed only.
-    cmap_str_result res = cmap_str_emplace_key(&umap, "CYAN");
+    hmap_str_result res = hmap_str_emplace_key(&umap, "CYAN");
     if (res.inserted)
         res.ref->second = cstr_from("#00FFFF"); // must assign second if key was inserted.
 
     // Output values by key
-    printf("The HEX of color RED is:[%s]\n", cstr_str(cmap_str_at(&umap, "RED")));
-    printf("The HEX of color BLACK is:[%s]\n", cstr_str(cmap_str_at(&umap, "BLACK")));
+    printf("The HEX of color RED is:[%s]\n", cstr_str(hmap_str_at(&umap, "RED")));
+    printf("The HEX of color BLACK is:[%s]\n", cstr_str(hmap_str_at(&umap, "BLACK")));
 
-    cmap_str_drop(&umap);
+    hmap_str_drop(&umap);
 }
 ```
 Output:
@@ -164,14 +164,14 @@ The HEX of color BLACK is:[#000000]
 ```
 
 ### Example 2
-This example uses a cmap with cstr as mapped value.
+This example uses a hmap with cstr as mapped value.
 ```c
 #define i_implement
 #include "stc/cstr.h"
 #define i_type IDMap
 #define i_key int
 #define i_val_str
-#include "stc/cmap.h"
+#include "stc/hmap.h"
 
 int main(void)
 {
@@ -184,10 +184,10 @@ int main(void)
 
     // replace existing mapped value:
     IDMap_emplace_or_assign(&idnames, 110, "White");
-    
+
     // insert a new constructed mapped string into map:
     IDMap_insert_or_assign(&idnames, 120, cstr_from_fmt("#%08x", col));
-    
+
     // emplace/insert does nothing if key already exist:
     IDMap_emplace(&idnames, 100, "Green");
 
@@ -205,7 +205,7 @@ Output:
 ```
 
 ### Example 3
-Demonstrate cmap with plain-old-data key type Vec3i and int as mapped type: cmap<Vec3i, int>.
+Demonstrate hmap with plain-old-data key type Vec3i and int as mapped type: hmap<Vec3i, int>.
 ```c
 #include <stdio.h>
 typedef struct { int x, y, z; } Vec3i;
@@ -214,22 +214,22 @@ typedef struct { int x, y, z; } Vec3i;
 #define i_val int
 #define i_eq c_memcmp_eq // bitwise equal, and uses stc_hash()
 #define i_tag vi
-#include "stc/cmap.h"
+#include "stc/hmap.h"
 
 int main(void)
 {
     // Define map with defered destruct
-    cmap_vi vecs = {0};
+    hmap_vi vecs = {0};
 
-    cmap_vi_insert(&vecs, (Vec3i){100,   0,   0}, 1);
-    cmap_vi_insert(&vecs, (Vec3i){  0, 100,   0}, 2);
-    cmap_vi_insert(&vecs, (Vec3i){  0,   0, 100}, 3);
-    cmap_vi_insert(&vecs, (Vec3i){100, 100, 100}, 4);
+    hmap_vi_insert(&vecs, (Vec3i){100,   0,   0}, 1);
+    hmap_vi_insert(&vecs, (Vec3i){  0, 100,   0}, 2);
+    hmap_vi_insert(&vecs, (Vec3i){  0,   0, 100}, 3);
+    hmap_vi_insert(&vecs, (Vec3i){100, 100, 100}, 4);
 
-    c_forpair (v3, num, cmap_vi, vecs)
+    c_forpair (v3, num, hmap_vi, vecs)
         printf("{ %3d, %3d, %3d }: %d\n", _.v3->x, _.v3->y, _.v3->z, *_.num);
 
-    cmap_vi_drop(&vecs);
+    hmap_vi_drop(&vecs);
 }
 ```
 Output:
@@ -241,7 +241,7 @@ Output:
 ```
 
 ### Example 4
-Inverse: demonstrate cmap with mapped POD type Vec3i: cmap<int, Vec3i>:
+Inverse: demonstrate hmap with mapped POD type Vec3i: hmap<int, Vec3i>:
 ```c
 #include <stdio.h>
 typedef struct { int x, y, z; } Vec3i;
@@ -249,21 +249,21 @@ typedef struct { int x, y, z; } Vec3i;
 #define i_key int
 #define i_val Vec3i
 #define i_tag iv
-#include "stc/cmap.h"
+#include "stc/hmap.h"
 
 int main(void)
 {
-    cmap_iv vecs = {0}
+    hmap_iv vecs = {0}
 
-    cmap_iv_insert(&vecs, 1, (Vec3i){100,   0,   0});
-    cmap_iv_insert(&vecs, 2, (Vec3i){  0, 100,   0});
-    cmap_iv_insert(&vecs, 3, (Vec3i){  0,   0, 100});
-    cmap_iv_insert(&vecs, 4, (Vec3i){100, 100, 100});
+    hmap_iv_insert(&vecs, 1, (Vec3i){100,   0,   0});
+    hmap_iv_insert(&vecs, 2, (Vec3i){  0, 100,   0});
+    hmap_iv_insert(&vecs, 3, (Vec3i){  0,   0, 100});
+    hmap_iv_insert(&vecs, 4, (Vec3i){100, 100, 100});
 
-    c_forpair (num, v3, cmap_iv, vecs)
+    c_forpair (num, v3, hmap_iv, vecs)
         printf("%d: { %3d, %3d, %3d }\n", *_.num, _.v3->x, _.v3->y, _.v3->z);
 
-    cmap_iv_drop(&vecs);
+    hmap_iv_drop(&vecs);
 }
 ```
 Output:
@@ -297,7 +297,7 @@ static inline uint32_t Viking_hash(const Viking* a) {
 }
 
 static inline Viking Viking_clone(Viking v) {
-    v.name = cstr_clone(v.name); 
+    v.name = cstr_clone(v.name);
     v.country = cstr_clone(v.country);
     return v;
 }
@@ -310,7 +310,7 @@ static inline void Viking_drop(Viking* vk) {
 #define i_type Vikings
 #define i_key_class Viking
 #define i_val int
-#include "stc/cmap.h"
+#include "stc/hmap.h"
 
 int main(void)
 {
@@ -321,7 +321,7 @@ int main(void)
     Vikings_insert(&vikings, (Viking){cstr_lit("Olaf"), cstr_lit("Denmark")}, 24);
     Vikings_insert(&vikings, (Viking){cstr_lit("Harald"), cstr_lit("Iceland")}, 12);
     Vikings_insert(&vikings, (Viking){cstr_lit("Einar"), cstr_lit("Denmark")}, 21);
-    
+
     Viking lookup = (Viking){cstr_lit("Einar"), cstr_lit("Norway")};
     printf("Lookup: Einar of Norway has %d hp\n\n", *Vikings_at(&vikings, lookup));
     Viking_drop(&lookup);
@@ -386,7 +386,7 @@ static inline RViking Viking_toraw(const Viking* vp) {
 #define i_opt       c_no_clone // disable map cloning
 #define i_hash(rp)  (stc_strhash(rp->name) ^ stc_strhash(rp->country))
 #define i_val       int
-#include "stc/cmap.h"
+#include "stc/hmap.h"
 
 int main(void)
 {

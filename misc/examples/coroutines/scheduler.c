@@ -6,7 +6,7 @@
 #define i_key cco_task*
 #define i_keydrop(x) { puts("free task"); free(*x); }
 #define i_no_clone
-#include "stc/cqueue.h"
+#include "stc/queue.h"
 
 typedef struct {
     cco_tasks tasks;
@@ -55,7 +55,7 @@ static int taskB(cco_task* task, cco_runtime* rt) {
 
 void Use(void) {
     cco_scheduler sched = {.tasks = c_init(cco_tasks, {
-        c_new(cco_task, {.cco_func=taskA}), 
+        c_new(cco_task, {.cco_func=taskA}),
         c_new(cco_task, {.cco_func=taskB}),
     })};
 

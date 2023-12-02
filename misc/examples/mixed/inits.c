@@ -4,12 +4,12 @@
 #define i_key int
 #define i_val_str
 #define i_tag id   // Map of int => cstr
-#include "stc/cmap.h"
+#include "stc/hmap.h"
 
 #define i_key_str
 #define i_val int
 #define i_tag cnt  // Map of cstr => int
-#include "stc/cmap.h"
+#include "stc/hmap.h"
 
 typedef struct {int x, y;} ipair_t;
 inline static int ipair_cmp(const ipair_t* a, const ipair_t* b) {
@@ -21,52 +21,52 @@ inline static int ipair_cmp(const ipair_t* a, const ipair_t* b) {
 #define i_key ipair_t
 #define i_cmp ipair_cmp
 #define i_tag ip
-#include "stc/cvec.h"
+#include "stc/vec.h"
 
 #define i_key ipair_t
 #define i_cmp ipair_cmp
 #define i_tag ip
-#include "stc/clist.h"
+#include "stc/list.h"
 
 #define i_key float
 #define i_tag f
-#include "stc/cpque.h"
+#include "stc/pque.h"
 
 int main(void)
 {
     // CVEC FLOAT / PRIORITY QUEUE
 
-    cpque_f floats = {0};
+    pque_f floats = {0};
     const float nums[] = {4.0f, 2.0f, 5.0f, 3.0f, 1.0f};
 
     // PRIORITY QUEUE
     c_forrange (i, c_arraylen(nums))
-        cpque_f_push(&floats, nums[i]);
+        pque_f_push(&floats, nums[i]);
 
     puts("\npop and show high priorites first:");
-    while (! cpque_f_empty(&floats)) {
-        printf("%.1f ", (double)*cpque_f_top(&floats));
-        cpque_f_pop(&floats);
+    while (! pque_f_empty(&floats)) {
+        printf("%.1f ", (double)*pque_f_top(&floats));
+        pque_f_pop(&floats);
     }
     puts("\n");
-    cpque_f_drop(&floats);
+    pque_f_drop(&floats);
 
     // CMAP ID
 
     int year = 2020;
-    cmap_id idnames = {0};
-    cmap_id_emplace(&idnames, 100, "Hello");
-    cmap_id_insert(&idnames, 110, cstr_lit("World"));
-    cmap_id_insert(&idnames, 120, cstr_from_fmt("Howdy, -%d-", year));
+    hmap_id idnames = {0};
+    hmap_id_emplace(&idnames, 100, "Hello");
+    hmap_id_insert(&idnames, 110, cstr_lit("World"));
+    hmap_id_insert(&idnames, 120, cstr_from_fmt("Howdy, -%d-", year));
 
-    c_foreach (i, cmap_id, idnames)
+    c_foreach (i, hmap_id, idnames)
         printf("%d: %s\n", i.ref->first, cstr_str(&i.ref->second));
     puts("");
-    cmap_id_drop(&idnames);
+    hmap_id_drop(&idnames);
 
     // CMAP CNT
 
-    cmap_cnt countries = c_init(cmap_cnt, {
+    hmap_cnt countries = c_init(hmap_cnt, {
         {"Norway", 100},
         {"Denmark", 50},
         {"Iceland", 10},
@@ -76,33 +76,33 @@ int main(void)
         {"Spain", 10},
         {"France", 10},
     });
-    cmap_cnt_emplace(&countries, "Greenland", 0).ref->second += 20;
-    cmap_cnt_emplace(&countries, "Sweden", 0).ref->second += 20;
-    cmap_cnt_emplace(&countries, "Norway", 0).ref->second += 20;
-    cmap_cnt_emplace(&countries, "Finland", 0).ref->second += 20;
+    hmap_cnt_emplace(&countries, "Greenland", 0).ref->second += 20;
+    hmap_cnt_emplace(&countries, "Sweden", 0).ref->second += 20;
+    hmap_cnt_emplace(&countries, "Norway", 0).ref->second += 20;
+    hmap_cnt_emplace(&countries, "Finland", 0).ref->second += 20;
 
-    c_forpair (country, health, cmap_cnt, countries)
+    c_forpair (country, health, hmap_cnt, countries)
         printf("%s: %d\n", cstr_str(_.country), *_.health);
     puts("");
-    cmap_cnt_drop(&countries);
+    hmap_cnt_drop(&countries);
 
     // CVEC PAIR
 
-    cvec_ip pairs1 = c_init(cvec_ip, {{5, 6}, {3, 4}, {1, 2}, {7, 8}});
-    cvec_ip_sort(&pairs1);
+    vec_ip pairs1 = c_init(vec_ip, {{5, 6}, {3, 4}, {1, 2}, {7, 8}});
+    vec_ip_sort(&pairs1);
 
-    c_foreach (i, cvec_ip, pairs1)
+    c_foreach (i, vec_ip, pairs1)
         printf("(%d %d) ", i.ref->x, i.ref->y);
     puts("");
-    cvec_ip_drop(&pairs1);
+    vec_ip_drop(&pairs1);
 
     // CLIST PAIR
 
-    clist_ip pairs2 = c_init(clist_ip, {{5, 6}, {3, 4}, {1, 2}, {7, 8}});
-    clist_ip_sort(&pairs2);
+    list_ip pairs2 = c_init(list_ip, {{5, 6}, {3, 4}, {1, 2}, {7, 8}});
+    list_ip_sort(&pairs2);
 
-    c_foreach (i, clist_ip, pairs2)
+    c_foreach (i, list_ip, pairs2)
         printf("(%d %d) ", i.ref->x, i.ref->y);
     puts("");
-    clist_ip_drop(&pairs2);
+    list_ip_drop(&pairs2);
 }

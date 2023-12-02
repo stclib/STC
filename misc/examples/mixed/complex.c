@@ -8,22 +8,22 @@
 #define i_implement
 #include "stc/cstr.h"
 
-#define i_T FloatStack,float
-#include "stc/cstack.h"
+#define i_TYPE FloatStack,float
+#include "stc/stack.h"
 
 #define i_type StackList
 #define i_key_class FloatStack  // "class" picks up _clone, _drop, _cmp
-#include "stc/clist.h"
+#include "stc/list.h"
 
 #define i_type ListMap
 #define i_key int
 #define i_val_class StackList   // "class" picks up _clone, _drop
-#include "stc/cmap.h"
+#include "stc/hmap.h"
 
 #define i_type MapMap
 #define i_key_str
 #define i_val_class ListMap
-#include "stc/cmap.h"
+#include "stc/hmap.h"
 
 
 int main(void)

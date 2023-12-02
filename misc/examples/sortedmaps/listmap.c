@@ -5,20 +5,20 @@
 #define i_implement
 #include "stc/cstr.h"
 #define i_key_str
-#include "stc/clist.h"
+#include "stc/list.h"
 
-// Map of int => clist_str.
+// Map of int => list_str.
 #define i_type Multimap
 #define i_key int
-#define i_val_class clist_str // set i_val = clist_str, bind clist_str_clone and clist_str_drop
+#define i_val_class list_str // set i_val = list_str, bind list_str_clone and list_str_drop
 #define i_cmp -c_default_cmp // like std::greater<int>
-#include "stc/csmap.h"
+#include "stc/smap.h"
 
 void print(const char* lbl, const Multimap mmap)
 {
     printf("%s ", lbl);
     c_foreach (e, Multimap, mmap) {
-        c_foreach (s, clist_str, e.ref->second)
+        c_foreach (s, list_str, e.ref->second)
             printf("{%d,%s} ", e.ref->first, cstr_str(s.ref));
     }
     puts("");
@@ -26,8 +26,8 @@ void print(const char* lbl, const Multimap mmap)
 
 void insert(Multimap* mmap, int key, const char* str)
 {
-    clist_str *list = &Multimap_insert(mmap, key, clist_str_init()).ref->second;
-    clist_str_emplace_back(list, str);
+    list_str *list = &Multimap_insert(mmap, key, list_str_init()).ref->second;
+    list_str_emplace_back(list, str);
 }
 
 int main(void)
@@ -60,6 +60,6 @@ int main(void)
     // erase all entries with key 5
     Multimap_erase(&mmap, 5);
     print("+5", mmap);
-    
+
     Multimap_drop(&mmap);
 }

@@ -5,8 +5,8 @@
 #include "stc/csview.h"
 #include "stc/algorithm.h"
 
-#define i_T IVec,int
-#include "stc/cstack.h"
+#define i_TYPE IVec,int
+#include "stc/stack.h"
 
 // filters and transforms:
 #define flt_skipValue(i, x) (*i.ref != (x))
@@ -82,7 +82,7 @@ fn main() {
 */
 #define i_type SVec
 #define i_key_class csview
-#include "stc/cstack.h"
+#include "stc/stack.h"
 
 void demo3(void)
 {

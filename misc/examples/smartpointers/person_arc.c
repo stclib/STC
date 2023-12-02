@@ -1,4 +1,4 @@
-/* cbox: heap allocated boxed type */
+/* box: heap allocated boxed type */
 #define i_implement
 #include "stc/cstr.h"
 
@@ -32,12 +32,12 @@ void Person_drop(Person* p) {
 #define i_type PSPtr
 #define i_key_class Person // ensure Person_drop
 #define i_use_cmp
-#include "stc/carc.h"
+#include "stc/arc.h"
 
 #define i_type Persons
 #define i_key_arcbox PSPtr // binds PSPtr_cmp, PSPtr_drop...
 #define i_use_cmp
-#include "stc/cvec.h"
+#include "stc/vec.h"
 
 
 int main(void)

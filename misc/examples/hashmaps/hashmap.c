@@ -4,13 +4,13 @@
 #define i_key_str
 #define i_val_str
 #include <stdio.h>
-#include "stc/cmap.h"
+#include "stc/hmap.h"
 
 const char* call(const char* number) {
     if (!strcmp(number, "798-1364"))
-        return "We're sorry, the call cannot be completed as dialed." 
+        return "We're sorry, the call cannot be completed as dialed."
                " Please hang up and try again.";
-    else if (!strcmp(number, "645-7689")) 
+    else if (!strcmp(number, "645-7689"))
         return "Hello, this is Mr. Awesome's Pizza. My name is Fred."
                " What can I get for you today?";
     else
@@ -18,33 +18,33 @@ const char* call(const char* number) {
 }
 
 int main(void) {
-    cmap_str contacts = {0};
+    hmap_str contacts = {0};
 
-    cmap_str_emplace(&contacts, "Daniel", "798-1364");
-    cmap_str_emplace(&contacts, "Ashley", "645-7689");
-    cmap_str_emplace(&contacts, "Katie", "435-8291");
-    cmap_str_emplace(&contacts, "Robert", "956-1745");
+    hmap_str_emplace(&contacts, "Daniel", "798-1364");
+    hmap_str_emplace(&contacts, "Ashley", "645-7689");
+    hmap_str_emplace(&contacts, "Katie", "435-8291");
+    hmap_str_emplace(&contacts, "Robert", "956-1745");
 
-    const cmap_str_value* v;
-    if ((v = cmap_str_get(&contacts, "Daniel")))
+    const hmap_str_value* v;
+    if ((v = hmap_str_get(&contacts, "Daniel")))
         printf("Calling Daniel: %s\n", call(cstr_str(&v->second)));
     else
         printf("Don't have Daniel's number.");
 
-    cmap_str_emplace_or_assign(&contacts, "Daniel", "164-6743");
+    hmap_str_emplace_or_assign(&contacts, "Daniel", "164-6743");
 
-    if ((v = cmap_str_get(&contacts, "Ashley")))
+    if ((v = hmap_str_get(&contacts, "Ashley")))
         printf("Calling Ashley: %s\n", call(cstr_str(&v->second)));
     else
         printf("Don't have Ashley's number.");
 
-    cmap_str_erase(&contacts, "Ashley");
+    hmap_str_erase(&contacts, "Ashley");
 
     puts("");
-    c_forpair (contact, number, cmap_str, contacts) {
+    c_forpair (contact, number, hmap_str, contacts) {
         printf("Calling %s: %s\n", cstr_str(_.contact), call(cstr_str(_.number)));
     }
     puts("");
 
-    cmap_str_drop(&contacts);
+    hmap_str_drop(&contacts);
 }

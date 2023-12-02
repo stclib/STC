@@ -17,10 +17,8 @@
 | `c_forindexed (it, ctype, container)`    | Iterate with enumerate count in it.index  |
 
 ```c
-#define i_type IMap
-#define i_key int
-#define i_val int
-#include "stc/csmap.h"
+#define i_TYPE IMap,int,int
+#include "stc/smap.h"
 // ...
 IMap map = c_init(IMap, { {23,1}, {3,2}, {7,3}, {5,4}, {12,5} });
 
@@ -57,15 +55,15 @@ Iterate compound literal array elements. In addition to `i.ref`, you can access 
 ```c
 // apply multiple push_backs
 c_forlist (i, int, {4, 5, 6, 7})
-    clist_i_push_back(&lst, *i.ref);
+    list_i_push_back(&lst, *i.ref);
 
 // insert in existing map
-c_forlist (i, cmap_ii_value, { {4, 5}, {6, 7} })
-    cmap_ii_insert(&map, i.ref->first, i.ref->second);
+c_forlist (i, hmap_ii_value, { {4, 5}, {6, 7} })
+    hmap_ii_insert(&map, i.ref->first, i.ref->second);
 
 // string literals pushed to a stack of cstr elements:
 c_forlist (i, const char*, {"Hello", "crazy", "world"})
-    cstack_str_emplace(&stk, *i.ref);
+    stack_str_emplace(&stk, *i.ref);
 ```
 ---
 
@@ -177,47 +175,47 @@ Note that `c_flt_take()` and `c_flt_takewhile()` breaks the loop on false.
 - **c_drop** - drop (destroy) multiple containers of the same type:
 ```c
 #define i_key_str // owned cstr string value type
-#include "stc/cset.h"
+#include "stc/hset.h"
 
 #define i_key int
 #define i_val int
-#include "stc/cmap.h"
+#include "stc/hmap.h"
 ...
 // Initializes with const char*, internally converted to cstr!
-cset_str myset = c_init(cset_str, {"This", "is", "the", "story"});
+hset_str myset = c_init(hset_str, {"This", "is", "the", "story"});
 
 int x = 7, y = 8;
-cmap_int mymap = c_init(cmap_int, { {1, 2}, {3, 4}, {5, 6}, {x, y} });
+hmap_int mymap = c_init(hmap_int, { {1, 2}, {3, 4}, {5, 6}, {x, y} });
 ```
 Drop multiple containers of the same type:
 ```c
-c_drop(cset_str, &myset, &myset2);
+c_drop(hset_str, &myset, &myset2);
 ```
 
 ### stc_find_if, stc_erase_if, stc_eraseremove_if
 Find or erase linearily in containers using a predicate. `value` is a pointer to each element in predicate.
 - For `stc_find_if(Iter* result, CntType, cnt, pred)`, ***result*** is output and must be declared prior to call.
-- Use `stc_erase_if(CntType, cnt, pred)` with **clist**, **cmap**, **cset**, **csmap**, and **csset**.
-- Use `stc_eraseremove_if(CntType, cnt, pred)` with **cstack**, **cvec**, **cdeq**, and **cqueue** only.
+- Use `stc_erase_if(CntType, cnt, pred)` with **list**, **hmap**, **hset**, **smap**, and **sset**.
+- Use `stc_eraseremove_if(CntType, cnt, pred)` with **stack**, **vec**, **deq**, and **queue** only.
 ```c
 // Search vec for first value > 20. NOTE: `value` is a pointer to current element
-cvec_int_iter result;
-stc_find_if(&result, cvec_int, vec, *value > 20);
+vec_int_iter result;
+stc_find_if(&result, vec_int, vec, *value > 20);
 if (result.ref) printf("%d\n", *result.ref);
 
 // Erase all values > 20 in a linked list:
-stc_erase_if(clist_int, &list, *value > 20);
+stc_erase_if(list_int, &list, *value > 20);
 
 // Erase values (20 < value < 25) in vec:
-stc_eraseremove_if(cvec_int, &vec, *value > 20 && *value < 25);
+stc_eraseremove_if(vec_int, &vec, *value > 20 && *value < 25);
 
 // Search a sorted map for the first string containing "hello" in range [it1, it2), and erase it:
-csmap_str_iter res, it1 = ..., it2 = ...;
-stc_find_if(&res, csmap_str, it1, it2, cstr_contains(value, "hello"));
-if (res.ref) csmap_str_erase_at(&map, res);
+smap_str_iter res, it1 = ..., it2 = ...;
+stc_find_if(&res, smap_str, it1, it2, cstr_contains(value, "hello"));
+if (res.ref) smap_str_erase_at(&map, res);
 
 // Erase all strings containing "hello" in a sorted map:
-stc_erase_if(csmap_str, &map, cstr_contains(value, "hello"));
+stc_erase_if(smap_str, &map, cstr_contains(value, "hello"));
 ```
 
 ### stc_all_of, stc_any_of, stc_none_of
@@ -229,7 +227,7 @@ Test a container/range using a predicate. ***result*** is output and must be dec
 #define DivisibleBy(n) (*value % (n) == 0) // `value` refers to the current element
 
 bool result;
-stc_any_of(&result, cvec_int, vec, DivisibleBy(7));
+stc_any_of(&result, vec_int, vec, DivisibleBy(7));
 if (result)
     puts("At least one number is divisible by 7");
 ```
@@ -253,13 +251,12 @@ int main(void) {
     c_forrange (i, c_arraylen(arr)) printf(" %d", arr[i]);
 }
 ```
-Also sorting cdeq/cqueue (with ring buffer) is possible, and very fast. Note that `i_more`
-must be defined to "extend the life" of specified template parameters for use by quicksort:
+Also sorting deq/queue (with ring buffer) is possible, and very fast. Note that `i_more`
+must be defined to extend the life of specified template parameters for use by quicksort:
 ```c
-#define i_type MyDeq
-#define i_key int
+#define i_TYPE MyDeq,int
 #define i_more
-#include "stc/cdeq.h" // deque
+#include "stc/deq.h" // deque
 #include "stc/algo/quicksort.h"
 #include <stdio.h>
 
@@ -304,7 +301,7 @@ intptr_t n = c_arraylen(array);
 ### c_swap, c_const_cast
 ```c
 // Safe macro for swapping internals of two objects of same type:
-c_swap(cmap_int, &map1, &map2);
+c_swap(hmap_int, &map1, &map2);
 
 // Type-safe casting a from const (pointer):
 const char cs[] = "Hello";
@@ -326,7 +323,7 @@ Default implementations
 ```c
 int         c_default_cmp(const Type*, const Type*);    // <=>
 bool        c_default_less(const Type*, const Type*);   // <
-bool        c_default_eq(const Type*, const Type*);     // == 
+bool        c_default_eq(const Type*, const Type*);     // ==
 uint64_t    c_default_hash(const Type*);
 Type        c_default_clone(Type val);                  // return val
 Type        c_default_toraw(const Type* p);             // return *p
@@ -400,23 +397,23 @@ return ok;
 #include "stc/cstr.h"
 
 #define i_key_str
-#include "stc/cvec.h"
+#include "stc/vec.h"
 
 // receiver should check errno variable
-cvec_str readFile(const char* name)
+vec_str readFile(const char* name)
 {
-    cvec_str vec = {0}; // returned
+    vec_str vec = {0}; // returned
     c_with (FILE* fp = fopen(name, "r"), fp != NULL, fclose(fp))
     c_with (cstr line = {0}, cstr_drop(&line))
         while (cstr_getline(&line, fp))
-            cvec_str_emplace(&vec, cstr_str(&line));
+            vec_str_emplace(&vec, cstr_str(&line));
     return vec;
 }
 
 int main(void)
 {
-    c_with (cvec_str vec = readFile(__FILE__), cvec_str_drop(&vec))
-        c_foreach (i, cvec_str, vec)
+    c_with (vec_str vec = readFile(__FILE__), vec_str_drop(&vec))
+        c_foreach (i, vec_str, vec)
             printf("| %s\n", cstr_str(i.ref));
 }
 ```

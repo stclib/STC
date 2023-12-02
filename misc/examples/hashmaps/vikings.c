@@ -39,7 +39,7 @@ static inline RViking Viking_toraw(const Viking* vp) {
 #define i_val       int         // mapped type
 #define i_opt       c_no_clone
 #define i_hash(rp)  stc_hash_mix(stc_strhash(rp->name), stc_strhash(rp->country))
-#include "stc/cmap.h"
+#include "stc/hmap.h"
 
 int main(void)
 {

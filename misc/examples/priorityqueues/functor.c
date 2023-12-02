@@ -5,20 +5,20 @@
 #include <stdio.h>
 
 #define i_type IPQue
-#define i_base cpque
+#define i_base pque
 #define i_key int
 #define i_extend bool(*less)(const int*, const int*);
 #define i_less(x, y) c_extend()->less(x, y)
-// Note: i_less: c_extend() accessible for cpque types
-//       i_cmp: c_extend() accessible for csmap and csset types
-//       i_hash/i_eq: c_extend() accessible for cmap and cset types
+// Note: i_less: c_extend() accessible for pque types
+//       i_cmp: c_extend() accessible for smap and sset types
+//       i_hash/i_eq: c_extend() accessible for hmap and hset types
 #include "stc/extend.h"
 
 void print_queue(const char* name, IPQue_ext q) {
     // NB: make a clone because there is no way to traverse
     // priority queue's content without erasing the queue.
     IPQue_ext copy = {q.less, IPQue_clone(q.get)};
-    
+
     for (printf("%s: \t", name); !IPQue_empty(&copy.get); IPQue_pop(&copy.get))
         printf("%d ", *IPQue_top(&copy.get));
     puts("");

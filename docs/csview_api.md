@@ -180,14 +180,14 @@ void print_split(csview input, const char* sep)
 #define i_implement
 #include "stc/cstr.h"
 #define i_key_str
-#include "stc/cstack.h"
+#include "stc/stack.h"
 
-cstack_str string_split(csview input, const char* sep)
+stack_str string_split(csview input, const char* sep)
 {
-    cstack_str out = cstack_str_init();
+    stack_str out = stack_str_init();
 
     c_fortoken_sv (i, input, sep)
-        cstack_str_push(&out, cstr_from_sv(i.token));
+        stack_str_push(&out, cstr_from_sv(i.token));
 
     return out;
 }
@@ -197,13 +197,13 @@ int main(void)
     print_split(c_sv("//This is a//double-slash//separated//string"), "//");
     print_split(c_sv("This has no matching separator"), "xx");
 
-    cstack_str s = string_split(c_sv("Split,this,,string,now,"), ",");
+    stack_str s = string_split(c_sv("Split,this,,string,now,"), ",");
 
-    c_foreach (i, cstack_str, s)
+    c_foreach (i, stack_str, s)
         printf("[%s]\n", cstr_str(i.ref));
     puts("");
 
-    cstack_str_drop(&s);
+    stack_str_drop(&s);
 }
 ```
 Output:

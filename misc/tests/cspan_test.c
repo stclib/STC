@@ -44,14 +44,14 @@ CTEST(cspan, slice) {
 }
 
 #define i_key int
-#include "stc/cstack.h"
+#include "stc/stack.h"
 
 CTEST(cspan, slice2) {
-    cstack_int stack = {0};
-    c_defer (cstack_int_drop(&stack))
+    stack_int stack = {0};
+    c_defer (stack_int_drop(&stack))
     {
         c_forrange (i, 10*20*30)
-            cstack_int_push(&stack, i);
+            stack_int_push(&stack, i);
 
         intspan3 ms3 = cspan_md(stack.data, 10, 20, 30);
         ms3 = cspan_slice(intspan3, &ms3, {1,4}, {3,7}, {20,24});
@@ -74,23 +74,23 @@ CTEST(cspan, slice2) {
 }
 
 
-#define i_T Tiles,intspan3
-#include "stc/cstack.h"
+#define i_TYPE Tiles,intspan3
+#include "stc/stack.h"
 
 CTEST_FIXTURE(cspan_cube) {
-    cstack_int stack;
+    stack_int stack;
     Tiles tiles;
 };
 
 CTEST_SETUP(cspan_cube) {
     enum {TSIZE=4, CUBE=64, N=CUBE*CUBE*CUBE};
 
-    _self->stack = cstack_int_init();
+    _self->stack = stack_int_init();
     _self->tiles = Tiles_init();
 
-    cstack_int_reserve(&_self->stack, N);
+    stack_int_reserve(&_self->stack, N);
     c_forrange (i, N)
-        cstack_int_push(&_self->stack, i+1);
+        stack_int_push(&_self->stack, i+1);
 
     intspan3 ms3 = cspan_md(_self->stack.data, CUBE, CUBE, CUBE);
 
@@ -106,13 +106,13 @@ CTEST_SETUP(cspan_cube) {
 
 // Optional teardown function for suite, called after every test in suite
 CTEST_TEARDOWN(cspan_cube) {
-    cstack_int_drop(&_self->stack);
+    stack_int_drop(&_self->stack);
     Tiles_drop(&_self->tiles);
 }
 
 
 CTEST_F(cspan_cube, slice3) {
-    long long n = cstack_int_size(&_self->stack);
+    long long n = stack_int_size(&_self->stack);
     long long sum = 0;
 
     // iterate each 3d tile in sequence

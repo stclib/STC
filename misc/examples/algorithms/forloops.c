@@ -1,11 +1,11 @@
 #include <stdio.h>
 #include "stc/algorithm.h"
 
-#define i_T IVec,int
-#include "stc/cstack.h"
+#define i_TYPE IVec,int
+#include "stc/stack.h"
 
-#define i_T IMap,int,int
-#include "stc/cmap.h"
+#define i_TYPE IMap,int,int
+#include "stc/hmap.h"
 
 
 int main(void)

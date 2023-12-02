@@ -1,30 +1,31 @@
-# STC [carc](../include/stc/carc.h): Atomic Reference Counted Smart Pointer
+# STC [arc](../include/stc/arc.h): Atomic Reference Counted Smart Pointer
 
-**carc** is a smart pointer that retains shared ownership of an object through a pointer.
-Several **carc** objects may own the same object. The object is destroyed and its memory
-deallocated when the last remaining **carc** owning the object is destroyed with *carc_X_drop()*;
+**arc** is a smart pointer that retains shared ownership of an object through a pointer.
+Several **arc** objects may own the same object. The object is destroyed and its memory
+deallocated when the last remaining **arc** owning the object is destroyed with *arc_X_drop()*;
 
-The object is destroyed using *carc_X_drop()*. A **carc** may also own no objects, in which 
-case it is called empty. The *carc_X_cmp()*, *carc_X_drop()* methods are defined based on
-the `i_cmp` and `i_keydrop` macros specified. Use *carc_X_clone(p)* when sharing ownership of
-the pointed-to object. 
+The object is destroyed using *arc_X_drop()*. A **arc** may also own no objects, in which
+case it is called empty. The *arc_X_cmp()*, *arc_X_drop()* methods are defined based on
+the `i_cmp` and `i_keydrop` macros specified. Use *arc_X_clone(p)* when sharing ownership of
+the pointed-to object.
 
-All **carc** functions can be called by multiple threads on different instances of **carc** without
+All **arc** functions can be called by multiple threads on different instances of **arc** without
 additional synchronization even if these instances are copies and share ownership of the same object.
-**carc** uses thread-safe atomic reference counting, through the *carc_X_clone()* and *carc_X_drop()* methods.
+**arc** uses thread-safe atomic reference counting, through the *arc_X_clone()* and *arc_X_drop()* methods.
 
-When declaring a container with shared pointers, define `i_key_arcbox` with the carc type, see example.
+When declaring a container with shared pointers, define `i_key_arcbox` with the arc type, see example.
 
 See similar c++ class [std::shared_ptr](https://en.cppreference.com/w/cpp/memory/shared_ptr) for a functional reference, or Rust [std::sync::Arc](https://doc.rust-lang.org/std/sync/struct.Arc.html) / [std::rc::Rc](https://doc.rust-lang.org/std/rc/struct.Rc.html).
 
 ## Header file and declaration
 
 ```c
+#define i_type <name>      // arc container type name
 #define i_key <t>          // element type: REQUIRED. Note: i_val* may be specified instead of i_key*.
-#define i_type <t>         // carc container type name
+#define i_TYPE <name>,<t>  // alternative shorthand to define i_type,i_key
 #define i_cmp <f>          // three-way compareison. REQUIRED IF i_key is a non-integral type
-                           // Note that containers of carcs will "inherit" i_cmp
-                           // when using carc in containers with i_val_arcbox MyArc - ie. the i_type.
+                           // Note that containers of arcs will "inherit" i_cmp
+                           // when using arc in containers with i_val_arcbox MyArc - ie. the i_type.
 #define i_use_cmp          // define instead of i_cmp only when i_key is an integral/native-type.
 #define i_keydrop <f>      // destroy element func - defaults to empty destruct
 #define i_keyclone <f>     // REQUIRED if i_keydrop is defined, unless 'i_opt c_no_clone' is defined.
@@ -34,54 +35,54 @@ See similar c++ class [std::shared_ptr](https://en.cppreference.com/w/cpp/memory
 #define i_keyfrom <f>      // from-raw func.
 
 #define i_opt c_no_atomic  // Non-atomic reference counting, like Rust Rc.
-#define i_tag <s>          // alternative typename: carc_{i_tag}. i_tag defaults to i_key
-#include "stc/carc.h"
+#define i_tag <s>          // alternative typename: arc_{i_tag}. i_tag defaults to i_key
+#include "stc/arc.h"
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.
 
 ## Methods
 ```c
-carc_X      carc_X_init();                                     // empty shared pointer
-carc_X      carc_X_from(i_keyraw raw);                         // create an carc from raw type (available if i_keyraw defined by user).
-carc_X      carc_X_from_ptr(i_key* p);                         // create an carc from raw pointer. Takes ownership of p.
-carc_X      carc_X_make(i_key key);                            // create an carc from constructed key object. Faster than from_ptr().
+arc_X      arc_X_init();                                    // empty shared pointer
+arc_X      arc_X_from(i_keyraw raw);                        // create an arc from raw type (available if i_keyraw defined by user).
+arc_X      arc_X_from_ptr(i_key* p);                        // create an arc from raw pointer. Takes ownership of p.
+arc_X      arc_X_make(i_key key);                           // create an arc from constructed key object. Faster than from_ptr().
 
-carc_X      carc_X_clone(carc_X other);                        // return other with increased use count
-carc_X      carc_X_move(carc_X* self);                         // transfer ownership to receiver; self becomes NULL
-void        carc_X_take(carc_X* self, carc_X unowned);         // take ownership of unowned.
-void        carc_X_assign(carc_X* self, carc_X other);         // shared assign (increases use count)
+arc_X      arc_X_clone(arc_X other);                        // return other with increased use count
+arc_X      arc_X_move(arc_X* self);                         // transfer ownership to receiver; self becomes NULL
+void        arc_X_take(arc_X* self, arc_X unowned);         // take ownership of unowned.
+void        arc_X_assign(arc_X* self, arc_X other);         // shared assign (increases use count)
 
-void        carc_X_drop(carc_X* self);                         // destruct (decrease use count, free at 0)
-long        carc_X_use_count(const carc_X* self);    
+void        arc_X_drop(arc_X* self);                        // destruct (decrease use count, free at 0)
+long        arc_X_use_count(const arc_X* self);
 
-void        carc_X_reset(carc_X* self);    
-void        carc_X_reset_to(carc_X* self, i_key* p);           // assign new carc from ptr. Takes ownership of p.
+void        arc_X_reset(arc_X* self);
+void        arc_X_reset_to(arc_X* self, i_key* p);          // assign new arc from ptr. Takes ownership of p.
 
-uint64_t    carc_X_hash(const carc_X* x);                      // hash value
-int         carc_X_cmp(const carc_X* x, const carc_X* y);      // compares pointer addresses if no `i_cmp` is specified.
-                                                               // is defined. Otherwise uses 'i_cmp' or default cmp.
-bool        carc_X_eq(const carc_X* x, const carc_X* y);       // carc_X_cmp() == 0
+uint64_t    arc_X_hash(const arc_X* x);                     // hash value
+int         arc_X_cmp(const arc_X* x, const arc_X* y);      // compares pointer addresses if no `i_cmp` is specified.
+                                                            // is defined. Otherwise uses 'i_cmp' or default cmp.
+bool        arc_X_eq(const arc_X* x, const arc_X* y);       // arc_X_cmp() == 0
 
 // functions on pointed to objects.
 
-uint64_t    carc_X_value_hash(const i_key* x);
-int         carc_X_value_cmp(const i_key* x, const i_key* y);
-bool        carc_X_value_eq(const i_key* x, const i_key* y);
+uint64_t    arc_X_value_hash(const i_key* x);
+int         arc_X_value_cmp(const i_key* x, const i_key* y);
+bool        arc_X_value_eq(const i_key* x, const i_key* y);
 ```
 
 ## Types and constants
 
-| Type name         | Type definition                                   | Used to represent...   |
-|:------------------|:--------------------------------------------------|:-----------------------|
-| `carc_null`       | `{0}`                                             | Init nullptr const     |
-| `carc_X`          | `struct { carc_X_value* get; long* use_count; }`  | The carc type          |
-| `carc_X_value`    | `i_key`                                           | The carc element type  |
-| `carc_X_raw`      | `i_keyraw`                                        | Convertion type        |
+| Type name        | Type definition                                   | Used to represent...   |
+|:-----------------|:--------------------------------------------------|:-----------------------|
+| `arc_null`       | `{0}`                                             | Init nullptr const     |
+| `arc_X`          | `struct { arc_X_value* get; long* use_count; }`   | The arc type          |
+| `arc_X_value`    | `i_key`                                           | The arc element type  |
+| `arc_X_raw`      | `i_keyraw`                                        | Convertion type        |
 
 ## Example
 
 ```c
-// Create two stacks with carcs to maps.
+// Create two stacks with arcs to maps.
 // Demonstrate sharing and cloning of maps.
 // Show elements dropped.
 #define i_implement
@@ -92,16 +93,16 @@ bool        carc_X_value_eq(const i_key* x, const i_key* y);
 #define i_val int // year
 // override cstr_drop(p) by defining i_keydrop:
 #define i_keydrop(p) (printf("  drop name: %s\n", cstr_str(p)), cstr_drop(p))
-#include "stc/csmap.h"
+#include "stc/smap.h"
 
 #define i_type Arc // (atomic) ref. counted pointer
 #define i_key Map
 #define i_keydrop(p) (printf("drop Arc:\n"), Map_drop(p))
-#include "stc/carc.h"
+#include "stc/arc.h"
 
 #define i_type Stack
-#define i_key_arcbox Arc // Note: use i_key_arcbox for carc or cbox value types
-#include "stc/cstack.h"
+#define i_key_arcbox Arc // Note: use i_key_arcbox for arc or box value types
+#include "stc/stack.h"
 
 int main(void)
 {
@@ -125,14 +126,14 @@ int main(void)
     Map_emplace(map, "Rick", 1974);
     Map_emplace(map, "Tracy", 2003);
 
-    // Share two Maps from s1 with s2 by cloning(=sharing) the carcs:
+    // Share two Maps from s1 with s2 by cloning(=sharing) the arcs:
     Stack_push(&s2, Arc_clone(s1.data[0]));
     Stack_push(&s2, Arc_clone(s1.data[1]));
-    
+
     // Deep-copy (does not share) a Map from s1 to s2.
     // s2 will contain two shared and two unshared maps.
     map = Stack_push(&s2, Arc_from(Map_clone(*s1.data[1].get)))->get;
-    
+
     // Add one more element to the cloned map:
     Map_emplace_or_assign(map, "Cloned", 2022);
 

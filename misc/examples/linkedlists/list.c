@@ -3,9 +3,9 @@
 #include "stc/algorithm.h"
 #include "stc/crand.h"
 
-#define i_T DList,double
+#define i_TYPE DList,double
 #define i_use_cmp
-#include "stc/clist.h"
+#include "stc/list.h"
 
 int main(void) {
     const int n = 3000000;

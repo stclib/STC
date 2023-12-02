@@ -56,8 +56,8 @@ void recursive_matrix_product(Mat2 A, Mat2 B, OutMat C)
 }
 
 
-#define i_T Values,double
-#include "stc/cstack.h"
+#define i_TYPE Values,double
+#include "stc/stack.h"
 #include "stc/crand.h"
 
 int main(void)

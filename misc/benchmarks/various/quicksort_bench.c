@@ -6,9 +6,9 @@
   #include <algorithm>
 #endif
 #define NDEBUG
-#define i_T Ints,int
+#define i_TYPE Ints,int
 #define i_more
-#include "stc/cvec.h"
+#include "stc/vec.h"
 #include "stc/algo/quicksort.h"
 
 #define ROTL(d,bits) ((d<<(bits)) | (d>>(8*sizeof(d)-(bits))))

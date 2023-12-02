@@ -11,20 +11,20 @@ uint64_t Person_hash(const Person* p);
 #define i_type PersonArc
 #define i_key_class Person // "class" assume _clone, _drop, _cmp, _hash is defined.
 #define i_use_cmp
-#include "stc/carc.h"
+#include "stc/arc.h"
 
-#define i_T IPtr,int
+#define i_TYPE IPtr,int
 #define i_keydrop(x) printf("drop: %d\n", *x)
 #define i_use_cmp
-#include "stc/carc.h"
+#include "stc/arc.h"
 
 #define i_type IPStack
 #define i_key_arcbox IPtr
-#include "stc/cstack.h"
+#include "stc/stack.h"
 
 #define i_type PASet
 #define i_key_arcbox PersonArc
-#include "stc/cset.h"
+#include "stc/hset.h"
 
 
 Person Person_make(const char* name, const char* last) {

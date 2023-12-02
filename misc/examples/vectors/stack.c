@@ -4,29 +4,29 @@
 #define i_tag i
 #define i_capacity 100
 #define i_key int
-#include "stc/cstack.h"
+#include "stc/stack.h"
 
 #define i_tag c
 #define i_key char
-#include "stc/cstack.h"
+#include "stc/stack.h"
 
 int main(void) {
-    cstack_i stack = {0};
-    cstack_c chars = {0};
+    stack_i stack = {0};
+    stack_c chars = {0};
 
     c_forrange (i, 101)
-        cstack_i_push(&stack, (int)(i*i));
+        stack_i_push(&stack, (int)(i*i));
 
-    printf("%d\n", *cstack_i_top(&stack));
+    printf("%d\n", *stack_i_top(&stack));
 
     c_forrange (i, 90)
-        cstack_i_pop(&stack);
+        stack_i_pop(&stack);
 
-    c_foreach (i, cstack_i, stack)
+    c_foreach (i, stack_i, stack)
         printf(" %d", *i.ref);
     puts("");
-    printf("top: %d\n", *cstack_i_top(&stack));
+    printf("top: %d\n", *stack_i_top(&stack));
 
-    cstack_i_drop(&stack);
-    cstack_c_drop(&chars);
+    stack_i_drop(&stack);
+    stack_c_drop(&chars);
 }
