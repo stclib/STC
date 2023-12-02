@@ -42,25 +42,25 @@ See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) fo
 ```c
 smap_X               smap_X_init(void);
 sset_X               smap_X_with_capacity(intptr_t cap);
-bool                  smap_X_reserve(smap_X* self, intptr_t cap);
-void                  smap_X_shrink_to_fit(smap_X* self);
+bool                 smap_X_reserve(smap_X* self, intptr_t cap);
+void                 smap_X_shrink_to_fit(smap_X* self);
 smap_X               smap_X_clone(smap_x map);
 
-void                  smap_X_clear(smap_X* self);
-void                  smap_X_copy(smap_X* self, const smap_X* other);
-void                  smap_X_drop(smap_X* self);                                               // destructor
+void                 smap_X_clear(smap_X* self);
+void                 smap_X_copy(smap_X* self, const smap_X* other);
+void                 smap_X_drop(smap_X* self);                                               // destructor
 
-bool                  smap_X_empty(const smap_X* self);
-intptr_t              smap_X_size(const smap_X* self);
-intptr_t              smap_X_capacity(const smap_X* self);
+bool                 smap_X_empty(const smap_X* self);
+intptr_t             smap_X_size(const smap_X* self);
+intptr_t             smap_X_capacity(const smap_X* self);
 
 const smap_X_mapped* smap_X_at(const smap_X* self, i_keyraw rkey);                            // rkey must be in map
 smap_X_mapped*       smap_X_at_mut(smap_X* self, i_keyraw rkey);                              // mutable at
 const smap_X_value*  smap_X_get(const smap_X* self, i_keyraw rkey);                           // return NULL if not found
 smap_X_value*        smap_X_get_mut(smap_X* self, i_keyraw rkey);                             // mutable get
-bool                  smap_X_contains(const smap_X* self, i_keyraw rkey);
+bool                 smap_X_contains(const smap_X* self, i_keyraw rkey);
 smap_X_iter          smap_X_find(const smap_X* self, i_keyraw rkey);
-smap_X_value*        smap_X_find_it(const smap_X* self, i_keyraw rkey, smap_X_iter* out);    // return NULL if not found
+smap_X_value*        smap_X_find_it(const smap_X* self, i_keyraw rkey, smap_X_iter* out);     // return NULL if not found
 smap_X_iter          smap_X_lower_bound(const smap_X* self, i_keyraw rkey);                   // find closest entry >= rkey
 
 smap_X_value*        smap_X_front(const smap_X* self);
@@ -68,36 +68,36 @@ smap_X_value*        smap_X_back(const smap_X* self);
 
 smap_X_result        smap_X_insert(smap_X* self, i_key key, i_val mapped);                    // no change if key in map
 smap_X_result        smap_X_insert_or_assign(smap_X* self, i_key key, i_val mapped);          // always update mapped
-smap_X_result        smap_X_push(smap_X* self, smap_X_value entry);                          // similar to insert()
+smap_X_result        smap_X_push(smap_X* self, smap_X_value entry);                           // similar to insert()
 
 smap_X_result        smap_X_emplace(smap_X* self, i_keyraw rkey, i_valraw rmapped);           // no change if rkey in map
 smap_X_result        smap_X_emplace_or_assign(smap_X* self, i_keyraw rkey, i_valraw rmapped); // always update rmapped
 smap_X_result        smap_X_emplace_key(smap_X* self, i_keyraw rkey);    // if key not in map, mapped is left unassigned
 
-int                   smap_X_erase(smap_X* self, i_keyraw rkey);
-smap_X_iter          smap_X_erase_at(smap_X* self, smap_X_iter it);                          // returns iter after it
-smap_X_iter          smap_X_erase_range(smap_X* self, smap_X_iter it1, smap_X_iter it2);    // returns updated it2
+int                  smap_X_erase(smap_X* self, i_keyraw rkey);
+smap_X_iter          smap_X_erase_at(smap_X* self, smap_X_iter it);                           // returns iter after it
+smap_X_iter          smap_X_erase_range(smap_X* self, smap_X_iter it1, smap_X_iter it2);      // returns updated it2
 
 smap_X_iter          smap_X_begin(const smap_X* self);
 smap_X_iter          smap_X_end(const smap_X* self);
-void                  smap_X_next(smap_X_iter* iter);
+void                 smap_X_next(smap_X_iter* iter);
 smap_X_iter          smap_X_advance(smap_X_iter it, intptr_t n);
 
 smap_X_value         smap_X_value_clone(smap_X_value val);
 smap_X_raw           smap_X_value_toraw(const smap_X_value* pval);
-void                  smap_X_value_drop(smap_X_value* pval);
+void                 smap_X_value_drop(smap_X_value* pval);
 ```
 ## Types
 
-| Type name           | Type definition                                   | Used to represent...         |
-|:--------------------|:--------------------------------------------------|:-----------------------------|
-| `smap_X`           | `struct { ... }`                                  | The smap type               |
-| `smap_X_key`       | `i_key`                                           | The key type                 |
-| `smap_X_mapped`    | `i_val`                                           | The mapped type              |
-| `smap_X_value`     | `struct { i_key first; i_val second; }`           | The value: key is immutable  |
-| `smap_X_keyraw`    | `i_keyraw`                                        | The raw key type             |
-| `smap_X_rmapped`   | `i_valraw`                                        | The raw mapped type          |
-| `smap_X_raw`       | `struct { i_keyraw first; i_valraw second; }`     | i_keyraw+i_valraw type       |
+| Type name          | Type definition                                  | Used to represent...         |
+|:-------------------|:-------------------------------------------------|:-----------------------------|
+| `smap_X`           | `struct { ... }`                                 | The smap type                |
+| `smap_X_key`       | `i_key`                                          | The key type                 |
+| `smap_X_mapped`    | `i_val`                                          | The mapped type              |
+| `smap_X_value`     | `struct { i_key first; i_val second; }`          | The value: key is immutable  |
+| `smap_X_keyraw`    | `i_keyraw`                                       | The raw key type             |
+| `smap_X_rmapped`   | `i_valraw`                                       | The raw mapped type          |
+| `smap_X_raw`       | `struct { i_keyraw first; i_valraw second; }`    | i_keyraw+i_valraw type       |
 | `smap_X_result`    | `struct { smap_X_value *ref; bool inserted; }`   | Result of insert/put/emplace |
 | `smap_X_iter`      | `struct { smap_X_value *ref; ... }`              | Iterator type                |
 
@@ -149,7 +149,7 @@ Translate a
 [C++ example using *insert* and *emplace*](https://en.cppreference.com/w/cpp/container/map/try_emplace)
  to STC:
 
-[ [Run this code](https://godbolt.org/z/o6qqsE9K9) ]
+[ [Run this code](https://godbolt.org/z/rea8Garn8) ]
 ```c
 #define i_implement
 #include "stc/cstr.h"

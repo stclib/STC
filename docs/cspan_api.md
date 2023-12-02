@@ -104,7 +104,7 @@ OutSpanM        cspan_slice(<TYPE> OutSpanM, const SpanTypeN* self, {x0,x1,xs}, 
 
 ## Example 1
 
-[ [Run this code](https://godbolt.org/z/85GGq8naq) ]
+[ [Run this code](https://godbolt.org/z/qrdcjPaqK) ]
 ```c
 #include <stdio.h>
 #define i_key int
