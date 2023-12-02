@@ -22,7 +22,7 @@
  */
 
 #ifndef i_is_forward
-_c_DEFTYPES(_c_cdeq_types, i_type, i_key);
+_c_DEFTYPES(_c_deq_types, i_type, i_key);
 #endif
 typedef i_keyraw _m_raw;
 
@@ -34,8 +34,8 @@ STC_API _m_value*       _c_MEMB(_push)(i_type* self, _m_value value); // push_ba
 STC_API void            _c_MEMB(_shrink_to_fit)(i_type *self);
 STC_API _m_iter         _c_MEMB(_advance)(_m_iter it, intptr_t n);
 
-#define _cdeq_toidx(self, pos) (((pos) - (self)->start) & (self)->capmask)
-#define _cdeq_topos(self, idx) (((self)->start + (idx)) & (self)->capmask)
+#define _cbuf_toidx(self, pos) (((pos) - (self)->start) & (self)->capmask)
+#define _cbuf_topos(self, idx) (((self)->start + (idx)) & (self)->capmask)
 
 STC_INLINE i_type       _c_MEMB(_init)(void)
                             { i_type cx = {0}; return cx; }
@@ -64,8 +64,8 @@ STC_INLINE void         _c_MEMB(_copy)(i_type* self, const i_type* other) {
                             *self = _c_MEMB(_clone)(*other);
                         }
 #endif // !i_no_clone
-STC_INLINE intptr_t     _c_MEMB(_size)(const i_type* self) 
-                            { return _cdeq_toidx(self, self->end); }
+STC_INLINE intptr_t     _c_MEMB(_size)(const i_type* self)
+                            { return _cbuf_toidx(self, self->end); }
 STC_INLINE intptr_t     _c_MEMB(_capacity)(const i_type* self)
                             { return self->capmask; }
 STC_INLINE bool         _c_MEMB(_empty)(const i_type* self)
@@ -73,7 +73,7 @@ STC_INLINE bool         _c_MEMB(_empty)(const i_type* self)
 STC_INLINE _m_raw       _c_MEMB(_value_toraw)(const _m_value* pval)
                             { return i_keyto(pval); }
 
-STC_INLINE _m_value*    _c_MEMB(_front)(const i_type* self) 
+STC_INLINE _m_value*    _c_MEMB(_front)(const i_type* self)
                             { return self->cbuf + self->start; }
 
 STC_INLINE _m_value*    _c_MEMB(_back)(const i_type* self)
@@ -109,7 +109,7 @@ STC_INLINE void _c_MEMB(_next)(_m_iter* it) {
 }
 
 STC_INLINE intptr_t _c_MEMB(_index)(const i_type* self, _m_iter it)
-    { return _cdeq_toidx(self, it.pos); }
+    { return _cbuf_toidx(self, it.pos); }
 
 STC_INLINE void _c_MEMB(_adjust_end_)(i_type* self, intptr_t n)
     { self->end = (self->end + n) & self->capmask; }

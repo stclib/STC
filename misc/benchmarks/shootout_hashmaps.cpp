@@ -32,28 +32,25 @@ typedef int64_t IValue;
 #include "external/khash.h"
 KHASH_MAP_INIT_INT64(ii, IValue)
 
-// cmap template expansion
-#define i_key IKey
-#define i_val IValue
-#define i_tag ii
-//#define i_expandby 1
+// STC hmap template definition
+#define i_TYPE hmap_ii,IKey,IValue
 #define i_max_load_factor MAX_LOAD_FACTOR / 100.0f
-#include "stc/cmap.h"
+#include "stc/hmap.h"
 
 #define SEED(s) rng = crand_init(s)
 #define RAND(N) (crand_u64(&rng) & (((uint64_t)1 << N) - 1))
 
-#define CMAP_SETUP(X, Key, Value) cmap_##X map = cmap_##X##_init()
-#define CMAP_PUT(X, key, val)     cmap_##X##_insert_or_assign(&map, key, val).ref->second
-#define CMAP_EMPLACE(X, key, val) cmap_##X##_insert(&map, key, val).ref->second
-#define CMAP_ERASE(X, key)        cmap_##X##_erase(&map, key)
-#define CMAP_FIND(X, key)         cmap_##X##_contains(&map, key)
-#define CMAP_FOR(X, i)            c_foreach (i, cmap_##X, map)
+#define CMAP_SETUP(X, Key, Value) hmap_##X map = hmap_##X##_init()
+#define CMAP_PUT(X, key, val)     hmap_##X##_insert_or_assign(&map, key, val).ref->second
+#define CMAP_EMPLACE(X, key, val) hmap_##X##_insert(&map, key, val).ref->second
+#define CMAP_ERASE(X, key)        hmap_##X##_erase(&map, key)
+#define CMAP_FIND(X, key)         hmap_##X##_contains(&map, key)
+#define CMAP_FOR(X, i)            c_foreach (i, hmap_##X, map)
 #define CMAP_ITEM(X, i)           i.ref->second
-#define CMAP_SIZE(X)              cmap_##X##_size(&map)
-#define CMAP_BUCKETS(X)           cmap_##X##_bucket_count(&map)
-#define CMAP_CLEAR(X)             cmap_##X##_clear(&map)
-#define CMAP_DTOR(X)              cmap_##X##_drop(&map)
+#define CMAP_SIZE(X)              hmap_##X##_size(&map)
+#define CMAP_BUCKETS(X)           hmap_##X##_bucket_count(&map)
+#define CMAP_CLEAR(X)             hmap_##X##_clear(&map)
+#define CMAP_DTOR(X)              hmap_##X##_drop(&map)
 
 #define KMAP_SETUP(X, Key, Value) khash_t(X)* map = kh_init(X); khiter_t ki; int ret
 #define KMAP_PUT(X, key, val)     (ki = kh_put(X, map, key, &ret), \
@@ -109,19 +106,6 @@ KHASH_MAP_INIT_INT64(ii, IValue)
 #define BMAP_BUCKETS(X)           UMAP_BUCKETS(X)
 #define BMAP_CLEAR(X)             UMAP_CLEAR(X)
 #define BMAP_DTOR(X)              UMAP_DTOR(X)
-
-#define HMAP_SETUP(X, Key, Value) tsl::hopscotch_map<Key, Value> map; \
-                                  map.max_load_factor(MAX_LOAD_FACTOR/100.0f)
-#define HMAP_PUT(X, key, val)     UMAP_PUT(X, key, val)
-#define HMAP_EMPLACE(X, key, val) map.emplace(key, val).first.value()
-#define HMAP_FIND(X, key)         UMAP_FIND(X, key)
-#define HMAP_ERASE(X, key)        UMAP_ERASE(X, key)
-#define HMAP_FOR(X, i)            UMAP_FOR(X, i)
-#define HMAP_ITEM(X, i)           UMAP_ITEM(X, i)
-#define HMAP_SIZE(X)              UMAP_SIZE(X)
-#define HMAP_BUCKETS(X)           UMAP_BUCKETS(X)
-#define HMAP_CLEAR(X)             UMAP_CLEAR(X)
-#define HMAP_DTOR(X)              UMAP_DTOR(X)
 
 #define TMAP_SETUP(X, Key, Value) tsl::robin_map<Key, Value> map; \
                                   map.max_load_factor(MAX_LOAD_FACTOR/100.0f)
@@ -319,12 +303,13 @@ int main(int argc, char* argv[])
 
     printf("\nUnordered hash map shootout\n");
     printf("KMAP = https://github.com/attractivechaos/klib\n"
+#ifdef HAVE_BOOST      
            "BMAP = https://www.boost.org (unordered_flat_map)\n"
-           "CMAP = https://github.com/tylov/STC (**)\n"
+#endif
+           "CMAP = https://github.com/stclib/STC (**)\n"
            //"PMAP = https://github.com/greg7mdp/parallel-hashmap\n"
            "FMAP = https://github.com/skarupke/flat_hash_map\n"
            "TMAP = https://github.com/Tessil/robin-map\n"
-           //"HMAP = https://github.com/Tessil/hopscotch-map\n"
            "RMAP = https://github.com/martinus/robin-hood-hashing\n"
            "DMAP = https://github.com/martinus/unordered_dense\n"
            "EMAP = https://github.com//ktprime/emhash\n"

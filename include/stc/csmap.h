@@ -30,23 +30,23 @@
 #define i_tag sx  // Sorted map<cstr, double>
 #define i_key_str
 #define i_val double
-#include "stc/csmap.h"
+#include "stc/smap.h"
 
 int main(void) {
-    csmap_sx m = {0};
-    csmap_sx_emplace(&m, "Testing one", 1.234);
-    csmap_sx_emplace(&m, "Testing two", 12.34);
-    csmap_sx_emplace(&m, "Testing three", 123.4);
+    smap_sx m = {0};
+    smap_sx_emplace(&m, "Testing one", 1.234);
+    smap_sx_emplace(&m, "Testing two", 12.34);
+    smap_sx_emplace(&m, "Testing three", 123.4);
 
-    csmap_sx_value *v = csmap_sx_get(&m, "Testing five"); // NULL
-    double num = *csmap_sx_at(&m, "Testing one");
-    csmap_sx_emplace_or_assign(&m, "Testing three", 1000.0); // update
-    csmap_sx_erase(&m, "Testing two");
+    smap_sx_value *v = smap_sx_get(&m, "Testing five"); // NULL
+    double num = *smap_sx_at(&m, "Testing one");
+    smap_sx_emplace_or_assign(&m, "Testing three", 1000.0); // update
+    smap_sx_erase(&m, "Testing two");
 
-    c_foreach (i, csmap_sx, m)
+    c_foreach (i, smap_sx, m)
         printf("map %s: %g\n", cstr_str(&i.ref->first), i.ref->second);
 
-    csmap_sx_drop(&m);
+    smap_sx_drop(&m);
 }
 */
 #include "priv/linkage.h"
@@ -602,4 +602,3 @@ _c_MEMB(_drop)(i_type* self) {
 #define CSMAP_H_INCLUDED
 #include "priv/template2.h"
 #include "priv/linkage2.h"
-

@@ -60,7 +60,7 @@ typedef long long _llong;
 #define _c_SEL31(a, b, c) a
 #define _c_SEL32(a, b, c) b
 #define _c_SEL33(a, b, c) c
-#define _c_SEL(selNN, args) selNN args
+#define _c_SEL(S, ...) S(__VA_ARGS__)
 
 #ifndef __cplusplus
     #define _i_alloc(T)         ((T*)i_malloc(c_sizeof(T)))

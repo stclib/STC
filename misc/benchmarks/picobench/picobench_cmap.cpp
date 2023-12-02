@@ -71,7 +71,7 @@ static void ins_and_erase_i(picobench::state& s)
 /*
 static void ins_and_erase_cmap_i(picobench::state& s)
 {
-    cmap_i map = cmap_i_init();
+    cmap_i map = {0};
     csrand(seed);
 
     picobench::scope scope(s);
@@ -90,7 +90,7 @@ static void ins_and_erase_cmap_i(picobench::state& s)
 */
 static void ins_and_erase_cmap_x(picobench::state& s)
 {
-    cmap_x map = cmap_x_init();
+    cmap_x map = {0};
     csrand(seed);
 
     picobench::scope scope(s);
@@ -136,7 +136,7 @@ static void ins_and_access_cmap_i(picobench::state& s)
 {
     uint64_t mask = (1ull << s.arg()) - 1;
     size_t result = 0;
-    cmap_i map = cmap_i_init();
+    cmap_i map = {0};
     csrand(seed);
 
     picobench::scope scope(s);
@@ -188,7 +188,7 @@ static void ins_and_access_cmap_s(picobench::state& s)
     cstr str = cstr_with_size(s.arg(), 'x');
     char* buf = cstr_data(&str);
     size_t result = 0;
-    cmap_str map = cmap_str_init();
+    cmap_str map = {0};
     csrand(seed);
 
     picobench::scope scope(s);
@@ -247,7 +247,7 @@ static void iterate_x(picobench::state& s)
 
 static void iterate_cmap_x(picobench::state& s)
 {
-    cmap_x map = cmap_x_init();
+    cmap_x map = {0};
     uint64_t K = (1ull << s.arg()) - 1;
 
     picobench::scope scope(s);

@@ -25,16 +25,15 @@ if(BUILD_TESTING)
 		target_link_libraries(${name} PRIVATE stc m)
 		add_test(NAME ${name} COMMAND ${name})
 	endforeach()
-	
+
 	file(GLOB test_files misc/tests/*_test.c)
 	add_executable(stctest ${test_files} misc/tests/main.c)
 	target_link_libraries(stctest PRIVATE stc m)
 	add_test(NAME stctest COMMAND stctest)
 
-	# foreach(name IN ITEMS cdeq clist cmap csmap cvec)
+	# foreach(name IN ITEMS deq list hmap smap vec)
 	#	add_executable(${name} misc/benchmarks/plotbench/${name}_benchmark.cpp)
 	#	target_link_libraries(${name} PRIVATE stc m)
 	#	add_test(NAME ${name} COMMAND ${name})
 	# endforeach()
 endif()
-

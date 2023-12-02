@@ -48,12 +48,12 @@
 #endif
 
 #if defined i_TYPE && defined _i_ismap
-  #define i_type _c_SEL(_c_SEL31, (i_TYPE))
-  #define i_key _c_SEL(_c_SEL32, (i_TYPE))
-  #define i_val _c_SEL(_c_SEL33, (i_TYPE))
+  #define i_type _c_SEL(_c_SEL31, i_TYPE)
+  #define i_key _c_SEL(_c_SEL32, i_TYPE)
+  #define i_val _c_SEL(_c_SEL33, i_TYPE)
 #elif defined i_TYPE
-  #define i_type _c_SEL(_c_SEL21, (i_TYPE))
-  #define i_key _c_SEL(_c_SEL22, (i_TYPE))
+  #define i_type _c_SEL(_c_SEL21, i_TYPE)
+  #define i_key _c_SEL(_c_SEL22, i_TYPE)
 #endif
 #ifndef i_type
   #define i_type c_JOIN(_i_prefix, i_tag)

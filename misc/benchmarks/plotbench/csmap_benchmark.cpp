@@ -47,7 +47,7 @@ Sample test_std_map() {
         s.test[FIND].t1 = clock();
         size_t sum = 0;
         container::iterator it;
-        c_forrange (N) 
+        c_forrange (N)
             if ((it = con.find(crand() & mask1)) != con.end())
                 sum += it->second;
         s.test[FIND].t2 = clock();
@@ -75,7 +75,7 @@ Sample test_stc_map() {
     {
         csrand(seed);
         s.test[INSERT].t1 = clock();
-        container con = csmap_x_init();
+        container con = {0};
         c_forrange (i, N/2) csmap_x_insert(&con, crand() & mask1, i);
         c_forrange (i, N/2) csmap_x_insert(&con, i, i);
         s.test[INSERT].t2 = clock();
@@ -87,7 +87,7 @@ Sample test_stc_map() {
         s.test[ERASE].sum = csmap_x_size(&con);
         csmap_x_drop(&con);
      }{
-        container con = csmap_x_init();
+        container con = {0};
         csrand(seed);
         c_forrange (i, N/2) csmap_x_insert(&con, crand() & mask1, i);
         c_forrange (i, N/2) csmap_x_insert(&con, i, i);

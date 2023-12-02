@@ -575,7 +575,7 @@ Implement PointVec in a c-file:
 #include "stc/forward.h"   // include various container data structure templates
 
 // declare PointVec. Note: struct Point may be an incomplete/undeclared type.
-forward_cvec(PointVec, struct Point);
+forward_vec(PointVec, struct Point);
 
 typedef struct Dataset {
     PointVec vertices;

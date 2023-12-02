@@ -25,20 +25,19 @@
 /*
 #include <stdio.h>
 
-#define i_tag i
-#define i_key int
-#include "stc/csset.h" // sorted set of int
+#define i_TYPE sset_i,int
+#include "stc/sset.h" // sorted set of int
 
 int main(void) {
-    csset_i s = csset_i_init();
-    csset_i_insert(&s, 5);
-    csset_i_insert(&s, 8);
-    csset_i_insert(&s, 3);
-    csset_i_insert(&s, 5);
+    sset_i s = {0};
+    sset_i_insert(&s, 5);
+    sset_i_insert(&s, 8);
+    sset_i_insert(&s, 3);
+    sset_i_insert(&s, 5);
 
-    c_foreach (k, csset_i, s)
+    c_foreach (k, sset_i, s)
         printf("set %d\n", *k.ref);
-    csset_i_drop(&s);
+    sset_i_drop(&s);
 }
 */
 

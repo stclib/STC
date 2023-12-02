@@ -71,7 +71,7 @@ int main(void)
 {
     // Define the multimap with destructor defered to when block is completed.
     smap_OL multimap = {0};
-    const list_OL empty = list_OL_init();
+    const list_OL empty = {0};
 
     for (size_t i = 0; i < c_arraylen(ol_data); ++i)
     {

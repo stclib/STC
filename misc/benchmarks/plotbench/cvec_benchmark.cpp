@@ -19,7 +19,7 @@ static float secs(Range s) { return (float)(s.t2 - s.t1) / CLOCKS_PER_SEC; }
 
 #define i_val size_t
 #define i_tag x
-#include "stc/cvec.h"
+#include "stc/vec.h"
 
 #ifdef __cplusplus
 Sample test_std_vector() {
@@ -63,24 +63,24 @@ Sample test_std_vector() { Sample s = {"std-vector"}; return s;}
 
 
 Sample test_stc_vector() {
-    typedef cvec_x container;
+    typedef vec_x container;
     Sample s = {"STC,vector"};
     {
         s.test[INSERT].t1 = clock();
-        container con = cvec_x_init();
+        container con = {0};
         csrand(seed);
-        c_forrange (N) cvec_x_push(&con, crand() & mask1);
+        c_forrange (N) vec_x_push(&con, crand() & mask1);
         s.test[INSERT].t2 = clock();
-        s.test[INSERT].sum = cvec_x_size(&con);
+        s.test[INSERT].sum = vec_x_size(&con);
         s.test[ERASE].t1 = clock();
-        c_forrange (N) { cvec_x_pop(&con); }
+        c_forrange (N) { vec_x_pop(&con); }
         s.test[ERASE].t2 = clock();
-        s.test[ERASE].sum = cvec_x_size(&con);
-        cvec_x_drop(&con);
+        s.test[ERASE].sum = vec_x_size(&con);
+        vec_x_drop(&con);
      }{
         csrand(seed);
-        container con = cvec_x_init();
-        c_forrange (N) cvec_x_push(&con, crand() & mask2);
+        container con = {0};
+        c_forrange (N) vec_x_push(&con, crand() & mask2);
         s.test[FIND].t1 = clock();
         size_t sum = 0;
         c_forrange (R) c_forrange (i, N) sum += con.data[i];
@@ -88,11 +88,11 @@ Sample test_stc_vector() {
         s.test[FIND].sum = sum;
         s.test[ITER].t1 = clock();
         sum = 0;
-        c_forrange (R) c_foreach (i, cvec_x, con) sum += *i.ref;
+        c_forrange (R) c_foreach (i, vec_x, con) sum += *i.ref;
         s.test[ITER].t2 = clock();
         s.test[ITER].sum = sum;
         s.test[DESTRUCT].t1 = clock();
-        cvec_x_drop(&con);
+        vec_x_drop(&con);
      }
      s.test[DESTRUCT].t2 = clock();
      s.test[DESTRUCT].sum = 0;

@@ -81,7 +81,7 @@ void        cregex_drop(cregex* self);
 
 ### Compiling a regular expression
 ```c
-cregex re1 = cregex_init();
+cregex re1 = {0};
 int result = cregex_compile(&re1, "[0-9]+");
 if (result < 0) return result;
 

@@ -19,7 +19,7 @@ static float secs(Range s) { return (float)(s.t2 - s.t1) / CLOCKS_PER_SEC; }
 
 #define i_tag x
 #define i_val size_t
-#include "stc/cdeq.h"
+#include "stc/deq.h"
 
 #ifdef __cplusplus
 Sample test_std_deque() {
@@ -64,39 +64,39 @@ Sample test_std_deque() { Sample s = {"std-deque"}; return s;}
 
 
 Sample test_stc_deque() {
-    typedef cdeq_x container;
+    typedef deq_x container;
     Sample s = {"STC,deque"};
     {
         s.test[INSERT].t1 = clock();
-        container con = cdeq_x_init();
-        //cdeq_x_reserve(&con, N);
+        container con = {0};
+        //deq_x_reserve(&con, N);
         csrand(seed);
-        c_forrange (N/3) cdeq_x_push_front(&con, crand() & mask1);
-        c_forrange (N/3) {cdeq_x_push_back(&con, crand() & mask1); cdeq_x_pop_front(&con);}
-        c_forrange (N/3) cdeq_x_push_back(&con, crand() & mask1);
+        c_forrange (N/3) deq_x_push_front(&con, crand() & mask1);
+        c_forrange (N/3) {deq_x_push_back(&con, crand() & mask1); deq_x_pop_front(&con);}
+        c_forrange (N/3) deq_x_push_back(&con, crand() & mask1);
         s.test[INSERT].t2 = clock();
-        s.test[INSERT].sum = cdeq_x_size(&con);
+        s.test[INSERT].sum = deq_x_size(&con);
         s.test[ERASE].t1 = clock();
-        c_forrange (cdeq_x_size(&con)/2) { cdeq_x_pop_front(&con); cdeq_x_pop_back(&con); }
+        c_forrange (deq_x_size(&con)/2) { deq_x_pop_front(&con); deq_x_pop_back(&con); }
         s.test[ERASE].t2 = clock();
-        s.test[ERASE].sum = cdeq_x_size(&con);
-        cdeq_x_drop(&con);
+        s.test[ERASE].sum = deq_x_size(&con);
+        deq_x_drop(&con);
      }{
         csrand(seed);
-        container con = cdeq_x_init();
-        c_forrange (N) cdeq_x_push_back(&con, crand() & mask2);
+        container con = {0};
+        c_forrange (N) deq_x_push_back(&con, crand() & mask2);
         s.test[FIND].t1 = clock();
         size_t sum = 0;
-        c_forrange (R) c_forrange (i, N) sum += *cdeq_x_at(&con, i);
+        c_forrange (R) c_forrange (i, N) sum += *deq_x_at(&con, i);
         s.test[FIND].t2 = clock();
         s.test[FIND].sum = sum;
         s.test[ITER].t1 = clock();
         sum = 0;
-        c_forrange (R) c_foreach (i, cdeq_x, con) sum += *i.ref;
+        c_forrange (R) c_foreach (i, deq_x, con) sum += *i.ref;
         s.test[ITER].t2 = clock();
         s.test[ITER].sum = sum;
         s.test[DESTRUCT].t1 = clock();
-        cdeq_x_drop(&con);
+        deq_x_drop(&con);
      }
      s.test[DESTRUCT].t2 = clock();
      s.test[DESTRUCT].sum = 0;

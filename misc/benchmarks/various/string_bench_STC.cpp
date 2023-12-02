@@ -11,37 +11,37 @@
 #include "stc/algo/misc.h"
 
 #define i_key_str
-#include "stc/cvec.h"   // vec of cstr with const char* lookup
+#include "stc/vec.h"    // vec of cstr with const char* lookup
 
-#define i_type cvec_sv  // override default type name (cvec_csview)
+#define i_type vec_sv  // override default type name (vec_csview)
 #define i_key csview
 #define i_cmp csview_cmp
-#include "stc/cvec.h"   // cvec_vs: vec of csview
+#include "stc/vec.h"   // vec_vs: vec of csview
 
 #define i_key_str
 #define i_val size_t
-#include "stc/csmap.h"  // sorted map of cstr, const char* lookup
+#include "stc/smap.h"  // sorted map of cstr, const char* lookup
 
 #define i_key_ssv
 #define i_val size_t
-#include "stc/csmap.h"  // sorted map of cstr, csview lookup
+#include "stc/smap.h"  // sorted map of cstr, csview lookup
 
 #define i_key_str
 #define i_val size_t
-#include "stc/cmap.h"   // unordered map of cstr, const char* lookup
+#include "stc/hmap.h"   // unordered map of cstr, const char* lookup
 
 #define i_key_ssv
 #define i_val size_t
-#include "stc/cmap.h"   // unordered map of cstr, csview lookup
+#include "stc/hmap.h"   // unordered map of cstr, csview lookup
 
 
-cvec_str read_file(const char* name)
+vec_str read_file(const char* name)
 {
-    cvec_str data = {0};
+    vec_str data = {0};
     c_with (cstr line = {0}, cstr_drop(&line))
     c_with (FILE* f = fopen(name, "r"), fclose(f))
         while (cstr_getline(&line, f))
-            cvec_str_emplace_back(&data, cstr_str(&line));
+            vec_str_emplace_back(&data, cstr_str(&line));
     return data;
 }
 
@@ -67,137 +67,137 @@ private:
     std::chrono::high_resolution_clock::time_point begin;
 };
 
-void initShortStringVec(cvec_str* vs, cvec_sv* vsv)
+void initShortStringVec(vec_str* vs, vec_sv* vsv)
 {
-    cvec_str_drop(vs);
-    cvec_sv_clear(vsv);
-    
+    vec_str_drop(vs);
+    vec_sv_clear(vsv);
+
     *vs = read_file("names.txt");
 /*
-    cvec_str_emplace_back(vs, "Susan");
-    cvec_str_emplace_back(vs, "Jason");
-    cvec_str_emplace_back(vs, "Lily");
-    cvec_str_emplace_back(vs, "Michael");
-    cvec_str_emplace_back(vs, "Mary");
+    vec_str_emplace_back(vs, "Susan");
+    vec_str_emplace_back(vs, "Jason");
+    vec_str_emplace_back(vs, "Lily");
+    vec_str_emplace_back(vs, "Michael");
+    vec_str_emplace_back(vs, "Mary");
 
-    cvec_str_emplace_back(vs, "Jerry");
-    cvec_str_emplace_back(vs, "Jenny");
-    cvec_str_emplace_back(vs, "Klaus");
-    cvec_str_emplace_back(vs, "Celine");
-    cvec_str_emplace_back(vs, "Kenny");
+    vec_str_emplace_back(vs, "Jerry");
+    vec_str_emplace_back(vs, "Jenny");
+    vec_str_emplace_back(vs, "Klaus");
+    vec_str_emplace_back(vs, "Celine");
+    vec_str_emplace_back(vs, "Kenny");
 
-    cvec_str_emplace_back(vs, "Kelly");
-    cvec_str_emplace_back(vs, "Jackson");
-    cvec_str_emplace_back(vs, "Mandy");
-    cvec_str_emplace_back(vs, "Terry");
-    cvec_str_emplace_back(vs, "Sandy");
+    vec_str_emplace_back(vs, "Kelly");
+    vec_str_emplace_back(vs, "Jackson");
+    vec_str_emplace_back(vs, "Mandy");
+    vec_str_emplace_back(vs, "Terry");
+    vec_str_emplace_back(vs, "Sandy");
 
-    cvec_str_emplace_back(vs, "Billy");
-    cvec_str_emplace_back(vs, "Cindy");
-    cvec_str_emplace_back(vs, "Phil");
-    cvec_str_emplace_back(vs, "Lindy");
-    cvec_str_emplace_back(vs, "David");
+    vec_str_emplace_back(vs, "Billy");
+    vec_str_emplace_back(vs, "Cindy");
+    vec_str_emplace_back(vs, "Phil");
+    vec_str_emplace_back(vs, "Lindy");
+    vec_str_emplace_back(vs, "David");
 */
     size_t num = 0;
-    c_foreach (i, cvec_str, *vs)
+    c_foreach (i, vec_str, *vs)
     {
-        cvec_sv_push_back(vsv, cstr_sv(i.ref));
+        vec_sv_push_back(vsv, cstr_sv(i.ref));
         num += cstr_size(i.ref);
     }
-    std::cout << "num strings: " << cvec_sv_size(vsv) << std::endl;
-    std::cout << "avg str len: " << num / (float)cvec_sv_size(vsv) << std::endl;
+    std::cout << "num strings: " << vec_sv_size(vsv) << std::endl;
+    std::cout << "avg str len: " << num / (float)vec_sv_size(vsv) << std::endl;
 }
 
-void initLongStringVec(cvec_str* vs, cvec_sv* vsv)
+void initLongStringVec(vec_str* vs, vec_sv* vsv)
 {
-    cvec_str_drop(vs);
-    cvec_sv_clear(vsv);
-    
+    vec_str_drop(vs);
+    vec_sv_clear(vsv);
+
     *vs = read_file("names.txt");
-    c_foreach (i, cvec_str, *vs) {
+    c_foreach (i, vec_str, *vs) {
         cstr_append_s(i.ref, *i.ref);
         cstr_append_s(i.ref, *i.ref);
         cstr_append_s(i.ref, *i.ref);
-    }    
+    }
 /*
-    cvec_str_emplace_back(vs, "Susan Susan Susan Susan Susan Susan");
-    cvec_str_emplace_back(vs, "Jason Jason Jason Jason Jason Jason");
-    cvec_str_emplace_back(vs, "Lily Lily Lily Lily Lily Lily");
-    cvec_str_emplace_back(vs, "Michael Michael Michael Michael Michael Michael");
-    cvec_str_emplace_back(vs, "Mary Mary Mary Mary Mary Mary");
+    vec_str_emplace_back(vs, "Susan Susan Susan Susan Susan Susan");
+    vec_str_emplace_back(vs, "Jason Jason Jason Jason Jason Jason");
+    vec_str_emplace_back(vs, "Lily Lily Lily Lily Lily Lily");
+    vec_str_emplace_back(vs, "Michael Michael Michael Michael Michael Michael");
+    vec_str_emplace_back(vs, "Mary Mary Mary Mary Mary Mary");
 
-    cvec_str_emplace_back(vs, "Jerry Jerry Jerry Jerry Jerry Jerry");
-    cvec_str_emplace_back(vs, "Jenny Jenny Jenny Jenny Jenny Jenny");
-    cvec_str_emplace_back(vs, "Klaus Klaus Klaus Klaus Klaus Klaus");
-    cvec_str_emplace_back(vs, "Celine Celine Celine Celine Celine Celine");
-    cvec_str_emplace_back(vs, "Kenny Kenny Kenny Kenny Kenny Kenny");
+    vec_str_emplace_back(vs, "Jerry Jerry Jerry Jerry Jerry Jerry");
+    vec_str_emplace_back(vs, "Jenny Jenny Jenny Jenny Jenny Jenny");
+    vec_str_emplace_back(vs, "Klaus Klaus Klaus Klaus Klaus Klaus");
+    vec_str_emplace_back(vs, "Celine Celine Celine Celine Celine Celine");
+    vec_str_emplace_back(vs, "Kenny Kenny Kenny Kenny Kenny Kenny");
 
-    cvec_str_emplace_back(vs, "Kelly Kelly Kelly Kelly Kelly Kelly");
-    cvec_str_emplace_back(vs, "Jackson Jackson Jackson Jackson Jackson Jackson");
-    cvec_str_emplace_back(vs, "Mandy Mandy Mandy Mandy Mandy Mandy");
-    cvec_str_emplace_back(vs, "Terry Terry Terry Terry Terry Terry");
-    cvec_str_emplace_back(vs, "Sandy Sandy Sandy Sandy Sandy Sandy");
+    vec_str_emplace_back(vs, "Kelly Kelly Kelly Kelly Kelly Kelly");
+    vec_str_emplace_back(vs, "Jackson Jackson Jackson Jackson Jackson Jackson");
+    vec_str_emplace_back(vs, "Mandy Mandy Mandy Mandy Mandy Mandy");
+    vec_str_emplace_back(vs, "Terry Terry Terry Terry Terry Terry");
+    vec_str_emplace_back(vs, "Sandy Sandy Sandy Sandy Sandy Sandy");
 
-    cvec_str_emplace_back(vs, "Billy Billy Billy Billy Billy Billy");
-    cvec_str_emplace_back(vs, "Cindy Cindy Cindy Cindy Cindy Cindy");
-    cvec_str_emplace_back(vs, "Phil Phil Phil Phil Phil Phil");
-    cvec_str_emplace_back(vs, "Lindy Lindy Lindy Lindy Lindy Lindy");
-    cvec_str_emplace_back(vs, "David David David David David David");
+    vec_str_emplace_back(vs, "Billy Billy Billy Billy Billy Billy");
+    vec_str_emplace_back(vs, "Cindy Cindy Cindy Cindy Cindy Cindy");
+    vec_str_emplace_back(vs, "Phil Phil Phil Phil Phil Phil");
+    vec_str_emplace_back(vs, "Lindy Lindy Lindy Lindy Lindy Lindy");
+    vec_str_emplace_back(vs, "David David David David David David");
 */
     size_t num = 0;
-    c_foreach (i, cvec_str, *vs)
+    c_foreach (i, vec_str, *vs)
     {
-        cvec_sv_push_back(vsv, cstr_sv(i.ref));
+        vec_sv_push_back(vsv, cstr_sv(i.ref));
         num += cstr_size(i.ref);
     }
-    std::cout << "num strings: " << cvec_sv_size(vsv) << std::endl;
-    std::cout << "avg str len: " << num / (float)cvec_sv_size(vsv) << std::endl;
+    std::cout << "num strings: " << vec_sv_size(vsv) << std::endl;
+    std::cout << "avg str len: " << num / (float)vec_sv_size(vsv) << std::endl;
 }
 
-void initMaps(const cvec_str* vs, csmap_str* mapTrans, csmap_ssv* mapSview,
-                                  cmap_str* unordmapTrans, cmap_ssv* unordmapSview)
+void initMaps(const vec_str* vs, smap_str* mapTrans, smap_ssv* mapSview,
+                                  hmap_str* unordmapTrans, hmap_ssv* unordmapSview)
 {
-    csmap_str_clear(mapTrans);
-    csmap_ssv_clear(mapSview);
-    cmap_str_clear(unordmapTrans);
-    cmap_ssv_clear(unordmapSview);
+    smap_str_clear(mapTrans);
+    smap_ssv_clear(mapSview);
+    hmap_str_clear(unordmapTrans);
+    hmap_ssv_clear(unordmapSview);
 
     size_t n = 0;
-    c_foreach (i, cvec_str, *vs)
+    c_foreach (i, vec_str, *vs)
     {
-        csmap_str_insert(mapTrans, cstr_clone(*i.ref), n);
-        csmap_ssv_insert(mapSview, cstr_clone(*i.ref), n);
-        cmap_str_insert(unordmapTrans, cstr_clone(*i.ref), n);
-        cmap_ssv_insert(unordmapSview, cstr_clone(*i.ref), n);
+        smap_str_insert(mapTrans, cstr_clone(*i.ref), n);
+        smap_ssv_insert(mapSview, cstr_clone(*i.ref), n);
+        hmap_str_insert(unordmapTrans, cstr_clone(*i.ref), n);
+        hmap_ssv_insert(unordmapSview, cstr_clone(*i.ref), n);
         ++n;
     }
 }
 
 void benchmark(
-    const cvec_str* vec_string,
-    const cvec_sv* vec_stringview,
-    const csmap_str* mapTrans,
-    const csmap_ssv* mapSview,
-    const cmap_str* unordmapTrans,
-    const cmap_ssv* unordmapSview);
+    const vec_str* vec_string,
+    const vec_sv* vec_stringview,
+    const smap_str* mapTrans,
+    const smap_ssv* mapSview,
+    const hmap_str* unordmapTrans,
+    const hmap_ssv* unordmapSview);
 
 //const size_t MAX_LOOP = 1000000;
 const size_t MAX_LOOP = 2000;
 
 int main(void)
 {
-    c_auto (cvec_str, vec_string)
-    c_auto (cvec_sv, vec_stringview)
-    c_auto (csmap_str, mapTrans)
-    c_auto (csmap_ssv, mapSview)
-    c_auto (cmap_str, unordmapTrans)
-    c_auto (cmap_ssv, unordmapSview)
+    c_auto (vec_str, vec_string)
+    c_auto (vec_sv, vec_stringview)
+    c_auto (smap_str, mapTrans)
+    c_auto (smap_ssv, mapSview)
+    c_auto (hmap_str, unordmapTrans)
+    c_auto (hmap_ssv, unordmapSview)
     {
         std::cout << "Short String Benchmark" << std::endl;
         std::cout << "======================" << std::endl;
 
         initShortStringVec(&vec_string, &vec_stringview);
-        initMaps(&vec_string, &mapTrans, &mapSview, 
+        initMaps(&vec_string, &mapTrans, &mapSview,
                               &unordmapTrans, &unordmapSview);
 
         for (int i=0; i<3; ++i)
@@ -213,7 +213,7 @@ int main(void)
         std::cout << "=====================" << std::endl;
 
         initLongStringVec(&vec_string, &vec_stringview);
-        initMaps(&vec_string, &mapTrans, &mapSview, 
+        initMaps(&vec_string, &mapTrans, &mapSview,
                               &unordmapTrans, &unordmapSview);
         for (int i=0; i<3; ++i)
         benchmark(
@@ -228,12 +228,12 @@ int main(void)
 }
 
 void benchmark(
-    const cvec_str* vec_string,
-    const cvec_sv* vec_stringview,
-    const csmap_str* mapTrans,
-    const csmap_ssv*  mapSview,
-    const cmap_str* unordmapTrans,
-    const cmap_ssv* unordmapSview)
+    const vec_str* vec_string,
+    const vec_sv* vec_stringview,
+    const smap_str* mapTrans,
+    const smap_ssv* mapSview,
+    const hmap_str* unordmapTrans,
+    const hmap_ssv* unordmapSview)
 {
     size_t grandtotal = 0;
 
@@ -244,9 +244,9 @@ void benchmark(
     stopwatch.start("Trans Map with char*");
     for (size_t i = 0; i < MAX_LOOP; ++i)
     {
-        c_foreach (j, cvec_str, *vec_string)
+        c_foreach (j, vec_str, *vec_string)
         {
-            const csmap_str_value* v = csmap_str_get(mapTrans, cstr_str(j.ref));
+            const smap_str_value* v = smap_str_get(mapTrans, cstr_str(j.ref));
             if (v)
                 total += v->second;
         }
@@ -258,23 +258,23 @@ void benchmark(
     stopwatch.start("Trans Map with string_view");
     for (size_t i = 0; i < MAX_LOOP; ++i)
     {
-        c_foreach (j, cvec_sv, *vec_stringview)
+        c_foreach (j, vec_sv, *vec_stringview)
         {
-            const csmap_ssv_value* v = csmap_ssv_get(mapSview, *j.ref);
+            const smap_ssv_value* v = smap_ssv_get(mapSview, *j.ref);
             if (v)
                 total += v->second;
         }
     }
     grandtotal += total;
     stopwatch.stop();
-    
+
     total = 0;
     stopwatch.start("Trans Unord Map with char*");
     for (size_t i = 0; i < MAX_LOOP; ++i)
     {
-        c_foreach (j, cvec_str, *vec_string)
+        c_foreach (j, vec_str, *vec_string)
         {
-            const cmap_str_value* v = cmap_str_get(unordmapTrans, cstr_str(j.ref));
+            const hmap_str_value* v = hmap_str_get(unordmapTrans, cstr_str(j.ref));
             if (v)
                 total += v->second;
         }
@@ -286,9 +286,9 @@ void benchmark(
     stopwatch.start("Trans Unord Map with string_view");
     for (size_t i = 0; i < MAX_LOOP; ++i)
     {
-        c_foreach (j, cvec_sv, *vec_stringview)
+        c_foreach (j, vec_sv, *vec_stringview)
         {
-            const cmap_ssv_value* v = cmap_ssv_get(unordmapSview, *j.ref);
+            const hmap_ssv_value* v = hmap_ssv_get(unordmapSview, *j.ref);
             if (v)
                 total += v->second;
         }

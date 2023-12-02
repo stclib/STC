@@ -68,7 +68,7 @@ Sample test_stc_forward_list() {
     Sample s = {"STC,forward_list"};
     {
         s.test[INSERT].t1 = clock();
-        container con = clist_x_init();
+        container con = {0};
         csrand(seed);
         c_forrange (N/2) clist_x_push_front(&con, crand() & mask1);
         c_forrange (N/2) clist_x_push_back(&con, crand() & mask1);
@@ -81,7 +81,7 @@ Sample test_stc_forward_list() {
         clist_x_drop(&con);
      }{
         csrand(seed);
-        container con = clist_x_init();
+        container con = {0};
         c_forrange (N) clist_x_push_front(&con, crand() & mask2);
         s.test[FIND].t1 = clock();
         size_t sum = 0;

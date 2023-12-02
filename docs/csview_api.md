@@ -184,7 +184,7 @@ void print_split(csview input, const char* sep)
 
 stack_str string_split(csview input, const char* sep)
 {
-    stack_str out = stack_str_init();
+    stack_str out = {0};
 
     c_fortoken_sv (i, input, sep)
         stack_str_push(&out, cstr_from_sv(i.token));

@@ -24,7 +24,7 @@
 #define STC_MISC_INCLUDED
 
 // ----------------------------------
-// c_auto init+drop containers (RAII) 
+// c_auto init+drop containers (RAII)
 // ----------------------------------
 
 #define c_auto(...) c_MACRO_OVERLOAD(c_auto, __VA_ARGS__)
@@ -71,7 +71,7 @@
 // stc_eraseremove_if
 // --------------------------------
 
-// Use with: cstack, cvec, cdeq, cqueue:
+// Use with: stack, vec, deq, queue:
 #define stc_eraseremove_if(C, cnt_p, pred) do { \
     C* _cnt = cnt_p; \
     intptr_t _n = 0; \

@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include "stc/forward.h"
 
-forward_cvec(vec_i32, int);
-forward_cvec(vec_pnt, struct Point);
+forward_vec(vec_i32, int);
+forward_vec(vec_pnt, struct Point);
 
 typedef struct MyStruct {
     vec_i32 intvec;

@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include "stc/forward.h"
 
-forward_clist(list_i32, int);
-forward_clist(list_pnt, struct Point);
+forward_list(list_i32, int);
+forward_list(list_pnt, struct Point);
 
 typedef struct {
     list_i32 intlist;

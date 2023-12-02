@@ -30,7 +30,7 @@ THE SOFTWARE.
 #ifndef CREGEX_H_INCLUDED
   #include "../include/stc/cregex.h"
 #endif
-#undef i_implement 
+#undef i_implement
 // implement cstr and utf8 if i_import was defined:
 #include "../include/stc/cstr.h"
 #include "../include/stc/priv/linkage.h"
@@ -583,7 +583,7 @@ _optimize(_Parser *par, _Reprog *pp)
             cl->end = (_Rune *)((char*)cl->end + diff);
             break;
         }
-        if (inst->l.left) 
+        if (inst->l.left)
             inst->l.left = (_Reinst *)((char*)inst->l.left + diff);
     }
     npp->startinst = (_Reinst *)((char*)npp->startinst + diff);
@@ -661,8 +661,8 @@ _lexutfclass(_Parser *par, _Rune *rp)
         {"{Digit}", 7, UTF_nd}, {"{Nd}", 4, UTF_nd},
         {"{Lower}", 7, UTF_ll}, {"{Ll}", 4, UTF_ll},
         {"{Upper}", 7, UTF_lu}, {"{Lu}", 4, UTF_lu},
-        {"{Cntrl}", 7, UTF_cc}, {"{Cc}", 4, UTF_cc}, 
-        {"{Alnum}", 7, UTF_an}, {"{Blank}", 7, UTF_bl}, 
+        {"{Cntrl}", 7, UTF_cc}, {"{Cc}", 4, UTF_cc},
+        {"{Alnum}", 7, UTF_an}, {"{Blank}", 7, UTF_bl},
         {"{Space}", 7, UTF_sp}, {"{Word}", 6, UTF_wr},
         {"{XDigit}", 8, ASC_xd},
         {"{Lt}", 4, UTF_lt}, {"{Nl}", 4, UTF_nl},
@@ -725,8 +725,8 @@ _lex(_Parser *par)
             if (par->exprp[-1] != '}')
                 _rcerror(par, CREG_UNMATCHEDRIGHTPARENTHESIS);
             if (par->yyrune == 0) return TOK_END;
-            break; 
-        case 'p': case 'P': 
+            break;
+        case 'p': case 'P':
             _lexutfclass(par, &par->yyrune);
             break;
         }
@@ -747,7 +747,7 @@ _lex(_Parser *par)
         if (par->exprp[0] == '?') { /* override global flags */
             for (int k = 1, enable = 1; ; ++k) switch (par->exprp[k]) {
                 case  0 : par->exprp += k; return TOK_END;
-                case ')': par->exprp += k + 1; 
+                case ')': par->exprp += k + 1;
                           return TOK_CASED + (par->rune_type == TOK_IRUNE);
                 case '-': enable = 0; break;
                 case 's': par->dot_type = TOK_ANY + enable; break;
@@ -949,7 +949,7 @@ _runematch(_Rune s, _Rune r)
     case UTF_SP: inv = 1; case UTF_sp: return inv ^ (int)utf8_isspace(r);
     case UTF_LL: inv = 1; case UTF_ll: return inv ^ (int)utf8_islower(r);
     case UTF_LU: inv = 1; case UTF_lu: return inv ^ (int)utf8_isupper(r);
-    case UTF_LC: inv = 1; case UTF_lc: return inv ^ (int)utf8_iscased(r); 
+    case UTF_LC: inv = 1; case UTF_lc: return inv ^ (int)utf8_iscased(r);
     case UTF_AL: inv = 1; case UTF_al: return inv ^ (int)utf8_isalpha(r);
     case UTF_WR: inv = 1; case UTF_wr: return inv ^ (int)utf8_isword(r);
     case UTF_cc: case UTF_CC:
@@ -1221,7 +1221,7 @@ _build_subst(const char* replace, int nmatch, const csview match[],
     cstr_buf buf = cstr_buffer(subst);
     intptr_t len = 0, cap = buf.cap;
     char* dst = buf.data;
-    cstr mstr = cstr_init();
+    cstr mstr = {0};
 
     while (*replace != '\0') {
         if (*replace == '$') {
@@ -1258,7 +1258,7 @@ _build_subst(const char* replace, int nmatch, const csview match[],
  * API functions
  */
 
-int 
+int
 cregex_compile_3(cregex *self, const char* pattern, int cflags) {
     _Parser par;
     self->prog = _regcomp1(self->prog, &par, pattern, cflags);
@@ -1283,7 +1283,7 @@ cregex_find_4(const cregex* re, const char* input, csview match[], int mflags) {
 int
 cregex_find_pattern_4(const char* pattern, const char* input,
                       csview match[], int cmflags) {
-    cregex re = cregex_init();
+    cregex re = {0};
     int res = cregex_compile(&re, pattern, cmflags);
     if (res != CREG_OK) return res;
     res = cregex_find(&re, input, match, cmflags);
@@ -1294,8 +1294,8 @@ cregex_find_pattern_4(const char* pattern, const char* input,
 cstr
 cregex_replace_sv_6(const cregex* re, csview input, const char* replace, int count,
                     bool (*mfun)(int, csview, cstr*), int rflags) {
-    cstr out = cstr_init();
-    cstr subst = cstr_init();
+    cstr out = {0};
+    cstr subst = {0};
     csview match[CREG_MAX_CAPTURES];
     int nmatch = cregex_captures(re) + 1;
     if (!count) count = INT32_MAX;
@@ -1317,7 +1317,7 @@ cregex_replace_sv_6(const cregex* re, csview input, const char* replace, int cou
 cstr
 cregex_replace_pattern_6(const char* pattern, const char* input, const char* replace, int count,
                          bool (*mfun)(int, csview, cstr*), int crflags) {
-    cregex re = cregex_init();
+    cregex re = {0};
     if (cregex_compile(&re, pattern, crflags) != CREG_OK)
         assert(0);
     csview sv = c_sv(input, c_strlen(input));

@@ -26,36 +26,36 @@
 #include "stc/cstr.h"
 #include "stc/forward.h"
 
-forward_cvec(cvec_i32, int);
+forward_vec(vec_i32, int);
 
 struct MyStruct {
-    cvec_i32 int_vec;
+    vec_i32 int_vec;
     cstr name;
 } typedef MyStruct;
 
 #define i_key float
-#include "stc/cvec.h"
+#include "stc/vec.h"
 
 #define i_key_str // special for cstr
-#include "stc/cvec.h"
+#include "stc/vec.h"
 
 #define i_key int
 #define i_is_forward
 #define i_tag i32
-#include "stc/cvec.h"
+#include "stc/vec.h"
 
 int main(void) {
-    cvec_i32 vec = {0};
-    cvec_i32_push(&vec, 123);
-    cvec_i32_drop(&vec);
+    vec_i32 vec = {0};
+    vec_i32_push(&vec, 123);
+    vec_i32_drop(&vec);
 
-    cvec_float fvec = {0};
-    cvec_float_push(&fvec, 123.3);
-    cvec_float_drop(&fvec);
+    vec_float fvec = {0};
+    vec_float_push(&fvec, 123.3);
+    vec_float_drop(&fvec);
 
-    cvec_str svec = {0};
-    cvec_str_emplace(&svec, "Hello, friend");
-    cvec_str_drop(&svec);
+    vec_str svec = {0};
+    vec_str_emplace(&svec, "Hello, friend");
+    vec_str_drop(&svec);
 }
 */
 #include "priv/linkage.h"
@@ -76,7 +76,7 @@ int main(void) {
 #include "priv/template.h"
 
 #ifndef i_is_forward
-   _c_DEFTYPES(_c_cvec_types, i_type, i_key);
+   _c_DEFTYPES(_c_vec_types, i_type, i_key);
 #endif
 typedef i_keyraw _m_raw;
 STC_API i_type          _c_MEMB(_init)(void);

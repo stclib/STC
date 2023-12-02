@@ -401,7 +401,7 @@ fn_tocase[] = {{tolower, utf8_casefold},
                {toupper, utf8_toupper}};
 
 static cstr cstr_tocase(csview sv, int k) {
-    cstr out = cstr_init();
+    cstr out = {0};
     char *buf = cstr_reserve(&out, sv.size*3/2);
     const char *end = sv.buf + sv.size;
     uint32_t cp; intptr_t sz = 0;

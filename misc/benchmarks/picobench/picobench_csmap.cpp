@@ -51,7 +51,7 @@ static void ctor_and_ins_one_csmap_i(picobench::state& s)
     size_t result = 0;
     picobench::scope scope(s);
     c_forrange (n, s.iterations()) {
-        csmap_i map = csmap_i_init();
+        csmap_i map = {0};
         csmap_i_insert(&map, n, 0);
         result += csmap_i_size(&map);
         csmap_i_drop(&map);
@@ -80,7 +80,7 @@ static void insert_i(picobench::state& s)
 
 static void insert_csmap_i(picobench::state& s)
 {
-    csmap_i map = csmap_i_init();
+    csmap_i map = {0};
     csrand(seed);
     picobench::scope scope(s);
     c_forrange (n, s.iterations())
@@ -125,7 +125,7 @@ static void ins_and_erase_csmap_i(picobench::state& s)
 {
     size_t result = 0;
     uint64_t mask = (1ull << s.arg()) - 1;
-    csmap_i map = csmap_i_init();
+    csmap_i map = {0};
     csrand(seed);
 
     picobench::scope scope(s);
@@ -173,7 +173,7 @@ static void ins_and_access_csmap_i(picobench::state& s)
 {
     uint64_t mask = (1ull << s.arg()) - 1;
     size_t result = 0;
-    csmap_i map = csmap_i_init();
+    csmap_i map = {0};
     csrand(seed);
 
     picobench::scope scope(s);
@@ -225,7 +225,7 @@ static void ins_and_access_csmap_s(picobench::state& s)
     cstr str = cstr_with_size(s.arg(), 'x');
     char* buf = cstr_data(&str);
     size_t result = 0;
-    csmap_str map = csmap_str_init();
+    csmap_str map = {0};
 
     picobench::scope scope(s);
     csrand(seed);
@@ -286,7 +286,7 @@ static void iterate_x(picobench::state& s)
 /*
 static void iterate_csmap_x(picobench::state& s)
 {
-    csmap_x map = csmap_x_init();
+    csmap_x map = {0};
     uint64_t K = (1ull << s.arg()) - 1;
 
     picobench::scope scope(s);

@@ -150,7 +150,7 @@ sorted: 5 7 8 13 16 25
 #include "stc/vec.h"
 
 int main(void) {
-    vec_str names = vec_str_init();
+    vec_str names = {0};
 
     vec_str_emplace(&names, "Mary");
     vec_str_emplace(&names, "Joe");

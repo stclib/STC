@@ -47,12 +47,12 @@ int main(void) {
     if (idx != -1) printf("found lower 200: %d\n", nums[idx]);
 }
 
-// ex2: Test on a cdeque !!
+// ex2: Test on a deque !!
 #include <stdio.h>
 #define i_type IDeq
 #define i_key int
 #define i_opt c_use_cmp | c_more // retain input template params to be reused by sort.h
-#include "stc/cdeq.h"
+#include "stc/deq.h"
 #include "stc/algo/quicksort.h"
 
 int main(void) {
@@ -80,8 +80,8 @@ int main(void) {
 #ifndef _i_template
   #define _i_is_arr
   #ifdef i_TYPE
-    #define i_type _c_SEL(_c_SEL21, (i_TYPE))
-    #define i_key _c_SEL(_c_SEL22, (i_TYPE))
+    #define i_type _c_SEL(_c_SEL21, i_TYPE)
+    #define i_key _c_SEL(_c_SEL22, i_TYPE)
   #elif !defined i_type
     #define i_type c_JOIN(i_key, s)
   #endif

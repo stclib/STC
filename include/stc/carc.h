@@ -43,7 +43,7 @@ void Person_drop(Person* p) {
 
 #define i_type ArcPers
 #define i_val_class Person    // clone, drop, cmp, hash
-#include "stc/carc.h"
+#include "stc/arc.h"
 
 int main(void) {
     ArcPers p = ArcPers_from(Person_make("John", "Smiths"));
@@ -95,7 +95,7 @@ typedef i_keyraw _m_raw;
   #define _i_atomic_dec_and_test(v) !(--*(v))
 #endif
 #ifndef i_is_forward
-_c_DEFTYPES(_c_carc_types, i_type, i_key);
+_c_DEFTYPES(_c_arc_types, i_type, i_key);
 #endif
 struct _c_MEMB(_rep_) { catomic_long counter; i_key value; };
 

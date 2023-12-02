@@ -32,14 +32,14 @@ NB! ***cco_yield\*()*** / ***cco_await\*()*** may not be called from within a `s
 |           | `cco_await_task(task, cco_runtime* rt);`| Await for task to finish             |
 |           | `cco_await_task(task, rt, retbit);`  | Await for task's return to be in (retbit \| CCO_DONE) |
 |`cco_result`| `cco_resume_task(task, rt);`        | Resume suspended task                   |
-|           | Semaphores:                          |                                         | 
+|           | Semaphores:                          |                                         |
 |           | `cco_sem`                            | Semaphore type                          |
 |           | `cco_await_sem(sem)`                 | Await for the semaphore count > 0       |
 | `cco_sem` | `cco_sem_from(long value)`           | Create semaphore                        |
 |           | `cco_sem_set(sem, long value)`       | Set semaphore value                     |
 
 |           | `cco_sem_release(sem)`               | Signal the semaphore (count += 1)       |
-|           | Timers:                              |                                         | 
+|           | Timers:                              |                                         |
 |           | `cco_timer`                          | Timer type                              |
 |           | `cco_await_timer(tm, double sec)`    | Await secs for timer to expire (usec prec.)|
 |           | `cco_timer_start(tm, double sec)`    | Start timer for secs duration           |
@@ -47,7 +47,7 @@ NB! ***cco_yield\*()*** / ***cco_await\*()*** may not be called from within a `s
 | `bool`    | `cco_timer_expired(tm)`              | Return true if timer is expired         |
 | `double`  | `cco_timer_elapsed(tm)`              | Return seconds elapsed                  |
 | `double`  | `cco_timer_remaining(tm)`            | Return seconds remaining                |
-|           | From caller side:                    |                                         | 
+|           | From caller side:                    |                                         |
 | `void`    | `cco_stop(co)`                       | Next call of coroutine finalizes        |
 | `void`    | `cco_reset(co)`                      | Reset state to initial (for reuse)      |
 | `void`    | `cco_blocking_call(cocall) {}`       | Run blocking until cocall is finished   |
@@ -96,7 +96,7 @@ int triples(struct triples* i) {
         for (i->c = 5;; ++i->c) {
             for (i->a = 1; i->a < i->c; ++i->a) {
                 for (i->b = i->a + 1; i->b < i->c; ++i->b) {
-                    if ((int64_t)i->a * i->a + 
+                    if ((int64_t)i->a * i->a +
                         (int64_t)i->b * i->b ==
                         (int64_t)i->c * i->c)
                     {
@@ -122,7 +122,7 @@ int main(void) {
     }
 }
 ```
-The next variant skips the triples which are upscaled version of smaller ones by checking 
+The next variant skips the triples which are upscaled version of smaller ones by checking
 the gcd() function. Note that the gcd1_triples struct contains the triples struct so that
 both functions have separate call frames:
 
@@ -182,7 +182,7 @@ However, this means that it first calls ***gcd1_triples()***, which immediately 
 is efficient only when yielding or awaiting from the top- or second-level call like here, but naturally not
 when couroutine calls are more deeply nested or recursive.
 
-The STC coroutine implementation therefore also contains task-objects (`cco_task`), which are base-coroutine 
+The STC coroutine implementation therefore also contains task-objects (`cco_task`), which are base-coroutine
 objects/enclosures. These can be executed using ***cco_blocking_task()*** instead of ***cco_blocking_call()***.
 Inner coroutine calls are done by ***cco_await_task()***, where you may await for a certain return value, normally CCO_YIELD or just CCO_DONE. It uses a stack of pointers of task-enclosures to call the current
 inner-level function directly. The task-objects have the added benefit that coroutines can be managed
@@ -224,7 +224,7 @@ void print_time()
 {
     time_t now = time(NULL);
     char mbstr[64];
-    strftime(mbstr, sizeof(mbstr), "[%H:%M:%S]", localtime(&now)); 
+    strftime(mbstr, sizeof(mbstr), "[%H:%M:%S]", localtime(&now));
     printf("%s ", mbstr);
 }
 

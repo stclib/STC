@@ -34,7 +34,7 @@
 #define _i_ispque
 #include "priv/template.h"
 #ifndef i_is_forward
-  _c_DEFTYPES(_c_cpque_types, i_type, i_key);
+  _c_DEFTYPES(_c_pque_types, i_type, i_key);
 #endif
 typedef i_keyraw _m_raw;
 

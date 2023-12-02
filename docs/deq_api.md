@@ -105,7 +105,7 @@ void               deq_X_value_drop(deq_X_value* pval);
 #include <stdio.h>
 
 int main(void) {
-    deq_i q = deq_i_init();
+    deq_i q = {0};
     deq_i_push_front(&q, 10);
     c_foreach (i, deq_i, q)
         printf(" %d", *i.ref);

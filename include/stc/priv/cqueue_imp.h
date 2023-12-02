@@ -23,8 +23,8 @@
 
 STC_DEF _m_iter _c_MEMB(_advance)(_m_iter it, intptr_t n) {
     intptr_t len = _c_MEMB(_size)(it._s);
-    intptr_t pos = it.pos, idx = _cdeq_toidx(it._s, pos);
-    it.pos = (pos + n) & it._s->capmask; 
+    intptr_t pos = it.pos, idx = _cbuf_toidx(it._s, pos);
+    it.pos = (pos + n) & it._s->capmask;
     it.ref += it.pos - pos;
     if (!c_uless(idx + n, len)) it.ref = NULL;
     return it;

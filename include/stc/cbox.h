@@ -43,7 +43,7 @@ void Person_drop(Person* p) {
 
 #define i_type PBox
 #define i_val_class Person // bind Person clone+drop fn's
-#include "stc/cbox.h"
+#include "stc/box.h"
 
 int main(void) {
     PBox p = PBox_from(Person_from("John Smiths", "josmiths@gmail.com"));
@@ -76,7 +76,7 @@ int main(void) {
 typedef i_keyraw _m_raw;
 
 #ifndef i_is_forward
-_c_DEFTYPES(_c_cbox_types, i_type, i_key);
+_c_DEFTYPES(_c_box_types, i_type, i_key);
 #endif
 
 // constructors (take ownership)

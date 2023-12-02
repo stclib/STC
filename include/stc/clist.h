@@ -30,23 +30,23 @@
 
     #define i_key int64_t
     #define i_tag ix
-    #include "stc/clist.h"
+    #include "stc/list.h"
 
     int main(void)
     {
-        c_auto (clist_ix, list)
+        c_auto (list_ix, list)
         {
             int n;
             for (int i = 0; i < 1000000; ++i) // one million
-                clist_ix_push_back(&list, crand() >> 32);
+                list_ix_push_back(&list, crand() >> 32);
             n = 0;
             c_foreach (i, clist_ix, list)
                 if (++n % 10000 == 0) printf("%8d: %10zu\n", n, *i.ref);
             // Sort them...
-            clist_ix_sort(&list); // qsort O(n*log n)
+            list_ix_sort(&list); // qsort O(n*log n)
             n = 0;
             puts("sorted");
-            c_foreach (i, clist_ix, list)
+            c_foreach (i, list_ix, list)
                 if (++n % 10000 == 0) printf("%8d: %10zu\n", n, *i.ref);
         }
     }
@@ -59,7 +59,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define _c_clist_complete_types(SELF, dummy) \
+#define _c_list_complete_types(SELF, dummy) \
     struct SELF##_node { \
         struct SELF##_node *next; \
         SELF##_value value; \
@@ -67,11 +67,11 @@
 
 #define _clist_tonode(vp) c_container_of(vp, _m_node, value)
 
-#define _c_clist_insert_entry_after(ref, val) \
+#define _c_list_insert_entry_after(ref, val) \
     _m_node *entry = (_m_node *)i_malloc(c_sizeof *entry); entry->value = val; \
-    _c_clist_insert_after_node(ref, entry)
+    _c_list_insert_after_node(ref, entry)
 
-#define _c_clist_insert_after_node(ref, entry) \
+#define _c_list_insert_after_node(ref, entry) \
     if (ref) entry->next = ref->next, ref->next = entry; \
     else     entry->next = entry
     // +: set self->last based on node
@@ -84,9 +84,9 @@
 #include "priv/template.h"
 
 #ifndef i_is_forward
-  _c_DEFTYPES(_c_clist_types, i_type, i_key);
+  _c_DEFTYPES(_c_list_types, i_type, i_key);
 #endif
-_c_DEFTYPES(_c_clist_complete_types, i_type, dummy);
+_c_DEFTYPES(_c_list_complete_types, i_type, dummy);
 typedef i_keyraw _m_raw;
 
 STC_API void            _c_MEMB(_drop)(i_type* self);
@@ -237,14 +237,14 @@ _c_MEMB(_drop)(i_type* self) {
 
 STC_DEF _m_value*
 _c_MEMB(_push_back)(i_type* self, _m_value value) {
-    _c_clist_insert_entry_after(self->last, value);
+    _c_list_insert_entry_after(self->last, value);
     self->last = entry;
     return &entry->value;
 }
 
 STC_DEF _m_value*
 _c_MEMB(_push_front)(i_type* self, _m_value value) {
-    _c_clist_insert_entry_after(self->last, value);
+    _c_list_insert_entry_after(self->last, value);
     if (!self->last)
         self->last = entry;
     return &entry->value;
@@ -252,14 +252,14 @@ _c_MEMB(_push_front)(i_type* self, _m_value value) {
 
 STC_DEF _m_value*
 _c_MEMB(_push_back_node)(i_type* self, _m_node* node) {
-    _c_clist_insert_after_node(self->last, node);
+    _c_list_insert_after_node(self->last, node);
     self->last = node;
     return &node->value;
 }
 
 STC_DEF _m_value*
 _c_MEMB(_insert_after_node)(i_type* self, _m_node* ref, _m_node* node) {
-    _c_clist_insert_after_node(ref, node);
+    _c_list_insert_after_node(ref, node);
     if (!self->last)
         self->last = node;
     return &node->value;
@@ -268,7 +268,7 @@ _c_MEMB(_insert_after_node)(i_type* self, _m_node* ref, _m_node* node) {
 STC_DEF _m_iter
 _c_MEMB(_insert_at)(i_type* self, _m_iter it, _m_value value) {
     _m_node* node = it.ref ? it.prev : self->last;
-    _c_clist_insert_entry_after(node, value);
+    _c_list_insert_entry_after(node, value);
     if (!self->last || !it.ref) {
         it.prev = self->last ? self->last : entry;
         self->last = entry;

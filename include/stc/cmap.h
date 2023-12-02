@@ -25,26 +25,25 @@
 /*
 #include <stdio.h>
 
-#define i_tag ichar  // Map int => char
-#define i_key int
-#define i_val char
-#include "stc/cmap.h"
+
+#define i_TYPE ICmap,int,char
+#include "stc/hmap.h"
 
 int main(void) {
-    cmap_ichar m = {0};
-    cmap_ichar_emplace(&m, 5, 'a');
-    cmap_ichar_emplace(&m, 8, 'b');
-    cmap_ichar_emplace(&m, 12, 'c');
+    ICmap m = {0};
+    ICmap_emplace(&m, 5, 'a');
+    ICmap_emplace(&m, 8, 'b');
+    ICmap_emplace(&m, 12, 'c');
 
-    cmap_ichar_value* v = cmap_ichar_get(&m, 10); // NULL
-    char val = *cmap_ichar_at(&m, 5);               // 'a'
-    cmap_ichar_emplace_or_assign(&m, 5, 'd');       // update
-    cmap_ichar_erase(&m, 8);
+    ICmap_value* v = ICmap_get(&m, 10);   // NULL
+    char val = *ICmap_at(&m, 5);          // 'a'
+    ICmap_emplace_or_assign(&m, 5, 'd');  // update
+    ICmap_erase(&m, 8);
 
-    c_foreach (i, cmap_ichar, m)
+    c_foreach (i, ICmap, m)
         printf("map %d: %c\n", i.ref->first, i.ref->second);
 
-    cmap_ichar_drop(&m);
+    ICmap_drop(&m);
 }
 */
 #include "priv/linkage.h"
@@ -73,7 +72,7 @@ struct chash_slot { uint8_t hashx; };
 #define _i_ishash
 #include "priv/template.h"
 #ifndef i_is_forward
-  _c_DEFTYPES(_c_chash_types, i_type, i_key, i_val, _i_MAP_ONLY, _i_SET_ONLY);
+  _c_DEFTYPES(_c_htable_types, i_type, i_key, i_val, _i_MAP_ONLY, _i_SET_ONLY);
 #endif
 
 _i_MAP_ONLY( struct _m_value {

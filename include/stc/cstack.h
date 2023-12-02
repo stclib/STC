@@ -37,9 +37,9 @@
 #ifndef i_is_forward
 #ifdef i_capacity
   #define i_no_clone
-  _c_DEFTYPES(_c_cstack_fixed, i_type, i_key, i_capacity);
+  _c_DEFTYPES(_c_stack_fixed, i_type, i_key, i_capacity);
 #else
-  _c_DEFTYPES(_c_cstack_types, i_type, i_key);
+  _c_DEFTYPES(_c_stack_types, i_type, i_key);
 #endif
 #endif
 typedef i_keyraw _m_raw;

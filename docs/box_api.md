@@ -81,8 +81,7 @@ void int_drop(int* x) {
     printf("\n drop %d", *x);
 }
 
-#define i_type IBox
-#define i_key int
+#define i_TYPE IBox,int
 #define i_keydrop int_drop  // optional func, just to display elements destroyed
 #define i_keyclone(x) x     // must specified when i_keydrop is defined.
 #include "stc/box.h"

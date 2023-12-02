@@ -1,8 +1,7 @@
 #include <stdio.h>
 
 #define i_TYPE IVec,int
-#define i_use_cmp
-#define i_more
+#define i_opt c_use_cmp | c_more
 #include "stc/vec.h"
 #include "stc/algo/quicksort.h"
 

@@ -2,7 +2,7 @@
 #include "stc/cstr.h"
 #include "stc/forward.h"
 
-forward_cmap(hmap_pnt, struct Point, int);
+forward_hmap(hmap_pnt, struct Point, int);
 
 typedef struct MyStruct {
     hmap_pnt pntmap;

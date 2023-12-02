@@ -47,11 +47,11 @@ STC_API void        _c_MEMB(_erase_n)(i_type* self, intptr_t idx, intptr_t n);
 
 STC_INLINE const _m_value*
 _c_MEMB(_at)(const i_type* self, intptr_t idx)
-    { return self->cbuf + _cdeq_topos(self, idx); }
+    { return self->cbuf + _cbuf_topos(self, idx); }
 
 STC_INLINE _m_value*
 _c_MEMB(_at_mut)(i_type* self, intptr_t idx)
-    { return self->cbuf + _cdeq_topos(self, idx); }
+    { return self->cbuf + _cbuf_topos(self, idx); }
 
 STC_INLINE _m_value*
 _c_MEMB(_push_back)(i_type* self, _m_value val)
@@ -72,21 +72,21 @@ STC_INLINE _m_value _c_MEMB(_pull_back)(i_type* self) { // move back out of deq
 
 STC_INLINE _m_iter
 _c_MEMB(_insert_at)(i_type* self, _m_iter it, const _m_value val) {
-    intptr_t idx = _cdeq_toidx(self, it.pos);
+    intptr_t idx = _cbuf_toidx(self, it.pos);
     return _c_MEMB(_insert_n)(self, idx, &val, 1);
 }
 
 STC_INLINE _m_iter
 _c_MEMB(_erase_at)(i_type* self, _m_iter it) {
-    _c_MEMB(_erase_n)(self, _cdeq_toidx(self, it.pos), 1);
+    _c_MEMB(_erase_n)(self, _cbuf_toidx(self, it.pos), 1);
     if (it.pos == self->end) it.ref = NULL;
     return it;
 }
 
 STC_INLINE _m_iter
 _c_MEMB(_erase_range)(i_type* self, _m_iter it1, _m_iter it2) {
-    intptr_t idx1 = _cdeq_toidx(self, it1.pos);
-    intptr_t idx2 = _cdeq_toidx(self, it2.pos);
+    intptr_t idx1 = _cbuf_toidx(self, it1.pos);
+    intptr_t idx2 = _cbuf_toidx(self, it2.pos);
     _c_MEMB(_erase_n)(self, idx1, idx2 - idx1);
     if (it1.pos == self->end) it1.ref = NULL;
     return it1;
@@ -162,7 +162,7 @@ _c_MEMB(_insert_uninit)(i_type* self, const intptr_t idx, const intptr_t n) {
     if (len + n > self->capmask)
         if (!_c_MEMB(_reserve)(self, len + n + 3)) // minimum 2x expand
             return it;
-    it.pos = _cdeq_topos(self, idx);
+    it.pos = _cbuf_topos(self, idx);
     it.ref = self->cbuf + it.pos;
     self->end = (self->end + n) & self->capmask;
 

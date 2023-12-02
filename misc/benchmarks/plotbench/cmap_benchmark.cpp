@@ -74,7 +74,7 @@ Sample test_stc_unordered_map() {
     {
         csrand(seed);
         s.test[INSERT].t1 = clock();
-        container con = cmap_x_init();
+        container con = {0};
         c_forrange (i, N/2) cmap_x_insert(&con, crand() & mask1, i);
         c_forrange (i, N/2) cmap_x_insert(&con, i, i);
         s.test[INSERT].t2 = clock();
@@ -86,7 +86,7 @@ Sample test_stc_unordered_map() {
         s.test[ERASE].sum = cmap_x_size(&con);
         cmap_x_drop(&con);
      }{
-        container con = cmap_x_init();
+        container con = {0};
         csrand(seed);
         c_forrange (i, N/2) cmap_x_insert(&con, crand() & mask1, i);
         c_forrange (i, N/2) cmap_x_insert(&con, i, i);

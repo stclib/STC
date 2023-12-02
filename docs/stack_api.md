@@ -72,14 +72,13 @@ void                stack_X_value_drop(vec_X_value* pval);
 
 ## Example
 ```c
-#define i_type IStack
-#define i_key int
+#define i_TYPE IStack,int
 #include "stc/stack.h"
 
 #include <stdio.h>
 
 int main(void) {
-    IStack stk = IStack_init();
+    IStack stk = {0};
 
     for (int i=0; i < 100; ++i)
         IStack_push(&stk, i*i);

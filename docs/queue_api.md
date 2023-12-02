@@ -76,7 +76,7 @@ void                queue_X_value_drop(queue_X_value* pval);
 #include <stdio.h>
 
 int main(void) {
-    queue_i Q = queue_i_init();
+    queue_i Q = {0};
 
     // push() and pop() a few.
     c_forrange (i, 20)

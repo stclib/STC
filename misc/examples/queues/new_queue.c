@@ -3,20 +3,14 @@
 #include <stdio.h>
 #include <time.h>
 
-forward_cqueue(queue_pnt, struct Point);
+forward_queue(queue_pnt, struct Point);
 
 typedef struct Point { int x, y; } Point;
-int point_cmp(const Point* a, const Point* b) {
-    int c = c_default_cmp(&a->x, &b->x);
-    return c ? c : c_default_cmp(&a->y, &b->y);
-}
-#define i_key Point
-#define i_cmp point_cmp
+#define i_TYPE queue_pnt,Point
 #define i_is_forward
-#define i_tag pnt
 #include "stc/queue.h"
 
-#define i_TYPE IQ,int
+#define i_TYPE IntQ,int
 #include "stc/queue.h"
 
 int main(void) {
@@ -24,23 +18,23 @@ int main(void) {
     crand_t rng = crand_init((uint64_t)time(NULL));
     crand_uniform_t dist = crand_uniform_init(0, n);
 
-    IQ Q = {0};
+    IntQ Q = {0};
 
     // Push 50'000'000 random numbers onto the queue.
     c_forrange (n)
-        IQ_push(&Q, (int)crand_uniform(&rng, &dist));
+        IntQ_push(&Q, (int)crand_uniform(&rng, &dist));
 
     // Push or pop on the queue 50 million times
-    printf("befor: size %" c_ZI ", capacity %" c_ZI "\n", IQ_size(&Q), IQ_capacity(&Q));
+    printf("befor: size %" c_ZI ", capacity %" c_ZI "\n", IntQ_size(&Q), IntQ_capacity(&Q));
 
     c_forrange (n) {
         int r = (int)crand_uniform(&rng, &dist);
         if (r & 3)
-            IQ_push(&Q, r);
+            IntQ_push(&Q, r);
         else
-            IQ_pop(&Q);
+            IntQ_pop(&Q);
     }
 
-    printf("after: size %" c_ZI ", capacity %" c_ZI "\n", IQ_size(&Q), IQ_capacity(&Q));
-    IQ_drop(&Q);
+    printf("after: size %" c_ZI ", capacity %" c_ZI "\n", IntQ_size(&Q), IntQ_capacity(&Q));
+    IntQ_drop(&Q);
 }

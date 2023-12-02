@@ -23,19 +23,18 @@
 
 // Unordered set - implemented as closed hashing with linear probing and no tombstones.
 /*
-#define i_tag sx
-#define i_key int
-#include "stc/cset.h"
+#define i_type hset_i,int
+#include "stc/hset.h"
 #include <stdio.h>
 
 int main(void) {
-    cset_sx s = cset_sx_init();
-    cset_sx_insert(&s, 5);
-    cset_sx_insert(&s, 8);
+    hset_i s = {0};
+    hset_i_insert(&s, 5);
+    hset_i_insert(&s, 8);
 
-    c_foreach (i, cset_sx, s)
+    c_foreach (i, hset_i, s)
         printf("set %d\n", *i.ref);
-    cset_sx_drop(&s);
+    hset_i_drop(&s);
 }
 */
 
