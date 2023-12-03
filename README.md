@@ -3,8 +3,19 @@
 STC - Smart Template Containers
 ===============================
 
-### [Version 5.0 beta 1](#version-history)
-- See details for breaking changes.
+### [Version 5.0 beta 2](#version-history)
+- New shorthand template parameter `i_TYPE` lets you define `i_type`, `i_key`, and `i_val` all in one line.
+- Renamed templated STC headers (old header names deprecated). Default container names corresponds to new header names:
+  - **vec.h** (from `cvec.h`)
+  - **deq.h** (from `cdeq.h`)
+  - **list.h** (from `clist.h`)
+  - **stack.h** (from `cstack.h`)
+  - **queue.h** (from `cqueue.h`)
+  - **pque.h** (from `cpque.h`)
+  - **hmap.h** (from `cmap.h`)
+  - **hset.h** (from `cset.h`)
+  - **smap.h** (from `csmap.h`)
+  - **sset.h** (from `csset.h`)
 ---
 Description
 -----------

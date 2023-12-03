@@ -11,6 +11,12 @@ void Viking_drop(Viking* vk) {
     cstr_drop(&vk->country);
 }
 
+Viking Viking_clone(Viking vk) {
+    vk.name = cstr_clone(vk.name);
+    vk.country = cstr_clone(vk.country);
+    return vk;
+}
+
 // Define Viking lookup struct with hash, cmp, and convertion functions between Viking and RViking structs:
 
 typedef struct RViking {
@@ -24,20 +30,18 @@ static inline int RViking_cmp(const RViking* rx, const RViking* ry) {
 }
 
 static inline Viking Viking_from(RViking raw) { // note: parameter is by value
-    return c_LITERAL(Viking){cstr_from(raw.name), cstr_from(raw.country)};
+    Viking v = {cstr_from(raw.name), cstr_from(raw.country)}; return v;
 }
 
 static inline RViking Viking_toraw(const Viking* vp) {
-    return c_LITERAL(RViking){cstr_str(&vp->name), cstr_str(&vp->country)};
+    RViking rv = {cstr_str(&vp->name), cstr_str(&vp->country)}; return rv;
 }
 
 // With this in place, we define the Viking => int hash map type:
 #define i_type      Vikings
-#define i_key_class Viking      // key type
-#define i_raw_class RViking     // lookup type
-#define i_keyfrom   Viking_from
+#define i_raw_class RViking     // lookup type ; binds _cmp, _hash (unless overridden)
+#define i_key_class Viking      // key type    ; binds _drop, _clone, _from, _toraw
 #define i_val       int         // mapped type
-#define i_opt       c_no_clone
 #define i_hash(rp)  stc_hash_mix(stc_strhash(rp->name), stc_strhash(rp->country))
 #include "stc/hmap.h"
 

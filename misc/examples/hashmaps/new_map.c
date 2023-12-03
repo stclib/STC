@@ -16,10 +16,9 @@ typedef struct MyStruct {
 // Point => int map
 typedef struct Point { int x, y; } Point;
 
-// Point => int map
+// Point => int map, uses default hash function
 #define i_TYPE hmap_pnt, struct Point, int
 #define i_eq c_memcmp_eq
-#define i_hash c_default_hash
 #define i_is_forward
 #include "stc/hmap.h"
 
