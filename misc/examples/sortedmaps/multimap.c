@@ -35,20 +35,20 @@ struct OlympicsData { int year; const char *city, *country, *date; } ol_data[] =
 
 typedef struct { int year; cstr city, date; } OlympicLoc;
 
-int OlympicLoc_cmp(const OlympicLoc* a, const OlympicLoc* b);
+int        OlympicLoc_cmp(const OlympicLoc* a, const OlympicLoc* b);
 OlympicLoc OlympicLoc_clone(OlympicLoc loc);
-void OlympicLoc_drop(OlympicLoc* self);
+void       OlympicLoc_drop(OlympicLoc* self);
 
 // Create a list<OlympicLoc>, can be sorted by year.
+#define i_type list_OL
 #define i_key_class OlympicLoc // binds _cmp, _clone and _drop.
-#define i_use_cmp
-#define i_tag OL
+#define i_use_cmp              // enable sorting
 #include "stc/list.h"
 
 // Create a smap<cstr, list_OL> where key is country name
-#define i_key_str            // binds cstr_equ, cstr_hash, cstr_clone, ++
-#define i_val_class list_OL // binds list_OL_clone, list_OL_drop
-#define i_tag OL
+#define i_type smap_OL
+#define i_key_str            // binds cstr_eq, cstr_hash, cstr_clone, ++
+#define i_val_class list_OL  // binds list_OL_clone, list_OL_drop
 #include "stc/smap.h"
 
 int OlympicLoc_cmp(const OlympicLoc* a, const OlympicLoc* b) {

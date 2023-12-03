@@ -1,18 +1,19 @@
 // This implements the std::map insert c++ example at:
 // https://docs.microsoft.com/en-us/cpp/standard-library/map-class?view=msvc-160#example-19
-#define i_TYPE smap_ii,int,int
+
+#define i_TYPE smap_ii, int, int
 #include "stc/smap.h"
+
+#define i_TYPE vec_ii, smap_ii_value
+#include "stc/vec.h"
 
 #define i_implement
 #include "stc/cstr.h"
+
+#define i_type smap_istr // Map of int => cstr
 #define i_key int
 #define i_val_str
-#define i_tag istr // Map of int => cstr
 #include "stc/smap.h"
-
-#define i_key smap_ii_raw
-#define i_tag ii
-#include "stc/vec.h"
 
 void print_ii(smap_ii map) {
     c_foreach (e, smap_ii, map)

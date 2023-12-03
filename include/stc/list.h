@@ -28,8 +28,7 @@
     #include <stdio.h>
     #include "stc/crand.h"
 
-    #define i_key int64_t
-    #define i_tag ix
+    #define i_TYPE list_ix,int64_t
     #include "stc/list.h"
 
     int main(void)
@@ -53,7 +52,8 @@
 */
 #include "priv/linkage.h"
 
-#ifndef CLIST_H_INCLUDED
+#ifndef STC_LIST_H_INCLUDED
+#define STC_LIST_H_INCLUDED
 #include "common.h"
 #include "forward.h"
 #include <stdlib.h>
@@ -76,7 +76,7 @@
     else     entry->next = entry
     // +: set self->last based on node
 
-#endif // CLIST_H_INCLUDED
+#endif // STC_LIST_H_INCLUDED
 
 #ifndef _i_prefix
   #define _i_prefix list_
@@ -407,6 +407,5 @@ STC_DEF bool _c_MEMB(_sort_with)(i_type* self, int(*cmp)(const _m_value*, const 
 }
 #endif // _i_has_cmp
 #endif // i_implement
-#define CLIST_H_INCLUDED
 #include "priv/template2.h"
 #include "priv/linkage2.h"

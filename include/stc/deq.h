@@ -22,13 +22,13 @@
  */
 #include "priv/linkage.h"
 
-#ifndef CDEQ_H_INCLUDED
-#define CDEQ_H_INCLUDED
+#ifndef STC_DEQ_H_INCLUDED
+#define STC_DEQ_H_INCLUDED
 #include "common.h"
 #include "forward.h"
 #include <stdlib.h>
 #include <string.h>
-#endif // CDEQ_H_INCLUDED
+#endif // STC_DEQ_H_INCLUDED
 
 #ifndef _i_prefix
   #define _i_prefix deq_

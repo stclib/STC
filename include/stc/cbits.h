@@ -50,8 +50,8 @@ int main(void) {
 }
 */
 #include "priv/linkage.h"
-#ifndef CBITS_H_INCLUDED
-#define CBITS_H_INCLUDED
+#ifndef STC_CBITS_H_INCLUDED
+#define STC_CBITS_H_INCLUDED
 #include "common.h"
 #include <stdlib.h>
 #include <string.h>
@@ -117,7 +117,7 @@ STC_INLINE bool _cbits_subset_of(const uint64_t* set, const uint64_t* other, con
 STC_INLINE bool _cbits_disjoint(const uint64_t* set, const uint64_t* other, const _llong sz)
     { _cbits_OPR(&, 0); }
 
-#endif // CBITS_H_INCLUDED
+#endif // STC_CBITS_H_INCLUDED
 
 #define _i_memb(name) c_JOIN(i_type, name)
 

@@ -55,8 +55,8 @@ int main(void) {
 */
 #include "priv/linkage.h"
 
-#ifndef CARC_H_INCLUDED
-#define CARC_H_INCLUDED
+#ifndef STC_ARC_H_INCLUDED
+#define STC_ARC_H_INCLUDED
 #include "common.h"
 #include "forward.h"
 #include <stdlib.h>
@@ -75,7 +75,7 @@ int main(void) {
 #endif
 
 #define carc_null {0}
-#endif // CARC_H_INCLUDED
+#endif // STC_ARC_H_INCLUDED
 
 #ifndef _i_prefix
   #define _i_prefix arc_

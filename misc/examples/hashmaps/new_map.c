@@ -10,25 +10,17 @@ typedef struct MyStruct {
 } MyStruct;
 
 // int => int map
-#define i_key int
-#define i_val int
+#define i_TYPE hmap_int, int, int
 #include "stc/hmap.h"
 
 // Point => int map
 typedef struct Point { int x, y; } Point;
 
-int point_cmp(const Point* a, const Point* b) {
-    int c = a->x - b->x;
-    return c ? c : a->y - b->y;
-}
-
 // Point => int map
-#define i_key Point
-#define i_val int
-#define i_cmp point_cmp
+#define i_TYPE hmap_pnt, struct Point, int
+#define i_eq c_memcmp_eq
 #define i_hash c_default_hash
 #define i_is_forward
-#define i_tag pnt
 #include "stc/hmap.h"
 
 // cstr => cstr map

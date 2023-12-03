@@ -22,8 +22,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-#ifndef CREGEX_H_INCLUDED
-#define CREGEX_H_INCLUDED
+#ifndef STC_CREGEX_H_INCLUDED
+#define STC_CREGEX_H_INCLUDED
 /*
  * cregex.h
  *
@@ -161,8 +161,8 @@ cstr cregex_replace_pattern_6(const char* pattern, const char* input, const char
 
 /* destroy regex */
 void cregex_drop(cregex* re);
-#endif // CREGEX_H_INCLUDED
+#endif // STC_CREGEX_H_INCLUDED
 
-#if (defined i_implement || defined i_import) && !defined CREGEX_C_INCLUDED
+#if (defined i_implement || defined i_import) && !defined STC_CREGEX_C_INCLUDED
   #include "../../src/cregex.c"
 #endif

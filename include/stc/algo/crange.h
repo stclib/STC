@@ -70,4 +70,4 @@ STC_INLINE void crange_next(crange_iter* it)
     { *it->ref += it->step; if ((it->step > 0) == (*it->ref > it->end)) it->ref = NULL; }
 
 #include "../priv/linkage2.h"
-#endif
+#endif // STC_CRANGE_H_INCLUDE

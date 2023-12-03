@@ -22,17 +22,18 @@ See the c++ class [std::list](https://en.cppreference.com/w/cpp/container/list) 
 ## Header file and declaration
 
 ```c
-#define i_key <t>      // element type: REQUIRED. Note: i_val* may be specified instead of i_key*.
-#define i_type <t>     // list container type name
-#define i_cmp <f>      // three-way compare two i_keyraw*
-#define i_use_cmp      // define instead of i_cmp only when i_key is an integral/native-type.
-#define i_keydrop <f>  // destroy value func - defaults to empty destruct
-#define i_keyclone <f> // REQUIRED IF i_keydrop defined
+#define i_TYPE <ct>,<kt> // shorthand to define i_type,i_key
+#define i_type <t>       // list container type name (default: list_{i_key})
+#define i_key <t>        // element type: REQUIRED. Note: i_val* may be specified instead of i_key*.
+#define i_cmp <f>        // three-way compare two i_keyraw*
+#define i_use_cmp        // may be defined instead of i_cmp when i_key is an integral/native-type.
+#define i_keydrop <f>    // destroy value func - defaults to empty destruct
+#define i_keyclone <f>   // REQUIRED IF i_keydrop defined
 
-#define i_keyraw <t>   // convertion "raw" type (default: {i_key})
-#define i_keyto <f>    // convertion func i_key* => i_keyraw
-#define i_keyfrom <f>  // convertion func i_keyraw => i_key
-#define i_tag <s>      // alternative typename: pque_{i_tag}. i_tag defaults to i_key
+#define i_keyraw <t>     // convertion "raw" type (default: {i_key})
+#define i_keyto <f>      // convertion func i_key* => i_keyraw
+#define i_keyfrom <f>    // convertion func i_keyraw => i_key
+#define i_tag <s>        // alternative typename: pque_{i_tag}. i_tag defaults to i_key
 #include "stc/list.h"
 ```
 

@@ -22,8 +22,8 @@
  */
 #include "priv/linkage.h"
 
-#ifndef CRAND_H_INCLUDED
-#define CRAND_H_INCLUDED
+#ifndef STC_CRAND_H_INCLUDED
+#define STC_CRAND_H_INCLUDED
 #include "common.h"
 /*
 // crand: Pseudo-random number generator
@@ -153,5 +153,5 @@ STC_DEF double crand_normal(crand_t* rng, crand_normal_t* dist) {
     return (u1*m)*dist->stddev + dist->mean;
 }
 #endif
-#endif
+#endif // STC_CRAND_H_INCLUDED
 #include "priv/linkage2.h"

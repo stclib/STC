@@ -4,7 +4,7 @@
 #include "stc/crand.h"
 
 #ifdef __cplusplus
-#include <vector>
+#include <deque>
 #include <algorithm>
 #endif
 
@@ -17,23 +17,24 @@ uint64_t seed = 1, mask1 = 0xfffffff, mask2 = 0xffff;
 
 static float secs(Range s) { return (float)(s.t2 - s.t1) / CLOCKS_PER_SEC; }
 
-#define i_val size_t
-#define i_tag x
-#include "stc/vec.h"
+#define i_TYPE deq_u64, uint64_t
+#include "stc/deq.h"
 
 #ifdef __cplusplus
-Sample test_std_vector() {
-    typedef std::vector<size_t> container;
-    Sample s = {"std,vector"};
+Sample test_std_deque() {
+    typedef std::deque<uint64_t> container;
+    Sample s = {"std,deque"};
     {
         s.test[INSERT].t1 = clock();
         container con;
         csrand(seed);
-        c_forrange (N) con.push_back(crand() & mask1);
+        c_forrange (N/3) con.push_front(crand() & mask1);
+        c_forrange (N/3) {con.push_back(crand() & mask1); con.pop_front();}
+        c_forrange (N/3) con.push_back(crand() & mask1);
         s.test[INSERT].t2 = clock();
         s.test[INSERT].sum = con.size();
         s.test[ERASE].t1 = clock();
-        c_forrange (N) con.pop_back();
+        c_forrange (con.size()/2) { con.pop_front(); con.pop_back(); }
         s.test[ERASE].t2 = clock();
         s.test[ERASE].sum = con.size();
      }{
@@ -57,42 +58,44 @@ Sample test_std_vector() {
      return s;
 }
 #else
-Sample test_std_vector() { Sample s = {"std-vector"}; return s;}
+Sample test_std_deque() { Sample s = {"std-deque"}; return s;}
 #endif
 
 
-
-Sample test_stc_vector() {
-    typedef vec_x container;
-    Sample s = {"STC,vector"};
+Sample test_stc_deque() {
+    typedef deq_u64 container;
+    Sample s = {"STC,deque"};
     {
         s.test[INSERT].t1 = clock();
         container con = {0};
+        //deq_u64_reserve(&con, N);
         csrand(seed);
-        c_forrange (N) vec_x_push(&con, crand() & mask1);
+        c_forrange (N/3) deq_u64_push_front(&con, crand() & mask1);
+        c_forrange (N/3) {deq_u64_push_back(&con, crand() & mask1); deq_u64_pop_front(&con);}
+        c_forrange (N/3) deq_u64_push_back(&con, crand() & mask1);
         s.test[INSERT].t2 = clock();
-        s.test[INSERT].sum = vec_x_size(&con);
+        s.test[INSERT].sum = deq_u64_size(&con);
         s.test[ERASE].t1 = clock();
-        c_forrange (N) { vec_x_pop(&con); }
+        c_forrange (deq_u64_size(&con)/2) { deq_u64_pop_front(&con); deq_u64_pop_back(&con); }
         s.test[ERASE].t2 = clock();
-        s.test[ERASE].sum = vec_x_size(&con);
-        vec_x_drop(&con);
+        s.test[ERASE].sum = deq_u64_size(&con);
+        deq_u64_drop(&con);
      }{
         csrand(seed);
         container con = {0};
-        c_forrange (N) vec_x_push(&con, crand() & mask2);
+        c_forrange (N) deq_u64_push_back(&con, crand() & mask2);
         s.test[FIND].t1 = clock();
         size_t sum = 0;
-        c_forrange (R) c_forrange (i, N) sum += con.data[i];
+        c_forrange (R) c_forrange (i, N) sum += *deq_u64_at(&con, i);
         s.test[FIND].t2 = clock();
         s.test[FIND].sum = sum;
         s.test[ITER].t1 = clock();
         sum = 0;
-        c_forrange (R) c_foreach (i, vec_x, con) sum += *i.ref;
+        c_forrange (R) c_foreach (i, deq_u64, con) sum += *i.ref;
         s.test[ITER].t2 = clock();
         s.test[ITER].sum = sum;
         s.test[DESTRUCT].t1 = clock();
-        vec_x_drop(&con);
+        deq_u64_drop(&con);
      }
      s.test[DESTRUCT].t2 = clock();
      s.test[DESTRUCT].sum = 0;
@@ -101,10 +104,10 @@ Sample test_stc_vector() {
 
 int main(int argc, char* argv[])
 {
-    Sample std_s[SAMPLES + 1] = {{NULL}}, stc_s[SAMPLES + 1] = {{NULL}};
+    Sample std_s[SAMPLES + 1], stc_s[SAMPLES + 1];
     c_forrange (i, SAMPLES) {
-        std_s[i] = test_std_vector();
-        stc_s[i] = test_stc_vector();
+        std_s[i] = test_std_deque();
+        stc_s[i] = test_stc_deque();
         if (i > 0) c_forrange (j, N_TESTS) {
             if (secs(std_s[i].test[j]) < secs(std_s[0].test[j])) std_s[0].test[j] = std_s[i].test[j];
             if (secs(stc_s[i].test[j]) < secs(stc_s[0].test[j])) stc_s[0].test[j] = stc_s[i].test[j];

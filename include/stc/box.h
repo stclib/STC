@@ -58,15 +58,15 @@ int main(void) {
 */
 #include "priv/linkage.h"
 
-#ifndef CBOX_H_INCLUDED
-#define CBOX_H_INCLUDED
+#ifndef STC_BOX_H_INCLUDED
+#define STC_BOX_H_INCLUDED
 #include "common.h"
 #include "forward.h"
 #include <stdlib.h>
 #include <string.h>
 
 #define cbox_null {0}
-#endif // CBOX_H_INCLUDED
+#endif // STC_BOX_H_INCLUDED
 
 #ifndef _i_prefix
   #define _i_prefix box_

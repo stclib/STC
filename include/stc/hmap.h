@@ -48,13 +48,14 @@ int main(void) {
 */
 #include "priv/linkage.h"
 
-#ifndef CMAP_H_INCLUDED
+#ifndef STC_HMAP_H_INCLUDED
+#define STC_HMAP_H_INCLUDED
 #include "common.h"
 #include "forward.h"
 #include <stdlib.h>
 #include <string.h>
-struct chash_slot { uint8_t hashx; };
-#endif // CMAP_H_INCLUDED
+struct hmap_slot { uint8_t hashx; };
+#endif // STC_HMAP_H_INCLUDED
 
 #ifndef _i_prefix
   #define _i_prefix hmap_
@@ -306,7 +307,7 @@ STC_INLINE void _c_MEMB(_wipe_)(i_type* self) {
     if (self->size == 0)
         return;
     _m_value* d = self->table, *_end = d + self->bucket_count;
-    struct chash_slot* s = self->slot;
+    struct hmap_slot* s = self->slot;
     for (; d != _end; ++d)
         if ((s++)->hashx)
             _c_MEMB(_value_drop)(d);
@@ -323,7 +324,7 @@ STC_DEF void _c_MEMB(_drop)(i_type* self) {
 STC_DEF void _c_MEMB(_clear)(i_type* self) {
     _c_MEMB(_wipe_)(self);
     self->size = 0;
-    c_memset(self->slot, 0, c_sizeof(struct chash_slot)*self->bucket_count);
+    c_memset(self->slot, 0, c_sizeof(struct hmap_slot)*self->bucket_count);
 }
 
 #ifdef _i_ismap
@@ -361,7 +362,7 @@ _c_MEMB(_bucket_)(const i_type* self, const _m_keyraw* rkeyptr) {
     intptr_t _cap = self->bucket_count;
     intptr_t _idx = fastrange_2(_hash, _cap);
     _m_result b = {NULL, true, (uint8_t)(_hash | 0x80)};
-    const struct chash_slot* s = self->slot;
+    const struct hmap_slot* s = self->slot;
     while (s[_idx].hashx) {
         if (s[_idx].hashx == b.hashx) {
             const _m_keyraw _raw = i_keyto(_i_keyref(self->table + _idx));
@@ -397,7 +398,7 @@ _c_MEMB(_clone)(i_type m) {
         _m_value *d = (_m_value *)i_malloc(m.bucket_count*c_sizeof *d),
                  *_dst = d, *_end = m.table + m.bucket_count;
         const intptr_t _sbytes = (m.bucket_count + 1)*c_sizeof *m.slot;
-        struct chash_slot *s = (struct chash_slot *)c_memcpy(i_malloc(_sbytes), m.slot, _sbytes);
+        struct hmap_slot *s = (struct hmap_slot *)c_memcpy(i_malloc(_sbytes), m.slot, _sbytes);
         if (!(d && s)) {
             i_free(d, m.bucket_count*c_sizeof *d);
             if (s) i_free(s, _sbytes);
@@ -421,14 +422,14 @@ _c_MEMB(_reserve)(i_type* self, const intptr_t _newcap) {
     _newbucks = stc_nextpow2(_newbucks);
     i_type m = {
         (_m_value *)i_malloc(_newbucks*c_sizeof(_m_value)),
-        (struct chash_slot *)i_calloc(_newbucks + 1, c_sizeof(struct chash_slot)),
+        (struct hmap_slot *)i_calloc(_newbucks + 1, c_sizeof(struct hmap_slot)),
         self->size, _newbucks
     };
     bool ok = m.table && m.slot;
     if (ok) {  // Rehash:
         m.slot[_newbucks].hashx = 0xff;
         const _m_value* d = self->table;
-        const struct chash_slot* s = self->slot;
+        const struct hmap_slot* s = self->slot;
         for (intptr_t i = 0; i < _oldbucks; ++i, ++d) if ((s++)->hashx) {
             _m_keyraw r = i_keyto(_i_keyref(d));
             _m_result b = _c_MEMB(_bucket_)(&m, &r);
@@ -445,7 +446,7 @@ _c_MEMB(_reserve)(i_type* self, const intptr_t _newcap) {
 STC_DEF void
 _c_MEMB(_erase_entry)(i_type* self, _m_value* _val) {
     _m_value* d = self->table;
-    struct chash_slot* s = self->slot;
+    struct hmap_slot* s = self->slot;
     intptr_t i = _val - d, j = i, k;
     const intptr_t _cap = self->bucket_count;
     _c_MEMB(_value_drop)(_val);
@@ -472,6 +473,5 @@ _c_MEMB(_erase_entry)(i_type* self, _m_value* _val) {
 #undef _i_keyref
 #undef _i_MAP_ONLY
 #undef _i_SET_ONLY
-#define CMAP_H_INCLUDED
 #include "priv/template2.h"
 #include "priv/linkage2.h"

@@ -20,8 +20,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
 */
-#ifndef STC_MISC_INCLUDED
-#define STC_MISC_INCLUDED
+#ifndef STC_MISC_H_INCLUDED
+#define STC_MISC_H_INCLUDED
 
 // ----------------------------------
 // c_auto init+drop containers (RAII)
@@ -109,4 +109,4 @@
     *(boolptr) = it.ref == NULL; \
 } while (0)
 
-#endif
+#endif // STC_MISC_H_INCLUDED

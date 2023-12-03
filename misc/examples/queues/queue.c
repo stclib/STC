@@ -1,8 +1,7 @@
 #include "stc/crand.h"
 #include <stdio.h>
 
-#define i_key int
-#define i_tag i
+#define i_TYPE queue_i, int
 #include "stc/queue.h"
 
 int main(void) {

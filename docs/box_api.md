@@ -14,23 +14,24 @@ See similar c++ class [std::unique_ptr](https://en.cppreference.com/w/cpp/memory
 ## Header file and declaration
 
 ```c
-#define i_key <t>       // element type: REQUIRED. Note: i_val* may be specified instead of i_key*.
-#define i_type <t>      // box container type name
-#define i_cmp <f>       // three-way compareison. REQUIRED IF i_key is a non-integral type
-                        // Note that containers of arcs will "inherit" i_cmp
-                        // when using arc in containers with i_val_arcbox MyArc - ie. the i_type.
-#define i_use_cmp       // define instead of i_cmp only when i_key is an integral/native-type.
-#define i_keydrop <f>   // destroy element func - defaults to empty destruct
-#define i_keyclone <f>  // REQUIRED if i_keydrop is defined, unless 'i_opt c_no_clone' is defined.
+#define i_TYPE <ct>,<kt> // shorthand to define i_type,i_key
+#define i_type <t>       // box container type name (default: box_{i_key})
+#define i_key <t>        // element type: REQUIRED. Note: i_val* may be specified instead of i_key*.
+#define i_cmp <f>        // three-way compareison. REQUIRED IF i_key is a non-integral type
+                         // Note that containers of arcs will "inherit" i_cmp
+                         // when using arc in containers with i_val_arcbox MyArc - ie. the i_type.
+#define i_use_cmp        // may be defined instead of i_cmp when i_key is an integral/native-type.
+#define i_keydrop <f>    // destroy element func - defaults to empty destruct
+#define i_keyclone <f>   // REQUIRED if i_keydrop is defined, unless 'i_opt c_no_clone' is defined.
 
-#define i_keyraw <t>    // convertion type (lookup): default to {i_key}
-#define i_keyto <f>     // convertion func i_key* => i_keyraw: REQUIRED IF i_keyraw defined.
-#define i_keyfrom <f>   // from-raw func.
+#define i_keyraw <t>     // convertion type (lookup): default to {i_key}
+#define i_keyto <f>      // convertion func i_key* => i_keyraw: REQUIRED IF i_keyraw defined.
+#define i_keyfrom <f>    // from-raw func.
 
-#define i_tag <s>       // alternative typename: box_{i_tag}. i_tag defaults to i_key
+#define i_tag <s>        // alternative typename: box_{i_tag}. i_tag defaults to i_key
 #define i_key_class <t>  // Use instead of i_key when functions {i_key}_clone,
-                        // {i_key}_drop and {i_keyraw}_cmp exist.
-#define i_key_arcbox <t>  // Use instead of i_key when key is a arc- or a box-type.
+                         // {i_key}_drop and {i_keyraw}_cmp exist.
+#define i_key_arcbox <t> // Use instead of i_key when key is a arc- or a box-type.
 #include "stc/box.h"
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.
@@ -39,13 +40,13 @@ compare the pointer addresses when used. Additionally, `c_no_clone` or `i_is_fwd
 
 ## Methods
 ```c
-box_X      box_X_init();                                    // return an empty box
-box_X      box_X_from(i_keyraw raw);                        // create a box from raw type. Avail if i_keyraw user defined.
-box_X      box_X_from_ptr(i_key* ptr);                      // create a box from a pointer. Takes ownership of ptr.
-box_X      box_X_make(i_key val);                           // create a box from unowned val object.
+box_X       box_X_init();                                   // return an empty box
+box_X       box_X_from(i_keyraw raw);                       // create a box from raw type. Avail if i_keyraw user defined.
+box_X       box_X_from_ptr(i_key* ptr);                     // create a box from a pointer. Takes ownership of ptr.
+box_X       box_X_make(i_key val);                          // create a box from unowned val object.
 
-box_X      box_X_clone(box_X other);                        // return deep copied clone
-box_X      box_X_move(box_X* self);                         // transfer ownership to receiving box returned. self becomes NULL.
+box_X       box_X_clone(box_X other);                       // return deep copied clone
+box_X       box_X_move(box_X* self);                        // transfer ownership to receiving box returned. self becomes NULL.
 void        box_X_take(box_X* self, box_X unowned);         // take ownership of unowned box object.
 void        box_X_assign(box_X* self, box_X* moved);        // transfer ownership from moved to self; moved becomes NULL.
 void        box_X_drop(box_X* self);                        // destruct the contained object and free its heap memory.

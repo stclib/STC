@@ -244,22 +244,20 @@ This example uses four different container types:
 #include <stdio.h>
 
 #define i_key int
-#include "stc/hset.h"  // hset_int: unordered/hash set (assume i_key is basic type, uses `==` operator)
+#include "stc/hset.h"   // hset_int: unordered/hash set (assume i_key is basic type, uses `==` operator)
 
 struct Point { float x, y; };
-// Define vec_pnt with a less-comparison function for Point.
-#define i_key struct Point
-#define i_less(a, b) a->x < b->x || (a->x == b->x && a->y < b->y) // enable sort/search
-#define i_tag pnt
-#include "stc/vec.h"   // vec_pnt: vector of struct Point
+
+#define i_TYPE vec_pnt, struct Point
+#define i_less(a, b) a->x < b->x || (a->x == b->x && a->y < b->y) // enable sort and (slow-ish) search
+#define i_eq(a, b) a->x == b->x && a->y == b->y                   // enable faster linear search
+#include "stc/vec.h"    // vec_pnt: vector of struct Point
 
 #define i_key int
-#define i_use_cmp       // enable sort/search. Use native `<` and `==` operators
-#include "stc/list.h"  // list_int: singly linked list
+#include "stc/list.h"   // list_int: singly linked list
 
-#define i_key int
-#define i_val int
-#include "stc/smap.h>  // smap_int: sorted map int =" int
+#define i_TYPE smap_int, int, int
+#include "stc/smap.h"  // sorted map int => int
 
 int main(void)
 {

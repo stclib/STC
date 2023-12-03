@@ -22,12 +22,12 @@
  */
 #include "priv/linkage.h"
 
-#ifndef CSTACK_H_INCLUDED
-#define CSTACK_H_INCLUDED
+#ifndef STC_STACK_H_INCLUDED
+#define STC_STACK_H_INCLUDED
 #include "common.h"
 #include <stdlib.h>
 #include "forward.h"
-#endif // CSTACK_H_INCLUDED
+#endif // STC_STACK_H_INCLUDED
 
 #ifndef _i_prefix
   #define _i_prefix stack_

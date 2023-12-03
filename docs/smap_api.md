@@ -15,24 +15,25 @@ See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) fo
 ## Header file and declaration
 
 ```c
-#define i_key <t>      // key type: REQUIRED.
-#define i_val <t>      // mapped value type: REQUIRED.
-#define i_type <t>     // container type name (default: hmap_{i_key})
-#define i_cmp <f>      // three-way compare two i_keyraw* : REQUIRED IF i_keyraw is a non-integral type
+#define i_TYPE <ct>,<kt>,<vt> // shorthand to define i_type,i_key,i_val
+#define i_type <t>            // container type name (default: smap_{i_key})
+#define i_key <t>             // key type: REQUIRED.
+#define i_val <t>             // mapped value type: REQUIRED.
+#define i_cmp <f>             // three-way compare two i_keyraw* : REQUIRED IF i_keyraw is a non-integral type
 
-#define i_keydrop <f>  // destroy key func - defaults to empty destruct
-#define i_keyclone <f> // REQUIRED IF i_valdrop defined
-#define i_keyraw <t>   // convertion "raw" type - defaults to i_key
-#define i_keyfrom <f>  // convertion func i_keyraw => i_key
-#define i_keyto <f>    // convertion func i_key* => i_keyraw
+#define i_keydrop <f>         // destroy key func - defaults to empty destruct
+#define i_keyclone <f>        // REQUIRED IF i_valdrop defined
+#define i_keyraw <t>          // convertion "raw" type - defaults to i_key
+#define i_keyfrom <f>         // convertion func i_keyraw => i_key
+#define i_keyto <f>           // convertion func i_key* => i_keyraw
 
-#define i_valdrop <f>  // destroy value func - defaults to empty destruct
-#define i_valclone <f> // REQUIRED IF i_valdrop defined
-#define i_valraw <t>   // convertion "raw" type - defaults to i_val
-#define i_valfrom <f>  // convertion func i_valraw => i_val
-#define i_valto <f>    // convertion func i_val* => i_valraw
+#define i_valdrop <f>         // destroy value func - defaults to empty destruct
+#define i_valclone <f>        // REQUIRED IF i_valdrop defined
+#define i_valraw <t>          // convertion "raw" type - defaults to i_val
+#define i_valfrom <f>         // convertion func i_valraw => i_val
+#define i_valto <f>           // convertion func i_val* => i_valraw
 
-#define i_tag <s>      // alternative typename: smap_{i_tag}. i_tag defaults to i_val
+#define i_tag <s>             // alternative typename: smap_{i_tag}. i_tag defaults to i_key
 #include "stc/smap.h"
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.
@@ -105,6 +106,7 @@ void                 smap_X_value_drop(smap_X_value* pval);
 ```c
 #define i_implement
 #include "stc/cstr.h"
+
 #define i_key_str // special macro for i_key = cstr, i_tag = str
 #define i_val_str // ditto
 #include "stc/smap.h"
@@ -231,10 +233,8 @@ static int Vec3i_cmp(const Vec3i* a, const Vec3i* b) {
     return a->z - b->z;
 }
 
-#define i_key Vec3i
-#define i_val int
+#define i_TYPE smap_vi, Vec3i, int
 #define i_cmp Vec3i_cmp
-#define i_tag vi
 #include "stc/smap.h"
 #include <stdio.h>
 

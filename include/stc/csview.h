@@ -23,8 +23,8 @@
 #define i_header // external linkage by default. override with i_static.
 #include "priv/linkage.h"
 
-#ifndef CSVIEW_H_INCLUDED
-#define CSVIEW_H_INCLUDED
+#ifndef STC_CSVIEW_H_INCLUDED
+#define STC_CSVIEW_H_INCLUDED
 
 #include "common.h"
 #include "forward.h"
@@ -146,10 +146,10 @@ STC_INLINE int csview_icmp(const csview* x, const csview* y)
 STC_INLINE bool csview_eq(const csview* x, const csview* y)
     { return x->size == y->size && !c_memcmp(x->buf, y->buf, x->size); }
 
-#endif // CSVIEW_H_INCLUDED
+#endif // STC_CSVIEW_H_INCLUDED
 
 /* csview interaction with cstr: */
-#ifdef CSTR_H_INCLUDED
+#ifdef STC_CSTR_H_INCLUDED
 
 STC_INLINE csview cstr_substr(const cstr* self, intptr_t pos, intptr_t n)
     { return csview_substr(cstr_sv(self), pos, n); }
@@ -169,8 +169,8 @@ STC_INLINE csview cstr_u8_substr(const cstr* self , intptr_t bytepos, intptr_t u
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined i_implement || defined i_static
-#ifndef CSVIEW_C_INCLUDED
-#define CSVIEW_C_INCLUDED
+#ifndef STC_CSVIEW_C_INCLUDED
+#define STC_CSVIEW_C_INCLUDED
 
 STC_DEF csview_iter csview_advance(csview_iter it, intptr_t pos) {
     int inc = -1;
@@ -219,7 +219,7 @@ STC_DEF csview csview_token(csview sv, const char* sep, intptr_t* start) {
     *start += tok.size + sep_size;
     return tok;
 }
-#endif // CSVIEW_C_INCLUDED
+#endif // STC_CSVIEW_C_INCLUDED
 #endif // i_implement
 
 #if defined i_import

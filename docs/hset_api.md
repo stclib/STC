@@ -7,19 +7,20 @@ A **hset** is an associative container that contains a set of unique objects of 
 ## Header file and declaration
 
 ```c
-#define i_key <t>      // element type: REQUIRED. Note: i_val* may be specified instead of i_key*.
-#define i_type <t>     // container type name
-#define i_hash <f>     // hash func i_keyraw*: REQUIRED IF i_keyraw is non-pod type
-#define i_eq <f>       // equality comparison two i_keyraw*: REQUIRED IF i_keyraw is a
-                       // non-integral type. Three-way i_cmp may alternatively be specified.
-#define i_keydrop <f>  // destroy key func: defaults to empty destruct
-#define i_keyclone <f> // clone func: REQUIRED IF i_keydrop defined
+#define i_TYPE <ct>,<kt> // shorthand to define i_type,i_key
+#define i_type <t>       // container type name (default: hset_{i_key})
+#define i_key <t>        // element type: REQUIRED. Note: i_val* may be specified instead of i_key*.
+#define i_hash <f>       // hash func i_keyraw*: REQUIRED IF i_keyraw is non-pod type
+#define i_eq <f>         // equality comparison two i_keyraw*: REQUIRED IF i_keyraw is a
+                         // non-integral type. Three-way i_cmp may be specified instead.
+#define i_keydrop <f>    // destroy key func: defaults to empty destruct
+#define i_keyclone <f>   // clone func: REQUIRED IF i_keydrop defined
 
-#define i_keyraw <t>   // convertion "raw" type - defaults to i_key
-#define i_keyfrom <f>  // convertion func i_keyraw => i_key - defaults to plain copy
-#define i_keyto <f>    // convertion func i_key* => i_keyraw - defaults to plain copy
+#define i_keyraw <t>     // convertion "raw" type - defaults to i_key
+#define i_keyfrom <f>    // convertion func i_keyraw => i_key - defaults to plain copy
+#define i_keyto <f>      // convertion func i_key* => i_keyraw - defaults to plain copy
 
-#define i_tag <s>      // alternative typename: hmap_{i_tag}. i_tag defaults to i_key
+#define i_tag <s>        // alternative typename: hmap_{i_tag}. i_tag defaults to i_key
 #include "stc/hset.h"
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.

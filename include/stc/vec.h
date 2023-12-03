@@ -39,9 +39,8 @@ struct MyStruct {
 #define i_key_str // special for cstr
 #include "stc/vec.h"
 
-#define i_key int
+#define i_TYPE vec_i32,int32_t
 #define i_is_forward
-#define i_tag i32
 #include "stc/vec.h"
 
 int main(void) {
@@ -60,7 +59,8 @@ int main(void) {
 */
 #include "priv/linkage.h"
 
-#ifndef CVEC_H_INCLUDED
+#ifndef STC_VEC_H_INCLUDED
+#define STC_VEC_H_INCLUDED
 #include "common.h"
 #include "forward.h"
 #include <stdlib.h>
@@ -68,7 +68,7 @@ int main(void) {
 
 #define _it2_ptr(it1, it2) (it1.ref && !it2.ref ? it2.end : it2.ref)
 #define _it_ptr(it) (it.ref ? it.ref : it.end)
-#endif // CVEC_H_INCLUDED
+#endif // STC_VEC_H_INCLUDED
 
 #ifndef _i_prefix
   #define _i_prefix vec_
@@ -383,6 +383,5 @@ STC_DEF int _c_MEMB(_value_cmp)(const _m_value* x, const _m_value* y) {
 }
 #endif // _i_has_cmp
 #endif // i_implement
-#define CVEC_H_INCLUDED
 #include "priv/template2.h"
 #include "priv/linkage2.h"

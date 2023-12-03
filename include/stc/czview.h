@@ -25,8 +25,8 @@
 
 // czview is a "zero-terminated string view". It replaces czview.
 
-#ifndef CZVIEW_H_INCLUDED
-#define CZVIEW_H_INCLUDED
+#ifndef STC_CZVIEW_H_INCLUDED
+#define STC_CZVIEW_H_INCLUDED
 
 #include "common.h"
 #include "forward.h"
@@ -135,7 +135,7 @@ STC_INLINE bool czview_eq(const czview* x, const czview* y)
 STC_INLINE uint64_t czview_hash(const czview *self)
     { return stc_hash(self->str, self->size); }
 
-#endif // CZVIEW_H_INCLUDED
+#endif // STC_CZVIEW_H_INCLUDED
 
 #if defined i_import
   #include "../../src/utf8code.c"

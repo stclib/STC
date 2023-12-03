@@ -1,14 +1,14 @@
 exe=''
 if [ "$OS" = "Windows_NT" ] ; then exe=".exe" ; fi
-clang -DNDEBUG -I../../include -O3 -o cdeq_benchmark$exe   cdeq_benchmark.cpp -lstdc++
-clang -DNDEBUG -I../../include -O3 -o clist_benchmark$exe  clist_benchmark.cpp -lstdc++
-clang -DNDEBUG -I../../include -O3 -o cmap_benchmark$exe   cmap_benchmark.cpp -lstdc++
-clang -DNDEBUG -I../../include -O3 -o csmap_benchmark$exe  csmap_benchmark.cpp -lstdc++
-clang -DNDEBUG -I../../include -O3 -o cvec_benchmark$exe   cvec_benchmark.cpp -lstdc++
+clang -DNDEBUG -I../../include -O3 -o deq_benchmark$exe   deq_benchmark.cpp -lstdc++
+clang -DNDEBUG -I../../include -O3 -o list_benchmark$exe  list_benchmark.cpp -lstdc++
+clang -DNDEBUG -I../../include -O3 -o hmap_benchmark$exe   hmap_benchmark.cpp -lstdc++
+clang -DNDEBUG -I../../include -O3 -o smap_benchmark$exe  smap_benchmark.cpp -lstdc++
+clang -DNDEBUG -I../../include -O3 -o vec_benchmark$exe   vec_benchmark.cpp -lstdc++
 
 c='Win-Clang-16.0.5'
-./cdeq_benchmark$exe $c
-./clist_benchmark$exe $c
-./cmap_benchmark$exe $c
-./csmap_benchmark$exe $c
-./cvec_benchmark$exe $c
+./deq_benchmark$exe $c
+./list_benchmark$exe $c
+./map_benchmark$exe $c
+./smap_benchmark$exe $c
+./vec_benchmark$exe $c

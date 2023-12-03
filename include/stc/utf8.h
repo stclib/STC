@@ -22,14 +22,14 @@
  */
 #include "priv/linkage.h"
 
-#ifndef UTF8_H_INCLUDED
-#define UTF8_H_INCLUDED
+#ifndef STC_UTF8_H_INCLUDED
+#define STC_UTF8_H_INCLUDED
 
 #include "common.h"
 #include "forward.h"
 #include "priv/utf8_hdr.h"
 
-#endif // UTF8_H_INCLUDED
+#endif // STC_UTF8_H_INCLUDED
 
 #if defined i_implement
   #include "../../src/utf8code.c"

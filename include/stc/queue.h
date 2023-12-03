@@ -22,13 +22,13 @@
  */
 #include "priv/linkage.h"
 
-#ifndef CQUEUE_H_INCLUDED
-#define CQUEUE_H_INCLUDED
+#ifndef STC_QUEUE_H_INCLUDED
+#define STC_QUEUE_H_INCLUDED
 #include "common.h"
 #include "forward.h"
 #include <stdlib.h>
 #include <string.h>
-#endif // CQUEUE_H_INCLUDED
+#endif // STC_QUEUE_H_INCLUDED
 
 #ifndef _i_prefix
   #define _i_prefix queue_

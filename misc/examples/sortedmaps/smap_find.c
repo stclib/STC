@@ -3,13 +3,12 @@
 #define i_implement
 #include "stc/cstr.h"
 
+#define i_type smap_istr
 #define i_key int
 #define i_val_str
-#define i_tag istr
 #include "stc/smap.h"
 
-#define i_key smap_istr_raw
-#define i_tag istr
+#define i_TYPE vec_istr, smap_istr_raw
 #include "stc/vec.h"
 
 void print_elem(smap_istr_raw p) {

@@ -22,11 +22,12 @@
  */
 #include "priv/linkage.h"
 
-#ifndef CPQUE_H_INCLUDED
+#ifndef STC_PQUE_H_INCLUDED
+#define STC_PQUE_H_INCLUDED
 #include "common.h"
 #include <stdlib.h>
 #include "forward.h"
-#endif
+#endif // STC_PQUE_H_INCLUDED
 
 #ifndef _i_prefix
   #define _i_prefix pque_
@@ -163,7 +164,6 @@ _c_MEMB(_push)(i_type* self, _m_value value) {
 }
 
 #endif
-#define CPQUE_H_INCLUDED
 #undef _i_ispque
 #include "priv/template2.h"
 #include "priv/linkage2.h"

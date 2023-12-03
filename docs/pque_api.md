@@ -8,17 +8,18 @@ See the c++ class [std::priority_queue](https://en.cppreference.com/w/cpp/contai
 ## Header file and declaration
 
 ```c
-#define i_key <t>      // element type: REQUIRED. Note: i_val* may be specified instead of i_key*.
-#define i_type <t>     // pque container type name
-#define i_less <f>     // compare two i_key* : REQUIRED IF i_key/i_keyraw is a non-integral type
-#define i_keydrop <f>  // destroy value func - defaults to empty destruct
-#define i_keyclone <f> // REQUIRED IF i_keydrop defined
+#define i_TYPE <ct>,<kt> // shorthand to define i_type,i_key
+#define i_type <t>       // pque container type name (default: pque_{i_key})
+#define i_key <t>        // element type: REQUIRED. Note: i_val* may be specified instead of i_key*.
+#define i_less <f>       // compare two i_key* : REQUIRED IF i_key/i_keyraw is a non-integral type
+#define i_keydrop <f>    // destroy value func - defaults to empty destruct
+#define i_keyclone <f>   // REQUIRED IF i_keydrop defined
 
-#define i_keyraw <t>   // convertion type
-#define i_keyfrom <f>  // convertion func i_keyraw => i_key
-#define i_keyto <f>    // convertion func i_key* => i_keyraw.
+#define i_keyraw <t>     // convertion type
+#define i_keyfrom <f>    // convertion func i_keyraw => i_key
+#define i_keyto <f>      // convertion func i_key* => i_keyraw.
 
-#define i_tag <s>      // alternative typename: pque_{i_tag}. i_tag defaults to i_key
+#define i_tag <s>        // alternative typename: pque_{i_tag}. i_tag defaults to i_key
 #include "stc/pque.h"
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.
@@ -63,9 +64,8 @@ i_key               pque_X_value_clone(i_key value);
 #include "stc/crand.h"
 #include <stdio.h>
 
-#define i_key int64_t
+#define i_TYPE pque_i64, int64_t
 #define i_cmp -c_default_cmp // min-heap
-#define i_tag i
 #include "stc/pque.h"
 
 int main(void)
@@ -75,23 +75,23 @@ int main(void)
     crand_uniform_t dist = crand_uniform_init(0, N * 10);
 
     // Define heap
-    pque_i heap = {0};
+    pque_i64 heap = {0};
 
     // Push ten million random numbers to priority queue.
     c_forrange (N)
-        pque_i_push(&heap, crand_uniform(&rng, &dist));
+        pque_i64_push(&heap, crand_uniform(&rng, &dist));
 
     // Add some negative ones.
     int nums[] = {-231, -32, -873, -4, -343};
     c_forrange (i, c_arraylen(nums))
-        pque_i_push(&heap, nums[i]);
+        pque_i64_push(&heap, nums[i]);
 
     // Extract and display the fifty smallest.
     c_forrange (50) {
-        printf("%" PRId64 " ", *pque_i_top(&heap));
-        pque_i_pop(&heap);
+        printf("%" PRId64 " ", *pque_i64_top(&heap));
+        pque_i64_pop(&heap);
     }
-    pque_i_drop(&heap);
+    pque_i64_drop(&heap);
 }
 ```
 Output:

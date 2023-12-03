@@ -1,7 +1,7 @@
-#ifndef UTF8_C_INCLUDED
-#define UTF8_C_INCLUDED
+#ifndef STC_UTF8_C_INCLUDED
+#define STC_UTF8_C_INCLUDED
 
-#ifndef UTF8_HDR_H
+#ifndef STC_UTF8_HDR_H_INCLUDED
   #include "../include/stc/utf8.h"
 #endif
 #include "utf8tabs.inc"
@@ -153,7 +153,7 @@ bool utf8_isalpha(uint32_t c) {
 
 bool utf8_iscased(uint32_t c) {
     if (c < 128) return isalpha((int)c) != 0;
-    return utf8_islower(c) || utf8_isupper(c) || 
+    return utf8_islower(c) || utf8_isupper(c) ||
            utf8_isgroup(U8G_Lt, c);
 }
 
@@ -488,4 +488,4 @@ const UGroup _utf8_unicode_groups[U8G_SIZE] = {
     _e_arg(U8G_Latin, UNI_ENTRY(Latin)),
 };
 
-#endif
+#endif // STC_UTF8_C_INCLUDED

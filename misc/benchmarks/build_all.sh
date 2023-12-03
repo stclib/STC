@@ -15,12 +15,12 @@ if [ ! -z "$1" ] ; then
     cc=$@
 fi
 if [ $run = 0 ] ; then
-    for i in *.cpp various/*.c* picobench/*.cpp plotbench/*.cpp ; do
+    for i in *.cpp various/*.cpp picobench/*.cpp plotbench/*.cpp ; do
         echo $cc -I../include $i -o $(basename -s .cpp $i).exe
         $cc -I../include $i -o $(basename -s .cpp $i).exe
     done
 else
-    for i in various/*.c* picobench/*.cpp ; do
+    for i in various/*.cpp picobench/*.cpp ; do
         echo $cc -O3 -I../include $i
         $cc -O3 -I../include $i
         if [ -f $(basename -s .c $i).exe ]; then ./$(basename -s .c $i).exe; fi

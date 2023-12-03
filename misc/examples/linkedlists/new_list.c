@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "stc/forward.h"
 
-forward_list(list_i32, int);
+forward_list(list_i32, int32_t);
 forward_list(list_pnt, struct Point);
 
 typedef struct {
@@ -9,8 +9,7 @@ typedef struct {
     list_pnt pntlist;
 } MyStruct;
 
-#define i_key int
-#define i_tag i32
+#define i_TYPE list_i32, int32_t
 #define i_is_forward
 #include "stc/list.h"
 
@@ -20,10 +19,9 @@ int point_cmp(const Point* a, const Point* b) {
     return c ? c : a->y - b->y;
 }
 
-#define i_key Point
+#define i_TYPE list_pnt, Point
 #define i_cmp point_cmp
 #define i_is_forward
-#define i_tag pnt
 #include "stc/list.h"
 
 #define i_key float

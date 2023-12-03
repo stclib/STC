@@ -25,14 +25,14 @@
 
 #ifndef STC_TEMPLATE_H_INCLUDED
 #define STC_TEMPLATE_H_INCLUDED
-  #define c_option(flag)          ((i_opt) & (flag))
-  #define c_is_forward            (1<<0)
-  #define c_no_atomic             (1<<1)
-  #define c_no_clone              (1<<2)
-  #define c_no_emplace            (1<<3)
-  #define c_no_hash               (1<<4)
-  #define c_use_cmp               (1<<5)
-  #define c_more                  (1<<6)
+  #define c_option(flag)  ((i_opt) & (flag))
+  #define c_is_forward    (1<<0)
+  #define c_no_atomic     (1<<1)
+  #define c_no_clone      (1<<2)
+  #define c_no_emplace    (1<<3)
+  #define c_no_hash       (1<<4)
+  #define c_use_cmp       (1<<5)
+  #define c_more          (1<<6)
 
   #define _c_MEMB(name) c_JOIN(i_type, name)
   #define _c_DEFTYPES(macro, SELF, ...) c_EXPAND(macro(SELF, __VA_ARGS__))
@@ -59,20 +59,10 @@
   #define i_type c_JOIN(_i_prefix, i_tag)
 #endif
 
-#ifdef i_keyclass // [deprecated]
-  #define i_key_class i_keyclass
-#endif
-#ifdef i_valclass // [deprecated]
-  #define i_val_class i_valclass
-#endif
-#ifdef i_rawclass // [deprecated]
-  #define i_raw_class i_rawclass
-#endif
-#ifdef i_keyboxed // [deprecated]
-  #define i_key_arcbox i_keyboxed
-#endif
-#ifdef i_valboxed // [deprecated]
-  #define i_val_arcbox i_valboxed
+#if defined i_keyclass || defined i_valclass || defined i_rawclass || \
+    defined i_keyboxed || defined i_valboxed
+  #error "i_keyclass, i_valclass, i_rawclass, i_keyboxed, i_valboxed is not supported. " \
+         "Use: i_key_class, i_val_class, i_raw_class, i_key_arcbox, i_val_arcbox."
 #endif
 
 #if !(defined i_key || \
@@ -314,5 +304,5 @@
 #endif
 #ifndef i_has_emplace
   #define i_no_emplace
-#endif
+#endif // STC_TEMPLATE_H_INCLUDED
 #endif

@@ -27,8 +27,8 @@
 #define i_header // external linkage by default. override with i_static.
 #include "priv/linkage.h"
 
-#ifndef CSTR_H_INCLUDED
-#define CSTR_H_INCLUDED
+#ifndef STC_CSTR_H_INCLUDED
+#define STC_CSTR_H_INCLUDED
 
 #include <stdlib.h> /* malloc */
 #include <stdarg.h>
@@ -386,11 +386,11 @@ STC_INLINE void cstr_insert_s(cstr* self, intptr_t pos, cstr s)
 STC_INLINE bool cstr_getline(cstr *self, FILE *fp)
     { return cstr_getdelim(self, '\n', fp); }
 
-#endif // CSTR_H_INCLUDED
+#endif // STC_CSTR_H_INCLUDED
 
-/* -------------------------- UTF8 CASE CONVERSION ------------------------- */
-#if defined(i_import) && !defined(CSTR_X_INCLUDED)
-#define CSTR_X_INCLUDED
+/* ----------------------- UTF8 CASE CONVERSION ---------------------- */
+#if defined i_import && !defined STC_CSTR_UTF8_INCLUDED
+#define STC_CSTR_UTF8_INCLUDED
 
 static struct {
     int      (*conv_asc)(int);
@@ -444,12 +444,12 @@ void cstr_uppercase(cstr* self)
 
 bool cstr_valid_utf8(const cstr* self)
     { return utf8_valid(cstr_str(self)); }
-#endif // i_import
+#endif // i_import STC_CSTR_UTF8_INCLUDED
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined i_implement || defined i_static
-#ifndef CSTR_C_INCLUDED
-#define CSTR_C_INCLUDED
+#ifndef STC_CSTR_C_INCLUDED
+#define STC_CSTR_C_INCLUDED
 
 STC_DEF uint64_t cstr_hash(const cstr *self) {
     csview sv = cstr_sv(self);
@@ -650,7 +650,7 @@ STC_DEF intptr_t cstr_printf(cstr* self, const char* fmt, ...) {
     va_end(args);
     return n;
 }
-#endif // CSTR_C_INCLUDED
+#endif // STC_CSTR_C_INCLUDED
 #endif // i_implement
 
 #if defined i_import

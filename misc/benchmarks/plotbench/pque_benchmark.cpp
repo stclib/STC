@@ -3,10 +3,9 @@
 #define i_static
 #include "stc/crand.h"
 
-#define i_val float
+#define i_TYPE pque_flt, float
 #define i_cmp -c_default_cmp
-#define i_tag f
-#include "stc/cpque.h"
+#include "stc/pque.h"
 
 #include <queue>
 
@@ -37,21 +36,21 @@ void stc_test()
 {
     int N = 10000000;
 
-    cpque_f pq = {0};   
-    c_defer(cpque_f_drop(&pq))
+    pque_flt pq = {0};
+    c_defer(pque_flt_drop(&pq))
     {
         csrand(seed);
         clock_t start = clock();
         c_forrange (i, N) {
-            cpque_f_push(&pq, (float) crandf()*100000);
+            pque_flt_push(&pq, (float) crandf()*100000);
         }
 
         printf("Built priority queue: %f secs\n", (float)(clock() - start)/(float)CLOCKS_PER_SEC);
-        printf("%g ", *cpque_f_top(&pq));
+        printf("%g ", *pque_flt_top(&pq));
 
         start = clock();
         c_forrange (i, N) {
-            cpque_f_pop(&pq);
+            pque_flt_pop(&pq);
         }
 
         printf("\npopped PQ: %f secs\n", (clock() - start) / (float) CLOCKS_PER_SEC);

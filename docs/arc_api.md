@@ -20,13 +20,13 @@ See similar c++ class [std::shared_ptr](https://en.cppreference.com/w/cpp/memory
 ## Header file and declaration
 
 ```c
-#define i_type <name>      // arc container type name
+#define i_TYPE <ct>,<kt>   // shorthand to define i_type,i_key
+#define i_type <t>         // arc container type name (default: arc_{i_key})
 #define i_key <t>          // element type: REQUIRED. Note: i_val* may be specified instead of i_key*.
-#define i_TYPE <name>,<t>  // alternative shorthand to define i_type,i_key
 #define i_cmp <f>          // three-way compareison. REQUIRED IF i_key is a non-integral type
                            // Note that containers of arcs will "inherit" i_cmp
                            // when using arc in containers with i_val_arcbox MyArc - ie. the i_type.
-#define i_use_cmp          // define instead of i_cmp only when i_key is an integral/native-type.
+#define i_use_cmp          // may be defined instead of i_cmp when i_key is an integral/native-type.
 #define i_keydrop <f>      // destroy element func - defaults to empty destruct
 #define i_keyclone <f>     // REQUIRED if i_keydrop is defined, unless 'i_opt c_no_clone' is defined.
 
@@ -42,13 +42,13 @@ See similar c++ class [std::shared_ptr](https://en.cppreference.com/w/cpp/memory
 
 ## Methods
 ```c
-arc_X      arc_X_init();                                    // empty shared pointer
-arc_X      arc_X_from(i_keyraw raw);                        // create an arc from raw type (available if i_keyraw defined by user).
-arc_X      arc_X_from_ptr(i_key* p);                        // create an arc from raw pointer. Takes ownership of p.
-arc_X      arc_X_make(i_key key);                           // create an arc from constructed key object. Faster than from_ptr().
+arc_X       arc_X_init();                                   // empty shared pointer
+arc_X       arc_X_from(i_keyraw raw);                       // create an arc from raw type (available if i_keyraw defined by user).
+arc_X       arc_X_from_ptr(i_key* p);                       // create an arc from raw pointer. Takes ownership of p.
+arc_X       arc_X_make(i_key key);                          // create an arc from constructed key object. Faster than from_ptr().
 
-arc_X      arc_X_clone(arc_X other);                        // return other with increased use count
-arc_X      arc_X_move(arc_X* self);                         // transfer ownership to receiver; self becomes NULL
+arc_X       arc_X_clone(arc_X other);                       // return other with increased use count
+arc_X       arc_X_move(arc_X* self);                        // transfer ownership to receiver; self becomes NULL
 void        arc_X_take(arc_X* self, arc_X unowned);         // take ownership of unowned.
 void        arc_X_assign(arc_X* self, arc_X other);         // shared assign (increases use count)
 

@@ -12,18 +12,19 @@ See the c++ class [std::vector](https://en.cppreference.com/w/cpp/container/vect
 ## Header file and declaration
 
 ```c
-#define i_type <t>     // container type name
-#define i_key <t>      // element type: REQUIRED. Note: i_val* may be specified instead of i_key*.
-#define i_cmp <f>      // three-way compare two i_keyraw*
-#define i_use_cmp      // define instead of i_cmp only when i_key is an integral/native-type.
-#define i_keydrop <f>  // destroy value func - defaults to empty destruct
-#define i_keyclone <f> // REQUIRED IF i_keydrop defined
+#define i_TYPE <ct>,<kt> // shorthand to define i_type,i_key
+#define i_type <t>       // container type name (default: vec_{i_key})
+#define i_key <t>        // element type: REQUIRED. Note: i_val* may be specified instead of i_key*.
+#define i_cmp <f>        // three-way compare two i_keyraw*
+#define i_use_cmp        // may be defined instead of i_cmp when i_key is an integral/native-type.
+#define i_keydrop <f>    // destroy value func - defaults to empty destruct
+#define i_keyclone <f>   // REQUIRED IF i_keydrop defined
 
-#define i_keyraw <t>   // convertion "raw" type - defaults to i_key
-#define i_keyfrom <f>  // convertion func i_keyraw => i_key
-#define i_keyto <f>    // convertion func i_key* => i_keyraw
+#define i_keyraw <t>     // convertion "raw" type - defaults to i_key
+#define i_keyfrom <f>    // convertion func i_keyraw => i_key
+#define i_keyto <f>      // convertion func i_key* => i_keyraw
 
-#define i_tag <s>      // alternative typename: vec_{i_tag}. i_tag defaults to i_key
+#define i_tag <s>        // alternative typename: vec_{i_tag}. i_tag defaults to i_key
 #include "stc/vec.h"
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.
@@ -201,21 +202,21 @@ User User_clone(User user) {
 }
 
 // Declare a managed, clonable vector of users.
-#define i_type UVec
+#define i_type Uservec
 #define i_key_class User // User is a "class" as it has _cmp, _clone and _drop functions.
 #include "stc/vec.h"
 
 int main(void) {
-    UVec vec = {0};
-    UVec_push(&vec, (User){cstr_lit("mary"), 0});
-    UVec_push(&vec, (User){cstr_lit("joe"), 1});
-    UVec_push(&vec, (User){cstr_lit("admin"), 2});
+    Uservec vec = {0};
+    Uservec_push(&vec, (User){cstr_lit("mary"), 0});
+    Uservec_push(&vec, (User){cstr_lit("joe"), 1});
+    Uservec_push(&vec, (User){cstr_lit("admin"), 2});
 
-    UVec vec2 = UVec_clone(vec);
+    Uservec vec2 = Uservec_clone(vec);
 
-    c_foreach (i, UVec, vec2)
+    c_foreach (i, Uservec, vec2)
         printf("%s: %d\n", cstr_str(&i.ref->name), i.ref->id);
 
-    c_drop(UVec, &vec, &vec2); // cleanup
+    c_drop(Uservec, &vec, &vec2); // cleanup
 }
 ```

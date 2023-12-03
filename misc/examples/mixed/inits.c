@@ -1,14 +1,14 @@
 #define i_implement
 #include "stc/cstr.h"
 
+#define i_type hmap_id   // Map of int => cstr
 #define i_key int
 #define i_val_str
-#define i_tag id   // Map of int => cstr
 #include "stc/hmap.h"
 
+#define i_type hmap_nat  // Map of cstr => int
 #define i_key_str
 #define i_val int
-#define i_tag cnt  // Map of cstr => int
 #include "stc/hmap.h"
 
 typedef struct {int x, y;} ipair_t;
@@ -17,39 +17,35 @@ inline static int ipair_cmp(const ipair_t* a, const ipair_t* b) {
     return c ? c : c_default_cmp(&a->y, &b->y);
 }
 
-
-#define i_key ipair_t
+#define i_TYPE vec_ip, ipair_t
 #define i_cmp ipair_cmp
-#define i_tag ip
 #include "stc/vec.h"
 
-#define i_key ipair_t
+#define i_TYPE list_ip, ipair_t
 #define i_cmp ipair_cmp
-#define i_tag ip
 #include "stc/list.h"
 
-#define i_key float
-#define i_tag f
+#define i_TYPE pque_flt,float
 #include "stc/pque.h"
 
 int main(void)
 {
-    // CVEC FLOAT / PRIORITY QUEUE
+    // VEC FLOAT / PRIORITY QUEUE
 
-    pque_f floats = {0};
+    pque_flt floats = {0};
     const float nums[] = {4.0f, 2.0f, 5.0f, 3.0f, 1.0f};
 
     // PRIORITY QUEUE
     c_forrange (i, c_arraylen(nums))
-        pque_f_push(&floats, nums[i]);
+        pque_flt_push(&floats, nums[i]);
 
     puts("\npop and show high priorites first:");
-    while (! pque_f_empty(&floats)) {
-        printf("%.1f ", (double)*pque_f_top(&floats));
-        pque_f_pop(&floats);
+    while (! pque_flt_empty(&floats)) {
+        printf("%.1f ", (double)*pque_flt_top(&floats));
+        pque_flt_pop(&floats);
     }
     puts("\n");
-    pque_f_drop(&floats);
+    pque_flt_drop(&floats);
 
     // CMAP ID
 
@@ -66,7 +62,7 @@ int main(void)
 
     // CMAP CNT
 
-    hmap_cnt countries = c_init(hmap_cnt, {
+    hmap_nat countries = c_init(hmap_nat, {
         {"Norway", 100},
         {"Denmark", 50},
         {"Iceland", 10},
@@ -76,15 +72,15 @@ int main(void)
         {"Spain", 10},
         {"France", 10},
     });
-    hmap_cnt_emplace(&countries, "Greenland", 0).ref->second += 20;
-    hmap_cnt_emplace(&countries, "Sweden", 0).ref->second += 20;
-    hmap_cnt_emplace(&countries, "Norway", 0).ref->second += 20;
-    hmap_cnt_emplace(&countries, "Finland", 0).ref->second += 20;
+    hmap_nat_emplace(&countries, "Greenland", 0).ref->second += 20;
+    hmap_nat_emplace(&countries, "Sweden", 0).ref->second += 20;
+    hmap_nat_emplace(&countries, "Norway", 0).ref->second += 20;
+    hmap_nat_emplace(&countries, "Finland", 0).ref->second += 20;
 
-    c_forpair (country, health, hmap_cnt, countries)
+    c_forpair (country, health, hmap_nat, countries)
         printf("%s: %d\n", cstr_str(_.country), *_.health);
     puts("");
-    hmap_cnt_drop(&countries);
+    hmap_nat_drop(&countries);
 
     // CVEC PAIR
 

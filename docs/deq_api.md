@@ -10,18 +10,19 @@ See the c++ class [std::deque](https://en.cppreference.com/w/cpp/container/deque
 ## Header file and declaration
 
 ```c
-#define i_key <t>      // element type: REQUIRED. Note: i_val* may be specified instead of i_key*.
-#define i_type <t>     // deq container type name
-#define i_cmp <f>      // three-way compare of two i_keyraw*.
-#define i_use_cmp      // define instead of i_cmp only when i_key is an integral/native-type.
-#define i_keydrop <f>  // destroy value func - defaults to empty destruct
-#define i_keyclone <f> // REQUIRED IF i_keydrop is defined
+#define i_TYPE <ct>,<kt> // shorthand to define i_type,i_key
+#define i_type <t>       // deq container type name (default: deq_{i_key})
+#define i_key <t>        // element type: REQUIRED. Note: i_val* may be specified instead of i_key*.
+#define i_cmp <f>        // three-way compare of two i_keyraw*.
+#define i_use_cmp        // may be defined instead of i_cmp when i_key is an integral/native-type.
+#define i_keydrop <f>    // destroy value func - defaults to empty destruct
+#define i_keyclone <f>   // REQUIRED IF i_keydrop is defined
 
-#define i_keyraw <t>   // convertion "raw" type - defaults to i_key
-#define i_keyfrom <f>  // convertion func i_keyraw => i_key
-#define i_keyto <f>    // convertion func i_key* => i_keyraw
+#define i_keyraw <t>     // convertion "raw" type - defaults to i_key
+#define i_keyfrom <f>    // convertion func i_keyraw => i_key
+#define i_keyto <f>      // convertion func i_key* => i_keyraw
 
-#define i_tag <s>      // alternative typename: deq_{i_tag}. i_tag defaults to i_key
+#define i_tag <s>        // alternative typename: deq_{i_tag}. i_tag defaults to i_key
 #include "stc/deq.h"
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.
@@ -98,35 +99,33 @@ void               deq_X_value_drop(deq_X_value* pval);
 
 ## Examples
 ```c
-#define i_key int
-#define i_tag i
+#define i_TYPE deq_i32, int32_t
 #include "stc/deq.h"
-
 #include <stdio.h>
 
 int main(void) {
-    deq_i q = {0};
-    deq_i_push_front(&q, 10);
-    c_foreach (i, deq_i, q)
+    deq_i32 q = {0};
+    deq_i32_push_front(&q, 10);
+    c_foreach (i, deq_i32, q)
         printf(" %d", *i.ref);
     puts("");
 
     c_forlist (i, int, {1, 4, 5, 22, 33, 2})
-        deq_i_push_back(&q, *i.ref)
+        deq_i32_push_back(&q, *i.ref)
 
-    c_foreach (i, deq_i, q)
+    c_foreach (i, deq_i32, q)
         printf(" %d", *i.ref);
     puts("");
 
-    deq_i_push_front(&q, 9);
-    deq_i_push_front(&q, 20);
-    deq_i_push_back(&q, 11);
-    deq_i_push_front(&q, 8);
+    deq_i32_push_front(&q, 9);
+    deq_i32_push_front(&q, 20);
+    deq_i32_push_back(&q, 11);
+    deq_i32_push_front(&q, 8);
 
-    c_foreach (i, deq_i, q)
+    c_foreach (i, deq_i32, q)
         printf(" %d", *i.ref);
     puts("");
-    deq_i_drop(&q);
+    deq_i32_drop(&q);
 }
 ```
 Output:

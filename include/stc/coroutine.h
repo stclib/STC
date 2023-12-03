@@ -20,8 +20,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef STC_COROUTINE_INCLUDED
-#define STC_COROUTINE_INCLUDED
+#ifndef STC_COROUTINE_H_INCLUDED
+#define STC_COROUTINE_H_INCLUDED
 /*
 #include <stdio.h>
 #include "stc/coroutine.h"
@@ -291,4 +291,4 @@ static inline double cco_timer_remaining(cco_timer* tm) {
     return tm->start + tm->interval - cco_time();
 }
 
-#endif
+#endif // STC_COROUTINE_H_INCLUDED
