@@ -99,33 +99,33 @@ void               deq_X_value_drop(deq_X_value* pval);
 
 ## Examples
 ```c
-#define i_TYPE deq_i32, int32_t
+#define i_TYPE Deque,int32_t
 #include "stc/deq.h"
 #include <stdio.h>
 
 int main(void) {
-    deq_i32 q = {0};
-    deq_i32_push_front(&q, 10);
-    c_foreach (i, deq_i32, q)
+    Deque q = {0};
+    Deque_push_front(&q, 10);
+    c_foreach (i, Deque, q)
         printf(" %d", *i.ref);
     puts("");
 
     c_forlist (i, int, {1, 4, 5, 22, 33, 2})
-        deq_i32_push_back(&q, *i.ref)
+        Deque_push_back(&q, *i.ref)
 
-    c_foreach (i, deq_i32, q)
+    c_foreach (i, Deque, q)
         printf(" %d", *i.ref);
     puts("");
 
-    deq_i32_push_front(&q, 9);
-    deq_i32_push_front(&q, 20);
-    deq_i32_push_back(&q, 11);
-    deq_i32_push_front(&q, 8);
+    Deque_push_front(&q, 9);
+    Deque_push_front(&q, 20);
+    Deque_push_back(&q, 11);
+    Deque_push_front(&q, 8);
 
-    c_foreach (i, deq_i32, q)
+    c_foreach (i, Deque, q)
         printf(" %d", *i.ref);
     puts("");
-    deq_i32_drop(&q);
+    Deque_drop(&q);
 }
 ```
 Output:

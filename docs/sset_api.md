@@ -86,9 +86,8 @@ sset_X_value        sset_X_value_clone(sset_X_value val);
 
 int main(void)
 {
-    SSet second={0}, third={0}, fourth={0}, fifth={0};
-
-    second = c_init(SSet, {"red", "green", "blue"});
+    SSet second = c_init(SSet, {"red", "green", "blue"});
+    SSet third={0}, fourth={0}, fifth={0};
 
     c_forlist (i, const char*, {"orange", "pink", "yellow"})
         SSet_emplace(&third, *i.ref);

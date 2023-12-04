@@ -105,6 +105,7 @@ vec_X_raw           vec_X_value_drop(vec_X_value* pval);
 ## Examples
 ```c
 #define i_key int
+#define i_use_cmp // enable sorting/searhing using default <, == operators
 #include "stc/vec.h"
 
 #include <stdio.h>
@@ -193,30 +194,36 @@ int User_cmp(const User* a, const User* b) {
     int c = strcmp(cstr_str(&a->name), cstr_str(&b->name));
     return c ? c : a->id - b->id;
 }
-void User_drop(User* self) {
-    cstr_drop(&self->name);
-}
+
 User User_clone(User user) {
     user.name = cstr_clone(user.name);
     return user;
 }
 
+void User_drop(User* self) {
+    cstr_drop(&self->name);
+}
+
 // Declare a managed, clonable vector of users.
-#define i_type Uservec
-#define i_key_class User // User is a "class" as it has _cmp, _clone and _drop functions.
+#define i_type Users
+#define i_key_class User // User is a "class" and binds the _clone, _drop, and _cmp functions.
+#define i_use_cmp        // Sorting/searching a vec is only enabled by either directly specifying an i_cmp function
+                         // or by defining i_use_cmp (i_cmp is then indirectly specified through i_key_class,
+                         // or it is assumed that i_key is a built-in type that works with < and == operators).
 #include "stc/vec.h"
 
 int main(void) {
-    Uservec vec = {0};
-    Uservec_push(&vec, (User){cstr_lit("mary"), 0});
-    Uservec_push(&vec, (User){cstr_lit("joe"), 1});
-    Uservec_push(&vec, (User){cstr_lit("admin"), 2});
+    Users users = {0};
+    Users_push(&users, (User){cstr_lit("mary"), 0});
+    Users_push(&users, (User){cstr_lit("joe"), 1});
+    Users_push(&users, (User){cstr_lit("admin"), 2});
 
-    Uservec vec2 = Uservec_clone(vec);
+    Users users2 = Users_clone(users);
+    Users_sort(&users2);
 
-    c_foreach (i, Uservec, vec2)
+    c_foreach (i, Users, users2)
         printf("%s: %d\n", cstr_str(&i.ref->name), i.ref->id);
 
-    c_drop(Uservec, &vec, &vec2); // cleanup
+    c_drop(Users, &users, &users2); // cleanup
 }
 ```

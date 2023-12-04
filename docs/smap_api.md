@@ -250,7 +250,7 @@ int main(void)
     c_forpair (v, n, smap_vi, vmap)
         printf("{ %3d, %3d, %3d }: %d\n", _.v->x, _.v->y, _.v->z, *_.n);
 
-    smap_vi_drop(&vmap)
+    smap_vi_drop(&vmap);
 }
 ```
 Output:

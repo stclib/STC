@@ -70,26 +70,27 @@ void                queue_X_value_drop(queue_X_value* pval);
 
 ## Examples
 ```c
-#define i_TYPE queue_i, int
+#define i_TYPE queue,int
 #include "stc/queue.h"
 
 #include <stdio.h>
 
 int main(void) {
-    queue_i Q = {0};
+    queue Q = {0};
 
     // push() and pop() a few.
     c_forrange (i, 20)
-        queue_i_push(&Q, i);
+        queue_push(&Q, i);
 
     c_forrange (5)
-        queue_i_pop(&Q);
+        queue_pop(&Q);
 
-    c_foreach (i, queue_i, Q)
+    c_foreach (i, queue, Q)
         printf(" %d", *i.ref);
 
-    queue_i_drop(&Q);
+    queue_drop(&Q);
 }
+
 ```
 Output:
 ```
