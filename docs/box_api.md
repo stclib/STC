@@ -75,7 +75,7 @@ bool        box_X_value_eq(const i_key* x, const i_key* y);
 | `box_X_value`     | `i_key`                         | The box element type   |
 
 ## Example
-
+Create a vec and a set with owned pointers to int elements, using box.
 ```c
 #include <stdio.h>
 void int_drop(int* x) {
@@ -85,6 +85,7 @@ void int_drop(int* x) {
 #define i_TYPE IBox,int
 #define i_keydrop int_drop  // optional func, just to display elements destroyed
 #define i_keyclone(x) x     // must be specified when i_keydrop is defined.
+#define i_use_cmp           // enable usage of default comparison == and < operators
 #include "stc/box.h"
 
 #define i_type ISet
@@ -97,7 +98,7 @@ void int_drop(int* x) {
 
 int main(void)
 {
-    IVec vec = c_init(Vec, {2021, 2012, 2022, 2015});
+    IVec vec = c_init(IVec, {2021, 2012, 2022, 2015});
     ISet set = {0};
     c_defer(
       IVec_drop(&vec),
