@@ -1,4 +1,4 @@
-# STC [box](../include/stc/box.h): Smart Pointer (Boxed object)
+# STC [box](../include/stc/box.h): Smart Pointer (boxed object)
 
 **box** is a smart pointer to a heap allocated value of type X. A **box** can
 be empty. The *box_X_cmp()*, *box_X_drop()* methods are defined based on the `i_cmp`
@@ -84,16 +84,16 @@ void int_drop(int* x) {
 
 #define i_TYPE IBox,int
 #define i_keydrop int_drop  // optional func, just to display elements destroyed
-#define i_keyclone(x) x     // must specified when i_keydrop is defined.
+#define i_keyclone(x) x     // must be specified when i_keydrop is defined.
 #include "stc/box.h"
 
 #define i_type ISet
 #define i_key_arcbox IBox   // NB: use i_key_arcbox instead of i_key
-#include "stc/sset.h>       // ISet : std::set<std::unique_ptr<int>"
+#include "stc/sset.h"       // ISet : std::set<std::unique_ptr<int>>
 
 #define i_type IVec
 #define i_key_arcbox IBox   // NB: use i_key_arcbox instead of i_key
-#include "stc/vec.h>        // IVec : std::vector<std::unique_ptr<int>"
+#include "stc/vec.h"        // IVec : std::vector<std::unique_ptr<int>>
 
 int main(void)
 {
