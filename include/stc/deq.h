@@ -36,7 +36,7 @@
 #define _pop _pop_front
 #define _pull _pull_front
 #include "priv/template.h"
-#include "priv/cqueue_hdr.h"
+#include "priv/queue_hdr.h"
 #undef _pop
 #undef _pull
 
@@ -130,7 +130,7 @@ _c_MEMB(_get_mut)(i_type* self, _m_raw raw)
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined(i_implement) || defined(i_static)
 
-#include "priv/cqueue_imp.h"
+#include "priv/queue_imp.h"
 
 STC_DEF _m_value*
 _c_MEMB(_push_front)(i_type* self, _m_value value) {

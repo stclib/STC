@@ -15,7 +15,7 @@ def read_unidata(casetype='lowcase', category='Lu', bitrange=16):
         df = df[df['code'] < (1<<16)]
     else:
         df = df[df['code'] >= (1<<16)]
-    
+
     if category:
         df = df[df['category'] == category]
     df = df.replace(np.nan, '0')
@@ -78,7 +78,7 @@ def make_table(caselist):
 def print_table(name, table, style=1, bitrange=16):
     r32 = '32' if bitrange == 32 else ''
     print('#include <stdint.h>\n')
-    print('struct CaseMapping%d { uint%d_t c1, c2, m2; };\n' % (bitrange, bitrange))
+    print('struct CaseMapping%s { uint%d_t c1, c2, m2; };\n' % (r32, bitrange))
     print('static struct CaseMapping%s %s%s[] = {' % (r32, name, r32))
     for a,b,c,t in table:
         if style == 1:   # first char with name
@@ -114,7 +114,7 @@ def compile_table(casetype='lowcase', category=None, bitrange=16):
 
 
 def main():
-    bitrange = 32
+    bitrange = 16
 
     casemappings = compile_table('lowcase', None, bitrange) # CaseFolding.txt
     upcase       = compile_table('lowcase', 'Lu', bitrange) # UnicodeData.txt uppercase
@@ -154,7 +154,7 @@ def main():
     # lowcase => up. add "missing" SHARP S caused by https://www.unicode.org/policies/stability_policy.html#Case_Pair
     if bitrange == 16:
         lowcase_ind.append(next(i for i,x in enumerate(casemappings) if x[0]==ord('ẞ')))
-    lowcase_ind.sort(key=lambda i: casemappings[i][2] - (casemappings[i][1] - casemappings[i][0]))         
+    lowcase_ind.sort(key=lambda i: casemappings[i][2] - (casemappings[i][1] - casemappings[i][0]))
     print_index_table('lowcase_ind', lowcase_ind)
 
 
