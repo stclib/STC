@@ -250,7 +250,7 @@ int main(void)
 ```
 This example uses four different container types:
 
-[ [Run this code](https://godbolt.org/z/jn83jK7cd) ]
+[ [Run this code](https://godbolt.org/z/oEhMbGn6E) ]
 ```c
 #include <stdio.h>
 
@@ -258,13 +258,13 @@ This example uses four different container types:
 #include "stc/hset.h"   // hset_int: unordered/hash set (assume i_key is basic type, uses `==` operator)
 
 struct Point { float x, y; };
-
+// Define cvec_pnt and enable linear search by defining i_eq
 #define i_TYPE vec_pnt, struct Point
-#define i_less(a, b) a->x < b->x || (a->x == b->x && a->y < b->y) // enable sort and (slow-ish) search
-#define i_eq(a, b) a->x == b->x && a->y == b->y                   // enable faster linear search
+#define i_eq(a, b) (a->x == b->x && a->y == b->y)
 #include "stc/vec.h"    // vec_pnt: vector of struct Point
 
 #define i_key int
+#define i_use_cmp       // enable sort/search. Use native `<` and `==` operators
 #include "stc/list.h"   // list_int: singly linked list
 
 #define i_TYPE smap_int, int, int

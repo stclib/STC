@@ -36,20 +36,22 @@ else
     comp="$cc $cflags"
 fi
 
+INC=../../include
+#INC=../../../stcsingle
 if [ $run = 0 ] ; then
     for i in */*.c ; do
         out=$(basename $i .c).exe
         #out=$(dirname $i)/$(basename $i .c).exe
         #echo $comp -I../../../stcsingle $i $clibs $oflag$out
-        echo $comp -I../../include $i $clibs $oflag$out
-        $comp -I../../include $i $clibs $oflag$out
+        echo $comp -I$INC $i $clibs $oflag$out
+        $comp -I$INC $i $clibs $oflag$out
     done
 else
     for i in */*.c ; do
         out=$(basename $i .c).exe
         #out=$(dirname $i)/$(basename $i .c).exe
-        echo $comp -I../../include $i $clibs $oflag$out
-        $comp -I../../include $i $clibs $oflag$out
+        echo $comp -I$INC $i $clibs $oflag$out
+        $comp -I$INC $i $clibs $oflag$out
         if [ -f $out ]; then ./$out; fi
     done
 fi
