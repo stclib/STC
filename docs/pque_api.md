@@ -10,7 +10,7 @@ See the c++ class [std::priority_queue](https://en.cppreference.com/w/cpp/contai
 ```c
 #define i_TYPE <ct>,<kt> // shorthand to define i_type,i_key
 #define i_type <t>       // pque container type name (default: pque_{i_key})
-#define i_key <t>        // element type: REQUIRED. Note: i_val* may be specified instead of i_key*.
+#define i_key <t>        // element type: REQUIRED. Defines pque_X_value
 #define i_less <f>       // compare two i_key* : REQUIRED IF i_key/i_keyraw is a non-integral type
 #define i_keydrop <f>    // destroy value func - defaults to empty destruct
 #define i_keyclone <f>   // REQUIRED IF i_keydrop defined
@@ -40,13 +40,14 @@ void                pque_X_drop(pque_X* self);        // destructor
 
 intptr_t            pque_X_size(const pque_X* self);
 bool                pque_X_empty(const pque_X* self);
-i_key*              pque_X_top(const pque_X* self);
+const i_key*        pque_X_top(const pque_X* self);
 
 void                pque_X_make_heap(pque_X* self);  // heapify the vector.
 void                pque_X_push(pque_X* self, i_key value);
 void                pque_X_emplace(pque_X* self, i_keyraw raw); // converts from raw
 
 void                pque_X_pop(pque_X* self);
+i_key               pque_X_pull(const pque_X* self);
 void                pque_X_erase_at(pque_X* self, intptr_t idx);
 
 i_key               pque_X_value_clone(i_key value);

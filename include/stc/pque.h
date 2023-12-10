@@ -97,6 +97,9 @@ STC_INLINE const _m_value* _c_MEMB(_top)(const i_type* self)
 STC_INLINE void _c_MEMB(_pop)(i_type* self)
     { c_assert(!_c_MEMB(_empty)(self)); _c_MEMB(_erase_at)(self, 0); }
 
+STC_INLINE _m_value _c_MEMB(_pull)(i_type* self)
+    { _m_value v = self->data[0]; _c_MEMB(_erase_at)(self, 0); return v; }
+
 #if !defined i_no_clone
 STC_API i_type _c_MEMB(_clone)(i_type q);
 

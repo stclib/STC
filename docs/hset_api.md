@@ -1,4 +1,4 @@
-# STC [hset](../include/stc/hset.h): Unordered Set
+# STC [hset](../include/stc/hset.h): HashSet (unordered)
 ![Set](pics/set.jpg)
 
 A **hset** is an associative container that contains a set of unique objects of type i_key. Search, insertion, and removal have average constant-time complexity. See the c++ class
@@ -9,7 +9,7 @@ A **hset** is an associative container that contains a set of unique objects of 
 ```c
 #define i_TYPE <ct>,<kt> // shorthand to define i_type,i_key
 #define i_type <t>       // container type name (default: hset_{i_key})
-#define i_key <t>        // element type: REQUIRED. Note: i_val* may be specified instead of i_key*.
+#define i_key <t>        // element type: REQUIRED. Defines hset_X_value
 #define i_hash <f>       // hash func i_keyraw*: REQUIRED IF i_keyraw is non-pod type
 #define i_eq <f>         // equality comparison two i_keyraw*: REQUIRED IF i_keyraw is a
                          // non-integral type. Three-way i_cmp may be specified instead.

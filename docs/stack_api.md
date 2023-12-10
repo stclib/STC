@@ -10,7 +10,7 @@ See the c++ class [std::stack](https://en.cppreference.com/w/cpp/container/stack
 ```c
 #define i_TYPE <ct>,<kt> // shorthand to define i_type,i_key
 #define i_type <t>       // container type name (default: stack_{i_key})
-#define i_key <t>        // element type: REQUIRED. Note: i_val* may be specified instead of i_key*.
+#define i_key <t>        // element type: REQUIRED. Defines stack_X_value
 #define i_keydrop <f>    // destroy value func - defaults to empty destruct
 #define i_keyclone <f>   // REQUIRED IF i_keydrop defined
 

@@ -1,4 +1,4 @@
-# STC [hmap](../include/stc/hmap.h): Unordered Map
+# STC [hmap](../include/stc/hmap.h): HashMap (unordered)
 ![Map](pics/map.jpg)
 
 A **hmap** is an associative container that contains key-value pairs with unique keys. Search, insertion, and removal of elements

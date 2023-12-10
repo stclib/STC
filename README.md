@@ -25,29 +25,29 @@ The library handles everything from trivial to highly complex data using *templa
 
 Containers
 ----------
-- [***arc*** - **std::shared_ptr** alike type](docs/arc_api.md)
-- [***box*** - **std::unique_ptr** alike type](docs/box_api.md)
-- [***cbits*** - **std::bitset** alike type](docs/cbits_api.md)
-- [***list*** - **std::forward_list** alike type](docs/list_api.md)
-- [***stack*** - **std::stack** alike type](docs/stack_api.md)
-- [***vec*** - **std::vector** alike type](docs/vec_api.md)
-- [***queue*** - **std::queue** alike type](docs/queue_api.md)
-- [***deq*** - **std::deque** alike type](docs/deq_api.md)
-- [***pque*** - **std::priority_queue** alike type](docs/pque_api.md)
-- [***hmap*** - **std::unordered_map** alike type](docs/hmap_api.md)
-- [***hset*** - **std::unordered_set** alike type](docs/hset_api.md)
-- [***smap*** - **std::map** sorted map alike type](docs/smap_api.md)
-- [***sset*** - **std::set** sorted set alike type](docs/sset_api.md)
-- [***cstr*** - **std::string** alike type](docs/cstr_api.md)
-- [***csview*** - **std::string_view** alike type](docs/csview_api.md)
-- [***czview*** - null-terminated string view type](docs/czview_api.md)
-- [***cspan*** - **std::span** + **std::mdspan** alike type](docs/cspan_api.md)
+- [***arc*** - (atomic) reference counted smart pointer`](docs/arc_api.md)
+- [***box*** - unique smart pointer`](docs/box_api.md)
+- [***cbits*** - dynamic bitset](docs/cbits_api.md)
+- [***list*** - forward linked list](docs/list_api.md)
+- [***stack*** - stack type](docs/stack_api.md)
+- [***vec*** - vector type](docs/vec_api.md)
+- [***deq*** - double ended queue - deque](docs/deq_api.md)
+- [***queue*** - queue type](docs/queue_api.md)
+- [***pque*** - priority queue](docs/pque_api.md)
+- [***hmap*** - hashmap (unordered)](docs/hmap_api.md)
+- [***hset*** - hashset (unordered)](docs/hset_api.md)
+- [***smap*** - sorted binary tree map](docs/smap_api.md)
+- [***sset*** - sorted binary tree set](docs/sset_api.md)
+- [***cstr*** - string type (short string optimized)](docs/cstr_api.md)
+- [***csview*** - string view (non-null terminated)](docs/csview_api.md)
+- [***czview*** - null-terminated string view](docs/czview_api.md)
+- [***cspan*** - single and multidimensional span](docs/cspan_api.md)
 
 Algorithms
 ----------
 - [***Ranged for-loops*** - c_foreach, c_forpair, c_forlist](docs/algorithm_api.md#ranged-for-loops)
 - [***Range algorithms*** - c_forrange, crange, c_forfilter](docs/algorithm_api.md#range-algorithms)
-- [***Generic algorithms*** - c_init, stc_find_if, stc_erase_if, X_quicksort, etc.](docs/algorithm_api.md#generic-algorithms)
+- [***Generic algorithms*** - c_init, stc_find_if, stc_erase_if, quicksort, lower_bound, ...](docs/algorithm_api.md#generic-algorithms)
 - [***Coroutines*** - ergonomic portable coroutines](docs/coroutine_api.md)
 - [***Regular expressions*** - Rob Pike's Plan 9 regexp modernized!](docs/cregex_api.md)
 - [***Random numbers*** - a very fast *PRNG* based on *SFC64*](docs/crandom_api.md)
@@ -128,20 +128,21 @@ Benchmark notes:
 ---
 ## Naming conventions
 
-- Container names are prefixed by `c`, e.g. `vec`, `cstr`.
-- Public STC macros are prefixed by `c_`, e.g. `c_foreach`, `c_init`.
+- Non-templated container names are prefixed by `c`, e.g. `cstr`, `cbits`, `cregex`.
+- Public STC macros and "keywords" are prefixed by `c_`, e.g. `c_foreach`, `c_init`.
 - Template parameter macros are prefixed by `i_`, e.g. `i_key`, `i_type`.
-- All containers can be initialized with `{0}`, i.e. no heap allocation used by default init.
+- All owning containers can be initialized with `{0}` (also `cstr`), i.e. no heap allocation initially.
 - Common types for a container type Cont:
     - Cont
     - Cont_value
     - Cont_raw
     - Cont_iter
-- Some common function names:
+
+- Functions that are available for most all containers:
     - Cont_init()
     - Cont_reserve(&con, capacity)
     - Cont_drop(&con)
-    - Cont_empty(&con)
+    - Cont_empty(&con) // check if empty
     - Cont_size(&con)
     - Cont_clone(con)
     - Cont_push(&con, value)
@@ -156,13 +157,13 @@ Benchmark notes:
 
 ---
 ## Usage
-STC containers have similar functionality to C++ STL standard containers. All containers except for a few,
+STC containers have similar functionality to the C++ STL standard containers. All containers except for a few,
 like **cstr** and **cbits** are generic/templated. No type casting is used, so containers are type-safe like
 templated types in C++. However, to specify template parameters with STC, you define them as macros prior to
-including the container.
+including the container, e.g.
 ```c
-#define i_TYPE Floats,float // Container type (name, element type)
-#include "stc/vec.h"        // "instantiate" the desired container type
+#define i_TYPE Floats, float // Container type (name, element type)
+#include "stc/vec.h"         // "instantiate" the desired container type
 #include <stdio.h>
 
 int main(void)
@@ -187,7 +188,7 @@ Switching to a different container type, e.g. a sorted set (sset):
 
 [ [Run this code](https://godbolt.org/z/ehzns5Pd9) ]
 ```c
-#define i_TYPE Floats,float
+#define i_TYPE Floats, float
 #include "stc/sset.h" // Use a sorted set instead
 #include <stdio.h>
 
@@ -220,7 +221,7 @@ Let's make a vector of vectors, which can be cloned. All of its element vectors 
 ```c
 #include <stdio.h>
 
-#define i_TYPE Vec,float
+#define i_TYPE Vec, float
 #include "stc/vec.h"
 
 #define i_type Vec2D

@@ -22,7 +22,7 @@ See similar c++ class [std::shared_ptr](https://en.cppreference.com/w/cpp/memory
 ```c
 #define i_TYPE <ct>,<kt>   // shorthand to define i_type,i_key
 #define i_type <t>         // arc container type name (default: arc_{i_key})
-#define i_key <t>          // element type: REQUIRED. Note: i_val* may be specified instead of i_key*.
+#define i_key <t>          // element type: REQUIRED. Defines arc_X_value
 #define i_cmp <f>          // three-way compareison. REQUIRED IF i_key is a non-integral type
                            // Note that containers of arcs will "inherit" i_cmp
                            // when using arc in containers with i_val_arcbox MyArc - ie. the i_type.
