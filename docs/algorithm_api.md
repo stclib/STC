@@ -215,7 +215,7 @@ stc_find_if(&res, smap_str, it1, it2, cstr_contains(value, "hello"));
 if (res.ref) smap_str_erase_at(&map, res);
 
 // Erase all strings containing "hello" in a sorted map:
-stc_erase_if(smap_str, &map, cstr_contains(value, "hello"));
+stc_erase_if(smap_str, &map, cstr_contains(&value->first, "hello"));
 ```
 
 ### stc_all_of, stc_any_of, stc_none_of

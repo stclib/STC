@@ -14,13 +14,13 @@ int main(void)
     c_forrange (30) printf(" xx");
     puts("");
 
-    c_forrange (i, 30) printf(" %lld", i);
+    c_forrange (i, 30) printf(" %d", (int)i);
     puts("");
 
-    c_forrange (i, 30, 60) printf(" %lld", i);
+    c_forrange (i, 30, 60) printf(" %d", (int)i);
     puts("");
 
-    c_forrange (i, 30, 90, 2) printf(" %lld", i);
+    c_forrange (i, 30, 90, 2) printf(" %d", (int)i);
 
     puts("\n\nc_forlist:");
     c_forlist (i, int, {12, 23, 453, 65, 676})

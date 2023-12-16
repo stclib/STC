@@ -29,7 +29,7 @@ int main(void)
 {
     crange r1 = crange_init(80, 90);
     c_foreach (i, crange, r1)
-        printf(" %lld", *i.ref);
+        printf(" %d", (int)*i.ref);
     puts("");
 
     // use a temporary crange object.
@@ -38,7 +38,7 @@ int main(void)
     c_forfilter (i, crange, r2,
                     c_flt_skip(i, 10) &&
                     c_flt_take(i, 3))
-        printf(" %lld", *i.ref);
+        printf(" %d", (int)*i.ref);
     puts("");
 }
 */
@@ -48,7 +48,7 @@ int main(void)
 #include "../priv/linkage.h"
 #include "../common.h"
 
-typedef long long crange_value;
+typedef intptr_t crange_value;
 typedef struct { crange_value start, end, step, value; } crange;
 typedef struct { crange_value *ref, end, step; } crange_iter;
 

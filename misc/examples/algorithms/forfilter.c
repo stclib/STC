@@ -132,7 +132,7 @@ void demo5(void)
         flt_even(i)                           &&
         c_flt_take(i,5)
     ){
-        printf(" %lld", *i.ref);
+        printf(" %d", (int)*i.ref);
     }
     puts("");
 }

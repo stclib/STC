@@ -5,14 +5,14 @@
 #define i_capacity 80 // enable fixed bitset on the stack
 #include "stc/cbits.h"
 
-int main(void) 
+int main(void)
 {
     Bits s1 = Bits_from("1110100110111");
-    
-    printf("size %lld\n", Bits_size(&s1));
+
+    printf("size %d\n", (int)Bits_size(&s1));
     char buf[256];
     Bits_to_str(&s1, buf, 0, 256);
-    printf("buf: %s: count=%lld\n", buf, Bits_count(&s1));
+    printf("buf: %s: count=%d\n", buf, (int)Bits_count(&s1));
 
     Bits_reset(&s1, 8);
     printf(" s1: %s\n", Bits_to_str(&s1, buf, 0, 256));
