@@ -57,7 +57,7 @@
 // stc_erase_if
 // --------------------------------
 
-// Use with: clist, cmap, cset, csmap, csset:
+// Use with: list, hmap, hset, smap, sset:
 #define stc_erase_if(C, cnt_p, pred) do { \
     C* _cnt = cnt_p; \
     const C##_value* value; \

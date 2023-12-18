@@ -28,8 +28,8 @@ cstr        cstr_init(void);                                        // construct
 cstr        cstr_lit(const char literal_only[]);                    // cstr from literal; no strlen() call.
 cstr        cstr_from(const char* str);                             // constructor using strlen()
 cstr        cstr_from_n(const char* str, intptr_t n);               // constructor with n first bytes of str
+cstr        cstr_from_zv(czview zv);                                // construct cstr from czview
 cstr        cstr_from_sv(csview sv);                                // construct cstr from csview
-cstr        cstr_from_rs(czview rs);                               // construct cstr from czview
 cstr        cstr_with_capacity(intptr_t cap);
 cstr        cstr_with_size(intptr_t len, char fill);                // repeat fill len times
 cstr        cstr_from_fmt(const char* fmt, ...);                    // printf() formatting
@@ -41,18 +41,19 @@ void        cstr_drop(cstr* self);                                  // destructo
 
 const char* cstr_str(const cstr* self);                             // to const char*
 csview      cstr_sv(const cstr* self);                              // to csview
-czview     cstr_rs(const cstr* self);                              // to czview
+czview      cstr_zv(const cstr* self);                              // to czview
 char*       cstr_data(cstr* self);                                  // to mutable char*
 cstr_buf    cstr_buffer(cstr* self);                                // to mutable buffer (with capacity)
 
 intptr_t    cstr_size(const cstr* self);
 intptr_t    cstr_capacity(const cstr* self);
+intptr_t    cstr_topos(const cstr* self, cstr_iter it);             // get byte position at iter.
 bool        cstr_empty(const cstr* self);
 
+void        cstr_clear(cstr* self);
 char*       cstr_reserve(cstr* self, intptr_t capacity);            // return pointer to buffer
 void        cstr_resize(cstr* self, intptr_t len, char fill);
 void        cstr_shrink_to_fit(cstr* self);
-void        cstr_clear(cstr* self);
 
 char*       cstr_assign(cstr* self, const char* str);
 char*       cstr_assign_n(cstr* self, const char* str, intptr_t n); // assign n first bytes of str
@@ -106,7 +107,7 @@ bool        cstr_getdelim(cstr *self, int delim, FILE *stream);     // does not 
 ```c
 intptr_t    cstr_u8_size(const cstr* self);                         // number of utf8 codepoints
 intptr_t    cstr_u8_size_n(const cstr self, intptr_t nbytes);       // utf8 size within n bytes
-intptr_t    cstr_u8_to_pos(const cstr* self, intptr_t u8idx);       // byte pos offset at utf8 codepoint index
+intptr_t    cstr_u8_topos(const cstr* self, intptr_t u8idx);        // byte position at utf8 codepoint index
 const char* cstr_u8_at(const cstr* self, intptr_t u8idx);           // char* position at utf8 codepoint index
 csview      cstr_u8_chr(const cstr* self, intptr_t u8idx);          // get utf8 character as a csview
 void        cstr_u8_replace_at(cstr* self, intptr_t bytepos, intptr_t u8len, csview repl); // replace u8len utf8 chars

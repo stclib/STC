@@ -92,16 +92,17 @@ STC_API cstr        cstr_replace_sv(csview sv, csview search, csview repl, int32
 STC_API uint64_t    cstr_hash(const cstr *self);
 
 STC_INLINE cstr_buf cstr_buffer(cstr* s) {
-    return cstr_is_long(s)
-        ? c_LITERAL(cstr_buf){s->lon.data, cstr_l_size(s), cstr_l_cap(s)}
-        : c_LITERAL(cstr_buf){s->sml.data, cstr_s_size(s), cstr_s_cap};
+    return cstr_is_long(s) ? c_LITERAL(cstr_buf){s->lon.data, cstr_l_size(s), cstr_l_cap(s)}
+                           : c_LITERAL(cstr_buf){s->sml.data, cstr_s_size(s), cstr_s_cap};
+}
+STC_INLINE czview cstr_zv(const cstr* s) {
+    return cstr_is_long(s) ? c_LITERAL(czview){s->lon.data, cstr_l_size(s)}
+                           : c_LITERAL(czview){s->sml.data, cstr_s_size(s)};
 }
 STC_INLINE csview cstr_sv(const cstr* s) {
-    return cstr_is_long(s) ? c_sv_2(s->lon.data, cstr_l_size(s))
-                           : c_sv_2(s->sml.data, cstr_s_size(s));
+    return cstr_is_long(s) ? c_LITERAL(csview){s->lon.data, cstr_l_size(s)}
+                           : c_LITERAL(csview){s->sml.data, cstr_s_size(s)};
 }
-STC_INLINE czview cstr_rs(const cstr* s)
-    { csview sv = cstr_sv(s); return c_zv_2(sv.buf, sv.size); }
 
 STC_INLINE cstr cstr_init(void)
     { return cstr_null; }
@@ -118,8 +119,8 @@ STC_INLINE cstr cstr_from(const char* str)
 STC_INLINE cstr cstr_from_sv(csview sv)
     { return cstr_from_n(sv.buf, sv.size); }
 
-STC_INLINE cstr cstr_from_rs(czview rs)
-    { return cstr_from_n(rs.str, rs.size); }
+STC_INLINE cstr cstr_from_zv(czview zv)
+    { return cstr_from_n(zv.str, zv.size); }
 
 STC_INLINE cstr cstr_with_size(const intptr_t size, const char value) {
     cstr s;
@@ -161,6 +162,9 @@ STC_INLINE void cstr_drop(cstr* self) {
 STC_INLINE void _cstr_set_size(cstr* self, intptr_t len)
     { SSO_CALL(self, set_size(self, len)); }
 
+STC_INLINE void cstr_clear(cstr* self)
+    { _cstr_set_size(self, 0); }
+
 STC_INLINE char* cstr_data(cstr* self)
     { return SSO_CALL(self, data(self)); }
 
@@ -175,6 +179,10 @@ STC_INLINE intptr_t cstr_size(const cstr* self)
 
 STC_INLINE intptr_t cstr_capacity(const cstr* self)
     { return cstr_is_long(self) ? cstr_l_cap(self) : (intptr_t)cstr_s_cap; }
+
+STC_INLINE intptr_t cstr_topos(const cstr* self, cstr_iter it)
+    { return it.ref - cstr_str(self); }
+
 
 // utf8 methods defined in/depending on src/utf8code.c:
 
@@ -195,7 +203,7 @@ STC_INLINE intptr_t cstr_u8_size(const cstr* self)
 STC_INLINE intptr_t cstr_u8_size_n(const cstr* self, intptr_t nbytes)
     { return utf8_size_n(cstr_str(self), nbytes); }
 
-STC_INLINE intptr_t cstr_u8_to_pos(const cstr* self, intptr_t u8idx)
+STC_INLINE intptr_t cstr_u8_topos(const cstr* self, intptr_t u8idx)
     { return utf8_pos(cstr_str(self), u8idx); }
 
 STC_INLINE const char* cstr_u8_at(const cstr* self, intptr_t u8idx)
@@ -233,9 +241,6 @@ STC_INLINE cstr_iter cstr_advance(cstr_iter it, intptr_t pos) {
     return it;
 }
 
-
-STC_INLINE void cstr_clear(cstr* self)
-    { _cstr_set_size(self, 0); }
 
 STC_INLINE int cstr_cmp(const cstr* s1, const cstr* s2)
     { return strcmp(cstr_str(s1), cstr_str(s2)); }

@@ -38,7 +38,7 @@
 #define             czview_toraw(self) (self)->str
 
 STC_INLINE czview   czview_from(const char* str)
-                        { return c_zv_2(str, c_strlen(str)); }
+                        { return c_LITERAL(czview){str, c_strlen(str)}; }
 STC_INLINE void     czview_clear(czview* self) { *self = c_zv(""); }
 STC_INLINE csview   czview_sv(czview rs) { return c_sv_2(rs.str, rs.size); }
 

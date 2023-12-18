@@ -8,7 +8,7 @@ int main(void)
 
     /* replace second smiley at utf8 codepoint pos 7 */
     cstr_u8_replace_at(&hello, 
-                        cstr_u8_to_pos(&hello, 7),
+                        cstr_u8_topos(&hello, 7),
                         1,
                         c_sv("🐨")
     );

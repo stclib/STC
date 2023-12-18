@@ -82,8 +82,7 @@ typedef union {
     csview chr;
 } czview_iter;
 
-#define c_zv(literal) c_zv_2(literal, c_litstrlen(literal))
-#define c_zv_2(str, n) (c_LITERAL(czview){str, n})
+#define c_zv(literal) (c_LITERAL(czview){literal, c_litstrlen(literal)})
 
 // cstr : null-terminated owning string (short string optimized - sso)
 typedef char cstr_value;
