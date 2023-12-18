@@ -3,6 +3,6 @@
 
 #include "algo/crange.h"
 #include "algo/filter.h"
-#include "algo/misc.h"
+#include "algo/utility.h"
 
 #endif // STC_ALGORITHM_H_INCLUDED

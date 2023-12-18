@@ -1,7 +1,7 @@
 #define i_import
 #include "stc/cregex.h"
 #include "stc/csview.h"
-#include "stc/algo/misc.h"
+#include "stc/algo/utility.h"
 #include "ctest.h"
 
 #define M_START(m) ((m).buf - inp)
@@ -64,8 +64,8 @@ CTEST(cregex, compile_match_quantifiers1)
 }
 
 CTEST(cregex, compile_match_quantifiers2)
-{   
-    const char* inp; 
+{
+    const char* inp;
     c_auto (cregex, re) {
         re = cregex_from("bä*");
         ASSERT_EQ(re.error, 0);
@@ -229,7 +229,7 @@ CTEST(cregex, captures_cap)
         ASSERT_EQ(M_END(cap[1]), 4);
         ASSERT_EQ(M_START(cap[2]), 4);
         ASSERT_EQ(M_END(cap[2]), 8);
-    
+
         ASSERT_TRUE(cregex_is_match(&re, "abcdcde"));
         ASSERT_TRUE(cregex_is_match(&re, "abcdcdcd"));
     }

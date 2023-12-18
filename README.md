@@ -676,10 +676,10 @@ STC is generally very memory efficient. Memory usage for the different container
 ## Version 4.3
 - Breaking changes:
     - **cstr** and **csview** now uses *shared linking* by default. Implement by either defining `i_implement` or `i_static` before including.
-    - Renamed "stc/calgo.h> => `<stc/algorithm.h"`
-    - Moved "stc/algo/coroutine.h> => `<stc/coroutine.h"`
+    - Renamed "stc/calgo.h" => `"stc/algorithm.h"`
+    - Moved "stc/algo/coroutine.h" => `"stc/coroutine.h"`
         - Much improved with some new API and added features.
-    - Removed deprecated "stc/crandom.h>. Use `<stc/crand.h"` with the new API.
+    - Removed deprecated "stc/crandom.h". Use `"stc/crand.h"` with the new API.
         - Reverted names _unif and _norm back to `_uniform` and `_normal`.
     - Removed default comparison for **list**, **vec** and **deq**:
         - Define `i_use_cmp` to enable comparison for built-in i_key types (<, ==).
@@ -732,8 +732,7 @@ Major changes:
 - Added: **crange**: number generator type, which can be iterated (e.g. with *c_forfilter*).
 - Added back **coption** - command line argument parsing.
 - New + renamed loop iteration/scope macros:
-    - `c_forlist`: macro replacing `c_forarray` and `c_apply`. Iterate a compound literal list.
-    - `c_forrange`: macro replacing `c_forrange`. Iterate a `long long` type number sequence.
+    - `c_forlist`: macro replacing *c_forarray* and *c_apply*. Iterate a compound literal list.
 - Updated **cstr**, now always takes self as pointer, like all containers except csview.
 - Updated **vec**, **deq**, changed `*_range*` function names.
 
