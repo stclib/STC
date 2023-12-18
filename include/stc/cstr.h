@@ -197,6 +197,9 @@ extern bool cstr_valid_utf8(const cstr* self);
 
 // utf8 functions not depending on src/utf8code.c:
 
+STC_INLINE cstr cstr_from_pos(cstr s, intptr_t pos, intptr_t len)
+    { return cstr_from_n(cstr_str(&s) + pos, len); }
+
 STC_INLINE intptr_t cstr_u8_size(const cstr* self)
     { return utf8_size(cstr_str(self)); }
 
