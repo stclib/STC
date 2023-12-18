@@ -116,8 +116,8 @@ void        cstr_u8_erase(cstr* self, intptr_t bytepos, intptr_t u8len); // eras
 // iterate utf8 codepoints
 cstr_iter   cstr_begin(const cstr* self);
 cstr_iter   cstr_end(const cstr* self);
-void        cstr_next(cstr_iter* it);
-cstr_iter   cstr_advance(cstr_iter it, intptr_t n);
+void        cstr_next(cstr_iter* it);                               // next utf8 codepoint
+cstr_iter   cstr_advance(cstr_iter it, intptr_t u8pos);             // advance +/- codepoints
 
 // utf8 functions requires linking with src/utf8code.c symbols:
 bool        cstr_valid_utf8(const cstr* self);                      // check if str is valid utf8

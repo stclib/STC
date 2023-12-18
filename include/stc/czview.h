@@ -110,10 +110,12 @@ STC_INLINE void czview_next(czview_iter* it) {
     if (!*it->ref) it->ref = NULL;
 }
 
-STC_INLINE czview_iter czview_advance(czview_iter it, intptr_t pos) {
+STC_INLINE czview_iter czview_advance(czview_iter it, intptr_t u8pos) {
     int inc = -1;
-    if (pos > 0) pos = -pos, inc = 1;
-    while (pos && *it.ref) pos += (*(it.ref += inc) & 0xC0) != 0x80;
+    if (u8pos > 0)
+        u8pos = -u8pos, inc = 1;
+    while (u8pos && *it.ref)
+        u8pos += (*(it.ref += inc) & 0xC0) != 0x80;
     it.chr.size = utf8_chr_size(it.ref);
     if (!*it.ref) it.ref = NULL;
     return it;

@@ -20,10 +20,10 @@ All czview definitions and prototypes are available by including a single header
 ## Methods
 
 ```c
-czview          c_zv(const char literal_only[]);                // construct from literal, no strlen()
+czview          c_zv(const char literal_only[]);                // from literal str, no strlen()
 czview          czview_from(const char* str);                   // construct from const char*
-czview          czview_from_pos(czview zv, intptr_t pos);
-czview          czview_last(czview zv, intptr_t count);
+czview          czview_from_pos(czview zv, intptr_t pos);       // subview starting from pos
+czview          czview_last(czview zv, intptr_t count);         // subview of the last count bytes
 
 intptr_t        czview_size(czview zv);
 bool            czview_empty(czview zv);                        // check if size == 0
@@ -38,15 +38,15 @@ bool            czview_ends_with(czview zv, const char* str);
 
 czview_iter     czview_begin(const czview* self);
 czview_iter     czview_end(const czview* self);
-void            czview_next(czview_iter* it);                   // utf8 codepoint step, not byte!
-czview_iter     czview_advance(czview_iter it, intptr_t n);
+void            czview_next(czview_iter* it);                   // next utf8 codepoint
+czview_iter     czview_advance(czview_iter it, intptr_t u8pos); // advance +/- codepoints
 
 /* utf8 */
 const char*     czview_u8_at(czview zv, intptr_t u8idx);
-czview          czview_u8_from_pos(czview zv, intptr_t u8idx);
-czview          czview_u8_last(czview zv, intptr_t u8len);
+czview          czview_u8_from_pos(czview zv, intptr_t u8idx);  // subview starting from u8idx
+czview          czview_u8_last(czview zv, intptr_t u8len);      // subview of the last u8len codepoints
 intptr_t        czview_u8_size(czview zv);
-bool            czview_u8_valid(czview zv); // depends on src/utf8code.c
+bool            czview_u8_valid(czview zv);                     // depends on src/utf8code.c
 ```
 
 #### Helper methods for usage in containers

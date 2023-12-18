@@ -31,17 +31,17 @@ All csview definitions and prototypes are available by including a single header
 ## Methods
 
 ```c
-csview         c_sv(const char literal_only[]);                        // construct from literal, no strlen()
-csview         c_sv(const char* str, intptr_t n);                      // construct from str and length n
-csview         csview_from(const char* str);                           // construct from const char*
-csview         csview_from_n(const char* str, intptr_t n);             // alias for c_sv(str, n)
+csview         c_sv(const char literal_only[]);                     // from literal, no strlen()
+csview         c_sv(const char* str, intptr_t n);                   // from str and length n
+csview         csview_from(const char* str);                        // from const char* str
+csview         csview_from_n(const char* str, intptr_t n);          // alias for c_sv(str, n)
 
 intptr_t       csview_size(csview sv);
 bool           csview_empty(csview sv);
 void           csview_clear(csview* self);
 
 bool           csview_equals(csview sv, const char* str);
-intptr_t       csview_equals_sv(csview sv, csview find);
+intptr_t       csview_equals_sv(csview sv, csview sv2);
 intptr_t       csview_find(csview sv, const char* str);
 intptr_t       csview_find_sv(csview sv, csview find);
 bool           csview_contains(csview sv, const char* str);
@@ -49,7 +49,7 @@ bool           csview_starts_with(csview sv, const char* str);
 bool           csview_ends_with(csview sv, const char* str);
 csview         csview_substr(csview sv, intptr_t pos, intptr_t n);
 csview         csview_slice(csview sv, intptr_t pos1, intptr_t pos2);
-csview         csview_last(csview sv, intptr_t len);
+csview         csview_last(csview sv, intptr_t len);                      // substr of the last len bytes 
 const char*    csview_at(csview sv, intptr_t index);
 
 csview         csview_substr_ex(csview sv, intptr_t pos, intptr_t n);     // negative pos count from end
@@ -61,14 +61,14 @@ csview         csview_token(csview sv, const char* sep, intptr_t* start); // *st
 ```c
 intptr_t       csview_u8_size(csview sv);
 csview         csview_u8_substr(csview sv, intptr_t bytepos, intptr_t u8len);
-csview         csview_u8_last(csview sv, intptr_t u8len);
+csview         csview_u8_last(csview sv, intptr_t u8len);                 // substr of the last u8len
 const char*    csview_u8_at(csview sv, intptr_t u8idx);
 bool           csview_u8_valid(csview sv);                                // requires linking with src/utf8code.c
 
 csview_iter    csview_begin(const csview* self);
 csview_iter    csview_end(const csview* self);
-void           csview_next(csview_iter* it);                              // utf8 codepoint step, not byte!
-csview_iter    csview_advance(csview_iter it, intptr_t n);
+void           csview_next(csview_iter* it);                              // next utf8 codepoint
+csview_iter    csview_advance(csview_iter it, intptr_t u8pos);            // advance +/- codepoints
 ```
 
 #### cstr methods returning csview

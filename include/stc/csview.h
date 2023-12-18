@@ -35,7 +35,7 @@
 #define             csview_clone(sv) c_default_clone(sv)
 #define             csview_from_n(str, n) c_sv_2(str, n)
 
-STC_API csview_iter csview_advance(csview_iter it, intptr_t pos);
+STC_API csview_iter csview_advance(csview_iter it, intptr_t u8pos);
 STC_API intptr_t    csview_find_sv(csview sv, csview search);
 STC_API uint64_t    csview_hash(const csview *self);
 STC_API csview      csview_slice_ex(csview sv, intptr_t p1, intptr_t p2);
@@ -172,10 +172,12 @@ STC_INLINE csview cstr_u8_substr(const cstr* self , intptr_t bytepos, intptr_t u
 #ifndef STC_CSVIEW_C_INCLUDED
 #define STC_CSVIEW_C_INCLUDED
 
-STC_DEF csview_iter csview_advance(csview_iter it, intptr_t pos) {
+STC_DEF csview_iter csview_advance(csview_iter it, intptr_t u8pos) {
     int inc = -1;
-    if (pos > 0) pos = -pos, inc = 1;
-    while (pos && it.ref != it.u8.end) pos += (*(it.ref += inc) & 0xC0) != 0x80;
+    if (u8pos > 0)
+        u8pos = -u8pos, inc = 1;
+    while (u8pos && it.ref != it.u8.end)
+        u8pos += (*(it.ref += inc) & 0xC0) != 0x80;
     it.chr.size = utf8_chr_size(it.ref);
     if (it.ref == it.u8.end) it.ref = NULL;
     return it;
