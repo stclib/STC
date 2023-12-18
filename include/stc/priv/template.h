@@ -113,8 +113,7 @@
 #if c_option(c_no_emplace)
   #define i_no_emplace
 #endif
-#if c_option(c_use_cmp) || defined i_cmp || defined i_less || \
-                           defined _i_ismap || defined _i_isset || defined _i_ispque
+#if c_option(c_use_cmp)
   #define i_use_cmp
 #endif
 #if c_option(c_no_clone) || defined _i_carc
@@ -127,12 +126,14 @@
 #if defined i_key_str
   #define i_key_class cstr
   #define i_raw_class ccharptr
+  #define i_use_cmp
   #ifndef i_tag
     #define i_tag str
   #endif
 #elif defined i_key_ssv
   #define i_key_class cstr
   #define i_raw_class csview
+  #define i_use_cmp
   #define i_keyfrom cstr_from_sv
   #define i_keyto cstr_sv
   #ifndef i_tag
@@ -141,9 +142,6 @@
 #elif defined i_key_arcbox
   #define i_key_class i_key_arcbox
   #define i_raw_class c_JOIN(i_key_arcbox, _raw)
-  #if defined i_use_cmp
-    #define i_eq c_JOIN(i_key_arcbox, _raw_eq)
-  #endif
 #endif
 
 #if defined i_raw_class
@@ -168,23 +166,23 @@
   #endif
 #endif
 
+#if defined i_use_cmp || defined i_cmp || defined i_less || defined _i_sorted || defined _i_ispque
+  #define _i_has_cmp
+#endif
+#if defined i_use_cmp || defined i_cmp || defined i_eq || defined i_hash || defined _i_ishash
+  #define _i_has_eq
+#endif
+
 #if defined i_raw_class
-  #if !(defined i_cmp || defined i_less) && defined i_use_cmp
+  #if !defined i_cmp && defined _i_has_cmp
     #define i_cmp c_JOIN(i_keyraw, _cmp)
+  #endif
+  #if !(defined i_eq || defined i_cmp) && defined _i_has_eq
+    #define i_eq c_JOIN(i_keyraw, _eq)
   #endif
   #if !(defined i_hash || defined i_no_hash)
     #define i_hash c_JOIN(i_keyraw, _hash)
   #endif
-#endif
-
-#if defined i_cmp || defined i_less || defined i_use_cmp
-  #define _i_has_cmp
-#endif
-#if defined i_eq || defined i_use_cmp
-  #define _i_has_eq
-#endif
-#if !(defined i_hash || defined i_no_hash)
-  #define i_hash c_default_hash
 #endif
 
 #if !defined i_key
@@ -196,14 +194,14 @@
 #elif defined i_from || defined i_drop
   #error "i_from / i_drop not supported. Define i_keyfrom/i_valfrom and/or i_keydrop/i_valdrop instead"
 #elif defined i_keyraw && defined _i_ishash && !(defined i_hash && (defined _i_has_cmp || defined i_eq))
-  #error "For cmap/cset, both i_hash and i_eq (or i_less or i_cmp) must be defined when i_keyraw is defined."
+  #error "For hmap/hset, both i_hash and i_eq (or i_less or i_cmp) must be defined when i_keyraw is defined."
 #elif defined i_keyraw && defined i_use_cmp && !defined _i_has_cmp
-  #error "For csmap/csset/cpque, i_cmp or i_less must be defined when i_keyraw is defined."
+  #error "For smap/sset/pque, i_cmp or i_less must be defined when i_keyraw is defined."
 #endif
 
 // i_eq, i_less, i_cmp
 #if !defined i_eq && defined i_cmp
-  #define i_eq(x, y) !(i_cmp(x, y))
+  #define i_eq(x, y) (i_cmp(x, y)) == 0
 #elif !defined i_eq && !defined i_keyraw
   #define i_eq(x, y) *x == *y // for integral types, else define i_eq or i_cmp yourself
 #endif
@@ -214,6 +212,9 @@
 #endif
 #if !defined i_cmp && defined i_less
   #define i_cmp(x, y) (i_less(y, x)) - (i_less(x, y))
+#endif
+#if !(defined i_hash || defined i_no_hash)
+  #define i_hash c_default_hash
 #endif
 
 #ifndef i_tag
@@ -237,7 +238,7 @@
   #define i_keydrop c_default_drop
 #endif
 
-#if defined _i_ismap // ---- process cmap/csmap value i_val, ... ----
+#if defined _i_ismap // ---- process hmap/smap value i_val, ... ----
 
 #ifdef i_val_str
   #define i_val_class cstr

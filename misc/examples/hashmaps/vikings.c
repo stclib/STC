@@ -24,9 +24,9 @@ typedef struct RViking {
     const char* country;
 } RViking;
 
-static inline int RViking_cmp(const RViking* rx, const RViking* ry) {
-    int c = strcmp(rx->name, ry->name);
-    return c ? c : strcmp(rx->country, ry->country);
+static inline bool RViking_eq(const RViking* rx, const RViking* ry) {
+    return strcmp(rx->name, ry->name) == 0 &&
+           strcmp(rx->country, ry->country) == 0;
 }
 
 static inline Viking Viking_from(RViking raw) { // note: parameter is by value
@@ -41,8 +41,8 @@ static inline RViking Viking_toraw(const Viking* vp) {
 #define i_type      Vikings
 #define i_raw_class RViking     // lookup type ; binds _cmp, _hash (unless overridden)
 #define i_key_class Viking      // key type    ; binds _drop, _clone, _from, _toraw
-#define i_val       int         // mapped type
 #define i_hash(rp)  stc_hash_mix(stc_strhash(rp->name), stc_strhash(rp->country))
+#define i_val       int         // mapped type
 #include "stc/hmap.h"
 
 int main(void)

@@ -196,7 +196,7 @@ STC_INLINE intptr_t _c_MEMB(_index)(const i_type* self, _m_iter it)
 STC_INLINE void _c_MEMB(_adjust_end_)(i_type* self, intptr_t n)
     { self->_len += n; }
 
-#if defined _i_has_eq || defined _i_has_cmp
+#if defined _i_has_eq
 STC_INLINE bool
 _c_MEMB(_eq)(const i_type* self, const i_type* other) {
     if (self->_len != other->_len) return false;

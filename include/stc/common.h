@@ -122,6 +122,7 @@
 // Non-owning c-string "class"
 typedef const char* ccharptr;
 #define ccharptr_cmp(xp, yp) strcmp(*(xp), *(yp))
+#define ccharptr_eq(xp, yp) (ccharptr_cmp(xp, yp) == 0)
 #define ccharptr_hash(p) stc_strhash(*(p))
 #define ccharptr_clone(s) (s)
 #define ccharptr_drop(p) ((void)p)

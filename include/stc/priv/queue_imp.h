@@ -114,7 +114,7 @@ _c_MEMB(_clone)(i_type cx) {
 }
 #endif // i_no_clone
 
-#if defined _i_has_eq || defined _i_has_cmp
+#if defined _i_has_eq
 STC_DEF bool
 _c_MEMB(_eq)(const i_type* self, const i_type* other) {
     if (_c_MEMB(_size)(self) != _c_MEMB(_size)(other)) return false;

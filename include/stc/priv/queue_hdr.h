@@ -50,7 +50,7 @@ STC_INLINE _m_value*    _c_MEMB(_emplace)(i_type* self, _m_raw raw)
                             { return _c_MEMB(_push)(self, i_keyfrom(raw)); }
 #endif
 
-#if defined _i_has_eq || defined _i_has_cmp
+#if defined _i_has_eq
 STC_API bool            _c_MEMB(_eq)(const i_type* self, const i_type* other);
 #endif
 

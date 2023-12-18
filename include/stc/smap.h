@@ -72,6 +72,7 @@ int main(void) {
   #define _i_SET_ONLY c_true
   #define _i_keyref(vp) (vp)
 #endif
+#define _i_sorted
 #include "priv/template.h"
 #ifndef i_is_forward
   _c_DEFTYPES(_c_aatree_types, i_type, i_key, i_val, _i_MAP_ONLY, _i_SET_ONLY);
@@ -209,6 +210,7 @@ _c_MEMB(_advance)(_m_iter it, size_t n) {
     return it;
 }
 
+#if defined _i_has_eq
 STC_INLINE bool
 _c_MEMB(_eq)(const i_type* self, const i_type* other) {
     if (_c_MEMB(_size)(self) != _c_MEMB(_size)(other)) return false;
@@ -219,6 +221,7 @@ _c_MEMB(_eq)(const i_type* self, const i_type* other) {
     }
     return true;
 }
+#endif
 
 STC_INLINE _m_result
 _c_MEMB(_insert)(i_type* self, _m_key _key _i_MAP_ONLY(, _m_mapped _mapped)) {
@@ -596,6 +599,7 @@ _c_MEMB(_drop)(i_type* self) {
 #endif // i_implement
 #undef _i_isset
 #undef _i_ismap
+#undef _i_sorted
 #undef _i_keyref
 #undef _i_MAP_ONLY
 #undef _i_SET_ONLY

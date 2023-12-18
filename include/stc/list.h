@@ -95,7 +95,7 @@ STC_API _m_value*       _c_MEMB(_push_front)(i_type* self, _m_value value);
 STC_API _m_iter         _c_MEMB(_insert_at)(i_type* self, _m_iter it, _m_value value);
 STC_API _m_iter         _c_MEMB(_erase_at)(i_type* self, _m_iter it);
 STC_API _m_iter         _c_MEMB(_erase_range)(i_type* self, _m_iter it1, _m_iter it2);
-#if defined _i_has_eq || defined _i_has_cmp
+#if defined _i_has_eq
 STC_API _m_iter         _c_MEMB(_find_in)(_m_iter it1, _m_iter it2, _m_raw val);
 STC_API intptr_t        _c_MEMB(_remove)(i_type* self, _m_raw val);
 #endif
@@ -191,7 +191,7 @@ _c_MEMB(_splice_range)(i_type* self, _m_iter it,
     return _c_MEMB(_splice)(self, it, &tmp);
 }
 
-#if defined _i_has_eq || defined _i_has_cmp
+#if defined _i_has_eq
 STC_INLINE _m_iter
 _c_MEMB(_find)(const i_type* self, _m_raw val) {
     return _c_MEMB(_find_in)(_c_MEMB(_begin)(self), _c_MEMB(_end)(self), val);
@@ -353,7 +353,7 @@ _c_MEMB(_split_off)(i_type* self, _m_iter it1, _m_iter it2) {
     return lst;
 }
 
-#if defined _i_has_eq || defined _i_has_cmp
+#if defined _i_has_eq
 STC_DEF _m_iter
 _c_MEMB(_find_in)(_m_iter it1, _m_iter it2, _m_raw val) {
     c_foreach (it, i_type, it1, it2) {
