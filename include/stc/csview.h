@@ -150,25 +150,6 @@ STC_INLINE bool csview_eq(const csview* x, const csview* y)
 
 #endif // STC_CSVIEW_H_INCLUDED
 
-/* csview interaction with cstr: */
-#ifdef STC_CSTR_H_INCLUDED
-
-STC_INLINE csview cstr_substr(const cstr* self, intptr_t pos, intptr_t n)
-    { return csview_substr(cstr_sv(self), pos, n); }
-
-STC_INLINE csview cstr_slice(const cstr* self, intptr_t p1, intptr_t p2)
-    { return csview_slice(cstr_sv(self), p1, p2); }
-
-STC_INLINE csview cstr_substr_ex(const cstr* self, intptr_t pos, intptr_t n)
-    { return csview_substr_ex(cstr_sv(self), pos, n); }
-
-STC_INLINE csview cstr_slice_ex(const cstr* self, intptr_t p1, intptr_t p2)
-    { return csview_slice_ex(cstr_sv(self), p1, p2); }
-
-STC_INLINE csview cstr_u8_substr(const cstr* self , intptr_t bytepos, intptr_t u8len)
-    { return csview_u8_substr(cstr_sv(self), bytepos, u8len); }
-#endif
-
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined i_implement || defined i_static
 #ifndef STC_CSVIEW_C_INCLUDED

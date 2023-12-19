@@ -58,6 +58,7 @@
 #undef i_keydrop
 
 #undef i_use_cmp
+#undef i_use_eq
 #undef i_no_hash
 #undef i_no_clone
 #undef i_no_emplace

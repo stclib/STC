@@ -32,7 +32,8 @@
   #define c_no_emplace    (1<<3)
   #define c_no_hash       (1<<4)
   #define c_use_cmp       (1<<5)
-  #define c_more          (1<<6)
+  #define c_use_eq        (1<<6)
+  #define c_more          (1<<7)
 
   #define _c_MEMB(name) c_JOIN(i_type, name)
   #define _c_DEFTYPES(macro, SELF, ...) c_EXPAND(macro(SELF, __VA_ARGS__))
@@ -116,6 +117,9 @@
 #if c_option(c_use_cmp)
   #define i_use_cmp
 #endif
+#if c_option(c_use_eq)
+  #define i_use_eq
+#endif
 #if c_option(c_no_clone) || defined _i_carc
   #define i_no_clone
 #endif
@@ -123,6 +127,8 @@
   #define i_more
 #endif
 
+// Handle predefined element-types with lookup convertion types:
+// cstr(const char*), cstr(csview), arc_T(T) / box_T(T)
 #if defined i_key_str
   #define i_key_class cstr
   #define i_raw_class ccharptr
@@ -144,12 +150,15 @@
   #define i_raw_class c_JOIN(i_key_arcbox, _raw)
 #endif
 
+// Check for i_key_class and i_raw_class, and fill in missing defs:
+// Element "class" type with possible assoc. convertion type and "member" functions.
 #if defined i_raw_class
   #define i_keyraw i_raw_class
 #elif defined i_key_class && !defined i_keyraw
   #define i_raw_class i_key
 #endif
 
+// Bind to i_key "class members": _clone, _drop, _from and _toraw (when conditions are met).
 #if defined i_key_class
   #define i_key i_key_class
   #ifndef i_keyclone
@@ -166,18 +175,20 @@
   #endif
 #endif
 
-#if defined i_use_cmp || defined i_cmp || defined i_less || defined _i_sorted || defined _i_ispque
+// Define when container has support for sorting (cmp) and linear search (eq)
+#if defined i_use_cmp || defined i_cmp || defined i_less
   #define _i_has_cmp
 #endif
-#if defined i_use_cmp || defined i_cmp || defined i_eq || defined i_hash || defined _i_ishash
+#if defined i_use_cmp || defined i_cmp || defined i_use_eq || defined i_eq
   #define _i_has_eq
 #endif
 
+// Bind to i_keyraw "class members": _cmp, _eq and _hash (when conditions are met).
 #if defined i_raw_class
-  #if !defined i_cmp && defined _i_has_cmp
+  #if !(defined i_cmp || defined i_less) && (defined i_use_cmp || defined _i_sorted || defined _i_ispque)
     #define i_cmp c_JOIN(i_keyraw, _cmp)
   #endif
-  #if !(defined i_eq || defined i_cmp) && defined _i_has_eq
+  #if !defined i_eq && (defined i_use_eq || defined i_hash || defined _i_ishash)
     #define i_eq c_JOIN(i_keyraw, _eq)
   #endif
   #if !(defined i_hash || defined i_no_hash)
@@ -194,21 +205,21 @@
 #elif defined i_from || defined i_drop
   #error "i_from / i_drop not supported. Define i_keyfrom/i_valfrom and/or i_keydrop/i_valdrop instead"
 #elif defined i_keyraw && defined _i_ishash && !(defined i_hash && (defined _i_has_cmp || defined i_eq))
-  #error "For hmap/hset, both i_hash and i_eq (or i_less or i_cmp) must be defined when i_keyraw is defined."
+  #error "For hmap/hset, both i_hash and i_eq (or i_cmp) must be defined when i_keyraw is defined."
 #elif defined i_keyraw && defined i_use_cmp && !defined _i_has_cmp
   #error "For smap/sset/pque, i_cmp or i_less must be defined when i_keyraw is defined."
 #endif
 
-// i_eq, i_less, i_cmp
+// Fill in missing i_eq, i_less, i_cmp functions with defaults.
 #if !defined i_eq && defined i_cmp
   #define i_eq(x, y) (i_cmp(x, y)) == 0
 #elif !defined i_eq && !defined i_keyraw
-  #define i_eq(x, y) *x == *y // for integral types, else define i_eq or i_cmp yourself
+  #define i_eq(x, y) *x == *y // works for integral types
 #endif
 #if !defined i_less && defined i_cmp
   #define i_less(x, y) (i_cmp(x, y)) < 0
 #elif !defined i_less && !defined i_keyraw
-  #define i_less(x, y) *x < *y // for integral types, else define i_less or i_cmp yourself
+  #define i_less(x, y) *x < *y // works for integral types
 #endif
 #if !defined i_cmp && defined i_less
   #define i_cmp(x, y) (i_less(y, x)) - (i_less(x, y))
