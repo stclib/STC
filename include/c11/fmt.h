@@ -30,7 +30,6 @@ void        fmt_close(fmt_stream* ss);
 * (c) operamint, 2022, MIT License.
 -----------------------------------------------------------------------------------
 #define FMT_IMPLEMENT
-#define FMT_SHORTS
 #include "c11/fmt.h"
 
 int main(void) {
@@ -43,21 +42,21 @@ int main(void) {
     unsigned char r = 123, g = 214, b = 90, w = 110;
     char buffer[64];
 
-    print("Color: ({} {} {}), {}\n", r, g, b, flag);
-    println("Wide: {}, {}", wstr, L"wide world");
-    println("{:10} {:10} {:10.2f}", 42ull, 43, pi);
-    println("{:>10} {:>10} {:>10}", z, z, w);
-    printd(stdout, "{:10} {:10} {:10}\n", "Hello", "Mad", "World");
-    printd(stderr, "100%: {:<20} {:.*} {}\n", string, 4, pi, x);
-    printd(buffer, "Precision: {} {:.10} {}", string, pi, x);
+    fmt_print("Color: ({} {} {}), {}\n", r, g, b, flag);
+    fmt_println("Wide: {}, {}", wstr, L"wide world");
+    fmt_println("{:10} {:10} {:10.2f}", 42ull, 43, pi);
+    fmt_println("{:>10} {:>10} {:>10}", z, z, w);
+    fmt_printd(stdout, "{:10} {:10} {:10}\n", "Hello", "Mad", "World");
+    fmt_printd(stderr, "100%: {:<20} {:.*} {}\n", string, 4, pi, x);
+    fmt_printd(buffer, "Precision: {} {:.10} {}", string, pi, x);
     fmt_println("{}", buffer);
     fmt_println("Vector: ({}, {}, {})", 3.2, 3.3, pi);
 
     fmt_stream ss[1] = {0};
-    printd(ss, "{} {}", "Pi is:", pi);
-    print("{}, len={}, cap={}\n", ss->data, ss->len, ss->cap);
-    printd(ss, "{} {}", ", Pi squared is:", pi*pi);
-    print("{}, len={}, cap={}\n", ss->data, ss->len, ss->cap);
+    fmt_printd(ss, "{} {}", "Pi is:", pi);
+    fmt_print("{}, len={}, cap={}\n", ss->data, ss->len, ss->cap);
+    fmt_printd(ss, "{} {}", ", Pi squared is:", pi*pi);
+    fmt_print("{}, len={}, cap={}\n", ss->data, ss->len, ss->cap);
     fmt_close(ss);
     
     time_t now = time(NULL);
@@ -96,11 +95,21 @@ typedef struct {
     _Bool overwrite;
 } fmt_stream;
 
+#if defined FMT_STATIC || defined STC_STATIC || defined i_static
+  #define FMT_API static
+  #define FMT_DEF static
+#elif defined FMT_IMPLEMENT || defined STC_IMPLEMENT || defined i_implement
+  #define FMT_API extern
+  #define FMT_DEF
+#else
+  #define FMT_API
+#endif
+
 struct tm;  /* Max 2 usages. Buffer = 64 chars. */
-const char* fmt_tm(const char *fmt, const struct tm *tp);
-void        fmt_close(fmt_stream* ss);
-int  _fmt_parse(char* p, int nargs, const char *fmt, ...);
-void _fmt_bprint(fmt_stream*, const char* fmt, ...);
+FMT_API const char* fmt_tm(const char *fmt, const struct tm *tp);
+FMT_API void        fmt_close(fmt_stream* ss);
+FMT_API int  _fmt_parse(char* p, int nargs, const char *fmt, ...);
+FMT_API void _fmt_bprint(fmt_stream*, const char* fmt, ...);
 
 #ifndef FMT_MAX
 #define FMT_MAX 128
@@ -196,25 +205,25 @@ void _fmt_bprint(fmt_stream*, const char* fmt, ...);
     const wchar_t*: "ls", \
     const void*: "p")
 
-#if defined FMT_IMPLEMENT || defined STC_IMPLEMENT || defined i_implement
+#if defined FMT_DEF
 
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
 #include <time.h>
 
-void fmt_close(fmt_stream* ss) {
+FMT_DEF void fmt_close(fmt_stream* ss) {
     free(ss->data);
 }
 
-const char* fmt_tm(const char *fmt, const struct tm *tp) {
+FMT_DEF const char* fmt_tm(const char *fmt, const struct tm *tp) {
     static char buf[2][64];
     static  int i;
     strftime(buf[(i = !i)], sizeof buf[0], fmt, tp);
     return buf[i];
 }
 
-void _fmt_bprint(fmt_stream* ss, const char* fmt, ...) {
+FMT_DEF void _fmt_bprint(fmt_stream* ss, const char* fmt, ...) {
     va_list args, args2;
     va_start(args, fmt);
     if (ss == NULL) {
@@ -235,7 +244,7 @@ void _fmt_bprint(fmt_stream* ss, const char* fmt, ...) {
     done1: va_end(args);
 }
 
-int _fmt_parse(char* p, int nargs, const char *fmt, ...) {
+FMT_DEF int _fmt_parse(char* p, int nargs, const char *fmt, ...) {
     char *arg, *p0, ch;
     int n = 0, empty;
     va_list args;
@@ -286,3 +295,4 @@ int _fmt_parse(char* p, int nargs, const char *fmt, ...) {
 #endif
 #endif
 #undef i_implement
+#undef i_static

@@ -57,12 +57,14 @@ int main(void)
 #define c_flt_takewhile(i, pred) _flt_takewhile(&(i).b, pred)
 #define c_flt_counter(i) ++(i).b.s1[(i).b.s1top++]
 #define c_flt_getcount(i) (i).b.s1[(i).b.s1top - 1]
+#define c_flt_map(i, expr) ((i).mapped = (expr), true)
+#define c_flt_reduce(i, ...) (__VA_ARGS__, true)
 
 #define c_forfilter(i, C, cnt, filter) \
     c_forfilter_it(i, C, C##_begin(&cnt), filter)
 
 #define c_forfilter_it(i, C, start, filter) \
-    for (struct {struct _flt_base b; C##_iter it; C##_value *ref;} \
+    for (struct {struct _flt_base b; C##_iter it; C##_value *ref, mapped;} \
          i = {.it=start, .ref=i.it.ref} ; !i.b.done & (i.it.ref != NULL) ; \
          C##_next(&i.it), i.ref = i.it.ref, i.b.s1top=0, i.b.s2top=0) \
       if (!(filter)) ; else
