@@ -87,10 +87,10 @@
 } while (0)
 
 // --------------------------------
-// c_clone_if
+// c_copy_if
 // --------------------------------
 
-#define c_clone_if(C, cnt, outcnt_ptr, pred) do { \
+#define c_copy_if(C, cnt, outcnt_ptr, pred) do { \
     C _cnt = cnt, *_out = outcnt_ptr; \
     const C##_value* value; \
     for (C##_iter _it = C##_begin(&_cnt); (value = _it.ref); C##_next(&_it)) \

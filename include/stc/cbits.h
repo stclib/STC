@@ -68,13 +68,13 @@ int main(void) {
 #define _cbits_words(n) (intptr_t)(((n) + (_cbits_BN - 1))/_cbits_BN)
 #define _cbits_bytes(n) (_cbits_words(n)*c_sizeof(uintptr_t))
 
-#if defined __GNUC__
-  STC_INLINE int stc_popcount(uintptr_t x) { return _gnu_popc(x); }
-#elif defined _MSC_VER
+#if defined _MSC_VER
   #include <intrin.h>
-  STC_INLINE int stc_popcount(uintptr_t x) { return _msc_popc(x); }
+  STC_INLINE int c_popcount(uintptr_t x) { return _msc_popc(x); }
+#elif defined __GNUC__ || defined __clang__
+  STC_INLINE int c_popcount(uintptr_t x) { return _gnu_popc(x); }
 #else
-  STC_INLINE int stc_popcount(uintptr_t x) { /* http://en.wikipedia.org/wiki/Hamming_weight */
+  STC_INLINE int c_popcount(uintptr_t x) { /* http://en.wikipedia.org/wiki/Hamming_weight */
     x -= (x >> 1) & (uintptr_t)0x5555555555555555;
     x = (x & (uintptr_t)0x3333333333333333) + ((x >> 2) & (uintptr_t)0x3333333333333333);
     x = (x + (x >> 4)) & (uintptr_t)0x0f0f0f0f0f0f0f0f;
@@ -90,9 +90,9 @@ STC_INLINE intptr_t _cbits_count(const uintptr_t* set, const intptr_t sz) {
     const intptr_t n = sz/_cbits_BN;
     intptr_t count = 0;
     for (intptr_t i = 0; i < n; ++i)
-        count += stc_popcount(set[i]);
+        count += c_popcount(set[i]);
     if (sz & (_cbits_BN - 1))
-        count += stc_popcount(set[n] & (_cbits_bit(sz) - 1));
+        count += c_popcount(set[n] & (_cbits_bit(sz) - 1));
     return count;
 }
 

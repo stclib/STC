@@ -89,14 +89,13 @@ hmap_X_raw            hmap_X_value_toraw(hmap_X_value* pval);
 ```
 Free helper functions:
 ```c
-uint64_t              stc_hash(const void *data, intptr_t n);               // base hash function
-uint64_t              stc_hash(const T* obj);                               // base hash function. n=sizeof(T)
-uint64_t              stc_strhash(const char *str);                         // string hash function, uses strlen()
-uint64_t              stc_hash_mix(uint64_t h1, uint64_t h2, ...);          // mix computed hashes
-uint64_t              stc_nextpow2(intptr_t i);                             // get next power of 2 >= i
+uint64_t              c_hash_n(const void *data, intptr_t n);               // generic hash function of n bytes
+uint64_t              c_hash_str(const char *str);                          // string hash function, uses strlen()
+uint64_t              c_hash_mix(uint64_t h1, uint64_t h2, ...);            // mix/combine computed hashes
+uint64_t              c_next_pow2(intptr_t k);                              // get next power of 2 >= k
 
 // hash/equal template default functions:
-uint64_t              c_default_hash(const T *obj);                         // alias for stc_hash(obj)
+uint64_t              c_default_hash(const T *obj);                         // alias for c_hash_n(obj, sizeof *obj)
 bool                  c_default_eq(const i_keyraw* a, const i_keyraw* b);   // *a == *b
 bool                  c_memcmp_eq(const i_keyraw* a, const i_keyraw* b);    // !memcmp(a, b, sizeof *a)
 ```
@@ -212,7 +211,7 @@ Demonstrate hmap with plain-old-data key type Vec3i and int as mapped type: hmap
 typedef struct { int x, y, z; } Vec3i;
 
 #define i_TYPE hmap_vi, Vec3i, int
-#define i_eq c_memcmp_eq // bitwise equal, and uses stc_hash()
+#define i_eq c_memcmp_eq // bitwise equal
 #include "stc/hmap.h"
 
 int main(void)
@@ -387,7 +386,7 @@ static inline RViking Viking_toraw(const Viking* vp) {
 #define i_raw_class RViking     // lookup type ; binds _cmp, _hash (unless overridden)
 #define i_key_class Viking      // key type    ; binds _drop, _clone, _from, _toraw
 #define i_val       int         // mapped type
-#define i_hash(rp)  stc_hash_mix(stc_strhash(rp->name), stc_strhash(rp->country))
+#define i_hash(rp)  c_hash_mix(c_hash_str(rp->name), c_hash_str(rp->country))
 #include "stc/hmap.h"
 
 int main(void)

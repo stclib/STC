@@ -192,17 +192,17 @@ Drop multiple containers of the same type:
 c_drop(hset_str, &myset, &myset2);
 ```
 
-### c_find_if, c_clone_if, c_erase_if, c_eraseremove_if
+### c_find_if, c_copy_if, c_erase_if, c_eraseremove_if
 Find, clone or erase linearily in containers using a predicate. `value` is a pointer to each element in predicate.
-- For `c_clone_if(CntType, cnt, outcnt_ptr, pred)`, ***outcnt_ptr*** must be defined prior to call.
+- For `c_copy_if(CntType, cnt, outcnt_ptr, pred)`, ***outcnt_ptr*** must be defined prior to call.
 - For `c_find_if(CntType, cnt, outiter_ptr, pred)`, ***outiter_ptr*** must be defined prior to call.
 - Use `c_erase_if(CntType, cnt_ptr, pred)` with **list**, **hmap**, **hset**, **smap**, and **sset**.
 - Use `c_eraseremove_if(CntType, cnt_ptr, pred)` with **stack**, **vec**, **deq**, and **queue** only.
 ```c
 // Clone all value > 10 to out vector. Note: `value` is a pointer to current element
 vec_int vec = c_init(vec_int, {2, 30, 21, 5, 9, 11});
-vec_int out = {0};
-c_clone_if(vec_int, vec, &out, *value > 10);
+vec_int outvec = {0};
+c_copy_if(vec_int, vec, &outvec, *value > 10);
 
 // Search vec for first value > 20.
 vec_int_iter result;
@@ -218,7 +218,7 @@ c_eraseremove_if(vec_int, &vec, *value > 20 && *value < 25);
 // Search a sorted map for the first string containing "hello" in range [it1, it2), and erase it:
 smap_str_iter result, it1 = ..., it2 = ...;
 c_find_if(smap_str, it1, it2, &result, cstr_contains(value, "hello"));
-if (res.ref) smap_str_erase_at(&map, res);
+if (result.ref) smap_str_erase_at(&map, res);
 
 // Erase all strings containing "hello" in a sorted map:
 c_erase_if(smap_str, &map, cstr_contains(&value->first, "hello"));

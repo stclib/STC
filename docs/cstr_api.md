@@ -145,7 +145,7 @@ int         cstr_cmp(const cstr* s1, const cstr* s2);
 bool        cstr_eq(const cstr* s1, const cstr* s2);
 uint64_t    cstr_hash(const cstr* self);
 
-char*       stc_strnstrn(const char* str, intptr_t slen, const char* needle, intptr_t nlen);
+char*       c_strnstrn(const char* str, intptr_t slen, const char* needle, intptr_t nlen);
 ```
 
 ## Types

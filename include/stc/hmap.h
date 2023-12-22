@@ -419,7 +419,7 @@ _c_MEMB(_reserve)(i_type* self, const intptr_t _newcap) {
     if (_newcap != self->size && _newcap <= _oldbucks)
         return true;
     intptr_t _newbucks = (intptr_t)((float)_newcap / (i_max_load_factor)) + 4;
-    _newbucks = stc_nextpow2(_newbucks);
+    _newbucks = c_next_pow2(_newbucks);
     i_type m = {
         (_m_value *)i_malloc(_newbucks*c_sizeof(_m_value)),
         (struct hmap_slot *)i_calloc(_newbucks + 1, c_sizeof(struct hmap_slot)),

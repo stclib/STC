@@ -4,11 +4,11 @@
 VER 2.2: NEW API:
 void        fmt_print(fmt, ...);
 void        fmt_println(fmt, ...);
-void        fmt_printd(dest, fmt, ...);
+void        fmt_printd(dst, fmt, ...);
 const char* fmt_tm(fmt, struct tm* tp);
 void        fmt_close(fmt_stream* ss);
 
-  dest - destination, one of:
+  dst - destination, one of:
     FILE* fp        Write to a file
     char* strbuf    Write to a pre-allocated string buffer
     fmt_stream* ss  Write to a string-stream (auto allocated).
@@ -26,7 +26,6 @@ void        fmt_close(fmt_stream* ss);
 * C11 or higher required.
 * MAX 255 chars fmt string by default. MAX 12 arguments after fmt string.
 * Define FMT_IMPLEMENT, STC_IMPLEMENT or i_implement prior to #include in one translation unit.
-* Define FMT_SHORTS to add print(), println() and printd() macros, without fmt_ prefix.
 * (c) operamint, 2022, MIT License.
 -----------------------------------------------------------------------------------
 #define FMT_IMPLEMENT
@@ -62,8 +61,9 @@ int main(void) {
     time_t now = time(NULL);
     struct tm t1 = *localtime(&now), t2 = t1;
     t2.tm_year += 2;
-    fmt_print("Dates:\n  {}\n  {}\n", fmt_tm("%Y-%m-%d %X %Z", &t1), 
-                                      fmt_tm("%Y-%m-%d %X %Z", &t2));
+    // NB! max 2 fmt_tm() calls per fmt_print()!
+    fmt_print("Dates: {} and {}\n", fmt_tm("%Y-%m-%d %X %Z", &t1), 
+                                    fmt_tm("%Y-%m-%d %X %Z", &t2));
 }
 */
 #include <stdio.h>
@@ -108,17 +108,11 @@ typedef struct {
 struct tm;  /* Max 2 usages. Buffer = 64 chars. */
 FMT_API const char* fmt_tm(const char *fmt, const struct tm *tp);
 FMT_API void        fmt_close(fmt_stream* ss);
-FMT_API int  _fmt_parse(char* p, int nargs, const char *fmt, ...);
-FMT_API void _fmt_bprint(fmt_stream*, const char* fmt, ...);
+FMT_API int        _fmt_parse(char* p, int nargs, const char *fmt, ...);
+FMT_API void       _fmt_sprint(fmt_stream*, const char* fmt, ...);
 
 #ifndef FMT_MAX
 #define FMT_MAX 128
-#endif
-
-#ifdef FMT_SHORTS
-#define print(...) fmt_printd(stdout, __VA_ARGS__)
-#define println(...) fmt_printd((fmt_stream*)0, __VA_ARGS__)
-#define printd fmt_printd
 #endif
 
 #define fmt_print(...) fmt_printd(stdout, __VA_ARGS__)
@@ -174,19 +168,24 @@ FMT_API void _fmt_bprint(fmt_stream*, const char* fmt, ...);
 #define _fmt_fn(x) _Generic ((x), \
     FILE*: fprintf, \
     char*: sprintf, \
-    fmt_stream*: _fmt_bprint)
+    fmt_stream*: _fmt_sprint)
 
 #if defined(_MSC_VER) && !defined(__clang__)
-#  define _signed_char_hhd
+  #define _signed_char_hhd
 #else
-#  define _signed_char_hhd signed char: "hhd",
+  #define _signed_char_hhd signed char: "hhd",
+#endif
+#ifdef __GNUC__
+  #define FMT_UNUSED __attribute__((unused))
+#else
+  #define FMT_UNUSED
 #endif
 
 #define _fc(x) _Generic (x, \
     _Bool: "d", \
     unsigned char: "hhu", \
     _signed_char_hhd \
-    char: "c", \
+    char: "hhd", \
     short: "hd", \
     unsigned short: "hu", \
     int: "d", \
@@ -212,18 +211,18 @@ FMT_API void _fmt_bprint(fmt_stream*, const char* fmt, ...);
 #include <string.h>
 #include <time.h>
 
-FMT_DEF void fmt_close(fmt_stream* ss) {
+FMT_DEF FMT_UNUSED void fmt_close(fmt_stream* ss) {
     free(ss->data);
 }
 
-FMT_DEF const char* fmt_tm(const char *fmt, const struct tm *tp) {
+FMT_DEF FMT_UNUSED const char* fmt_tm(const char *fmt, const struct tm *tp) {
     static char buf[2][64];
-    static  int i;
-    strftime(buf[(i = !i)], sizeof buf[0], fmt, tp);
+    static int i;
+    strftime(buf[(i = !i)], sizeof(buf[0]) - 1, fmt, tp);
     return buf[i];
 }
 
-FMT_DEF void _fmt_bprint(fmt_stream* ss, const char* fmt, ...) {
+FMT_DEF void _fmt_sprint(fmt_stream* ss, const char* fmt, ...) {
     va_list args, args2;
     va_start(args, fmt);
     if (ss == NULL) {

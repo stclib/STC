@@ -61,13 +61,13 @@ int main(void) {
 #include "forward.h"
 #include <stdlib.h>
 
-#if defined __GNUC__
-    #define c_atomic_inc(v) (void)__atomic_add_fetch(v, 1, __ATOMIC_SEQ_CST)
-    #define c_atomic_dec_and_test(v) !__atomic_sub_fetch(v, 1, __ATOMIC_SEQ_CST)
-#elif defined _MSC_VER
+#if defined _MSC_VER
     #include <intrin.h>
     #define c_atomic_inc(v) (void)_InterlockedIncrement(v)
     #define c_atomic_dec_and_test(v) !_InterlockedDecrement(v)
+#elif defined __GNUC__ || defined __clang__
+    #define c_atomic_inc(v) (void)__atomic_add_fetch(v, 1, __ATOMIC_SEQ_CST)
+    #define c_atomic_dec_and_test(v) !__atomic_sub_fetch(v, 1, __ATOMIC_SEQ_CST)
 #else
     #include <stdatomic.h>
     #define c_atomic_inc(v) (void)atomic_fetch_add(v, 1)

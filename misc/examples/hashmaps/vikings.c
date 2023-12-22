@@ -41,7 +41,7 @@ static inline RViking Viking_toraw(const Viking* vp) {
 #define i_type      Vikings
 #define i_raw_class RViking     // lookup type ; binds _cmp, _hash (unless overridden)
 #define i_key_class Viking      // key type    ; binds _drop, _clone, _from, _toraw
-#define i_hash(rp)  stc_hash_mix(stc_strhash(rp->name), stc_strhash(rp->country))
+#define i_hash(rp)  c_hash_mix(c_hash_str(rp->name), c_hash_str(rp->country))
 #define i_val       int         // mapped type
 #include "stc/hmap.h"
 

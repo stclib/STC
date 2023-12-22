@@ -36,7 +36,7 @@
 #define c_ZI PRIiPTR
 #define c_ZU PRIuPTR
 
-#if defined __GNUC__ // includes __clang__
+#if defined __GNUC__ || defined __clang__
     #define STC_INLINE static inline __attribute((unused))
 #else
     #define STC_INLINE static inline
@@ -104,11 +104,11 @@
 #define c_uless(a, b)           ((size_t)(a) < (size_t)(b))
 
 // x and y are i_keyraw* type, defaults to i_key*:
+#define c_memcmp_eq(x, y)       (memcmp(x, y, sizeof *(x)) == 0)
 #define c_default_cmp(x, y)     (c_default_less(y, x) - c_default_less(x, y))
 #define c_default_less(x, y)    (*(x) < *(y))
 #define c_default_eq(x, y)      (*(x) == *(y))
-#define c_memcmp_eq(x, y)       (memcmp(x, y, sizeof *(x)) == 0)
-#define c_default_hash          stc_hash_1
+#define c_default_hash          c_hash_pod
 
 #define c_default_clone(v)      (v)
 #define c_default_toraw(vp)     (*(vp))
@@ -123,16 +123,13 @@
 typedef const char* ccharptr;
 #define ccharptr_cmp(xp, yp) strcmp(*(xp), *(yp))
 #define ccharptr_eq(xp, yp) (ccharptr_cmp(xp, yp) == 0)
-#define ccharptr_hash(p) stc_strhash(*(p))
+#define ccharptr_hash(p) c_hash_str(*(p))
 #define ccharptr_clone(s) (s)
 #define ccharptr_drop(p) ((void)p)
 
 #define c_ROTL(x, k) (x << (k) | x >> (8*sizeof(x) - (k)))
 
-#define stc_hash(...) c_MACRO_OVERLOAD(stc_hash, __VA_ARGS__)
-#define stc_hash_1(x) stc_hash_2(x, c_sizeof(*(x)))
-
-STC_INLINE uint64_t stc_hash_2(const void* key, intptr_t len) {
+STC_INLINE uint64_t c_hash_n(const void* key, intptr_t len) {
     uint32_t u4; uint64_t u8;
     switch (len) {
         case 8: memcpy(&u8, key, 8); return u8*0xc6a4a7935bd1e99d;
@@ -150,15 +147,17 @@ STC_INLINE uint64_t stc_hash_2(const void* key, intptr_t len) {
     return h ^ c_ROTL(h, 26);
 }
 
-STC_INLINE uint64_t stc_strhash(const char *str)
-    { return stc_hash_2(str, c_strlen(str)); }
+#define c_hash_pod(pod) c_hash_n(pod, sizeof *(pod))
 
-STC_INLINE uint64_t _stc_hash_mix(uint64_t h[], int n) { // n > 0
+STC_INLINE uint64_t c_hash_str(const char *str)
+    { return c_hash_n(str, c_strlen(str)); }
+
+STC_INLINE uint64_t _c_hash_mix(uint64_t h[], int n) { // n > 0
     for (int i = 1; i < n; ++i) h[0] ^= h[0] + h[i]; // non-commutative!
     return h[0];
 }
 
-STC_INLINE char* stc_strnstrn(const char *str, intptr_t slen,
+STC_INLINE char* c_strnstrn(const char *str, intptr_t slen,
                               const char *needle, intptr_t nlen) {
     if (!nlen) return (char *)str;
     if (nlen > slen) return NULL;
@@ -171,7 +170,7 @@ STC_INLINE char* stc_strnstrn(const char *str, intptr_t slen,
     return NULL;
 }
 
-STC_INLINE intptr_t stc_nextpow2(intptr_t n) {
+STC_INLINE intptr_t c_next_pow2(intptr_t n) {
     n--;
     n |= n >> 1, n |= n >> 2;
     n |= n >> 4, n |= n >> 8;
@@ -218,8 +217,8 @@ STC_INLINE intptr_t stc_nextpow2(intptr_t n) {
         for (struct {T* ref; int size, index;} \
              it = {.ref=(T[])__VA_ARGS__, .size=(int)(sizeof((T[])__VA_ARGS__)/sizeof(T))} \
              ; it.index < it.size; ++it.ref, ++it.index)
-    #define stc_hash_mix(...) \
-        _stc_hash_mix((uint64_t[]){__VA_ARGS__}, c_NUMARGS(__VA_ARGS__))
+    #define c_hash_mix(...) \
+        _c_hash_mix((uint64_t[]){__VA_ARGS__}, c_NUMARGS(__VA_ARGS__))
 #else
     #include <initializer_list>
     #include <array>
@@ -231,8 +230,8 @@ STC_INLINE intptr_t stc_nextpow2(intptr_t n) {
         for (struct {std::initializer_list<T> _il; std::initializer_list<T>::iterator ref; size_t size, index;} \
              it = {._il=__VA_ARGS__, .ref=it._il.begin(), .size=it._il.size()} \
              ; it.index < it.size; ++it.ref, ++it.index)
-    #define stc_hash_mix(...) \
-        _stc_hash_mix(std::array<uint64_t, c_NUMARGS(__VA_ARGS__)>{__VA_ARGS__}.data(), c_NUMARGS(__VA_ARGS__))
+    #define c_hash_mix(...) \
+        _c_hash_mix(std::array<uint64_t, c_NUMARGS(__VA_ARGS__)>{__VA_ARGS__}.data(), c_NUMARGS(__VA_ARGS__))
 #endif
 
 #define c_defer(...) \
