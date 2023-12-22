@@ -192,42 +192,48 @@ Drop multiple containers of the same type:
 c_drop(hset_str, &myset, &myset2);
 ```
 
-### stc_find_if, stc_erase_if, stc_eraseremove_if
-Find or erase linearily in containers using a predicate. `value` is a pointer to each element in predicate.
-- For `stc_find_if(Iter* result, CntType, cnt, pred)`, ***result*** is output and must be declared prior to call.
-- Use `stc_erase_if(CntType, cnt, pred)` with **list**, **hmap**, **hset**, **smap**, and **sset**.
-- Use `stc_eraseremove_if(CntType, cnt, pred)` with **stack**, **vec**, **deq**, and **queue** only.
+### c_find_if, c_clone_if, c_erase_if, c_eraseremove_if
+Find, clone or erase linearily in containers using a predicate. `value` is a pointer to each element in predicate.
+- For `c_clone_if(CntType, cnt, outcnt_ptr, pred)`, ***outcnt_ptr*** must be defined prior to call.
+- For `c_find_if(CntType, cnt, outiter_ptr, pred)`, ***outiter_ptr*** must be defined prior to call.
+- Use `c_erase_if(CntType, cnt_ptr, pred)` with **list**, **hmap**, **hset**, **smap**, and **sset**.
+- Use `c_eraseremove_if(CntType, cnt_ptr, pred)` with **stack**, **vec**, **deq**, and **queue** only.
 ```c
-// Search vec for first value > 20. NOTE: `value` is a pointer to current element
+// Clone all value > 10 to out vector. Note: `value` is a pointer to current element
+vec_int vec = c_init(vec_int, {2, 30, 21, 5, 9, 11});
+vec_int out = {0};
+c_clone_if(vec_int, vec, &out, *value > 10);
+
+// Search vec for first value > 20.
 vec_int_iter result;
-stc_find_if(&result, vec_int, vec, *value > 20);
+c_find_if(vec_int, vec, &result, *value > 20);
 if (result.ref) printf("%d\n", *result.ref);
 
 // Erase all values > 20 in a linked list:
-stc_erase_if(list_int, &list, *value > 20);
+c_erase_if(list_int, &list, *value > 20);
 
-// Erase values (20 < value < 25) in vec:
-stc_eraseremove_if(vec_int, &vec, *value > 20 && *value < 25);
+// Erase values (20 < value < 25) in vec (contigious array):
+c_eraseremove_if(vec_int, &vec, *value > 20 && *value < 25);
 
 // Search a sorted map for the first string containing "hello" in range [it1, it2), and erase it:
-smap_str_iter res, it1 = ..., it2 = ...;
-stc_find_if(&res, smap_str, it1, it2, cstr_contains(value, "hello"));
+smap_str_iter result, it1 = ..., it2 = ...;
+c_find_if(smap_str, it1, it2, &result, cstr_contains(value, "hello"));
 if (res.ref) smap_str_erase_at(&map, res);
 
 // Erase all strings containing "hello" in a sorted map:
-stc_erase_if(smap_str, &map, cstr_contains(&value->first, "hello"));
+c_erase_if(smap_str, &map, cstr_contains(&value->first, "hello"));
 ```
 
-### stc_all_of, stc_any_of, stc_none_of
+### c_all_of, c_any_of, c_none_of
 Test a container/range using a predicate. ***result*** is output and must be declared prior to call.
-- `void stc_all_of(bool* result, CntType, cnt, predicate`
-- `void stc_any_of(bool* result, CntType, cnt, predicate)`
-- `void stc_none_of(bool* result, CntType, cnt, predicate)`
+- `void c_all_of(CntType, cnt, bool* result, pred)`
+- `void c_any_of(CntType, cnt, bool* result, pred)`
+- `void c_none_of(CntType, cnt, bool* result, pred)`
 ```c
 #define DivisibleBy(n) (*value % (n) == 0) // `value` refers to the current element
 
 bool result;
-stc_any_of(&result, vec_int, vec, DivisibleBy(7));
+c_any_of(vec_int, vec, &result, DivisibleBy(7));
 if (result)
     puts("At least one number is divisible by 7");
 ```

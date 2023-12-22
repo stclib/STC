@@ -38,28 +38,28 @@
             (C##_drop(&c), C##_drop(&b), C##_drop(&a)))
 
 // --------------------------------
-// stc_find_if
+// c_find_if
 // --------------------------------
 
-#define stc_find_if(...) c_MACRO_OVERLOAD(stc_find_if, __VA_ARGS__)
-#define stc_find_if_4(it_p, C, cnt, pred) \
-    stc_find_if_5(it_p, C, C##_begin(&cnt), C##_end(&cnt), pred)
+#define c_find_if(...) c_MACRO_OVERLOAD(c_find_if, __VA_ARGS__)
+#define c_find_if_4(C, cnt, it_ptr, pred) \
+    c_find_if_5(C, C##_begin(&cnt), C##_end(&cnt), it_ptr, pred)
 
-#define stc_find_if_5(it_p, C, start, end, pred) do { \
+#define c_find_if_5(C, start, end, it_ptr, pred) do { \
     intptr_t index = 0; \
     const C##_value *_endref = (end).ref, *value; \
-    for (*(it_p) = start; (value = (it_p)->ref) != _endref; C##_next(it_p), ++index) \
+    for (*(it_ptr) = start; (value = (it_ptr)->ref) != _endref; C##_next(it_ptr), ++index) \
         if (pred) goto c_JOIN(findif_, __LINE__); \
-    (it_p)->ref = NULL; c_JOIN(findif_, __LINE__):; \
+    (it_ptr)->ref = NULL; c_JOIN(findif_, __LINE__):; \
 } while (0)
 
 // --------------------------------
-// stc_erase_if
+// c_erase_if
 // --------------------------------
 
 // Use with: list, hmap, hset, smap, sset:
-#define stc_erase_if(C, cnt_p, pred) do { \
-    C* _cnt = cnt_p; \
+#define c_erase_if(C, cnt_ptr, pred) do { \
+    C* _cnt = cnt_ptr; \
     const C##_value* value; \
     for (C##_iter _it = C##_begin(_cnt); (value = _it.ref); ) { \
         if (pred) _it = C##_erase_at(_cnt, _it); \
@@ -68,12 +68,12 @@
 } while (0)
 
 // --------------------------------
-// stc_eraseremove_if
+// c_eraseremove_if
 // --------------------------------
 
 // Use with: stack, vec, deq, queue:
-#define stc_eraseremove_if(C, cnt_p, pred) do { \
-    C* _cnt = cnt_p; \
+#define c_eraseremove_if(C, cnt_ptr, pred) do { \
+    C* _cnt = cnt_ptr; \
     intptr_t _n = 0; \
     const C##_value* value; \
     C##_iter _i, _it = C##_begin(_cnt); \
@@ -86,26 +86,36 @@
     C##_adjust_end_(_cnt, -_n); \
 } while (0)
 
+// --------------------------------
+// c_clone_if
+// --------------------------------
+
+#define c_clone_if(C, cnt, outcnt_ptr, pred) do { \
+    C _cnt = cnt, *_out = outcnt_ptr; \
+    const C##_value* value; \
+    for (C##_iter _it = C##_begin(&_cnt); (value = _it.ref); C##_next(&_it)) \
+        if (pred) C##_push(_out, C##_value_clone(*_it.ref)); \
+} while (0)
 
 // --------------------------------
-// stc_all_of, stc_any_of, stc_none_of:
+// c_all_of, c_any_of, c_none_of:
 // --------------------------------
 
-#define stc_all_of(boolptr, C, cnt, pred) do { \
+#define c_all_of(C, cnt, boolptr, pred) do { \
     C##_iter it; \
-    stc_find_if_4(&it, C, cnt, !(pred)); \
+    c_find_if_4(C, cnt, &it, !(pred)); \
     *(boolptr) = it.ref == NULL; \
 } while (0)
 
-#define stc_any_of(boolptr, C, cnt, pred) do { \
+#define c_any_of(C, cnt, boolptr, pred) do { \
     C##_iter it; \
-    stc_find_if_4(&it, C, cnt, pred); \
+    c_find_if_4(C, cnt, &it, pred); \
     *(boolptr) = it.ref != NULL; \
 } while (0)
 
-#define stc_none_of(boolptr, C, cnt, pred) do { \
+#define c_none_of(C, cnt, boolptr, pred) do { \
     C##_iter it; \
-    stc_find_if_4(&it, C, cnt, pred); \
+    c_find_if_4(C, cnt, &it, pred); \
     *(boolptr) = it.ref == NULL; \
 } while (0)
 
