@@ -3,7 +3,7 @@
 "No raw loops" - Sean Parent
 ## Ranged for-loops
 
-### c_foreach, c_forpair, c_foriter, c_forindexed
+### c_foreach, c_forpair, c_foreach_n, c_foreach_it
 ```c
 #include "stc/common.h"
 ```
@@ -13,8 +13,8 @@
 | `c_foreach (it, ctype, container)`       | Iteratate all elements                    |
 | `c_foreach (it, ctype, it1, it2)`        | Iterate the range [it1, it2)              |
 | `c_forpair (key, val, ctype, container)` | Iterate with structured binding           |
-| `c_foriter (existing_iter, ctype, container)` | Iterate with an existing iterator    |
-| `c_forindexed (it, ctype, container)`    | Iterate with enumerate count in it.index  |
+| `c_foreach_n (it, ctype, cnt, n)`    | Iterate up to n times using it.index and it.n |
+| `c_foreach_it (existing_iter, ctype, cnt)` | Iterate with an existing iterator       |
 
 ```c
 #define i_TYPE IMap,int,int
@@ -36,18 +36,18 @@ c_foreach (i, IMap, iter, IMap_end(&map))
     printf(" %d", i.ref->first);
 // 7 12 23
 
-// iterate with an already declared iter (useful in coroutines)
-c_foriter (iter, IMap, map)
-    printf(" (%d %d)", iter.ref->first, iter.ref->second);
-
 // iterate with "structured binding":
 c_forpair (id, count, IMap, map)
     printf(" (%d %d)", *_.id, *_.count);
 
-// iterate with an index count enumeration
-c_forindexed (i, IMap, map)
-    printf(" %d:(%d %d)", i.index, i.ref->first, i.ref->second);
-// 0:(3 2) 1:(5 4) 2:(7 3) 3:(12 5) 4:(23 1)
+// iterate first 3 with an index count enumeration
+c_foreach_n (i, IMap, map, 3)
+    printf(" %zd:(%d %d)", i.index, i.ref->first, i.ref->second);
+// 0:(3 2) 1:(5 4) 2:(7 3)
+
+// iterate with an already declared iter (useful in coroutines)
+c_foreach_it (iter, IMap, map)
+    printf(" (%d %d)", iter.ref->first, iter.ref->second);
 ```
 
 ### c_forlist

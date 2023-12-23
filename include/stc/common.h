@@ -194,11 +194,11 @@ STC_INLINE intptr_t c_next_pow2(intptr_t n) {
          ; _.iter.ref && (_.key = &_.iter.ref->first, _.val = &_.iter.ref->second) \
          ; C##_next(&_.iter))
 
-#define c_forindexed(it, C, cnt) \
-    for (struct {C##_iter iter; C##_value* ref; intptr_t index;} it = {.iter=C##_begin(&cnt)} \
-         ; (it.ref = it.iter.ref) ; C##_next(&it.iter), ++it.index)
+#define c_foreach_n(it, C, cnt, _n) \
+    for (struct {C##_iter iter; C##_value* ref; intptr_t index, n;} it = {.iter=C##_begin(&cnt), .n=_n} \
+         ; (it.ref = it.iter.ref) && it.index < it.n; C##_next(&it.iter), ++it.index)
 
-#define c_foriter(existing_iter, C, cnt) \
+#define c_foreach_it(existing_iter, C, cnt) \
     for (existing_iter = C##_begin(&cnt); (existing_iter).ref; C##_next(&existing_iter))
 
 #define c_forrange(...) c_MACRO_OVERLOAD(c_forrange, __VA_ARGS__)
