@@ -92,7 +92,7 @@ STC_API i_type          _c_MEMB(_with_capacity)(intptr_t cap);
 #if !defined i_no_clone
 STC_API i_type          _c_MEMB(_clone)(i_type map);
 #endif
-STC_API void            _c_MEMB(_drop)(i_type* self);
+STC_API void            _c_MEMB(_drop)(const i_type* cself);
 STC_API void            _c_MEMB(_clear)(i_type* self);
 STC_API bool            _c_MEMB(_reserve)(i_type* self, intptr_t capacity);
 STC_API _m_result       _c_MEMB(_bucket_)(const i_type* self, const _m_keyraw* rkeyptr);
@@ -313,7 +313,8 @@ STC_INLINE void _c_MEMB(_wipe_)(i_type* self) {
             _c_MEMB(_value_drop)(d);
 }
 
-STC_DEF void _c_MEMB(_drop)(i_type* self) {
+STC_DEF void _c_MEMB(_drop)(const i_type* cself) {
+    i_type* self = (i_type*)cself;
     if (self->bucket_count > 0) {
         _c_MEMB(_wipe_)(self);
         i_free(self->slot, (self->bucket_count + 1)*c_sizeof *self->slot);

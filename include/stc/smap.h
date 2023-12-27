@@ -100,7 +100,7 @@ STC_API _m_result       _c_MEMB(_emplace)(i_type* self, _m_keyraw rkey _i_MAP_ON
 #if !defined i_no_clone
 STC_API i_type          _c_MEMB(_clone)(i_type tree);
 #endif // !i_no_clone
-STC_API void            _c_MEMB(_drop)(i_type* self);
+STC_API void            _c_MEMB(_drop)(const i_type* cself);
 STC_API bool            _c_MEMB(_reserve)(i_type* self, intptr_t cap);
 STC_API _m_value*       _c_MEMB(_find_it)(const i_type* self, _m_keyraw rkey, _m_iter* out);
 STC_API _m_iter         _c_MEMB(_lower_bound)(const i_type* self, _m_keyraw rkey);
@@ -589,7 +589,8 @@ _c_MEMB(_drop_r_)(_m_node* d, int32_t tn) {
 }
 
 STC_DEF void
-_c_MEMB(_drop)(i_type* self) {
+_c_MEMB(_drop)(const i_type* cself) {
+    i_type* self = (i_type*)cself;
     if (self->cap) {
         _c_MEMB(_drop_r_)(self->nodes, self->root);
         i_free(self->nodes, (self->cap + 1)*c_sizeof(_m_node));

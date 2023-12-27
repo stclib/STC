@@ -77,7 +77,8 @@ STC_INLINE void _c_MEMB(_clear)(i_type* self) {
     while (i--) { i_keydrop((self->data + i)); }
 }
 
-STC_INLINE void _c_MEMB(_drop)(i_type* self) {
+STC_INLINE void _c_MEMB(_drop)(const i_type* cself) {
+    i_type* self = (i_type*)cself;
     _c_MEMB(_clear)(self);
     i_free(self->data, self->_cap*c_sizeof(*self->data));
 }

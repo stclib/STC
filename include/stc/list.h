@@ -89,7 +89,7 @@
 _c_DEFTYPES(_c_list_complete_types, i_type, dummy);
 typedef i_keyraw _m_raw;
 
-STC_API void            _c_MEMB(_drop)(i_type* self);
+STC_API void            _c_MEMB(_drop)(const i_type* cself);
 STC_API _m_value*       _c_MEMB(_push_back)(i_type* self, _m_value value);
 STC_API _m_value*       _c_MEMB(_push_front)(i_type* self, _m_value value);
 STC_API _m_iter         _c_MEMB(_insert_at)(i_type* self, _m_iter it, _m_value value);
@@ -231,7 +231,8 @@ _c_MEMB(_clone)(i_type cx) {
 #endif
 
 STC_DEF void
-_c_MEMB(_drop)(i_type* self) {
+_c_MEMB(_drop)(const i_type* cself) {
+    i_type* self = (i_type*)cself;
     while (self->last) _c_MEMB(_erase_after_node)(self, self->last);
 }
 

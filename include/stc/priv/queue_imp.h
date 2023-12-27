@@ -38,7 +38,8 @@ _c_MEMB(_clear)(i_type* self) {
 }
 
 STC_DEF void
-_c_MEMB(_drop)(i_type* self) {
+_c_MEMB(_drop)(const i_type* cself) {
+    i_type* self = (i_type*)cself;
     _c_MEMB(_clear)(self);
     i_free(self->cbuf, (self->capmask + 1)*c_sizeof(*self->cbuf));
 }

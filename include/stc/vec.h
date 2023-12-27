@@ -80,7 +80,7 @@ int main(void) {
 #endif
 typedef i_keyraw _m_raw;
 STC_API i_type          _c_MEMB(_init)(void);
-STC_API void            _c_MEMB(_drop)(i_type* self);
+STC_API void            _c_MEMB(_drop)(const i_type* cself);
 STC_API void            _c_MEMB(_clear)(i_type* self);
 STC_API bool            _c_MEMB(_reserve)(i_type* self, intptr_t cap);
 STC_API bool            _c_MEMB(_resize)(i_type* self, intptr_t size, _m_value null);
@@ -277,7 +277,8 @@ _c_MEMB(_clear)(i_type* self) {
 }
 
 STC_DEF void
-_c_MEMB(_drop)(i_type* self) {
+_c_MEMB(_drop)(const i_type* cself) {
+    i_type* self = (i_type*)cself;
     if (self->_cap == 0)
         return;
     _c_MEMB(_clear)(self);

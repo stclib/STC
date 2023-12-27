@@ -100,7 +100,8 @@ STC_INLINE _m_raw _c_MEMB(_toraw)(const i_type* self)
     { return i_keyto(self->get); }
 
 // destructor
-STC_INLINE void _c_MEMB(_drop)(i_type* self) {
+STC_INLINE void _c_MEMB(_drop)(const i_type* cself) {
+    i_type* self = (i_type*)cself;
     if (self->get) {
         i_keydrop(self->get);
         i_free(self->get, c_sizeof *self->get);

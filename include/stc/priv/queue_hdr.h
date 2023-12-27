@@ -29,7 +29,7 @@ typedef i_keyraw _m_raw;
 STC_API i_type          _c_MEMB(_with_capacity)(const intptr_t n);
 STC_API bool            _c_MEMB(_reserve)(i_type* self, const intptr_t n);
 STC_API void            _c_MEMB(_clear)(i_type* self);
-STC_API void            _c_MEMB(_drop)(i_type* self);
+STC_API void            _c_MEMB(_drop)(const i_type* cself);
 STC_API _m_value*       _c_MEMB(_push)(i_type* self, _m_value value); // push_back
 STC_API void            _c_MEMB(_shrink_to_fit)(i_type *self);
 STC_API _m_iter         _c_MEMB(_advance)(_m_iter it, intptr_t n);

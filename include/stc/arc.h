@@ -130,7 +130,8 @@ STC_INLINE i_type _c_MEMB(_move)(i_type* self) {
     return arc;
 }
 
-STC_INLINE void _c_MEMB(_drop)(i_type* self) {
+STC_INLINE void _c_MEMB(_drop)(const i_type* cself) {
+    i_type* self = (i_type*)cself;
     if (self->use_count && _i_atomic_dec_and_test(self->use_count)) {
         i_keydrop(self->get);
         if ((char *)self->get != (char *)self->use_count + offsetof(struct _c_MEMB(_rep_), value)) {
