@@ -46,16 +46,14 @@ int main(void)
     c_forpair (key, val, IMap, map)
         printf(" (%d %d)", *_.key, *_.val);
 
-    #define isOdd(i) (*i.ref & 1)
+    #define f_isOdd() (*value & 1)
 
-    puts("\n\nc_forfilter:");
-    c_forfilter (i, IVec, vec,
-        isOdd(i)          &&
-        c_flt_skip(i, 4)  &&
-        c_flt_take(i, 4)
-    ){
-        printf(" %d", *i.ref);
-    }
+    puts("\n\nc_filter:");
+    c_filter(IVec, vec
+         , f_isOdd()
+        && c_flt_skip(4)
+        && (printf(" %d", *value), c_flt_take(4))
+    );
 
     IVec_drop(&vec);
     IMap_drop(&map);

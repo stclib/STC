@@ -72,6 +72,10 @@ typedef enum {
 #define cco_suspended(co) ((co)->cco_state > 0)
 #define cco_done(co) ((co)->cco_state == CCO_STATE_DONE)
 
+// Use with c_filter:
+#define cco_take(n) (c_flt_take(n), _fl.done ? _it.cco_state = CCO_STATE_FINAL : 1)
+#define cco_takewhile(pred) (c_flt_takewhile(pred), _fl.done ? _it.cco_state = CCO_STATE_FINAL : 1)
+
 #define cco_routine(co) \
     for (int* _state = &(co)->cco_state; *_state != CCO_STATE_DONE; *_state = CCO_STATE_DONE) \
         _resume: switch (*_state) case 0: // thanks, @liigo!
@@ -120,22 +124,18 @@ typedef enum {
 #define cco_cancel \
     do { *_state = CCO_STATE_DONE; goto _resume; } while (0)
 
+#define cco_stop(co) \
+    ((co)->cco_state = (co)->cco_state >= 0 ? CCO_STATE_FINAL : CCO_STATE_DONE)
+
+#define cco_reset(co) \
+    (void)((co)->cco_state = 0)
+
 #define cco_yield_final() cco_yield_final_v(CCO_YIELD)
 #define cco_yield_final_v(value) \
     do { \
         *_state = *_state >= 0 ? CCO_STATE_FINAL : CCO_STATE_DONE; \
         return value; \
     } while (0)
-
-#define cco_stop(co) \
-    do { \
-        int* _s = &(co)->cco_state; \
-        if (*_s > 0) *_s = CCO_STATE_FINAL; \
-        else if (*_s == 0) *_s = CCO_STATE_DONE; \
-    } while (0)
-
-#define cco_reset(co) \
-    (void)((co)->cco_state = 0)
 
 /*
  * Iterator (for generators)

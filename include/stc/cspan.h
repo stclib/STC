@@ -47,13 +47,12 @@ int demo2() {
         printf(" %d", *i.ref);
     puts("");
 
-    c_forfilter (i, Intspan, span,
-        c_flt_skipwhile(i, *i.ref < 25) &&
-        (*i.ref & 1) == 0               && // even only
-        c_flt_take(i, 2)                   // break after 2
-    ){
-        printf(" %d", *i.ref);
-    }
+    c_filter(Intspan, span
+         , c_flt_skipwhile(*value < 25)
+        && (*value & 1) == 0       // even only
+        && (printf(" %d", *value),
+            c_flt_take(2))
+    );
     puts("");
 }
 */

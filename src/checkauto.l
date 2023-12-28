@@ -34,7 +34,6 @@ STR \"([^"\\]|\\.)*\"
 c_foreach       |
 c_forpair       |
 c_forrange      |
-c_forfilter     |
 c_formatch      |
 c_fortoken      |
 for             |
@@ -55,7 +54,7 @@ if              { if (state == BRACESDONE) {
                       printf("%s:%d: warning: 'if' after c_auto* not enclosed in curly braces.\n"
                              "    Make sure to enclose 'if - else' statement in { } after c_auto*.\n",
                              fname, yylineno);
-                      ++warnings;                    
+                      ++warnings;
                     }
                     state = BRACES;
                   }

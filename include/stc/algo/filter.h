@@ -22,50 +22,53 @@
 */
 /*
 #include <stdio.h>
-#define i_val int
+#define i_TYPE Vec, int
 #include "stc/cstack.h"
 #include "stc/algorithm.h"
 
 int main(void)
 {
-    cstack_int stk = c_init(cstack_int, {1, 2, 3, 4, 5, 6, 7, 8, 9});
+    Vec vec = c_init(Vec, {1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 9, 10, 11, 12, 5});
 
-    c_foreach (i, cstack_int, stk)
-        printf(" %d", *i.ref);
+    c_filter(Vec, vec
+         , c_flt_skipwhile(*value < 3)  // skip leading values < 3
+        && (*value & 1) == 1            // then use odd values only
+        && c_flt_map(*value * 2)        // multiply by 2
+        && c_flt_takewhile(*value < 20) // stop if mapped *value >= 20
+        && printf(" %d", *value)        // print value
+    );
+    //  6 10 14 2 6 18
     puts("");
-
-    c_forfilter (i, cstack_int, stk,
-                    c_flt_skipwhile(i, *i.ref < 3) &&
-                    (*i.ref & 1) == 0              && // even only
-                    c_flt_take(i, 2))                 // break after 2
-        printf(" %d", *i.ref);
-    puts("");
-
-    cstack_int_drop(&stk);
+    Vec_drop(&vec);
 }
 */
-#ifndef STC_FILTER_H_INCLUDED
-#define STC_FILTER_H_INCLUDED
+#ifndef STC_TRANSFORM_H_INCLUDED
+#define STC_TRANSFORM_H_INCLUDED
 
 #include "../common.h"
 
-// c_forfilter:
+// c_filter:
 
-#define c_flt_skip(i, n) (c_flt_counter(i) > (n))
-#define c_flt_skipwhile(i, pred) ((i).b.s2[(i).b.s2top++] |= !(pred))
-#define c_flt_take(i, n) _flt_take(&(i).b, n)
-#define c_flt_takewhile(i, pred) _flt_takewhile(&(i).b, pred)
-#define c_flt_counter(i) ++(i).b.s1[(i).b.s1top++]
-#define c_flt_getcount(i) (i).b.s1[(i).b.s1top - 1]
+#define c_flt_skip(n) (c_flt_counter() > (n))
+#define c_flt_take(n) _flt_take(&_fl, n)
+#define c_flt_skipwhile(pred) (_fl.sb[_fl.sb_top++] |= !(pred))
+#define c_flt_takewhile(pred) _flt_takewhile(&_fl, pred)
+#define c_flt_counter() (++_fl.sn[++_fl.sn_top])
+#define c_flt_getcount() (_fl.sn[_fl.sn_top])
+#define c_flt_map(expr) (_mapped = (expr), value = &_mapped)
+#define c_flt_src _it.ref
 
-#define c_forfilter(i, C, cnt, filter) \
-    c_forfilter_it(i, C, C##_begin(&cnt), filter)
+#define c_filter(C, cnt, ...) \
+    c_filter_from(C, C##_begin(&cnt), __VA_ARGS__)
 
-#define c_forfilter_it(i, C, start, filter) \
-    for (struct {struct _flt_base b; C##_iter it; C##_value *ref;} \
-         i = {.it=start, .ref=i.it.ref} ; !i.b.done & (i.it.ref != NULL) ; \
-         C##_next(&i.it), i.ref = i.it.ref, i.b.s1top=0, i.b.s2top=0) \
-      if (!(filter)) ; else
+#define c_filter_from(C, start, ...) do { \
+    struct _flt_base _fl = {0}; \
+    C##_iter _it = start; \
+    C##_value *value = _it.ref, _mapped; \
+    for ((void)_mapped ; !_fl.done & (_it.ref != NULL) ; \
+         C##_next(&_it), value = _it.ref, _fl.sn_top=0, _fl.sb_top=0) \
+      (void)(__VA_ARGS__); \
+} while (0)
 
 // ------------------------ private -------------------------
 #ifndef c_NFILTERS
@@ -73,20 +76,20 @@ int main(void)
 #endif
 
 struct _flt_base {
-    uint32_t s1[c_NFILTERS];
-    bool s2[c_NFILTERS], done;
-    uint8_t s1top, s2top;
+    uint8_t sn_top, sb_top;
+    bool done, sb[c_NFILTERS];
+    uint32_t sn[c_NFILTERS];
 };
 
-static inline bool _flt_take(struct _flt_base* b, uint32_t n) {
-    uint32_t k = ++b->s1[b->s1top++];
-    b->done |= (k >= n);
-    return k <= n;
+static inline bool _flt_take(struct _flt_base* fl, uint32_t n) {
+    uint32_t k = ++fl->sn[++fl->sn_top];
+    fl->done |= (k >= n);
+    return n > 0;
 }
 
-static inline bool _flt_takewhile(struct _flt_base* b, bool pred) {
-    bool skip = (b->s2[b->s2top++] |= !pred);
-    b->done |= skip;
+static inline bool _flt_takewhile(struct _flt_base* fl, bool pred) {
+    bool skip = (fl->sb[fl->sb_top++] |= !pred);
+    fl->done |= skip;
     return !skip;
 }
 

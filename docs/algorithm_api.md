@@ -72,12 +72,12 @@ c_forlist (i, const char*, {"Hello", "crazy", "world"})
 ### c_forrange
 Abstraction for iterating sequence of integers. Like python's **for** *i* **in** *range()* loop.
 
-| Usage                                        | Python equivalent                    |
-|:---------------------------------------------|:-------------------------------------|
-| `c_forrange (stop)`                          | `for _ in range(stop):`              |
-| `c_forrange (i, stop) // i type = long long` | `for i in range(stop):`              |
-| `c_forrange (i, start, stop)`                | `for i in range(start, stop):`       |
-| `c_forrange (i, start, stop, step)`          | `for i in range(start, stop, step):` |
+| Usage                                | Python equivalent                    |
+|:-------------------------------------|:-------------------------------------|
+| `c_forrange (stop)`                  | `for _ in range(stop):`              |
+| `c_forrange (i, stop)`               | `for i in range(stop):`              |
+| `c_forrange (i, start, stop)`        | `for i in range(start, stop):`       |
+| `c_forrange (i, start, stop, step)`  | `for i in range(start, stop, step):` |
 
 ```c
 c_forrange (5) printf("x");
@@ -100,71 +100,73 @@ crange      crange_make(start, stop, step); // will generate start, start+step, 
 crange_iter crange_begin(crange* self);
 crange_iter crange_end(crange* self);
 void        crange_next(crange_iter* it);
-
-// 1. All primes less than 32:
+```
+```
+// 1. All primes less than 32: See below for c_filter() and is_prime()
 crange r1 = crange_make(3, 32, 2);
 printf("2"); // first prime
-c_forfilter (i, crange, r1, isPrime(*i.ref))
-    printf(" %lld", *i.ref);
+c_filter(crange, r1
+     , is_prime(*value)
+    && printf(" %lld", *value)
+);
 // 2 3 5 7 11 13 17 19 23 29 31
 
 // 2. The first 11 primes:
 printf("2");
-crange range = crange_make(3, INT64_MAX, 2);
-c_forfilter (i, crange, range,
-    isPrime(*i.ref) &&
-    c_flt_take(10)
-){
-    printf(" %lld", *i.ref);
-}
+crange r2 = crange_make(3, INTPTR_MAX, 2);
+c_filter(crange, r2
+     , is_prime(*value)
+    && (printf(" %lld", *value), c_flt_take(10))
+);
 // 2 3 5 7 11 13 17 19 23 29 31
 ```
 
-### c_forfilter
-Iterate a container or a crange with chained `&&` filtering.
+### c_filter
+Functional programming with chained `&&` filtering. `value` is the pointer to current value.
+Enables similar functional programming subset as other popular languages.
 
-| Usage                                               | Description                            |
-|:----------------------------------------------------|:---------------------------------------|
-| `c_forfilter (it, ctype, container, filter)`        | Filter out items in chain with &&      |
-| `c_forfilter_it (it, ctype, startit, filter)`       | Filter from startit iterator position  |
+| Usage                                | Description                       |
+|:-------------------------------------|:----------------------------------|
+| `c_filter(ctype, container, filters)` | Filter items in chain with &&    |
 
-| Built-in filter                   | Description                                |
-|:----------------------------------|:-------------------------------------------|
-| `c_flt_skip(it, numItems)`        | Skip numItems (inc count)                  |
-| `c_flt_take(it, numItems)`        | Take numItems (inc count)                  |
-| `c_flt_skipwhile(it, predicate)`  | Skip items until predicate is false        |
-| `c_flt_takewhile(it, predicate)`  | Take items until predicate is false        |
-| `c_flt_counter(it)`               | Increment current and return count         |
-| `c_flt_getcount(it)`              | Number of items passed skip*/take*/counter |
+| Built-in filter              | Description                                |
+|:-----------------------------|:-------------------------------------------|
+| `c_flt_skip(numItems)`       | Skip numItems (increments count)           |
+| `c_flt_take(numItems)`       | Take numItems only (increments count)      |
+| `c_flt_skipwhile(predicate)` | Skip items until predicate is false        |
+| `c_flt_takewhile(predicate)` | Take items until predicate is false        |
+| `c_flt_counter()`            | Increment count and returns it             |
+| `c_flt_getcount()`           | Number of items passed skip*/take*/counter |
+| `c_flt_map(expr)`            | Map expr to current value. Input unchanged |
+| `c_flt_src`                  | Pointer to current source value (non-mapped) |
+| `value`                      | Pointer to current (possible mapped) value |
 
 [ [Run this example](https://godbolt.org/z/exqYEK6qa) ]
 ```c
 #include "stc/algorithm.h"
 #include <stdio.h>
 
-bool isPrime(long long i) {
+bool is_prime(long long i) {
     for (long long j=2; j*j <= i; ++j)
         if (i % j == 0) return false;
     return true;
 }
 
 int main(void) {
-    // Get 10 prime numbers starting from 1000. Skip the first 15 primes,
-    // then select every 25th prime (including the initial).
-    crange R = crange_make(1001, INT64_MAX, 2); // 1001, 1003, ...
+    // Get 10 prime numbers starting from 1000. Skip the first 15 primes, then select
+    // every 25th prime (including the initial, i.e. c_flt_counter() starts at 1).
+    crange R = crange_make(1001, INTPTR_MAX, 2); // 1001, 1003, ...
 
-    c_forfilter (i, crange, R,
-                    isPrime(*i.ref)            &&
-                    c_flt_skip(i, 15)          &&
-                    c_flt_counter(i) % 25 == 1 &&
-                    c_flt_take(i, 10)
-    ){
-        printf(" %lld", *i.ref);
-    }
+    c_filter(crange, R
+         , is_prime(*value)
+        && c_flt_skip(15)
+        && c_flt_counter() % 25 == 1
+        && (printf(" %lld", *value),
+            c_flt_take(10))
+    );
 }
 // out: 1097 1289 1481 1637 1861 2039 2243 2417 2657 2803
 ```
-Note that `c_flt_take()` and `c_flt_takewhile()` breaks the loop on false.
 
 ---
 ## Generic algorithms
@@ -194,34 +196,72 @@ c_drop(hset_str, &myset, &myset2);
 
 ### c_find_if, c_copy_if, c_erase_if, c_eraseremove_if
 Find, clone or erase linearily in containers using a predicate. `value` is a pointer to each element in predicate.
-- For `c_copy_if(CntType, cnt, outcnt_ptr, pred)`, ***outcnt_ptr*** must be defined prior to call.
 - For `c_find_if(CntType, cnt, outiter_ptr, pred)`, ***outiter_ptr*** must be defined prior to call.
+- For `c_copy_if(CntType, cnt, outcnt_ptr, pred)`, ***outcnt_ptr*** must be defined prior to call.
 - Use `c_erase_if(CntType, cnt_ptr, pred)` with **list**, **hmap**, **hset**, **smap**, and **sset**.
 - Use `c_eraseremove_if(CntType, cnt_ptr, pred)` with **stack**, **vec**, **deq**, and **queue** only.
 ```c
-// Clone all value > 10 to out vector. Note: `value` is a pointer to current element
-vec_int vec = c_init(vec_int, {2, 30, 21, 5, 9, 11});
-vec_int outvec = {0};
-c_copy_if(vec_int, vec, &outvec, *value > 10);
+#include <stdio.h>
+#define i_static
+#include "stc/cstr.h"
+#include "stc/algorithm.h"
 
-// Search vec for first value > 20.
-vec_int_iter result;
-c_find_if(vec_int, vec, &result, *value > 20);
-if (result.ref) printf("%d\n", *result.ref);
+#define i_TYPE Vec,int
+#define i_use_cmp
+#include "stc/vec.h"
 
-// Erase all values > 20 in a linked list:
-c_erase_if(list_int, &list, *value > 20);
+#define i_TYPE List,int
+#define i_use_cmp
+#include "stc/list.h"
 
-// Erase values (20 < value < 25) in vec (contigious array):
-c_eraseremove_if(vec_int, &vec, *value > 20 && *value < 25);
+#define i_type Map
+#define i_key_str
+#define i_val int
+#include "stc/smap.h"
 
-// Search a sorted map for the first string containing "hello" in range [it1, it2), and erase it:
-smap_str_iter result, it1 = ..., it2 = ...;
-c_find_if(smap_str, it1, it2, &result, cstr_contains(value, "hello"));
-if (result.ref) smap_str_erase_at(&map, res);
+int main(void)
+{
+    // Clone all *value > 10 to outvec. Note: `value` is a pointer to current element
+    Vec vec = c_init(Vec, {2, 30, 21, 5, 9, 11});
+    Vec outvec = {0};
 
-// Erase all strings containing "hello" in a sorted map:
-c_erase_if(smap_str, &map, cstr_contains(&value->first, "hello"));
+    c_copy_if(Vec, vec, &outvec, *value > 10);
+    c_foreach (i, Vec, outvec) printf(" %d", *i.ref);
+    puts("");
+
+    // Search vec for first value > 20.
+    Vec_iter result;
+
+    c_find_if(Vec, vec, &result, *value > 20);
+    if (result.ref) printf("found %d\n", *result.ref);
+
+    // Erase values between 20 and 25 in vec:
+    c_eraseremove_if(Vec, &vec, 20 < *value && *value < 25);
+    c_foreach (i, Vec, vec) printf(" %d", *i.ref);
+    puts("");
+
+    // Erase all values > 20 in a linked list:
+    List list = c_init(List, {2, 30, 21, 5, 9, 11});
+
+    c_erase_if(List, &list, *value > 20);
+    c_foreach (i, List, list) printf(" %d", *i.ref);
+    puts("");
+
+    // Search a sorted map for the first string containing "hello" from it1, and erase it:
+    Map map = c_init(Map, {{"yes",1}, {"no",2}, {"say hello from me",3}, {"goodbye",4}});
+    Map_iter res, it1 = Map_begin(&map);
+
+    c_find_from(Map, it1, &res, cstr_contains(&value->first, "hello"));
+    if (res.ref) Map_erase_at(&map, res);
+
+    // Erase all strings containing "good" in the sorted map:
+    c_erase_if(Map, &map, cstr_contains(&value->first, "good"));
+    c_foreach (i, Map, map) printf("%s, ", cstr_str(&i.ref->first));
+
+    c_drop(Vec, &vec, &outvec);
+    List_drop(&list);
+    Map_drop(&map);
+}
 ```
 
 ### c_all_of, c_any_of, c_none_of

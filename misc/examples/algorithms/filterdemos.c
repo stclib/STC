@@ -9,31 +9,26 @@
 #include "stc/stack.h"
 
 // filters and transforms:
-#define flt_skipValue(i, x) (*i.ref != (x))
-#define flt_isEven(i) ((*i.ref & 1) == 0)
-#define flt_isOdd(i) (*i.ref & 1)
-#define flt_square(i) (*i.ref * *i.ref)
+#define f_skipValue(x) (*value != (x))
+#define f_isEven() ((*value & 1) == 0)
+#define f_square() (*value * *value)
 
 void demo1(void)
 {
     IVec vec = c_init(IVec, {0, 1, 2, 3, 4, 5, 80, 6, 7, 80, 8, 9, 80,
                              10, 11, 12, 13, 14, 15, 80, 16, 17});
 
-    c_forfilter (i, IVec, vec, flt_skipValue(i, 80))
-        printf(" %d", *i.ref);
+    c_filter(IVec, vec, f_skipValue(80) && printf(" %d", (int) *value));
     puts("");
 
     int sum = 0;
-    c_forfilter (i, IVec, vec,
-        c_flt_skipwhile(i, *i.ref != 80) &&
-        c_flt_skip(i, 1)                 &&
-        flt_isEven(i)                    &&
-        flt_skipValue(i, 80)             &&
-        c_flt_take(i, 5) // short-circuit
-    ){
-        sum += flt_square(i);
-    }
-
+    c_filter(IVec, vec
+         , c_flt_skipwhile(*value != 80)
+        && c_flt_skip(1)
+        && f_isEven()
+        && f_skipValue(80)
+        && (sum += f_square(), c_flt_take(5))
+    );
     printf("\n sum: %d\n", sum);
     IVec_drop(&vec);
 }
@@ -53,16 +48,16 @@ fn main() {
 void demo2(void)
 {
     IVec vector = {0};
-    crange r = crange_make(INT64_MAX);
-    c_forfilter (x, crange, r,
-        c_flt_skipwhile(x, *x.ref != 11) &&
-        (*x.ref % 2) != 0                &&
-        c_flt_take(x, 5)
-    ){
-        IVec_push(&vector, (int)(*x.ref * *x.ref));
-    }
-    c_foreach (x, IVec, vector) printf(" %d", *x.ref);
-
+    crange r = crange_make(INTPTR_MAX);  // Infinite range of integers
+    c_filter(crange, r
+         , c_flt_skipwhile(*value != 11) // Skip initial numbers unequal 11
+        && (*value % 2) != 0             // Collect odd numbers
+        && (c_flt_map(*value * *value),  // Square each number
+            IVec_push(&vector, *value),  // Populate output IVec
+            c_flt_take(5))               // Only take five numbers
+    );
+    c_foreach (i, IVec, vector)
+        printf(" %d", *i.ref);           // Print result
     puts("");
     IVec_drop(&vector);
 }
@@ -92,10 +87,10 @@ void demo3(void)
         SVec_push(&words, *w.ref);
 
     SVec words_containing_i = {0};
-    c_forfilter (w, SVec, words,
-                    csview_contains(*w.ref, "i"))
-        SVec_push(&words_containing_i, *w.ref);
-
+    c_filter(SVec, words
+         , csview_contains(*value, "i")
+        && SVec_push(&words_containing_i, *value)
+    );
     c_foreach (w, SVec, words_containing_i)
         printf(" %.*s", c_SV(*w.ref));
 
@@ -108,34 +103,17 @@ void demo4(void)
     // Keep only uppercase letters and convert them to lowercase:
     csview s = c_sv("ab123cReAghNGnΩoEp"); // Ω = multi-byte
     cstr out = {0};
+    char chr[4];
 
-    c_forfilter (i, csview, s, utf8_isupper(utf8_peek(i.ref))) {
-        char chr[4];
-        utf8_encode(chr, utf8_tolower(utf8_peek(i.ref)));
-        cstr_push(&out, chr);
-    }
-
+    c_filter(csview, s
+         , utf8_isupper(utf8_peek(value))
+        && (utf8_encode(chr, utf8_tolower(utf8_peek(value))),
+            cstr_push(&out, chr))
+    );
     printf(" %s\n", cstr_str(&out));
     cstr_drop(&out);
 }
 
-void demo5(void)
-{
-    #define flt_even(i) ((*i.ref & 1) == 0)
-    #define flt_mid_decade(i) ((*i.ref % 10) != 0)
-    crange R = crange_make(1963, INT32_MAX);
-
-    c_forfilter (i, crange, R,
-        c_flt_skip(i,15)                      &&
-        c_flt_skipwhile(i, flt_mid_decade(i)) &&
-        c_flt_skip(i,30)                      &&
-        flt_even(i)                           &&
-        c_flt_take(i,5)
-    ){
-        printf(" %d", (int)*i.ref);
-    }
-    puts("");
-}
 
 int main(void)
 {
@@ -143,5 +121,4 @@ int main(void)
     puts("demo2"); demo2();
     puts("demo3"); demo3();
     puts("demo4"); demo4();
-    puts("demo5"); demo5();
 }

@@ -3,8 +3,11 @@
 STC - Smart Template Containers
 ===============================
 
-### [Version 5.0 beta 2](#version-history)
+### [Version 5.0 beta 3](#version-history)
 - New shorthand template parameter `i_TYPE` lets you define `i_type`, `i_key`, and `i_val` all in one line.
+- **c_filter(C, cnt, filters)** replaces *c_forfilter (it, C, cnt, filter)*, changed to pure functional call => , i.e. the  imperative block removed.
+  - **c_flt_{FILTER}(...)** changed => removed first parameter `it`, and variable **value** points to current item.
+  - See [c_filter](docs/algorithm_api.md#c_filter) and examples for details.
 - Renamed templated STC headers (old header names deprecated). Default container names corresponds to new header names:
   - **vec.h** (from `cvec.h`)
   - **deq.h** (from `cdeq.h`)
@@ -46,7 +49,7 @@ Containers
 Algorithms
 ----------
 - [***Ranged for-loops*** - c_foreach, c_forpair, c_forlist](docs/algorithm_api.md#ranged-for-loops)
-- [***Range algorithms*** - c_forrange, crange, c_forfilter](docs/algorithm_api.md#range-algorithms)
+- [***Range algorithms*** - c_forrange, crange, c_filter](docs/algorithm_api.md#range-algorithms)
 - [***Generic algorithms*** - c_init, c_find_if, c_erase_if, quicksort, lower_bound, ...](docs/algorithm_api.md#generic-algorithms)
 - [***Coroutines*** - ergonomic portable coroutines](docs/coroutine_api.md)
 - [***Regular expressions*** - Rob Pike's Plan 9 regexp modernized!](docs/cregex_api.md)

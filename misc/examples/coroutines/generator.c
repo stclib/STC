@@ -30,8 +30,9 @@ int Triple_next(Triple_iter* it) {
                 }
             }
         }
-        cco_final:
-        it->ref = NULL; // stop the iterator
+        cco_final:      // cleanup
+        it->ref = NULL; // stop iteration
+        printf("Done\n");
     }
     return 0;
 }
@@ -42,25 +43,22 @@ Triple_iter Triple_begin(Triple* g) {
     return it;
 }
 
-
 int main(void)
 {
-    puts("Pythagorean triples.\nGet max 200 triples with c < 50:");
-    Triple triple = {.max_triples=200};
+    Triple triple = {.max_triples=INT32_MAX};
 
+    puts("Pythagorean triples.\nGet all triples with c < 40, using c_foreach:");
     c_foreach (i, Triple, triple) {
-        if (i.ref->c < 50)
+        if (i.ref->c < 40)
             printf("%u: (%d, %d, %d)\n", i.count, i.ref->a, i.ref->b, i.ref->c);
         else
             cco_stop(&i);
     }
 
-    puts("\nGet the 10 first triples with odd a's and a <= 20:");
-    c_forfilter (i, Triple, triple,
-                    i.ref->a <= 20 &&
-                    (i.ref->a & 1) &&
-                    c_flt_take(i, 10)
-    ){
-        printf("%d: (%d, %d, %d)\n", c_flt_getcount(i), i.ref->a, i.ref->b, i.ref->c);
-    }
+    puts("\nGet the 10 first triples with c < 40, using c_filter:");
+    c_filter(Triple, triple
+         , (value->c < 40)
+        && (cco_take(10),  // NB! use cco_take(n) instead of c_flt_take(n) to ensure coroutine/iter cleanup if needed
+            printf("%d: (%d, %d, %d)\n", c_flt_getcount(), value->a, value->b, value->c))
+    );
 }

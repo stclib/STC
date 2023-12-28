@@ -35,10 +35,10 @@ int main(void)
     // use a temporary crange object.
     int a = 100, b = INT32_MAX;
     crange r2 = crange_make(a, b, 8);
-    c_forfilter (i, crange, r2,
-                    c_flt_skip(i, 10) &&
-                    c_flt_take(i, 3))
-        printf(" %d", (int)*i.ref);
+    c_filter(crange, r2
+         , c_flt_skip(10)
+        && (printf(" %zi", *value), c_flt_take(3))
+    );
     puts("");
 }
 */

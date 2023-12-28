@@ -41,16 +41,15 @@
 // c_find_if
 // --------------------------------
 
-#define c_find_if(...) c_MACRO_OVERLOAD(c_find_if, __VA_ARGS__)
-#define c_find_if_4(C, cnt, it_ptr, pred) \
-    c_find_if_5(C, C##_begin(&cnt), C##_end(&cnt), it_ptr, pred)
+#define c_find_if(C, cnt, outit_ptr, pred) \
+    c_find_from(C, C##_begin(&cnt), outit_ptr, pred)
 
-#define c_find_if_5(C, start, end, it_ptr, pred) do { \
-    intptr_t index = 0; \
-    const C##_value *_endref = (end).ref, *value; \
-    for (*(it_ptr) = start; (value = (it_ptr)->ref) != _endref; C##_next(it_ptr), ++index) \
+#define c_find_from(C, start, outit_ptr, pred) do { \
+    C##_iter* _out = outit_ptr; \
+    const C##_value *value; \
+    for (*_out = start; (value = _out->ref); C##_next(_out)) \
         if (pred) goto c_JOIN(findif_, __LINE__); \
-    (it_ptr)->ref = NULL; c_JOIN(findif_, __LINE__):; \
+    _out->ref = NULL; c_JOIN(findif_, __LINE__):; \
 } while (0)
 
 // --------------------------------
@@ -102,21 +101,21 @@
 // --------------------------------
 
 #define c_all_of(C, cnt, boolptr, pred) do { \
-    C##_iter it; \
-    c_find_if_4(C, cnt, &it, !(pred)); \
-    *(boolptr) = it.ref == NULL; \
+    C##_iter _it; \
+    c_find_if(C, cnt, &_it, !(pred)); \
+    *(boolptr) = _it.ref == NULL; \
 } while (0)
 
 #define c_any_of(C, cnt, boolptr, pred) do { \
-    C##_iter it; \
-    c_find_if_4(C, cnt, &it, pred); \
-    *(boolptr) = it.ref != NULL; \
+    C##_iter _it; \
+    c_find_if(C, cnt, &_it, pred); \
+    *(boolptr) = _it.ref != NULL; \
 } while (0)
 
 #define c_none_of(C, cnt, boolptr, pred) do { \
-    C##_iter it; \
-    c_find_if_4(C, cnt, &it, pred); \
-    *(boolptr) = it.ref == NULL; \
+    C##_iter _it; \
+    c_find_if(C, cnt, &_it, pred); \
+    *(boolptr) = _it.ref == NULL; \
 } while (0)
 
 #endif // STC_UTILITY_H_INCLUDED
