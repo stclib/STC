@@ -2,9 +2,9 @@
 #define STC_UTF8_C_INCLUDED
 
 #ifndef STC_UTF8_HDR_H_INCLUDED
-  #include "../include/stc/utf8.h"
+  #include "../utf8.h"
 #endif
-#include "utf8tabs.inc"
+#include "utf8_tab.c"
 
 const uint8_t utf8_dtab[] = {
    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,

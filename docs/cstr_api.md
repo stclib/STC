@@ -119,7 +119,7 @@ cstr_iter   cstr_end(const cstr* self);
 void        cstr_next(cstr_iter* it);                               // next utf8 codepoint
 cstr_iter   cstr_advance(cstr_iter it, intptr_t u8pos);             // advance +/- codepoints
 
-// utf8 functions requires linking with src/utf8code.c symbols:
+// requires linking with utf8 symbols:
 bool        cstr_valid_utf8(const cstr* self);                      // check if str is valid utf8
 cstr        cstr_casefold_sv(csview sv);                            // returns new casefolded utf8 cstr
 

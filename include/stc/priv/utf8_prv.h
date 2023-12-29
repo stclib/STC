@@ -64,7 +64,7 @@ STC_INLINE intptr_t utf8_pos(const char* s, intptr_t index)
     { return (intptr_t)(utf8_at(s, index) - s); }
 
 // ------------------------------------------------------
-// The following utf8 function depends on src/utf8code.c.
+// The following requires linking with utf8 symbols.
 // To call them, either define i_import before including
 // one of cstr, csview czview, or link with src/libstc.o.
 

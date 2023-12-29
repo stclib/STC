@@ -27,11 +27,11 @@
 
 #include "common.h"
 #include "forward.h"
-#include "priv/utf8_hdr.h"
+#include "priv/utf8_prv.h"
 
 #endif // STC_UTF8_H_INCLUDED
 
 #if defined i_implement
-  #include "../../src/utf8code.c"
+  #include "priv/utf8_prv.c"
 #endif
 #include "priv/linkage2.h"

@@ -28,7 +28,7 @@
 
 #include "common.h"
 #include "forward.h"
-#include "priv/utf8_hdr.h"
+#include "priv/utf8_prv.h"
 
 #define             csview_init() c_sv_1("")
 #define             csview_drop(p) c_default_drop(p)
@@ -123,7 +123,7 @@ STC_INLINE csview csview_u8_last(csview sv, intptr_t u8len) {
     return csview_substr(sv, p - sv.buf, sv.size);
 }
 
-STC_INLINE bool csview_u8_valid(csview sv) // depends on src/utf8code.c
+STC_INLINE bool csview_u8_valid(csview sv) // requires linking with utf8 symbols
     { return utf8_valid_n(sv.buf, sv.size); }
 
 #define c_fortoken_sv(it, inputsv, sep) \
@@ -208,6 +208,6 @@ STC_DEF csview csview_token(csview sv, const char* sep, intptr_t* start) {
 #endif // i_implement
 
 #if defined i_import
-  #include "../../src/utf8code.c"
+  #include "priv/utf8_prv.c"
 #endif
 #include "priv/linkage2.h"

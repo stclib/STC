@@ -37,6 +37,7 @@ else
 fi
 
 INC=../../include
+#CPATH=
 #INC=../../../stcsingle
 if [ $run = 0 ] ; then
     for i in */*.c ; do

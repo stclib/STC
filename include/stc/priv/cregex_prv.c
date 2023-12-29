@@ -28,12 +28,12 @@ THE SOFTWARE.
 
 #include <setjmp.h>
 #ifndef STC_CREGEX_H_INCLUDED
-  #include "../include/stc/cregex.h"
+  #include "../cregex.h"
 #endif
 #undef i_implement
 // implement cstr and utf8 if i_import was defined:
-#include "../include/stc/cstr.h"
-#include "../include/stc/priv/linkage.h"
+#include "../cstr.h"
+#include "linkage.h"
 
 typedef uint32_t _Rune; /* Utf8 code point */
 typedef int32_t _Token;
@@ -1331,5 +1331,5 @@ cregex_drop(cregex* self) {
     i_free(self->prog, self->prog->allocsize);
 }
 
-#include "../include/stc/priv/linkage2.h"
+#include "linkage2.h"
 #endif

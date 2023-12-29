@@ -35,7 +35,7 @@
 #include <stdio.h> /* vsnprintf */
 #include "common.h"
 #include "forward.h"
-#include "priv/utf8_hdr.h"
+#include "priv/utf8_prv.h"
 
 /**************************** PRIVATE API **********************************/
 
@@ -184,7 +184,7 @@ STC_INLINE intptr_t cstr_topos(const cstr* self, cstr_iter it)
     { return it.ref - cstr_str(self); }
 
 
-// utf8 methods defined in/depending on src/utf8code.c:
+// requires linking with utf8 symbols, e.g. #define i_import before including cstr.h in one TU.
 
 extern cstr cstr_casefold_sv(csview sv);
 extern cstr cstr_tolower_sv(csview sv);
@@ -194,8 +194,6 @@ extern cstr cstr_toupper(const char* str);
 extern void cstr_lowercase(cstr* self);
 extern void cstr_uppercase(cstr* self);
 extern bool cstr_valid_utf8(const cstr* self);
-
-// utf8 functions not depending on src/utf8code.c:
 
 STC_INLINE cstr cstr_from_pos(cstr s, intptr_t pos, intptr_t len)
     { return cstr_from_n(cstr_str(&s) + pos, len); }
@@ -664,6 +662,6 @@ STC_DEF intptr_t cstr_printf(cstr* self, const char* fmt, ...) {
 #endif // i_implement
 
 #if defined i_import
-  #include "../../src/utf8code.c"
+  #include "priv/utf8_prv.c"
 #endif
 #include "priv/linkage2.h"

@@ -164,5 +164,5 @@ void cregex_drop(cregex* re);
 #endif // STC_CREGEX_H_INCLUDED
 
 #if (defined i_implement || defined i_import) && !defined STC_CREGEX_C_INCLUDED
-  #include "../../src/cregex.c"
+  #include "priv/cregex_prv.c"
 #endif

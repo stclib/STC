@@ -1,4 +1,6 @@
 #!python
+# To generate "include/stc/priv/utf8_tab.c" file.
+
 import pandas as pd
 import numpy as np
 

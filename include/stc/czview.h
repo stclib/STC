@@ -30,7 +30,7 @@
 
 #include "common.h"
 #include "forward.h"
-#include "priv/utf8_hdr.h"
+#include "priv/utf8_prv.h"
 
 #define             czview_init() c_zv("")
 #define             czview_clone(rs) c_default_clone(rs)
@@ -92,7 +92,7 @@ STC_INLINE czview czview_u8_last(czview rs, intptr_t u8len) {
     return czview_from_pos(rs, p - rs.str);
 }
 
-STC_INLINE bool czview_u8_valid(czview rs) // depends on src/utf8code.c
+STC_INLINE bool czview_u8_valid(czview rs) // requires linking with utf8 symbols
     { return utf8_valid_n(rs.str, rs.size); }
 
 /* utf8 iterator */
@@ -121,7 +121,7 @@ STC_INLINE czview_iter czview_advance(czview_iter it, intptr_t u8pos) {
     return it;
 }
 
-/* utf8 ignore case cmp: depends on src/utf8code.c */
+/* utf8 ignore case cmp: requires linking with utf8 symbols */
 STC_INLINE int czview_icmp(const czview* x, const czview* y)
     { return utf8_icmp_sv(c_sv_2(x->str, x->size), c_sv_2(y->str, y->size)); }
 
@@ -140,6 +140,6 @@ STC_INLINE uint64_t czview_hash(const czview *self)
 #endif // STC_CZVIEW_H_INCLUDED
 
 #if defined i_import
-  #include "../../src/utf8code.c"
+  #include "priv/utf8_prv.c"
 #endif
-#include "../stc/priv/linkage2.h"
+#include "priv/linkage2.h"

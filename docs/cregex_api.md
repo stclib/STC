@@ -130,7 +130,7 @@ if (cregex_find_pattern(pattern, input, match))
     printf("Found date: %.*s\n", c_SV(match[0]));
 ```
 
-To use: `gcc first_match.c src/cregex.c src/utf8code.c`.
+To use: `gcc first_match.c`.
 In order to use a callback function in the replace call, see `examples/regex_replace.c`.
 
 ### Iterate through regex matches, *c_formatch*
@@ -152,10 +152,6 @@ c_formatch (it, &re, input)
 ## Using cregex in a project
 
 The easiest is to `#define i_import` before `#include "stc/cregex.h"`. Make sure to do that in one translation unit only.
-
-For reference, **cregex** uses the following files:
-- `stc/cregex.h`, `stc/utf8.h`, `stc/csview.h`, `stc/cstr.h`, `stc/common.h`, `stc/forward.h`
-- `src/cregex.c`, `src/utf8code.c`.
 
 ## Regex Cheatsheet
 

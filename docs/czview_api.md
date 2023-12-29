@@ -46,13 +46,13 @@ const char*     czview_u8_at(czview zv, intptr_t u8idx);
 czview          czview_u8_from_pos(czview zv, intptr_t u8idx);  // subview starting from u8idx
 czview          czview_u8_last(czview zv, intptr_t u8len);      // subview of the last u8len codepoints
 intptr_t        czview_u8_size(czview zv);
-bool            czview_u8_valid(czview zv);                     // depends on src/utf8code.c
+bool            czview_u8_valid(czview zv);                     // requires linking with utf8 symbols
 ```
 
 #### Helper methods for usage in containers
 ```c
 int             czview_cmp(const czview* x, const czview* y);
-int             czview_icmp(const czview* x, const czview* y);  // depends on src/utf8code.c:
+int             czview_icmp(const czview* x, const czview* y);  // requires linking with utf8 symbols
 bool            czview_eq(const czview* x, const czview* y);
 uint64_t        czview_hash(const czview* x);
 ```
@@ -65,7 +65,8 @@ intptr_t        utf8_size_n(const char *s, intptr_t nbytes);        // number of
 const char*     utf8_at(const char *s, intptr_t index);             // from UTF8 index to char* position
 intptr_t        utf8_pos(const char* s, intptr_t index);            // from UTF8 index to byte index position
 unsigned        utf8_chr_size(const char* s);                       // UTF8 character size: 1-4
-                // implemented in src/utf8code.c:
+
+                // requires linking with utf8 symbols
 bool            utf8_valid(const char* s);
 bool            utf8_valid_n(const char* s, intptr_t nbytes);
 uint32_t        utf8_decode(utf8_decode_t *d, uint8_t byte);        // decode next byte to utf8, return state.

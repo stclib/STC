@@ -34,11 +34,11 @@
   #define _i_prefix queue_
 #endif
 #include "priv/template.h"
-#include "priv/queue_hdr.h"
+#include "priv/queue_prv.h"
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined i_implement || defined i_static
-#include "priv/queue_imp.h"
+#include "priv/queue_prv.c"
 #endif // IMPLEMENTATION
 #include "priv/template2.h"
 #include "priv/linkage2.h"
