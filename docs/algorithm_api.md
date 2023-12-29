@@ -141,31 +141,28 @@ Enables similar functional programming subset as other popular languages.
 | `c_flt_src`                  | Pointer to current source value (non-mapped) |
 | `value`                      | Pointer to current (possible mapped) value |
 
-[ [Run this example](https://godbolt.org/z/exqYEK6qa) ]
+[ [Run this example](https://godbolt.org/z/7dP5a1s4s) ]
 ```c
-#include "stc/algorithm.h"
 #include <stdio.h>
+#define i_TYPE Vec, int
+#include "stc/stack.h"
+#include "stc/algorithm.h"
 
-bool is_prime(long long i) {
-    for (long long j=2; j*j <= i; ++j)
-        if (i % j == 0) return false;
-    return true;
-}
+int main(void)
+{
+    Vec vec = c_init(Vec, {1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 9, 10, 11, 12, 5});
 
-int main(void) {
-    // Get 10 prime numbers starting from 1000. Skip the first 15 primes, then select
-    // every 25th prime (including the initial, i.e. c_flt_counter() starts at 1).
-    crange R = crange_make(1001, INTPTR_MAX, 2); // 1001, 1003, ...
-
-    c_filter(crange, R
-         , is_prime(*value)
-        && c_flt_skip(15)
-        && c_flt_counter() % 25 == 1
-        && (printf(" %lld", *value),
-            c_flt_take(10))
+    c_filter(Vec, vec
+         , c_flt_skipwhile(*value < 3)  // skip leading values < 3
+        && (*value & 1) == 1            // then use odd values only
+        && c_flt_map(*value * 2)        // multiply by 2
+        && c_flt_takewhile(*value < 20) // stop if mapped *value >= 20
+        && printf(" %d", *value)        // print value
     );
+    //  6 10 14 2 6 18
+    puts("");
+    Vec_drop(&vec);
 }
-// out: 1097 1289 1481 1637 1861 2039 2243 2417 2657 2803
 ```
 
 ---

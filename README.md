@@ -3,11 +3,9 @@
 STC - Smart Template Containers
 ===============================
 
-### [Version 5.0 beta 3](#version-history)
+### [Version 5.0 beta 4](#version-history)
 - New shorthand template parameter `i_TYPE` lets you define `i_type`, `i_key`, and `i_val` all in one line.
-- **c_filter(C, cnt, filters)** replaces *c_forfilter (it, C, cnt, filter)*, changed to pure functional call => , i.e. the  imperative block removed.
-  - **c_flt_{FILTER}(...)** changed => removed first parameter `it`, and variable **value** points to current item.
-  - See [c_filter](docs/algorithm_api.md#c_filter) and examples for details.
+- [**c_filter(C, cnt, filters)**](docs/algorithm_api.md#c_filter) replaces *c_forfilter (it, C, cnt, filter)* loop: Changed to a more "pure" functional programming call.
 - Renamed templated STC headers (old header names deprecated). Default container names corresponds to new header names:
   - **vec.h** (from `cvec.h`)
   - **deq.h** (from `cdeq.h`)

@@ -23,17 +23,12 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-#ifndef STC_CREGEX_C_INCLUDED
-#define STC_CREGEX_C_INCLUDED
+#ifndef STC_CREGEX_PRV_C_INCLUDED
+#define STC_CREGEX_PRV_C_INCLUDED
 
 #include <setjmp.h>
-#ifndef STC_CREGEX_H_INCLUDED
-  #include "../cregex.h"
-#endif
-#undef i_implement
-// implement cstr and utf8 if i_import was defined:
-#include "../cstr.h"
-#include "linkage.h"
+#include "utf8_prv.h"
+#include "cstr_prv.h"
 
 typedef uint32_t _Rune; /* Utf8 code point */
 typedef int32_t _Token;
@@ -1331,5 +1326,4 @@ cregex_drop(cregex* self) {
     i_free(self->prog, self->prog->allocsize);
 }
 
-#include "linkage2.h"
-#endif
+#endif // STC_CREGEX_PRV_C_INCLUDED

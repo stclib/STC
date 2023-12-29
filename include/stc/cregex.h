@@ -32,7 +32,7 @@ THE SOFTWARE.
  */
 #include <stdbool.h>
 #include <string.h>
-#include "forward.h" // csview
+#include "forward.h" // csview, cstr types
 #include "common.h"
 
 enum {
@@ -161,8 +161,15 @@ cstr cregex_replace_pattern_6(const char* pattern, const char* input, const char
 
 /* destroy regex */
 void cregex_drop(cregex* re);
+
 #endif // STC_CREGEX_H_INCLUDED
 
-#if (defined i_implement || defined i_import) && !defined STC_CREGEX_C_INCLUDED
+#if defined i_implement || defined i_import
+  #include "priv/linkage.h"
   #include "priv/cregex_prv.c"
+  #if defined i_import
+     #include "priv/utf8_prv.c"
+     #include "priv/cstr_prv.c"
+  #endif
+  #include "priv/linkage2.h"
 #endif

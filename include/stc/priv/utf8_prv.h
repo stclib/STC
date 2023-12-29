@@ -20,8 +20,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef STC_UTF8_HDR_H_INCLUDED
-#define STC_UTF8_HDR_H_INCLUDED
+#ifndef STC_UTF8_PRV_H_INCLUDED
+#define STC_UTF8_PRV_H_INCLUDED
 
 #include <ctype.h>
 
@@ -137,4 +137,4 @@ STC_INLINE bool utf8_valid(const char* s) {
     return utf8_valid_n(s, INTPTR_MAX);
 }
 
-#endif // STC_UTF8_HDR_H_INCLUDED
+#endif // STC_UTF8_PRV_H_INCLUDED
