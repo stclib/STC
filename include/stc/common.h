@@ -194,8 +194,12 @@ STC_INLINE intptr_t c_next_pow2(intptr_t n) {
          ; _.iter.ref && (_.key = &_.iter.ref->first, _.val = &_.iter.ref->second) \
          ; C##_next(&_.iter))
 
-#define c_foreach_n(it, C, cnt, _n) \
-    for (struct {C##_iter iter; C##_value* ref; intptr_t index, n;} it = {.iter=C##_begin(&cnt), .n=_n} \
+#define c_foreach_rev(it, C, cnt) /* reverse: works only for stack and vec */ \
+    for (C##_iter _start = C##_begin(&cnt), it = {.ref=_start.ref ? _start.end - 1 : NULL, .end=_start.ref - 1} \
+         ; it.ref ; --it.ref == it.end ? it.ref = NULL : NULL)
+
+#define c_foreach_n(it, C, cnt, N) /* iterate up to N items */ \
+    for (struct {C##_iter iter; C##_value* ref; intptr_t index, n;} it = {.iter=C##_begin(&cnt), .n=N} \
          ; (it.ref = it.iter.ref) && it.index < it.n; C##_next(&it.iter), ++it.index)
 
 #define c_foreach_it(existing_iter, C, cnt) \
