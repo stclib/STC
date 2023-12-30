@@ -69,4 +69,10 @@
 #undef _i_has_eq
 #undef _i_prefix
 #undef _i_template
+
+#undef i_keyclass // [deprecated]
+#undef i_valclass // [deprecated]
+#undef i_rawclass // [deprecated]
+#undef i_keyboxed // [deprecated]
+#undef i_valboxed // [deprecated]
 #endif

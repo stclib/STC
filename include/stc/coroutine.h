@@ -109,6 +109,7 @@ typedef enum {
 /* cco_blocking_call(): assumes coroutine returns a cco_result value (int) */
 #define cco_blocking_call(corocall) while ((corocall) != CCO_DONE)
 
+#define cco_cleanup cco_final // [deprecated]
 #define cco_final \
     *_state = CCO_STATE_FINAL; \
     /* fall through */ \
