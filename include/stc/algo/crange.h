@@ -52,7 +52,6 @@ typedef intptr_t crange_value;
 typedef struct { crange_value start, end, step, value; } crange;
 typedef struct { crange_value *ref, end, step; } crange_iter;
 
-#define crange_init crange_make // [deprecated]
 #define crange_make(...) c_MACRO_OVERLOAD(crange_make, __VA_ARGS__)
 #define crange_make_1(stop) crange_make_3(0, stop, 1)
 #define crange_make_2(start, stop) crange_make_3(start, stop, 1)

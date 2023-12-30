@@ -38,19 +38,6 @@
 #define forward_pque(C, VAL) _c_pque_types(C, VAL)
 #define forward_queue(C, VAL) _c_deq_types(C, VAL)
 #define forward_vec(C, VAL) _c_vec_types(C, VAL)
-// OLD deprecated names:
-#define forward_carc forward_arc
-#define forward_cbox forward_box
-#define forward_cdeq forward_deq
-#define forward_clist forward_list
-#define forward_cmap forward_hmap
-#define forward_cset forward_hset
-#define forward_csmap forward_smap
-#define forward_csset forward_sset
-#define forward_cstack forward_stack
-#define forward_cpque forward_pque
-#define forward_cqueue forward_queue
-#define forward_cvec forward_vec
 
 // csview : non-null terminated string view
 typedef const char csview_value;
