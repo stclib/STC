@@ -245,7 +245,7 @@ int main(void)
     puts("");
 
     // Search a sorted map for the first string containing "hello" from it1, and erase it:
-    Map map = c_init(Map, {{"yes",1}, {"no",2}, {"say hello from me",3}, {"goodbye",4}});
+    Map map = c_init(Map, { {"yes",1}, {"no",2}, {"say hello from me",3}, {"goodbye",4} });
     Map_iter res, it1 = Map_begin(&map);
 
     c_find_from(Map, it1, &res, cstr_contains(&value->first, "hello"));
