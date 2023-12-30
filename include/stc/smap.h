@@ -54,7 +54,7 @@ int main(void) {
 #ifndef STC_SMAP_H_INCLUDED
 #define STC_SMAP_H_INCLUDED
 #include "common.h"
-#include "forward.h"
+#include "types.h"
 #include <stdlib.h>
 #include <string.h>
 #endif // STC_SMAP_H_INCLUDED

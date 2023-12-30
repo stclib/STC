@@ -24,7 +24,7 @@
 /*
 #define i_implement
 #include "stc/cstr.h"
-#include "stc/forward.h"
+#include "stc/types.h"
 
 forward_vec(vec_i32, int);
 
@@ -62,7 +62,7 @@ int main(void) {
 #ifndef STC_VEC_H_INCLUDED
 #define STC_VEC_H_INCLUDED
 #include "common.h"
-#include "forward.h"
+#include "types.h"
 #include <stdlib.h>
 #include <string.h>
 

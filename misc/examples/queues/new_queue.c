@@ -1,5 +1,5 @@
 #include "stc/crand.h"
-#include "stc/forward.h"
+#include "stc/types.h"
 #include <stdio.h>
 #include <time.h>
 

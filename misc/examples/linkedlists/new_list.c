@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "stc/forward.h"
+#include "stc/types.h"
 
 forward_list(list_i32, int32_t);
 forward_list(list_pnt, struct Point);

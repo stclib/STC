@@ -26,7 +26,7 @@
 #define STC_UTF8_H_INCLUDED
 
 #include "common.h"
-#include "forward.h"
+#include "types.h"
 #include "priv/utf8_prv.h"
 
 #endif // STC_UTF8_H_INCLUDED

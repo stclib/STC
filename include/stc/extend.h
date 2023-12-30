@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 #include "stc/common.h"
-#include "stc/forward.h"
+#include "stc/types.h"
 
 #ifdef i_key_str
   #define _i_key cstr

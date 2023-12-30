@@ -58,7 +58,7 @@ int main(void) {
 #ifndef STC_ARC_H_INCLUDED
 #define STC_ARC_H_INCLUDED
 #include "common.h"
-#include "forward.h"
+#include "types.h"
 #include <stdlib.h>
 
 #if defined _MSC_VER

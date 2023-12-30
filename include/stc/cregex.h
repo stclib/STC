@@ -32,7 +32,7 @@ THE SOFTWARE.
  */
 #include <stdbool.h>
 #include <string.h>
-#include "forward.h" // csview, cstr types
+#include "types.h" // csview, cstr types
 #include "common.h"
 
 enum {

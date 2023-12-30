@@ -25,7 +25,7 @@
 #ifndef STC_DEQ_H_INCLUDED
 #define STC_DEQ_H_INCLUDED
 #include "common.h"
-#include "forward.h"
+#include "types.h"
 #include <stdlib.h>
 #include <string.h>
 #endif // STC_DEQ_H_INCLUDED

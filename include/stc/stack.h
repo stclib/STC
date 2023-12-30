@@ -26,7 +26,7 @@
 #define STC_STACK_H_INCLUDED
 #include "common.h"
 #include <stdlib.h>
-#include "forward.h"
+#include "types.h"
 #endif // STC_STACK_H_INCLUDED
 
 #ifndef _i_prefix

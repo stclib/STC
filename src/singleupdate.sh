@@ -26,5 +26,5 @@ python singleheader.py $d/include/stc/csview.h  $d/../stcsingle/stc/csview.h
 python singleheader.py $d/include/stc/czview.h  $d/../stcsingle/stc/czview.h
 python singleheader.py $d/include/stc/vec.h    $d/../stcsingle/stc/vec.h
 python singleheader.py $d/include/stc/extend.h  $d/../stcsingle/stc/extend.h
-python singleheader.py $d/include/stc/forward.h $d/../stcsingle/stc/forward.h
+python singleheader.py $d/include/stc/types.h $d/../stcsingle/stc/types.h
 echo "$d/../stcsingle headers updated"

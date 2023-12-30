@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "stc/forward.h"
+#include "stc/types.h"
 
 forward_vec(vec_i32, int);
 forward_vec(vec_pnt, struct Point);

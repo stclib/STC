@@ -31,7 +31,7 @@
 #define STC_CSTR_H_INCLUDED
 
 #include "common.h"
-#include "forward.h"
+#include "types.h"
 #include "priv/utf8_prv.h"
 #include "priv/cstr_prv.h"
 
@@ -44,4 +44,5 @@
 #if defined i_import
   #include "priv/utf8_prv.c"
 #endif
+
 #include "priv/linkage2.h"

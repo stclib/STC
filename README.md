@@ -17,6 +17,8 @@ STC - Smart Template Containers
   - **hset.h** (from `cset.h`)
   - **smap.h** (from `csmap.h`)
   - **sset.h** (from `csset.h`)
+  - **types.h** (from `forward.h`)
+  - ***NOTE***: Deprecated headers will be removed from STC V5.0!
 ---
 Description
 -----------
@@ -583,7 +585,7 @@ Implement PointVec in a c-file:
 // Dataset.h
 #ifndef Dataset_H_
 #define Dataset_H_
-#include "stc/forward.h"   // include various container data structure templates
+#include "stc/types.h"   // include various container data structure templates
 
 // declare PointVec. Note: struct Point may be an incomplete/undeclared type.
 forward_vec(PointVec, struct Point);

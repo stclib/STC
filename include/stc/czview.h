@@ -29,7 +29,7 @@
 #define STC_CZVIEW_H_INCLUDED
 
 #include "common.h"
-#include "forward.h"
+#include "types.h"
 #include "priv/utf8_prv.h"
 
 #define             czview_init() c_zv("")

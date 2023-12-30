@@ -51,7 +51,7 @@ int main(void) {
 #ifndef STC_HMAP_H_INCLUDED
 #define STC_HMAP_H_INCLUDED
 #include "common.h"
-#include "forward.h"
+#include "types.h"
 #include <stdlib.h>
 #include <string.h>
 struct hmap_slot { uint8_t hashx; };
