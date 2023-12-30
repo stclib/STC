@@ -6,7 +6,7 @@
 #include "stc/cstr.h"
 #include "stc/coroutine.h"
 
-struct next_value { 
+struct next_value {
     int val;
     int cco_state;
     cco_timer tm;
@@ -28,7 +28,7 @@ void print_time(void)
 {
     time_t now = time(NULL);
     char mbstr[64];
-    strftime(mbstr, sizeof(mbstr), "[%H:%M:%S]", localtime(&now)); 
+    strftime(mbstr, sizeof(mbstr), "[%H:%M:%S]", localtime(&now));
     printf("%s ", mbstr);
 }
 

@@ -22,7 +22,7 @@ All cbits definitions and prototypes are available by including a single header 
 cbits       cbits_init(void);
 cbits       cbits_from(const char* str);
 cbits       cbits_with_size(int64_t size, bool value);              // size must be <= N if N is defined
-cbits       cbits_with_pattern(int64_t size, uint64_t pattern); 
+cbits       cbits_with_pattern(int64_t size, uint64_t pattern);
 cbits       cbits_clone(cbits other);
 
 void        cbits_clear(cbits* self);

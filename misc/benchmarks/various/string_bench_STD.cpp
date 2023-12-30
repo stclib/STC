@@ -242,7 +242,7 @@ int main(void)
 }
 
 void benchmark(
-    const std::vector<std::string>& vec_shortstr, 
+    const std::vector<std::string>& vec_shortstr,
     const std::vector<std::string_view>& vec_shortstrview,
     const std::map<std::string, size_t>& mapNormal,
     const std::map<std::string, size_t, std::less<> >& mapTrans,
@@ -294,7 +294,7 @@ void benchmark(
     }
     grandtotal += total;
     stopwatch.stop();
-    
+
     total = 0;
     stopwatch.start("Trans Map with string_view");
     for (size_t i = 0; i < MAX_LOOP; ++i)

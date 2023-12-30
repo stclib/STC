@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
         {0}
     };
     const char* shortopts = "xy:z::123";
-    if (argc == 1) 
+    if (argc == 1)
         printf("Usage: program -x -y ARG -z [ARG] -1 -2 -3 --foo --bar ARG --opt [ARG] [ARGUMENTS]\n", argv[0]);
     coption opt = coption_init();
     int c;

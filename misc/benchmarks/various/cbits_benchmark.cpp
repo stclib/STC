@@ -51,7 +51,7 @@ int main(int argc, char **argv)
     difference1 = get_time_in_ms() - current_time;
     current_time = get_time_in_ms();
 
-    c_forrange (100) c_forrange (num, N) 
+    c_forrange (100) c_forrange (num, N)
     {
         total += bools[num];
     }
@@ -60,7 +60,7 @@ int main(int argc, char **argv)
 
     difference2 = get_time_in_ms() - current_time;
 
-    cout << "Bool:" << endl << "sum total = " << total << ", random access time = " << difference1 
+    cout << "Bool:" << endl << "sum total = " << total << ", random access time = " << difference1
                             << ", sequential access time = " << difference2 << endl << endl;
 
     one_sec_delay();
@@ -82,7 +82,7 @@ int main(int argc, char **argv)
     c_forrange (100) c_forrange (num, N)
     {
         total += bits[num];
-    }   
+    }
 
     difference2 = get_time_in_ms() - current_time;
 

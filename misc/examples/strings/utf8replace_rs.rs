@@ -13,7 +13,7 @@ pub fn main() {
     );
     println!("{}", hello);
 
-    for c in hello.chars() { 
+    for c in hello.chars() {
         print!("{},", c);
     }
 

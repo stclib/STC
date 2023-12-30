@@ -105,8 +105,8 @@ int main(void)
 
     cco_blocking_call(res = combined(&c)) {
         if (res == CCO_YIELD)
-            printf("Prime(%d)=%lld, Fib(%d)=%lld\n", 
-                c.prm.idx, c.prm.result, 
+            printf("Prime(%d)=%lld, Fib(%d)=%lld\n",
+                c.prm.idx, c.prm.result,
                 c.fib.idx, c.fib.result);
     }
 }

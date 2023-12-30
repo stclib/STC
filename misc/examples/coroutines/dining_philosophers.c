@@ -3,7 +3,7 @@
 #include <time.h>
 #include "stc/crand.h"
 #include "stc/coroutine.h"
- 
+
 // Define the number of philosophers and forks
 enum {
     num_philosophers = 5,
@@ -25,7 +25,7 @@ struct Dining {
     int cco_state; // required
 };
 
- 
+
 // Philosopher coroutine
 int philosopher(struct Philosopher* p)
 {

@@ -1,6 +1,6 @@
 #ifndef FMT_H_INCLUDED
 #define FMT_H_INCLUDED
-/* 
+/*
 VER 2.2: NEW API:
 void        fmt_print(fmt, ...);
 void        fmt_println(fmt, ...);
@@ -57,12 +57,12 @@ int main(void) {
     fmt_printd(ss, "{} {}", ", Pi squared is:", pi*pi);
     fmt_print("{}, len={}, cap={}\n", ss->data, ss->len, ss->cap);
     fmt_close(ss);
-    
+
     time_t now = time(NULL);
     struct tm t1 = *localtime(&now), t2 = t1;
     t2.tm_year += 2;
     // NB! max 2 fmt_tm() calls per fmt_print()!
-    fmt_print("Dates: {} and {}\n", fmt_tm("%Y-%m-%d %X %Z", &t1), 
+    fmt_print("Dates: {} and {}\n", fmt_tm("%Y-%m-%d %X %Z", &t1),
                                     fmt_tm("%Y-%m-%d %X %Z", &t2));
 }
 */

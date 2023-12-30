@@ -17,7 +17,7 @@ int main(void)
     sv = cstr_sv(&str);
     cstr s2 = cstr_from_sv(csview_substr_ex(sv, -3, 3));    // "red"
     cstr s3 = cstr_from_sv(csview_substr_ex(sv, 0, 6));     // "apples"
-    printf("%s %s: %d, %d\n", cstr_str(&s2), cstr_str(&s3), 
+    printf("%s %s: %d, %d\n", cstr_str(&s2), cstr_str(&s3),
                               cstr_is_long(&str), cstr_is_long(&s2));
     c_drop(cstr, &str, &s2, &s3);
 }

@@ -28,7 +28,7 @@ void print_time(void)
 {
     time_t now = time(NULL);
     char mbstr[64];
-    strftime(mbstr, sizeof(mbstr), "[%H:%M:%S]", localtime(&now)); 
+    strftime(mbstr, sizeof(mbstr), "[%H:%M:%S]", localtime(&now));
     printf("%s ", mbstr);
 }
 

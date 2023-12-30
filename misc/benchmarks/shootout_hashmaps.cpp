@@ -303,7 +303,7 @@ int main(int argc, char* argv[])
 
     printf("\nUnordered hash map shootout\n");
     printf("KMAP = https://github.com/attractivechaos/klib\n"
-#ifdef HAVE_BOOST      
+#ifdef HAVE_BOOST
            "BMAP = https://www.boost.org (unordered_flat_map)\n"
 #endif
            "CMAP = https://github.com/stclib/STC (**)\n"

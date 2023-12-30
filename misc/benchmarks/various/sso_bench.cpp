@@ -151,7 +151,7 @@ int main(void) {
     }
     std::cout << "Avg:\t" << sum/n << "ms\n";
 
-    
+
     csrand(seed);
     sum = 0, n = 0;
     std::cerr << "\nstrsize\tmsecs\tinsert: cset<cstr>, size=" << BENCHMARK_SIZE/2 << "\n";
