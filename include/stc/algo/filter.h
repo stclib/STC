@@ -42,13 +42,12 @@ int main(void)
     Vec_drop(&vec);
 }
 */
-#ifndef STC_TRANSFORM_H_INCLUDED
-#define STC_TRANSFORM_H_INCLUDED
+#ifndef STC_FILTER_H_INCLUDED
+#define STC_FILTER_H_INCLUDED
 
 #include "../common.h"
 
-// c_filter:
-
+// ------- c_filter --------
 #define c_flt_skip(n) (c_flt_counter() > (n))
 #define c_flt_take(n) _flt_take(&_fl, n)
 #define c_flt_skipwhile(pred) (_fl.sb[_fl.sb_top++] |= !(pred))
@@ -56,7 +55,7 @@ int main(void)
 #define c_flt_counter() (++_fl.sn[++_fl.sn_top])
 #define c_flt_getcount() (_fl.sn[_fl.sn_top])
 #define c_flt_map(expr) (_mapped = (expr), value = &_mapped)
-#define c_flt_src _it.ref
+#define c_flt_src() _it.ref
 
 #define c_filter(C, cnt, ...) \
     c_filter_from(C, C##_begin(&cnt), __VA_ARGS__)
@@ -70,9 +69,42 @@ int main(void)
       (void)(__VA_ARGS__); \
 } while (0)
 
+// ------- c_forfilter --------
+// c_forfilter allows to execute imperative statements for each element
+// as it is a for-loop, e.g., calling nested generic algorithms instead
+// of defining a wrapper-function for it:
+/*
+    Vec vec = ..., vec2 = ...;
+    c_forfilter (i, Vec, vec
+         , c_fflt_skipwhile(i, *i.ref < 3)  // skip leading values < 3
+        && (*i.ref & 1) == 1                // then use odd values only
+        && c_fflt_map(i, *i.ref * 2)        // multiply by 2
+        && c_fflt_takewhile(i, *i.ref < 20) // stop if mapped *i.ref >= 20
+    ){
+        c_eraseremove_if(Vec, &vec2, *value == *i.ref);
+    }
+*/
+#define c_fflt_skip(i, n) (c_fflt_counter(i) > (n))
+#define c_fflt_take(i, n) _flt_take(&i._fl, n)
+#define c_fflt_skipwhile(i, pred) (i._fl.sb[i._fl.sb_top++] |= !(pred))
+#define c_fflt_takewhile(i, pred) _flt_takewhile(&i._fl, pred)
+#define c_fflt_counter(i) (++i._fl.sn[++i._fl.sn_top])
+#define c_fflt_getcount(i) (i._fl.sn[i._fl.sn_top])
+#define c_fflt_map(i, expr) (i._mapped = (expr), i.ref = &i._mapped)
+#define c_fflt_src(i) i._it.ref
+
+#define c_forfilter(i, C, cnt, ...) \
+    c_forfilter_from(i, C, C##_begin(&cnt), __VA_ARGS__)
+
+#define c_forfilter_from(i, C, start, ...) \
+    for (struct {C##_iter _it; C##_value *ref, _mapped; struct _flt_base _fl;} \
+         i = {._it=start, .ref=i._it.ref} ; !i._fl.done & (i._it.ref != NULL) ; \
+         C##_next(&i._it), i.ref = i._it.ref, i._fl.sn_top=0, i._fl.sb_top=0) \
+      if (!(__VA_ARGS__)) ; else
+
 // ------------------------ private -------------------------
 #ifndef c_NFILTERS
-#define c_NFILTERS 32
+#define c_NFILTERS 20
 #endif
 
 struct _flt_base {
@@ -93,4 +125,4 @@ static inline bool _flt_takewhile(struct _flt_base* fl, bool pred) {
     return !skip;
 }
 
-#endif
+#endif // STC_FILTER_H_INCLUDED

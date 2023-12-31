@@ -138,8 +138,11 @@ Enables similar functional programming subset as other popular languages.
 | `c_flt_counter()`            | Increment count and return it              |
 | `c_flt_getcount()`           | Number of items passed skip/take/counter   |
 | `c_flt_map(expr)`            | Map expr to current value. Input unchanged |
-| `c_flt_src`                  | Pointer to current unmapped source value   |
-| `value`                      | Pointer to current (possible mapped) value |
+| `c_flt_src()`                | Pointer to current unmapped source value   |
+| `value`                      | Pointer variable to current (possible mapped) value |
+
+**NOTE**: There is also a `c_forfilter` iterator variant of `c_filter`. It uses the filter namings
+`c_fflt_skip(it, numItems)`, etc. See [filter.h](../include/stc/algo/filter.h).
 
 [ [Run this example](https://godbolt.org/z/7dP5a1s4s) ]
 ```c
