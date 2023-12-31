@@ -92,6 +92,7 @@ STC_INLINE intptr_t _c_MEMB(_capacity)(const i_type* self) {
     (void)self; return i_capacity;
 #endif
 }
+
 STC_INLINE void _c_MEMB(_value_drop)(_m_value* val)
     { i_keydrop(val); }
 
@@ -147,6 +148,7 @@ STC_INLINE i_type _c_MEMB(_from_n)(const _m_raw* raw, intptr_t n)
 
 STC_INLINE const _m_value* _c_MEMB(_at)(const i_type* self, intptr_t idx)
     { c_assert(idx < self->_len); return self->data + idx; }
+
 STC_INLINE _m_value* _c_MEMB(_at_mut)(i_type* self, intptr_t idx)
     { c_assert(idx < self->_len); return self->data + idx; }
 
@@ -178,15 +180,26 @@ STC_INLINE i_keyraw _c_MEMB(_value_toraw)(const _m_value* val)
 #endif // !i_no_clone
 
 STC_INLINE _m_iter _c_MEMB(_begin)(const i_type* self) {
-    return c_LITERAL(_m_iter){self->_len ? (_m_value*)self->data : NULL,
-                              (_m_value*)self->data + self->_len};
+    intptr_t n = self->_len; _m_value* d = (_m_value*)self->data;
+    return c_LITERAL(_m_iter){n ? d : NULL, d + n};
+}
+
+STC_INLINE _m_iter _c_MEMB(_rbegin)(const i_type* self) {
+    intptr_t n = self->_len; _m_value* d = (_m_value*)self->data;
+    return c_LITERAL(_m_iter){n ? d + n - 1 : NULL, d - 1};
 }
 
 STC_INLINE _m_iter _c_MEMB(_end)(const i_type* self)
-    { return c_LITERAL(_m_iter){NULL, (_m_value*)self->data + self->_len}; }
+    { (void)self; return c_LITERAL(_m_iter){0}; }
+
+STC_INLINE _m_iter _c_MEMB(_rend)(const i_type* self)
+    { (void)self; return c_LITERAL(_m_iter){0}; }
 
 STC_INLINE void _c_MEMB(_next)(_m_iter* it)
     { if (++it->ref == it->end) it->ref = NULL; }
+
+STC_INLINE void _c_MEMB(_rnext)(_m_iter* it)
+    { if (--it->ref == it->end) it->ref = NULL; }
 
 STC_INLINE _m_iter _c_MEMB(_advance)(_m_iter it, size_t n)
     { if ((it.ref += n) >= it.end) it.ref = NULL ; return it; }

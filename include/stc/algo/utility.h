@@ -86,14 +86,25 @@
 } while (0)
 
 // --------------------------------
-// c_copy_if
+// c_copy, c_copy_if
 // --------------------------------
 
-#define c_copy_if(C, cnt, outcnt_ptr, pred) do { \
-    C _cnt = cnt, *_out = outcnt_ptr; \
+#define c_copy(...) c_MACRO_OVERLOAD(c_copy, __VA_ARGS__)
+#define c_copy_3(C, cnt, outcnt_ptr) \
+    c_copy_if_5(C, cnt, C, outcnt_ptr, true)
+
+#define c_copy_4(C, cnt, C_outp, outcnt_ptr) \
+    c_copy_if_5(C, cnt, C_outp, outcnt_ptr, true)
+
+#define c_copy_if(...) c_MACRO_OVERLOAD(c_copy_if, __VA_ARGS__)
+#define c_copy_if_4(C, cnt, outcnt_ptr, pred) \
+    c_copy_if_5(C, cnt, C, outcnt_ptr, pred)
+
+#define c_copy_if_5(C, cnt, C_out, outcnt_ptr, pred) do { \
+    C _cnt = cnt; C_out *_out = outcnt_ptr; \
     const C##_value* value; \
     for (C##_iter _it = C##_begin(&_cnt); (value = _it.ref); C##_next(&_it)) \
-        if (pred) C##_push(_out, C##_value_clone(*_it.ref)); \
+        if (pred) C_out##_push(_out, C##_value_clone(*_it.ref)); \
 } while (0)
 
 // --------------------------------

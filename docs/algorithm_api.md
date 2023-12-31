@@ -3,7 +3,7 @@
 "No raw loops" - Sean Parent
 ## Ranged for-loops
 
-### c_foreach, c_forpair, c_foreach_n, c_foreach_it
+### c_foreach, c_foreach_n, c_foreach_reverse, c_foreach_iter, c_forpair
 ```c
 #include "stc/common.h"
 ```
@@ -12,9 +12,10 @@
 |:-----------------------------------------|:------------------------------------------|
 | `c_foreach (it, ctype, container)`       | Iteratate all elements                    |
 | `c_foreach (it, ctype, it1, it2)`        | Iterate the range [it1, it2)              |
+| `c_foreach_n (it, ctype, cnt, n)`        | Iterate up to n times using it.index and it.n |
+| `c_foreach_reverse (it, ctype, container)`| Iteratate all elements in reverse: *vec, deq, queue, stack* only! |
+| `c_foreach_iter (existing_it, ctype, cnt)` | Iterate with an existing iterator       |
 | `c_forpair (key, val, ctype, container)` | Iterate with structured binding           |
-| `c_foreach_n (it, ctype, cnt, n)`    | Iterate up to n times using it.index and it.n |
-| `c_foreach_it (existing_iter, ctype, cnt)` | Iterate with an existing iterator       |
 
 ```c
 #define i_TYPE IMap,int,int
@@ -196,8 +197,11 @@ c_drop(hset_str, &myset, &myset2);
 
 ### c_find_if, c_copy_if, c_erase_if, c_eraseremove_if
 Find, clone or erase linearily in containers using a predicate. `value` is a pointer to each element in predicate.
-- For `c_find_if(CntType, cnt, outiter_ptr, pred)`, ***outiter_ptr*** must be defined prior to call.
-- For `c_copy_if(CntType, cnt, outcnt_ptr, pred)`, ***outcnt_ptr*** must be defined prior to call.
+- `c_find_if(CntType, cnt, outiter_ptr, pred)`, ***outiter_ptr*** must be defined prior to call.
+- `c_copy(CntType, cnt, outcnt_ptr)`
+- `c_copy(CntType, cnt, OutCnt, outcnt_ptr)`
+- `c_copy_if(CntType, cnt, outcnt_ptr, pred)`
+- `c_copy_if(CntType, cnt, OutCnt, outcnt_ptr, pred)`
 - Use `c_erase_if(CntType, cnt_ptr, pred)` with **list**, **hmap**, **hset**, **smap**, and **sset**.
 - Use `c_eraseremove_if(CntType, cnt_ptr, pred)` with **stack**, **vec**, **deq**, and **queue** only.
 ```c

@@ -172,6 +172,7 @@ _c_MEMB(_insert_n)(i_type* self, const intptr_t idx, const _m_value arr[], const
         c_memcpy(it.ref, arr, n*c_sizeof *arr);
     return it;
 }
+
 STC_INLINE _m_iter
 _c_MEMB(_insert_at)(i_type* self, _m_iter it, const _m_value value) {
     return _c_MEMB(_insert_n)(self, _it_ptr(it) - self->data, &value, 1);
@@ -181,6 +182,7 @@ STC_INLINE _m_iter
 _c_MEMB(_erase_at)(i_type* self, _m_iter it) {
     return _c_MEMB(_erase_n)(self, it.ref - self->data, 1);
 }
+
 STC_INLINE _m_iter
 _c_MEMB(_erase_range)(i_type* self, _m_iter i1, _m_iter i2) {
     return _c_MEMB(_erase_n)(self, i1.ref - self->data, _it2_ptr(i1, i2) - i1.ref);
@@ -190,6 +192,7 @@ STC_INLINE const _m_value*
 _c_MEMB(_at)(const i_type* self, const intptr_t idx) {
     c_assert(idx < self->_len); return self->data + idx;
 }
+
 STC_INLINE _m_value*
 _c_MEMB(_at_mut)(i_type* self, const intptr_t idx) {
     c_assert(idx < self->_len); return self->data + idx;
@@ -201,14 +204,27 @@ STC_INLINE _m_iter _c_MEMB(_begin)(const i_type* self) {
     return c_LITERAL(_m_iter){n ? self->data : NULL, self->data + n};
 }
 
+STC_INLINE _m_iter _c_MEMB(_rbegin)(const i_type* self) {
+    intptr_t n = self->_len;
+    return c_LITERAL(_m_iter){n ? self->data + n - 1 : NULL, self->data - 1};
+}
+
 STC_INLINE _m_iter _c_MEMB(_end)(const i_type* self)
-    { return c_LITERAL(_m_iter){NULL, self->data + self->_len}; }
+    { (void)self; return c_LITERAL(_m_iter){0}; }
+
+STC_INLINE _m_iter _c_MEMB(_rend)(const i_type* self)
+    { (void)self; return c_LITERAL(_m_iter){0}; }
 
 STC_INLINE void _c_MEMB(_next)(_m_iter* it)
     { if (++it->ref == it->end) it->ref = NULL; }
 
-STC_INLINE _m_iter _c_MEMB(_advance)(_m_iter it, size_t n)
-    { if ((it.ref += n) >= it.end) it.ref = NULL; return it; }
+STC_INLINE void _c_MEMB(_rnext)(_m_iter* it)
+    { if (--it->ref == it->end) it->ref = NULL; }
+
+STC_INLINE _m_iter _c_MEMB(_advance)(_m_iter it, size_t n) {
+    if ((it.ref += n) >= it.end) it.ref = NULL;
+    return it;
+}
 
 STC_INLINE intptr_t _c_MEMB(_index)(const i_type* self, _m_iter it)
     { return (it.ref - self->data); }

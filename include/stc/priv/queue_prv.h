@@ -95,17 +95,32 @@ STC_INLINE _m_value _c_MEMB(_pull)(i_type* self) { // move front out of queue
 STC_INLINE _m_iter _c_MEMB(_begin)(const i_type* self) {
     return c_LITERAL(_m_iter){
         .ref=_c_MEMB(_empty)(self) ? NULL : self->cbuf + self->start,
-        .pos=self->start, ._s=self
-    };
+        .pos=self->start, ._s=self};
+}
+
+STC_INLINE _m_iter _c_MEMB(_rbegin)(const i_type* self) {
+    intptr_t pos = (self->end - 1) & self->capmask;
+    return c_LITERAL(_m_iter){
+        .ref=_c_MEMB(_empty)(self) ? NULL : self->cbuf + pos,
+        .pos=pos, ._s=self};
 }
 
 STC_INLINE _m_iter _c_MEMB(_end)(const i_type* self)
-    { return c_LITERAL(_m_iter){.pos=self->end, ._s=self}; }
+    { (void)self; return c_LITERAL(_m_iter){0}; }
+
+STC_INLINE _m_iter _c_MEMB(_rend)(const i_type* self)
+    { (void)self; return c_LITERAL(_m_iter){0}; }
 
 STC_INLINE void _c_MEMB(_next)(_m_iter* it) {
     if (it->pos != it->_s->capmask) { ++it->ref; ++it->pos; }
     else { it->ref -= it->pos; it->pos = 0; }
     if (it->pos == it->_s->end) it->ref = NULL;
+}
+
+STC_INLINE void _c_MEMB(_rnext)(_m_iter* it) {
+    if (it->pos == it->_s->start) it->ref = NULL;
+    else if (it->pos != 0) { --it->ref; --it->pos; }
+    else it->ref += (it->pos = it->_s->capmask);
 }
 
 STC_INLINE intptr_t _c_MEMB(_index)(const i_type* self, _m_iter it)
