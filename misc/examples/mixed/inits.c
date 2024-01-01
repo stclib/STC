@@ -40,7 +40,7 @@ int main(void)
         pque_flt_push(&floats, nums[i]);
 
     puts("\npop and show high priorites first:");
-    while (! pque_flt_empty(&floats)) {
+    while (! pque_flt_is_empty(&floats)) {
         printf("%.1f ", (double)*pque_flt_top(&floats));
         pque_flt_pop(&floats);
     }

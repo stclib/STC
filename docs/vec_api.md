@@ -45,7 +45,7 @@ bool                vec_X_resize(vec_X* self, intptr_t size, i_key null);
 void                vec_X_shrink_to_fit(vec_X* self);
 void                vec_X_drop(vec_X* self);                              // destructor
 
-bool                vec_X_empty(const vec_X* self);
+bool                vec_X_is_empty(const vec_X* self);
 intptr_t            vec_X_size(const vec_X* self);
 intptr_t            vec_X_capacity(const vec_X* self);
 

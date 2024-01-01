@@ -37,7 +37,7 @@ void                sset_X_clear(sset_X* self);
 void                sset_X_copy(sset_X* self, const sset_X* other);
 void                sset_X_drop(sset_X* self);                                             // destructor
 
-bool                sset_X_empty(const sset_X* self);
+bool                sset_X_is_empty(const sset_X* self);
 intptr_t            sset_X_size(const sset_X* self);
 intptr_t            sset_X_capacity(const sset_X* self);
 

@@ -86,7 +86,7 @@ STC_INLINE void _c_MEMB(_drop)(const i_type* cself) {
 STC_INLINE intptr_t _c_MEMB(_size)(const i_type* q)
     { return q->_len; }
 
-STC_INLINE bool _c_MEMB(_empty)(const i_type* q)
+STC_INLINE bool _c_MEMB(_is_empty)(const i_type* q)
     { return !q->_len; }
 
 STC_INLINE intptr_t _c_MEMB(_capacity)(const i_type* q)
@@ -96,7 +96,7 @@ STC_INLINE const _m_value* _c_MEMB(_top)(const i_type* self)
     { return &self->data[0]; }
 
 STC_INLINE void _c_MEMB(_pop)(i_type* self)
-    { c_assert(!_c_MEMB(_empty)(self)); _c_MEMB(_erase_at)(self, 0); }
+    { c_assert(!_c_MEMB(_is_empty)(self)); _c_MEMB(_erase_at)(self, 0); }
 
 STC_INLINE _m_value _c_MEMB(_pull)(i_type* self)
     { _m_value v = self->data[0]; _c_MEMB(_erase_at)(self, 0); return v; }

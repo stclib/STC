@@ -43,7 +43,7 @@ STC_INLINE void     czview_clear(czview* self) { *self = c_zv(""); }
 STC_INLINE csview   czview_sv(czview rs) { return c_sv_2(rs.str, rs.size); }
 
 STC_INLINE intptr_t czview_size(czview rs) { return rs.size; }
-STC_INLINE bool     czview_empty(czview rs) { return rs.size == 0; }
+STC_INLINE bool     czview_is_empty(czview rs) { return rs.size == 0; }
 
 STC_INLINE bool czview_equals(czview rs, const char* str) {
     intptr_t n = c_strlen(str);

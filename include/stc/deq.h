@@ -59,13 +59,13 @@ _c_MEMB(_push_back)(i_type* self, _m_value val)
 
 STC_INLINE void
 _c_MEMB(_pop_back)(i_type* self) {
-    c_assert(!_c_MEMB(_empty)(self));
+    c_assert(!_c_MEMB(_is_empty)(self));
     self->end = (self->end - 1) & self->capmask;
     i_keydrop((self->cbuf + self->end));
 }
 
 STC_INLINE _m_value _c_MEMB(_pull_back)(i_type* self) { // move back out of deq
-    c_assert(!_c_MEMB(_empty)(self));
+    c_assert(!_c_MEMB(_is_empty)(self));
     self->end = (self->end - 1) & self->capmask;
     return self->cbuf[self->end];
 }

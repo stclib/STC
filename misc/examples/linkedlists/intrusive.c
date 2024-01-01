@@ -25,7 +25,7 @@ int main(void) {
     printList(list);
 
     puts("Remove nodes from list");
-    while (!List_empty(&list))
+    while (!List_is_empty(&list))
         free(List_unlink_after_node(&list, list.last));
 
     printList(list);

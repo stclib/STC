@@ -40,7 +40,7 @@ bool               deq_X_reserve(deq_X* self, intptr_t cap);
 void               deq_X_shrink_to_fit(deq_X* self);
 void               deq_X_drop(deq_X* self);                                      // destructor
 
-bool               deq_X_empty(const deq_X* self);
+bool               deq_X_is_empty(const deq_X* self);
 intptr_t           deq_X_size(const deq_X* self);
 intptr_t           deq_X_capacity(const deq_X* self);
 

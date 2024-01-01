@@ -19,7 +19,7 @@ void print_queue(const char* name, IPQue_ext q) {
     // priority queue's content without erasing the queue.
     IPQue_ext copy = {q.less, IPQue_clone(q.get)};
 
-    for (printf("%s: \t", name); !IPQue_empty(&copy.get); IPQue_pop(&copy.get))
+    for (printf("%s: \t", name); !IPQue_is_empty(&copy.get); IPQue_pop(&copy.get))
         printf("%d ", *IPQue_top(&copy.get));
     puts("");
 

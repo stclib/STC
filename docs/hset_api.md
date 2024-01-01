@@ -39,7 +39,7 @@ bool                hset_X_reserve(hset_X* self, intptr_t size);
 void                hset_X_shrink_to_fit(hset_X* self);
 void                hset_X_drop(hset_X* self);                               // destructor
 
-bool                hset_X_empty(const hset_X* self);
+bool                hset_X_is_empty(const hset_X* self);
 intptr_t            hset_X_size(const hset_X* self);                         // num. of allocated buckets
 intptr_t            hset_X_capacity(const hset_X* self);                     // buckets * max_load_factor
 intptr_t            hset_X_bucket_count(const hset_X* self);

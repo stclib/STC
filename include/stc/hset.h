@@ -23,18 +23,18 @@
 
 // Unordered set - implemented as closed hashing with linear probing and no tombstones.
 /*
-#define i_type hset_i,int
+#define i_TYPE iset,int
 #include "stc/hset.h"
 #include <stdio.h>
 
 int main(void) {
-    hset_i s = {0};
-    hset_i_insert(&s, 5);
-    hset_i_insert(&s, 8);
+    iset set = {0};
+    iset_insert(&set, 5);
+    iset_insert(&set, 8);
 
-    c_foreach (i, hset_i, s)
+    c_foreach (i, iset, set)
         printf("set %d\n", *i.ref);
-    hset_i_drop(&s);
+    iset_drop(&set);
 }
 */
 

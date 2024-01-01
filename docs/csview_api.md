@@ -37,7 +37,7 @@ csview         csview_from(const char* str);                        // from cons
 csview         csview_from_n(const char* str, intptr_t n);          // alias for c_sv(str, n)
 
 intptr_t       csview_size(csview sv);
-bool           csview_empty(csview sv);
+bool           csview_is_empty(csview sv);
 void           csview_clear(csview* self);
 
 bool           csview_equals(csview sv, const char* str);

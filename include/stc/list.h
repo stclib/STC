@@ -143,12 +143,12 @@ STC_INLINE void         _c_MEMB(_put_n)(i_type* self, const _m_raw* raw, intptr_
 STC_INLINE i_type       _c_MEMB(_from_n)(const _m_raw* raw, intptr_t n)
                             { i_type cx = {0}; _c_MEMB(_put_n)(&cx, raw, n); return cx; }
 STC_INLINE bool         _c_MEMB(_reserve)(i_type* self, intptr_t n) { (void)(self + n); return true; }
-STC_INLINE bool         _c_MEMB(_empty)(const i_type* self) { return self->last == NULL; }
+STC_INLINE bool         _c_MEMB(_is_empty)(const i_type* self) { return self->last == NULL; }
 STC_INLINE void         _c_MEMB(_clear)(i_type* self) { _c_MEMB(_drop)(self); }
 STC_INLINE _m_value*    _c_MEMB(_push)(i_type* self, _m_value value)
                             { return _c_MEMB(_push_back)(self, value); }
 STC_INLINE void         _c_MEMB(_pop_front)(i_type* self)
-                            { c_assert(!_c_MEMB(_empty)(self)); _c_MEMB(_erase_after_node)(self, self->last); }
+                            { c_assert(!_c_MEMB(_is_empty)(self)); _c_MEMB(_erase_after_node)(self, self->last); }
 STC_INLINE _m_value*    _c_MEMB(_front)(const i_type* self) { return &self->last->next->value; }
 STC_INLINE _m_value*    _c_MEMB(_back)(const i_type* self) { return &self->last->value; }
 STC_INLINE _m_raw       _c_MEMB(_value_toraw)(const _m_value* pval) { return i_keyto(pval); }

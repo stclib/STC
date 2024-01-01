@@ -113,7 +113,7 @@ STC_API _m_iter         _c_MEMB(_begin)(const i_type* self);
 STC_API void            _c_MEMB(_next)(_m_iter* it);
 
 STC_INLINE i_type       _c_MEMB(_init)(void) { i_type tree = {0}; return tree; }
-STC_INLINE bool         _c_MEMB(_empty)(const i_type* cx) { return cx->size == 0; }
+STC_INLINE bool         _c_MEMB(_is_empty)(const i_type* cx) { return cx->size == 0; }
 STC_INLINE intptr_t     _c_MEMB(_size)(const i_type* cx) { return cx->size; }
 STC_INLINE intptr_t     _c_MEMB(_capacity)(const i_type* cx) { return cx->cap; }
 STC_INLINE _m_iter      _c_MEMB(_find)(const i_type* self, _m_keyraw rkey)

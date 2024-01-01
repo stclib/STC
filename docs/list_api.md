@@ -49,7 +49,7 @@ void                list_X_clear(list_X* self);
 void                list_X_copy(list_X* self, const list_X* other);
 void                list_X_drop(list_X* self);                                        // destructor
 
-bool                list_X_empty(const list_X* list);
+bool                list_X_is_empty(const list_X* list);
 intptr_t            list_X_count(const list_X* list);                                 // size() in O(n) time
 
 list_X_value*       list_X_back(const list_X* self);

@@ -11,7 +11,7 @@ int main(void)
 {
     PointQ pque = c_init(PointQ, {{23, 80}, {12, 32}, {54, 74}, {12, 62}});
     // print
-    for (; !PointQ_empty(&pque); PointQ_pop(&pque))
+    for (; !PointQ_is_empty(&pque); PointQ_pop(&pque))
     {
         const Point *v = PointQ_top(&pque);
         printf(" (%d,%d)", v->x, v->y);

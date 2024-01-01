@@ -2,27 +2,27 @@
 #include <stdio.h>
 #include "stc/coroutine.h"
 
-#define i_type cco_tasks
+#define i_type Tasks
 #define i_key cco_task*
 #define i_keydrop(x) { puts("free task"); free(*x); }
 #define i_no_clone
 #include "stc/queue.h"
 
 typedef struct {
-    cco_tasks tasks;
+    Tasks tasks;
 } cco_scheduler;
 
 void cco_scheduler_drop(cco_scheduler* sched) {
-    cco_tasks_drop(&sched->tasks);
+    Tasks_drop(&sched->tasks);
 }
 
 int cco_scheduler_run(cco_scheduler* sched) {
-    while (!cco_tasks_empty(&sched->tasks)) {
-        cco_task* task = cco_tasks_pull(&sched->tasks);
+    while (!Tasks_is_empty(&sched->tasks)) {
+        cco_task* task = Tasks_pull(&sched->tasks);
         if (cco_resume_task(task, NULL))
-            cco_tasks_push(&sched->tasks, task);
+            Tasks_push(&sched->tasks, task);
         else
-            cco_tasks_value_drop(&task);
+            Tasks_value_drop(&task);
     }
     return 0;
 }
@@ -54,7 +54,7 @@ static int taskB(cco_task* task, cco_runtime* rt) {
 }
 
 void Use(void) {
-    cco_scheduler sched = {.tasks = c_init(cco_tasks, {
+    cco_scheduler sched = {.tasks = c_init(Tasks, {
         c_new(cco_task, {.cco_func=taskA}),
         c_new(cco_task, {.cco_func=taskB}),
     })};

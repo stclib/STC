@@ -103,7 +103,7 @@ STC_API intptr_t        _c_MEMB(_capacity)(const i_type* map);
 
 STC_INLINE i_type       _c_MEMB(_init)(void) { i_type map = {0}; return map; }
 STC_INLINE void         _c_MEMB(_shrink_to_fit)(i_type* self) { _c_MEMB(_reserve)(self, (intptr_t)self->size); }
-STC_INLINE bool         _c_MEMB(_empty)(const i_type* map) { return !map->size; }
+STC_INLINE bool         _c_MEMB(_is_empty)(const i_type* map) { return !map->size; }
 STC_INLINE intptr_t     _c_MEMB(_size)(const i_type* map) { return (intptr_t)map->size; }
 STC_INLINE intptr_t     _c_MEMB(_bucket_count)(i_type* map) { return map->bucket_count; }
 STC_INLINE bool         _c_MEMB(_contains)(const i_type* self, _m_keyraw rkey)

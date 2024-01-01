@@ -133,7 +133,7 @@ STC_INLINE void         _c_MEMB(_copy)(i_type* self, const i_type* other) {
 
 STC_INLINE intptr_t     _c_MEMB(_size)(const i_type* self) { return self->_len; }
 STC_INLINE intptr_t     _c_MEMB(_capacity)(const i_type* self) { return self->_cap; }
-STC_INLINE bool         _c_MEMB(_empty)(const i_type* self) { return !self->_len; }
+STC_INLINE bool         _c_MEMB(_is_empty)(const i_type* self) { return !self->_len; }
 STC_INLINE _m_raw       _c_MEMB(_value_toraw)(const _m_value* val) { return i_keyto(val); }
 STC_INLINE _m_value*    _c_MEMB(_front)(const i_type* self) { return self->data; }
 STC_INLINE _m_value*    _c_MEMB(_back)(const i_type* self)

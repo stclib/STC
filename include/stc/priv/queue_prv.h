@@ -56,7 +56,7 @@ STC_API bool            _c_MEMB(_eq)(const i_type* self, const i_type* other);
 
 #if !defined i_no_clone
 STC_API i_type          _c_MEMB(_clone)(i_type cx);
-STC_INLINE _m_value        _c_MEMB(_value_clone)(_m_value val)
+STC_INLINE _m_value     _c_MEMB(_value_clone)(_m_value val)
                             { return i_keyclone(val); }
 STC_INLINE void         _c_MEMB(_copy)(i_type* self, const i_type* other) {
                             if (self->cbuf == other->cbuf) return;
@@ -68,7 +68,7 @@ STC_INLINE intptr_t     _c_MEMB(_size)(const i_type* self)
                             { return _cbuf_toidx(self, self->end); }
 STC_INLINE intptr_t     _c_MEMB(_capacity)(const i_type* self)
                             { return self->capmask; }
-STC_INLINE bool         _c_MEMB(_empty)(const i_type* self)
+STC_INLINE bool         _c_MEMB(_is_empty)(const i_type* self)
                             { return self->start == self->end; }
 STC_INLINE _m_raw       _c_MEMB(_value_toraw)(const _m_value* pval)
                             { return i_keyto(pval); }
@@ -80,13 +80,13 @@ STC_INLINE _m_value*    _c_MEMB(_back)(const i_type* self)
                             { return self->cbuf + ((self->end - 1) & self->capmask); }
 
 STC_INLINE void _c_MEMB(_pop)(i_type* self) { // pop_front
-    c_assert(!_c_MEMB(_empty)(self));
+    c_assert(!_c_MEMB(_is_empty)(self));
     i_keydrop((self->cbuf + self->start));
     self->start = (self->start + 1) & self->capmask;
 }
 
 STC_INLINE _m_value _c_MEMB(_pull)(i_type* self) { // move front out of queue
-    c_assert(!_c_MEMB(_empty)(self));
+    c_assert(!_c_MEMB(_is_empty)(self));
     intptr_t s = self->start;
     self->start = (s + 1) & self->capmask;
     return self->cbuf[s];
@@ -94,14 +94,14 @@ STC_INLINE _m_value _c_MEMB(_pull)(i_type* self) { // move front out of queue
 
 STC_INLINE _m_iter _c_MEMB(_begin)(const i_type* self) {
     return c_LITERAL(_m_iter){
-        .ref=_c_MEMB(_empty)(self) ? NULL : self->cbuf + self->start,
+        .ref=_c_MEMB(_is_empty)(self) ? NULL : self->cbuf + self->start,
         .pos=self->start, ._s=self};
 }
 
 STC_INLINE _m_iter _c_MEMB(_rbegin)(const i_type* self) {
     intptr_t pos = (self->end - 1) & self->capmask;
     return c_LITERAL(_m_iter){
-        .ref=_c_MEMB(_empty)(self) ? NULL : self->cbuf + pos,
+        .ref=_c_MEMB(_is_empty)(self) ? NULL : self->cbuf + pos,
         .pos=pos, ._s=self};
 }
 

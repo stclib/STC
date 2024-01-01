@@ -48,7 +48,7 @@ cstr_buf    cstr_buffer(cstr* self);                                // to mutabl
 intptr_t    cstr_size(const cstr* self);
 intptr_t    cstr_capacity(const cstr* self);
 intptr_t    cstr_topos(const cstr* self, cstr_iter it);             // get byte position at iter.
-bool        cstr_empty(const cstr* self);
+bool        cstr_is_empty(const cstr* self);
 
 void        cstr_clear(cstr* self);
 char*       cstr_reserve(cstr* self, intptr_t capacity);            // return pointer to buffer

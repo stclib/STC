@@ -51,7 +51,7 @@ void                 smap_X_clear(smap_X* self);
 void                 smap_X_copy(smap_X* self, const smap_X* other);
 void                 smap_X_drop(smap_X* self);                                               // destructor
 
-bool                 smap_X_empty(const smap_X* self);
+bool                 smap_X_is_empty(const smap_X* self);
 intptr_t             smap_X_size(const smap_X* self);
 intptr_t             smap_X_capacity(const smap_X* self);
 

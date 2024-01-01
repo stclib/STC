@@ -26,7 +26,7 @@ czview          czview_from_pos(czview zv, intptr_t pos);       // subview start
 czview          czview_last(czview zv, intptr_t count);         // subview of the last count bytes
 
 intptr_t        czview_size(czview zv);
-bool            czview_empty(czview zv);                        // check if size == 0
+bool            czview_is_empty(czview zv);                        // check if size == 0
 void            czview_clear(czview* self);
 
 csview          czview_sv(czview zv);                           // convert to csview type

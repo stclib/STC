@@ -38,7 +38,7 @@ void                queue_X_drop(queue_X* self);       // destructor
 
 intptr_t            queue_X_size(const queue_X* self);
 intptr_t            queue_X_capacity(const queue_X* self);
-bool                queue_X_empty(const queue_X* self);
+bool                queue_X_is_empty(const queue_X* self);
 
 queue_X_value*      queue_X_front(const queue_X* self);
 queue_X_value*      queue_X_back(const queue_X* self);

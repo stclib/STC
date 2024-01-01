@@ -88,7 +88,7 @@ astar(cstr* maze, int width)
         point goal = point_from(maze, "!", width);
         smap_pcost_insert(&costs, start, 0);
         pque_point_push(&front, start);
-        while (!pque_point_empty(&front))
+        while (!pque_point_is_empty(&front))
         {
             point current = *pque_point_top(&front);
             pque_point_pop(&front);

@@ -31,10 +31,8 @@
   #define i_static
   #if defined __GNUC__ || defined __clang__
     #define STC_API static __attribute__((unused))
-  #elif defined __TINYC__
-    #define STC_API static inline
   #else
-    #define STC_API static
+    #define STC_API static inline
   #endif
   #define STC_DEF static
 #endif

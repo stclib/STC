@@ -145,7 +145,7 @@ Benchmark notes:
     - Cont_init()
     - Cont_reserve(&con, capacity)
     - Cont_drop(&con)
-    - Cont_empty(&con) // check if empty
+    - Cont_is_empty(&con)
     - Cont_size(&con)
     - Cont_clone(con)
     - Cont_push(&con, value)
@@ -756,7 +756,7 @@ Major changes:
 - NB! Changed self argument from value to const pointer on containers (does not apply to **cstr**):
     - `CNT_size(const CNT *self)`
     - `CNT_capacity(const CNT *self)`
-    - `CNT_empty(const CNT *self)`
+    - `CNT_is_empty(const CNT *self)`
 - Now both **stack** and **cbits** can be used with template `i_capacity` parameter: `#define i_capacity <NUM>`. They then use fixed sized arrays, and no heap allocated memory.
 - Renamed *cstr_rename_n()* => *cstr_rename_with_n()* as it could be confused with replacing n instances instead of n bytes.
 - Fixed bug in `smap.h`: begin() on empty map was not fully initialized.

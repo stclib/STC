@@ -39,7 +39,7 @@ void                pque_X_copy(pque_X* self, const pque_X* other);
 void                pque_X_drop(pque_X* self);        // destructor
 
 intptr_t            pque_X_size(const pque_X* self);
-bool                pque_X_empty(const pque_X* self);
+bool                pque_X_is_empty(const pque_X* self);
 const i_key*        pque_X_top(const pque_X* self);
 
 void                pque_X_make_heap(pque_X* self);  // heapify the vector.

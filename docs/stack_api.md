@@ -40,7 +40,7 @@ void                stack_X_drop(stack_X* self);                       // destru
 
 intptr_t            stack_X_size(const stack_X* self);
 intptr_t            stack_X_capacity(const stack_X* self);
-bool                stack_X_empty(const stack_X* self);
+bool                stack_X_is_empty(const stack_X* self);
 
 i_key*              stack_X_top(const stack_X* self);
 const i_key*        stack_X_at(const stack_X* self, intptr_t idx);

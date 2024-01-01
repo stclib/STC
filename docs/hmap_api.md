@@ -55,7 +55,7 @@ bool                  hmap_X_reserve(hmap_X* self, intptr_t size);
 void                  hmap_X_shrink_to_fit(hmap_X* self);
 void                  hmap_X_drop(hmap_X* self);                                        // destructor
 
-bool                  hmap_X_empty(const hmap_X* self );
+bool                  hmap_X_is_empty(const hmap_X* self );
 intptr_t              hmap_X_size(const hmap_X* self);
 intptr_t              hmap_X_capacity(const hmap_X* self);                              // buckets * max_load_factor
 intptr_t              hmap_X_bucket_count(const hmap_X* self);                          // num. of allocated buckets
