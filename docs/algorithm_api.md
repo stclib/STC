@@ -3,7 +3,7 @@
 "No raw loops" - Sean Parent
 ## Ranged for-loops
 
-### c_foreach, c_foreach_n, c_foreach_reverse, c_foreach_iter, c_forpair
+### c_foreach, c_foreach_reverse, c_foreach_n, c_forpair
 ```c
 #include "stc/common.h"
 ```
@@ -12,9 +12,9 @@
 |:-----------------------------------------|:------------------------------------------|
 | `c_foreach (it, ctype, container)`       | Iteratate all elements                    |
 | `c_foreach (it, ctype, it1, it2)`        | Iterate the range [it1, it2)              |
+| `c_foreach_reverse (it, ctype, container)`| Iteratate all elements in reverse. *vec, deq, queue, stack* only! |
+| `c_foreach_reverse (it, ctype, it1, it2)`| Iteratate range [it1, it2) elements in reverse. |
 | `c_foreach_n (it, ctype, cnt, n)`        | Iterate up to n times using it.index and it.n |
-| `c_foreach_reverse (it, ctype, container)`| Iteratate all elements in reverse: *vec, deq, queue, stack* only! |
-| `c_foreach_iter (existing_it, ctype, cnt)` | Iterate with an existing iterator       |
 | `c_forpair (key, val, ctype, container)` | Iterate with structured binding           |
 
 ```c
@@ -122,13 +122,20 @@ c_filter(crange, r2
 // 2 3 5 7 11 13 17 19 23 29 31
 ```
 
-### c_filter
+### c_filter, c_forfilter
 Functional programming with chained `&&` filtering. `value` is the pointer to current value.
-Enables similar functional programming subset as other popular languages.
+It enables a subset of functional programming like in other popular languages.
+
+- **Note 1**: The **_reverse** variants only works with *vec, deq, stack, queue* containers.
+- **Note 2**: There is also a `c_forfilter` loop variant of `c_filter`. It uses the filter namings
+`c_fflt_skip(it, numItems)`, etc. See [filter.h](../include/stc/algo/filter.h).
 
 | Usage                                | Description                       |
 |:-------------------------------------|:----------------------------------|
-| `c_filter(ctype, container, filters)` | Filter items in chain with &&    |
+| `c_filter(ctype, container, filters)` | Filter items in chain with the && operator |
+| `c_filter_reverse(ctype, cnt, filters)` | Filter items in reverse order  |
+| `c_filter_in(ctype, start, finish, filters)` | Filter over iterators [start, finish) |
+| `c_filter_reverse_in(ctype, start, finish, filters)` | Filter reverse [start, finish) |
 
 | Built-in filter              | Description                                |
 |:-----------------------------|:-------------------------------------------|
@@ -141,9 +148,6 @@ Enables similar functional programming subset as other popular languages.
 | `c_flt_map(expr)`            | Map expr to current value. Input unchanged |
 | `c_flt_src()`                | Pointer to current unmapped source value   |
 | `value`                      | Pointer variable to current (possible mapped) value |
-
-**NOTE**: There is also a `c_forfilter` iterator variant of `c_filter`. It uses the filter namings
-`c_fflt_skip(it, numItems)`, etc. See [filter.h](../include/stc/algo/filter.h).
 
 [ [Run this example](https://godbolt.org/z/7dP5a1s4s) ]
 ```c
@@ -195,15 +199,29 @@ Drop multiple containers of the same type:
 c_drop(hset_str, &myset, &myset2);
 ```
 
-### c_find_if, c_copy_if, c_erase_if, c_eraseremove_if
-Find, clone or erase linearily in containers using a predicate. `value` is a pointer to each element in predicate.
-- `c_find_if(CntType, cnt, outiter_ptr, pred)`, ***outiter_ptr*** must be defined prior to call.
+### c_find_if, c_find_in, c_find_reverse, c_find_reverse_in,
+Find linearily in containers using a predicate. `value` is a pointer to each element in predicate.
+***outiter_ptr*** must be defined prior to call.
+- `c_find_if(CntType, cnt, outiter_ptr, pred)`. 
+- `c_find_if(CntType, cnt, OutCnt, outiter_ptr, pred)`
+- `c_find_reverse_if(CntType, cnt, outiter_ptr, pred)`
+- `c_find_reverse_if(CntType, cnt, OutCnt, outiter_ptr, pred)`
+
+### c_copy, c_copy_reverse, c_copy_if, c_copy_reverse_if 
+Copy linearily in containers using a predicate. `value` is a pointer to each element in predicate.
 - `c_copy(CntType, cnt, outcnt_ptr)`
 - `c_copy(CntType, cnt, OutCnt, outcnt_ptr)`
+- `c_copy_reverse(CntType, cnt, outcnt_ptr)`
+- `c_copy_reverse(CntType, cnt, OutCnt, outcnt_ptr)`
 - `c_copy_if(CntType, cnt, outcnt_ptr, pred)`
 - `c_copy_if(CntType, cnt, OutCnt, outcnt_ptr, pred)`
-- Use `c_erase_if(CntType, cnt_ptr, pred)` with **list**, **hmap**, **hset**, **smap**, and **sset**.
-- Use `c_eraseremove_if(CntType, cnt_ptr, pred)` with **stack**, **vec**, **deq**, and **queue** only.
+- `c_copy_reverse_if(CntType, cnt, outcnt_ptr, pred)`
+- `c_copy_reverse_if(CntType, cnt, OutCnt, outcnt_ptr, pred)`
+
+### c_erase_if, c_eraseremove_if
+Erase linearily in containers using a predicate. `value` is a pointer to each element in predicate.
+- `c_erase_if(CntType, cnt_ptr, pred)`. Use with **list**, **hmap**, **hset**, **smap**, and **sset**.
+- `c_eraseremove_if(CntType, cnt_ptr, pred)`. Use with **stack**, **vec**, **deq**, and **queue** only.
 ```c
 #include <stdio.h>
 #define i_static

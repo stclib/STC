@@ -23,9 +23,9 @@
 #ifndef STC_UTILITY_H_INCLUDED
 #define STC_UTILITY_H_INCLUDED
 
-// ----------------------------------
-// c_auto init+drop containers (RAII)
-// ----------------------------------
+// -----------------------------------
+// c_auto: init+drop containers (RAII)
+// -----------------------------------
 
 #define c_auto(...) c_MACRO_OVERLOAD(c_auto, __VA_ARGS__)
 #define c_auto_2(C, a) \
@@ -38,16 +38,28 @@
             (C##_drop(&c), C##_drop(&b), C##_drop(&a)))
 
 // --------------------------------
-// c_find_if
+// c_find_if, c_find_reverse_if
 // --------------------------------
 
-#define c_find_if(C, cnt, outit_ptr, pred) \
-    c_find_from(C, C##_begin(&cnt), outit_ptr, pred)
+#define c_find_if(...) c_MACRO_OVERLOAD(c_find_if, __VA_ARGS__)
+#define c_find_if_4(C, cnt, outit_ptr, pred) \
+    _c_find(C, C##_begin(&cnt), NULL, _, outit_ptr, pred)
 
-#define c_find_from(C, start, outit_ptr, pred) do { \
+#define c_find_if_5(C, start, finish, outit_ptr, pred) \
+    _c_find(C, start, (finish).ref, _, outit_ptr, pred)
+
+#define c_find_reverse_if(...) c_MACRO_OVERLOAD(c_find_reverse_if, __VA_ARGS__)
+#define c_find_reverse_if_4(C, cnt, outit_ptr, pred) \
+    _c_find(C, C##_rbegin(&cnt), NULL, _r, outit_ptr, pred)
+
+#define c_find_reverse_if_5(C, rstart, rfinish, outit_ptr, pred) \
+    _c_find(C, rstart, (rfinish).ref, _r, outit_ptr, pred)
+
+// private
+#define _c_find(C, start, endref, rev, outit_ptr, pred) do { \
     C##_iter* _out = outit_ptr; \
-    const C##_value *value; \
-    for (*_out = start; (value = _out->ref); C##_next(_out)) \
+    const C##_value *value, *_endref = endref; \
+    for (*_out = start; (value = _out->ref) != _endref; C##rev##next(_out)) \
         if (pred) goto c_JOIN(findif_, __LINE__); \
     _out->ref = NULL; c_JOIN(findif_, __LINE__):; \
 } while (0)
@@ -85,48 +97,68 @@
     C##_adjust_end_(_cnt, -_n); \
 } while (0)
 
-// --------------------------------
-// c_copy, c_copy_if
-// --------------------------------
+// ------------------------------------
+// c_copy, c_copy_if, c_copy_reverse_if
+// ------------------------------------
 
 #define c_copy(...) c_MACRO_OVERLOAD(c_copy, __VA_ARGS__)
 #define c_copy_3(C, cnt, outcnt_ptr) \
-    c_copy_if_5(C, cnt, C, outcnt_ptr, true)
+    _c_copy_if(C, cnt, _, C, outcnt_ptr, true)
 
-#define c_copy_4(C, cnt, C_outp, outcnt_ptr) \
-    c_copy_if_5(C, cnt, C_outp, outcnt_ptr, true)
+#define c_copy_4(C, cnt, C_out, outcnt_ptr) \
+    _c_copy_if(C, cnt, _, C_out, outcnt_ptr, true)
+
+#define c_copy_reverse(...) c_MACRO_OVERLOAD(c_copy_reverse, __VA_ARGS__)
+#define c_copy_reverse_3(C, cnt, outcnt_ptr) \
+    _c_copy_if(C, cnt, _r, C, outcnt_ptr, true)
+
+#define c_copy_reverse_4(C, cnt, C_out, outcnt_ptr) \
+    _c_copy_if(C, cnt, _r, C_out, outcnt_ptr, true)
+
 
 #define c_copy_if(...) c_MACRO_OVERLOAD(c_copy_if, __VA_ARGS__)
 #define c_copy_if_4(C, cnt, outcnt_ptr, pred) \
-    c_copy_if_5(C, cnt, C, outcnt_ptr, pred)
+    _c_copy_if(C, cnt, _, C, outcnt_ptr, pred)
 
-#define c_copy_if_5(C, cnt, C_out, outcnt_ptr, pred) do { \
-    C _cnt = cnt; C_out *_out = outcnt_ptr; \
+#define c_copy_if_5(C, cnt, C_out, outcnt_ptr, pred) \
+    _c_copy_if(C, cnt, _, C_out, outcnt_ptr, pred)
+
+#define c_copy_reverse_if(...) c_MACRO_OVERLOAD(c_copy_reverse_if, __VA_ARGS__)
+#define c_copy_reverse_if_4(C, cnt, outcnt_ptr, pred) \
+    _c_copy_if(C, cnt, _r, C, outcnt_ptr, pred)
+
+#define c_copy_reverse_if_5(C, cnt, C_out, outcnt_ptr, pred) \
+    _c_copy_if(C, cnt, _r, C_out, outcnt_ptr, pred)
+
+// private
+#define _c_copy_if(C, cnt, rev, C_out, outcnt_ptr, pred) do { \
+    C _cnt = cnt; \
+    C_out *_out = outcnt_ptr; \
     const C##_value* value; \
-    for (C##_iter _it = C##_begin(&_cnt); (value = _it.ref); C##_next(&_it)) \
+    for (C##_iter _it = C##rev##begin(&_cnt); (value = _it.ref); C##rev##next(&_it)) \
         if (pred) C_out##_push(_out, C##_value_clone(*_it.ref)); \
 } while (0)
 
 // --------------------------------
-// c_all_of, c_any_of, c_none_of:
+// c_all_of, c_any_of, c_none_of
 // --------------------------------
 
-#define c_all_of(C, cnt, boolptr, pred) do { \
+#define c_all_of(C, cnt, outbool_ptr, pred) do { \
     C##_iter _it; \
-    c_find_if(C, cnt, &_it, !(pred)); \
-    *(boolptr) = _it.ref == NULL; \
+    c_find_if_4(C, cnt, &_it, !(pred)); \
+    *(outbool_ptr) = _it.ref == NULL; \
 } while (0)
 
-#define c_any_of(C, cnt, boolptr, pred) do { \
+#define c_any_of(C, cnt, outbool_ptr, pred) do { \
     C##_iter _it; \
-    c_find_if(C, cnt, &_it, pred); \
-    *(boolptr) = _it.ref != NULL; \
+    c_find_if_4(C, cnt, &_it, pred); \
+    *(outbool_ptr) = _it.ref != NULL; \
 } while (0)
 
-#define c_none_of(C, cnt, boolptr, pred) do { \
+#define c_none_of(C, cnt, outbool_ptr, pred) do { \
     C##_iter _it; \
-    c_find_if(C, cnt, &_it, pred); \
-    *(boolptr) = _it.ref == NULL; \
+    c_find_if_4(C, cnt, &_it, pred); \
+    *(outbool_ptr) = _it.ref == NULL; \
 } while (0)
 
 #endif // STC_UTILITY_H_INCLUDED

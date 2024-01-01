@@ -76,6 +76,12 @@ typedef enum {
 #define cco_take(n) (c_flt_take(n), _fl.done ? _it.cco_state = CCO_STATE_FINAL : 1)
 #define cco_takewhile(pred) (c_flt_takewhile(pred), _fl.done ? _it.cco_state = CCO_STATE_FINAL : 1)
 
+#define cco_foreach(existing_it, C, cnt) \
+    for (existing_it = C##_begin(&cnt); (existing_it).ref; C##_next(&existing_it))
+#define cco_foreach_reverse(existing_it, C, cnt) \
+    for (existing_it = C##_rbegin(&cnt); (existing_it).ref; C##_rnext(&existing_it))
+
+
 #define cco_routine(co) \
     for (int* _state = &(co)->cco_state; *_state != CCO_STATE_DONE; *_state = CCO_STATE_DONE) \
         _resume: switch (*_state) case 0: // thanks, @liigo!
