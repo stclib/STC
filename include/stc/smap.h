@@ -127,7 +127,7 @@ STC_INLINE _m_value*    _c_MEMB(_get_mut)(i_type* self, _m_keyraw rkey)
 
 STC_INLINE i_type
 _c_MEMB(_with_capacity)(const intptr_t cap) {
-    i_type tree = _c_MEMB(_init)();
+    i_type tree = {0};
     _c_MEMB(_reserve)(&tree, cap);
     return tree;
 }

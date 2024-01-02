@@ -42,8 +42,8 @@ Containers
 - [***smap*** - sorted binary tree map](docs/smap_api.md)
 - [***sset*** - sorted binary tree set](docs/sset_api.md)
 - [***cstr*** - string type (short string optimized)](docs/cstr_api.md)
-- [***csview*** - string view (non-null terminated)](docs/csview_api.md)
-- [***czview*** - null-terminated string view](docs/czview_api.md)
+- [***csview*** - string view (non-zero terminated)](docs/csview_api.md)
+- [***czview*** - zero-terminated string view](docs/czview_api.md)
 - [***cspan*** - single and multidimensional span](docs/cspan_api.md)
 
 Algorithms

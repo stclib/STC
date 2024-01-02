@@ -57,7 +57,7 @@ typedef union {
 #define c_sv_2(str, n) (c_LITERAL(csview){str, n})
 #define c_SV(sv) (int)(sv).size, (sv).buf // printf("%.*s\n", c_SV(sv));
 
-// czview : null-terminated string view
+// czview : zero-terminated string view
 typedef csview_value czview_value;
 typedef struct czview {
     czview_value* str;
@@ -71,7 +71,7 @@ typedef union {
 
 #define c_zv(literal) (c_LITERAL(czview){literal, c_litstrlen(literal)})
 
-// cstr : null-terminated owning string (short string optimized - sso)
+// cstr : zero-terminated owning string (short string optimized - sso)
 typedef char cstr_value;
 typedef struct { cstr_value* data; intptr_t size, cap; } cstr_buf;
 typedef union cstr {

@@ -79,7 +79,6 @@ int main(void) {
    _c_DEFTYPES(_c_vec_types, i_type, i_key);
 #endif
 typedef i_keyraw _m_raw;
-STC_API i_type          _c_MEMB(_init)(void);
 STC_API void            _c_MEMB(_drop)(const i_type* cself);
 STC_API void            _c_MEMB(_clear)(i_type* self);
 STC_API bool            _c_MEMB(_reserve)(i_type* self, intptr_t cap);
@@ -89,16 +88,18 @@ STC_API _m_iter         _c_MEMB(_insert_uninit)(i_type* self, intptr_t idx, intp
 #if defined _i_has_eq
 STC_API _m_iter         _c_MEMB(_find_in)(_m_iter it1, _m_iter it2, _m_raw raw);
 #endif
+STC_INLINE i_type       _c_MEMB(_init)(void) { return c_LITERAL(i_type){0}; }
 STC_INLINE void         _c_MEMB(_value_drop)(_m_value* val) { i_keydrop(val); }
 
-STC_INLINE _m_value*    _c_MEMB(_push)(i_type* self, _m_value value) {
-                            if (self->_len == self->_cap)
-                            if (!_c_MEMB(_reserve)(self, self->_len*2 + 4))
-                                return NULL;
-                            _m_value *v = self->data + self->_len++;
-                            *v = value;
-                            return v;
-                        }
+STC_INLINE _m_value*
+_c_MEMB(_push)(i_type* self, _m_value value) {
+    if (self->_len == self->_cap)
+        if (!_c_MEMB(_reserve)(self, self->_len*2 + 4))
+            return NULL;
+    _m_value *v = self->data + self->_len++;
+    *v = value;
+    return v;
+}
 
 #if !defined i_no_emplace
 STC_API _m_iter
@@ -148,14 +149,14 @@ STC_INLINE void         _c_MEMB(_pop_back)(i_type* self) { _c_MEMB(_pop)(self); 
 
 STC_INLINE i_type
 _c_MEMB(_with_size)(const intptr_t size, _m_value null) {
-    i_type cx = _c_MEMB(_init)();
+    i_type cx = {0};
     _c_MEMB(_resize)(&cx, size, null);
     return cx;
 }
 
 STC_INLINE i_type
 _c_MEMB(_with_capacity)(const intptr_t cap) {
-    i_type cx = _c_MEMB(_init)();
+    i_type cx = {0};
     _c_MEMB(_reserve)(&cx, cap);
     return cx;
 }
@@ -277,11 +278,6 @@ _c_MEMB(_bsearch)(const i_type* self, _m_value key) {
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined(i_implement) || defined(i_static)
 
-STC_DEF i_type
-_c_MEMB(_init)(void) {
-    return c_LITERAL(i_type){NULL};
-}
-
 STC_DEF void
 _c_MEMB(_clear)(i_type* self) {
     if (self->_cap) {
@@ -352,7 +348,7 @@ _c_MEMB(_erase_n)(i_type* self, const intptr_t idx, const intptr_t len) {
 #if !defined i_no_clone
 STC_DEF i_type
 _c_MEMB(_clone)(i_type cx) {
-    i_type out = _c_MEMB(_init)();
+    i_type out = {0};
     _c_MEMB(_copy_n)(&out, 0, cx.data, cx._len);
     return out;
 }

@@ -97,27 +97,31 @@ A number sequence generator type, similar to [boost::irange](https://www.boost.o
 crange      crange_make(stop);              // will generate 0, 1, ..., stop-1
 crange      crange_make(start, stop);       // will generate start, start+1, ... stop-1
 crange      crange_make(start, stop, step); // will generate start, start+step, ... upto-not-including stop
-                                            // note that step may be negative.
+                                            // step may be negative.
 crange_iter crange_begin(crange* self);
 crange_iter crange_end(crange* self);
 void        crange_next(crange_iter* it);
+
+crange&     c_iota(start);                  // returns an l-value; will generate start, start+1, ...
+crange&     c_iota(start, stop);            // l-value, otherwise like crange_make(start, stop)
+crange&     c_iota(start, stop, step);      // l-value, otherwise like crange_make(start, stop, step)
 ```
-```
+```c
 // 1. All primes less than 32: See below for c_filter() and is_prime()
 crange r1 = crange_make(3, 32, 2);
 printf("2"); // first prime
 c_filter(crange, r1
      , is_prime(*value)
-    && printf(" %lld", *value)
+    && printf(" %zi", *value)
 );
 // 2 3 5 7 11 13 17 19 23 29 31
 
 // 2. The first 11 primes:
+// c_iota() can be used as argument to c_filter.
 printf("2");
-crange r2 = crange_make(3, INTPTR_MAX, 2);
-c_filter(crange, r2
+c_filter(crange, c_iota(3)
      , is_prime(*value)
-    && (printf(" %lld", *value), c_flt_take(10))
+    && (printf(" %zi", *value), c_flt_take(10))
 );
 // 2 3 5 7 11 13 17 19 23 29 31
 ```
@@ -202,12 +206,12 @@ c_drop(hset_str, &myset, &myset2);
 ### c_find_if, c_find_in, c_find_reverse, c_find_reverse_in,
 Find linearily in containers using a predicate. `value` is a pointer to each element in predicate.
 ***outiter_ptr*** must be defined prior to call.
-- `c_find_if(CntType, cnt, outiter_ptr, pred)`. 
+- `c_find_if(CntType, cnt, outiter_ptr, pred)`.
 - `c_find_if(CntType, cnt, OutCnt, outiter_ptr, pred)`
 - `c_find_reverse_if(CntType, cnt, outiter_ptr, pred)`
 - `c_find_reverse_if(CntType, cnt, OutCnt, outiter_ptr, pred)`
 
-### c_copy, c_copy_reverse, c_copy_if, c_copy_reverse_if 
+### c_copy, c_copy_reverse, c_copy_if, c_copy_reverse_if
 Copy linearily in containers using a predicate. `value` is a pointer to each element in predicate.
 - `c_copy(CntType, cnt, outcnt_ptr)`
 - `c_copy(CntType, cnt, OutCnt, outcnt_ptr)`

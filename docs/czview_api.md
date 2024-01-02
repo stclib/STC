@@ -1,12 +1,13 @@
-# STC [czview](../include/stc/czview.h): Null-terminated UTF8 String View
+# STC [czview](../include/stc/czview.h): Zero-terminated UTF8 String View
 ![String](pics/string.jpg)
 
-The type **czview** is a ***null-terminated*** string view and refers to a constant contiguous sequence of
-char-elements with the first element of the sequence at position zero. The implementation holds two
-members: a pointer to constant char and a size. See [csview](csview_api.md) for a ***non null-terminated***
-string view/span type.
+The type **czview** is a ***zero-terminated*** and ***utf8-iterable*** string view. It refers to a
+constant contiguous sequence of char-elements with the first element of the sequence at position zero.
+The implementation holds two members: a pointer to constant char and a size. See [csview](csview_api.md)
+for a ***non zero-terminated*** string view/span type.
 
-Because **czview** is null-terminated, it can be an efficient replacent for `const char*`. It never
+Because **czview** is zero-terminated, it can be an efficient replacent for `const char*`. E.g., the .str
+char* pointer can safely be passed to c-api's which expects standard zero terminated c-strings. It never
 allocates memory, and therefore need not be destructed. Its lifetime is limited by the source string
 storage. It keeps the length of the string, i.e. no need to call *strlen()* for various operations.
 
@@ -20,13 +21,13 @@ All czview definitions and prototypes are available by including a single header
 ## Methods
 
 ```c
-czview          c_zv(const char literal_only[]);                // from literal str, no strlen()
+czview          c_zv(const char literal_only[]);                // create from string literal only
 czview          czview_from(const char* str);                   // construct from const char*
-czview          czview_from_pos(czview zv, intptr_t pos);       // subview starting from pos
+czview          czview_from_pos(czview zv, intptr_t pos);       // subview starting from pos to eos.
 czview          czview_last(czview zv, intptr_t count);         // subview of the last count bytes
 
 intptr_t        czview_size(czview zv);
-bool            czview_is_empty(czview zv);                        // check if size == 0
+bool            czview_is_empty(czview zv);                     // check if size == 0
 void            czview_clear(czview* self);
 
 csview          czview_sv(czview zv);                           // convert to csview type
@@ -57,7 +58,7 @@ bool            czview_eq(const czview* x, const czview* y);
 uint64_t        czview_hash(const czview* x);
 ```
 
-#### UTF8 methods
+#### UTF8 helper methods
 ```c
                 // from utf8.h
 intptr_t        utf8_size(const char *s);

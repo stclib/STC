@@ -105,10 +105,11 @@
 
 // x and y are i_keyraw* type, defaults to i_key*:
 #define c_memcmp_eq(x, y)       (memcmp(x, y, sizeof *(x)) == 0)
-#define c_default_cmp(x, y)     (c_default_less(y, x) - c_default_less(x, y))
-#define c_default_less(x, y)    (*(x) < *(y))
 #define c_default_eq(x, y)      (*(x) == *(y))
-#define c_default_hash          c_hash_pod
+#define c_default_less(x, y)    (*(x) < *(y))
+#define c_default_cmp(x, y)     (c_default_less(y, x) - c_default_less(x, y))
+#define c_default_hash(d)       c_hash(d)
+#define c_hash(d)               c_hash_n(d, sizeof *(d))
 
 #define c_default_clone(v)      (v)
 #define c_default_toraw(vp)     (*(vp))
@@ -146,8 +147,6 @@ STC_INLINE uint64_t c_hash_n(const void* key, intptr_t len) {
     while (len--) h = (h ^ *x++)*0x100000001b3;
     return h ^ c_ROTL(h, 26);
 }
-
-#define c_hash_pod(pod) c_hash_n(pod, sizeof *(pod))
 
 STC_INLINE uint64_t c_hash_str(const char *str)
     { return c_hash_n(str, c_strlen(str)); }

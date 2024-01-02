@@ -1,19 +1,23 @@
-# STC [csview](../include/stc/csview.h): Sub-string View
+# STC [csview](../include/stc/csview.h): Non-zero terminated String View
 ![String](pics/string.jpg)
 
-The type **csview** is a non-null terminated string view and can refer to a constant contiguous
-sequence of char-elements with the first element of the sequence at position zero. The implementation
-holds two members: a pointer to constant char and a size.
+The type **csview** is a ***non-zero terminated*** and ***utf8-iterable*** string view. It refers to a
+constant contiguous sequence of char-elements with the first element of the sequence at position zero.
+The implementation holds two members: a pointer to constant char and a size. See [czview](czview_api.md)
+for a ***zero-terminated*** string view/span type.
 
-Because **csview** is non-null terminated, it cannot be a replacent view for `const char*` -
-see [czview](czview_api.md) for that. **csview** never allocates memory, and therefore need not be
-destructed. Its lifetime is limited by the source string storage. It keeps the length of the string,
-and does not need to call *strlen()* to acquire the length.
+**csview** never allocates memory, and therefore need not be destructed. Its lifetime is limited by the
+source string storage. It keeps the length of the string, which redcues the need to call *strlen()* in
+usage.
 
 - **csview** iterators works on UTF8 codepoints - like **cstr** and **czview** (see Example 2).
-- Because it is null-terminated, it must be printed the following way:
+- Because it is not zero-terminated, it must be printed the following way:
 ```c
-printf("%.*s", c_SV(sstr));
+csview sv = c_sv("Hello world");
+sv = csview_substr(sv, 0, 5);
+printf("%.*s\n", sv.size, sv.buf);
+// or with the c_SV() macro:
+printf("%.*s\n", c_SV(sv));
 ```
 
 See the c++ class [std::basic_string_view](https://en.cppreference.com/w/cpp/string/basic_string_view)
@@ -31,8 +35,8 @@ All csview definitions and prototypes are available by including a single header
 ## Methods
 
 ```c
-csview         c_sv(const char literal_only[]);                     // from literal, no strlen()
-csview         c_sv(const char* str, intptr_t n);                   // from str and length n
+csview         c_sv(const char literal_only[]);                     // from string literal only
+csview         c_sv(const char* str, intptr_t n);                   // from a const char* and length n
 csview         csview_from(const char* str);                        // from const char* str
 csview         csview_from_n(const char* str, intptr_t n);          // alias for c_sv(str, n)
 
@@ -47,6 +51,7 @@ intptr_t       csview_find_sv(csview sv, csview find);
 bool           csview_contains(csview sv, const char* str);
 bool           csview_starts_with(csview sv, const char* str);
 bool           csview_ends_with(csview sv, const char* str);
+
 csview         csview_substr(csview sv, intptr_t pos, intptr_t n);
 csview         csview_slice(csview sv, intptr_t pos1, intptr_t pos2);
 csview         csview_last(csview sv, intptr_t len);                      // substr of the last len bytes
@@ -166,7 +171,7 @@ h,e,l,l,😀, ,w,ø,r,l,d,
 
 ### Example 3: csview tokenizer (string split)
 Splits strings into tokens. *print_split()* makes **no** memory allocations or *strlen()* calls,
-and does not depend on null-terminated strings. *string_split()* function returns a vector of cstr.
+and does not depend on zero-terminated strings. *string_split()* function returns a vector of cstr.
 ```c
 #include <stdio.h>
 #include "stc/csview.h"
