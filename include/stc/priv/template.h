@@ -169,6 +169,8 @@
   #endif
   #if !defined i_keyfrom && defined i_keyraw
     #define i_keyfrom c_JOIN(i_key, _from)
+  #elif !defined i_keyfrom
+    #define i_keyfrom c_JOIN(i_key, _clone)
   #endif
   #if !defined i_keyto && defined i_keyraw
     #define i_keyto c_JOIN(i_key, _toraw)
@@ -274,6 +276,8 @@
   #endif
   #if !defined i_valfrom && defined i_valraw
     #define i_valfrom c_JOIN(i_val, _from)
+  #elif !defined i_valfrom
+    #define i_valfrom c_JOIN(i_val, _clone)
   #endif
   #if !defined i_valto && defined i_valraw
     #define i_valto c_JOIN(i_val, _toraw)
