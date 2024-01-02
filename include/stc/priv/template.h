@@ -169,7 +169,7 @@
   #endif
   #if !defined i_keyfrom && defined i_keyraw
     #define i_keyfrom c_JOIN(i_key, _from)
-  #elif !defined i_keyfrom
+  #elif !defined i_keyfrom && !defined i_no_clone
     #define i_keyfrom c_JOIN(i_key, _clone)
   #endif
   #if !defined i_keyto && defined i_keyraw
@@ -276,7 +276,7 @@
   #endif
   #if !defined i_valfrom && defined i_valraw
     #define i_valfrom c_JOIN(i_val, _from)
-  #elif !defined i_valfrom
+  #elif !defined i_valfrom && !defined i_no_clone
     #define i_valfrom c_JOIN(i_val, _clone)
   #endif
   #if !defined i_valto && defined i_valraw
