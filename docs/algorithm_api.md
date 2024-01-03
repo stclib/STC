@@ -150,7 +150,7 @@ It enables a subset of functional programming like in other popular languages.
 | `c_flt_counter()`            | Increment count and return it              |
 | `c_flt_getcount()`           | Number of items passed skip/take/counter   |
 | `c_flt_map(expr)`            | Map expr to current value. Input unchanged |
-| `c_flt_src()`                | Pointer to current unmapped source value   |
+| `c_flt_source`               | Pointer variable to current unmapped source value   |
 | `value`                      | Pointer variable to current (possible mapped) value |
 
 [ [Run this example](https://godbolt.org/z/7dP5a1s4s) ]

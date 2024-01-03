@@ -55,7 +55,7 @@ int main(void)
 #define c_flt_counter() (++_fl.sn[++_fl.sn_top])
 #define c_flt_getcount() (_fl.sn[_fl.sn_top])
 #define c_flt_map(expr) (_mapped = (expr), value = &_mapped)
-#define c_flt_src() _it.ref
+#define c_flt_source _it.ref
 
 #define c_filter(C, cnt, ...) \
     _c_filter(C, C##_begin(&cnt), _, __VA_ARGS__)
