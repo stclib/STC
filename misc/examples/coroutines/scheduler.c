@@ -2,8 +2,7 @@
 #include <stdio.h>
 #include "stc/coroutine.h"
 
-#define i_type Tasks
-#define i_key cco_task*
+#define i_TYPE Tasks, cco_task*
 #define i_keydrop(x) { puts("free task"); free(*x); }
 #define i_no_clone
 #include "stc/queue.h"
@@ -31,11 +30,11 @@ static int taskA(cco_task* task, cco_runtime* rt) {
     (void)rt;
     cco_routine(task) {
         puts("Hello, from task A");
-        cco_yield();
+        cco_yield;
         puts("A is back doing work");
-        cco_yield();
+        cco_yield;
         puts("A is back doing more work");
-        cco_yield();
+        cco_yield;
         puts("A is back doing even more work");
     }
     return 0;
@@ -45,9 +44,9 @@ static int taskB(cco_task* task, cco_runtime* rt) {
     (void)rt;
     cco_routine(task) {
         puts("Hello, from task B");
-        cco_yield();
+        cco_yield;
         puts("B is back doing work");
-        cco_yield();
+        cco_yield;
         puts("B is back doing more work");
     }
     return 0;

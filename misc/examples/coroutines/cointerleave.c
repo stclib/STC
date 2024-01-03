@@ -31,11 +31,11 @@ cco_result interleaved(struct Generator* g)
         while (!(cco_done(&g->x) & cco_done(&g->y))) {
             g->value = get_value(&g->x);
             if (!cco_done(&g->x))
-                cco_yield();
+                cco_yield;
 
             g->value = get_value(&g->y);
             if (!cco_done(&g->y))
-                cco_yield();
+                cco_yield;
         }
     }
     return CCO_DONE;

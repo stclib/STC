@@ -23,7 +23,7 @@ int prime(struct prime* g) {
         if (g->result == 2) {
             if (g->count-- == 0) cco_return;
             ++g->idx;
-            cco_yield();
+            cco_yield;
         }
         g->result += !(g->result & 1);
         for (g->pos = g->result; g->count > 0; g->pos += 2) {
@@ -31,7 +31,7 @@ int prime(struct prime* g) {
                 --g->count;
                 ++g->idx;
                 g->result = g->pos;
-                cco_yield();
+                cco_yield;
             }
         }
         cco_final:
@@ -66,7 +66,7 @@ int fibonacci(struct fibonacci* g) {
                 g->result = g->b;
                 g->b = sum;
             }
-            cco_yield();
+            cco_yield;
         }
         cco_final:
         printf("final fib\n");

@@ -36,7 +36,7 @@ int iterpair(struct iterpair* I) {
     cco_routine(I) {
         for (I->x = 0; I->x < I->max_x; I->x++)
             for (I->y = 0; I->y < I->max_y; I->y++)
-                cco_yield();
+                cco_yield;
 
         cco_final: // required if there is cleanup code
         puts("final");
@@ -86,7 +86,7 @@ typedef enum {
     for (int* _state = &(co)->cco_state; *_state != CCO_STATE_DONE; *_state = CCO_STATE_DONE) \
         _resume: switch (*_state) case 0: // thanks, @liigo!
 
-#define cco_yield() cco_yield_v(CCO_YIELD)
+#define cco_yield cco_yield_v(CCO_YIELD)
 #define cco_yield_v(ret) \
     do { \
         *_state = __LINE__; return ret; goto _resume; \
@@ -135,7 +135,7 @@ typedef enum {
 #define cco_reset(co) \
     (void)((co)->cco_state = 0)
 
-#define cco_yield_final() cco_yield_final_v(CCO_YIELD)
+#define cco_yield_final cco_yield_final_v(CCO_YIELD)
 #define cco_yield_final_v(value) \
     do { \
         *_state = *_state >= 0 ? CCO_STATE_FINAL : CCO_STATE_DONE; \

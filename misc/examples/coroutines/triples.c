@@ -35,7 +35,7 @@ int triples_coro(struct triples* t) {
                     {
                         if (t->c > t->max_c)
                             cco_return;
-                        cco_yield();
+                        cco_yield;
                     }
                 }
             }

@@ -26,7 +26,7 @@ int file_read(struct file_read* co, cco_runtime* rt)
 
             if (!cstr_getline(&co->line, co->fp))
                 break;
-            cco_yield();
+            cco_yield;
         }
 
         cco_final:
@@ -54,7 +54,7 @@ int count_line(struct count_line* co, cco_runtime* rt)
             cco_await_task(&co->reader, rt, CCO_YIELD);
             if (rt->result == CCO_DONE) break;
             co->lineCount += 1;
-            cco_yield();
+            cco_yield;
         }
 
         cco_final:

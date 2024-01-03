@@ -73,7 +73,7 @@ int dining(struct Dining* d)
             for (int i = 0; i < num_philosophers; ++i) {
                 philosopher(&d->ph[i]);
             }
-            cco_yield(); // suspend, return control back to main
+            cco_yield; // suspend, return control back to main
         }
 
         cco_final:

@@ -126,7 +126,7 @@ c_filter(crange, c_iota(3)
 // 2 3 5 7 11 13 17 19 23 29 31
 ```
 
-### c_filter, c_forfilter
+### c_filter\*, c_forfilter\*
 Functional programming with chained `&&` filtering. `value` is the pointer to current value.
 It enables a subset of functional programming like in other popular languages.
 
@@ -137,9 +137,9 @@ It enables a subset of functional programming like in other popular languages.
 | Usage                                | Description                       |
 |:-------------------------------------|:----------------------------------|
 | `c_filter(ctype, container, filters)` | Filter items in chain with the && operator |
+| `c_filter_from(ctype, start, filters)` | Filter from start iterator |
 | `c_filter_reverse(ctype, cnt, filters)` | Filter items in reverse order  |
-| `c_filter_in(ctype, start, finish, filters)` | Filter over iterators [start, finish) |
-| `c_filter_reverse_in(ctype, start, finish, filters)` | Filter reverse [start, finish) |
+| `c_filter_reverse_from(ctype, rstart, filters)` | Filter reverse from rstart iterator |
 
 | Built-in filter              | Description                                |
 |:-----------------------------|:-------------------------------------------|
@@ -203,7 +203,7 @@ Drop multiple containers of the same type:
 c_drop(hset_str, &myset, &myset2);
 ```
 
-### c_find_if, c_find_in, c_find_reverse, c_find_reverse_in,
+### c_find_if, c_find_reverse_if
 Find linearily in containers using a predicate. `value` is a pointer to each element in predicate.
 ***outiter_ptr*** must be defined prior to call.
 - `c_find_if(CntType, cnt, outiter_ptr, pred)`.

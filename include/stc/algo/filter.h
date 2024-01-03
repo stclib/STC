@@ -57,27 +57,25 @@ int main(void)
 #define c_flt_map(expr) (_mapped = (expr), value = &_mapped)
 #define c_flt_src() _it.ref
 
-#define c_filter(...) c_MACRO_OVERLOAD(c_filter, __VA_ARGS__)
-#define c_filter_3(C, cnt, pred) \
-    _c_filter(C, C##_begin(&cnt), NULL, _, pred)
+#define c_filter(C, cnt, ...) \
+    _c_filter(C, C##_begin(&cnt), _, __VA_ARGS__)
 
-#define c_filter_4(C, start, finish, pred) \
-    _c_filter(C, start, (finish).ref, _, pred)
+#define c_filter_from(C, start, ...) \
+    _c_filter(C, start, _, __VA_ARGS__)
 
-#define c_filter_reverse(...) c_MACRO_OVERLOAD(c_filter_reverse, __VA_ARGS__)
-#define c_filter_reverse_3(C, cnt, pred) \
-    _c_filter(C, C##_rbegin(&cnt), NULL, _r, pred)
+#define c_filter_reverse(C, cnt, ...) \
+    _c_filter(C, C##_rbegin(&cnt), _r, __VA_ARGS__)
 
-#define c_filter_reverse_4(C, start, finish, pred) \
-    _c_filter(C, start, (finish).ref, _r, pred)
+#define c_filter_reverse_from(C, start, ...) \
+    _c_filter(C, start, _r, __VA_ARGS__)
 
-#define _c_filter(C, start, endref, rev, pred) do { \
+#define _c_filter(C, start, rev, ...) do { \
     struct _flt_base _fl = {0}; \
     C##_iter _it = start; \
-    C##_value *value = _it.ref, *_endref = endref, _mapped; \
-    for ((void)_mapped ; !_fl.done & (_it.ref != _endref) ; \
+    C##_value *value = _it.ref, _mapped; \
+    for ((void)_mapped ; !_fl.done & (_it.ref != NULL) ; \
          C##rev##next(&_it), value = _it.ref, _fl.sn_top=0, _fl.sb_top=0) \
-      (void)(pred); \
+      (void)(__VA_ARGS__); \
 } while (0)
 
 // ------- c_forfilter --------
@@ -105,20 +103,20 @@ int main(void)
 #define c_fflt_src(i) i._it.ref
 
 #define c_forfilter(i, C, cnt, ...) \
-    _c_forfilter(i, C, C##_begin(&cnt), NULL, _, __VA_ARGS__)
+    _c_forfilter(i, C, C##_begin(&cnt), _, __VA_ARGS__)
 
 #define c_forfilter_reverse(i, C, cnt,...) \
-    _c_forfilter(i, C, C##_rbegin(&cnt), NULL, _r, __VA_ARGS__)
+    _c_forfilter(i, C, C##_rbegin(&cnt), _r, __VA_ARGS__)
 
-#define c_forfilter_in(i, C, start, finish, ...) \
-    _c_forfilter(i, C, start, (finish).ref, _, __VA_ARGS__)
+#define c_forfilter_from(i, C, start, ...) \
+    _c_forfilter(i, C, start, _, __VA_ARGS__)
 
-#define c_forfilter_reverse_in(i, C, start, finish, ...) \
-    _c_forfilter(i, C, start, (finish).ref, _r, __VA_ARGS__)
+#define c_forfilter_reverse_from(i, C, start, ...) \
+    _c_forfilter(i, C, start, _r, __VA_ARGS__)
 
-#define _c_forfilter(i, C, start, endref, rev, ...) \
-    for (struct {C##_iter _it; C##_value *ref, *_endref, _mapped; struct _flt_base _fl;} \
-         i = {._it=start, .ref=i._it.ref, ._endref=endref} ; !i._fl.done & (i._it.ref != i._endref) ; \
+#define _c_forfilter(i, C, start, rev, ...) \
+    for (struct {C##_iter _it; C##_value *ref, _mapped; struct _flt_base _fl;} \
+         i = {._it=start, .ref=i._it.ref} ; !i._fl.done & (i._it.ref != NULL) ; \
          C##rev##next(&i._it), i.ref = i._it.ref, i._fl.sn_top=0, i._fl.sb_top=0) \
       if (!(__VA_ARGS__)) ; else
 

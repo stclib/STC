@@ -45,7 +45,6 @@ int main(void)
 #ifndef STC_CRANGE_H_INCLUDED
 #define STC_CRANGE_H_INCLUDED
 
-#include "../priv/linkage.h"
 #include "../common.h"
 
 typedef intptr_t crange_value;
@@ -64,14 +63,18 @@ typedef struct { crange_value *ref, end, step; } crange_iter;
 STC_INLINE crange crange_make_3(crange_value start, crange_value stop, crange_value step)
     { crange r = {start, stop - (step > 0), step}; return r; }
 
-STC_INLINE crange_iter crange_begin(crange* self)
-    { self->value = self->start; crange_iter it = {&self->value, self->end, self->step}; return it; }
+STC_INLINE crange_iter crange_begin(crange* self) {
+    self->value = self->start;
+    crange_iter it = {&self->value, self->end, self->step};
+    return it;
+}
 
 STC_INLINE crange_iter crange_end(crange* self)
     { (void)self; crange_iter it = {0}; return it; }
 
-STC_INLINE void crange_next(crange_iter* it)
-    { if ((it->step > 0) == ((*it->ref += it->step) > it->end)) it->ref = NULL; }
+STC_INLINE void crange_next(crange_iter* it) {
+    if ((it->step > 0) == ((*it->ref += it->step) > it->end))
+        it->ref = NULL;
+}
 
-#include "../priv/linkage2.h"
 #endif // STC_CRANGE_H_INCLUDE

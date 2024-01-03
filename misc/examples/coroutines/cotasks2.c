@@ -18,7 +18,7 @@ int next_value(struct next_value* co, cco_runtime* rt)
         while (true) {
             cco_await_timer(&co->tm, 1 + rand() % 2);
             co->val = rand();
-            cco_yield();
+            cco_yield;
         }
     }
     return 0;
@@ -51,7 +51,7 @@ int produce_items(struct produce_items* p, cco_runtime* rt)
             cstr_printf(&p->text, "item %d", p->next.val);
             print_time();
             printf("produced %s\n", cstr_str(&p->text));
-            cco_yield();
+            cco_yield;
         }
 
         cco_final:

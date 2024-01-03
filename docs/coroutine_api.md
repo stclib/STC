@@ -19,10 +19,10 @@ NB! ***cco_yield\*()*** / ***cco_await\*()*** may not be called from within a `s
 |           | `cco_final:`                         | Label for cleanup position in coroutine |
 | `bool`    | `cco_done(co)`                       | Is coroutine done?                      |
 |           | `cco_routine(co) {}`                 | The coroutine scope                     |
-|           | `cco_yield();`                       | Yield/suspend execution (return CCO_YIELD)|
+|           | `cco_yield;`                         | Yield/suspend execution (return CCO_YIELD)|
 |           | `cco_yield_v(ret);`                  | Yield/suspend execution (return ret)    |
-|           | `cco_yield_final();`                 | Yield final suspend, enter cleanup-state |
-|           | `cco_yield_final(ret);`              | Yield a final value                     |
+|           | `cco_yield_final;`                   | Yield final suspend, enter cleanup-state |
+|           | `cco_yield_final_v(ret);`            | Yield with a final value                 |
 |           | `cco_await(condition);`              | Suspend until condition is true (return CCO_AWAIT)|
 |           | `cco_await_call(cocall);`            | Await for subcoro to finish (returns its ret value) |
 |           | `cco_await_call(cocall, retbit);`    | Await for subcoro's return to be in (retbit \| CCO_DONE)  |
@@ -108,7 +108,7 @@ int triples(struct triples* i) {
                     {
                         if (i->c > i->max_c)
                             cco_return; // "jump" to cco_final if defined, else exit scope.
-                        cco_yield();
+                        cco_yield;
                     }
                 }
             }
@@ -164,7 +164,7 @@ int gcd1_triples(struct gcd1_triples* i)
             if (++i->count > i->max_n)
                 cco_return;
             else
-                cco_yield();
+                cco_yield;
         }
         cco_final:
         cco_stop(&i->tri); // to cleanup state if still active
@@ -220,7 +220,7 @@ int next_value(struct next_value* co, cco_runtime* rt)
         while (true) {
             cco_await_timer(&co->tm, 1 + rand() % 2); // suspend with CCO_AWAIT
             co->val = rand();
-            cco_yield();                              // suspend with CCO_YIELD
+            cco_yield;                                // suspend with CCO_YIELD
         }
     }
     return 0;
@@ -252,7 +252,7 @@ int produce_items(struct produce_items* p, cco_runtime* rt)
             cstr_printf(&p->text, "item %d", p->next.val);
             print_time();
             printf("produced %s\n", cstr_str(&p->text));
-            cco_yield();
+            cco_yield;
         }
         cco_final:
         cstr_drop(&p->text);
