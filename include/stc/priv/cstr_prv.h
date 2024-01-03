@@ -85,9 +85,9 @@ STC_INLINE cstr_buf cstr_buffer(cstr* s) {
     return cstr_is_long(s) ? c_LITERAL(cstr_buf){s->lon.data, cstr_l_size(s), cstr_l_cap(s)}
                            : c_LITERAL(cstr_buf){s->sml.data, cstr_s_size(s), cstr_s_cap};
 }
-STC_INLINE czview cstr_zv(const cstr* s) {
-    return cstr_is_long(s) ? c_LITERAL(czview){s->lon.data, cstr_l_size(s)}
-                           : c_LITERAL(czview){s->sml.data, cstr_s_size(s)};
+STC_INLINE zsview cstr_zv(const cstr* s) {
+    return cstr_is_long(s) ? c_LITERAL(zsview){s->lon.data, cstr_l_size(s)}
+                           : c_LITERAL(zsview){s->sml.data, cstr_s_size(s)};
 }
 STC_INLINE csview cstr_sv(const cstr* s) {
     return cstr_is_long(s) ? c_LITERAL(csview){s->lon.data, cstr_l_size(s)}
@@ -109,7 +109,7 @@ STC_INLINE cstr cstr_from(const char* str)
 STC_INLINE cstr cstr_from_sv(csview sv)
     { return cstr_from_n(sv.buf, sv.size); }
 
-STC_INLINE cstr cstr_from_zv(czview zv)
+STC_INLINE cstr cstr_from_zv(zsview zv)
     { return cstr_from_n(zv.str, zv.size); }
 
 STC_INLINE cstr cstr_with_size(const intptr_t size, const char value) {

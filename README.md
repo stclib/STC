@@ -3,10 +3,13 @@
 STC - Smart Template Containers
 ===============================
 
-### [Version 5.0 beta 4](#version-history)
+### [Version 5.0 beta 5](#version-history)
 - New shorthand template parameter `i_TYPE` lets you define `i_type`, `i_key`, and `i_val` all in one line.
-- [**c_filter(C, cnt, filters)**](docs/algorithm_api.md#c_filter) replaces *c_forfilter (it, C, cnt, filter)* loop: Changed to a more "pure" functional programming call.
-- Renamed templated STC headers (old header names deprecated). Default container names corresponds to new header names:
+- [**c_filter(C, cnt, filters)**](docs/algorithm_api.md#c_filter) added to `filter.h`: Enforces functional programming paradigm.
+- **Breaking changes**:
+- Renamed several function `stc_xxxxx()` to **c_xxxxx()** in `common.h` and `algo/*.h`.
+- Coroutine "keyword" `cco_yield();` changed to **cco_yield;**
+- Renamed templated STC headers (old header names deprecated). The new header names  corresponds to default container names:
   - **vec.h** (from `cvec.h`)
   - **deq.h** (from `cdeq.h`)
   - **list.h** (from `clist.h`)
@@ -17,8 +20,9 @@ STC - Smart Template Containers
   - **hset.h** (from `cset.h`)
   - **smap.h** (from `csmap.h`)
   - **sset.h** (from `csset.h`)
+  - **zsview.h** (from `czview.h`)
   - **types.h** (from `forward.h`)
-  - ***NOTE***: Deprecated headers will be removed from STC V5.0!
+- **Note**: Deprecated headers is removed as of STC V5.0 release.
 ---
 Description
 -----------
@@ -29,12 +33,12 @@ The library handles everything from trivial to highly complex data using *templa
 Containers
 ----------
 - [***arc*** - (atomic) reference counted smart pointer`](docs/arc_api.md)
-- [***box*** - unique smart pointer`](docs/box_api.md)
+- [***box*** - heap allocated element wrapped in a smart pointer`](docs/box_api.md)
 - [***cbits*** - dynamic bitset](docs/cbits_api.md)
 - [***list*** - forward linked list](docs/list_api.md)
 - [***stack*** - stack type](docs/stack_api.md)
 - [***vec*** - vector type](docs/vec_api.md)
-- [***deq*** - double ended queue - deque](docs/deq_api.md)
+- [***deq*** - double ended queue (deque)](docs/deq_api.md)
 - [***queue*** - queue type](docs/queue_api.md)
 - [***pque*** - priority queue](docs/pque_api.md)
 - [***hmap*** - hashmap (unordered)](docs/hmap_api.md)
@@ -43,7 +47,7 @@ Containers
 - [***sset*** - sorted binary tree set](docs/sset_api.md)
 - [***cstr*** - string type (short string optimized)](docs/cstr_api.md)
 - [***csview*** - string view (non-zero terminated)](docs/csview_api.md)
-- [***czview*** - zero-terminated string view](docs/czview_api.md)
+- [***zsview*** - zero-terminated string view](docs/zsview_api.md)
 - [***cspan*** - single and multidimensional span](docs/cspan_api.md)
 
 Algorithms
@@ -359,7 +363,7 @@ binary size. However, if container type instances, e.g. a `vec_int` is used used
 ```
 Note that the non-templated string types **cstr**, **csview** uses shared linking by default (may use static linking by
 `#define i_static` before include). Most functions in **csview** are inlined though, and the zero-terminated string view,
-**czview** is fully inlined.
+**zsview** is fully inlined.
 
 Conveniently, `src\libstc.c` implements all the non-templated functions with shared linking for **cstr**,
 **csview**, **cregex**, **utf8**, and **crand**.

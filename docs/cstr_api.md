@@ -28,7 +28,7 @@ cstr        cstr_init(void);                                        // construct
 cstr        cstr_lit(const char literal_only[]);                    // cstr from literal; no strlen() call.
 cstr        cstr_from(const char* str);                             // constructor using strlen()
 cstr        cstr_from_n(const char* str, intptr_t n);               // constructor with n first bytes of str
-cstr        cstr_from_zv(czview zv);                                // construct cstr from czview
+cstr        cstr_from_zv(zsview zv);                                // construct cstr from zsview
 cstr        cstr_from_sv(csview sv);                                // construct cstr from csview
 cstr        cstr_with_capacity(intptr_t cap);
 cstr        cstr_with_size(intptr_t len, char fill);                // repeat fill len times
@@ -41,7 +41,7 @@ void        cstr_drop(cstr* self);                                  // destructo
 
 const char* cstr_str(const cstr* self);                             // to const char*
 csview      cstr_sv(const cstr* self);                              // to csview
-czview      cstr_zv(const cstr* self);                              // to czview
+zsview      cstr_zv(const cstr* self);                              // to zsview
 char*       cstr_data(cstr* self);                                  // to mutable char*
 cstr_buf    cstr_buffer(cstr* self);                                // to mutable buffer (with capacity)
 

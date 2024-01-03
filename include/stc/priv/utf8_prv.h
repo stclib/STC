@@ -66,7 +66,7 @@ STC_INLINE intptr_t utf8_pos(const char* s, intptr_t index)
 // ------------------------------------------------------
 // The following requires linking with utf8 symbols.
 // To call them, either define i_import before including
-// one of cstr, csview, czview, or link with src/libstc.o.
+// one of cstr, csview, zsview, or link with src/libstc.o.
 
 enum {
     U8G_Cc, U8G_Lt, U8G_Nd, U8G_Nl,
