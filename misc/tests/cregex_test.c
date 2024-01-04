@@ -46,7 +46,7 @@ CTEST(cregex, compile_match_anchors)
 CTEST(cregex, compile_match_quantifiers1)
 {
     const char* inp;
-    c_with (cregex re = {0}, cregex_drop(&re)) {
+    c_scoped (cregex re = {0}, cregex_drop(&re)) {
         re = cregex_from("ä+");
         ASSERT_EQ(re.error, 0);
 
@@ -66,7 +66,7 @@ CTEST(cregex, compile_match_quantifiers1)
 CTEST(cregex, compile_match_quantifiers2)
 {
     const char* inp;
-    c_auto (cregex, re) {
+    c_scoped (cregex re = {0}, cregex_drop(&re)) {
         re = cregex_from("bä*");
         ASSERT_EQ(re.error, 0);
 
@@ -99,13 +99,13 @@ CTEST(cregex, compile_match_escaped_chars)
 
 CTEST(cregex, compile_match_class_simple)
 {
-    c_auto (cregex, re1, re2, re3)
+    cregex re1 = cregex_from("\\s");
+    cregex re2 = cregex_from("\\w");
+    cregex re3 = cregex_from("\\D");
+    c_defer (cregex_drop(&re1), cregex_drop(&re2), cregex_drop(&re3))
     {
-        re1 = cregex_from("\\s");
         ASSERT_EQ(re1.error, 0);
-        re2 = cregex_from("\\w");
         ASSERT_EQ(re2.error, 0);
-        re3 = cregex_from("\\D");
         ASSERT_EQ(re3.error, 0);
 
         csview match;
@@ -124,7 +124,8 @@ CTEST(cregex, compile_match_class_simple)
 
 CTEST(cregex, compile_match_or)
 {
-    c_auto (cregex, re, re2)
+    cregex re, re2;
+    c_defer (cregex_drop(&re), cregex_drop(&re2))
     {
         re = cregex_from("as|df");
         ASSERT_EQ(re.error, 0);
@@ -186,7 +187,7 @@ CTEST(cregex, compile_match_cap)
 CTEST(cregex, search_all)
 {
     const char* inp;
-    c_auto (cregex, re)
+    c_scoped (cregex re = {0}, cregex_drop(&re))
     {
         re = cregex_from("ab");
         csview m = {0};
@@ -207,7 +208,7 @@ CTEST(cregex, search_all)
 
 CTEST(cregex, captures_len)
 {
-    c_auto (cregex, re) {
+    c_scoped (cregex re = {0}, cregex_drop(&re)) {
        re = cregex_from("(ab(cd))(ef)");
        ASSERT_EQ(cregex_captures(&re), 3);
     }
@@ -216,7 +217,7 @@ CTEST(cregex, captures_len)
 CTEST(cregex, captures_cap)
 {
     const char* inp;
-    c_auto (cregex, re) {
+    c_scoped (cregex re = {0}, cregex_drop(&re)) {
         re = cregex_from("(ab)((cd)+)");
         ASSERT_EQ(cregex_captures(&re), 3);
 

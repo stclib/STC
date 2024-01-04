@@ -7,9 +7,10 @@ STC - Smart Template Containers
 - New shorthand template parameter `i_TYPE` lets you define `i_type`, `i_key`, and `i_val` all in one line.
 - [**c_filter(C, cnt, filters)**](docs/algorithm_api.md#c_filter) added to `filter.h`: Enforces functional programming paradigm.
 - **Breaking changes**:
-- Renamed several function `stc_xxxxx()` to **c_xxxxx()** in `common.h` and `algo/*.h`.
-- Coroutine "keyword" `cco_yield();` changed to **cco_yield;**
-- Renamed templated STC headers (old header names deprecated). The new header names  corresponds to default container names:
+- Changed coroutine "keyword" `cco_yield();` => **cco_yield;**
+- Renamed several function `stc_xxxxx()` => **c_xxxxx()** in `common.h` and `algo/*.h`.
+- Renamed all member functions `TYPE_empty()` => **TYPE_is_empty()**.
+- Renamed templated STC header files. The file names corresponds to the new default container names:
   - **vec.h** (from `cvec.h`)
   - **deq.h** (from `cdeq.h`)
   - **list.h** (from `clist.h`)
@@ -22,7 +23,7 @@ STC - Smart Template Containers
   - **sset.h** (from `csset.h`)
   - **zsview.h** (from `czview.h`)
   - **types.h** (from `forward.h`)
-- **Note**: Deprecated headers is removed as of STC V5.0 release.
+- **Note**: Old headers are removed as of the STC V5.0 release.
 ---
 Description
 -----------
@@ -224,36 +225,45 @@ If an element destructor `i_keydrop` is defined, `i_keyclone` function is requir
 
 Let's make a vector of vectors, which can be cloned. All of its element vectors will be destroyed when destroying the Vec2D.
 
-[ [Run this code](https://godbolt.org/z/WKEMMbnzK) ]
+[ [Run this code](https://godbolt.org/z/vnMeG6qj9) ]
 ```c
 #include <stdio.h>
+#include "stc/algorithm.h"
 
-#define i_TYPE Vec, float
+#define i_TYPE Vec,float
+#define i_use_cmp        // enable default ==, < and c_hash operations
 #include "stc/vec.h"
 
 #define i_type Vec2D
-#define i_key_class Vec  // Use i_key_class instead i_key when element type has "members" _clone(), _drop() and _cmp().
+#define i_key_class Vec  // Use i_key_class when key type has "members" _clone() and _drop().
+#define i_use_eq         // vec does not have _cmp(), but it has _eq()
 #include "stc/vec.h"
 
 int main(void)
 {
     Vec* v;
-    Vec2D vec = {0};                  // All containers in STC can be initialized with {0}.
-    v = Vec2D_push(&vec, Vec_init()); // push() returns a pointer to the new element in vec.
+    Vec2D vec_a = {0};                  // All containers in STC can be initialized with {0}.
+    v = Vec2D_push(&vec_a, Vec_init()); // push() returns a pointer to the new element in vec.
     Vec_push(v, 10.f);
     Vec_push(v, 20.f);
 
-    v = Vec2D_push(&vec, Vec_init());
+    v = Vec2D_push(&vec_a, Vec_init());
     Vec_push(v, 30.f);
     Vec_push(v, 40.f);
 
-    Vec2D clone = Vec2D_clone(vec);   // Make a deep-copy of vec
+    Vec2D vec_b = c_init(Vec2D, {
+        c_init(Vec, {10.f, 20.f}),
+        c_init(Vec, {30.f, 40.f}),
+    });
+    printf("vec_a == vec_b is %s.\n", Vec2D_eq(&vec_a, &vec_b) ? "true":"false");
+ 
+    Vec2D clone = Vec2D_clone(vec_a);   // Make a deep-copy of vec
 
-    c_foreach (i, Vec2D, clone)       // Loop through the cloned vector
+    c_foreach (i, Vec2D, clone)         // Loop through the cloned vector
         c_foreach (j, Vec, *i.ref)
             printf(" %g", *j.ref);
 
-    c_drop(Vec2D, &vec, &clone);      // Cleanup all (6) vectors.
+    c_drop(Vec2D, &vec_a, &vec_b, &clone);  // Free all 9 vectors.
 }
 ```
 This example uses four different container types:

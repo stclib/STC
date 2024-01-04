@@ -8,8 +8,8 @@
 vec_str read_file(const char* name)
 {
     vec_str vec = {0};
-    c_with (FILE* f = fopen(name, "r"), fclose(f))
-        c_with (cstr line = {0}, cstr_drop(&line))
+    c_scoped (FILE* f = fopen(name, "r"), f != NULL, fclose(f))
+        c_scoped (cstr line = {0}, cstr_drop(&line))
             while (cstr_getline(&line, f))
                 vec_str_push(&vec, cstr_clone(line));
     return vec;
@@ -18,7 +18,7 @@ vec_str read_file(const char* name)
 int main(void)
 {
     int n = 0;
-    c_with (vec_str vec = read_file(__FILE__), vec_str_drop(&vec))
+    c_scoped (vec_str vec = read_file(__FILE__), vec_str_drop(&vec))
         c_foreach (i, vec_str, vec)
             printf("%5d: %s\n", ++n, cstr_str(i.ref));
 
