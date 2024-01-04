@@ -39,10 +39,13 @@ STC_API _m_iter         _c_MEMB(_advance)(_m_iter it, intptr_t n);
 
 STC_INLINE i_type       _c_MEMB(_init)(void)
                             { i_type cx = {0}; return cx; }
+
 STC_INLINE void         _c_MEMB(_put_n)(i_type* self, const _m_raw* raw, intptr_t n)
-                            { while (n--) _c_MEMB(_push)(self, i_keyfrom(*raw++)); }
+                            { while (n--) _c_MEMB(_push)(self, i_keyfrom((*raw))), ++raw; }
+
 STC_INLINE i_type       _c_MEMB(_from_n)(const _m_raw* raw, intptr_t n)
                             { i_type cx = {0}; _c_MEMB(_put_n)(&cx, raw, n); return cx; }
+
 STC_INLINE void         _c_MEMB(_value_drop)(_m_value* val) { i_keydrop(val); }
 
 #if !defined i_no_emplace
@@ -58,6 +61,7 @@ STC_API bool            _c_MEMB(_eq)(const i_type* self, const i_type* other);
 STC_API i_type          _c_MEMB(_clone)(i_type cx);
 STC_INLINE _m_value     _c_MEMB(_value_clone)(_m_value val)
                             { return i_keyclone(val); }
+
 STC_INLINE void         _c_MEMB(_copy)(i_type* self, const i_type* other) {
                             if (self->cbuf == other->cbuf) return;
                             _c_MEMB(_drop)(self);
