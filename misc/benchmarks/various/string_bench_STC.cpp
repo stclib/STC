@@ -38,10 +38,10 @@
 vec_str read_file(const char* name)
 {
     vec_str data = {0};
-    c_with (cstr line = {0}, cstr_drop(&line))
-    c_with (FILE* f = fopen(name, "r"), fclose(f))
-        while (cstr_getline(&line, f))
-            vec_str_emplace_back(&data, cstr_str(&line));
+    c_scoped (cstr line = {0}, cstr_drop(&line))
+        c_scoped (FILE* f = fopen(name, "r"), f, fclose(f))
+            while (cstr_getline(&line, f))
+                vec_str_emplace_back(&data, cstr_str(&line));
     return data;
 }
 
@@ -186,12 +186,12 @@ const size_t MAX_LOOP = 2000;
 
 int main(void)
 {
-    c_auto (vec_str, vec_string)
-    c_auto (vec_sv, vec_stringview)
-    c_auto (smap_str, mapTrans)
-    c_auto (smap_ssv, mapSview)
-    c_auto (hmap_str, unordmapTrans)
-    c_auto (hmap_ssv, unordmapSview)
+    c_scoped (vec_str vec_string = {0}, vec_drop(&vec_string))
+    c_scoped (vec_sv vec_stringview = {0}, vec_drop(&vec_stringview))
+    c_scoped (smap_str mapTrans = {0}, smap_drop(&mapTrans))
+    c_scoped (smap_ssv mapSview = {0}, smap_drop(&mapSview))
+    c_scoped (hmap_str unordmapTrans = {0}, hmap_drop(&unordmapTrans))
+    c_scoped (hmap_ssv unordmapSview = {0}, hamp_drop(&unordmapSview))
     {
         std::cout << "Short String Benchmark" << std::endl;
         std::cout << "======================" << std::endl;

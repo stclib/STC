@@ -243,11 +243,12 @@ STC_INLINE intptr_t c_next_pow2(intptr_t n) {
 #define c_defer(...) \
     for (int _i = 1; _i; _i = 0, __VA_ARGS__)
 
-#define c_with(...) c_MACRO_OVERLOAD(c_with, __VA_ARGS__)
-#define c_with_2(declvar, drop) \
+#define c_scoped(...) c_MACRO_OVERLOAD(c_scoped, __VA_ARGS__)
+#define c_scoped_2(declvar, drop) \
     for (declvar, *_i, **_ip = &_i; _ip; _ip = 0, drop)
-#define c_with_3(declvar, pred, drop) \
+#define c_scoped_3(declvar, pred, drop) \
     for (declvar, *_i, **_ip = &_i; _ip && (pred); _ip = 0, drop)
+#define c_with c_scoped // [deprecated]
 
 #define c_scope(...) c_MACRO_OVERLOAD(c_scope, __VA_ARGS__)
 #define c_scope_2(init, drop) \

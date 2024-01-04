@@ -405,17 +405,16 @@ void        c_default_drop(Type* p);                    // does nothing
 ## RAII scope macros
 General ***defer*** mechanics for resource acquisition. These macros allows you to specify the
 freeing of the resources at the point where the acquisition takes place.
-The **checkauto** utility described below, ensures that the `c_auto*` macros are used correctly.
+The **checkscoped** utility described below, ensures that the `c_scope*` and `c_defer` macros are used correctly.
 
-| Usage                                  | Description                                               |
-|:---------------------------------------|:----------------------------------------------------------|
-| `c_defer (drop...)`                    | Defer `drop...` to end of scope                           |
-| `c_scope (init, drop)`                 | Execute `init` and defer `drop` to end of scope           |
-| `c_scope (init, pred, drop)`           | Adds a predicate in order to exit early if init failed    |
-| `c_with (Type var=init, drop)`         | Declare `var`. Defer `drop...` to end of scope            |
-| `c_with (Type var=init, pred, drop)`   | Adds a predicate in order to exit early if init failed    |
-| `c_auto (Type, var1,...,var3)`         | `c_with (Type var1=Type_init(), Type_drop(&var1))` ...    |
-| `continue`                             | Exit a defer-block without resource leak                  |
+| Usage                                     | Description                                               |
+|:------------------------------------------|:----------------------------------------------------------|
+| `c_defer (drop...) {}`                    | Defer `drop...` to end of scope                           |
+| `c_scope (init, drop) {}`                 | Execute `init` and defer executing `drop` to end of scope |
+| `c_scope (init, pred, drop) {}`           | Adds a predicate in order to exit early if init failed    |
+| `c_scoped (Type var=init, drop) {}`       | Declare `var`. Defer `drop...` to end of scope            |
+| `c_scoped (Type var=init, pred, drop) {}` | Adds a predicate in order to exit early if init failed    |
+| `continue`                                | Exit a defer/scope*-block without resource leak                  |
 
 ```c
 // `c_defer` executes the expression(s) when leaving scope.
@@ -425,38 +424,28 @@ c_defer (cstr_drop(&s1), cstr_drop(&s2))
     printf("%s %s\n", cstr_str(&s1), cstr_str(&s2));
 }
 
-// `c_scope` syntactically "binds" initialization and defer.
+// `c_scope` initialize an already declared object or objects, and deinitializes at end of scope:
 static pthread_mutex_t mut;
 c_scope (pthread_mutex_lock(&mut), pthread_mutex_unlock(&mut))
 {
     /* Do syncronized work. */
 }
 
-// `c_with` is similar to python `with`: declare a variable and defer the drop call.
-c_with (cstr str = cstr_lit("Hello"), cstr_drop(&str))
+// `c_scoped`: declare and init a new scoped variable and specify the deinitialize call.
+c_scoped (cstr str = cstr_lit("Hello"), cstr_drop(&str))
 {
     cstr_append(&str, " world");
     printf("%s\n", cstr_str(&str));
 }
-
-// `c_auto` automatically initialize and drops up to 4 variables:
-c_auto (cstr, s1, s2)
-{
-    cstr_append(&s1, "Hello");
-    cstr_append(&s1, " world");
-    cstr_append(&s2, "Cool");
-    cstr_append(&s2, " stuff");
-    printf("%s %s\n", cstr_str(&s1), cstr_str(&s2));
-}
 ```
-**Example 1**: Use multiple **c_with** in sequence:
+**Example 1**: Use multiple **c_scoped** in sequence:
 ```c
 bool ok = false;
-c_with (uint8_t* buf = malloc(BUF_SIZE), buf != NULL, free(buf))
-c_with (FILE* fp = fopen(fname, "rb"), fp != NULL, fclose(fp))
+c_scoped (uint8_t* buf = malloc(BUF_SIZE), buf != NULL, free(buf))
+c_scoped (FILE* fp = fopen(fname, "rb"), fp != NULL, fclose(fp))
 {
     int n = fread(buf, 1, BUF_SIZE, fp);
-    if (n <= 0) continue; // auto cleanup! NB do not break or return here.
+    if (n <= 0) continue; // NB! do not return here.
     ...
     ok = true;
 }
@@ -475,8 +464,8 @@ return ok;
 vec_str readFile(const char* name)
 {
     vec_str vec = {0}; // returned
-    c_with (FILE* fp = fopen(name, "r"), fp != NULL, fclose(fp))
-    c_with (cstr line = {0}, cstr_drop(&line))
+    c_scoped (FILE* fp = fopen(name, "r"), fp != NULL, fclose(fp))
+    c_scoped (cstr line = {0}, cstr_drop(&line))
         while (cstr_getline(&line, fp))
             vec_str_emplace(&vec, cstr_str(&line));
     return vec;
@@ -484,30 +473,30 @@ vec_str readFile(const char* name)
 
 int main(void)
 {
-    c_with (vec_str vec = readFile(__FILE__), vec_str_drop(&vec))
+    c_scoped (vec_str vec = readFile(__FILE__), vec_str_drop(&vec))
         c_foreach (i, vec_str, vec)
             printf("| %s\n", cstr_str(i.ref));
 }
 ```
 
-### The **checkauto** utility program (for RAII)
-The **checkauto** program will check the source code for any misuses of the `c_auto*` macros which
-may lead to resource leakages. The `c_auto*`- macros are implemented as one-time executed **for-loops**,
+### The **checkscoped** utility program (for RAII)
+The **checkscoped** program will check the source code for any misuses of the `c_scope*` macros which
+may lead to resource leakages. The `c_scope*`- macros are implemented as one-time executed **for-loops**,
 so any `return` or `break` appearing within such a block will lead to resource leaks, as it will disable
 the cleanup/drop method to be called. A `break` may originally be intended to break a loop or switch
-outside the `c_auto` scope.
+outside the `c_scoped` scope.
 
-NOTE: One must always make sure to unwind temporary allocated resources before a `return` in C. However, by using `c_auto*`-macros,
+NOTE: One must always make sure to unwind temporary allocated resources before a `return` in C. However, by using `c_scope*`-macros,
 - it is much easier to automatically detect misplaced return/break between resource acquisition and destruction.
 - it prevents forgetting to call the destructor at the end.
 
-The **checkauto** utility will report any misusages. The following example shows how to correctly break/return
-from a `c_auto` scope:
+The **checkscoped** utility will report any misusages. The following example shows how to correctly break/return
+from a `c_scope`:
 ```c
 int flag = 0;
 for (int i = 0; i<n; ++i) {
-    c_auto (cstr, text)
-    c_auto (List, list)
+    c_scoped (cstr text = {0}, cstr_drop(&text))
+    c_scoped (List list = {0}, List_drop(&list))
     {
         for (int j = 0; j<m; ++j) {
             List_push_back(&list, i*j);
@@ -516,23 +505,23 @@ for (int i = 0; i<n; ++i) {
         }
         // WRONG:
         if (cond2())
-            break;      // checkauto ERROR! break inside c_auto.
+            break;      // checkscoped ERROR! break inside c_scoped.
 
         if (cond3())
-            return -1;  // checkauto ERROR! return inside c_auto
+            return -1;  // checkscoped ERROR! return inside c_scoped
 
         // CORRECT:
         if (cond2()) {
             flag = 1;   // flag to break outer for-loop
-            continue;   // cleanup and leave c_auto block
+            continue;   // cleanup and leave c_scoped block
         }
         if (cond3()) {
             flag = -1;  // return -1
-            continue;   // cleanup and leave c_auto block
+            continue;   // cleanup and leave c_scoped block
         }
         ...
     }
-    // do the return/break outside of c_auto
+    // do the return/break outside of c_scoped
     if (flag < 0) return flag;
     else if (flag > 0) break;
     ...

@@ -23,20 +23,6 @@
 #ifndef STC_UTILITY_H_INCLUDED
 #define STC_UTILITY_H_INCLUDED
 
-// -----------------------------------
-// c_auto: init+drop containers (RAII)
-// -----------------------------------
-
-#define c_auto(...) c_MACRO_OVERLOAD(c_auto, __VA_ARGS__)
-#define c_auto_2(C, a) \
-    c_with_2(C a = C##_init(), C##_drop(&a))
-#define c_auto_3(C, a, b) \
-    c_with_2(c_EXPAND(C a = C##_init(), b = C##_init()), \
-            (C##_drop(&b), C##_drop(&a)))
-#define c_auto_4(C, a, b, c) \
-    c_with_2(c_EXPAND(C a = C##_init(), b = C##_init(), c = C##_init()), \
-            (C##_drop(&c), C##_drop(&b), C##_drop(&a)))
-
 // --------------------------------
 // c_find_if, c_find_reverse_if
 // --------------------------------

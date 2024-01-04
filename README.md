@@ -7,9 +7,10 @@ STC - Smart Template Containers
 - New shorthand template parameter `i_TYPE` lets you define `i_type`, `i_key`, and `i_val` all in one line.
 - [**c_filter(C, cnt, filters)**](docs/algorithm_api.md#c_filter) added to `filter.h`: Enforces functional programming paradigm.
 - **Breaking changes**:
-- Renamed several function `stc_xxxxx()` to **c_xxxxx()** in `common.h` and `algo/*.h`.
-- Coroutine "keyword" `cco_yield();` changed to **cco_yield;**
-- Renamed templated STC headers (old header names deprecated). The new header names  corresponds to default container names:
+- Changed coroutine "keyword" `cco_yield();` => **cco_yield;**
+- Renamed several function `stc_xxxxx()` => **c_xxxxx()** in `common.h` and `algo/*.h`.
+- Renamed all member functions `TYPE_empty()` => **TYPE_is_empty()**.
+- Renamed templated STC header files. The file names corresponds to the new default container names:
   - **vec.h** (from `cvec.h`)
   - **deq.h** (from `cdeq.h`)
   - **list.h** (from `clist.h`)
@@ -22,7 +23,7 @@ STC - Smart Template Containers
   - **sset.h** (from `csset.h`)
   - **zsview.h** (from `czview.h`)
   - **types.h** (from `forward.h`)
-- **Note**: Deprecated headers is removed as of STC V5.0 release.
+- **Note**: Old headers are removed as of the STC V5.0 release.
 ---
 Description
 -----------
