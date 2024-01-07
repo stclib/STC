@@ -10,7 +10,8 @@ STC - Smart Template Containers
 - Changed coroutine "keyword" `cco_yield();` => **cco_yield;**
 - Renamed several function `stc_xxxxx()` => **c_xxxxx()** in `common.h` and `algo/*.h`.
 - Renamed all member functions `TYPE_empty()` => **TYPE_is_empty()**.
-- Renamed templated STC header files. The file names corresponds to the new default container names:
+- Swapped 2nd and 3rd argument in `c_fortoken*()` to make it consistent with all other `c_for*()`, i.e, input object is third/last.
+- Renamed templated STC header files. The new default container names are based on the new file names:
   - **vec.h** (from `cvec.h`)
   - **deq.h** (from `cdeq.h`)
   - **list.h** (from `clist.h`)
@@ -256,7 +257,7 @@ int main(void)
         c_init(Vec, {30.f, 40.f}),
     });
     printf("vec_a == vec_b is %s.\n", Vec2D_eq(&vec_a, &vec_b) ? "true":"false");
- 
+
     Vec2D clone = Vec2D_clone(vec_a);   // Make a deep-copy of vec
 
     c_foreach (i, Vec2D, clone)         // Loop through the cloned vector

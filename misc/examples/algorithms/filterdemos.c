@@ -83,8 +83,8 @@ void demo3(void)
 {
     const char* sentence = "This is a sentence in C99.";
     SVec words = {0};
-    c_fortoken (w, sentence, " ") // split words
-        SVec_push(&words, *w.ref);
+    c_fortoken (i, " ", sentence) // split words
+        SVec_push(&words, i.token);
 
     SVec words_containing_i = {0};
     c_filter(SVec, words

@@ -86,10 +86,15 @@ csview         cstr_u8_substr(const cstr* self, intptr_t bytepos, intptr_t u8len
 ```
 #### Iterate tokens with *c_fortoken*, *c_fortoken_sv*
 
-To iterate tokens in an input string separated by a string:
+Iterate tokens in an input string split by a separator string:
+- `c_fortoken (it, const char* separator, const char* input_str);`
+- `c_fortoken_sv (it, const char* separator, csview input_sv);`
+- `it.token` is a csview of the current token.
+
 ```c
-c_fortoken (i, "hello, one, two, three", ", ")
-    printf("token: %.*s\n", c_SV(i.token));
+c_fortoken (i, ", ", "hello, one, two, three")
+    printf("'%.*s' ", c_SV(i.token));
+// 'hello' 'one' 'two' 'three'
 ```
 
 #### Helper methods

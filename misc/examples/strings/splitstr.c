@@ -8,13 +8,13 @@ int main(void)
 {
     puts("Split with c_fortoken (csview):");
 
-    c_fortoken (i, "Hello World C99!", " ")
+    c_fortoken (i, " ", "Hello World C99!")
         printf("'%.*s'\n", c_SV(i.token));
 
     puts("\nSplit with c_formatch (regex):");
 
-    cregex re = cregex_from("[^ ]+");
-    c_formatch (i, &re, "  Hello   World      C99! ")
+    cregex re = cregex_from("[^\\s]+");
+    c_formatch (i, &re, "  Hello   \t World   \n   C99! ")
         printf("'%.*s'\n", c_SV(i.match[0]));
 
     cregex_drop(&re);
