@@ -48,8 +48,7 @@ fn main() {
 void demo2(void)
 {
     IVec vector = {0};
-    crange r = crange_make(INTPTR_MAX);  // Infinite range of integers
-    c_filter(crange, r
+    c_filter(crange, c_iota(0)           // Infinite range of integers
          , c_flt_skipwhile(*value != 11) // Skip initial numbers unequal 11
         && (*value % 2) != 0             // Collect odd numbers
         && (c_flt_map(*value * *value),  // Square each number

@@ -92,20 +92,20 @@ c_forrange (i, 30, 0, -5) printf(" %lld", i);
 ```
 
 ### crange: Integer range generator object
-A number sequence generator type, similar to [boost::irange](https://www.boost.org/doc/libs/release/libs/range/doc/html/range/reference/ranges/irange.html). The **crange_value** type is `long long`. Below *start*, *stop*, and *step* are of type *crange_value*:
+A number sequence generator type, similar to [boost::irange](https://www.boost.org/doc/libs/release/libs/range/doc/html/range/reference/ranges/irange.html).
 ```c
 crange      crange_make(stop);              // will generate 0, 1, ..., stop-1
 crange      crange_make(start, stop);       // will generate start, start+1, ... stop-1
 crange      crange_make(start, stop, step); // will generate start, start+step, ... upto-not-including stop
                                             // step may be negative.
 crange_iter crange_begin(crange* self);
-crange_iter crange_end(crange* self);
 void        crange_next(crange_iter* it);
 
 crange&     c_iota(start);                  // returns an l-value; will generate start, start+1, ...
 crange&     c_iota(start, stop);            // l-value, otherwise like crange_make(start, stop)
 crange&     c_iota(start, stop, step);      // l-value, otherwise like crange_make(start, stop, step)
 ```
+ The **crange_value** type is *intptr_t*. Variables *start*, *stop*, and *step* are of type *crange_value*. Note that **crange** does not have *_end()* and *_advance()* functions; e.g. will not compile when used with *c_filter_pairwise()*.
 ```c
 // 1. All primes less than 32: See below for c_filter() and is_prime()
 crange r1 = crange_make(3, 32, 2);
@@ -126,7 +126,7 @@ c_filter(crange, c_iota(3)
 // 2 3 5 7 11 13 17 19 23 29 31
 ```
 
-### c_filter\*, c_forfilter\*
+### c_filter, c_filter_zip, c_filter_pairwise, c_forfilter
 Functional programming with chained `&&` filtering. `value` is the pointer to current value.
 It enables a subset of functional programming like in other popular languages.
 
@@ -136,10 +136,16 @@ It enables a subset of functional programming like in other popular languages.
 
 | Usage                                | Description                       |
 |:-------------------------------------|:----------------------------------|
-| `c_filter(ctype, container, filters)` | Filter items in chain with the && operator |
-| `c_filter_from(ctype, start, filters)` | Filter from start iterator |
-| `c_filter_reverse(ctype, cnt, filters)` | Filter items in reverse order  |
-| `c_filter_reverse_from(ctype, rstart, filters)` | Filter reverse from rstart iterator |
+| `c_filter(CType, container, filters)` | Filter items in chain with the && operator |
+| `c_filter_from(CType, start, filters)` | Filter from start iterator |
+| `c_filter_reverse(CType, cnt, filters)` | Filter items in reverse order  |
+| `c_filter_reverse_from(CType, rstart, filters)` | Filter reverse from rstart iterator |
+| *c_filter_zip*, *c_filter_pairwise*: ||
+| `c_filter_zip(CType, cnt1, cnt2, filters)` | Filter (cnt1, cnt2) items |
+| `c_filter_zip(CType1, cnt1, CType2, cnt2, filters)` | May use different types for cnt1, cnt2 |
+| `c_filter_reverse_zip(CType, cnt1, cnt2, filters)` | Filter (cnt1, cnt2) items in reverse order  |
+| `c_filter_reverse_zip(CType1, cnt1, CType2, cnt2, filters)` | May use different types for cnt1, cnt2 |
+| `c_filter_pairwise(CType, cnt, filters)` | Filter items pairwise as value1, value2 |
 
 | Built-in filter              | Description                                |
 |:-----------------------------|:-------------------------------------------|
@@ -150,8 +156,13 @@ It enables a subset of functional programming like in other popular languages.
 | `c_flt_counter()`            | Increment count and return it              |
 | `c_flt_getcount()`           | Number of items passed skip/take/counter   |
 | `c_flt_map(expr)`            | Map expr to current value. Input unchanged |
-| `c_flt_source`               | Pointer variable to current unmapped source value   |
-| `value`                      | Pointer variable to current (possible mapped) value |
+| `c_flt_src`                  | Pointer variable to current unmapped source value |
+| `value`                      | Pointer variable to (possible mapped) value |
+| For *c_filter_zip*, *c_filter_pairwise*: ||
+| `c_flt_map1(expr)`           | Map expr to value1. Input unchanged |
+| `c_flt_map2(expr)`           | Map expr to value2. Input unchanged |
+| `c_flt_src1, c_flt_src2`     | Pointer variables to current unmapped source values |
+| `value1, value2`             | Pointer variables to (possible mapped) values |
 
 [ [Run this example](https://godbolt.org/z/7dP5a1s4s) ]
 ```c

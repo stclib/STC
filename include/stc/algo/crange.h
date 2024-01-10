@@ -69,9 +69,6 @@ STC_INLINE crange_iter crange_begin(crange* self) {
     return it;
 }
 
-STC_INLINE crange_iter crange_end(crange* self)
-    { (void)self; crange_iter it = {0}; return it; }
-
 STC_INLINE void crange_next(crange_iter* it) {
     if ((it->step > 0) == ((*it->ref += it->step) > it->end))
         it->ref = NULL;

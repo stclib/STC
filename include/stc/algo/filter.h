@@ -55,27 +55,60 @@ int main(void)
 #define c_flt_counter() (++_fl.sn[++_fl.sn_top])
 #define c_flt_getcount() (_fl.sn[_fl.sn_top])
 #define c_flt_map(expr) (_mapped = (expr), value = &_mapped)
-#define c_flt_source _it.ref
+#define c_flt_src _it.ref
 
-#define c_filter(C, cnt, ...) \
-    _c_filter(C, C##_begin(&cnt), _, __VA_ARGS__)
+#define c_filter(C, cnt, pred) \
+    _c_filter(C, C##_begin(&cnt), _, pred)
 
-#define c_filter_from(C, start, ...) \
-    _c_filter(C, start, _, __VA_ARGS__)
+#define c_filter_from(C, start, pred) \
+    _c_filter(C, start, _, pred)
 
-#define c_filter_reverse(C, cnt, ...) \
-    _c_filter(C, C##_rbegin(&cnt), _r, __VA_ARGS__)
+#define c_filter_reverse(C, cnt, pred) \
+    _c_filter(C, C##_rbegin(&cnt), _r, pred)
 
-#define c_filter_reverse_from(C, start, ...) \
-    _c_filter(C, start, _r, __VA_ARGS__)
+#define c_filter_reverse_from(C, start, pred) \
+    _c_filter(C, start, _r, pred)
 
-#define _c_filter(C, start, rev, ...) do { \
+#define _c_filter(C, start, rev, pred) do { \
     struct _flt_base _fl = {0}; \
     C##_iter _it = start; \
     C##_value *value = _it.ref, _mapped; \
     for ((void)_mapped ; !_fl.done & (_it.ref != NULL) ; \
          C##rev##next(&_it), value = _it.ref, _fl.sn_top=0, _fl.sb_top=0) \
-      (void)(__VA_ARGS__); \
+      (void)(pred); \
+} while (0)
+
+// ------- c_filter_zip --------
+#define c_filter_zip(...) c_MACRO_OVERLOAD(c_filter_zip, __VA_ARGS__)
+#define c_filter_zip_4(C, cnt1, cnt2, pred) \
+    c_filter_zip_5(C, cnt1, C, cnt2, pred)
+#define c_filter_zip_5(C1, cnt1, C2, cnt2, pred) \
+    _c_filter_zip(C1, C1##_begin(&cnt1), C2, C2##_begin(&cnt2), _, pred)
+
+#define c_filter_reverse_zip(...) c_MACRO_OVERLOAD(c_filter_reverse_zip, __VA_ARGS__)
+#define c_filter_reverse_zip_4(C, cnt1, cnt2, pred) \
+    c_filter_reverse_zip_5(C, cnt1, C, cnt2, pred)
+#define c_filter_reverse_zip_5(C1, cnt1, C2, cnt2, pred) \
+    _c_filter_zip(C1, C1##_rbegin(&cnt1), C2, C2##_rbegin(&cnt2), _r, pred)
+
+#define c_filter_pairwise(C, cnt, pred) \
+    _c_filter_zip(C, C##_begin(&cnt), C, C##_advance(_it1, 1), _, pred)
+
+#define c_flt_map1(expr) (_mapped1 = (expr), value1 = &_mapped1)
+#define c_flt_map2(expr) (_mapped2 = (expr), value2 = &_mapped2)
+#define c_flt_src1 _it1.ref
+#define c_flt_src2 _it2.ref
+
+#define _c_filter_zip(C1, start1, C2, start2, rev, pred) do { \
+    struct _flt_base _fl = {0}; \
+    C1##_iter _it1 = start1; \
+    C2##_iter _it2 = start2; \
+    C1##_value* value1 = _it1.ref, _mapped1; \
+    C2##_value* value2 = _it2.ref, _mapped2; \
+    for ((void)(_mapped1, _mapped2); !_fl.done & (_it1.ref != NULL) & (_it2.ref != NULL); \
+         C1##rev##next(&_it1), value1 = _it1.ref, C2##rev##next(&_it2), value2 = _it2.ref, \
+         _fl.sn_top=0, _fl.sb_top=0) \
+      (void)(pred); \
 } while (0)
 
 // ------- c_forfilter --------
@@ -102,23 +135,23 @@ int main(void)
 #define c_fflt_map(i, expr) (i._mapped = (expr), i.ref = &i._mapped)
 #define c_fflt_src(i) i._it.ref
 
-#define c_forfilter(i, C, cnt, ...) \
-    _c_forfilter(i, C, C##_begin(&cnt), _, __VA_ARGS__)
+#define c_forfilter(i, C, cnt, pred) \
+    _c_forfilter(i, C, C##_begin(&cnt), _, pred)
 
-#define c_forfilter_reverse(i, C, cnt,...) \
-    _c_forfilter(i, C, C##_rbegin(&cnt), _r, __VA_ARGS__)
+#define c_forfilter_reverse(i, C, cnt,pred) \
+    _c_forfilter(i, C, C##_rbegin(&cnt), _r, pred)
 
-#define c_forfilter_from(i, C, start, ...) \
-    _c_forfilter(i, C, start, _, __VA_ARGS__)
+#define c_forfilter_from(i, C, start, pred) \
+    _c_forfilter(i, C, start, _, pred)
 
-#define c_forfilter_reverse_from(i, C, start, ...) \
-    _c_forfilter(i, C, start, _r, __VA_ARGS__)
+#define c_forfilter_reverse_from(i, C, start, pred) \
+    _c_forfilter(i, C, start, _r, pred)
 
-#define _c_forfilter(i, C, start, rev, ...) \
+#define _c_forfilter(i, C, start, rev, pred) \
     for (struct {C##_iter _it; C##_value *ref, _mapped; struct _flt_base _fl;} \
          i = {._it=start, .ref=i._it.ref} ; !i._fl.done & (i._it.ref != NULL) ; \
          C##rev##next(&i._it), i.ref = i._it.ref, i._fl.sn_top=0, i._fl.sb_top=0) \
-      if (!(__VA_ARGS__)) ; else
+      if (!(pred)) ; else
 
 // ------------------------ private -------------------------
 #ifndef c_NFILTERS

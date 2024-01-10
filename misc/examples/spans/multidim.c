@@ -7,24 +7,6 @@
 
 using_cspan3(ispan, int);
 
-void print2d(ispan2 ms2) {
-    for (int i=0; i < ms2.shape[0]; i++) {
-        for (int j=0; j < ms2.shape[1]; j++)
-            printf(" %3d", *cspan_at(&ms2, i, j));
-        puts("");
-    }
-}
-
-void print3d(ispan3 ms3) {
-    for (int i=0; i < ms3.shape[0]; i++) {
-        for (int j=0; j < ms3.shape[1]; j++) {
-            for (int k=0; k < ms3.shape[2]; k++)
-                printf(" %3d", *cspan_at(&ms3, i, j, k));
-            puts("");
-        }
-        puts("");
-    }
-}
 
 int main(void)
 {
@@ -37,14 +19,14 @@ int main(void)
     ispan3 ms3 = cspan_md(v.data, 2, 3, 4);
 
     puts("ms3:");
-    print3d(ms3);
+    cspan_print(ispan3, ms3, "%d");
 
     // Take a slice of md3
     ispan3 ss3 = cspan_slice(ispan3, &ms3, {c_ALL}, {1,3}, {1,3});
-    puts("ss3 = ms3[:, 1:3, 1:3]");
-    print3d(ss3);
+    puts("\nss3 = ms3[:, 1:3, 1:3]");
+    cspan_print(ispan3, ss3, "%d");
 
-    puts("Iterate ss3 flat:");
+    puts("\nIterate ss3 flat:");
     c_foreach (i, ispan3, ss3) printf(" %d", *i.ref);
     puts("");
 
@@ -57,17 +39,16 @@ int main(void)
             *cspan_at(&ms2, i, j) = (i + 1)*100 + j;
 
     puts("\nms2 = ms3[1] with updated data:");
-    print2d(ms2);
-    puts("");
+    cspan_print(ispan2, ms2, "%d");
 
     puts("\nOriginal s1 span with updated data:");
     c_foreach (i, ispan, ms1) printf(" %d", *i.ref);
     puts("");
 
     puts("\nOriginal ms3 span with updated data:");
-    print3d(ms3);
+    cspan_print(ispan3, ms3, "%d");
 
-    puts("col = ms3[1, :, 2]");
+    puts("\ncol = ms3[1, :, 2]");
     ispan col = cspan_slice(ispan, &ms3, {1}, {c_ALL}, {2});
     c_foreach (i, ispan, col) printf(" %d", *i.ref);
     puts("");
