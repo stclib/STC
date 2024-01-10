@@ -47,7 +47,7 @@ c_foreach_n (i, IMap, map, 3)
 // 0:(3 2) 1:(5 4) 2:(7 3)
 
 // iterate with an already declared iter (useful in coroutines)
-c_foreach_it (iter, IMap, map)
+c_foreach_iter (iter, IMap, map)
     printf(" (%d %d)", iter.ref->first, iter.ref->second);
 ```
 

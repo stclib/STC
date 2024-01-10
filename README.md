@@ -232,7 +232,7 @@ Let's make a vector of vectors, which can be cloned. All of its element vectors 
 #include "stc/algorithm.h"
 
 #define i_TYPE Vec,float
-#define i_use_cmp        // enable default ==, < and c_hash operations
+#define i_use_cmp        // enable default ==, < and hash operations
 #include "stc/vec.h"
 
 #define i_type Vec2D

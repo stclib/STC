@@ -27,25 +27,25 @@ NB! ***cco_yield\*()*** / ***cco_await\*()*** may not be called from within a `s
 |           | `cco_await_call(cocall);`            | Await for subcoro to finish (returns its ret value) |
 |           | `cco_await_call(cocall, retbit);`    | Await for subcoro's return to be in (retbit \| CCO_DONE)  |
 |           | `cco_return;`                        | Return from coroutine (inside cco_routine) |
-|           | ***c_filter() interoperability with coroutine iterators***: |                  |
+|           | ***c_filter() interoperability with coroutine iterators***: ||
 |           | `cco_take(num);`                     | Use instead of *c_flt_take(num)* to ensure cleanup state |
 |           | `cco_takewhile(predicate);`          | Use instead of *c_flt_takewhile(pred)* to ensure cleanup state |
 |           | `cco_takewhile(predicate);`          | Use instead of *c_flt_takewhile(pred)* to ensure cleanup state |
-|           | ***Container iteration in coroutines ***: |                                                   |
-|           | `c_foreach_it (external_it, ctype, cnt)` | Use iterator stored in coroutine object |
-|           | `c_foreach_reverse_it (external_it, ctype, cnt)` | Iterate in reverse order     |
-|           | ***Task objects***:                  |                                         |
+|           | ***Container iteration in coroutines***: ||
+|           | `c_foreach_iter(external_it, ctype, cnt)` | Use iterator stored in coroutine object |
+|           | `c_foreach_reverse_iter(external_it, ctype, cnt)` | Iterate in reverse order     |
+|           | ***Task objects***:                  ||
 |           | `cco_task_struct(Name, ...);`        | Define a coroutine task struct          |
 |           | `cco_await_task(task, cco_runtime* rt);`| Await for task to finish             |
 |           | `cco_await_task(task, rt, retbit);`  | Await for task's return to be in (retbit \| CCO_DONE) |
 |`cco_result`| `cco_resume_task(task, rt);`        | Resume suspended task                   |
-|           | ***Semaphores***:                    |                                         |
+|           | ***Semaphores***:                    ||
 |           | `cco_sem`                            | Semaphore type                          |
 |           | `cco_await_sem(sem)`                 | Await for the semaphore count > 0       |
 | `cco_sem` | `cco_sem_from(long value)`           | Create semaphore                        |
 |           | `cco_sem_set(sem, long value)`       | Set semaphore value                     |
 |           | `cco_sem_release(sem)`               | Signal the semaphore (count += 1)       |
-|           | ***Timers***:                        |                                         |
+|           | ***Timers***:                        ||
 |           | `cco_timer`                          | Timer type                              |
 |           | `cco_await_timer(tm, double sec)`    | Await secs for timer to expire (usec prec.)|
 |           | `cco_timer_start(tm, double sec)`    | Start timer for secs duration           |
@@ -53,16 +53,15 @@ NB! ***cco_yield\*()*** / ***cco_await\*()*** may not be called from within a `s
 | `bool`    | `cco_timer_expired(tm)`              | Return true if timer is expired         |
 | `double`  | `cco_timer_elapsed(tm)`              | Return seconds elapsed                  |
 | `double`  | `cco_timer_remaining(tm)`            | Return seconds remaining                |
-|           | ***From caller side***:              |                                         |
+|           | ***From caller side***:              ||
 | `void`    | `cco_stop(co)`                       | Next call of coroutine finalizes        |
 | `void`    | `cco_reset(co)`                      | Reset state to initial (for reuse)      |
 | `void`    | `cco_blocking_call(cocall) {}`       | Run blocking until cocall is finished   |
 |           | `cco_blocking_task(task) {}`         | Run blocking until task is finished |
 |           | `cco_blocking_task(task, rt, STACKSZ) {}`| Run blocking until task is finished |
-|           | ***Time functions***:                |                                         |
+|           | ***Time functions***:                ||
 | `double`  | `cco_time(void)`                     | Return secs with usec prec. since Epoch |
 |           | `cco_sleep(double sec)`              | Sleep for seconds (msec or usec prec.)  |
-
 
 ## Implementation and examples
 
