@@ -102,10 +102,8 @@ STC_INLINE _m_raw _c_MEMB(_toraw)(const i_type* self)
 // destructor
 STC_INLINE void _c_MEMB(_drop)(const i_type* cself) {
     i_type* self = (i_type*)cself;
-    if (self->get) {
-        i_keydrop(self->get);
-        i_free(self->get, c_sizeof *self->get);
-    }
+    i_keydrop(self->get);
+    i_free(self->get, c_sizeof *self->get);
 }
 
 STC_INLINE i_type _c_MEMB(_move)(i_type* self) {
@@ -116,11 +114,6 @@ STC_INLINE i_type _c_MEMB(_move)(i_type* self) {
 
 STC_INLINE _m_value* _c_MEMB(_release)(i_type* self)
     { return _c_MEMB(_move)(self).get; }
-
-STC_INLINE void _c_MEMB(_reset)(i_type* self) {
-    _c_MEMB(_drop)(self);
-    self->get = NULL;
-}
 
 // take ownership of p
 STC_INLINE void _c_MEMB(_reset_to)(i_type* self, _m_value* p) {
@@ -138,8 +131,6 @@ STC_INLINE i_type _c_MEMB(_from)(_m_value val)
 
 #if !defined i_no_clone
     STC_INLINE i_type _c_MEMB(_clone)(i_type other) {
-        if (!other.get)
-            return other;
         i_type out = {_i_alloc(_m_value)};
         *out.get = i_keyclone((*other.get));
         return out;
