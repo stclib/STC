@@ -38,10 +38,11 @@
 vec_str read_file(const char* name)
 {
     vec_str data = {0};
-    c_scoped (cstr line = {0}, cstr_drop(&line))
-        c_scoped (FILE* f = fopen(name, "r"), f, fclose(f))
-            while (cstr_getline(&line, f))
-                vec_str_emplace_back(&data, cstr_str(&line));
+    c_scoped (FILE* f = fopen(name, "r"), f != 0, fclose(f))
+    c_scoped (cstr line = {0}, cstr_drop(&line)) {
+        while (cstr_getline(&line, f))
+            vec_str_push(&data, cstr_clone(line));
+    }
     return data;
 }
 

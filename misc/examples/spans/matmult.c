@@ -4,29 +4,30 @@
 #include <time.h>
 #include "stc/cspan.h"
 
-using_cspan3(Mat, double);
-typedef Mat2 OutMat;
-typedef struct { Mat2 m00, m01, m10, m11; } Partition;
+using_cspan(Mat, double, 2);
+using_cspan(Mat3, double, 3);
+typedef Mat OutMat;
+typedef struct { Mat m00, m01, m10, m11; } Partition;
 
-Partition partition(Mat2 A)
+Partition partition(Mat A)
 {
-  intptr_t M = A.shape[0];
-  intptr_t N = A.shape[1];
+  int M = A.shape[0];
+  int N = A.shape[1];
   return (Partition){
-    .m00 = cspan_slice(Mat2, &A, {0, M/2}, {0, N/2}),
-    .m01 = cspan_slice(Mat2, &A, {0, M/2}, {N/2, N}),
-    .m10 = cspan_slice(Mat2, &A, {M/2, M}, {0, N/2}),
-    .m11 = cspan_slice(Mat2, &A, {M/2, M}, {N/2, N}),
+    .m00 = cspan_slice(Mat, &A, {0, M/2}, {0, N/2}),
+    .m01 = cspan_slice(Mat, &A, {0, M/2}, {N/2, N}),
+    .m10 = cspan_slice(Mat, &A, {M/2, M}, {0, N/2}),
+    .m11 = cspan_slice(Mat, &A, {M/2, M}, {N/2, N}),
   };
 }
 
 // Slow generic implementation
-void base_case_matrix_product(Mat2 A, Mat2 B, OutMat C)
+void base_case_matrix_product(Mat A, Mat B, OutMat C)
 {
-  for (intptr_t j = 0; j < C.shape[1]; ++j) {
-    for (intptr_t i = 0; i < C.shape[0]; ++i) {
-      Mat2_value C_ij = 0;
-      for (intptr_t k = 0; k < A.shape[1]; ++k) {
+  for (int j = 0; j < C.shape[1]; ++j) {
+    for (int i = 0; i < C.shape[0]; ++i) {
+      Mat_value C_ij = 0;
+      for (int k = 0; k < A.shape[1]; ++k) {
         C_ij += *cspan_at(&A, i,k) * *cspan_at(&B, k,j);
       }
       *cspan_at(&C, i,j) += C_ij;
@@ -34,7 +35,7 @@ void base_case_matrix_product(Mat2 A, Mat2 B, OutMat C)
   }
 }
 
-void recursive_matrix_product(Mat2 A, Mat2 B, OutMat C)
+void recursive_matrix_product(Mat A, Mat B, OutMat C)
 {
   // Some hardware-dependent constant
   enum {recursion_threshold = 16};
@@ -71,12 +72,12 @@ int main(void)
   double out[D1*D2];
   Mat3 data = cspan_md_layout(c_ROWMAJOR, values.data, N, D1, D2);
   OutMat c = cspan_md_layout(c_COLMAJOR, out, D1, D2);
-  Mat2 a = cspan_submd3(&data, 0);
+  Mat a = cspan_submd3(&data, 0);
   double sum = 0.0;
   clock_t t = clock();
 
   for (int i=1; i<N; ++i) {
-    Mat2 b = cspan_submd3(&data, i);
+    Mat b = cspan_submd3(&data, i);
     memset(out, 0, sizeof out);
     recursive_matrix_product(a, b, c); // > 2x faster
     //base_case_matrix_product(a, b, c);
@@ -85,12 +86,12 @@ int main(void)
 
   t = clock() - t;
 
-  puts("upper 10x10 sub-matrix of input a");
-  cspan_print(Mat2, cspan_slice(Mat2, &a, {0,10}, {0,10}), "%.4f");
-  puts("upper 10x10 sub-matrix of result c");
-  cspan_print(Mat2, cspan_slice(Mat2, &c, {0,10}, {0,10}), "%.4f");
+  puts("a 8x8 sub-matrix of input a");
+  cspan_print(Mat, cspan_slice(Mat, &a, {12,20}, {12,20}), "%.4f");
+  puts("\na 8x8 sub-matrix of result c");
+  cspan_print(Mat, cspan_slice(Mat, &c, {12,20}, {12,20}), "%.4f");
 
   puts("checksum and time");
-  printf("%.16g: %f\n", sum, (double)t*1000.0/CLOCKS_PER_SEC);
+  printf("%.16g: %f ms\n", sum, (double)t*1000.0/CLOCKS_PER_SEC);
   Values_drop(&values);
 }

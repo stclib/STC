@@ -103,9 +103,9 @@ int main(void)
     struct _flt_base _fl = {0}; \
     C1##_iter _it1 = start1; \
     C2##_iter _it2 = start2; \
-    C1##_value* value1 = _it1.ref, _mapped1; \
-    C2##_value* value2 = _it2.ref, _mapped2; \
-    for ((void)(_mapped1, _mapped2); !_fl.done & (_it1.ref != NULL) & (_it2.ref != NULL); \
+    C1##_value* value1 = _it1.ref, _mapped1; (void)_mapped1; \
+    C2##_value* value2 = _it2.ref, _mapped2; (void)_mapped2; \
+    for (; !_fl.done & (_it1.ref != NULL) & (_it2.ref != NULL); \
          C1##rev##next(&_it1), value1 = _it1.ref, C2##rev##next(&_it2), value2 = _it2.ref, \
          _fl.sn_top=0, _fl.sb_top=0) \
       (void)(pred); \

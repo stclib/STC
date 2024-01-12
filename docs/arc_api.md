@@ -7,7 +7,8 @@ deallocated when the last remaining **arc** owning the object is destroyed with 
 The object is destroyed using *arc_X_drop()*. A **arc** may also own no objects, in which
 case it is called empty. The *arc_X_cmp()*, *arc_X_drop()* methods are defined based on
 the `i_cmp` and `i_keydrop` macros specified. Use *arc_X_clone(p)* when sharing ownership of
-the pointed-to object.
+the pointed-to object. Note that an arc set to NULL is consider uninitialized, and
+cannot be e.g. cloned or dropped.
 
 All **arc** functions can be called by multiple threads on different instances of **arc** without
 additional synchronization even if these instances are copies and share ownership of the same object.
@@ -55,7 +56,6 @@ void        arc_X_assign(arc_X* self, arc_X other);         // shared assign (in
 void        arc_X_drop(arc_X* self);                        // destruct (decrease use count, free at 0)
 long        arc_X_use_count(const arc_X* self);
 
-void        arc_X_reset(arc_X* self);
 void        arc_X_reset_to(arc_X* self, i_key* p);          // assign new arc from ptr. Takes ownership of p.
 
 uint64_t    arc_X_hash(const arc_X* x);                     // hash value

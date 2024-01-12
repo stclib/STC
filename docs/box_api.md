@@ -3,7 +3,8 @@
 **box** is a smart pointer to a heap allocated value of type X. A **box** can
 be empty. The *box_X_cmp()*, *box_X_drop()* methods are defined based on the `i_cmp`
 and `i_keydrop` macros specified. Use *box_X_clone(p)* to make a deep copy, which uses the
-`i_keyclone` macro if defined.
+`i_keyclone` macro if defined. Note that a box set to NULL is consider uninitialized, and
+cannot be e.g. cloned or dropped.
 
 When declaring a container of **box** values, define `i_key_arcbox` with the
 box type instead of defining `i_key`. This will auto-set `i_keydrop`, `i_keyclone`, and `i_cmp` using
@@ -51,7 +52,6 @@ void        box_X_take(box_X* self, box_X unowned);         // take ownership of
 void        box_X_assign(box_X* self, box_X* moved);        // transfer ownership from moved to self; moved becomes NULL.
 void        box_X_drop(box_X* self);                        // destruct the contained object and free its heap memory.
 
-void        box_X_reset(box_X* self);
 void        box_X_reset_to(box_X* self, i_key* p);          // assign new box from ptr. Takes ownership of p.
 
 uint64_t    box_X_hash(const box_X* x);                     // hash value

@@ -107,8 +107,7 @@ STC_INLINE long _c_MEMB(_use_count)(const i_type* self)
 
 STC_INLINE i_type _c_MEMB(_from_ptr)(_m_value* p) {
     i_type arc = {p};
-    if (p)
-        *(arc.use_count = _i_alloc(catomic_long)) = 1;
+    *(arc.use_count = _i_alloc(catomic_long)) = 1;
     return arc;
 }
 
@@ -132,7 +131,7 @@ STC_INLINE i_type _c_MEMB(_move)(i_type* self) {
 
 STC_INLINE void _c_MEMB(_drop)(const i_type* cself) {
     i_type* self = (i_type*)cself;
-    if (self->use_count && _i_atomic_dec_and_test(self->use_count)) {
+    if (_i_atomic_dec_and_test(self->use_count)) {
         i_keydrop(self->get);
         if ((char *)self->get != (char *)self->use_count + offsetof(struct _c_MEMB(_rep_), value)) {
             i_free(self->get, c_sizeof *self->get);
@@ -141,11 +140,6 @@ STC_INLINE void _c_MEMB(_drop)(const i_type* cself) {
             i_free(self->use_count, c_sizeof(struct _c_MEMB(_rep_)));
         }
     }
-}
-
-STC_INLINE void _c_MEMB(_reset)(i_type* self) {
-    _c_MEMB(_drop)(self);
-    self->use_count = NULL, self->get = NULL;
 }
 
 STC_INLINE void _c_MEMB(_reset_to)(i_type* self, _m_value* p) {
@@ -163,8 +157,7 @@ STC_INLINE i_type _c_MEMB(_from)(_m_value val)
 
 // does not use i_keyclone, so OK to always define.
 STC_INLINE i_type _c_MEMB(_clone)(i_type arc) {
-    if (arc.use_count)
-        _i_atomic_inc(arc.use_count);
+    _i_atomic_inc(arc.use_count);
     return arc;
 }
 
@@ -175,8 +168,7 @@ STC_INLINE void _c_MEMB(_take)(i_type* self, i_type unowned) {
 }
 // share ownership with arc
 STC_INLINE void _c_MEMB(_assign)(i_type* self, i_type arc) {
-    if (arc.use_count)
-        _i_atomic_inc(arc.use_count);
+    _i_atomic_inc(arc.use_count);
     _c_MEMB(_drop)(self);
     *self = arc;
 }
