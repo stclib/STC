@@ -187,12 +187,12 @@ const size_t MAX_LOOP = 2000;
 
 int main(void)
 {
-    c_scoped (vec_str vec_string = {0}, vec_drop(&vec_string))
-    c_scoped (vec_sv vec_stringview = {0}, vec_drop(&vec_stringview))
-    c_scoped (smap_str mapTrans = {0}, smap_drop(&mapTrans))
-    c_scoped (smap_ssv mapSview = {0}, smap_drop(&mapSview))
-    c_scoped (hmap_str unordmapTrans = {0}, hmap_drop(&unordmapTrans))
-    c_scoped (hmap_ssv unordmapSview = {0}, hamp_drop(&unordmapSview))
+    c_scoped (vec_str vec_string = {0}, vec_str_drop(&vec_string))
+    c_scoped (vec_sv vec_stringview = {0}, vec_sv_drop(&vec_stringview))
+    c_scoped (smap_str mapTrans = {0}, smap_str_drop(&mapTrans))
+    c_scoped (smap_ssv mapSview = {0}, smap_ssv_drop(&mapSview))
+    c_scoped (hmap_str unordmapTrans = {0}, hmap_str_drop(&unordmapTrans))
+    c_scoped (hmap_ssv unordmapSview = {0}, hmap_ssv_drop(&unordmapSview))
     {
         std::cout << "Short String Benchmark" << std::endl;
         std::cout << "======================" << std::endl;
