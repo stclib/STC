@@ -152,7 +152,7 @@ STC_INLINE uint64_t c_hash_str(const char *str)
     { return c_hash_n(str, c_strlen(str)); }
 
 STC_INLINE uint64_t _c_hash_mix(uint64_t h[], int n) { // n > 0
-    for (int i = 1; i < n; ++i) h[0] ^= h[0] + h[i]; // non-commutative!
+    for (int i = 1; i < n; ++i) h[0] += h[0] ^ h[i]; // non-commutative!
     return h[0];
 }
 
