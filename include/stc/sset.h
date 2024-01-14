@@ -42,5 +42,5 @@ int main(void) {
 */
 
 #define _i_prefix sset_
-#define _i_isset
+#define _i_is_set
 #include "smap.h"

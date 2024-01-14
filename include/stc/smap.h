@@ -62,8 +62,8 @@ int main(void) {
 #ifndef _i_prefix
   #define _i_prefix smap_
 #endif
-#ifndef _i_isset
-  #define _i_ismap
+#ifndef _i_is_set
+  #define _i_is_map
   #define _i_MAP_ONLY c_true
   #define _i_SET_ONLY c_false
   #define _i_keyref(vp) (&(vp)->first)
@@ -174,7 +174,7 @@ _c_MEMB(_shrink_to_fit)(i_type *self) {
 
 STC_API _m_result _c_MEMB(_insert_entry_)(i_type* self, _m_keyraw rkey);
 
-#ifdef _i_ismap
+#ifdef _i_is_map
     STC_API _m_result _c_MEMB(_insert_or_assign)(i_type* self, _m_key key, _m_mapped mapped);
     #if !defined i_no_emplace
         STC_API _m_result  _c_MEMB(_emplace_or_assign)(i_type* self, _m_keyraw rkey, _m_rmapped rmapped);
@@ -194,7 +194,7 @@ STC_API _m_result _c_MEMB(_insert_entry_)(i_type* self, _m_keyraw rkey);
     STC_INLINE _m_mapped*
     _c_MEMB(_at_mut)(i_type* self, _m_keyraw rkey)
         { _m_iter it; return &_c_MEMB(_find_it)(self, rkey, &it)->second; }
-#endif // _i_ismap
+#endif // _i_is_map
 
 STC_INLINE _m_iter
 _c_MEMB(_end)(const i_type* self) {
@@ -246,9 +246,9 @@ _c_MEMB(_push)(i_type* self, _m_value _val) {
 STC_INLINE void
 _c_MEMB(_put_n)(i_type* self, const _m_raw* raw, intptr_t n) {
     while (n--)
-#if defined _i_isset && defined i_no_emplace
+#if defined _i_is_set && defined i_no_emplace
         _c_MEMB(_insert)(self, *raw++);
-#elif defined _i_isset
+#elif defined _i_is_set
         _c_MEMB(_emplace)(self, *raw++);
 #elif defined i_no_emplace
         _c_MEMB(_insert_or_assign)(self, raw->first, raw->second), ++raw;
@@ -339,7 +339,7 @@ _c_MEMB(_new_node_)(i_type* self, int level) {
     return tn;
 }
 
-#ifdef _i_ismap
+#ifdef _i_is_map
     STC_DEF _m_result
     _c_MEMB(_insert_or_assign)(i_type* self, _m_key _key, _m_mapped _mapped) {
         _m_result _res = _c_MEMB(_insert_entry_)(self, i_keyto((&_key)));
@@ -366,7 +366,7 @@ _c_MEMB(_new_node_)(i_type* self, int level) {
         return _res;
     }
     #endif // !i_no_emplace
-#endif // !_i_ismap
+#endif // !_i_is_map
 
 STC_DEF _m_value*
 _c_MEMB(_find_it)(const i_type* self, _m_keyraw rkey, _m_iter* out) {
@@ -598,8 +598,8 @@ _c_MEMB(_drop)(const i_type* cself) {
 }
 
 #endif // i_implement
-#undef _i_isset
-#undef _i_ismap
+#undef _i_is_set
+#undef _i_is_map
 #undef _i_sorted
 #undef _i_keyref
 #undef _i_MAP_ONLY

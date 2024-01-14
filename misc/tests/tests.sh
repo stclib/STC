@@ -1,1 +1,1 @@
-tcc *_test.c main.c -run
+tcc -I../../include *_test.c main.c -run

@@ -71,7 +71,6 @@ int main(void) {
 #ifndef _i_prefix
   #define _i_prefix box_
 #endif
-#define _i_cbox
 #include "priv/template.h"
 typedef i_keyraw _m_raw;
 
@@ -160,8 +159,13 @@ STC_INLINE void _c_MEMB(_assign)(i_type* self, i_type* moved) {
         return i_cmp((&rx), (&ry));
     }
 #else
-    STC_INLINE int _c_MEMB(_cmp)(const i_type* self, const i_type* other)
-        { return c_default_cmp(&self->get, &other->get); }
+    STC_INLINE int _c_MEMB(_raw_cmp)(const _m_raw* rx, const _m_raw* ry)
+        { return (rx > ry) - (rx < ry); }
+
+    STC_INLINE int _c_MEMB(_cmp)(const i_type* self, const i_type* other) {
+        const _m_value *x = self->get, *y = other->get;
+        return (x > y) - (x < y);
+    }
 #endif
 
 #if defined _i_has_eq
@@ -173,11 +177,14 @@ STC_INLINE void _c_MEMB(_assign)(i_type* self, i_type* moved) {
         return i_eq((&rx), (&ry));
     }
 #else
+    STC_INLINE bool _c_MEMB(_raw_eq)(const _m_raw* rx, const _m_raw* ry)
+        { return rx == ry; }
+
     STC_INLINE bool _c_MEMB(_eq)(const i_type* self, const i_type* other)
         { return self->get == other->get; }
 #endif
 
-#ifndef i_no_hash
+#if !defined i_no_hash && defined _i_has_eq
     STC_INLINE uint64_t _c_MEMB(_raw_hash)(const _m_raw* rx)
         { return i_hash(rx); }
 
@@ -186,10 +193,12 @@ STC_INLINE void _c_MEMB(_assign)(i_type* self, i_type* moved) {
         return i_hash((&rx));
     }
 #else
+    STC_INLINE uint64_t _c_MEMB(_raw_hash)(const _m_raw* rx)
+        { return c_default_hash(&rx); }
+
     STC_INLINE uint64_t _c_MEMB(_hash)(const i_type* self)
         { return c_default_hash(&self->get); }
 #endif // i_no_hash
 
-#undef _i_cbox
 #include "priv/template2.h"
 #include "priv/linkage2.h"

@@ -39,5 +39,5 @@ int main(void) {
 */
 
 #define _i_prefix hset_
-#define _i_isset
+#define _i_is_set
 #include "hmap.h"

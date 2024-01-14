@@ -48,7 +48,7 @@
   #define _m_node _c_MEMB(_node)
 #endif
 
-#if defined i_TYPE && defined _i_ismap
+#if defined i_TYPE && defined _i_is_map
   #define i_type _c_SEL(_c_SEL31, i_TYPE)
   #define i_key _c_SEL(_c_SEL32, i_TYPE)
   #define i_val _c_SEL(_c_SEL33, i_TYPE)
@@ -69,7 +69,7 @@
 #if !(defined i_key || \
       defined i_key_str || defined i_key_ssv || \
       defined i_key_class || defined i_key_arcbox)
-  #if defined _i_ismap
+  #if defined _i_is_map
     #error "i_key* must be defined for maps"
   #endif
 
@@ -120,7 +120,7 @@
 #if c_option(c_use_eq)
   #define i_use_eq
 #endif
-#if c_option(c_no_clone) || defined _i_carc
+#if c_option(c_no_clone) || defined _i_is_arc
   #define i_no_clone
 #endif
 #if c_option(c_more)
@@ -161,7 +161,7 @@
 // Bind to i_key "class members": _clone, _drop, _from and _toraw (when conditions are met).
 #if defined i_key_class
   #define i_key i_key_class
-  #ifndef i_keyclone
+  #if !defined i_keyclone && !defined i_no_clone
     #define i_keyclone c_JOIN(i_key, _clone)
   #endif
   #ifndef i_keydrop
@@ -190,7 +190,7 @@
   #if !(defined i_cmp || defined i_less) && (defined i_use_cmp || defined _i_sorted || defined _i_ispque)
     #define i_cmp c_JOIN(i_keyraw, _cmp)
   #endif
-  #if !defined i_eq && (defined i_use_eq || defined i_hash || defined _i_ishash)
+  #if !defined i_eq && (defined i_use_eq || defined i_hash || defined _i_is_hash)
     #define i_eq c_JOIN(i_keyraw, _eq)
   #endif
   #if !(defined i_hash || defined i_no_hash)
@@ -206,7 +206,7 @@
   #error "Both i_keyclone/i_valclone and i_keydrop/i_valdrop must be defined, if any (unless i_no_clone defined)."
 #elif defined i_from || defined i_drop
   #error "i_from / i_drop not supported. Define i_keyfrom/i_valfrom and/or i_keydrop/i_valdrop instead"
-#elif defined i_keyraw && defined _i_ishash && !(defined i_hash && (defined _i_has_cmp || defined i_eq))
+#elif defined i_keyraw && defined _i_is_hash && !(defined i_hash && (defined _i_has_cmp || defined i_eq))
   #error "For hmap/hset, both i_hash and i_eq (or i_cmp) must be defined when i_keyraw is defined."
 #elif defined i_keyraw && defined i_use_cmp && !defined _i_has_cmp
   #error "For smap/sset/pque, i_cmp or i_less must be defined when i_keyraw is defined."
@@ -233,15 +233,16 @@
 #ifndef i_tag
   #define i_tag i_key
 #endif
-#ifndef i_keyraw
-  #define i_keyraw i_key
-#endif
-#ifndef i_keyfrom
+#if !defined i_keyfrom && defined i_keyclone && !defined i_keyraw
+  #define i_keyfrom i_keyclone
+  #define i_has_emplace
+#elif !defined i_keyfrom
   #define i_keyfrom c_default_clone
 #else
   #define i_has_emplace
 #endif
-#ifndef i_keyto
+#ifndef i_keyraw
+  #define i_keyraw i_key
   #define i_keyto c_default_toraw
 #endif
 #ifndef i_keyclone
@@ -251,7 +252,7 @@
   #define i_keydrop c_default_drop
 #endif
 
-#if defined _i_ismap // ---- process hmap/smap value i_val, ... ----
+#if defined _i_is_map // ---- process hmap/smap value i_val, ... ----
 
 #ifdef i_val_str
   #define i_val_class cstr
@@ -268,7 +269,7 @@
 
 #ifdef i_val_class
   #define i_val i_val_class
-  #ifndef i_valclone
+  #if !defined i_valclone && !defined i_no_clone
     #define i_valclone c_JOIN(i_val, _clone)
   #endif
   #ifndef i_valdrop
@@ -292,15 +293,15 @@
   #error "Both i_valclone and i_valdrop must be defined, if any"
 #endif
 
-#ifndef i_valraw
-  #define i_valraw i_val
-#endif
-#ifndef i_valfrom
+#if !defined i_valfrom && defined i_valclone && !defined i_valraw
+  #define i_valfrom i_valclone
+#elif !defined i_valfrom
   #define i_valfrom c_default_clone
 #else
   #define i_has_emplace
 #endif
-#ifndef i_valto
+#ifndef i_valraw
+  #define i_valraw i_val
   #define i_valto c_default_toraw
 #endif
 #ifndef i_valclone
@@ -310,7 +311,7 @@
   #define i_valdrop c_default_drop
 #endif
 
-#endif // !_i_ismap
+#endif // !_i_is_map
 
 #ifndef i_val
   #define i_val i_key

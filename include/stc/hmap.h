@@ -60,8 +60,8 @@ struct hmap_slot { uint8_t hashx; };
 #ifndef _i_prefix
   #define _i_prefix hmap_
 #endif
-#ifndef _i_isset
-  #define _i_ismap
+#ifndef _i_is_set
+  #define _i_is_map
   #define _i_MAP_ONLY c_true
   #define _i_SET_ONLY c_false
   #define _i_keyref(vp) (&(vp)->first)
@@ -70,7 +70,7 @@ struct hmap_slot { uint8_t hashx; };
   #define _i_SET_ONLY c_true
   #define _i_keyref(vp) (vp)
 #endif
-#define _i_ishash
+#define _i_is_hash
 #include "priv/template.h"
 #ifndef i_is_forward
   _c_DEFTYPES(_c_htable_types, i_type, i_key, i_val, _i_MAP_ONLY, _i_SET_ONLY);
@@ -109,7 +109,7 @@ STC_INLINE intptr_t     _c_MEMB(_bucket_count)(i_type* map) { return map->bucket
 STC_INLINE bool         _c_MEMB(_contains)(const i_type* self, _m_keyraw rkey)
                             { return self->size && !_c_MEMB(_bucket_)(self, &rkey).inserted; }
 
-#ifdef _i_ismap
+#ifdef _i_is_map
     STC_API _m_result _c_MEMB(_insert_or_assign)(i_type* self, _m_key key, _m_mapped mapped);
     #if !defined i_no_emplace
         STC_API _m_result  _c_MEMB(_emplace_or_assign)(i_type* self, _m_keyraw rkey, _m_rmapped rmapped);
@@ -125,7 +125,7 @@ STC_INLINE bool         _c_MEMB(_contains)(const i_type* self, _m_keyraw rkey)
     STC_INLINE _m_mapped*
     _c_MEMB(_at_mut)(i_type* self, _m_keyraw rkey)
         { return (_m_mapped*)_c_MEMB(_at)(self, rkey); }
-#endif // _i_ismap
+#endif // _i_is_map
 
 #if !defined i_no_clone
 STC_INLINE void _c_MEMB(_copy)(i_type *self, const i_type* other) {
@@ -154,7 +154,7 @@ _c_MEMB(_emplace)(i_type* self, _m_keyraw rkey _i_MAP_ONLY(, _m_rmapped rmapped)
     return _res;
 }
 
-#ifdef _i_ismap
+#ifdef _i_is_map
     STC_INLINE _m_result
     _c_MEMB(_emplace_key)(i_type* self, _m_keyraw rkey) {
         _m_result _res = _c_MEMB(_insert_entry_)(self, rkey);
@@ -162,7 +162,7 @@ _c_MEMB(_emplace)(i_type* self, _m_keyraw rkey _i_MAP_ONLY(, _m_rmapped rmapped)
             _res.ref->first = i_keyfrom(rkey);
         return _res;
     }
-#endif // _i_ismap
+#endif // _i_is_map
 #endif // !i_no_emplace
 
 STC_INLINE _m_raw _c_MEMB(_value_toraw)(const _m_value* val) {
@@ -196,9 +196,9 @@ STC_INLINE _m_value* _c_MEMB(_push)(i_type* self, _m_value _val) {
 
 STC_INLINE void _c_MEMB(_put_n)(i_type* self, const _m_raw* raw, intptr_t n) {
     while (n--)
-#if defined _i_isset && defined i_no_emplace
+#if defined _i_is_set && defined i_no_emplace
         _c_MEMB(_insert)(self, *raw++);
-#elif defined _i_isset
+#elif defined _i_is_set
         _c_MEMB(_emplace)(self, *raw++);
 #elif defined i_no_emplace
         _c_MEMB(_insert_or_assign)(self, raw->first, raw->second), ++raw;
@@ -328,7 +328,7 @@ STC_DEF void _c_MEMB(_clear)(i_type* self) {
     c_memset(self->slot, 0, c_sizeof(struct hmap_slot)*self->bucket_count);
 }
 
-#ifdef _i_ismap
+#ifdef _i_is_map
     STC_DEF _m_result
     _c_MEMB(_insert_or_assign)(i_type* self, _m_key _key, _m_mapped _mapped) {
         _m_result _res = _c_MEMB(_insert_entry_)(self, i_keyto((&_key)));
@@ -355,7 +355,7 @@ STC_DEF void _c_MEMB(_clear)(i_type* self) {
         return _res;
     }
     #endif // !i_no_emplace
-#endif // _i_ismap
+#endif // _i_is_map
 
 STC_DEF _m_result
 _c_MEMB(_bucket_)(const i_type* self, const _m_keyraw* rkeyptr) {
@@ -468,9 +468,9 @@ _c_MEMB(_erase_entry)(i_type* self, _m_value* _val) {
 }
 #endif // i_implement
 #undef i_max_load_factor
-#undef _i_isset
-#undef _i_ismap
-#undef _i_ishash
+#undef _i_is_set
+#undef _i_is_map
+#undef _i_is_hash
 #undef _i_keyref
 #undef _i_MAP_ONLY
 #undef _i_SET_ONLY
