@@ -376,7 +376,8 @@ static void msg_end(void) {
 
 CTEST_IMPL_DIAG_PUSH_IGNORED(missing-noreturn)
 
-static void ctest_print(int diag, const char* fmt, ...) CTEST_IMPL_FORMAT_PRINTF(2, 3)  // may not return
+static void ctest_print(int diag, const char* fmt, ...) CTEST_IMPL_FORMAT_PRINTF(2, 3);  // may not return
+static void ctest_print(int diag, const char* fmt, ...)
 {
     va_list argp;
     switch (diag) {
