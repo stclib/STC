@@ -34,49 +34,61 @@ static cstr to_roman(int value)
     return result;
 }
 
-CTEST(algorithm, cstr_append)
+TEST(algorithm, cstr_append)
 {
     c_scoped (cstr s = to_roman(2024), cstr_drop(&s))
     {
-        ASSERT_STREQ("MMXXIV", cstr_str(&s));
+        EXPECT_STREQ("MMXXIV", cstr_str(&s));
     }
 }
 
 
-CTEST(algorithm, c_find_if)
+TEST(algorithm, c_find_if)
 {
     ISpan nums = c_init(ISpan, {1,1,2,3,5,8,13,21,34});
 
     ISpan_iter it;
     c_find_if(ISpan, nums, &it, *value == 13);
 
-    ASSERT_EQ(13, *it.ref);
+    EXPECT_EQ(13, *it.ref);
 }
 
 
-CTEST(algorithm, c_filter)
+TEST(algorithm, c_filter)
 {
-    IVec vec = c_init(IVec, {1,1,2,3,5,8,13,21,34});
+    IVec vec = c_init(IVec, {1,1,2,3,5,8,13,21,34,10});
     #define f_is_even(v) ((v & 1) == 0)
     #define f_is_odd(v) ((v & 1) == 1)
 
     int sum = 0;
     c_filter(IVec, vec
-         , c_flt_skip(3)
-        && c_flt_skipwhile(f_is_odd(*value))
-        && c_flt_take(4)
+         , c_flt_skipwhile(f_is_odd(*value))
+        && c_flt_skip(1)
         && f_is_even(*value)
+        && c_flt_take(2)
         && (sum += *value));
 
-    ASSERT_EQ(42, sum);
+    EXPECT_EQ(42, sum);
 
     uint64_t hash = 0;
     c_filter(IVec, vec, hash = c_hash_mix(hash, *value));
-    ASSERT_EQ(332, hash);
+    EXPECT_EQ(658, hash);
 
     hash = 0;
     c_filter_reverse(IVec, vec, hash = c_hash_mix(hash, *value));
-    ASSERT_EQ(10897, hash);
+    EXPECT_EQ(10897, hash);
+
+    sum = 0;
+    c_filter(IVec, vec, sum += *value);
+    EXPECT_EQ(98, sum);
+
+    sum = 0;
+    c_filter_reverse(IVec, vec, sum += *value);
+    EXPECT_EQ(98, sum);
+
+    sum = 0;
+    c_filter_zip(IVec, vec, crange, c_iota(-6), sum += *value1 * *value2);
+    EXPECT_EQ(73, sum);
 
     IVec_drop(&vec);
 }

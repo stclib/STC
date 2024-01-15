@@ -5,7 +5,7 @@
 using_cspan3(intspan, int);
 
 
-CTEST(cspan, subdim) {
+TEST(cspan, subdim) {
     int array[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
     intspan3 m = cspan_md(array, 2, 2, 3);
 
@@ -20,7 +20,7 @@ CTEST(cspan, subdim) {
     }
 }
 
-CTEST(cspan, slice) {
+TEST(cspan, slice) {
     int array[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
     intspan2 m1 = cspan_md(array, 3, 4);
 
@@ -39,14 +39,14 @@ CTEST(cspan, slice) {
             sum2 += *cspan_at(&m2, i, j);
         }
     }
-    ASSERT_EQ(78, sum1);
-    ASSERT_EQ(45, sum2);
+    EXPECT_EQ(78, sum1);
+    EXPECT_EQ(45, sum2);
 }
 
 #define i_key int
 #include "stc/stack.h"
 
-CTEST(cspan, slice2) {
+TEST(cspan, slice2) {
     stack_int stack = {0};
     c_defer (stack_int_drop(&stack))
     {
@@ -64,12 +64,12 @@ CTEST(cspan, slice2) {
                 }
             }
         }
-        ASSERT_EQ(65112, sum);
+        EXPECT_EQ(65112, sum);
 
         sum = 0;
         c_foreach (i, intspan3, ms3)
             sum += *i.ref;
-        ASSERT_EQ(65112, sum);
+        EXPECT_EQ(65112, sum);
     }
 }
 
@@ -77,46 +77,46 @@ CTEST(cspan, slice2) {
 #define i_TYPE Tiles,intspan3
 #include "stc/stack.h"
 
-CTEST_FIXTURE(cspan_cube) {
+TEST_FIXTURE(cspan_cube) {
     stack_int stack;
     Tiles tiles;
 };
 
-CTEST_SETUP(cspan_cube) {
+TEST_SETUP(cspan_cube) {
     enum {TSIZE=4, CUBE=64, N=CUBE*CUBE*CUBE};
 
-    _self->stack = stack_int_init();
-    _self->tiles = Tiles_init();
+    self->stack = stack_int_init();
+    self->tiles = Tiles_init();
 
-    stack_int_reserve(&_self->stack, N);
+    stack_int_reserve(&self->stack, N);
     c_forrange (i, N)
-        stack_int_push(&_self->stack, i+1);
+        stack_int_push(&self->stack, i+1);
 
-    intspan3 ms3 = cspan_md(_self->stack.data, CUBE, CUBE, CUBE);
+    intspan3 ms3 = cspan_md(self->stack.data, CUBE, CUBE, CUBE);
 
     c_forrange (i, 0, ms3.shape[0], TSIZE) {
         c_forrange (j, 0, ms3.shape[1], TSIZE) {
             c_forrange (k, 0, ms3.shape[2], TSIZE) {
                 intspan3 tile = cspan_slice(intspan3, &ms3, {i, i + TSIZE}, {j, j + TSIZE}, {k, k + TSIZE});
-                Tiles_push(&_self->tiles, tile);
+                Tiles_push(&self->tiles, tile);
             }
         }
     }
 }
 
 // Optional teardown function for suite, called after every test in suite
-CTEST_TEARDOWN(cspan_cube) {
-    stack_int_drop(&_self->stack);
-    Tiles_drop(&_self->tiles);
+TEST_TEARDOWN(cspan_cube) {
+    stack_int_drop(&self->stack);
+    Tiles_drop(&self->tiles);
 }
 
 
-CTEST_F(cspan_cube, slice3) {
-    long long n = stack_int_size(&_self->stack);
+TEST_F(cspan_cube, slice3) {
+    long long n = stack_int_size(&self->stack);
     long long sum = 0;
 
     // iterate each 3d tile in sequence
-    c_foreach (i, Tiles, _self->tiles)
+    c_foreach (i, Tiles, self->tiles)
         c_foreach (t, intspan3, *i.ref)
             sum += *t.ref;
 
