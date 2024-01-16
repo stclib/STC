@@ -1,5 +1,6 @@
 #define i_implement
 #include "stc/cstr.h"
+#include "stc/algorithm.h"
 
 #define i_key_str
 #define i_val_str
@@ -13,7 +14,7 @@
 
 int main(void)
 {
-    hmap_str map, mclone;
+    hmap_str map = {0}, mclone = {0};
     vec_str keys = {0}, values = {0};
     list_str list = {0};
 
@@ -31,27 +32,33 @@ int main(void)
         });
 
         puts("MAP:");
-        c_foreach (i, hmap_str, map)
-            printf("  %s: %s\n", cstr_str(&i.ref->first), cstr_str(&i.ref->second));
+        c_filter(hmap_str, map,
+            printf("  %s: %s\n", cstr_str(&value->first), cstr_str(&value->second)));
 
         puts("\nCLONE MAP:");
         mclone = hmap_str_clone(map);
-        c_foreach (i, hmap_str, mclone)
-            printf("  %s: %s\n", cstr_str(&i.ref->first), cstr_str(&i.ref->second));
+        // print
+        c_filter(hmap_str, mclone,
+            printf("  %s: %s\n", cstr_str(&value->first), cstr_str(&value->second)));
 
         puts("\nCOPY MAP TO VECS:");
-        c_foreach (i, hmap_str, mclone) {
-            vec_str_emplace_back(&keys, cstr_str(&i.ref->first));
-            vec_str_emplace_back(&values, cstr_str(&i.ref->second));
-        }
-        c_forrange (i, vec_str_size(&keys))
-            printf("  %s: %s\n", cstr_str(keys.data + i), cstr_str(values.data + i));
+        c_filter(hmap_str, mclone, (vec_str_push(&keys, cstr_clone(value->first)),
+                                    vec_str_push(&values, cstr_clone(value->second))));
+        // print both keys and values zipped
+        c_filter_zip(vec_str, keys, values,
+            printf("  %s: %s\n", cstr_str(value1), cstr_str(value2)));
 
         puts("\nCOPY VEC TO LIST:");
-        c_foreach (i, vec_str, keys)
-            list_str_emplace_back(&list, cstr_str(i.ref));
+        c_copy(vec_str, keys, list_str, &list);
+        // print
+        c_filter(list_str, list, printf("  %s\n", cstr_str(value)));
 
-        c_foreach (i, list_str, list)
-            printf("  %s\n", cstr_str(i.ref));
+        puts("\nCOPY VEC AND LIST TO MAP:");
+        hmap_str_clear(&map);
+        c_filter_zip(vec_str, values, list_str, list,
+            hmap_str_emplace(&map, cstr_str(value1), cstr_str(value2)));
+        // print inverted map
+        c_filter(hmap_str, map,
+            printf("  %s: %s\n", cstr_str(&value->first), cstr_str(&value->second)));
     }
 }
