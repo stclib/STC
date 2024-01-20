@@ -61,11 +61,11 @@
 
 #define _c_list_complete_types(SELF, dummy) \
     struct SELF##_node { \
+        SELF##_value value; /* must be first! */ \
         struct SELF##_node *next; \
-        SELF##_value value; \
     }
 
-#define _clist_tonode(vp) c_container_of(vp, _m_node, value)
+#define _clist_tonode(vp) c_safe_cast(_m_node*, _m_value*, vp)
 
 #define _c_list_insert_entry_after(ref, val) \
     _m_node *entry = (_m_node *)i_malloc(c_sizeof *entry); entry->value = val; \

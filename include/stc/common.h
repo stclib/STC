@@ -88,7 +88,7 @@
 #endif
 #define c_container_of(p, C, m) ((C*)((char*)(1 ? (p) : &((C*)0)->m) - offsetof(C, m)))
 #define c_const_cast(Tp, p)     ((Tp)(1 ? (p) : (Tp)0))
-#define c_safe_cast(T, F, x)    ((T)(1 ? (x) : (F){0}))
+#define c_safe_cast(T, From, x) ((T)(1 ? (x) : (From){0}))
 #define c_swap(T, xp, yp)       do { T *_xp = xp, *_yp = yp, \
                                     _tv = *_xp; *_xp = *_yp; *_yp = _tv; } while (0)
 // use with gcc -Wconversion

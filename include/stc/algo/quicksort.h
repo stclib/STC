@@ -51,7 +51,7 @@ int main(void) {
 #include <stdio.h>
 #define i_type IDeq
 #define i_key int
-#define i_opt c_use_cmp | c_more // retain input template params to be reused by sort.h
+#define i_opt c_use_cmp | c_more // retain input template params to be reused by quicksort.h
 #include "stc/deq.h"
 #include "stc/algo/quicksort.h"
 

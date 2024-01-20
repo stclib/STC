@@ -23,7 +23,12 @@
 #include "stc/common.h"
 #include "stc/types.h"
 
-#ifdef i_key_str
+#ifndef i_type
+  #error "You must define i_type for the extend functionality"
+  #define i_type PLEASE_DEFINE_i_type
+#endif
+
+#if defined i_key_str
   #define _i_key cstr
 #elif defined i_key_class
   #define _i_key i_key_class
@@ -51,21 +56,36 @@
   c_JOIN(forward_, i_base)(i_type, _i_val);
 #endif
 
-typedef struct {
+typedef struct c_JOIN(i_type, _ext) {
+    i_type get; // must be first!
     i_extend
-    i_type get;
 } c_JOIN(i_type, _ext);
 
-#define c_extend() c_container_of(self, _c_MEMB(_ext), get)
-// Note: i_less: c_extend() accessible for cpque types
-//       i_cmp: c_extend() accessible for csmap and csset types
-//       i_hash/i_eq: c_extend() accessible for cmap and cset types
+#define c_extend() ((c_JOIN(i_type, _ext)*) self)
+// c_extend() is accessible from the following customization macros:
+//   i_malloc, i_calloc, i_realloc, i_free: all container types
+//   i_cmp: smap and sset types
+//   i_hash, i_eq: hmap and hset types
+//   i_less: pque types
 
-#define i_is_forward
+// flag that container type was forward declared, and don't undef the template parameters:
+#define i_opt c_is_forward | c_more
 #define _i_inc <stc/i_base.h>
 #include _i_inc
+
+// Add a clone function for the extended container struct.
+// Assumes that the extended member(s) are POD/trivial type(s).
+#ifndef i_no_clone
+STC_INLINE c_JOIN(i_type, _ext) _c_MEMB(_ext_clone)(c_JOIN(i_type, _ext) cx) {
+    cx.get = _c_MEMB(_clone)(cx.get);
+    return cx;
+}
+#endif
+
+#include "priv/template2.h" // undef the template parameters
 #undef _i_inc
 #undef _i_key
 #undef _i_val
 #undef i_base
 #undef i_extend
+#undef c_extend // make it unavailable when irrelevant

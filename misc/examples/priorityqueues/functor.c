@@ -5,19 +5,19 @@
 #include <stdio.h>
 
 #define i_type IPQue
-#define i_base pque
 #define i_key int
 #define i_extend bool(*less)(const int*, const int*);
 #define i_less(x, y) c_extend()->less(x, y)
-// Note: i_less: c_extend() accessible for pque types
-//       i_cmp: c_extend() accessible for smap and sset types
-//       i_hash/i_eq: c_extend() accessible for hmap and hset types
+#define i_base pque
 #include "stc/extend.h"
 
 void print_queue(const char* name, IPQue_ext q) {
-    // NB: make a clone because there is no way to traverse
-    // priority queue's content without erasing the queue.
-    IPQue_ext copy = {q.less, IPQue_clone(q.get)};
+    // Make a clone, because there is no way to traverse
+    // priority queues ordered without erasing the queue.
+
+    // NB! A clone function for the extended container struct is provided.
+    // It assumes that the extended member(s) are POD/trivial type(s).
+    IPQue_ext copy = IPQue_ext_clone(q); //
 
     for (printf("%s: \t", name); !IPQue_is_empty(&copy.get); IPQue_pop(&copy.get))
         printf("%d ", *IPQue_top(&copy.get));
