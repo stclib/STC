@@ -105,14 +105,13 @@
   #endif
 #endif
 
+#define i_no_emplace
+
 #if c_option(c_is_forward)
   #define i_is_forward
 #endif
 #if c_option(c_no_hash)
   #define i_no_hash
-#endif
-#if c_option(c_no_emplace)
-  #define i_no_emplace
 #endif
 #if c_option(c_use_cmp)
   #define i_use_cmp
@@ -235,11 +234,10 @@
 #endif
 #if !defined i_keyfrom && defined i_keyclone && !defined i_keyraw
   #define i_keyfrom i_keyclone
-  #define i_has_emplace
 #elif !defined i_keyfrom
   #define i_keyfrom c_default_clone
-#else
-  #define i_has_emplace
+#elif !c_option(c_no_emplace)
+  #undef i_no_emplace
 #endif
 #ifndef i_keyraw
   #define i_keyraw i_key
@@ -297,8 +295,8 @@
   #define i_valfrom i_valclone
 #elif !defined i_valfrom
   #define i_valfrom c_default_clone
-#else
-  #define i_has_emplace
+#elif !c_option(c_no_emplace)
+  #undef i_no_emplace
 #endif
 #ifndef i_valraw
   #define i_valraw i_val
@@ -319,7 +317,4 @@
 #ifndef i_valraw
   #define i_valraw i_keyraw
 #endif
-#ifndef i_has_emplace
-  #define i_no_emplace
 #endif // STC_TEMPLATE_H_INCLUDED
-#endif
