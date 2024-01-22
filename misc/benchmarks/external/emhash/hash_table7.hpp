@@ -1,6 +1,6 @@
 // emhash7::HashMap for C++11/14/17
-// version 2.2.4
-// https://github.com/ktprime/ktprime/blob/master/hash_table7.hpp
+// version 2.2.5
+// https://github.com/ktprime/emhash/blob/master/hash_table7.hpp
 //
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 // SPDX-License-Identifier: MIT
@@ -176,7 +176,7 @@ static_assert((int)INACTIVE < 0, "INACTIVE must negative (to int)");
 #endif
 
 //count the leading zero bit
-static int CTZ(size_t n)
+static inline int CTZ(size_t n)
 {
 #if defined(__x86_64__) || defined(_WIN32) || (__BYTE_ORDER__ && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
 
@@ -354,11 +354,11 @@ public:
 
         iterator() = default;
         iterator(const const_iterator& it) : _map(it._map), _bucket(it._bucket), _from(it._from), _bmask(it._bmask) { }
-        iterator(const htype* hash_map, size_type bucket, bool) : _map(hash_map), _bucket(bucket) { init(); }
+        //iterator(const htype* hash_map, size_type bucket, bool) : _map(hash_map), _bucket(bucket) { init(); }
 #if EMH_ITER_SAFE
         iterator(const htype* hash_map, size_type bucket) : _map(hash_map), _bucket(bucket) { init(); }
 #else
-        iterator(const htype* hash_map, size_type bucket) : _map(hash_map), _bucket(bucket) { _bmask = _from = 0; }
+        iterator(const htype* hash_map, size_type bucket) : _map(hash_map), _bucket(bucket) { _from = -1; }
 #endif
 
         void init()
@@ -392,6 +392,9 @@ public:
 
         iterator& operator++()
         {
+#ifndef EMH_ITER_SAFE
+            if (_from == (size_type)-1) init();
+#endif
             _bmask &= _bmask - 1;
             goto_next_element();
             return *this;
@@ -399,6 +402,9 @@ public:
 
         iterator operator++(int)
         {
+#ifndef EMH_ITER_SAFE
+            if (_from == (size_type)-1) init();
+#endif
             iterator old = *this;
             _bmask &= _bmask - 1;
             goto_next_element();
@@ -453,11 +459,11 @@ public:
         typedef const value_pair&          reference;
 
         const_iterator(const iterator& it) : _map(it._map), _bucket(it._bucket), _from(it._from), _bmask(it._bmask) { }
-        const_iterator(const htype* hash_map, size_type bucket, bool) : _map(hash_map), _bucket(bucket) { init(); }
+        //const_iterator(const htype* hash_map, size_type bucket, bool) : _map(hash_map), _bucket(bucket) { init(); }
 #if EMH_ITER_SAFE
         const_iterator(const htype* hash_map, size_type bucket) : _map(hash_map), _bucket(bucket) { init(); }
 #else
-        const_iterator(const htype* hash_map, size_type bucket) : _map(hash_map), _bucket(bucket) { _bmask = _from = 0; }
+        const_iterator(const htype* hash_map, size_type bucket) : _map(hash_map), _bucket(bucket) { _from = -1; }
 #endif
 
         void init()
@@ -479,12 +485,18 @@ public:
 
         const_iterator& operator++()
         {
+#ifndef EMH_ITER_SAFE
+            if (_from == (size_type)-1) init();
+#endif
             goto_next_element();
             return *this;
         }
 
         const_iterator operator++(int)
         {
+#ifndef EMH_ITER_SAFE
+            if (_from == (size_type)-1) init();
+#endif
             const_iterator old(*this);
             goto_next_element();
             return old;
@@ -531,6 +543,7 @@ public:
         _pairs = nullptr;
         _bitmask = nullptr;
         _num_buckets = _num_filled = 0;
+        _mlf = (uint32_t)((1 << 27) / EMH_DEFAULT_LOAD_FACTOR);
         max_load_factor(mlf);
         rehash(bucket);
     }
@@ -653,6 +666,7 @@ public:
             }
         }
         free(_pairs);
+        _pairs = nullptr;
     }
 
     void clone(const HashMap& rhs) noexcept
@@ -702,9 +716,10 @@ public:
 
         const auto bmask = ~(*(size_t*)_bitmask);
         if (bmask != 0)
-            return {this, (size_type)CTZ(bmask), true};
+            return {this, (size_type)CTZ(bmask)};
 
         iterator it(this, sizeof(bmask) * 8 - 1);
+        it.init();
         return it.next();
     }
 
@@ -717,9 +732,10 @@ public:
 
         const auto bmask = ~(*(size_t*)_bitmask);
         if (bmask != 0)
-            return {this, (size_type)CTZ(bmask), true};
+            return {this, (size_type)CTZ(bmask)};
 
         iterator it(this, sizeof(bmask) * 8 - 1);
+        it.init();
         return it.next();
     }
 
@@ -730,7 +746,7 @@ public:
 
         auto bucket = _mask;
         while (EMH_EMPTY(_pairs, bucket)) bucket--;
-        return {this, bucket, true};
+        return {this, bucket};
     }
 
     inline const_iterator begin() const noexcept { return cbegin(); }
@@ -750,7 +766,7 @@ public:
 
     inline void max_load_factor(float mlf)
     {
-        if (mlf < 0.999f && mlf > EMH_MIN_LOAD_FACTOR)
+        if (mlf <= 0.999f && mlf > EMH_MIN_LOAD_FACTOR)
             _mlf = (uint32_t)((1 << 27) / mlf);
     }
 
@@ -873,7 +889,7 @@ public:
         int bsize = sprintf (buff, "============== buckets size ration ========\n");
 
         miss += _num_buckets - _num_filled;
-        for (int i = 1, factorial = 1; i < sizeof(buckets) / sizeof(buckets[0]); i++) {
+        for (int i = 1, factorial = 1; i < int(sizeof(buckets) / sizeof(buckets[0])); i++) {
             double poisson = fk / factorial; factorial *= i; fk *= lf;
             if (poisson > 1e-13 && i < 20)
             sum_poisson += poisson * 100.0 * (i - 1) / i;
@@ -1301,7 +1317,8 @@ public:
     void clearkv()
     {
         if (is_triviall_destructable()) {
-            for (auto it = cbegin(); _num_filled; ++it)
+            auto it = cbegin(); it.init();
+            for (; _num_filled; ++it)
                 clear_bucket(it.bucket());
         }
     }
@@ -1690,19 +1707,34 @@ private:
                 return step * SIZE_BIT + CTZ(bmask3);
         }
 
-        for (; ;) {
-            auto& _last = EMH_BUCKET(_pairs, _num_buckets);
-            const auto bmask2 = *((size_t*)_bitmask + _last);
+        auto next_bucket = (bucket_from + 0 * SIZE_BIT) & qmask;
+        auto& last = EMH_BUCKET(_pairs, _num_buckets);
+        for (size_type offset = 1; ; offset += 1) {
+            last &= qmask;
+            const auto bmask2 = *((size_t*)_bitmask + last);
             if (bmask2 != 0)
-                return _last * SIZE_BIT + CTZ(bmask2);
-
-            const auto next1 = (qmask / 2 + _last) & qmask;
+                return last * SIZE_BIT + CTZ(bmask2);
+#if 1
+            const auto next1 = (qmask / 2 + last) & qmask;
             const auto bmask1 = *((size_t*)_bitmask + next1);
             if (bmask1 != 0) {
-                //_last = next1;
+                last = next1;
                 return next1 * SIZE_BIT + CTZ(bmask1);
             }
-            _last = (_last + 1) & qmask;
+            last += 1;
+#else
+            next_bucket += offset < 10 ? 1 + SIZE_BIT * offset : 1 + qmask / 32;
+            if (next_bucket >= qmask) {
+                next_bucket += 1;
+                next_bucket &= qmask;
+            }
+
+            const auto bmask1 = *((size_t*)_bitmask + next_bucket);
+            if (bmask1 != 0) {
+                last = next_bucket;
+                return next_bucket * SIZE_BIT + CTZ(bmask1);
+            }
+#endif
         }
 
         return 0;
@@ -1849,7 +1881,7 @@ private:
     }
 
 private:
-    uint32_t* _bitmask;
+    uint8_t* _bitmask;
     PairT*    _pairs;
     HashT     _hasher;
     EqT       _eq;
@@ -1860,7 +1892,7 @@ private:
     uint32_t  _mlf;
 
 private:
-    static constexpr uint32_t BIT_PACK = sizeof(_bitmask[0]) * 2;
+    static constexpr uint32_t BIT_PACK = sizeof(uint64_t);
     static constexpr uint32_t MASK_BIT = sizeof(_bitmask[0]) * 8;
     static constexpr uint32_t SIZE_BIT = sizeof(size_t) * 8;
     static constexpr uint32_t EPACK_SIZE = sizeof(PairT) >= sizeof(size_t) == 0 ? 1 : 2; // > 1

@@ -30,7 +30,7 @@ Point origin(void) {
 
 box_Point boxed_origin(void) {
     // Allocate this point on the heap, and return a pointer to it
-    return box_Point_make(c_LITERAL(Point){ .x=1.0, .y=2.0 });
+    return box_Point_from(c_LITERAL(Point){ .x=1.0, .y=2.0 });
 }
 
 
@@ -43,12 +43,12 @@ int main(void) {
     };
 
     // Heap allocated rectangle
-    box_Rectangle boxed_rectangle = box_Rectangle_make(c_LITERAL(Rectangle){
+    box_Rectangle boxed_rectangle = box_Rectangle_from(c_LITERAL(Rectangle){
         .top_left = origin(),
         .bottom_right = { .x=3.0, .y=-4.0 }
     });
     // The output of functions can be boxed
-    box_Point boxed_point = box_Point_make(origin());
+    box_Point boxed_point = box_Point_from(origin());
 
     // Can use from(raw) and toraw instead:
     BoxBoxPoint box_in_a_box = BoxBoxPoint_from(origin());

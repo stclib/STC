@@ -147,13 +147,8 @@ STC_INLINE void _c_MEMB(_reset_to)(i_type* self, _m_value* p) {
     *self = _c_MEMB(_from_ptr)(p);
 }
 
-#ifndef i_no_emplace
 STC_INLINE i_type _c_MEMB(_from)(_m_raw raw)
     { return _c_MEMB(_make)(i_keyfrom(raw)); }
-#else
-STC_INLINE i_type _c_MEMB(_from)(_m_value val)
-    { return _c_MEMB(_make)(val); }
-#endif
 
 // does not use i_keyclone, so OK to always define.
 STC_INLINE i_type _c_MEMB(_clone)(i_type arc) {

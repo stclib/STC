@@ -87,6 +87,8 @@ static T numeric_cast(U value,
     TSL_RH_THROW_OR_TERMINATE(std::runtime_error, error_message);
   }
 
+  TSL_RH_UNUSED(error_message);
+
   return ret;
 }
 

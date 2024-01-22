@@ -29,7 +29,6 @@
   #define c_is_forward    (1<<0)
   #define c_no_atomic     (1<<1)
   #define c_no_clone      (1<<2)
-  #define c_no_emplace    (1<<3)
   #define c_no_hash       (1<<4)
   #define c_use_cmp       (1<<5)
   #define c_use_eq        (1<<6)
@@ -236,7 +235,7 @@
   #define i_keyfrom i_keyclone
 #elif !defined i_keyfrom
   #define i_keyfrom c_default_clone
-#elif !c_option(c_no_emplace)
+#else
   #undef i_no_emplace
 #endif
 #ifndef i_keyraw
@@ -295,7 +294,7 @@
   #define i_valfrom i_valclone
 #elif !defined i_valfrom
   #define i_valfrom c_default_clone
-#elif !c_option(c_no_emplace)
+#else
   #undef i_no_emplace
 #endif
 #ifndef i_valraw

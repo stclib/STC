@@ -120,13 +120,8 @@ STC_INLINE void _c_MEMB(_reset_to)(i_type* self, _m_value* p) {
     self->get = p;
 }
 
-#ifndef i_no_emplace
 STC_INLINE i_type _c_MEMB(_from)(_m_raw raw)
     { return _c_MEMB(_make)(i_keyfrom(raw)); }
-#else
-STC_INLINE i_type _c_MEMB(_from)(_m_value val)
-    { return _c_MEMB(_make)(val); }
-#endif
 
 #if !defined i_no_clone
     STC_INLINE i_type _c_MEMB(_clone)(i_type other) {
