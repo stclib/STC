@@ -62,7 +62,7 @@ STC_API char* _cstr_internal_move(cstr* self, intptr_t pos1, intptr_t pos2);
 
 #define cstr_lit(literal) cstr_from_n(literal, c_litstrlen(literal))
 #define cstr_null (c_LITERAL(cstr){0})
-#define cstr_toraw(self) cstr_str(self)
+typedef const char* cstr_raw;
 
 STC_API char*       cstr_reserve(cstr* self, intptr_t cap);
 STC_API void        cstr_shrink_to_fit(cstr* self);
@@ -159,6 +159,9 @@ STC_INLINE char* cstr_data(cstr* self)
     { return SSO_CALL(self, data(self)); }
 
 STC_INLINE const char* cstr_str(const cstr* self)
+    { return SSO_CALL(self, data(self)); }
+
+STC_INLINE const char* cstr_toraw(const cstr* self)
     { return SSO_CALL(self, data(self)); }
 
 STC_INLINE bool cstr_is_empty(const cstr* self)

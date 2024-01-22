@@ -55,21 +55,21 @@ STC_DEF bool
 _c_MEMB(_reserve)(i_type* self, const intptr_t n) {
     if (n <= self->capmask)
         return true;
-    intptr_t oldcap = self->capmask + 1, newcap = c_next_pow2(n + 1);
-    _m_value* d = (_m_value *)i_realloc(self->cbuf, oldcap*c_sizeof *d, newcap*c_sizeof *d);
+    intptr_t oldpow2 = self->capmask + 1, newpow2 = c_next_pow2(n + 1);
+    _m_value* d = (_m_value *)i_realloc(self->cbuf, oldpow2*c_sizeof *d, newpow2*c_sizeof *d);
     if (!d)
         return false;
-    intptr_t head = oldcap - self->start;
+    intptr_t head = oldpow2 - self->start;
     if (self->start <= self->end)
         ;
     else if (head < self->end) {
-        self->start = newcap - head;
-        c_memmove(d + self->start, d + oldcap - head, head*c_sizeof *d);
+        self->start = newpow2 - head;
+        c_memmove(d + self->start, d + oldpow2 - head, head*c_sizeof *d);
     } else {
-        c_memmove(d + oldcap, d, self->end*c_sizeof *d);
-        self->end += oldcap;
+        c_memmove(d + oldpow2, d, self->end*c_sizeof *d);
+        self->end += oldpow2;
     }
-    self->capmask = newcap - 1;
+    self->capmask = newpow2 - 1;
     self->cbuf = d;
     return true;
 }

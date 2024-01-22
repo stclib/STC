@@ -13,24 +13,24 @@ typedef struct {
     Point bottom_right;
 } Rectangle;
 
-#define i_key Point
-#include "stc/box.h" // box_Point
+#define i_TYPE BoxPoint,Point
+#include "stc/box.h"
 
-#define i_key Rectangle
-#include "stc/box.h" // box_Rectangle
+#define i_TYPE BoxRect,Rectangle
+#include "stc/box.h"
 
 // Box in box:
 #define i_type BoxBoxPoint
-#define i_key_arcbox box_Point // NB: use i_key_arcbox when value is a box or arc!
+#define i_key_arcbox BoxPoint // NB: use i_key_arcbox when value is a box or arc!
 #include "stc/box.h" // BoxBoxPoint
 
 Point origin(void) {
     return c_LITERAL(Point){ .x=1.0, .y=2.0 };
 }
 
-box_Point boxed_origin(void) {
+BoxPoint boxed_origin(void) {
     // Allocate this point on the heap, and return a pointer to it
-    return box_Point_from(c_LITERAL(Point){ .x=1.0, .y=2.0 });
+    return BoxPoint_from(c_LITERAL(Point){ .x=1.0, .y=2.0 });
 }
 
 
@@ -43,20 +43,21 @@ int main(void) {
     };
 
     // Heap allocated rectangle
-    box_Rectangle boxed_rectangle = box_Rectangle_from(c_LITERAL(Rectangle){
+    BoxRect boxed_rectangle = BoxRect_from(c_LITERAL(Rectangle){
         .top_left = origin(),
         .bottom_right = { .x=3.0, .y=-4.0 }
     });
     // The output of functions can be boxed
-    box_Point boxed_point = box_Point_from(origin());
+    BoxPoint boxed_point = BoxPoint_from(origin());
 
-    // Can use from(raw) and toraw instead:
+    // Create BoxBoxPoint from either a Point or a BoxPoint:
     BoxBoxPoint box_in_a_box = BoxBoxPoint_from(origin());
+    BoxBoxPoint box_in_a_box2 = BoxBoxPoint_make(boxed_origin());
 
     c_defer(
         BoxBoxPoint_drop(&box_in_a_box),
-        box_Point_drop(&boxed_point),
-        box_Rectangle_drop(&boxed_rectangle)
+        BoxPoint_drop(&boxed_point),
+        BoxRect_drop(&boxed_rectangle)
     ){
         printf("box_in_a_box: x = %g\n", BoxBoxPoint_toraw(&box_in_a_box).x);
 
