@@ -169,10 +169,11 @@ char*       c_strnstrn(const char* str, intptr_t slen, const char* needle, intpt
 #include "stc/cstr.h"
 
 int main(void) {
-    cstr s0, s1, full_path;
+    cstr s0, s1, s2, full_path;
     c_defer(
         cstr_drop(&s0),
         cstr_drop(&s1),
+        cstr_drop(&s2),
         cstr_drop(&full_path)
     ){
         s0 = cstr_lit("Initialization without using strlen().");
@@ -195,6 +196,11 @@ int main(void) {
         cstr_append(&s1, " eight");
         printf("append: %s\n", cstr_str(&s1));
 
+        s2 = cstr_lit("Let's iterate");
+        for (cstr_iter i = cstr_begin(&s2); i.ref != cstr_end(&s2).ref; cstr_next(&i)) {
+            printf("%c, ", *i.ref);
+        }
+
         full_path = cstr_from_fmt("%s/%s.%s", "directory", "filename", "ext");
         printf("%s\n", cstr_str(&full_path));
     }
@@ -207,5 +213,6 @@ one-two-nine-three-seven-five.
 one-two-three-seven-five.
 one-two-three-four-five.
 append: one two three four five six seven eight
+L, e, t, ', s,  , i, t, e, r, a, t, e, 
 directory/filename.ext
 ```
