@@ -35,22 +35,22 @@ KHASH_MAP_INIT_INT64(ii, IValue)
 // STC hmap template definition
 #define i_TYPE hmap_ii,IKey,IValue
 #define i_max_load_factor MAX_LOAD_FACTOR / 100.0f
-#include "stc/hmap.h"
+#include "stc/hmap-robin.h"
 
 #define SEED(s) rng = crand_init(s)
 #define RAND(N) (crand_u64(&rng) & (((uint64_t)1 << N) - 1))
 
-#define CMAP_SETUP(X, Key, Value) hmap_##X map = hmap_##X##_init()
-#define CMAP_PUT(X, key, val)     hmap_##X##_insert_or_assign(&map, key, val).ref->second
-#define CMAP_EMPLACE(X, key, val) hmap_##X##_insert(&map, key, val).ref->second
-#define CMAP_ERASE(X, key)        hmap_##X##_erase(&map, key)
-#define CMAP_FIND(X, key)         hmap_##X##_contains(&map, key)
-#define CMAP_FOR(X, i)            c_foreach (i, hmap_##X, map)
-#define CMAP_ITEM(X, i)           i.ref->second
-#define CMAP_SIZE(X)              hmap_##X##_size(&map)
-#define CMAP_BUCKETS(X)           hmap_##X##_bucket_count(&map)
-#define CMAP_CLEAR(X)             hmap_##X##_clear(&map)
-#define CMAP_DTOR(X)              hmap_##X##_drop(&map)
+#define HMAP_SETUP(X, Key, Value) hmap_##X map = hmap_##X##_init()
+#define HMAP_PUT(X, key, val)     hmap_##X##_insert_or_assign(&map, key, val).ref->second
+#define HMAP_EMPLACE(X, key, val) hmap_##X##_insert(&map, key, val).ref->second
+#define HMAP_ERASE(X, key)        hmap_##X##_erase(&map, key)
+#define HMAP_FIND(X, key)         hmap_##X##_contains(&map, key)
+#define HMAP_FOR(X, i)            c_foreach (i, hmap_##X, map)
+#define HMAP_ITEM(X, i)           i.ref->second
+#define HMAP_SIZE(X)              hmap_##X##_size(&map)
+#define HMAP_BUCKETS(X)           hmap_##X##_bucket_count(&map)
+#define HMAP_CLEAR(X)             hmap_##X##_clear(&map)
+#define HMAP_DTOR(X)              hmap_##X##_drop(&map)
 
 #define KMAP_SETUP(X, Key, Value) khash_t(X)* map = kh_init(X); khiter_t ki; int ret
 #define KMAP_PUT(X, key, val)     (ki = kh_put(X, map, key, &ret), \
@@ -271,7 +271,7 @@ KHASH_MAP_INIT_INT64(ii, IValue)
 #endif
 #define RUN_TEST(n) MAP_TEST##n(KMAP, ii, N##n) \
                     MAP_TEST_BOOST(n, ii) \
-                    MAP_TEST##n(CMAP, ii, N##n) \
+                    MAP_TEST##n(HMAP, ii, N##n) \
                     MAP_TEST##n(FMAP, ii, N##n) \
                     MAP_TEST##n(TMAP, ii, N##n) \
                     MAP_TEST##n(RMAP, ii, N##n) \
@@ -280,7 +280,7 @@ KHASH_MAP_INIT_INT64(ii, IValue)
                     MAP_TEST##n(UMAP, ii, N##n)
 #else
 #define RUN_TEST(n) MAP_TEST##n(KMAP, ii, N##n) \
-                    MAP_TEST##n(CMAP, ii, N##n)
+                    MAP_TEST##n(HMAP, ii, N##n)
 #endif
 
 enum {
@@ -306,7 +306,7 @@ int main(int argc, char* argv[])
 #ifdef HAVE_BOOST
            "BMAP = https://www.boost.org (unordered_flat_map)\n"
 #endif
-           "CMAP = https://github.com/stclib/STC (**)\n"
+           "HMAP = https://github.com/stclib/STC (**)\n"
            //"PMAP = https://github.com/greg7mdp/parallel-hashmap\n"
            "FMAP = https://github.com/skarupke/flat_hash_map\n"
            "TMAP = https://github.com/Tessil/robin-map\n"
