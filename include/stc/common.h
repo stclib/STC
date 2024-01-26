@@ -59,7 +59,7 @@
 #define _c_SEL31(a, b, c) a
 #define _c_SEL32(a, b, c) b
 #define _c_SEL33(a, b, c) c
-#define _c_SEL(S, ...) S(__VA_ARGS__)
+#define _c_SEL(S, ...) c_EXPAND(S(__VA_ARGS__)) // c_EXPAND for MSVC
 
 #ifndef __cplusplus
     #define _i_alloc(T)         ((T*)i_malloc(c_sizeof(T)))
