@@ -105,7 +105,7 @@ vec_X_raw           vec_X_value_drop(vec_X_value* pval);
 ## Examples
 ```c
 #define i_key int
-#define i_use_cmp // enable sorting/searhing using default <, == operators
+#define i_use_cmp // enable sorting/searching using default <, == operators
 #include "stc/vec.h"
 
 #include <stdio.h>
