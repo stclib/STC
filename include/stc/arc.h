@@ -97,7 +97,8 @@ typedef i_keyraw _m_raw;
 #ifndef i_is_forward
 _c_DEFTYPES(_c_arc_types, i_type, i_key);
 #endif
-struct _c_MEMB(_rep_) { catomic_long counter; i_key value; };
+struct _c_MEMB(_metadata_) { catomic_long counter; bool value_included; };
+struct _c_MEMB(_rep_) { struct _c_MEMB(_metadata_) metadata; i_key value; };
 
 STC_INLINE i_type _c_MEMB(_init)(void)
     { return c_LITERAL(i_type){NULL, NULL}; }
@@ -107,8 +108,11 @@ STC_INLINE long _c_MEMB(_use_count)(const i_type* self)
 
 STC_INLINE i_type _c_MEMB(_from_ptr)(_m_value* p) {
     i_type arc = {p};
-    if (p)
-        *(arc.use_count = _i_alloc(catomic_long)) = 1;
+    if (p) {
+        struct _c_MEMB(_metadata_)* metadata = _i_alloc(struct _c_MEMB(_metadata_));
+        metadata->value_included = false;
+        *(arc.use_count = &metadata->counter) = 1;
+    }
     return arc;
 }
 
@@ -116,7 +120,8 @@ STC_INLINE i_type _c_MEMB(_from_ptr)(_m_value* p) {
 STC_INLINE i_type _c_MEMB(_make)(_m_value val) {
     i_type arc;
     struct _c_MEMB(_rep_)* rep = _i_alloc(struct _c_MEMB(_rep_));
-    *(arc.use_count = &rep->counter) = 1;
+    rep->metadata.value_included = true;
+    *(arc.use_count = &rep->metadata.counter) = 1;
     *(arc.get = &rep->value) = val;
     return arc;
 }
@@ -134,7 +139,7 @@ STC_INLINE void _c_MEMB(_drop)(const i_type* cself) {
     i_type* self = (i_type*)cself;
     if (self->use_count && _i_atomic_dec_and_test(self->use_count)) {
         i_keydrop(self->get);
-        if ((char *)self->get != (char *)self->use_count + offsetof(struct _c_MEMB(_rep_), value)) {
+        if (!c_container_of(self->use_count, struct _c_MEMB(_metadata_), counter)->value_included) {
             i_free(self->get, c_sizeof *self->get);
             i_free(self->use_count, c_sizeof(long));
         } else { // allocated combined counter+value with _make()
