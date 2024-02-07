@@ -144,6 +144,7 @@ typedef union {
 \
     typedef struct { \
         SELF##_value *ref; \
+        size_t idx; \
         bool inserted; \
         uint8_t hashx, dist; \
     } SELF##_result; \

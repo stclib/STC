@@ -360,7 +360,7 @@ STC_DEF _m_result
 _c_MEMB(_bucket_)(const i_type* self, const _m_keyraw* rkeyptr) {
     const uint64_t _hash = i_hash(rkeyptr);
     size_t _mask = (size_t)self->bucket_count - 1, _idx = _hash & _mask;
-    _m_result _res = {NULL, true, (uint8_t)(_hash | 0x80)};
+    _m_result _res = {.inserted=true, .hashx=(uint8_t)(_hash | 0x80)};
     const struct hmap_slot* s = self->slot;
     while (s[_idx].hashx) {
         if (s[_idx].hashx == _res.hashx) {
