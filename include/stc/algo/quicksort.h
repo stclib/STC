@@ -137,19 +137,21 @@ static inline void _c_MEMB(_quicksort_ij)(i_type* arr, intptr_t lo, intptr_t hi)
 
 static inline intptr_t // -1 = not found
 _c_MEMB(_lower_bound_range)(const i_type* arr, const _m_raw raw, intptr_t first, intptr_t last) {
-    intptr_t step, count = last - first;
+    intptr_t count = last - first, step = count/2;
 
     while (count > 0) {
         intptr_t it = first;
-        step = count / 2;
         it += step;
 
         const _m_raw rx = i_keyto(i_at(arr, it));
         if (i_less((&rx), (&raw))) {
             first = ++it;
             count -= step + 1;
-        } else
+            step = count*3/4;
+        } else {
             count = step;
+            step = count/4;
+        }
     }
     return first == last ? -1 : first;
 }
