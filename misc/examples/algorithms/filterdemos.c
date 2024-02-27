@@ -62,6 +62,36 @@ void demo2(void)
     IVec_drop(&vector);
 }
 
+using_crange(int)
+
+/* Rust:
+fn main() {
+    let vector: Vec<i32> = (1..)  // Infinite range of integers
+        .skip_while(|x| *x != 11) // Skip initial numbers unequal 11
+        .filter(|x| x % 2 != 0)   // Collect odd numbers
+        .take(5)                  // Only take five numbers
+        .map(|x| x * x)           // Square each number
+        .collect::<Vec<usize>>(); // Return as a new Vec<usize>
+    println!("{:?}", vector);     // Print result
+}
+*/
+void demo3(void)
+{
+    IVec vector = {0};
+    crange_int r = crange_t_make(int, INT32_MAX);  // Infinite range of integers
+    c_filter(crange_int, r
+         , c_flt_skipwhile(*value != 11) // Skip initial numbers unequal 11
+        && (*value % 2) != 0             // Collect odd numbers
+        && (c_flt_map(*value * *value),  // Square each number
+            IVec_push(&vector, *value),  // Populate output IVec
+            c_flt_take(5))               // Only take five numbers
+    );
+    c_foreach (i, IVec, vector)
+        printf(" %d", *i.ref);           // Print result
+    puts("");
+    IVec_drop(&vector);
+}
+
 /* Rust:
 fn main() {
     let sentence = "This is a sentence in Rust.";
@@ -79,7 +109,7 @@ fn main() {
 #define i_key_class csview
 #include "stc/stack.h"
 
-void demo3(void)
+void demo4(void)
 {
     const char* sentence = "This is a sentence in C99.";
     SVec words = {0};
@@ -98,7 +128,7 @@ void demo3(void)
     c_drop(SVec, &words, &words_containing_i);
 }
 
-void demo4(void)
+void demo5(void)
 {
     // Keep only uppercase letters and convert them to lowercase:
     csview s = c_sv("ab123cReAghNGnΩoEp"); // Ω = multi-byte
@@ -114,11 +144,11 @@ void demo4(void)
     cstr_drop(&out);
 }
 
-
 int main(void)
 {
     puts("demo1"); demo1();
     puts("demo2"); demo2();
     puts("demo3"); demo3();
     puts("demo4"); demo4();
+    puts("demo5"); demo5();
 }
