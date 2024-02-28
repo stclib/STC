@@ -62,8 +62,6 @@ void demo2(void)
     IVec_drop(&vector);
 }
 
-using_crange(int)
-
 /* Rust:
 fn main() {
     let vector: Vec<i32> = (1..)  // Infinite range of integers
@@ -75,11 +73,13 @@ fn main() {
     println!("{:?}", vector);     // Print result
 }
 */
+using_crange(Intrange, int)
+
 void demo3(void)
 {
     IVec vector = {0};
-    crange_int r = crange_t_make(int, INT32_MAX);  // Infinite range of integers
-    c_filter(crange_int, r
+    Intrange r = crange_t_make(Intrange, INT32_MAX);  // Infinite range of integers
+    c_filter(Intrange, r
          , c_flt_skipwhile(*value != 11) // Skip initial numbers unequal 11
         && (*value % 2) != 0             // Collect odd numbers
         && (c_flt_map(*value * *value),  // Square each number

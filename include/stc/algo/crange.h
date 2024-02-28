@@ -42,12 +42,12 @@ int demo1()
     puts("");
 }
 
-using_crange(int);
+using_crange(Intrange, int);
 
 int demo2()
 {
-    crange_int r1 = crange_t_make(int, 80, 90, 2);
-    c_foreach (i, crange_int, r1)
+    Intrange r1 = crange_t_make(Intrange, 80, 90, 2);
+    c_foreach (i, Intrange, r1)
         printf(" %d", *i.ref);
     puts("");
 }
@@ -58,24 +58,24 @@ int demo2()
 #include "../priv/linkage.h"
 #include "../common.h"
 
-#define using_crange(T) \
-    typedef T crange_##T##_value; \
-    typedef struct { T start, end, step, value; } crange_##T; \
-    typedef struct { T *ref, end, step; } crange_##T##_iter; \
+#define using_crange(Self, T) \
+    typedef T Self##_value; \
+    typedef struct { T start, end, step, value; } Self; \
+    typedef struct { T *ref, end, step; } Self##_iter; \
     \
-    STC_INLINE crange_##T crange_##T##_make(T start, T stop, T step) \
-        { crange_##T r = {start, stop - (step > 0), step}; return r; } \
-    STC_INLINE crange_##T##_iter crange_##T##_begin(crange_##T* self) \
-        { self->value = self->start; crange_##T##_iter it = {&self->value, self->end, self->step}; return it; } \
-    STC_INLINE crange_##T##_iter crange_##T##_end(crange_##T* self) \
-        { (void)self; crange_##T##_iter it = {0}; return it; } \
-    STC_INLINE void crange_##T##_next(crange_##T##_iter* it) \
+    STC_INLINE Self Self##_make(T start, T stop, T step) \
+        { Self r = {start, stop - (step > 0), step}; return r; } \
+    STC_INLINE Self##_iter Self##_begin(Self* self) \
+        { self->value = self->start; Self##_iter it = {&self->value, self->end, self->step}; return it; } \
+    STC_INLINE Self##_iter Self##_end(Self* self) \
+        { (void)self; Self##_iter it = {0}; return it; } \
+    STC_INLINE void Self##_next(Self##_iter* it) \
         { *it->ref += it->step; if ((it->step > 0) == (*it->ref > it->end)) it->ref = NULL; }
 
 #define crange_t_make(...) c_MACRO_OVERLOAD(crange_t_make, __VA_ARGS__)
-#define crange_t_make_2(T, stop) crange_##T##_make(0, stop, 1)
-#define crange_t_make_3(T, start, stop) crange_##T##_make(start, stop, 1)
-#define crange_t_make_4(T, start, stop, step) crange_##T##_make(start, stop, step)
+#define crange_t_make_2(Self, stop) Self##_make(0, stop, 1)
+#define crange_t_make_3(Self, start, stop) Self##_make(start, stop, 1)
+#define crange_t_make_4(Self, start, stop, step) Self##_make(start, stop, step)
 
 typedef intptr_t crange_value;
 typedef struct { crange_value start, end, step, value; } crange;
