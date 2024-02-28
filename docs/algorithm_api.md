@@ -120,27 +120,28 @@ c_filter(crange, r2
 );
 // 2 3 5 7 11 13 17 19 23 29 31
 ```
-They can use another type than `long long` by calling `using_crange(T)` with a type `T`.
+They can use another type than `long long` by calling `using_crange(RangeType, ValueType)`.
 This will define the following functions:
 ```c
-crange_##T      crange_t_make(T, stop);              // will generate 0, 1, ..., stop-1
-crange_##T      crange_t_make(T, start, stop);       // will generate start, start+1, ... stop-1
-crange_##T      crange_t_make(T, start, stop, step); // will generate start, start+step, ... upto-not-including stop
-                                                     // note that step may be negative.
-crange_iter_##T crange_##T##_begin(crange_##T* self);
-crange_iter_##T crange_##T##_end(crange_##T* self);
-void            crange_##T##_next(crange_iter_##T* it);
+RangeType      crange_t_make(RangeType, stop);              // will generate 0, 1, ..., stop-1
+RangeType      crange_t_make(RangeType, start, stop);       // will generate start, start+1, ... stop-1
+RangeType      crange_t_make(RangeType, start, stop, step); // will generate start, start+step, ... upto-not-including stop
+                                                            // note that step may be negative.
+RangeType        RangeType##_make(start, stop, step);       // equivalent to crange_t_make(RangeType, start, stop, step)
+RangeType##_iter RangeType##_begin(RangeType* self);
+RangeType##_iter RangeType##_end(RangeType* self);
+void             RangeType##_next(RangeType* it);
 ```
 ```c
 #include "stc/algorithm.h"
 
-using_crange(int);
+using_crange(Intrange, int);
 
 int main(void)
 {
-    crange_int r = crange_int_make(3, 32, 2);
+    Intrange r = Intrange_make(3, 32, 2);
     printf("2");
-    c_filter(crange_int, r
+    c_filter(Intrange, r
          , is_prime(*value)
         && printf(" %d", *value)
     );
