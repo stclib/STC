@@ -214,6 +214,15 @@ STC_INLINE intptr_t c_next_pow2(intptr_t n) {
     for (intptr_t i=start, _inc=step, _end=(intptr_t)(stop) - (_inc > 0) \
          ; (_inc > 0) ^ (i > _end); i += _inc)
 
+#define c_forrange_t(...) c_MACRO_OVERLOAD(c_forrange, __VA_ARGS__)
+#define c_forrange_t_2(T, stop) c_forrange_t_4(T, _i, 0, stop)
+#define c_forrange_t_3(T, i, stop) c_forrange_t_4(T, i, 0, stop)
+#define c_forrange_t_4(T, i, start, stop) \
+    for (T i=start, _end=stop; i < _end; ++i)
+#define c_forrange_t_5(T, i, start, stop, step) \
+    for (T i=start, _inc=step, _end=(T)(stop) - (_inc > 0) \
+         ; (_inc > 0) ^ (i > _end); i += _inc)
+
 #ifndef __cplusplus
     #define c_init(C, ...) \
         C##_from_n((C##_raw[])__VA_ARGS__, c_sizeof((C##_raw[])__VA_ARGS__)/c_sizeof(C##_raw))

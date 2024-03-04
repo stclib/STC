@@ -90,6 +90,26 @@ c_forrange (i, 30, 0, -5) printf(" %lld", i);
 // 30 25 20 15 10 5
 ```
 
+Type-safe integer range loops. The first argument specifies the type of the loop variable.
+
+| Usage                                       | Python equivalent                    |
+|:--------------------------------------------|:-------------------------------------|
+| `c_forrange_t (int, stop)`                  | `for _ in range(stop):`              |
+| `c_forrange_t (int, i, stop)`               | `for i in range(stop):`              |
+| `c_forrange_t (int, i, start, stop)`        | `for i in range(start, stop):`       |
+| `c_forrange_t (int, i, start, stop, step)`  | `for i in range(start, stop, step):` |
+
+```c
+c_forrange_t (int, 5) printf("x");
+// xxxxx
+c_forrange_t (int, i, 5) printf(" %lld", i);
+// 0 1 2 3 4
+c_forrange_t (int, i, -3, 3) printf(" %lld", i);
+// -3 -2 -1 0 1 2
+c_forrange_t (int, i, 30, 0, -5) printf(" %lld", i);
+// 30 25 20 15 10 5
+```
+
 ### crange: Integer range generator object
 A number sequence generator type, similar to [boost::irange](https://www.boost.org/doc/libs/release/libs/range/doc/html/range/reference/ranges/irange.html). The **crange_value** type is `long long`. Below *start*, *stop*, and *step* are of type *crange_value*:
 ```c
@@ -119,6 +139,34 @@ c_filter(crange, r2
     && (printf(" %lld", *value), c_flt_take(10))
 );
 // 2 3 5 7 11 13 17 19 23 29 31
+```
+They can use another type than `long long` by calling `using_crange(RangeType, ValueType)`.
+This will define the following functions:
+```c
+RangeType      crange_t_make(RangeType, stop);              // will generate 0, 1, ..., stop-1
+RangeType      crange_t_make(RangeType, start, stop);       // will generate start, start+1, ... stop-1
+RangeType      crange_t_make(RangeType, start, stop, step); // will generate start, start+step, ... upto-not-including stop
+                                                            // note that step may be negative.
+RangeType        RangeType##_make(start, stop, step);       // equivalent to crange_t_make(RangeType, start, stop, step)
+RangeType##_iter RangeType##_begin(RangeType* self);
+RangeType##_iter RangeType##_end(RangeType* self);
+void             RangeType##_next(RangeType* it);
+```
+```c
+#include "stc/algorithm.h"
+
+using_crange(Intrange, int);
+
+int main(void)
+{
+    Intrange r = Intrange_make(3, 32, 2);
+    printf("2");
+    c_filter(Intrange, r
+         , is_prime(*value)
+        && printf(" %d", *value)
+    );
+    // 2 3 5 7 11 13 17 19 23 29 31
+}
 ```
 
 ### c_filter
