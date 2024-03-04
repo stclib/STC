@@ -90,6 +90,26 @@ c_forrange (i, 30, 0, -5) printf(" %lld", i);
 // 30 25 20 15 10 5
 ```
 
+Type-safe integer range loops. The first argument specifies the type of the loop variable.
+
+| Usage                                       | Python equivalent                    |
+|:--------------------------------------------|:-------------------------------------|
+| `c_forrange_t (int, stop)`                  | `for _ in range(stop):`              |
+| `c_forrange_t (int, i, stop)`               | `for i in range(stop):`              |
+| `c_forrange_t (int, i, start, stop)`        | `for i in range(start, stop):`       |
+| `c_forrange_t (int, i, start, stop, step)`  | `for i in range(start, stop, step):` |
+
+```c
+c_forrange_t (int, 5) printf("x");
+// xxxxx
+c_forrange_t (int, i, 5) printf(" %lld", i);
+// 0 1 2 3 4
+c_forrange_t (int, i, -3, 3) printf(" %lld", i);
+// -3 -2 -1 0 1 2
+c_forrange_t (int, i, 30, 0, -5) printf(" %lld", i);
+// 30 25 20 15 10 5
+```
+
 ### crange: Integer range generator object
 A number sequence generator type, similar to [boost::irange](https://www.boost.org/doc/libs/release/libs/range/doc/html/range/reference/ranges/irange.html). The **crange_value** type is `long long`. Below *start*, *stop*, and *step* are of type *crange_value*:
 ```c
