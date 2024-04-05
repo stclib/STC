@@ -114,11 +114,11 @@ struct ctest {
 
 #ifdef __cplusplus
 
-#define CTEST_SETUP(sname) \
-    template <> void CTEST_IMPL_SETUP_FNAME(sname)(struct CTEST_IMPL_DATA_SNAME(sname)* self)
+#define CTEST_SETUP(sname, fixt) \
+    template <> void CTEST_IMPL_SETUP_FNAME(sname)(struct CTEST_IMPL_DATA_SNAME(sname)* fixt)
 
-#define CTEST_TEARDOWN(sname) \
-    template <> void CTEST_IMPL_TEARDOWN_FNAME(sname)(struct CTEST_IMPL_DATA_SNAME(sname)* self)
+#define CTEST_TEARDOWN(sname, fixt) \
+    template <> void CTEST_IMPL_TEARDOWN_FNAME(sname)(struct CTEST_IMPL_DATA_SNAME(sname)* fixt)
 
 #define CTEST_FIXTURE(sname) \
     template <typename T> void CTEST_IMPL_SETUP_FNAME(sname)(T* self) { } \
@@ -130,25 +130,25 @@ struct ctest {
     CTEST_IMPL_STRUCT(sname, tname, tskip, NULL, NULL, NULL); \
     static void CTEST_IMPL_FNAME(sname, tname)(void)
 
-#define CTEST_IMPL_CTEST_F(sname, tname, tskip) \
+#define CTEST_IMPL_CTEST_F(sname, tname, tskip, fixt) \
     static struct CTEST_IMPL_DATA_SNAME(sname) CTEST_IMPL_DATA_TNAME(sname, tname); \
-    static void CTEST_IMPL_FNAME(sname, tname)(struct CTEST_IMPL_DATA_SNAME(sname)* self); \
+    static void CTEST_IMPL_FNAME(sname, tname)(struct CTEST_IMPL_DATA_SNAME(sname)* fixt); \
     static void (*CTEST_IMPL_SETUP_TPNAME(sname, tname))(struct CTEST_IMPL_DATA_SNAME(sname)*) = &CTEST_IMPL_SETUP_FNAME(sname)<struct CTEST_IMPL_DATA_SNAME(sname)>; \
     static void (*CTEST_IMPL_TEARDOWN_TPNAME(sname, tname))(struct CTEST_IMPL_DATA_SNAME(sname)*) = &CTEST_IMPL_TEARDOWN_FNAME(sname)<struct CTEST_IMPL_DATA_SNAME(sname)>; \
     CTEST_IMPL_STRUCT(sname, tname, tskip, &CTEST_IMPL_DATA_TNAME(sname, tname), &CTEST_IMPL_SETUP_TPNAME(sname, tname), &CTEST_IMPL_TEARDOWN_TPNAME(sname, tname)); \
-    static void CTEST_IMPL_FNAME(sname, tname)(struct CTEST_IMPL_DATA_SNAME(sname)* self)
+    static void CTEST_IMPL_FNAME(sname, tname)(struct CTEST_IMPL_DATA_SNAME(sname)* fixt)
 
 #else
 
-#define CTEST_SETUP(sname) \
-    static void CTEST_IMPL_SETUP_FNAME(sname)(struct CTEST_IMPL_DATA_SNAME(sname)* self); \
+#define CTEST_SETUP(sname, fixt) \
+    static void CTEST_IMPL_SETUP_FNAME(sname)(struct CTEST_IMPL_DATA_SNAME(sname)* fixt); \
     static void (*CTEST_IMPL_SETUP_FPNAME(sname))(struct CTEST_IMPL_DATA_SNAME(sname)*) = &CTEST_IMPL_SETUP_FNAME(sname); \
-    static void CTEST_IMPL_SETUP_FNAME(sname)(struct CTEST_IMPL_DATA_SNAME(sname)* self)
+    static void CTEST_IMPL_SETUP_FNAME(sname)(struct CTEST_IMPL_DATA_SNAME(sname)* fixt)
 
-#define CTEST_TEARDOWN(sname) \
-    static void CTEST_IMPL_TEARDOWN_FNAME(sname)(struct CTEST_IMPL_DATA_SNAME(sname)* self); \
+#define CTEST_TEARDOWN(sname, fixt) \
+    static void CTEST_IMPL_TEARDOWN_FNAME(sname)(struct CTEST_IMPL_DATA_SNAME(sname)* fixt); \
     static void (*CTEST_IMPL_TEARDOWN_FPNAME(sname))(struct CTEST_IMPL_DATA_SNAME(sname)*) = &CTEST_IMPL_TEARDOWN_FNAME(sname); \
-    static void CTEST_IMPL_TEARDOWN_FNAME(sname)(struct CTEST_IMPL_DATA_SNAME(sname)* self)
+    static void CTEST_IMPL_TEARDOWN_FNAME(sname)(struct CTEST_IMPL_DATA_SNAME(sname)* fixt)
 
 #define CTEST_FIXTURE(sname) \
     struct CTEST_IMPL_DATA_SNAME(sname); \
@@ -161,11 +161,11 @@ struct ctest {
     CTEST_IMPL_STRUCT(sname, tname, tskip, NULL, NULL, NULL); \
     static void CTEST_IMPL_FNAME(sname, tname)(void)
 
-#define CTEST_IMPL_CTEST_F(sname, tname, tskip) \
+#define CTEST_IMPL_CTEST_F(sname, tname, tskip, fixt) \
     static struct CTEST_IMPL_DATA_SNAME(sname) CTEST_IMPL_DATA_TNAME(sname, tname); \
-    static void CTEST_IMPL_FNAME(sname, tname)(struct CTEST_IMPL_DATA_SNAME(sname)* self); \
+    static void CTEST_IMPL_FNAME(sname, tname)(struct CTEST_IMPL_DATA_SNAME(sname)* fixt); \
     CTEST_IMPL_STRUCT(sname, tname, tskip, &CTEST_IMPL_DATA_TNAME(sname, tname), &CTEST_IMPL_SETUP_FPNAME(sname), &CTEST_IMPL_TEARDOWN_FPNAME(sname)); \
-    static void CTEST_IMPL_FNAME(sname, tname)(struct CTEST_IMPL_DATA_SNAME(sname)* self)
+    static void CTEST_IMPL_FNAME(sname, tname)(struct CTEST_IMPL_DATA_SNAME(sname)* fixt)
 
 #endif
 
@@ -182,19 +182,19 @@ void assert_fail(const char* caller, int line);
 #define CTEST_DBL_EPSILON 1e-12
 
 #define CTEST(sname, tname) CTEST_IMPL_CTEST(sname, tname, 0)
-#define CTEST_F(sname, tname) CTEST_IMPL_CTEST_F(sname, tname, 0)
+#define CTEST_F(sname, tname, fixt) CTEST_IMPL_CTEST_F(sname, tname, 0, fixt)
 #define CTEST_SKIP(sname, tname) CTEST_IMPL_CTEST(sname, tname, 1)
-#define CTEST_F_SKIP(sname, tname) CTEST_IMPL_CTEST_F(sname, tname, 1)
+#define CTEST_F_SKIP(sname, tname, fixt) CTEST_IMPL_CTEST_F(sname, tname, 1, fixt)
 
 // Aliases, more like gtest:
-#define TEST_FIXTURE(sname) CTEST_FIXTURE(sname)
-#define TEST_SETUP(sname) CTEST_SETUP(sname)
-#define TEST_TEARDOWN(sname) CTEST_TEARDOWN(sname)
-
 #define TEST(sname, tname) CTEST(sname, tname)
-#define TEST_F(sname, tname) CTEST_F(sname, tname)
 #define TEST_SKIP(sname, tname) CTEST_SKIP(sname, tname)
-#define TEST_F_SKIP(sname, tname) CTEST_F_SKIP(sname, tname)
+
+#define TEST_FIXTURE(sname) CTEST_FIXTURE(sname)
+#define TEST_SETUP(sname, fixt) CTEST_SETUP(sname, fixt)
+#define TEST_TEARDOWN(sname, fixt) CTEST_TEARDOWN(sname, fixt)
+#define TEST_F(sname, tname, fixt) CTEST_F(sname, tname, fixt)
+#define TEST_F_SKIP(sname, tname, fixt) CTEST_F_SKIP(sname, tname, fixt)
 
 // private
 #define _CHECK_STREQ(diag, exp, real) assert_str(diag, "==", exp, real, __FILE__, __LINE__)

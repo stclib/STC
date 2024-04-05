@@ -81,41 +81,41 @@ TEST_FIXTURE(cspan_cube) {
     Tiles tiles;
 };
 
-TEST_SETUP(cspan_cube) {
+TEST_SETUP(cspan_cube, fixt) {
     enum {TSIZE=4, CUBE=64, N=CUBE*CUBE*CUBE};
 
-    self->stack = Stack_init();
-    self->tiles = Tiles_init();
+    fixt->stack = Stack_init();
+    fixt->tiles = Tiles_init();
 
-    Stack_reserve(&self->stack, N);
+    Stack_reserve(&fixt->stack, N);
     c_forrange (i, N)
-        Stack_push(&self->stack, i+1);
+        Stack_push(&fixt->stack, i+1);
 
-    Span3 ms3 = cspan_md(self->stack.data, CUBE, CUBE, CUBE);
+    Span3 ms3 = cspan_md(fixt->stack.data, CUBE, CUBE, CUBE);
 
     c_forrange (i, 0, ms3.shape[0], TSIZE) {
         c_forrange (j, 0, ms3.shape[1], TSIZE) {
             c_forrange (k, 0, ms3.shape[2], TSIZE) {
                 Span3 tile = cspan_slice(Span3, &ms3, {i, i + TSIZE}, {j, j + TSIZE}, {k, k + TSIZE});
-                Tiles_push(&self->tiles, tile);
+                Tiles_push(&fixt->tiles, tile);
             }
         }
     }
 }
 
 // Optional teardown function for suite, called after every test in suite
-TEST_TEARDOWN(cspan_cube) {
-    Stack_drop(&self->stack);
-    Tiles_drop(&self->tiles);
+TEST_TEARDOWN(cspan_cube, fixt) {
+    Stack_drop(&fixt->stack);
+    Tiles_drop(&fixt->tiles);
 }
 
 
-TEST_F(cspan_cube, slice3) {
-    int64_t n = Stack_size(&self->stack);
+TEST_F(cspan_cube, slice3, fixt) {
+    int64_t n = Stack_size(&fixt->stack);
     int64_t sum = 0;
 
     // iterate each 3d tile in sequence
-    c_foreach (tile, Tiles, self->tiles)
+    c_foreach (tile, Tiles, fixt->tiles)
         c_foreach (i, Span3, *tile.ref)
             sum += *i.ref;
 
