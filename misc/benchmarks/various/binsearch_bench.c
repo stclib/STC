@@ -21,7 +21,7 @@ int main(int argc, char const *argv[])
 
     ivec_sort(&v);
 
-    intptr_t count = 0;
+    long long count = 0;
     clock_t t = clock();
     //csrand(0);
     c_forrange (i, N) {
@@ -38,6 +38,6 @@ int main(int argc, char const *argv[])
         #endif
     }
     t = clock() - t;
-    printf("%s: count %d %f\n", LABEL, count, (float)t/CLOCKS_PER_SEC);
+    printf("%s: count %lld %f\n", LABEL, count, (float)t/CLOCKS_PER_SEC);
     ivec_drop(&v);
 }

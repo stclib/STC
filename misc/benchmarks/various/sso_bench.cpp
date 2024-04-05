@@ -8,7 +8,7 @@
 
 #define i_type StcVec
 #define i_val_str
-#include "stc/cstack.h"
+#include "stc/stack.h"
 
 #include <vector>
 using StdVec = std::vector<std::string>;
@@ -29,13 +29,16 @@ struct string_hash {
     return std::hash<std::string>{}(txt);
   }
 };
-using StdSet = robin_hood::unordered_flat_set<std::string, string_hash, std::equal_to<>>;
-//using StdSet = std::unordered_set<std::string>;
+//using StdSet = robin_hood::unordered_flat_set<std::string, string_hash, std::equal_to<>>;
+using StdSet = std::unordered_set<std::string, string_hash, std::equal_to<>>;
 
 #define i_type StcSet
 #define i_val_str
 //#define i_hash(txtp) std::hash<std::string_view>{}(*txtp)
-#include "stc/cset.h"
+//#include "stc/hset.h"
+#define _i_is_set
+#include "stc/hmap-robin.h"
+
 
 
 static const int BENCHMARK_SIZE = 250000;
@@ -130,7 +133,7 @@ int main(void) {
 
     csrand(seed);
     sum = 0, n = 0;
-    std::cerr << "\nstrsize\tmsecs\tcvec<cstr>, size=" << BENCHMARK_SIZE << "\n";
+    std::cerr << "\nstrsize\tmsecs\tvec<cstr>, size=" << BENCHMARK_SIZE << "\n";
     for (int strsize = 1; strsize <= MAX_STRING_SIZE; strsize += 4) {
         StcVec vec = StcVec_with_capacity(BENCHMARK_SIZE);
         sum += benchmark(vec, BENCHMARK_SIZE, strsize), ++n;
@@ -154,7 +157,7 @@ int main(void) {
 
     csrand(seed);
     sum = 0, n = 0;
-    std::cerr << "\nstrsize\tmsecs\tinsert: cset<cstr>, size=" << BENCHMARK_SIZE/2 << "\n";
+    std::cerr << "\nstrsize\tmsecs\tinsert: hset<cstr>, size=" << BENCHMARK_SIZE/2 << "\n";
     for (int strsize = 1; strsize <= MAX_STRING_SIZE; strsize += 4) {
         StcSet set = StcSet_with_capacity(BENCHMARK_SIZE/2);
         sum += benchmark(set, BENCHMARK_SIZE/2, strsize), ++n;
@@ -169,7 +172,7 @@ int main(void) {
     sum = 0, n = 0;
     std::cerr << "\nstrsize\tmsecs\tfind: robin_hood::unordered_flat_set<std::string>, size=" << BENCHMARK_SIZE/2 << "\n";
     for (int strsize = 1; strsize <= MAX_STRING_SIZE; strsize += 2) {
-        StdSet set; set.reserve(BENCHMARK_SIZE/2);
+        StdSet set;
         sum += benchmark_lookup(set, BENCHMARK_SIZE/2, strsize), ++n;
         std::cout << '\t' << *set.begin() << '\n';
     }
@@ -177,9 +180,9 @@ int main(void) {
 
     csrand(seed);
     sum = 0, n = 0;
-    std::cerr << "\nstrsize\tmsecs\tfind: cset<cstr>, size=" << BENCHMARK_SIZE/2 << "\n";
+    std::cerr << "\nstrsize\tmsecs\tfind: hset<cstr>, size=" << BENCHMARK_SIZE/2 << "\n";
     for (int strsize = 1; strsize <= MAX_STRING_SIZE; strsize += 2) {
-        StcSet set = StcSet_with_capacity(BENCHMARK_SIZE/2);
+        StcSet set = {0};
         sum += benchmark_lookup(set, BENCHMARK_SIZE/2, strsize), ++n;
         std::cout << '\t' << cstr_str(StcSet_begin(&set).ref) << '\n';
         StcSet_drop(&set);

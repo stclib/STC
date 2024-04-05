@@ -95,11 +95,11 @@ STC_API i_type          _c_MEMB(_clone)(i_type map);
 STC_API void            _c_MEMB(_drop)(const i_type* cself);
 STC_API void            _c_MEMB(_clear)(i_type* self);
 STC_API bool            _c_MEMB(_reserve)(i_type* self, intptr_t capacity);
-STC_API _m_result       _c_MEMB(_bucket_lookup_)(const i_type* self, const _m_keyraw* rkeyptr);
-STC_API _m_result       _c_MEMB(_insert_entry_)(i_type* self, _m_keyraw rkey);
 STC_API void            _c_MEMB(_erase_entry)(i_type* self, _m_value* val);
 STC_API float           _c_MEMB(_max_load_factor)(const i_type* self);
 STC_API intptr_t        _c_MEMB(_capacity)(const i_type* map);
+static _m_result        _c_MEMB(_bucket_lookup_)(const i_type* self, const _m_keyraw* rkeyptr);
+static _m_result        _c_MEMB(_bucket_insert_)(const i_type* self, const _m_keyraw* rkeyptr);
 
 STC_INLINE i_type       _c_MEMB(_init)(void) { i_type map = {0}; return map; }
 STC_INLINE void         _c_MEMB(_shrink_to_fit)(i_type* self) { _c_MEMB(_reserve)(self, (intptr_t)self->size); }
@@ -108,6 +108,21 @@ STC_INLINE intptr_t     _c_MEMB(_size)(const i_type* map) { return (intptr_t)map
 STC_INLINE intptr_t     _c_MEMB(_bucket_count)(i_type* map) { return map->bucket_count; }
 STC_INLINE bool         _c_MEMB(_contains)(const i_type* self, _m_keyraw rkey)
                             { return self->size && _c_MEMB(_bucket_lookup_)(self, &rkey).ref; }
+
+#ifndef i_max_load_factor
+  #define i_max_load_factor 0.80f
+#endif
+
+STC_INLINE _m_result
+_c_MEMB(_insert_entry_)(i_type* self, _m_keyraw rkey) {
+    if (self->size >= (intptr_t)((float)self->bucket_count * (i_max_load_factor)))
+        if (!_c_MEMB(_reserve)(self, (intptr_t)(self->size*3/2 + 2)))
+            return c_LITERAL(_m_result){0};
+
+    _m_result res = _c_MEMB(_bucket_insert_)(self, &rkey);
+    self->size += res.inserted;
+    return res;
+}
 
 #ifdef _i_is_map
     STC_API _m_result _c_MEMB(_insert_or_assign)(i_type* self, _m_key key, _m_mapped mapped);
@@ -128,40 +143,41 @@ STC_INLINE bool         _c_MEMB(_contains)(const i_type* self, _m_keyraw rkey)
 #endif // _i_is_map
 
 #if !defined i_no_clone
-STC_INLINE void _c_MEMB(_copy)(i_type *self, const i_type* other) {
-    if (self->table == other->table)
-        return;
-    _c_MEMB(_drop)(self);
-    *self = _c_MEMB(_clone)(*other);
-}
+    STC_INLINE void
+    _c_MEMB(_copy)(i_type *self, const i_type* other) {
+        if (self->table == other->table)
+            return;
+        _c_MEMB(_drop)(self);
+        *self = _c_MEMB(_clone)(*other);
+    }
 
-STC_INLINE _m_value
-_c_MEMB(_value_clone)(_m_value _val) {
-    *_i_keyref(&_val) = i_keyclone((*_i_keyref(&_val)));
-    _i_MAP_ONLY( _val.second = i_valclone(_val.second); )
-    return _val;
-}
+    STC_INLINE _m_value
+    _c_MEMB(_value_clone)(_m_value _val) {
+        *_i_keyref(&_val) = i_keyclone((*_i_keyref(&_val)));
+        _i_MAP_ONLY( _val.second = i_valclone(_val.second); )
+        return _val;
+    }
 #endif // !i_no_clone
 
 #if !defined i_no_emplace
-STC_INLINE _m_result
-_c_MEMB(_emplace)(i_type* self, _m_keyraw rkey _i_MAP_ONLY(, _m_rmapped rmapped)) {
-    _m_result _res = _c_MEMB(_insert_entry_)(self, rkey);
-    if (_res.inserted) {
-        *_i_keyref(_res.ref) = i_keyfrom(rkey);
-        _i_MAP_ONLY( _res.ref->second = i_valfrom(rmapped); )
-    }
-    return _res;
-}
-
-#ifdef _i_is_map
     STC_INLINE _m_result
-    _c_MEMB(_emplace_key)(i_type* self, _m_keyraw rkey) {
+    _c_MEMB(_emplace)(i_type* self, _m_keyraw rkey _i_MAP_ONLY(, _m_rmapped rmapped)) {
         _m_result _res = _c_MEMB(_insert_entry_)(self, rkey);
-        if (_res.inserted)
-            _res.ref->first = i_keyfrom(rkey);
+        if (_res.inserted) {
+            *_i_keyref(_res.ref) = i_keyfrom(rkey);
+            _i_MAP_ONLY( _res.ref->second = i_valfrom(rmapped); )
+        }
         return _res;
     }
+
+#ifdef _i_is_map
+STC_INLINE _m_result
+_c_MEMB(_emplace_key)(i_type* self, _m_keyraw rkey) {
+    _m_result _res = _c_MEMB(_insert_entry_)(self, rkey);
+    if (_res.inserted)
+        _res.ref->first = i_keyfrom(rkey);
+    return _res;
+}
 #endif // _i_is_map
 #endif // !i_no_emplace
 
@@ -230,8 +246,8 @@ _c_MEMB(_find)(const i_type* self, _m_keyraw rkey) {
     _m_value* ref;
     if (self->size && (ref = _c_MEMB(_bucket_lookup_)(self, &rkey).ref))
         return c_LITERAL(_m_iter){ref,
-                                  self->table + self->bucket_count,
-                                  self->slot + (ref - self->table)};
+                                  &self->table[self->bucket_count],
+                                  &self->slot[ref - self->table]};
     return _c_MEMB(_end)(self);
 }
 
@@ -272,9 +288,6 @@ _c_MEMB(_eq)(const i_type* self, const i_type* other) {
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined(i_implement) || defined(i_static)
-#ifndef i_max_load_factor
-  #define i_max_load_factor 0.80f
-#endif
 
 STC_DEF _m_iter _c_MEMB(_begin)(const i_type* self) {
     _m_iter it = {self->table, self->table+self->bucket_count, self->slot};
@@ -299,10 +312,10 @@ STC_DEF i_type _c_MEMB(_with_capacity)(const intptr_t cap) {
     return map;
 }
 
-STC_INLINE void _c_MEMB(_wipe_)(i_type* self) {
+static void _c_MEMB(_wipe_)(i_type* self) {
     if (self->size == 0)
         return;
-    _m_value* d = self->table, *_end = d + self->bucket_count;
+    _m_value* d = self->table, *_end = &d[self->bucket_count];
     struct hmap_slot* s = self->slot;
     for (; d != _end; ++d)
         if ((s++)->dist)
@@ -353,19 +366,17 @@ STC_DEF void _c_MEMB(_clear)(i_type* self) {
     #endif // !i_no_emplace
 #endif // _i_is_map
 
-
-STC_DEF _m_result
+static _m_result
 _c_MEMB(_bucket_lookup_)(const i_type* self, const _m_keyraw* rkeyptr) {
     const uint64_t _hash = i_hash(rkeyptr);
-    size_t _mask = (size_t)self->bucket_count - 1;
+    const size_t _mask = (size_t)self->bucket_count - 1;
     _m_result _res = {.idx=_hash & _mask, .hashx=(uint8_t)_hash, .dist=1};
-    const struct hmap_slot* _slot = self->slot;
 
-    while (_res.dist <= _slot[_res.idx].dist) {
-        if (_slot[_res.idx].hashx == _res.hashx) {
-            const _m_keyraw _raw = i_keyto(_i_keyref(self->table + _res.idx));
+    while (_res.dist <= self->slot[_res.idx].dist) {
+        if (self->slot[_res.idx].hashx == _res.hashx) {
+            const _m_keyraw _raw = i_keyto(_i_keyref(&self->table[_res.idx]));
             if (i_eq((&_raw), rkeyptr)) {
-                _res.ref = self->table + _res.idx;
+                _res.ref = &self->table[_res.idx];
                 break;
             }
         }
@@ -375,18 +386,19 @@ _c_MEMB(_bucket_lookup_)(const i_type* self, const _m_keyraw* rkeyptr) {
     return _res;
 }
 
-STC_DEF _m_result
+static _m_result
 _c_MEMB(_bucket_insert_)(const i_type* self, const _m_keyraw* rkeyptr) {
     _m_result res = _c_MEMB(_bucket_lookup_)(self, rkeyptr);
-    if (res.ref) // entry exists
+    if (res.ref) // bucket exists
         return res;
-    res.ref = self->table + res.idx;
+    res.ref = &self->table[res.idx];
     res.inserted = true;
-    struct hmap_slot *slot = self->slot, snew = {res.hashx, res.dist};
-    struct hmap_slot scur = slot[res.idx];
-    slot[res.idx] = snew;
+    struct hmap_slot snew = {res.hashx, res.dist};
+    struct hmap_slot scur = self->slot[res.idx];
+    self->slot[res.idx] = snew;
 
     if (scur.dist != 0) { // collision, reorder buckets
+        struct hmap_slot *slot = self->slot;
         size_t mask = (size_t)self->bucket_count - 1;
         _m_value dcur = *res.ref;
         for (;;) {
@@ -395,8 +407,8 @@ _c_MEMB(_bucket_insert_)(const i_type* self, const _m_keyraw* rkeyptr) {
             if (slot[res.idx].dist == 0)
                 break;
             if (slot[res.idx].dist < scur.dist) {
-                c_swap(struct hmap_slot, &scur, slot + res.idx);
-                c_swap(_m_value, &dcur, self->table + res.idx);
+                c_swap(struct hmap_slot, &scur, &slot[res.idx]);
+                c_swap(_m_value, &dcur, &self->table[res.idx]);
             }
         }
         slot[res.idx] = scur;
@@ -406,37 +418,26 @@ _c_MEMB(_bucket_insert_)(const i_type* self, const _m_keyraw* rkeyptr) {
 }
 
 
-STC_DEF _m_result
-_c_MEMB(_insert_entry_)(i_type* self, _m_keyraw rkey) {
-    if (self->size >= (intptr_t)((float)self->bucket_count * (i_max_load_factor)))
-        if (!_c_MEMB(_reserve)(self, (intptr_t)(self->size*3/2 + 2)))
-            return c_LITERAL(_m_result){0};
-
-    _m_result res = _c_MEMB(_bucket_insert_)(self, &rkey);
-    self->size += res.inserted;
-    return res;
-}
-
 #if !defined i_no_clone
-STC_DEF i_type
-_c_MEMB(_clone)(i_type m) {
-    if (m.bucket_count) {
-        _m_value *d = (_m_value *)i_malloc(m.bucket_count*c_sizeof *d),
-                 *_dst = d, *_end = m.table + m.bucket_count;
-        const intptr_t _sbytes = (m.bucket_count + 1)*c_sizeof *m.slot;
-        struct hmap_slot *s = (struct hmap_slot *)c_memcpy(i_malloc(_sbytes), m.slot, _sbytes);
-        if (!(d && s)) {
-            i_free(d, m.bucket_count*c_sizeof *d);
-            if (s) i_free(s, _sbytes);
-            d = 0, s = 0, m.bucket_count = 0;
-        } else
-            for (; m.table != _end; ++m.table, ++m.slot, ++_dst)
-                if (m.slot->dist)
-                    *_dst = _c_MEMB(_value_clone)(*m.table);
-        m.table = d, m.slot = s;
+    STC_DEF i_type
+    _c_MEMB(_clone)(i_type m) {
+        if (m.bucket_count) {
+            _m_value *d = (_m_value *)i_malloc(m.bucket_count*c_sizeof *d),
+                    *_dst = d, *_end = &m.table[m.bucket_count];
+            const intptr_t _sbytes = (m.bucket_count + 1)*c_sizeof *m.slot;
+            struct hmap_slot *s = (struct hmap_slot *)c_memcpy(i_malloc(_sbytes), m.slot, _sbytes);
+            if (!(d && s)) {
+                i_free(d, m.bucket_count*c_sizeof *d);
+                if (s) i_free(s, _sbytes);
+                d = 0, s = 0, m.bucket_count = 0;
+            } else
+                for (; m.table != _end; ++m.table, ++m.slot, ++_dst)
+                    if (m.slot->dist)
+                        *_dst = _c_MEMB(_value_clone)(*m.table);
+            m.table = d, m.slot = s;
+        }
+        return m;
     }
-    return m;
-}
 #endif
 
 STC_DEF bool
@@ -491,6 +492,7 @@ _c_MEMB(_erase_entry)(i_type* self, _m_value* _val) {
     s[i].dist = 0;
     --self->size;
 }
+
 #endif // i_implement
 #undef i_max_load_factor
 #undef _i_is_set

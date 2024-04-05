@@ -653,12 +653,12 @@ allocated size of the given pointer, unlike standard `realloc` and `free`.
 #define i_extend MemoryContext memctx;
 #include "stc/extend.h"
 ```
-To use it, define both `i_type` and `i_base` (the container type) before including the custom header:
+To use it, define both `i_type` and `i_container` (the container type) before including the custom header:
 ```c
 #define i_type IMap
 #define i_key int
 #define i_val int
-#define i_base smap
+#define i_container smap
 #include "stcpgs.h"
 
 // Note the wrapper struct type is IMap_ext. IMap is accessed by .get

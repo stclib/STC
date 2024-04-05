@@ -35,7 +35,8 @@ KHASH_MAP_INIT_INT64(ii, IValue)
 // STC hmap template definition
 #define i_TYPE hmap_ii,IKey,IValue
 #define i_max_load_factor MAX_LOAD_FACTOR / 100.0f
-#include "stc/hmap-robin.h"
+//#include "stc/hmap-robin.h"
+#include "stc/hmap.h"
 
 #define SEED(s) rng = crand_init(s)
 #define RAND(N) (crand_u64(&rng) & (((uint64_t)1 << N) - 1))

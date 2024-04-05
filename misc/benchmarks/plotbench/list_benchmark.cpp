@@ -109,7 +109,7 @@ int main(int argc, char* argv[])
         if (i > 0) c_forrange (j, N_TESTS) {
             if (secs(std_s[i].test[j]) < secs(std_s[0].test[j])) std_s[0].test[j] = std_s[i].test[j];
             if (secs(stc_s[i].test[j]) < secs(stc_s[0].test[j])) stc_s[0].test[j] = stc_s[i].test[j];
-            if (stc_s[i].test[j].sum != stc_s[0].test[j].sum) printf("Error in sum: test %lld, sample %lld\n", i, j);
+            if (stc_s[i].test[j].sum != stc_s[0].test[j].sum) printf("Error in sum: test %ld, sample %ld\n", (long)i, (long)j);
         }
     }
     const char* comp = argc > 1 ? argv[1] : "test";

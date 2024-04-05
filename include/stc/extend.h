@@ -48,16 +48,20 @@
   #define _i_val i_val
 #endif
 
+#ifdef i_base // [deprecated]
+  #define i_container i_base
+#endif
+
 #if defined _i_key && defined _i_val
-  c_JOIN(forward_, i_base)(i_type, _i_key, _i_val);
+  c_JOIN(forward_, i_container)(i_type, _i_key, _i_val);
 #elif defined _i_key
-  c_JOIN(forward_, i_base)(i_type, _i_key);
+  c_JOIN(forward_, i_container)(i_type, _i_key);
 #else
-  c_JOIN(forward_, i_base)(i_type, _i_val);
+  c_JOIN(forward_, i_container)(i_type, _i_val);
 #endif
 
 typedef struct c_JOIN(i_type, _ext) {
-    i_type get; // must be first!
+    i_type get[1]; // must be first!
     i_extend
 } c_JOIN(i_type, _ext);
 
@@ -70,14 +74,14 @@ typedef struct c_JOIN(i_type, _ext) {
 
 // flag that container type was forward declared, and don't undef the template parameters:
 #define i_opt c_is_forward | c_more
-#define _i_inc <stc/i_base.h>
+#define _i_inc <stc/i_container.h>
 #include _i_inc
 
 // Add a clone function for the extended container struct.
 // Assumes that the extended member(s) are POD/trivial type(s).
 #ifndef i_no_clone
 STC_INLINE c_JOIN(i_type, _ext) _c_MEMB(_ext_clone)(c_JOIN(i_type, _ext) cx) {
-    cx.get = _c_MEMB(_clone)(cx.get);
+    *cx.get = _c_MEMB(_clone)(*cx.get);
     return cx;
 }
 #endif
@@ -86,6 +90,7 @@ STC_INLINE c_JOIN(i_type, _ext) _c_MEMB(_ext_clone)(c_JOIN(i_type, _ext) cx) {
 #undef _i_inc
 #undef _i_key
 #undef _i_val
-#undef i_base
+#undef i_container
+#undef i_base   // [deprecated]
 #undef i_extend
 #undef c_extend // make it unavailable when irrelevant

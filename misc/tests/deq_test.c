@@ -1,5 +1,4 @@
 #include "ctest.h"
-#include "stc/algorithm.h"
 
 #define i_TYPE IDeq,int
 #define i_use_cmp
