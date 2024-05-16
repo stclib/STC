@@ -2,22 +2,22 @@
 #include <stdio.h>
 #include "stc/coroutine.h"
 
-#define i_TYPE Tasks, cco_task*
+#define i_TYPE Tasks, struct cco_task*
 #define i_keydrop(x) { puts("free task"); free(*x); }
 #define i_no_clone
 #include "stc/queue.h"
 
 typedef struct {
     Tasks tasks;
-} cco_scheduler;
+} Scheduler;
 
-void cco_scheduler_drop(cco_scheduler* sched) {
+void Scheduler_drop(Scheduler* sched) {
     Tasks_drop(&sched->tasks);
 }
 
-int cco_scheduler_run(cco_scheduler* sched) {
+int Scheduler_run(Scheduler* sched) {
     while (!Tasks_is_empty(&sched->tasks)) {
-        cco_task* task = Tasks_pull(&sched->tasks);
+        struct cco_task* task = Tasks_pull(&sched->tasks);
         if (cco_resume_task(task, NULL))
             Tasks_push(&sched->tasks, task);
         else
@@ -26,7 +26,7 @@ int cco_scheduler_run(cco_scheduler* sched) {
     return 0;
 }
 
-static int taskA(cco_task* task, cco_runtime* rt) {
+static int taskA(struct cco_task* task, cco_runtime* rt) {
     (void)rt;
     cco_routine(task) {
         puts("Hello, from task A");
@@ -40,7 +40,7 @@ static int taskA(cco_task* task, cco_runtime* rt) {
     return 0;
 }
 
-static int taskB(cco_task* task, cco_runtime* rt) {
+static int taskB(struct cco_task* task, cco_runtime* rt) {
     (void)rt;
     cco_routine(task) {
         puts("Hello, from task B");
@@ -53,13 +53,13 @@ static int taskB(cco_task* task, cco_runtime* rt) {
 }
 
 void Use(void) {
-    cco_scheduler sched = {.tasks = c_init(Tasks, {
-        c_new(cco_task, {.cco_func=taskA}),
-        c_new(cco_task, {.cco_func=taskB}),
+    Scheduler sched = {.tasks = c_init(Tasks, {
+        c_new(struct cco_task, {.cco_func=taskA}),
+        c_new(struct cco_task, {.cco_func=taskB}),
     })};
 
-    cco_scheduler_run(&sched);
-    cco_scheduler_drop(&sched);
+    Scheduler_run(&sched);
+    Scheduler_drop(&sched);
 }
 
 int main(void)

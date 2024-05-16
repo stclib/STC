@@ -28,9 +28,9 @@ NB! ***cco_yield\*()*** / ***cco_await\*()*** may not be called from within a `s
 |           | `cco_await_call(cocall, retbit);`    | Await for subcoro's return to be in (retbit \| CCO_DONE)  |
 |           | `cco_return;`                        | Return from coroutine (inside cco_routine) |
 |           | ***c_filter() interoperability with coroutine iterators***: ||
-|           | `cco_take(num);`                     | Use instead of *c_flt_take(num)* to ensure cleanup state |
-|           | `cco_takewhile(predicate);`          | Use instead of *c_flt_takewhile(pred)* to ensure cleanup state |
-|           | `cco_takewhile(predicate);`          | Use instead of *c_flt_takewhile(pred)* to ensure cleanup state |
+|           | `cco_flt_take(num);`                 | Use instead of *c_flt_take(num)* to ensure cleanup state |
+|           | `cco_flt_takewhile(predicate);`      | Use instead of *c_flt_takewhile(pred)* to ensure cleanup state |
+|           | `cco_flt_takewhile(predicate);`      | Use instead of *c_flt_takewhile(pred)* to ensure cleanup state |
 |           | ***Container iteration in coroutines***: ||
 |           | `c_foreach_iter(external_it, ctype, cnt)` | Use iterator stored in coroutine object |
 |           | `c_foreach_reverse_iter(external_it, ctype, cnt)` | Iterate in reverse order     |

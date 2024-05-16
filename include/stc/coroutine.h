@@ -59,6 +59,7 @@ int main(void) {
 #include "common.h"
 
 enum {
+    CCO_STATE_INIT = 0,
     CCO_STATE_FINAL = -1,
     CCO_STATE_DONE = -2,
 };
@@ -72,19 +73,9 @@ typedef enum {
 #define cco_suspended(co) ((co)->cco_state > 0)
 #define cco_done(co) ((co)->cco_state == CCO_STATE_DONE)
 
-// Use with c_filter:
-#define cco_take(n) (c_flt_take(n), _fl.done ? _it.cco_state = CCO_STATE_FINAL : 1)
-#define cco_takewhile(pred) (c_flt_takewhile(pred), _fl.done ? _it.cco_state = CCO_STATE_FINAL : 1)
-
-#define c_foreach_iter(existing_it, C, cnt) \
-    for (existing_it = C##_begin(&cnt); (existing_it).ref; C##_next(&existing_it))
-#define c_foreach_reverse_iter(existing_it, C, cnt) \
-    for (existing_it = C##_rbegin(&cnt); (existing_it).ref; C##_rnext(&existing_it))
-
-
 #define cco_routine(co) \
     for (int* _state = &(co)->cco_state; *_state != CCO_STATE_DONE; *_state = CCO_STATE_DONE) \
-        _resume: switch (*_state) case 0: // thanks, @liigo!
+        _resume: switch (*_state) case CCO_STATE_INIT: // thanks, @liigo!
 
 #define cco_yield cco_yield_v(CCO_YIELD)
 #define cco_yield_v(ret) \
@@ -142,11 +133,20 @@ typedef enum {
         return value; \
     } while (0)
 
+
+/* ============ ADVANCED, OPTIONAL ============= */
+
 /*
- * Iterator (for generators)
- * User define: Gen must be an existing typedef struct:
- *     Gen_iter Gen_begin(Gen* g);      // function
- *     int      Gen_next(Gen_iter* it); // coroutine
+ * Iterators (for generators)
+ * Gen must be an existing typedef struct, i.e., these must be defined:
+ *     Gen_iter Gen_begin(Gen* g);      // return a coroutine object, advanced to the first yield
+ *     int      Gen_next(Gen_iter* it); // resume the coroutine
+ * 
+ * Gen_iter Gen_begin(Gen* g) { // basic implementation
+ *   Gen_iter it = {.ref=g};
+ *   Gen_next(&it);
+ *   return it;
+ * }
  */
 
 #define cco_iter_struct(Gen, ...) \
@@ -156,6 +156,7 @@ typedef enum {
         int cco_state; \
         __VA_ARGS__ \
     } Gen##_iter
+
 
 /*
  * Tasks
@@ -170,14 +171,14 @@ struct cco_runtime;
         __VA_ARGS__ \
     }
 
-typedef cco_task_struct(cco_task, /**/) cco_task;
+cco_task_struct(cco_task, /**/); /* Define base Task struct type */
 
 typedef struct cco_runtime {
-    int result, top; cco_task* stack[];
+    int result, top; struct cco_task* stack[];
 } cco_runtime;
 
 #define cco_cast_task(task) \
-    ((cco_task *)(task) + 0*sizeof((task)->cco_func(task, (cco_runtime*)0) + ((int*)0 == &(task)->cco_state)))
+    ((struct cco_task *)(task) + 0*sizeof((task)->cco_func(task, (cco_runtime*)0) + ((int*)0 == &(task)->cco_state)))
 
 #define cco_resume_task(task, rt) \
     (task)->cco_func(task, rt)
@@ -193,9 +194,27 @@ typedef struct cco_runtime {
 #define cco_blocking_task(...) c_MACRO_OVERLOAD(cco_blocking_task, __VA_ARGS__)
 #define cco_blocking_task_1(task) cco_blocking_task_3(task, _rt, 16)
 #define cco_blocking_task_3(task, rt, STACKDEPTH) \
-    for (struct { int result, top; cco_task* stack[STACKDEPTH]; } rt = {.stack={cco_cast_task(task)}}; \
+    for (struct { int result, top; struct cco_task* stack[STACKDEPTH]; } rt = {.stack={cco_cast_task(task)}}; \
          (((rt.result = cco_resume_task(rt.stack[rt.top], (cco_runtime*)&rt)) & \
            ~rt.stack[rt.top]->cco_expect) || --rt.top >= 0); )
+
+
+/*
+ * Use with c_filter:
+ */
+
+#define cco_flt_take(n) (c_flt_take(n), _fl.done ? _it.cco_state = CCO_STATE_FINAL : 1)
+#define cco_flt_takewhile(pred) (c_flt_takewhile(pred), _fl.done ? _it.cco_state = CCO_STATE_FINAL : 1)
+
+/*
+ * Iterate containers with already defined iterator (prefer to use in coroutines only):
+ */
+
+#define c_foreach_iter(existing_it, C, cnt) \
+    for (existing_it = C##_begin(&cnt); (existing_it).ref; C##_next(&existing_it))
+#define c_foreach_reverse_iter(existing_it, C, cnt) \
+    for (existing_it = C##_rbegin(&cnt); (existing_it).ref; C##_rnext(&existing_it))
+
 
 /*
  * Semaphore
@@ -214,6 +233,7 @@ typedef struct { intptr_t count; } cco_sem;
 #define cco_sem_release(sem) ++(sem)->count
 #define cco_sem_from(value) ((cco_sem){value})
 #define cco_sem_set(sem, value) ((sem)->count = value)
+
 
 /*
  * Timer
