@@ -6,7 +6,7 @@ and `i_keydrop` macros specified. Use *box_X_clone(p)* to make a deep copy, whic
 `i_keyclone` macro if defined. Note that a box set to NULL is consider uninitialized, and
 cannot be e.g. cloned or dropped.
 
-When declaring a container of **box** values, define `i_key_arcbox` with the
+When declaring a container of **box** values, define `i_key_box` with the
 box type instead of defining `i_key`. This will auto-set `i_keydrop`, `i_keyclone`, and `i_cmp` using
 functions defined by the specified **box**.
 
@@ -23,7 +23,7 @@ See similar c++ class [std::unique_ptr](https://en.cppreference.com/w/cpp/memory
                          //   {i_key}_drop and {i_keyraw}_cmp exist.
 #define i_cmp <f>        // three-way compareison. REQUIRED IF i_key is a non-integral type
                          // Note that containers of arcs will "inherit" i_cmp
-                         // when using arc in containers with i_val_arcbox MyArc - ie. the i_type.
+                         // when using arc in containers with i_val_arc MyArc - ie. the i_type.
 #define i_use_cmp        // may be defined instead of i_cmp when i_key is an integral/native-type.
 #define i_keydrop <f>    // destroy element func - defaults to empty destruct
 #define i_keyclone <f>   // REQUIRED if i_keydrop is defined, unless 'i_opt c_no_clone' is defined.

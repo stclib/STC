@@ -13,14 +13,14 @@ enum {
 struct Philosopher {
     int id;
     cco_timer tm;
-    cco_sem* left_fork;
-    cco_sem* right_fork;
+    cco_semaphore* left_fork;
+    cco_semaphore* right_fork;
     int cco_state; // required
 };
 
 struct Dining {
     // Define semaphores for the forks
-    cco_sem forks[num_forks];
+    cco_semaphore forks[num_forks];
     struct Philosopher ph[num_philosophers];
     int cco_state; // required
 };
@@ -37,15 +37,15 @@ int philosopher(struct Philosopher* p)
             cco_await_timer(&p->tm, duration);
 
             printf("Philosopher %d is hungry...\n", p->id);
-            cco_await_sem(p->left_fork);
-            cco_await_sem(p->right_fork);
+            cco_await_semaphore(p->left_fork);
+            cco_await_semaphore(p->right_fork);
 
             duration = 0.5 + crandf();
             printf("Philosopher %d is eating for %.0f minutes...\n", p->id, duration*10);
             cco_await_timer(&p->tm, duration);
 
-            cco_sem_release(p->left_fork);
-            cco_sem_release(p->right_fork);
+            cco_semaphore_release(p->left_fork);
+            cco_semaphore_release(p->right_fork);
         }
 
         cco_final:
@@ -60,7 +60,7 @@ int dining(struct Dining* d)
 {
     cco_scope(d) {
         for (int i = 0; i < num_forks; ++i)
-            cco_sem_set(&d->forks[i], 1); // all forks available
+            cco_semaphore_set(&d->forks[i], 1); // all forks available
         for (int i = 0; i < num_philosophers; ++i) {
             cco_reset(&d->ph[i]);
             d->ph[i].id = i + 1;

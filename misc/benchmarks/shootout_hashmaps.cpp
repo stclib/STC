@@ -55,7 +55,7 @@ KHASH_MAP_INIT_INT64(ii, IValue)
 #define HMAP_PUT(X, key, val)     hmap_##X##_insert_or_assign(&map, key, val).ref->second
 #define HMAP_GET_OR_INSERT(X, key, val) hmap_##X##_insert(&map, key, val).ref->second
 #define HMAP_ERASE(X, key)        hmap_##X##_erase(&map, key)
-#define HMAP_CONTAINS(X, key)         hmap_##X##_contains(&map, key)
+#define HMAP_CONTAINS(X, key)     hmap_##X##_contains(&map, key)
 #define HMAP_FOR(X, i)            c_foreach (i, hmap_##X, map)
 #define HMAP_ITEM(X, i)           i.ref->second
 #define HMAP_SIZE(X)              hmap_##X##_size(&map)

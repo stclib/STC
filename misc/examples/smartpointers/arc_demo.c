@@ -14,11 +14,11 @@ void int_drop(int* x) {
 #include "stc/arc.h"        // Arc
 
 #define i_type Arcset
-#define i_key_arcbox Arc    // note: use i_key_arcbox instead of i_key for arc/box elements
+#define i_key_arc Arc       // note: use i_key_arc instead of i_key for arc/box elements
 #include "stc/sset.h"       // Arcset (like: std::set<std::shared_ptr<int>>)
 
 #define i_type Arcvec
-#define i_key_arcbox Arc    // note: as above.
+#define i_key_arc Arc       // note: as above.
 #define i_use_cmp
 #include "stc/vec.h"        // Arcvec (like: std::vector<std::shared_ptr<int>>)
 

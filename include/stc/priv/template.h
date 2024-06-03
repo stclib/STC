@@ -47,9 +47,6 @@
   #define _m_node _c_MEMB(_node)
 #endif
 
-#if defined i_typedef
-  #define i_TYPE i_typedef
-#endif
 #if defined i_key2
   #define i_key c_SELECT(_c_SEL21, i_key2)
   #define i_keyraw c_SELECT(_c_SEL22, i_key2)

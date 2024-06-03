@@ -18,14 +18,14 @@ NB! ***cco_yield\*()*** / ***cco_await\*()*** may not be called from within a `s
 |`cco_result` | `CCO_DONE`, `CCO_AWAIT`, `CCO_YIELD` | Default set of return values from coroutines |
 |           | `cco_final:`                         | Label for cleanup position in coroutine |
 | `bool`    | `cco_done(co)`                       | Is coroutine done?                      |
-|           | `cco_scope(co) {}`                 | The coroutine scope                     |
+|           | `cco_scope(co) {}`                   | The coroutine scope                     |
 |           | `cco_yield;`                         | Yield/suspend execution (return CCO_YIELD)|
 |           | `cco_yield_v(ret);`                  | Yield/suspend execution (return ret)    |
 |           | `cco_yield_final;`                   | Yield final suspend, enter cleanup-state |
 |           | `cco_yield_final_v(ret);`            | Yield with a final value                 |
 |           | `cco_await(condition);`              | Suspend until condition is true (return CCO_AWAIT)|
-|           | `cco_await_coroutine(cocall);`            | Await for subcoro to finish (returns its ret value) |
-|           | `cco_await_coroutine(cocall, retbit);`    | Await for subcoro's return to be in (retbit \| CCO_DONE)  |
+|           | `cco_await_coroutine(cocall);`       | Await for subcoro to finish (returns its ret value) |
+|           | `cco_await_coroutine(cocall, retbit);` | Await for subcoro's return to be in (retbit \| CCO_DONE)  |
 |           | `cco_return;`                        | Return from coroutine (inside cco_scope) |
 |           | ***c_filter() interoperability with coroutine iterators***: ||
 |           | `cco_flt_take(num);`                 | Use instead of *c_flt_take(num)* to ensure cleanup state |
@@ -40,11 +40,11 @@ NB! ***cco_yield\*()*** / ***cco_await\*()*** may not be called from within a `s
 |           | `cco_await_task(task, rt, retbit);`  | Await for task's return to be in (retbit \| CCO_DONE) |
 |`cco_result`| `cco_resume_task(task, rt);`        | Resume suspended task                   |
 |           | ***Semaphores***:                    ||
-|           | `cco_sem`                            | Semaphore type                          |
-|           | `cco_await_sem(sem)`                 | Await for the semaphore count > 0       |
-| `cco_sem` | `cco_sem_from(long value)`           | Create semaphore                        |
-|           | `cco_sem_set(sem, long value)`       | Set semaphore value                     |
-|           | `cco_sem_release(sem)`               | Signal the semaphore (count += 1)       |
+|           | `cco_semaphore`                      | Semaphore type                          |
+|           | `cco_await_semaphore(sem)`           | Await for the semaphore count > 0       |
+|`cco_semaphore`| `cco_semaphore_from(long value)` | Create semaphore                        |
+|           | `cco_semaphore_set(sem, long value)` | Set semaphore value                     |
+|           | `cco_semaphore_release(sem)`         | Signal the semaphore (count += 1)       |
 |           | ***Timers***:                        ||
 |           | `cco_timer`                          | Timer type                              |
 |           | `cco_await_timer(tm, double sec)`    | Await secs for timer to expire (usec prec.)|

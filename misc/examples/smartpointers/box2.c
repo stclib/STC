@@ -21,7 +21,7 @@ typedef struct {
 
 // Box in box:
 #define i_type BoxBoxPoint
-#define i_key_arcbox BoxPoint // NB: use i_key_arcbox when value is a box or arc!
+#define i_key_box BoxPoint // NB: use i_key_box when value is a box or arc!
 #include "stc/box.h" // BoxBoxPoint
 
 Point origin(void) {

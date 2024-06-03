@@ -8,7 +8,7 @@ void show_drop(int* x) { printf("drop: %d\n", *x); }
 #include "stc/arc.h"        // Shared pointer to int
 
 #define i_type Vec
-#define i_key_arcbox Arc
+#define i_key_arc Arc
 #define i_use_cmp
 #include "stc/vec.h"        // Vec: vec<Arc>
 

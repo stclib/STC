@@ -9,7 +9,7 @@
 // hmap of cstr => IBox
 #define i_type Boxmap
 #define i_key_str
-#define i_val_arcbox IBox // i_val_arcbox: use properties from IBox automatically
+#define i_val_box IBox // i_val_box: use properties from IBox automatically
 #include "stc/hmap.h"
 
 

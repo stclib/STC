@@ -425,9 +425,9 @@ Only functions required by the container type is required to be defined. E.g.:
 `i_keyfrom`, `i_keyto`, and sets `i_cmp`, `i_eq`, `i_hash` functions with *const char\*\** as argument.
 - `i_key_ssv` - Sets `i_keyclass` = *cstr*, `i_tag` = *ssv*, and `i_keyraw` = *csview\**. Defines both type convertion
 `i_keyfrom`, `i_keyto`, and sets `i_cmp`, `i_eq`, `i_hash` functions with *csview\** as argument.
-- `i_key_arcbox` *Type* - Use when *Type* is a smart pointer **arc** or **box**. Defines *i_keyclass = Type*, and *i_keyraw = Type\**.
+- `i_key_arc`, `i_key_box` *Type* - Use when *Type* is a smart pointer **arc** or **box**. Defines *i_keyclass = Type*, and *i_keyraw = Type\**.
 NB: Do not use when defining arc/box types themselves.
-- `i_valclass` *Type*, `i_val_str`, `i_val_ssv`, `i_val_arcbox` - Similar rules as for ***key***.
+- `i_valclass` *Type*, `i_val_str`, `i_val_arc`, `i_val_box` - Similar rules as for ***key***.
 
 **Notes**:
 - Instead of defining `i_*clone`, you may define *i_opt c_no_clone* to disable *clone* functionality.
@@ -437,7 +437,7 @@ NB: Do not use when defining arc/box types themselves.
 
 The table below shows the template parameters which must be defined to support element search and sort for various containers versus element types.
 
-For the containers marked ***optional***, the features are disabled if the template parameter(s) are not defined. Note that the ***(integral type)*** columns also applies to "special" types, specified with `i_key_str`, `i_key_arcbox`, and `i_keyclass`, and not only true integral types like `int` or `float`.
+For the containers marked ***optional***, the features are disabled if the template parameter(s) are not defined. Note that the ***(integral type)*** columns also applies to "special" types, specified with `i_key_str`, `i_key_arc`, `i_key_box`, and `i_keyclass`, and not only true integral types like `int` or `float`.
 
 | Container         | find (integral type) | sort (integral type) |\|| find (struct elem) | sort (struct elem) | optional |
 |:------------------|:---------------------|:---------------------|:-|:-----------------|:-------------------|:---------|
@@ -702,7 +702,7 @@ STC is generally very memory efficient. Memory usage for the different container
     - Removed default comparison for **list**, **vec** and **deq**:
         - Define `i_use_cmp` to enable comparison for built-in i_key types (<, ==).
         - Use of `i_keyclass` still expects comparison functions to be defined.
-        - Use of `i_key_arcbox` compares stored pointers instead of pointed to values if comparison not defined.
+        - Use of `i_key_arc/i_key_box` compares stored pointers instead of pointed to values if comparison not defined.
     - Renamed input enum flags for ***cregex***-functions.
 - **cspan**: Added **column-major** order (fortran) multidimensional spans and transposed views (changed representation of strides).
 - All new faster and smaller **queue** and **deq** implementations, using a circular buffer.

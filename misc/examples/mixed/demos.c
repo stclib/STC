@@ -118,7 +118,7 @@ void setdemo1(void)
     hset_int_drop(&nums);
 }
 
-#define i_TYPE hmap_ii, int, int
+#define i_TYPE hmap_ii,int,int
 #include "stc/hmap.h"
 
 void mapdemo1(void)

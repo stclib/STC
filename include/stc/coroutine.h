@@ -138,7 +138,7 @@ typedef enum {
  * Gen must be an existing typedef struct, i.e., these must be defined:
  *     Gen_iter Gen_begin(Gen* g);      // return a coroutine object, advanced to the first yield
  *     int      Gen_next(Gen_iter* it); // resume the coroutine
- * 
+ *
  * Gen_iter Gen_begin(Gen* g) { // basic implementation
  *   Gen_iter it = {.ref=g};
  *   Gen_next(&it);
@@ -218,18 +218,18 @@ typedef struct cco_runtime {
  * Semaphore
  */
 
-typedef struct { intptr_t count; } cco_sem;
+typedef struct { intptr_t count; } cco_semaphore;
 
-#define cco_await_sem(sem) cco_await_sem_and_return(sem, CCO_AWAIT)
-#define cco_await_sem_and_return(sem, ret) \
+#define cco_await_semaphore(sem) cco_await_semaphore_and_return(sem, CCO_AWAIT)
+#define cco_await_semaphore_and_return(sem, ret) \
     do { \
         cco_await_and_return((sem)->count > 0, ret); \
         --(sem)->count; \
     } while (0)
 
-#define cco_sem_release(sem) ++(sem)->count
-#define cco_sem_from(value) ((cco_sem){value})
-#define cco_sem_set(sem, value) ((sem)->count = value)
+#define cco_semaphore_release(sem) ++(sem)->count
+#define cco_semaphore_from(value) ((cco_semaphore){value})
+#define cco_semaphore_set(sem, value) ((sem)->count = value)
 
 
 /*

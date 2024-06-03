@@ -23,8 +23,7 @@
 #ifdef i_more
 #undef i_more
 #else
-#undef i_typedef
-#undef i_TYPE // [deprecated]
+#undef i_TYPE
 #undef i_type
 #undef i_tag
 #undef i_opt
