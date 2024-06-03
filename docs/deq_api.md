@@ -111,7 +111,7 @@ int main(void) {
     puts("");
 
     c_forlist (i, int, {1, 4, 5, 22, 33, 2})
-        Deque_push_back(&q, *i.ref)
+        Deque_push_back(&q, *i.ref);
 
     c_foreach (i, Deque, q)
         printf(" %d", *i.ref);
@@ -132,5 +132,5 @@ Output:
 ```
  10
  10 1 4 5 22 33 2
- 8 20 9 10 1 4 5 22 33 2 1
+ 8 20 9 10 1 4 5 22 33 2 11
 ```
