@@ -10,35 +10,36 @@ struct GenValue {
     int cco_state;
 };
 
-static int get_value(struct GenValue* g)
+static long get_value(struct GenValue* g)
 {
-    cco_routine(g) {
-        for (g->it = IVec_begin(g->v); g->it.ref; IVec_next(&g->it))
+    cco_scope(g) {
+        c_foreach_it(g->it, IVec, *g->v)
             cco_yield_v(*g->it.ref);
     }
-    return -1;
+    return 0;
 }
 
 struct Generator {
     struct GenValue x, y;
     int cco_state;
-    int value;
+    long value;
 };
 
-cco_result interleaved(struct Generator* g)
+int interleaved(struct Generator* g)
 {
-    cco_routine(g) {
-        while (!(cco_done(&g->x) & cco_done(&g->y))) {
+    cco_scope(g) {
+        bool a, b;
+        do {
             g->value = get_value(&g->x);
-            if (!cco_done(&g->x))
+            if ((a = !cco_done(&g->x)))
                 cco_yield;
 
             g->value = get_value(&g->y);
-            if (!cco_done(&g->y))
+            if ((b = !cco_done(&g->y)))
                 cco_yield;
-        }
+        } while (a | b);
     }
-    return CCO_DONE;
+    return 0;
 }
 
 void Use(void)
@@ -48,8 +49,8 @@ void Use(void)
 
     struct Generator g = {{&a}, {&b}};
 
-    cco_blocking_call(interleaved(&g)) {
-        printf("%d ", g.value);
+    cco_run_coroutine(interleaved(&g)) {
+        printf("%ld ", g.value);
     }
     puts("");
     c_drop(IVec, &a, &b);

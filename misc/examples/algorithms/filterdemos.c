@@ -75,14 +75,14 @@ fn main() {
 }
 */
 #define i_type SVec
-#define i_key_class csview
+#define i_keyclass csview
 #include "stc/stack.h"
 
 void demo3(void)
 {
-    const char* sentence = "This is a sentence in C99.";
+    csview sentence = c_sv("This is a sentence in C99.");
     SVec words = {0};
-    c_fortoken (i, " ", sentence) // split words
+    c_fortoken_sv (i, " ", sentence) // split words
         SVec_push(&words, i.token);
 
     SVec words_containing_i = {0};
@@ -91,7 +91,7 @@ void demo3(void)
         && SVec_push(&words_containing_i, *value)
     );
     c_foreach (w, SVec, words_containing_i)
-        printf(" %.*s", c_SV(*w.ref));
+        printf(" %.*s", c_SVARG(*w.ref));
 
     puts("");
     c_drop(SVec, &words, &words_containing_i);

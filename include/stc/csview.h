@@ -131,9 +131,6 @@ STC_INLINE bool csview_u8_valid(csview sv) // requires linking with utf8 symbols
          it = {.in=input_sv, .sep=separator} ; \
          it.pos <= it.in.size && (it.token = csview_token(it.in, it.sep, &it.pos)).buf ; )
 
-#define c_fortoken(it, separator, input_str) \
-    c_fortoken_sv(it, separator, csview_from(input_str))
-
 /* ---- Container helper functions ---- */
 
 STC_INLINE int csview_cmp(const csview* x, const csview* y) {

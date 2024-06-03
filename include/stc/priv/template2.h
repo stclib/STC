@@ -23,39 +23,45 @@
 #ifdef i_more
 #undef i_more
 #else
-#undef i_TYPE
+#undef i_typedef
+#undef i_TYPE // [deprecated]
 #undef i_type
 #undef i_tag
-#undef i_imp
 #undef i_opt
-#undef i_less
+#undef i_capacity
+
+#undef i_key
+#undef i_key2       // i_key + i_keyraw
+#undef i_keyraw
+#undef i_key_str
+#undef i_key_arc
+#undef i_key_box
+#undef i_key_arcbox // [deprecated]
+#undef i_keyclass
+#undef i_keyclass2  // i_keyclass + i_keyraw
+#undef i_rawclass   // i_keyraw with i_cmp, i_eq, i_hash "members"
+#undef i_keyclone
+#undef i_keyfrom
+#undef i_keyto
 #undef i_cmp
+#undef i_less
 #undef i_eq
 #undef i_hash
-#undef i_capacity
-#undef i_raw_class
+#undef i_keydrop
 
 #undef i_val
-#undef i_val_str
-#undef i_val_ssv
-#undef i_val_arcbox
-#undef i_val_class
+#undef i_val2       // i_val + i_valraw
 #undef i_valraw
+#undef i_val_str
+#undef i_val_arc
+#undef i_val_box
+#undef i_val_arcbox // [deprecated]
+#undef i_valclass
+#undef i_valclass2  // i_valclass + i_valraw
 #undef i_valclone
 #undef i_valfrom
 #undef i_valto
 #undef i_valdrop
-
-#undef i_key
-#undef i_key_str
-#undef i_key_ssv
-#undef i_key_arcbox
-#undef i_key_class
-#undef i_keyraw
-#undef i_keyclone
-#undef i_keyfrom
-#undef i_keyto
-#undef i_keydrop
 
 #undef i_use_cmp
 #undef i_use_eq

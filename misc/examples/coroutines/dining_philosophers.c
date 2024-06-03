@@ -30,7 +30,7 @@ struct Dining {
 int philosopher(struct Philosopher* p)
 {
     double duration;
-    cco_routine(p) {
+    cco_scope(p) {
         while (1) {
             duration = 1.0 + crandf()*2.0;
             printf("Philosopher %d is thinking for %.0f minutes...\n", p->id, duration*10);
@@ -58,7 +58,7 @@ int philosopher(struct Philosopher* p)
 // Dining coroutine
 int dining(struct Dining* d)
 {
-    cco_routine(d) {
+    cco_scope(d) {
         for (int i = 0; i < num_forks; ++i)
             cco_sem_set(&d->forks[i], 1); // all forks available
         for (int i = 0; i < num_philosophers; ++i) {
@@ -94,7 +94,7 @@ int main(void)
     cco_timer tm = cco_timer_from(5.0); // seconds
     csrand((uint64_t)time(NULL));
 
-    cco_blocking_call(dining(&dine))
+    cco_run_coroutine(dining(&dine))
     {
         if (cco_timer_expired(&tm))
             cco_stop(&dine);

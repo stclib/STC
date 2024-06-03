@@ -24,6 +24,10 @@ See similar c++ class [std::shared_ptr](https://en.cppreference.com/w/cpp/memory
 #define i_TYPE <ct>,<kt>   // shorthand to define i_type,i_key
 #define i_type <t>         // arc container type name (default: arc_{i_key})
 #define i_key <t>          // element type: REQUIRED. Defines arc_X_value
+#define i_keyclass <t>     // Use instead of i_key when functions {i_key}_clone,
+                           //   {i_key}_drop and {i_keyraw}_cmp exist.
+#define i_key_arc <t>      // Use instead of i_key when key itself is an arc-type.
+#define i_key_box <t>      // Use instead of i_key when key  is a box-type.
 #define i_cmp <f>          // three-way compareison. REQUIRED IF i_key is a non-integral type
                            // Note that containers of arcs will "inherit" i_cmp
                            // when using arc in containers with i_val_arcbox MyArc - ie. the i_type.
@@ -101,7 +105,7 @@ bool        arc_X_value_eq(const i_key* x, const i_key* y);
 #include "stc/arc.h"
 
 #define i_type Stack
-#define i_key_arcbox Arc // Note: use i_key_arcbox for arc or box value types
+#define i_key_arc Arc // Note: use i_key_arc for arc key types
 #include "stc/stack.h"
 
 int main(void)

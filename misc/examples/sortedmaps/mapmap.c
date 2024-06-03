@@ -12,7 +12,7 @@
 // Departments: std::map<std::string, People>
 #define i_type Departments
 #define i_key_str // dep. name
-#define i_val_class People
+#define i_valclass People
 #include "stc/hmap.h"
 
 

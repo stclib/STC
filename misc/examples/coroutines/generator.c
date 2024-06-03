@@ -16,8 +16,8 @@ cco_iter_struct(Triple,
 );
 
 int Triple_next(Triple_iter* it) {
-    Triple* g = it->ref; // note: before cco_routine
-    cco_routine(it)
+    Triple* g = it->ref; // note: before cco_scope
+    cco_scope(it)
     {
         for (g->c = 5;; ++g->c) {
             for (g->a = 1; g->a < g->c; ++g->a) {

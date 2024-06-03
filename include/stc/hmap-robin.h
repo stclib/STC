@@ -54,7 +54,9 @@ int main(void) {
 #include "types.h"
 #include <stdlib.h>
 #include <string.h>
-struct hmap_slot { uint8_t hashx, dist; }; // dist: 0=empty, 1=PSL 0, 2=PSL 1, ...
+#define _hashmask 0x3fU
+#define _distmask 0x3ffU
+struct hmap_slot { uint16_t hashx:6, dist:10; }; // dist: 0=empty, 1=PSL 0, 2=PSL 1, ...
 #endif // STC_HMAP_H_INCLUDED
 
 #ifndef _i_prefix
@@ -369,8 +371,8 @@ STC_DEF void _c_MEMB(_clear)(i_type* self) {
 static _m_result
 _c_MEMB(_bucket_lookup_)(const i_type* self, const _m_keyraw* rkeyptr) {
     const uint64_t _hash = i_hash(rkeyptr);
-    const size_t _mask = (size_t)self->bucket_count - 1;
-    _m_result _res = {.idx=_hash & _mask, .hashx=(uint8_t)_hash, .dist=1};
+    const size_t _idxmask = (size_t)self->bucket_count - 1;
+    _m_result _res = {.idx=_hash & _idxmask, .hashx=_hash & _hashmask, .dist=1};
 
     while (_res.dist <= self->slot[_res.idx].dist) {
         if (self->slot[_res.idx].hashx == _res.hashx) {
@@ -380,7 +382,7 @@ _c_MEMB(_bucket_lookup_)(const i_type* self, const _m_keyraw* rkeyptr) {
                 break;
             }
         }
-        _res.idx = (_res.idx + 1) & _mask;
+        _res.idx = (_res.idx + 1) & _idxmask;
         ++_res.dist;
     }
     return _res;
@@ -393,7 +395,7 @@ _c_MEMB(_bucket_insert_)(const i_type* self, const _m_keyraw* rkeyptr) {
         return res;
     res.ref = &self->table[res.idx];
     res.inserted = true;
-    struct hmap_slot snew = {res.hashx, res.dist};
+    struct hmap_slot snew = {.hashx=res.hashx & _hashmask, .dist=res.dist & _distmask};
     struct hmap_slot scur = self->slot[res.idx];
     self->slot[res.idx] = snew;
 

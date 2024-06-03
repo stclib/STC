@@ -14,7 +14,7 @@ cco_task_struct (next_value,
 int next_value(struct next_value* co, cco_runtime* rt)
 {
     (void)rt;
-    cco_routine (co) {
+    cco_scope (co) {
         while (true) {
             cco_await_timer(&co->tm, 1 + rand() % 2);
             co->val = rand();
@@ -41,7 +41,7 @@ cco_task_struct (produce_items,
 
 int produce_items(struct produce_items* p, cco_runtime* rt)
 {
-    cco_routine (p) {
+    cco_scope (p) {
         p->text = cstr_init();
         p->next.cco_func = next_value;
         while (true)
@@ -70,7 +70,7 @@ cco_task_struct (consume_items,
 
 int consume_items(struct consume_items* c, cco_runtime* rt)
 {
-   cco_routine (c) {
+   cco_scope (c) {
         c->produce.cco_func = produce_items;
 
         for (c->i = 1; c->i <= c->n; ++c->i)
@@ -95,5 +95,5 @@ int main(void)
         .cco_func = consume_items,
         .n = 3,
     };
-    cco_blocking_task(&consume);
+    cco_run_task(&consume);
 }

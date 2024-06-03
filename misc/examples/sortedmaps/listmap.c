@@ -10,7 +10,7 @@
 // Map of int => list_str.
 #define i_type Multimap
 #define i_key int
-#define i_val_class list_str // set i_val = list_str, bind list_str_clone and list_str_drop
+#define i_valclass list_str // set i_val = list_str, bind list_str_clone and list_str_drop
 #define i_cmp -c_default_cmp // like std::greater<int>
 #include "stc/smap.h"
 

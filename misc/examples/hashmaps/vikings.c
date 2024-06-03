@@ -48,23 +48,23 @@ static inline RViking Viking_toraw(const Viking* vp) {
 #ifdef USE_BOX
 // Wrap Viking into a smart pointer (box), which itself uses RViking as raw-type:
 #define i_type          VikingBox
-#define i_key_class     Viking
-#define i_raw_class     RViking  // Lookup type ; binds _keyraw, _from and _toraw
+#define i_keyclass      Viking
+#define i_rawclass      RViking  // Lookup type ; binds _keyraw, _from and _toraw
 #define i_use_eq                 // For box/arc, if neither of i_use_cmp, i_cmp, i_use_eq, i_eq, or i_hash
                                  // is defined, it does comparison/hashing of the object's address.
 #include "stc/box.h"
 
 // With this in place, we define the VikingBox => int hash map type:
 #define i_type          Vikings
-#define i_key_arcbox    VikingBox
+#define i_key_box       VikingBox
 #define i_val           int
 #include "stc/hmap.h"
 
 #else
 // With this in place, we define the Viking => int hash map type:
 #define i_type      Vikings
-#define i_key_class Viking      // key type    ; binds _drop, _clone, _from, _toraw
-#define i_raw_class RViking     // lookup type ; binds _cmp, _hash (unless overridden)
+#define i_keyclass  Viking      // key type    ; binds _drop, _clone, _from, _toraw
+#define i_rawclass  RViking     // lookup type ; binds _cmp, _hash (unless overridden)
 #define i_val       int         // mapped type
 #include "stc/hmap.h"
 

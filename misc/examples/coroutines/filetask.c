@@ -13,10 +13,11 @@ cco_task_struct(file_read,
     cco_timer tm;
 );
 
+
 int file_read(struct file_read* co, cco_runtime* rt)
 {
-    (void)rt;
-    cco_routine (co) {
+    cco_scope (co) {
+        (void)rt;
         co->fp = fopen(co->path, "r");
         co->line = cstr_init();
 
@@ -37,19 +38,21 @@ int file_read(struct file_read* co, cco_runtime* rt)
     return 0;
 }
 
+
 cco_task_struct(count_line,
     cstr path;
     struct file_read reader;
     int lineCount;
 );
 
+
 int count_line(struct count_line* co, cco_runtime* rt)
 {
-    cco_routine (co) {
+    cco_scope (co) {
         co->reader.cco_func = file_read;
         co->reader.path = cstr_str(&co->path);
-        while (true)
-        {
+
+        while (true) {
             // await for next CCO_YIELD (or CCO_DONE) in file_read()
             cco_await_task(&co->reader, rt, CCO_YIELD);
             if (rt->result == CCO_DONE) break;
@@ -64,6 +67,7 @@ int count_line(struct count_line* co, cco_runtime* rt)
     return 0;
 }
 
+
 int main(void)
 {
     // Creates a new task
@@ -74,7 +78,7 @@ int main(void)
 
     // Execute coroutine as top-level blocking
     int loop = 0;
-    cco_blocking_task(&countTask) { ++loop; }
+    cco_run_task(&countTask) { ++loop; }
 
     printf("line count = %d\n", countTask.lineCount);
     printf("exec count = %d\n", loop);

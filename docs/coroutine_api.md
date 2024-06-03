@@ -11,28 +11,28 @@ Because these coroutines are stackless, local variables within the coroutine whe
 ### Coroutine API
 
 NB! ***cco_yield\*()*** / ***cco_await\*()*** may not be called from within a `switch` statement in a
-`cco_routine` scope; Use `if-else-if` constructs instead.
+`cco_scope` scope; Use `if-else-if` constructs instead.
 
 |           |  Function / operator                 | Description                             |
 |:----------|:-------------------------------------|:----------------------------------------|
 |`cco_result` | `CCO_DONE`, `CCO_AWAIT`, `CCO_YIELD` | Default set of return values from coroutines |
 |           | `cco_final:`                         | Label for cleanup position in coroutine |
 | `bool`    | `cco_done(co)`                       | Is coroutine done?                      |
-|           | `cco_routine(co) {}`                 | The coroutine scope                     |
+|           | `cco_scope(co) {}`                 | The coroutine scope                     |
 |           | `cco_yield;`                         | Yield/suspend execution (return CCO_YIELD)|
 |           | `cco_yield_v(ret);`                  | Yield/suspend execution (return ret)    |
 |           | `cco_yield_final;`                   | Yield final suspend, enter cleanup-state |
 |           | `cco_yield_final_v(ret);`            | Yield with a final value                 |
 |           | `cco_await(condition);`              | Suspend until condition is true (return CCO_AWAIT)|
-|           | `cco_await_call(cocall);`            | Await for subcoro to finish (returns its ret value) |
-|           | `cco_await_call(cocall, retbit);`    | Await for subcoro's return to be in (retbit \| CCO_DONE)  |
-|           | `cco_return;`                        | Return from coroutine (inside cco_routine) |
+|           | `cco_await_coroutine(cocall);`            | Await for subcoro to finish (returns its ret value) |
+|           | `cco_await_coroutine(cocall, retbit);`    | Await for subcoro's return to be in (retbit \| CCO_DONE)  |
+|           | `cco_return;`                        | Return from coroutine (inside cco_scope) |
 |           | ***c_filter() interoperability with coroutine iterators***: ||
 |           | `cco_flt_take(num);`                 | Use instead of *c_flt_take(num)* to ensure cleanup state |
 |           | `cco_flt_takewhile(predicate);`      | Use instead of *c_flt_takewhile(pred)* to ensure cleanup state |
 |           | `cco_flt_takewhile(predicate);`      | Use instead of *c_flt_takewhile(pred)* to ensure cleanup state |
 |           | ***Container iteration in coroutines***: ||
-|           | `c_foreach_iter(external_it, ctype, cnt)` | Use iterator stored in coroutine object |
+|           | `c_foreach_it(external_it, ctype, cnt)` | Use iterator stored in coroutine object |
 |           | `c_foreach_reverse_iter(external_it, ctype, cnt)` | Iterate in reverse order     |
 |           | ***Task objects***:                  ||
 |           | `cco_task_struct(Name, ...);`        | Define a coroutine task struct          |
@@ -56,9 +56,9 @@ NB! ***cco_yield\*()*** / ***cco_await\*()*** may not be called from within a `s
 |           | ***From caller side***:              ||
 | `void`    | `cco_stop(co)`                       | Next call of coroutine finalizes        |
 | `void`    | `cco_reset(co)`                      | Reset state to initial (for reuse)      |
-| `void`    | `cco_blocking_call(cocall) {}`       | Run blocking until cocall is finished   |
-|           | `cco_blocking_task(task) {}`         | Run blocking until task is finished |
-|           | `cco_blocking_task(task, rt, STACKSZ) {}`| Run blocking until task is finished |
+| `void`    | `cco_run_coroutine(cocall) {}`       | Run blocking until cocall is finished   |
+|           | `cco_run_task(task) {}`         | Run blocking until task is finished |
+|           | `cco_run_task(task, rt, STACKSZ) {}`| Run blocking until task is finished |
 |           | ***Time functions***:                ||
 | `double`  | `cco_time(void)`                     | Return secs with usec prec. since Epoch |
 |           | `cco_sleep(double sec)`              | Sleep for seconds (msec or usec prec.)  |
@@ -97,7 +97,7 @@ struct triples {
 };
 
 int triples(struct triples* i) {
-    cco_routine(i) {  // the coroutine scope!
+    cco_scope(i) {  // the coroutine scope!
         for (i->c = 5;; ++i->c) {
             for (i->a = 1; i->a < i->c; ++i->a) {
                 for (i->b = i->a + 1; i->b < i->c; ++i->b) {
@@ -122,7 +122,7 @@ int main(void) {
     struct triples co = {.max_c = 25};
     int n = 0;
 
-    cco_blocking_call(triples(&co)) {
+    cco_run_coroutine(triples(&co)) {
         printf("%d: [%d, %d, %d]\n", ++n, co.a, co.b, co.c);
     }
 }
@@ -150,7 +150,7 @@ struct gcd1_triples {
 
 int gcd1_triples(struct gcd1_triples* i)
 {
-    cco_routine(i) {
+    cco_scope(i) {
         cco_reset(&i->tri);
         i->tri.max_c = i->max_c;
 
@@ -176,19 +176,19 @@ int main(void) {
     struct gcd1_triples co = {.max_n = 100, .max_c = 100};
     int n = 0;
 
-    cco_blocking_call(gcd1_triples(&co)) {
+    cco_run_coroutine(gcd1_triples(&co)) {
         printf("%d: [%d, %d, %d]\n", ++n, co.tri.a, co.tri.b, co.tri.c);
     }
 }
 ```
-When using ***cco_blocking_call()***, the coroutine is continuously resumed after each yield suspension.
+When using ***cco_run_coroutine()***, the coroutine is continuously resumed after each yield suspension.
 However, this means that it first calls ***gcd1_triples()***, which immediately jumps to after the `cco_yield`
 -statement and calls ***triples()***, which again jumps and resumes after its `cco_yield`-statement. This
 is efficient only when yielding or awaiting from the top- or second-level call like here, but naturally not
 when couroutine calls are more deeply nested or recursive.
 
 The STC coroutine implementation therefore also contains task-objects (`cco_task`), which are base-coroutine
-objects/enclosures. These can be executed using ***cco_blocking_task()*** instead of ***cco_blocking_call()***.
+objects/enclosures. These can be executed using ***cco_run_task()*** instead of ***cco_run_coroutine()***.
 Inner coroutine calls are done by ***cco_await_task()***, where you may await for a certain return value, normally CCO_YIELD or just CCO_DONE. It uses a stack of pointers of task-enclosures to call the current
 inner-level function directly. The task-objects have the added benefit that coroutines can be managed
 by a scheduler, which is useful when dealing with large numbers of coroutines (like in many games and
@@ -215,7 +215,7 @@ cco_task_struct (next_value,
 
 int next_value(struct next_value* co, cco_runtime* rt)
 {
-    cco_routine (co) {
+    cco_scope (co) {
         while (true) {
             cco_await_timer(&co->tm, 1 + rand() % 2); // suspend with CCO_AWAIT
             co->val = rand();
@@ -241,7 +241,7 @@ cco_task_struct (produce_items,
 
 int produce_items(struct produce_items* p, cco_runtime* rt)
 {
-    cco_routine (p) {
+    cco_scope (p) {
         p->text = cstr_init();
         p->next.cco_func = next_value;
         while (true)
@@ -268,7 +268,7 @@ cco_task_struct (consume_items,
 
 int consume_items(struct consume_items* c, cco_runtime* rt)
 {
-   cco_routine (c) {
+   cco_scope (c) {
         c->produce.cco_func = produce_items;
 
         for (c->i = 1; c->i <= c->n; ++c->i)
@@ -279,9 +279,9 @@ int consume_items(struct consume_items* c, cco_runtime* rt)
             printf("consumed %s\n", cstr_str(&c->produce.text));
         }
         cco_final:
-            cco_stop(&c->produce);
-            cco_resume_task(&c->produce, rt);
-            puts("done consume");
+        cco_stop(&c->produce);
+        cco_resume_task(&c->produce, rt);
+        puts("done consume");
     }
     return 0;
 }
@@ -292,6 +292,6 @@ int main(void)
         .n = 5,
         .cco_func = consume_items,
     };
-    cco_blocking_task(&consume);
+    cco_run_task(&consume);
 }
 ```

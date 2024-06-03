@@ -16,8 +16,8 @@ usage.
 csview sv = c_sv("Hello world");
 sv = csview_substr(sv, 0, 5);
 printf("%.*s\n", sv.size, sv.buf);
-// or with the c_SV() macro:
-printf("%.*s\n", c_SV(sv));
+// or with the c_SVARG() macro:
+printf("%.*s\n", c_SVARG(sv));
 ```
 
 See the c++ class [std::basic_string_view](https://en.cppreference.com/w/cpp/string/basic_string_view)
@@ -93,7 +93,7 @@ Iterate tokens in an input string split by a separator string:
 
 ```c
 c_fortoken (i, ", ", "hello, one, two, three")
-    printf("'%.*s' ", c_SV(i.token));
+    printf("'%.*s' ", c_SVARG(i.token));
 // 'hello' 'one' 'two' 'three'
 ```
 
@@ -117,7 +117,7 @@ uint64_t       csview_hash(const csview* x);
 
 | Name           | Value                | Usage                                        |
 |:---------------|:---------------------|:---------------------------------------------|
-| `c_SV(sv)`     | printf argument      | `printf("sv: %.*s\n", c_SV(sv));`            |
+| `c_SVARG(sv)`     | printf argument      | `printf("sv: %.*s\n", c_SVARG(sv));`            |
 
 ## Example
 ```c
@@ -135,7 +135,7 @@ int main(void)
     csview ss2 = cstr_substr_ex(&str1, pos, 4);        // get "live"
     csview ss3 = cstr_slice_ex(&str1, -8, -1);         // get "details"
     printf("%.*s %.*s %.*s\n",
-        c_SV(ss1), c_SV(ss2), c_SV(ss3));
+        c_SVARG(ss1), c_SVARG(ss2), c_SVARG(ss3));
     cstr s1 = cstr_lit("Apples are red");
     cstr s2 = cstr_from_sv(cstr_substr_ex(&s1, -3, 3)); // "red"
     cstr s3 = cstr_from_sv(cstr_substr_ex(&s1, 0, 6));  // "Apples"
@@ -163,7 +163,7 @@ int main(void)
     printf("%s\n", cstr_str(&s1));
 
     c_foreach (i, cstr, s1)
-        printf("%.*s,", c_SV(i.chr));
+        printf("%.*s,", c_SVARG(i.chr));
 
     cstr_drop(&s1);
 }
@@ -184,7 +184,7 @@ and does not depend on zero-terminated strings. *string_split()* function return
 void print_split(csview input, const char* sep)
 {
     c_fortoken_sv (i, input, sep)
-        printf("[%.*s]\n", c_SV(i.token));
+        printf("[%.*s]\n", c_SVARG(i.token));
     puts("");
 }
 #define i_implement

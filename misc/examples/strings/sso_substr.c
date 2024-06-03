@@ -11,7 +11,7 @@ int main(void)
     intptr_t pos = csview_find(sv, "live");                // position of "live"
     csview sv2 = csview_substr_ex(sv, pos, 4);             // "live"
     csview sv3 = csview_slice_ex(sv, -8, -1);              // "details"
-    printf("%.*s, %.*s, %.*s\n", c_SV(sv1), c_SV(sv2), c_SV(sv3));
+    printf("%.*s, %.*s, %.*s\n", c_SVARG(sv1), c_SVARG(sv2), c_SVARG(sv3));
 
     cstr_assign(&str, "apples are green or red");
     sv = cstr_sv(&str);

@@ -28,7 +28,7 @@ int Scheduler_run(Scheduler* sched) {
 
 static int taskA(struct cco_task* task, cco_runtime* rt) {
     (void)rt;
-    cco_routine(task) {
+    cco_scope(task) {
         puts("Hello, from task A");
         cco_yield;
         puts("A is back doing work");
@@ -42,7 +42,7 @@ static int taskA(struct cco_task* task, cco_runtime* rt) {
 
 static int taskB(struct cco_task* task, cco_runtime* rt) {
     (void)rt;
-    cco_routine(task) {
+    cco_scope(task) {
         puts("Hello, from task B");
         cco_yield;
         puts("B is back doing work");

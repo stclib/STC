@@ -42,7 +42,7 @@ void Person_drop(Person* p) {
 }
 
 #define i_type ArcPers
-#define i_val_class Person    // clone, drop, cmp, hash
+#define i_valclass Person    // clone, drop, cmp, hash
 #include "stc/arc.h"
 
 int main(void) {

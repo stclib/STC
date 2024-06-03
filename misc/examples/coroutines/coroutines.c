@@ -12,30 +12,30 @@ bool is_prime(long long i) {
 }
 
 struct prime {
-    int count, idx;
-    long long result, pos;
+    int count;
+    long long value;
     int cco_state;
 };
 
+enum { YIELD_PRM = 1<<0, YIELD_FIB = 1<<1};
+
 int prime(struct prime* g) {
-    cco_routine(g) {
-        if (g->result < 2) g->result = 2;
-        if (g->result == 2) {
-            if (g->count-- == 0) cco_return;
-            ++g->idx;
-            cco_yield;
+    cco_scope(g) {
+        if (g->value < 2)
+            g->value = 2;
+        if (g->value == 2) {
+            if (g->count-- == 0)
+                cco_return;
+            cco_yield_v(YIELD_PRM);
         }
-        g->result += !(g->result & 1);
-        for (g->pos = g->result; g->count > 0; g->pos += 2) {
-            if (is_prime(g->pos)) {
+        for (g->value |= 1; g->count > 0; g->value += 2) {
+            if (is_prime(g->value)) {
                 --g->count;
-                ++g->idx;
-                g->result = g->pos;
-                cco_yield;
+                cco_yield_v(YIELD_PRM);
             }
         }
         cco_final:
-        printf("final prm\n");
+        puts("DONE prm");
     }
     return 0;
 }
@@ -44,32 +44,28 @@ int prime(struct prime* g) {
 // Use coroutine to create a fibonacci sequence generator:
 
 struct fibonacci {
-    int count, idx;
-    long long result, b;
+    int count;
+    long long value, b;
     int cco_state;
 };
 
 int fibonacci(struct fibonacci* g) {
     assert(g->count < 94);
 
-    long long sum;
-    cco_routine(g) {
-        g->idx = 0;
-        g->result = 0;
-        g->b = 1;
-        for (;;) {
+    cco_scope(g) {
+        if (g->value == 0)
+            g->b = 1;
+        while (true) {
             if (g->count-- == 0)
                 cco_return;
-            if (++g->idx > 1) {
-                // NB! locals lasts only until next yield/await!
-                sum = g->result + g->b;
-                g->result = g->b;
-                g->b = sum;
-            }
-            cco_yield;
+            // NB! locals lasts only until next yield/await!
+            long long tmp = g->value;
+            g->value = g->b;
+            g->b += tmp;
+            cco_yield_v(YIELD_FIB);
         }
         cco_final:
-        printf("final fib\n");
+        puts("DONE fib");
     }
     return 0;
 }
@@ -82,31 +78,48 @@ struct combined {
     int cco_state;
 };
 
-int combined(struct combined* g) {
-    cco_routine(g) {
-        cco_await_call(prime(&g->prm));
-        cco_await_call(fibonacci(&g->fib));
-
-        // Reuse the g->prm context and extend the count:
-        g->prm.count = 8, g->prm.result += 2;
-        cco_reset(&g->prm);
-        cco_await_call(prime(&g->prm));
+int sequenced(struct combined* g) {
+    cco_scope(g) {
+        cco_await_coroutine( prime(&g->prm) );
+        cco_await_coroutine( fibonacci(&g->fib) );
 
         cco_final:
-        puts("final combined");
+        puts("DONE sequenced");
     }
     return 0;
 }
 
+int parallel(struct combined* g) {
+    cco_scope(g) {
+        cco_await_coroutine( prime(&g->prm) | fibonacci(&g->fib) );
+
+        cco_final:
+        puts("DONE parallel");
+    }
+    return 0;
+}
+
+
+
 int main(void)
 {
-    struct combined c = {.prm={.count=8}, .fib={14}};
+    struct combined c = {.prm={.count=8}, .fib={.count=12}};
     int res;
 
-    cco_blocking_call(res = combined(&c)) {
-        if (res == CCO_YIELD)
-            printf("Prime(%d)=%lld, Fib(%d)=%lld\n",
-                c.prm.idx, c.prm.result,
-                c.fib.idx, c.fib.result);
+    puts("SEQUENCED");
+    cco_run_coroutine(res = sequenced(&c)) {
+        if (res & YIELD_PRM) 
+            printf("Prime=%lld\n", c.prm.value);
+        if (res & YIELD_FIB)
+            printf("Fibon=%lld\n", c.fib.value);
+    }
+    
+    c = (struct combined){.prm={.count=12}, .fib={.count=8}};
+    puts("PARALLEL");
+    cco_run_coroutine(res = parallel(&c)) {
+        if (res & YIELD_PRM) 
+            printf("Prime=%lld\n", c.prm.value);
+        if (res & YIELD_FIB)
+            printf("Fibon=%lld\n", c.fib.value);
     }
 }

@@ -19,8 +19,8 @@ int main(void)
     csview ch1 = cstr_u8_chr(&s1, 7);
     csview ch2 = cstr_u8_chr(&s1, 10);
     printf("%s\nsize: %" c_ZI ", %" c_ZI "\n", cstr_str(&s1), cstr_u8_size(&s1), cstr_size(&s1));
-    printf("ch1: %.*s\n", c_SV(ch1));
-    printf("ch2: %.*s\n", c_SV(ch2));
+    printf("ch1: %.*s\n", c_SVARG(ch1));
+    printf("ch2: %.*s\n", c_SVARG(ch2));
 
     c_drop(cstr, &ss, &s1);
 }

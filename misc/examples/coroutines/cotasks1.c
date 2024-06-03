@@ -14,7 +14,7 @@ struct next_value {
 
 int next_value(struct next_value* co)
 {
-    cco_routine (co) {
+    cco_scope (co) {
         while (true) {
             cco_await_timer(&co->tm, 1 + rand() % 2);
             co->val = rand();
@@ -42,7 +42,7 @@ struct produce_items {
 
 int produce_items(struct produce_items* p)
 {
-    cco_routine (p) {
+    cco_scope (p) {
         p->text = cstr_init();
         while (true)
         {
@@ -68,7 +68,7 @@ struct consume_items {
 
 int consume_items(struct consume_items* c, struct produce_items* p)
 {
-   cco_routine (c) {
+   cco_scope (c) {
         for (c->i = 1; c->i <= c->n; ++c->i)
         {
             printf("consume #%d\n", c->i);
@@ -88,7 +88,7 @@ int main(void)
     struct consume_items consume = {.n=3};
     int count = 0;
 
-    cco_blocking_call(consume_items(&consume, &produce))
+    cco_run_coroutine(consume_items(&consume, &produce))
     {
         ++count;
         //cco_sleep(0.001);

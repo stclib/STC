@@ -18,6 +18,9 @@ See similar c++ class [std::unique_ptr](https://en.cppreference.com/w/cpp/memory
 #define i_TYPE <ct>,<kt> // shorthand to define i_type,i_key
 #define i_type <t>       // box container type name (default: box_{i_key})
 #define i_key <t>        // element type: REQUIRED. Note: i_val* may be specified instead of i_key*.
+#define i_key_box <t>    // Use instead of i_key when key itself is a box-type.
+#define i_keyclass <t>   // Use instead of i_key when functions {i_key}_clone,
+                         //   {i_key}_drop and {i_keyraw}_cmp exist.
 #define i_cmp <f>        // three-way compareison. REQUIRED IF i_key is a non-integral type
                          // Note that containers of arcs will "inherit" i_cmp
                          // when using arc in containers with i_val_arcbox MyArc - ie. the i_type.
@@ -28,11 +31,7 @@ See similar c++ class [std::unique_ptr](https://en.cppreference.com/w/cpp/memory
 #define i_keyraw <t>     // convertion type (lookup): default to {i_key}
 #define i_keyto <f>      // convertion func i_key* => i_keyraw: REQUIRED IF i_keyraw defined.
 #define i_keyfrom <f>    // from-raw func.
-
 #define i_tag <s>        // alternative typename: box_{i_tag}. i_tag defaults to i_key
-#define i_key_class <t>  // Use instead of i_key when functions {i_key}_clone,
-                         // {i_key}_drop and {i_keyraw}_cmp exist.
-#define i_key_arcbox <t> // Use instead of i_key when key is a arc- or a box-type.
 #include "stc/box.h"
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.
@@ -89,11 +88,11 @@ void int_drop(int* x) {
 #include "stc/box.h"
 
 #define i_type ISet
-#define i_key_arcbox IBox   // NB: use i_key_arcbox instead of i_key
+#define i_key_box IBox      // NB: use i_key_box instead of i_key
 #include "stc/sset.h"       // ISet : std::set<std::unique_ptr<int>>
 
 #define i_type IVec
-#define i_key_arcbox IBox   // NB: use i_key_arcbox instead of i_key
+#define i_key_box IBox      // NB: use i_key_box instead of i_key
 #include "stc/vec.h"        // IVec : std::vector<std::unique_ptr<int>>
 
 int main(void)

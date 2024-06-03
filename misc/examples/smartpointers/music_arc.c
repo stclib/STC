@@ -11,7 +11,7 @@ struct {
     cstr title;
 } typedef Song;
 
-// Song "class" members (only _drop is actually used in this example):
+// Make Song a "class" by defining _clone and _drop "members":
 Song Song_init(const char* artist, const char* title)
     { return (Song){cstr_from(artist), cstr_from(title)}; }
 
@@ -29,26 +29,27 @@ void Song_drop(Song* self) {
     c_drop(cstr, &self->artist, &self->title);
 }
 
-// Define the shared pointer with a keyraw conversion type, SongView:
+// Define a keyraw conversion type, SongView:
 struct {
     const char* artist;
     const char* title;
 } typedef SongView;
 
+// Define the shared pointer type SongArc and conversion functions to SongView:
 #define i_type SongArc
-#define i_key_class Song
-#define i_keyraw SongView
+#define i_keyclass2 Song,SongView // define both i_keyclass and i_keyraw
 #define i_keyto(x) ((SongView){.artist=cstr_str(&x->artist), .title=cstr_str(&x->title)})
 #define i_keyfrom(sw) ((Song){.artist=cstr_from(sw.artist), .title=cstr_from(sw.title)})
-// When commenting the next two lines (or either), containers will use object address comparison and hashing
-// provided by arc instead of object content comparison (i.e. "Billie Jean" will appear more than once):
+// If commenting the next two lines (or either), containers uses object pointer equal and hashing
+// provided by arc instead of object content comparison (i.e. "The Times They Are A Changing" will appear more than once).
+// Note that both i_eq and i_hash takes const i_keyraw* type as arguments:
 #define i_eq(xw, yw) (strcmp(xw->artist, yw->artist)==0 && strcmp(xw->title, yw->title)==0)
 #define i_hash(xw) c_hash_mix(c_hash_str(xw->artist), c_hash_str(xw->title))
 #include "stc/arc.h"
 
 // Create a set of SongArc
 #define i_type SongSet
-#define i_key_arcbox SongArc // use i_key_arcbox on arc / box (not i_key)
+#define i_key_arc SongArc // use i_key_arc if key is an arc type (instead of i_key)
 #include "stc/hset.h"
 #include "stc/algorithm.h"
 

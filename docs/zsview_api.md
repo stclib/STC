@@ -96,7 +96,7 @@ int main(void)
     printf("%s\n", zs.str);
 
     c_foreach (i, zsview, say)
-        printf("%.*s ", c_SV(i.chr));
+        printf("%.*s ", c_SVARG(i.chr));
     puts("");
 
     cstr upper = cstr_toupper_sv(zsview_sv(say));

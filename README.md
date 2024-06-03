@@ -217,7 +217,7 @@ int main(void)
 ```
 Comparison/lookup functions are enabled by default for associative containers and priority queue (hmap, hset, smap, sset, pque). To enable it for the remaining containers, define `i_cmp` or `i_less` (and optionally `i_eq`) on the element type. If the element is an integral type, simply define `i_use_cmp` to use `<` and `==` operators for comparisons.
 
-Note that for `#define i_key_class Type`, defining `i_use_cmp` means that *Type_cmp()* function is expected to exist (along with *Type_clone()* and *Type_drop()*).
+Note that for `#define i_keyclass Type`, defining `i_use_cmp` means that *Type_cmp()* function is expected to exist (along with *Type_clone()* and *Type_drop()*).
 
 To summarize, `i_use_cmp` is only needed to enable comparison (sort/search) functions when defining stack, vec, queue, deq, arc, box. With built-in types, it enables the comparison operators, whereas for keyclass types, it binds comparison to its Type_cmp() function.
 
@@ -236,7 +236,7 @@ Let's make a vector of vectors, which can be cloned. All of its element vectors 
 #include "stc/vec.h"
 
 #define i_type Vec2D
-#define i_key_class Vec  // Use i_key_class when key type has "members" _clone() and _drop().
+#define i_keyclass Vec  // Use i_keyclass when key type has "members" _clone() and _drop().
 #define i_use_eq         // vec does not have _cmp(), but it has _eq()
 #include "stc/vec.h"
 
@@ -415,29 +415,29 @@ Val: (hmap/smap mapped value only)
 - `i_valto` *Func* - Convertion func *i_val*\* => *i_valraw*.
 
 Specials: Meta-template parameters. Use instead of `i_key` / `i_val`.
-- `i_key_class` *Type* - Auto-set standard named functions: *Type_clone()*, *Type_drop()*, *Type_cmp()*, *Type_eq()*, *Type_hash()*.
+- `i_keyclass` *Type* - Auto-set standard named functions: *Type_clone()*, *Type_drop()*, *Type_cmp()*, *Type_eq()*, *Type_hash()*.
 If `i_keyraw` is defined, it sets `i_keyto` = *Type_toraw()* and `i_keyfrom` = *Type_from()*.
 Only functions required by the container type is required to be defined. E.g.:
     - *Type_hash()* and *Type_eq()* are only required by **hmap**, **hset** and smart pointers.
     - *Type_cmp()* is not used by **stack** and **hmap/hset**.
     - *Type_clone()* is not used if *#define i_opt c_no_clone* is specified.
-- `i_key_str` - Sets `i_key_class` = *cstr*, `i_tag` = *str*, and `i_keyraw` = *const char*\*. Defines both type convertion
+- `i_key_str` - Sets `i_keyclass` = *cstr*, `i_tag` = *str*, and `i_keyraw` = *const char*\*. Defines both type convertion
 `i_keyfrom`, `i_keyto`, and sets `i_cmp`, `i_eq`, `i_hash` functions with *const char\*\** as argument.
-- `i_key_ssv` - Sets `i_key_class` = *cstr*, `i_tag` = *ssv*, and `i_keyraw` = *csview\**. Defines both type convertion
+- `i_key_ssv` - Sets `i_keyclass` = *cstr*, `i_tag` = *ssv*, and `i_keyraw` = *csview\**. Defines both type convertion
 `i_keyfrom`, `i_keyto`, and sets `i_cmp`, `i_eq`, `i_hash` functions with *csview\** as argument.
-- `i_key_arcbox` *Type* - Use when *Type* is a smart pointer **arc** or **box**. Defines *i_key_class = Type*, and *i_keyraw = Type\**.
+- `i_key_arcbox` *Type* - Use when *Type* is a smart pointer **arc** or **box**. Defines *i_keyclass = Type*, and *i_keyraw = Type\**.
 NB: Do not use when defining arc/box types themselves.
-- `i_val_class` *Type*, `i_val_str`, `i_val_ssv`, `i_val_arcbox` - Similar rules as for ***key***.
+- `i_valclass` *Type*, `i_val_str`, `i_val_ssv`, `i_val_arcbox` - Similar rules as for ***key***.
 
 **Notes**:
 - Instead of defining `i_*clone`, you may define *i_opt c_no_clone* to disable *clone* functionality.
-- For `i_key_class`, if *i_keyraw* is defined along with it, *i_keyfrom* may also be defined to enable the *emplace*-functions. NB: the signature for ***cmp***, ***eq***, and ***hash*** uses *i_keyraw* as input.
+- For `i_keyclass`, if *i_keyraw* is defined along with it, *i_keyfrom* may also be defined to enable the *emplace*-functions. NB: the signature for ***cmp***, ***eq***, and ***hash*** uses *i_keyraw* as input.
 
 ## Specifying comparison parameters
 
 The table below shows the template parameters which must be defined to support element search and sort for various containers versus element types.
 
-For the containers marked ***optional***, the features are disabled if the template parameter(s) are not defined. Note that the ***(integral type)*** columns also applies to "special" types, specified with `i_key_str`, `i_key_arcbox`, and `i_key_class`, and not only true integral types like `int` or `float`.
+For the containers marked ***optional***, the features are disabled if the template parameter(s) are not defined. Note that the ***(integral type)*** columns also applies to "special" types, specified with `i_key_str`, `i_key_arcbox`, and `i_keyclass`, and not only true integral types like `int` or `float`.
 
 | Container         | find (integral type) | sort (integral type) |\|| find (struct elem) | sort (struct elem) | optional |
 |:------------------|:---------------------|:---------------------|:-|:-----------------|:-------------------|:---------|
@@ -701,7 +701,7 @@ STC is generally very memory efficient. Memory usage for the different container
         - Reverted names _unif and _norm back to `_uniform` and `_normal`.
     - Removed default comparison for **list**, **vec** and **deq**:
         - Define `i_use_cmp` to enable comparison for built-in i_key types (<, ==).
-        - Use of `i_key_class` still expects comparison functions to be defined.
+        - Use of `i_keyclass` still expects comparison functions to be defined.
         - Use of `i_key_arcbox` compares stored pointers instead of pointed to values if comparison not defined.
     - Renamed input enum flags for ***cregex***-functions.
 - **cspan**: Added **column-major** order (fortran) multidimensional spans and transposed views (changed representation of strides).
@@ -725,7 +725,7 @@ STC is generally very memory efficient. Memory usage for the different container
 - Renamed c_flt_count(i) => `c_flt_counter(i)`
 - Renamed c_flt_last(i) => `c_flt_getcount(i)`
 - Renamed c_ARRAYLEN() => c_arraylen()
-- Removed deprecated c_ARGSV(). Use c_SV()
+- Removed deprecated c_ARGSV(). Use c_SVARG()
 - Removed c_PAIR
 
 ## Version 4.1.1
@@ -738,7 +738,7 @@ Major changes:
     - [crange](docs/algorithm_api.md#crange) - similar to [boost::irange](https://www.boost.org/doc/libs/release/libs/range/doc/html/range/reference/ranges/irange.html) integer range generator.
     - [c_forfilter](docs/algorithm_api.md#c_forfilter) - ranges-like view filtering.
     - [csort](include/stc/algo/quicksort.h) - [fast quicksort](misc/benchmarks/various/quicksort_bench.c) with custom inline comparison.
-- Renamed `c_ARGSV()` => `c_SV()`: **csview** print arg. Note `c_sv()` is shorthand for *csview_from()*.
+- Renamed `c_ARGSV()` => `c_SVARG()`: **csview** print arg. Note `c_sv()` is shorthand for *csview_from()*.
 - Support for [uppercase flow-control](include/stc/priv/altnames.h) macro names in common.h.
 - Some API changes in **cregex** and **cstr**.
 - Create single header container versions with python script.

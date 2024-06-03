@@ -30,7 +30,7 @@ void Person_drop(Person* p) {
 }
 
 #define i_type PSPtr
-#define i_key_class Person // ensure Person_drop
+#define i_keyclass Person // ensure Person_drop
 #define i_use_cmp
 #include "stc/arc.h"
 

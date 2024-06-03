@@ -42,7 +42,7 @@ void Person_drop(Person* p) {
 }
 
 #define i_type PBox
-#define i_val_class Person // bind Person clone+drop fn's
+#define i_valclass Person // bind Person clone+drop fn's
 #include "stc/box.h"
 
 int main(void) {

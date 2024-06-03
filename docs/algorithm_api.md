@@ -47,7 +47,7 @@ c_foreach_n (i, IMap, map, 3)
 // 0:(3 2) 1:(5 4) 2:(7 3)
 
 // iterate with an already declared iter (useful in coroutines)
-c_foreach_iter (iter, IMap, map)
+c_foreach_it (iter, IMap, map)
     printf(" (%d %d)", iter.ref->first, iter.ref->second);
 ```
 
@@ -394,7 +394,7 @@ int* ip = c_const_cast(int*, cs);  // issues a warning!
 
 ### Predefined template parameter functions
 
-**ccharptr** - Non-owning `const char*` "class" element type: `#define i_key_class ccharptr`
+**ccharptr** - Non-owning `const char*` "class" element type: `#define i_keyclass ccharptr`
 ```c
 typedef     const char* ccharptr;
 int         ccharptr_cmp(const ccharptr* x, const ccharptr* y);

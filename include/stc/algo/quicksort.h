@@ -80,8 +80,8 @@ int main(void) {
 #ifndef _i_template
   #define _i_is_arr
   #ifdef i_TYPE
-    #define i_type _c_SEL(_c_SEL21, i_TYPE)
-    #define i_key _c_SEL(_c_SEL22, i_TYPE)
+    #define i_type c_SELECT(_c_SEL21, i_TYPE)
+    #define i_key c_SELECT(_c_SEL22, i_TYPE)
   #elif !defined i_type
     #define i_type c_JOIN(i_key, s)
   #endif

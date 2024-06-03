@@ -25,7 +25,7 @@ struct triples {
 };
 
 int triples_coro(struct triples* t) {
-    cco_routine(t) {
+    cco_scope(t) {
         for (t->c = 5;; ++t->c) {
             for (t->a = 1; t->a < t->c; ++t->a) {
                 for (t->b = t->a + 1; t->b < t->c; ++t->b) {
@@ -64,7 +64,7 @@ int main(void)
     struct triples t = {.max_c = 100};
     int n = 0;
 
-    cco_blocking_call(triples_coro(&t)) {
+    cco_run_coroutine(triples_coro(&t)) {
         if (gcd(t.a, t.b) > 1)
             continue;
         if (++n <= 20)
