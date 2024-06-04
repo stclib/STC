@@ -219,7 +219,7 @@ STC_INLINE intptr_t c_next_pow2(intptr_t n) {
 #ifndef __cplusplus
     #define c_init(C, ...) \
         C##_from_n((C##_raw[])__VA_ARGS__, c_sizeof((C##_raw[])__VA_ARGS__)/c_sizeof(C##_raw))
-    #define c_forlist(it, T, ...) \
+    #define c_foritems(it, T, ...) \
         for (struct {T* ref; int size, index;} \
              it = {.ref=(T[])__VA_ARGS__, .size=(int)(sizeof((T[])__VA_ARGS__)/sizeof(T))} \
              ; it.index < it.size; ++it.ref, ++it.index)
@@ -232,13 +232,14 @@ STC_INLINE intptr_t c_next_pow2(intptr_t n) {
     inline C _from_n(C (*func)(const T[], intptr_t), std::initializer_list<T> il)
         { return func(&*il.begin(), il.size()); }
     #define c_init(C, ...) _from_n<C,C##_raw>(C##_from_n, __VA_ARGS__)
-    #define c_forlist(it, T, ...) \
+    #define c_foritems(it, T, ...) \
         for (struct {std::initializer_list<T> _il; std::initializer_list<T>::iterator ref; size_t size, index;} \
              it = {._il=__VA_ARGS__, .ref=it._il.begin(), .size=it._il.size()} \
              ; it.index < it.size; ++it.ref, ++it.index)
     #define c_hash_mix(...) \
         _c_hash_mix(std::array<uint64_t, c_NUMARGS(__VA_ARGS__)>{__VA_ARGS__}.data(), c_NUMARGS(__VA_ARGS__))
 #endif
+#define c_forlist(...) c_foritems(__VA_ARGS__) // [deprecated]
 
 #define c_defer(...) \
     for (int _i = 1; _i; _i = 0, __VA_ARGS__)
@@ -257,7 +258,7 @@ STC_INLINE intptr_t c_next_pow2(intptr_t n) {
     for (int _i = (init, 1); _i && (pred); _i = 0, drop)
 
 #define c_drop(C, ...) \
-    do { c_forlist (_i, C*, {__VA_ARGS__}) C##_drop(*_i.ref); } while(0)
+    do { c_foritems (_i, C*, {__VA_ARGS__}) C##_drop(*_i.ref); } while(0)
 
 #if defined(__SIZEOF_INT128__)
     #define c_umul128(a, b, lo, hi) \

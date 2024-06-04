@@ -120,7 +120,7 @@ int main(void)
     vec_int_push(&vec, 13);
 
     // Append a set of numbers
-    c_forlist (i, int, {7, 5, 16, 8})
+    c_foritems (i, int, {7, 5, 16, 8})
         vec_int_push(&vec, *i.ref);
 
     printf("initial:");

@@ -54,7 +54,7 @@ Containers
 
 Algorithms
 ----------
-- [***Ranged for-loops*** - c_foreach, c_forpair, c_forlist](docs/algorithm_api.md#ranged-for-loops)
+- [***Ranged for-loops*** - c_foreach, c_forpair, c_foritems](docs/algorithm_api.md#ranged-for-loops)
 - [***Range algorithms*** - c_forrange, crange, c_filter](docs/algorithm_api.md#range-algorithms)
 - [***Generic algorithms*** - c_init, c_find_if, c_erase_if, quicksort, lower_bound, ...](docs/algorithm_api.md#generic-algorithms)
 - [***Coroutines*** - ergonomic portable coroutines](docs/coroutine_api.md)
@@ -750,7 +750,7 @@ Major changes:
 - Added: **crange**: number generator type, which can be iterated (e.g. with *c_forfilter*).
 - Added back **coption** - command line argument parsing.
 - New + renamed loop iteration/scope macros:
-    - `c_forlist`: macro replacing *c_forarray* and *c_apply*. Iterate a compound literal list.
+    - `c_foritems`: macro replacing *c_forarray* and *c_apply*. Iterate a compound literal list.
 - Updated **cstr**, now always takes self as pointer, like all containers except csview.
 - Updated **vec**, **deq**, changed `*_range*` function names.
 

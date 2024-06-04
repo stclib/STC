@@ -84,7 +84,7 @@ void example3(void)
     SongSet_erase(&set1, (SongView){"Thalia", "Entre El Mar y Una Estrella"});
 
     int n = 0;
-    c_forlist (i, SongSet, {set1, set2}) {
+    c_foritems (i, SongSet, {set1, set2}) {
         printf("SET%d:\n", ++n);
         c_foreach (s, SongSet, *i.ref)
             printf("  %s (%s), REFS: %ld\n", cstr_str(&s.ref->get->title),

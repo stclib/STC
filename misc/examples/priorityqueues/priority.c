@@ -20,7 +20,7 @@ int main(void) {
         PQueue_push(&heap, (int)crand_uniform(&rng, &dist));
 
     // push some negative numbers too.
-    c_forlist (i, int, {-231, -32, -873, -4, -343})
+    c_foritems (i, int, {-231, -32, -873, -4, -343})
         PQueue_push(&heap, *i.ref);
 
     c_forrange (N)

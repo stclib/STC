@@ -179,7 +179,7 @@ int main(void)
 
     IDMap idnames = {0};
 
-    c_forlist (i, IDMap_raw, { {100, "Red"}, {110, "Blue"} })
+    c_foritems (i, IDMap_raw, { {100, "Red"}, {110, "Blue"} })
         IDMap_emplace(&idnames, i.ref->first, i.ref->second);
 
     // replace existing mapped value:

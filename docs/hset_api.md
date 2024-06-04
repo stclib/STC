@@ -89,7 +89,7 @@ int main(void)
     Strings first = c_init(Strings, {"red", "green", "blue"});
     Strings second={0}, third={0}, fourth={0}, fifth={0};
 
-    c_forlist (i, const char*, {"orange", "pink", "yellow"})
+    c_foritems (i, const char*, {"orange", "pink", "yellow"})
         Strings_emplace(&third, *i.ref);
 
     c_foreach (i, Strings, third)

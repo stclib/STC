@@ -51,19 +51,19 @@ c_foreach_it (iter, IMap, map)
     printf(" (%d %d)", iter.ref->first, iter.ref->second);
 ```
 
-### c_forlist
+### c_foritems
 Iterate compound literal array elements. In addition to `i.ref`, you can access `i.index` and `i.size`.
 ```c
 // apply multiple push_backs
-c_forlist (i, int, {4, 5, 6, 7})
+c_foritems (i, int, {4, 5, 6, 7})
     list_i_push_back(&lst, *i.ref);
 
 // insert in existing map
-c_forlist (i, hmap_ii_value, { {4, 5}, {6, 7} })
+c_foritems (i, hmap_ii_value, { {4, 5}, {6, 7} })
     hmap_ii_insert(&map, i.ref->first, i.ref->second);
 
 // string literals pushed to a stack of cstr elements:
-c_forlist (i, const char*, {"Hello", "crazy", "world"})
+c_foritems (i, const char*, {"Hello", "crazy", "world"})
     stack_str_emplace(&stk, *i.ref);
 ```
 ---
@@ -345,7 +345,7 @@ must be defined to extend the life of specified template parameters for use by q
 
 int main(void) {
     MyDeq deq = c_init(MyDeq, {5, 3, 5, 9, 7, 4, 7}); // pushed back
-    c_forlist (i, int, {2, 4, 9, 3, 1, 2, 6, 4}) MyDeq_push_front(&deq, *i.ref);
+    c_foritems (i, int, {2, 4, 9, 3, 1, 2, 6, 4}) MyDeq_push_front(&deq, *i.ref);
     MyDeq_quicksort(&deq);
     c_foreach (i, MyDeq, deq) printf(" %d", *i.ref);
     MyDeq_drop(&deq);

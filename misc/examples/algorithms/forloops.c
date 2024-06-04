@@ -23,11 +23,11 @@ int main(void)
     c_forrange (i, 30, 90, 2) printf(" %d", (int)i);
 
     puts("\n\nc_forlist:");
-    c_forlist (i, int, {12, 23, 453, 65, 676})
+    c_foritems (i, int, {12, 23, 453, 65, 676})
         printf(" %d", *i.ref);
     puts("");
 
-    c_forlist (i, const char*, {"12", "23", "453", "65", "676"})
+    c_foritems (i, const char*, {"12", "23", "453", "65", "676"})
         printf(" %s", *i.ref);
     puts("");
 
