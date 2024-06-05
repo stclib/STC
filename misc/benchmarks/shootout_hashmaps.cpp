@@ -267,8 +267,7 @@ void fisher_yates_shuffle(IKey a[], size_t n) {
 #define MAP_TEST4(M, X, n) \
 {   /* Iterate */ \
     M##_SETUP(X, IKey, IValue); \
-    size_t sum = 0, m = 1ull << keybits, _n = n; \
-    if (_n < m) m = _n; \
+    size_t sum = 0, _n = n; \
     SEED(seed); \
     for (size_t i = 0; i < n; ++i) \
         M##_GET_OR_INSERT(X, RAND(keybits), i); \
@@ -368,10 +367,10 @@ int main(int argc, char* argv[])
     //printf("\nT2: Insert %g mill. SEQUENTIAL keys, erase them in same order:\n", N2/1000000.0);
     //RUN_TEST(2)
 
-    printf("\nT3: Erase all elements by lookup (%u mill. random inserts), key range [0, 2^%u)\n", n_mill, keybits);
+    printf("\nT3: Erase all elements by lookup, %u mill. inserts, key range [0, 2^%u)\n", n_mill, keybits);
     RUN_TEST(3)
 
-    printf("\nT4: Iterate map with Min(%u mill, 2^%u) inserts repeated times:\n", n_mill, keybits);
+    printf("\nT4: Iterate map with %u mill inserts, repeatedly:\n", n_mill);
     RUN_TEST(4)
 
     printf("\nT5: Lookup mix of random/existing keys in range [0, 2^%u). Num lookups adjusted for size.\n", keybits);
