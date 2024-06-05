@@ -38,6 +38,9 @@ KHASH_MAP_INIT_INT64(ii, IValue)
 //#include "stc/hmap-robin.h"
 #include "stc/hmap.h"
 
+#define i_TYPE ivec,IKey
+#include "stc/stack.h"
+
 // Verstable map
 #define NAME vmap_ii
 #define KEY_TY IKey
@@ -225,33 +228,51 @@ KHASH_MAP_INIT_INT64(ii, IValue)
     M##_DTOR(X); \
 }
 
+void fisher_yates_shuffle(IKey a[], size_t n) {
+    --n;
+    for (size_t i = 0; i < n; i++) {
+        size_t j = i + (crand() % (n - i)); // swap element with random later element
+        IKey t = a[i];
+        a[i] = a[j];
+        a[j] = t;
+    }
+}
+
 #define MAP_TEST3(M, X, n) \
 {   /* Erase elements */ \
     M##_SETUP(X, IKey, IValue); \
-    size_t erased = 0, _n = (n)*2; \
+    size_t erased = 0, _n = n; \
     clock_t difference, before; \
     SEED(seed); \
-    for (size_t i = 0; i < _n; ++i) \
-        M##_GET_OR_INSERT(X, RAND(keybits), i); \
+    ivec vec = {0}; \
+    for (size_t i = 0; i < _n; ++i) { \
+        IKey k = RAND(keybits); \
+        ivec_push(&vec, k); \
+        M##_GET_OR_INSERT(X, k, i); \
+    } \
+    fisher_yates_shuffle(vec.data, ivec_size(&vec)); \
     SEED(seed); \
     before = clock(); \
-    for (size_t i = 0; i < _n; ++i) \
-        erased += M##_ERASE(X, RAND(keybits)); \
+    c_foreach (i, ivec, vec) \
+        erased += M##_ERASE(X, *i.ref); \
+    /*for (size_t i = 0; i < _n; ++i) \
+        erased += M##_ERASE(X, RAND(keybits));*/ \
     difference = clock() - before; \
     printf(#M ": %5.03f s, size: %" c_ZU ", buckets: %8" c_ZU ", erased %" c_ZU "\n", \
            (float) difference / CLOCKS_PER_SEC, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X), erased); \
+    ivec_drop(&vec); \
     M##_DTOR(X); \
 }
 
 #define MAP_TEST4(M, X, n) \
 {   /* Iterate */ \
     M##_SETUP(X, IKey, IValue); \
-    size_t sum = 0, m = 1ull << (keybits + 1), _n = n; \
+    size_t sum = 0, m = 1ull << keybits, _n = n; \
     if (_n < m) m = _n; \
     SEED(seed); \
-    for (size_t i = 0; i < m; ++i) \
+    for (size_t i = 0; i < n; ++i) \
         M##_GET_OR_INSERT(X, RAND(keybits), i); \
-    size_t rep = 60000000ull/M##_SIZE(X); \
+    size_t rep = 80000000ull/M##_SIZE(X); \
     clock_t difference, before = clock(); \
     for (size_t k=0; k < rep; k++) M##_FOR (X, it) \
         sum += M##_ITEM(X, it); \
@@ -347,12 +368,12 @@ int main(int argc, char* argv[])
     //printf("\nT2: Insert %g mill. SEQUENTIAL keys, erase them in same order:\n", N2/1000000.0);
     //RUN_TEST(2)
 
-    printf("\nT3: Erase all elements by lookup (%u mill. random inserts), key range [0, 2^%u)\n", n_mill*2, keybits);
+    printf("\nT3: Erase all elements by lookup (%u mill. random inserts), key range [0, 2^%u)\n", n_mill, keybits);
     RUN_TEST(3)
 
-    //printf("\nT4: Iterate map with Min(%u mill, 2^%u) inserts repeated times:\n", n_mill, keybits+1);
-    //RUN_TEST(4)
+    printf("\nT4: Iterate map with Min(%u mill, 2^%u) inserts repeated times:\n", n_mill, keybits);
+    RUN_TEST(4)
 
-    printf("\nT5: Lookup mix of random/existing keys in range [0, 2^%u). Num lookups depends on size.\n", keybits);
+    printf("\nT5: Lookup mix of random/existing keys in range [0, 2^%u). Num lookups adjusted for size.\n", keybits);
     RUN_TEST(5)
 }
