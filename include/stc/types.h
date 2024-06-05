@@ -153,12 +153,12 @@ typedef union {
 \
     typedef struct { \
         SELF##_value *ref, *_end; \
-        struct hmap_slot *_sref; \
+        struct hmap_meta *_mref; \
     } SELF##_iter; \
 \
     typedef struct SELF { \
         SELF##_value* table; \
-        struct hmap_slot* slot; \
+        struct hmap_meta* meta; \
         intptr_t size, bucket_count; \
     } SELF
 

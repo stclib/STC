@@ -56,7 +56,7 @@ int main(void) {
 #include <string.h>
 #define _hashmask 0x3fU
 #define _distmask 0x3ffU
-struct hmap_slot { uint16_t hashx:6, dist:10; }; // dist: 0=empty, 1=PSL 0, 2=PSL 1, ...
+struct hmap_meta { uint16_t hashx:6, dist:10; }; // dist: 0=empty, 1=PSL 0, 2=PSL 1, ...
 #endif // STC_HMAP_H_INCLUDED
 
 #ifndef _i_prefix
@@ -234,7 +234,7 @@ STC_INLINE _m_iter _c_MEMB(_end)(const i_type* self)
     { (void)self; return c_LITERAL(_m_iter){0}; }
 
 STC_INLINE void _c_MEMB(_next)(_m_iter* it) {
-    while ((++it->ref, (++it->_sref)->dist == 0)) ;
+    while ((++it->ref, (++it->_mref)->dist == 0)) ;
     if (it->ref == it->_end) it->ref = NULL;
 }
 
@@ -249,7 +249,7 @@ _c_MEMB(_find)(const i_type* self, _m_keyraw rkey) {
     if (self->size && (ref = _c_MEMB(_bucket_lookup_)(self, &rkey).ref))
         return c_LITERAL(_m_iter){ref,
                                   &self->table[self->bucket_count],
-                                  &self->slot[ref - self->table]};
+                                  &self->meta[ref - self->table]};
     return _c_MEMB(_end)(self);
 }
 
@@ -273,7 +273,7 @@ _c_MEMB(_erase)(i_type* self, _m_keyraw rkey) {
 STC_INLINE _m_iter
 _c_MEMB(_erase_at)(i_type* self, _m_iter it) {
     _c_MEMB(_erase_entry)(self, it.ref);
-    if (it._sref->dist == 0)
+    if (it._mref->dist == 0)
         _c_MEMB(_next)(&it);
     return it;
 }
@@ -292,10 +292,10 @@ _c_MEMB(_eq)(const i_type* self, const i_type* other) {
 #if defined(i_implement) || defined(i_static)
 
 STC_DEF _m_iter _c_MEMB(_begin)(const i_type* self) {
-    _m_iter it = {self->table, self->table+self->bucket_count, self->slot};
-    if (it._sref)
-        while (it._sref->dist == 0)
-            ++it.ref, ++it._sref;
+    _m_iter it = {self->table, self->table+self->bucket_count, self->meta};
+    if (it._mref)
+        while (it._mref->dist == 0)
+            ++it.ref, ++it._mref;
     if (it.ref == it._end) it.ref = NULL;
     return it;
 }
@@ -318,9 +318,9 @@ static void _c_MEMB(_wipe_)(i_type* self) {
     if (self->size == 0)
         return;
     _m_value* d = self->table, *_end = &d[self->bucket_count];
-    struct hmap_slot* s = self->slot;
+    struct hmap_meta* m = self->meta;
     for (; d != _end; ++d)
-        if ((s++)->dist)
+        if ((m++)->dist)
             _c_MEMB(_value_drop)(d);
 }
 
@@ -328,7 +328,7 @@ STC_DEF void _c_MEMB(_drop)(const i_type* cself) {
     i_type* self = (i_type*)cself;
     if (self->bucket_count > 0) {
         _c_MEMB(_wipe_)(self);
-        i_free(self->slot, (self->bucket_count + 1)*c_sizeof *self->slot);
+        i_free(self->meta, (self->bucket_count + 1)*c_sizeof *self->meta);
         i_free(self->table, self->bucket_count*c_sizeof *self->table);
     }
 }
@@ -336,7 +336,7 @@ STC_DEF void _c_MEMB(_drop)(const i_type* cself) {
 STC_DEF void _c_MEMB(_clear)(i_type* self) {
     _c_MEMB(_wipe_)(self);
     self->size = 0;
-    c_memset(self->slot, 0, c_sizeof(struct hmap_slot)*self->bucket_count);
+    c_memset(self->meta, 0, c_sizeof(struct hmap_meta)*self->bucket_count);
 }
 
 #ifdef _i_is_map
@@ -372,10 +372,10 @@ static _m_result
 _c_MEMB(_bucket_lookup_)(const i_type* self, const _m_keyraw* rkeyptr) {
     const uint64_t _hash = i_hash(rkeyptr);
     const size_t _idxmask = (size_t)self->bucket_count - 1;
-    _m_result _res = {.idx=_hash & _idxmask, .hashx=_hash & _hashmask, .dist=1};
+    _m_result _res = {.idx=_hash & _idxmask, .hashx=(_hash >> 24) & _hashmask, .dist=1};
 
-    while (_res.dist <= self->slot[_res.idx].dist) {
-        if (self->slot[_res.idx].hashx == _res.hashx) {
+    while (_res.dist <= self->meta[_res.idx].dist) {
+        if (self->meta[_res.idx].hashx == _res.hashx) {
             const _m_keyraw _raw = i_keyto(_i_keyref(&self->table[_res.idx]));
             if (i_eq((&_raw), rkeyptr)) {
                 _res.ref = &self->table[_res.idx];
@@ -395,25 +395,25 @@ _c_MEMB(_bucket_insert_)(const i_type* self, const _m_keyraw* rkeyptr) {
         return res;
     res.ref = &self->table[res.idx];
     res.inserted = true;
-    struct hmap_slot snew = {.hashx=res.hashx & _hashmask, .dist=res.dist & _distmask};
-    struct hmap_slot scur = self->slot[res.idx];
-    self->slot[res.idx] = snew;
+    struct hmap_meta snew = {.hashx=res.hashx & _hashmask, .dist=res.dist & _distmask};
+    struct hmap_meta scur = self->meta[res.idx];
+    self->meta[res.idx] = snew;
 
     if (scur.dist != 0) { // collision, reorder buckets
-        struct hmap_slot *slot = self->slot;
+        struct hmap_meta *meta = self->meta;
         size_t mask = (size_t)self->bucket_count - 1;
         _m_value dcur = *res.ref;
         for (;;) {
             res.idx = (res.idx + 1) & mask;
             ++scur.dist;
-            if (slot[res.idx].dist == 0)
+            if (meta[res.idx].dist == 0)
                 break;
-            if (slot[res.idx].dist < scur.dist) {
-                c_swap(struct hmap_slot, &scur, &slot[res.idx]);
+            if (meta[res.idx].dist < scur.dist) {
+                c_swap(struct hmap_meta, &scur, &meta[res.idx]);
                 c_swap(_m_value, &dcur, &self->table[res.idx]);
             }
         }
-        slot[res.idx] = scur;
+        meta[res.idx] = scur;
         self->table[res.idx] = dcur;
     }
     return res;
@@ -422,23 +422,25 @@ _c_MEMB(_bucket_insert_)(const i_type* self, const _m_keyraw* rkeyptr) {
 
 #if !defined i_no_clone
     STC_DEF i_type
-    _c_MEMB(_clone)(i_type m) {
-        if (m.bucket_count) {
-            _m_value *d = (_m_value *)i_malloc(m.bucket_count*c_sizeof *d),
-                    *_dst = d, *_end = &m.table[m.bucket_count];
-            const intptr_t _sbytes = (m.bucket_count + 1)*c_sizeof *m.slot;
-            struct hmap_slot *s = (struct hmap_slot *)c_memcpy(i_malloc(_sbytes), m.slot, _sbytes);
-            if (!(d && s)) {
-                i_free(d, m.bucket_count*c_sizeof *d);
-                if (s) i_free(s, _sbytes);
-                d = 0, s = 0, m.bucket_count = 0;
-            } else
-                for (; m.table != _end; ++m.table, ++m.slot, ++_dst)
-                    if (m.slot->dist)
-                        *_dst = _c_MEMB(_value_clone)(*m.table);
-            m.table = d, m.slot = s;
+    _c_MEMB(_clone)(i_type map) {
+        if (map.bucket_count) {
+            _m_value *d = (_m_value *)i_malloc(map.bucket_count*c_sizeof *d);
+            const intptr_t _mbytes = (map.bucket_count + 1)*c_sizeof *map.meta;
+            struct hmap_meta *m = (struct hmap_meta *)i_malloc(_mbytes);
+            if (d && m) {
+                c_memcpy(m, map.meta, _mbytes);
+                _m_value *_dst = d, *_end = map.table + map.bucket_count;
+                for (; map.table != _end; ++map.table, ++map.meta, ++_dst)
+                    if (map.meta->hashx)
+                        *_dst = _c_MEMB(_value_clone)(*map.table);
+            } else {
+                if (d) i_free(d, map.bucket_count*c_sizeof *d);
+                if (m) i_free(m, _mbytes);
+                d = 0, m = 0, map.bucket_count = 0;
+            }
+            map.table = d, map.meta = m;
         }
-        return m;
+        return map;
     }
 #endif
 
@@ -450,48 +452,48 @@ _c_MEMB(_reserve)(i_type* self, const intptr_t _newcap) {
     intptr_t _newbucks = (intptr_t)((float)_newcap / (i_max_load_factor)) + 4;
     _newbucks = c_next_pow2(_newbucks);
 
-    i_type m = {
+    i_type map = {
         (_m_value *)i_malloc(_newbucks*c_sizeof(_m_value)),
-        (struct hmap_slot *)i_calloc(_newbucks + 1, c_sizeof(struct hmap_slot)),
+        (struct hmap_meta *)i_calloc(_newbucks + 1, c_sizeof(struct hmap_meta)),
         self->size, _newbucks
     };
 
-    bool ok = m.table && m.slot;
+    bool ok = map.table && map.meta;
     if (ok) {  // Rehash:
-        m.slot[_newbucks].dist = 0xff; // end-mark for iter
+        map.meta[_newbucks].dist = 0xff; // end-mark for iter
         const _m_value* d = self->table;
-        const struct hmap_slot* s = self->slot;
+        const struct hmap_meta* m = self->meta;
 
-        for (intptr_t i = 0; i < _oldbucks; ++i, ++d) if ((s++)->dist) {
+        for (intptr_t i = 0; i < _oldbucks; ++i, ++d) if ((m++)->dist) {
             _m_keyraw r = i_keyto(_i_keyref(d));
-            _m_result _res = _c_MEMB(_bucket_insert_)(&m, &r);
+            _m_result _res = _c_MEMB(_bucket_insert_)(&map, &r);
             *_res.ref = *d; // move
         }
-        c_swap(i_type, self, &m);
+        c_swap(i_type, self, &map);
     }
-    i_free(m.slot, (m.bucket_count + (int)(m.slot != NULL))*c_sizeof *m.slot);
-    i_free(m.table, m.bucket_count*c_sizeof *m.table);
+    i_free(map.meta, (map.bucket_count + (int)(map.meta != NULL))*c_sizeof *map.meta);
+    i_free(map.table, map.bucket_count*c_sizeof *map.table);
     return ok;
 }
 
 STC_DEF void
 _c_MEMB(_erase_entry)(i_type* self, _m_value* _val) {
     _m_value* d = self->table;
-    struct hmap_slot *s = self->slot;
+    struct hmap_meta *m = self->meta;
     size_t i = (size_t)(_val - d), j = i;
     size_t mask = (size_t)self->bucket_count - 1;
 
     _c_MEMB(_value_drop)(_val);
     for (;;) {
         j = (j + 1) & mask;
-        if (s[j].dist < 2) // 0 => empty, 1 => PSL 0
+        if (m[j].dist < 2) // 0 => empty, 1 => PSL 0
             break;
         d[i] = d[j];
-        s[i] = s[j];
-        --s[i].dist;
+        m[i] = m[j];
+        --m[i].dist;
         i = j;
     }
-    s[i].dist = 0;
+    m[i].dist = 0;
     --self->size;
 }
 
