@@ -35,8 +35,8 @@ KHASH_MAP_INIT_INT64(ii, IValue)
 // STC hmap template definition
 #define i_TYPE hmap_ii,IKey,IValue
 #define i_max_load_factor MAX_LOAD_FACTOR / 100.0f
-//#include "stc/hmap-robin.h"
-#include "stc/hmap.h"
+#include "stc/hmap-robin.h"
+//#include "stc/hmap.h"
 
 #define i_TYPE ivec,IKey
 #include "stc/stack.h"
@@ -247,16 +247,16 @@ void fisher_yates_shuffle(IKey a[], size_t n) {
     ivec vec = {0}; \
     for (size_t i = 0; i < _n; ++i) { \
         IKey k = RAND(keybits); \
-        ivec_push(&vec, k); \
+        /*ivec_push(&vec, k);*/ \
         M##_GET_OR_INSERT(X, k, i); \
     } \
-    fisher_yates_shuffle(vec.data, ivec_size(&vec)); \
+    /*fisher_yates_shuffle(vec.data, ivec_size(&vec));*/ \
     SEED(seed); \
     before = clock(); \
-    c_foreach (i, ivec, vec) \
-        erased += M##_ERASE(X, *i.ref); \
-    /*for (size_t i = 0; i < _n; ++i) \
-        erased += M##_ERASE(X, RAND(keybits));*/ \
+    /*c_foreach (i, ivec, vec) \
+        erased += M##_ERASE(X, *i.ref);*/ \
+    for (size_t i = 0; i < _n; ++i) \
+        erased += M##_ERASE(X, RAND(keybits)); \
     difference = clock() - before; \
     printf(#M ": %5.03f s, size: %" c_ZU ", buckets: %8" c_ZU ", erased %" c_ZU "\n", \
            (float) difference / CLOCKS_PER_SEC, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X), erased); \
@@ -271,7 +271,7 @@ void fisher_yates_shuffle(IKey a[], size_t n) {
     SEED(seed); \
     for (size_t i = 0; i < n; ++i) \
         M##_GET_OR_INSERT(X, RAND(keybits), i); \
-    size_t rep = 80000000ull/M##_SIZE(X); \
+    size_t rep = 100000000ull/M##_SIZE(X); \
     clock_t difference, before = clock(); \
     for (size_t k=0; k < rep; k++) M##_FOR (X, it) \
         sum += M##_ITEM(X, it); \
@@ -292,7 +292,7 @@ void fisher_yates_shuffle(IKey a[], size_t n) {
         M##_GET_OR_INSERT(X, RAND(keybits), i); \
     before = clock(); \
     /* Lookup x random keys */ \
-    size_t x = m * 8000000ull/M##_SIZE(X); \
+    size_t x = m * 10000000ull/M##_SIZE(X); \
     for (size_t i = 0; i < x; ++i) \
         found += M##_CONTAINS(X, RAND(keybits)); \
     /* Lookup x existing keys by resetting seed */ \
@@ -315,6 +315,7 @@ void fisher_yates_shuffle(IKey a[], size_t n) {
 #define RUN_TEST(n) MAP_TEST##n(KMAP, ii, N##n) \
                     MAP_TEST_BOOST(n, ii) \
                     MAP_TEST##n(HMAP, ii, N##n) \
+                    MAP_TEST##n(VMAP, ii, N##n) \
                     MAP_TEST##n(FMAP, ii, N##n) \
                     MAP_TEST##n(TMAP, ii, N##n) \
                     MAP_TEST##n(RMAP, ii, N##n) \
@@ -370,7 +371,7 @@ int main(int argc, char* argv[])
     printf("\nT3: Erase all elements by lookup, %u mill. inserts, key range [0, 2^%u)\n", n_mill, keybits);
     RUN_TEST(3)
 
-    printf("\nT4: Iterate map with %u mill inserts, repeatedly:\n", n_mill);
+    printf("\nT4: Iterate map with %u mill inserts, repeatedly.\n", n_mill);
     RUN_TEST(4)
 
     printf("\nT5: Lookup mix of random/existing keys in range [0, 2^%u). Num lookups adjusted for size.\n", keybits);

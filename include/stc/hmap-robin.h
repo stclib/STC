@@ -372,7 +372,7 @@ static _m_result
 _c_MEMB(_bucket_lookup_)(const i_type* self, const _m_keyraw* rkeyptr) {
     const uint64_t _hash = i_hash(rkeyptr);
     const size_t _idxmask = (size_t)self->bucket_count - 1;
-    _m_result _res = {.idx=_hash & _idxmask, .hashx=(_hash >> 24) & _hashmask, .dist=1};
+    _m_result _res = {.idx=_hash & _idxmask, .hashx=(uint8_t)((_hash >> 24) & _hashmask), .dist=1};
 
     while (_res.dist <= self->meta[_res.idx].dist) {
         if (self->meta[_res.idx].hashx == _res.hashx) {
@@ -395,7 +395,8 @@ _c_MEMB(_bucket_insert_)(const i_type* self, const _m_keyraw* rkeyptr) {
         return res;
     res.ref = &self->table[res.idx];
     res.inserted = true;
-    struct hmap_meta snew = {.hashx=res.hashx & _hashmask, .dist=res.dist & _distmask};
+    struct hmap_meta snew = {.hashx=(uint16_t)(res.hashx & _hashmask),
+                             .dist=(uint16_t)(res.dist & _distmask)};
     struct hmap_meta scur = self->meta[res.idx];
     self->meta[res.idx] = snew;
 
@@ -431,7 +432,7 @@ _c_MEMB(_bucket_insert_)(const i_type* self, const _m_keyraw* rkeyptr) {
                 c_memcpy(m, map.meta, _mbytes);
                 _m_value *_dst = d, *_end = map.table + map.bucket_count;
                 for (; map.table != _end; ++map.table, ++map.meta, ++_dst)
-                    if (map.meta->hashx)
+                    if (map.meta->dist)
                         *_dst = _c_MEMB(_value_clone)(*map.table);
             } else {
                 if (d) i_free(d, map.bucket_count*c_sizeof *d);
@@ -460,7 +461,7 @@ _c_MEMB(_reserve)(i_type* self, const intptr_t _newcap) {
 
     bool ok = map.table && map.meta;
     if (ok) {  // Rehash:
-        map.meta[_newbucks].dist = 0xff; // end-mark for iter
+        map.meta[_newbucks].dist = _distmask; // end-mark for iter
         const _m_value* d = self->table;
         const struct hmap_meta* m = self->meta;
 
