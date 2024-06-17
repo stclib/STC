@@ -38,8 +38,8 @@ DEFMAP(map_str, <std::string, std::string>);
 #define i_max_load_factor float(MaxLoadFactor100) / 100.0f
 #include "stc/hmap.h"
 
-#define i_key_str
-#define i_val_str
+#define i_key_cstr
+#define i_val_cstr
 #define i_max_load_factor float(MaxLoadFactor100) / 100.0f
 #include "stc/hmap.h"
 
@@ -179,26 +179,26 @@ static void insert_and_access_str(picobench::state& s)
     s.set_result(result + map.size());
 }
 
-static void insert_and_access_hmap_str(picobench::state& s)
+static void insert_and_access_hmap_cstr(picobench::state& s)
 {
     cstr str = cstr_with_size(s.arg(), 'x');
     char* buf = cstr_data(&str);
     size_t result = 0;
-    hmap_str map = {0};
+    hmap_cstr map = {0};
     csrand(seed);
 
     picobench::scope scope(s);
     c_forrange (s.iterations()) {
         randomize(buf, s.arg());
         //if (s.arg() > 30) { printf("%s\n", buf); exit(0); }
-        hmap_str_emplace(&map, buf, buf);
+        hmap_cstr_emplace(&map, buf, buf);
 
         randomize(buf, s.arg());
-        result += hmap_str_erase(&map, buf);
+        result += hmap_cstr_erase(&map, buf);
     }
-    s.set_result(result + hmap_str_size(&map));
+    s.set_result(result + hmap_cstr_size(&map));
     cstr_drop(&str);
-    hmap_str_drop(&map);
+    hmap_cstr_drop(&map);
 }
 
 #define P samples(S1).iterations({N1/5, N1/5, N1/5, N1/10, N1/40}).args({13, 7, 8, 100, 1000})
@@ -206,7 +206,7 @@ PICOBENCH(insert_and_access_str<umap_str>).P;
 PICOBENCH(insert_and_access_str<dmap_str>).P;
 PICOBENCH(insert_and_access_str<fmap_str>).P;
 PICOBENCH(insert_and_access_str<tmap_str>).P;
-PICOBENCH(insert_and_access_hmap_str).P;
+PICOBENCH(insert_and_access_hmap_cstr).P;
 #undef P
 
 PICOBENCH_SUITE("Map4");

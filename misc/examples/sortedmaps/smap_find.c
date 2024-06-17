@@ -5,7 +5,7 @@
 
 #define i_type smap_istr
 #define i_key int
-#define i_val_str
+#define i_val_cstr
 #include "stc/smap.h"
 
 #define i_TYPE vec_istr, smap_istr_raw

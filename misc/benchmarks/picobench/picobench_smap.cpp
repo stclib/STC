@@ -23,8 +23,8 @@ using omap_str = std::map<std::string, std::string>;
 #define i_TYPE smap_u64, uint64_t, uint64_t
 #include "stc/smap.h"
 
-#define i_key_str
-#define i_val_str
+#define i_key_cstr
+#define i_val_cstr
 #include "stc/smap.h"
 
 PICOBENCH_SUITE("Map1");
@@ -216,37 +216,37 @@ static void insert_and_access_str(picobench::state& s)
     s.set_result(result + map.size());
 }
 
-static void insert_and_access_smap_str(picobench::state& s)
+static void insert_and_access_smap_cstr(picobench::state& s)
 {
     cstr str = cstr_with_size(s.arg(), 'x');
     char* buf = cstr_data(&str);
     size_t result = 0;
-    smap_str map = {0};
+    smap_cstr map = {0};
 
     picobench::scope scope(s);
     csrand(seed);
     c_forrange (s.iterations()) {
         randomize(buf, s.arg());
-        smap_str_emplace(&map, buf, buf);
+        smap_cstr_emplace(&map, buf, buf);
     }
     csrand(seed);
     c_forrange (s.iterations()) {
         randomize(buf, s.arg());
-        result += smap_str_erase(&map, buf);
-        /*smap_str_iter it = smap_str_find(&map, buf);
+        result += smap_cstr_erase(&map, buf);
+        /*smap_cstr_iter it = smap_cstr_find(&map, buf);
         if (it.ref) {
             ++result;
-            smap_str_erase(&map, cstr_str(&it.ref->first));
+            smap_cstr_erase(&map, cstr_str(&it.ref->first));
         }*/
     }
-    s.set_result(result + smap_str_size(&map));
+    s.set_result(result + smap_cstr_size(&map));
     cstr_drop(&str);
-    smap_str_drop(&map);
+    smap_cstr_drop(&map);
 }
 
 #define P samples(S1).iterations({N1/5, N1/5, N1/5, N1/10, N1/40}).args({13, 7, 8, 100, 1000})
 PICOBENCH(insert_and_access_str<omap_str>).P;
-PICOBENCH(insert_and_access_smap_str).P;
+PICOBENCH(insert_and_access_smap_cstr).P;
 #undef P
 
 PICOBENCH_SUITE("Map5");

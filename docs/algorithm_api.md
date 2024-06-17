@@ -64,7 +64,7 @@ c_foritems (i, hmap_ii_value, { {4, 5}, {6, 7} })
 
 // string literals pushed to a stack of cstr elements:
 c_foritems (i, const char*, {"Hello", "crazy", "world"})
-    stack_str_emplace(&stk, *i.ref);
+    stack_cstr_emplace(&stk, *i.ref);
 ```
 ---
 
@@ -196,7 +196,7 @@ int main(void)
 - **c_init** - construct any container from an initializer list:
 - **c_drop** - drop (destroy) multiple containers of the same type:
 ```c
-#define i_key_str // owned cstr string value type
+#define i_key_cstr // owned cstr string value type
 #include "stc/hset.h"
 
 #define i_key int
@@ -204,14 +204,14 @@ int main(void)
 #include "stc/hmap.h"
 ...
 // Initializes with const char*, internally converted to cstr!
-hset_str myset = c_init(hset_str, {"This", "is", "the", "story"});
+hset_cstr myset = c_init(hset_cstr, {"This", "is", "the", "story"});
 
 int x = 7, y = 8;
 hmap_int mymap = c_init(hmap_int, { {1, 2}, {3, 4}, {5, 6}, {x, y} });
 ```
 Drop multiple containers of the same type:
 ```c
-c_drop(hset_str, &myset, &myset2);
+c_drop(hset_cstr, &myset, &myset2);
 ```
 
 ### c_find_if, c_find_reverse_if
@@ -252,7 +252,7 @@ Erase linearily in containers using a predicate. `value` is a pointer to each el
 #include "stc/list.h"
 
 #define i_type Map
-#define i_key_str
+#define i_key_cstr
 #define i_val int
 #include "stc/smap.h"
 
@@ -468,24 +468,24 @@ return ok;
 #define i_implement
 #include "stc/cstr.h"
 
-#define i_key_str
+#define i_key_cstr
 #include "stc/vec.h"
 
 // receiver should check errno variable
-vec_str readFile(const char* name)
+vec_cstr readFile(const char* name)
 {
-    vec_str vec = {0}; // returned
+    vec_cstr vec = {0}; // returned
     c_scoped (FILE* fp = fopen(name, "r"), fp != NULL, fclose(fp))
     c_scoped (cstr line = {0}, cstr_drop(&line))
         while (cstr_getline(&line, fp))
-            vec_str_emplace(&vec, cstr_str(&line));
+            vec_cstr_emplace(&vec, cstr_str(&line));
     return vec;
 }
 
 int main(void)
 {
-    c_scoped (vec_str vec = readFile(__FILE__), vec_str_drop(&vec))
-        c_foreach (i, vec_str, vec)
+    c_scoped (vec_cstr vec = readFile(__FILE__), vec_cstr_drop(&vec))
+        c_foreach (i, vec_cstr, vec)
             printf("| %s\n", cstr_str(i.ref));
 }
 ```

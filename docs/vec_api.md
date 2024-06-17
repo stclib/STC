@@ -148,27 +148,27 @@ sorted: 5 7 8 13 16 25
 #define i_implement
 #include "stc/cstr.h"
 
-#define i_key_str
+#define i_key_cstr
 #include "stc/vec.h"
 
 int main(void) {
-    vec_str names = {0};
+    vec_cstr names = {0};
 
-    vec_str_emplace(&names, "Mary");
-    vec_str_emplace(&names, "Joe");
+    vec_cstr_emplace(&names, "Mary");
+    vec_cstr_emplace(&names, "Joe");
     cstr_assign(&names.data[1], "Jake"); // replace "Joe".
 
-    cstr tmp = cstr_from_fmt("%d elements so far", vec_str_size(names));
+    cstr tmp = cstr_from_fmt("%d elements so far", vec_cstr_size(names));
 
-    // vec_str_emplace() only accept const char*, so use push():
-    vec_str_push(&names, tmp); // tmp is "moved" to names (must not be dropped).
+    // vec_cstr_emplace() only accept const char*, so use push():
+    vec_cstr_push(&names, tmp); // tmp is "moved" to names (must not be dropped).
 
     printf("%s\n", cstr_str(&names.data[1])); // Access second element
 
-    c_foreach (i, vec_str, names)
+    c_foreach (i, vec_cstr, names)
         printf("item: %s\n", cstr_str(i.ref));
 
-    vec_str_drop(&names);
+    vec_cstr_drop(&names);
 }
 ```
 Output:

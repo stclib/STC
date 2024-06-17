@@ -120,38 +120,38 @@ bool                  c_memcmp_eq(const i_keyraw* a, const i_keyraw* b);    // !
 #define i_implement
 #include "stc/cstr.h"
 
-#define i_key_str
-#define i_val_str
+#define i_key_cstr
+#define i_val_cstr
 #include "stc/hmap.h"
 
 int main(void)
 {
     // Create an unordered_map of three strings (that map to strings)
-    hmap_str umap = c_init(hmap_str, {
+    hmap_cstr umap = c_init(hmap_cstr, {
         {"RED", "#FF0000"},
         {"GREEN", "#00FF00"},
         {"BLUE", "#0000FF"}
     });
 
     // Iterate and print keys and values of unordered map
-    c_foreach (n, hmap_str, umap) {
+    c_foreach (n, hmap_cstr, umap) {
         printf("Key:[%s] Value:[%s]\n", cstr_str(&n.ref->first), cstr_str(&n.ref->second));
     }
 
     // Add two new entries to the unordered map
-    hmap_str_emplace(&umap, "BLACK", "#000000");
-    hmap_str_emplace(&umap, "WHITE", "#FFFFFF");
+    hmap_cstr_emplace(&umap, "BLACK", "#000000");
+    hmap_cstr_emplace(&umap, "WHITE", "#FFFFFF");
 
     // Insert only if "CYAN" is not in the map: create mapped value when needed only.
-    hmap_str_result res = hmap_str_emplace_key(&umap, "CYAN");
+    hmap_cstr_result res = hmap_cstr_emplace_key(&umap, "CYAN");
     if (res.inserted)
         res.ref->second = cstr_from("#00FFFF"); // must assign second if key was inserted.
 
     // Output values by key
-    printf("The HEX of color RED is:[%s]\n", cstr_str(hmap_str_at(&umap, "RED")));
-    printf("The HEX of color BLACK is:[%s]\n", cstr_str(hmap_str_at(&umap, "BLACK")));
+    printf("The HEX of color RED is:[%s]\n", cstr_str(hmap_cstr_at(&umap, "RED")));
+    printf("The HEX of color BLACK is:[%s]\n", cstr_str(hmap_cstr_at(&umap, "BLACK")));
 
-    hmap_str_drop(&umap);
+    hmap_cstr_drop(&umap);
 }
 ```
 Output:
@@ -170,7 +170,7 @@ This example uses a hmap with cstr as mapped value.
 #include "stc/cstr.h"
 #define i_type IDMap
 #define i_key int
-#define i_val_str
+#define i_val_cstr
 #include "stc/hmap.h"
 
 int main(void)

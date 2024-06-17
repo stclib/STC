@@ -47,7 +47,7 @@ void       OlympicLoc_drop(OlympicLoc* self);
 
 // Create a smap<cstr, list_OL> where key is country name
 #define i_type smap_OL
-#define i_key_str            // binds cstr_eq, cstr_hash, cstr_clone, ++
+#define i_key_cstr          // binds cstr_eq, cstr_hash, cstr_clone, ++
 #define i_valclass list_OL  // binds list_OL_clone, list_OL_drop
 #include "stc/smap.h"
 

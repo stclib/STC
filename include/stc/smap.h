@@ -28,7 +28,7 @@
 #include "stc/cstr.h"
 
 #define i_type smap_sd  // Sorted map<cstr, double>
-#define i_key_str
+#define i_key_cstr
 #define i_val double
 #include "stc/smap.h"
 

@@ -81,7 +81,7 @@ sset_X_value        sset_X_value_clone(sset_X_value val);
 #include "stc/cstr.h"
 
 #define i_type SSet
-#define i_key_str
+#define i_key_cstr
 #include "stc/sset.h"
 
 int main(void)

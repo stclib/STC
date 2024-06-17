@@ -110,8 +110,8 @@ lookup in containers. E.g., containers with STC string elements (**cstr**) uses 
 as lookup type, so constructing a `cstr` (which may allocate memory) for the lookup
 *is not needed*. Hence, the alternative lookup key does not need to be destroyed after use,
 as it is normally a POD type. Finally, the key may be passed to an ***emplace***-function.
-So instead of calling e.g. `vec_str_push(&vec, cstr_from("Hello"))`, you may call
-`vec_str_emplace(&vec, "Hello")`, which is functionally identical, but more convenient.
+So instead of calling e.g. `vec_cstr_push(&vec, cstr_from("Hello"))`, you may call
+`vec_cstr_emplace(&vec, "Hello")`, which is functionally identical, but more convenient.
 3. ***Standardized container iterators***. All containers can be iterated in the same manner, and all use the
 same element access syntax. E.g.:
     - `c_foreach (it, MyInts, myints) *it.ref += 42;` works for any container defined as
@@ -421,13 +421,13 @@ Only functions required by the container type is required to be defined. E.g.:
     - *Type_hash()* and *Type_eq()* are only required by **hmap**, **hset** and smart pointers.
     - *Type_cmp()* is not used by **stack** and **hmap/hset**.
     - *Type_clone()* is not used if *#define i_opt c_no_clone* is specified.
-- `i_key_str` - Sets `i_keyclass` = *cstr*, `i_tag` = *str*, and `i_keyraw` = *const char*\*. Defines both type convertion
+- `i_key_cstr` - Sets `i_keyclass` = *cstr*, `i_tag` = *cstr*, and `i_keyraw` = *const char*\*. Defines both type convertion
 `i_keyfrom`, `i_keyto`, and sets `i_cmp`, `i_eq`, `i_hash` functions with *const char\*\** as argument.
 - `i_key_ssv` - Sets `i_keyclass` = *cstr*, `i_tag` = *ssv*, and `i_keyraw` = *csview\**. Defines both type convertion
 `i_keyfrom`, `i_keyto`, and sets `i_cmp`, `i_eq`, `i_hash` functions with *csview\** as argument.
 - `i_key_arc`, `i_key_box` *Type* - Use when *Type* is a smart pointer **arc** or **box**. Defines *i_keyclass = Type*, and *i_keyraw = Type\**.
 NB: Do not use when defining arc/box types themselves.
-- `i_valclass` *Type*, `i_val_str`, `i_val_arc`, `i_val_box` - Similar rules as for ***key***.
+- `i_valclass` *Type*, `i_val_cstr`, `i_val_arc`, `i_val_box` - Similar rules as for ***key***.
 
 **Notes**:
 - Instead of defining `i_*clone`, you may define *i_opt c_no_clone* to disable *clone* functionality.
@@ -437,7 +437,7 @@ NB: Do not use when defining arc/box types themselves.
 
 The table below shows the template parameters which must be defined to support element search and sort for various containers versus element types.
 
-For the containers marked ***optional***, the features are disabled if the template parameter(s) are not defined. Note that the ***(integral type)*** columns also applies to "special" types, specified with `i_key_str`, `i_key_arc`, `i_key_box`, and `i_keyclass`, and not only true integral types like `int` or `float`.
+For the containers marked ***optional***, the features are disabled if the template parameter(s) are not defined. Note that the ***(integral type)*** columns also applies to "special" types, specified with `i_key_cstr`, `i_key_arc`, `i_key_box`, and `i_keyclass`, and not only true integral types like `int` or `float`.
 
 | Container         | find (integral type) | sort (integral type) |\|| find (struct elem) | sort (struct elem) | optional |
 |:------------------|:---------------------|:---------------------|:-|:-----------------|:-------------------|:---------|
@@ -478,22 +478,22 @@ and non-emplace methods:
 #define i_implement     // define in ONE file to implement longer functions in cstr
 #include "stc/cstr.h"
 
-#define i_key_str       // special macro to enable container of cstr
+#define i_key_cstr       // special macro to enable container of cstr
 #include "stc/vec.h"   // vector of string (cstr)
 ...
-vec_str vec = {0};
+vec_cstr vec = {0};
 cstr s = cstr_lit("a string literal");
 const char* hello = "Hello";
 
-vec_str_push(&vec, cstr_from(hello);    // make a cstr from const char* and move it onto vec
-vec_str_push(&vec, cstr_clone(s));      // make a cstr clone and move it onto vec
+vec_cstr_push(&vec, cstr_from(hello);    // make a cstr from const char* and move it onto vec
+vec_cstr_push(&vec, cstr_clone(s));      // make a cstr clone and move it onto vec
 
-vec_str_emplace(&vec, "Yay, literal");  // internally make a cstr from const char*
-vec_str_emplace(&vec, cstr_clone(s));   // <-- COMPILE ERROR: expects const char*
-vec_str_emplace(&vec, cstr_str(&s));    // Ok: const char* input type.
+vec_cstr_emplace(&vec, "Yay, literal");  // internally make a cstr from const char*
+vec_cstr_emplace(&vec, cstr_clone(s));   // <-- COMPILE ERROR: expects const char*
+vec_cstr_emplace(&vec, cstr_str(&s));    // Ok: const char* input type.
 
 cstr_drop(&s)
-vec_str_drop(&vec);
+vec_cstr_drop(&vec);
 ```
 This is made possible because the type configuration may be given an optional
 conversion/"rawvalue"-type as template parameter, along with a back and forth conversion
@@ -502,20 +502,20 @@ methods to the container value type.
 Rawvalues are primarily beneficial for **lookup** and **map insertions**, however the
 **emplace** methods constructs `cstr`-objects from the rawvalues, but only when required:
 ```c
-hmap_str_emplace(&map, "Hello", "world");
+hmap_cstr_emplace(&map, "Hello", "world");
 // Two cstr-objects were constructed by emplace
 
-hmap_str_emplace(&map, "Hello", "again");
+hmap_cstr_emplace(&map, "Hello", "again");
 // No cstr was constructed because "Hello" was already in the map.
 
-hmap_str_emplace_or_assign(&map, "Hello", "there");
+hmap_cstr_emplace_or_assign(&map, "Hello", "there");
 // Only cstr_lit("there") constructed. "world" was destructed and replaced.
 
-hmap_str_insert(&map, cstr_lit("Hello"), cstr_lit("you"));
+hmap_cstr_insert(&map, cstr_lit("Hello"), cstr_lit("you"));
 // Two cstr's constructed outside call, but both destructed by insert
 // because "Hello" existed. No mem-leak but less efficient.
 
-it = hmap_str_find(&map, "Hello");
+it = hmap_cstr_find(&map, "Hello");
 // No cstr constructed for lookup, although keys are cstr-type.
 ```
 Apart from strings, maps and sets are normally used with trivial value types. However, the

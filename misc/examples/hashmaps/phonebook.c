@@ -23,22 +23,22 @@
 #define i_implement
 #include "stc/cstr.h"
 
-#define i_key_str
-#define i_val_str
+#define i_key_cstr
+#define i_val_cstr
 #include "stc/hmap.h"
 
-#define i_key_str
+#define i_key_cstr
 #include "stc/hset.h"
 
-void print_phone_book(hmap_str phone_book)
+void print_phone_book(hmap_cstr phone_book)
 {
-    c_foreach (i, hmap_str, phone_book)
+    c_foreach (i, hmap_cstr, phone_book)
         printf("%s\t- %s\n", cstr_str(&i.ref->first), cstr_str(&i.ref->second));
 }
 
 int main(void)
 {
-    hmap_str phone_book = c_init(hmap_str, {
+    hmap_cstr phone_book = c_init(hmap_cstr, {
         {"Lilia Friedman", "(892) 670-4739"},
         {"Tariq Beltran", "(489) 600-7575"},
         {"Laiba Juarez", "(303) 885-5692"},
@@ -48,25 +48,25 @@ int main(void)
     printf("Phone book:\n");
     print_phone_book(phone_book);
 
-    hmap_str_emplace(&phone_book, "Zak Byers", "(551) 396-1880");
-    hmap_str_emplace(&phone_book, "Zak Byers", "(551) 396-1990");
+    hmap_cstr_emplace(&phone_book, "Zak Byers", "(551) 396-1880");
+    hmap_cstr_emplace(&phone_book, "Zak Byers", "(551) 396-1990");
 
     printf("\nPhone book after adding Zak Byers:\n");
     print_phone_book(phone_book);
 
-    if (hmap_str_contains(&phone_book, "Tariq Beltran"))
+    if (hmap_cstr_contains(&phone_book, "Tariq Beltran"))
         printf("\nTariq Beltran is in phone book\n");
 
-    hmap_str_erase(&phone_book, "Tariq Beltran");
-    hmap_str_erase(&phone_book, "Elliott Mooney");
+    hmap_cstr_erase(&phone_book, "Tariq Beltran");
+    hmap_cstr_erase(&phone_book, "Elliott Mooney");
 
     printf("\nPhone book after erasing Tariq and Elliott:\n");
     print_phone_book(phone_book);
 
-    hmap_str_emplace_or_assign(&phone_book, "Zak Byers", "(555) 396-188");
+    hmap_cstr_emplace_or_assign(&phone_book, "Zak Byers", "(555) 396-188");
 
     printf("\nPhone book after update phone of Zak Byers:\n");
     print_phone_book(phone_book);
 
-    hmap_str_drop(&phone_book);
+    hmap_cstr_drop(&phone_book);
 }

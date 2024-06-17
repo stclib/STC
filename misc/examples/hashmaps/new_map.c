@@ -23,12 +23,12 @@ typedef struct Point { int x, y; } Point;
 #include "stc/hmap.h"
 
 // cstr => cstr map
-#define i_key_str
-#define i_val_str
+#define i_key_cstr
+#define i_val_cstr
 #include "stc/hmap.h"
 
 // string set
-#define i_key_str
+#define i_key_cstr
 #include "stc/hset.h"
 
 
@@ -40,12 +40,12 @@ int main(void)
         printf(" (%d, %d: %d)", i.ref->first.x, i.ref->first.y, i.ref->second);
     puts("");
 
-    hmap_str smap = c_init(hmap_str, {
+    hmap_cstr smap = c_init(hmap_cstr, {
         {"Hello, friend", "long time no see"},
         {"So long", "see you around"},
     });
 
-    hset_str sset = c_init(hset_str, {
+    hset_cstr sset = c_init(hset_cstr, {
         "Hello, friend",
         "Nice to see you again",
         "So long",
@@ -56,11 +56,11 @@ int main(void)
     hmap_int_insert(&map, 456, 654);
     hmap_int_insert(&map, 789, 987);
 
-    c_foreach (i, hset_str, sset)
+    c_foreach (i, hset_cstr, sset)
         printf(" %s\n", cstr_str(i.ref));
 
     hmap_int_drop(&map);
-    hset_str_drop(&sset);
-    hmap_str_drop(&smap);
+    hset_cstr_drop(&sset);
+    hmap_cstr_drop(&smap);
     hmap_pnt_drop(&pmap);
 }

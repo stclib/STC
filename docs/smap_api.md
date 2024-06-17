@@ -107,33 +107,33 @@ void                 smap_X_value_drop(smap_X_value* pval);
 #define i_implement
 #include "stc/cstr.h"
 
-#define i_key_str // special macro for i_key = cstr, i_tag = str
-#define i_val_str // ditto
+#define i_key_cstr // special macro for i_key = cstr, i_tag = str
+#define i_val_cstr // ditto
 #include "stc/smap.h"
 
 int main(void)
 {
     // Create a sorted map of three strings (maps to string)
-    smap_str colors = c_init(smap_str, {
+    smap_cstr colors = c_init(smap_cstr, {
         {"RED", "#FF0000"},
         {"GREEN", "#00FF00"},
         {"BLUE", "#0000FF"}
     });
 
     // Iterate and print keys and values of sorted map
-    c_foreach (i, smap_str, colors) {
+    c_foreach (i, smap_cstr, colors) {
         printf("Key:[%s] Value:[%s]\n", cstr_str(&i.ref->first), cstr_str(&i.ref->second));
     }
 
     // Add two new entries to the sorted map
-    smap_str_emplace(&colors, "BLACK", "#000000");
-    smap_str_emplace(&colors, "WHITE", "#FFFFFF");
+    smap_cstr_emplace(&colors, "BLACK", "#000000");
+    smap_cstr_emplace(&colors, "WHITE", "#FFFFFF");
 
     // Output values by key
-    printf("The HEX of color RED is:[%s]\n", cstr_str(smap_str_at(&colors, "RED")));
-    printf("The HEX of color BLACK is:[%s]\n", cstr_str(smap_str_at(&colors, "BLACK")));
+    printf("The HEX of color RED is:[%s]\n", cstr_str(smap_cstr_at(&colors, "RED")));
+    printf("The HEX of color BLACK is:[%s]\n", cstr_str(smap_cstr_at(&colors, "BLACK")));
 
-    smap_str_drop(&colors);
+    smap_cstr_drop(&colors);
 }
 ```
 Output:
@@ -156,8 +156,8 @@ Translate a
 #define i_implement
 #include "stc/cstr.h"
 #define i_type strmap
-#define i_key_str
-#define i_val_str
+#define i_key_cstr
+#define i_val_cstr
 #include "stc/smap.h"
 
 static void print_node(const strmap_value* node) {
@@ -191,7 +191,7 @@ This example uses a smap with cstr as mapped value.
 
 #define i_type IDSMap
 #define i_key int
-#define i_val_str
+#define i_val_cstr
 #include "stc/smap.h"
 
 int main(void)

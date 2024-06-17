@@ -51,25 +51,25 @@ void vectordemo1(void)
     vec_ll_drop(&bignums);
 }
 
-#define i_key_str
+#define i_key_cstr
 #define i_use_cmp
 #include "stc/vec.h"
 
 void vectordemo2(void)
 {
-    vec_str names = {0};
-    vec_str_emplace_back(&names, "Mary");
-    vec_str_emplace_back(&names, "Joe");
-    vec_str_emplace_back(&names, "Chris");
+    vec_cstr names = {0};
+    vec_cstr_emplace_back(&names, "Mary");
+    vec_cstr_emplace_back(&names, "Joe");
+    vec_cstr_emplace_back(&names, "Chris");
     cstr_assign(&names.data[1], "Jane"); // replace Joe
     printf("names[1]: %s\n", cstr_str(&names.data[1]));
 
-    vec_str_sort(&names);               // Sort the array
+    vec_cstr_sort(&names);               // Sort the array
 
-    c_foreach (i, vec_str, names)
+    c_foreach (i, vec_cstr, names)
         printf("sorted: %s\n", cstr_str(i.ref));
 
-    vec_str_drop(&names);
+    vec_cstr_drop(&names);
 }
 
 #define i_key int
@@ -131,7 +131,7 @@ void mapdemo1(void)
 }
 
 #define i_type hmap_si
-#define i_key_str
+#define i_key_cstr
 #define i_val int
 #include "stc/hmap.h"
 
@@ -153,28 +153,28 @@ void mapdemo2(void)
     hmap_si_drop(&nums);
 }
 
-#define i_key_str
-#define i_val_str
+#define i_key_cstr
+#define i_val_cstr
 #include "stc/hmap.h"
 
 void mapdemo3(void)
 {
-    hmap_str table = {0};
-    hmap_str_emplace(&table, "Map", "test");
-    hmap_str_emplace(&table, "Make", "my");
-    hmap_str_emplace(&table, "Sunny", "day");
-    hmap_str_iter it = hmap_str_find(&table, "Make");
-    c_foreach (i, hmap_str, table)
+    hmap_cstr table = {0};
+    hmap_cstr_emplace(&table, "Map", "test");
+    hmap_cstr_emplace(&table, "Make", "my");
+    hmap_cstr_emplace(&table, "Sunny", "day");
+    hmap_cstr_iter it = hmap_cstr_find(&table, "Make");
+    c_foreach (i, hmap_cstr, table)
         printf("entry: %s: %s\n", cstr_str(&i.ref->first), cstr_str(&i.ref->second));
-    printf("size %" c_ZI ": remove: Make: %s\n", hmap_str_size(&table), cstr_str(&it.ref->second));
-    //hmap_str_erase(&table, "Make");
-    hmap_str_erase_at(&table, it);
+    printf("size %" c_ZI ": remove: Make: %s\n", hmap_cstr_size(&table), cstr_str(&it.ref->second));
+    //hmap_cstr_erase(&table, "Make");
+    hmap_cstr_erase_at(&table, it);
 
-    printf("size %" c_ZI "\n", hmap_str_size(&table));
-    c_foreach (i, hmap_str, table)
+    printf("size %" c_ZI "\n", hmap_cstr_size(&table));
+    c_foreach (i, hmap_cstr, table)
         printf("entry: %s: %s\n", cstr_str(&i.ref->first), cstr_str(&i.ref->second));
 
-    hmap_str_drop(&table); // frees key and value cstrs, and hash table.
+    hmap_cstr_drop(&table); // frees key and value cstrs, and hash table.
 }
 
 int main(void)

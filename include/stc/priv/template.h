@@ -63,12 +63,22 @@
   #define i_valclass c_SELECT(_c_SEL21, i_valclass2)
   #define i_valraw c_SELECT(_c_SEL22, i_valclass2)
 #endif
-#if defined i_key_arc
+
+#if defined i_key_str // [deprecated]
+  #define i_key_cstr
+  #define i_tag str
+#elif defined i_key_arc
   #define i_key_arcbox i_key_arc
 #elif defined i_key_box
   #define i_key_arcbox i_key_box
 #endif
-#if defined i_val_arc
+
+#if defined i_val_str // [deprecated]
+  #define i_val_cstr
+  #ifndef i_tag
+    #define i_tag str
+  #endif
+#elif defined i_val_arc
   #define i_val_arcbox i_val_arc
 #elif defined i_val_box
   #define i_val_arcbox i_val_box
@@ -91,14 +101,14 @@
          "Use: i_key_box, i_val_box, i_key_arc, i_val_arc."
 #endif
 
-#if !(defined i_key || defined i_key_str || \
+#if !(defined i_key || defined i_key_cstr || \
       defined i_keyclass || defined i_key_arcbox)
   #if defined _i_is_map
     #error "i_key* must be defined for maps"
   #endif
 
-  #if defined i_val_str
-    #define i_key_str i_val_str
+  #if defined i_val_cstr
+    #define i_key_cstr i_val_cstr
   #endif
   #if defined i_val_arcbox
     #define i_key_arcbox i_val_arcbox
@@ -149,12 +159,12 @@
 
 // Handle predefined element-types with lookup convertion types:
 // cstr(const char*), cstr(csview), arc_T(T) / box_T(T)
-#if defined i_key_str
+#if defined i_key_cstr
   #define i_keyclass cstr
   #define i_rawclass ccharptr
   #define i_use_cmp
   #ifndef i_tag
-    #define i_tag str
+    #define i_tag cstr
   #endif
 #elif defined i_key_arcbox
   #define i_keyclass i_key_arcbox
@@ -264,7 +274,7 @@
 
 #if defined _i_is_map // ---- process hmap/smap value i_val, ... ----
 
-#ifdef i_val_str
+#ifdef i_val_cstr
   #define i_valclass cstr
   #define i_valraw const char*
 #elif defined i_val_arcbox

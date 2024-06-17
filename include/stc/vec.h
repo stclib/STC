@@ -36,7 +36,7 @@ struct MyStruct {
 #define i_key float
 #include "stc/vec.h"
 
-#define i_key_str // special for cstr
+#define i_key_cstr // special for cstr
 #include "stc/vec.h"
 
 #define i_TYPE vec_i32,int32_t
@@ -52,9 +52,9 @@ int main(void) {
     vec_float_push(&fvec, 123.3);
     vec_float_drop(&fvec);
 
-    vec_str svec = {0};
-    vec_str_emplace(&svec, "Hello, friend");
-    vec_str_drop(&svec);
+    vec_cstr svec = {0};
+    vec_cstr_emplace(&svec, "Hello, friend");
+    vec_cstr_drop(&svec);
 }
 */
 #include "priv/linkage.h"

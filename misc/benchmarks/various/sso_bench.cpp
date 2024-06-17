@@ -7,7 +7,7 @@
 #include "stc/cstr.h"
 
 #define i_type StcVec
-#define i_val_str
+#define i_val_cstr
 #include "stc/stack.h"
 
 #include <vector>
@@ -33,7 +33,7 @@ struct string_hash {
 using StdSet = std::unordered_set<std::string, string_hash, std::equal_to<>>;
 
 #define i_type StcSet
-#define i_val_str
+#define i_val_cstr
 //#define i_hash(txtp) std::hash<std::string_view>{}(*txtp)
 //#include "stc/hset.h"
 #define _i_is_set

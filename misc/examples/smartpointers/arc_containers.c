@@ -3,7 +3,7 @@
 #define i_implement
 #include "stc/cstr.h"
 #define i_type Map
-#define i_key_str // strings
+#define i_key_cstr // strings
 #define i_val int
 #define i_keydrop(p) (printf("drop name: %s\n", cstr_str(p)), cstr_drop(p))
 #include "stc/smap.h"

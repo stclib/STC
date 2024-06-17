@@ -28,7 +28,7 @@
   #define i_type PLEASE_DEFINE_i_type
 #endif
 
-#if defined i_key_str
+#if defined i_key_cstr
   #define _i_key cstr
 #elif defined i_keyclass
   #define _i_key i_keyclass
@@ -38,7 +38,7 @@
   #define _i_key i_key
 #endif
 
-#ifdef i_val_str
+#ifdef i_val_cstr
   #define _i_val cstr
 #elif defined i_valclass
   #define _i_val i_valclass

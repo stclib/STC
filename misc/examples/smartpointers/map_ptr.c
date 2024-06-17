@@ -4,7 +4,7 @@
 
 // hmap of cstr => long*
 #define i_type Ptrmap
-#define i_key_str
+#define i_key_cstr
 #define i_val long*
 #define i_valraw long
 #define i_valfrom(raw) c_new(long, raw)

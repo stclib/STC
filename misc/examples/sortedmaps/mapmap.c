@@ -4,14 +4,14 @@
 
 // People: std::map<std::string, std::string>
 #define i_type People
-#define i_key_str // name
-#define i_val_str // email
+#define i_key_cstr // name
+#define i_val_cstr // email
 #define i_keydrop(p) (printf("kdrop: %s\n", cstr_str(p)), cstr_drop(p)) // override
 #include "stc/hmap.h"
 
 // Departments: std::map<std::string, People>
 #define i_type Departments
-#define i_key_str // dep. name
+#define i_key_cstr // dep. name
 #define i_valclass People
 #include "stc/hmap.h"
 
