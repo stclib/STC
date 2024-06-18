@@ -18,8 +18,8 @@ int main(void)
     Ptrmap map = {0};
 
     puts("Map cstr => long*:");
-    Ptrmap_insert(&map, cstr_from("Test1"), c_new(long, 1));
-    Ptrmap_insert(&map, cstr_from("Test2"), c_new(long, 2));
+    Ptrmap_insert(&map, cstr_lit("Test1"), c_new(long, 1));
+    Ptrmap_insert(&map, cstr_lit("Test2"), c_new(long, 2));
 
     // Simple: emplace() implicitly creates cstr from const char* and an owned long* from long!
     Ptrmap_emplace(&map, "Test3", 3);

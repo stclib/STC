@@ -175,7 +175,7 @@ int main(void)
 
     print_result( strmap_emplace(&m, "a", "a") );
     print_result( strmap_emplace(&m, "b", "abcd") );
-    print_result( strmap_insert(&m, cstr_from("c"), cstr_with_size(10, 'c') ) );
+    print_result( strmap_insert(&m, cstr_lit("c"), cstr_with_size(10, 'c') ) );
     print_result( strmap_emplace(&m, "c", "Won't be inserted") );
 
     c_foreach (p, strmap, m) { print_node(p.ref); }

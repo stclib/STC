@@ -161,7 +161,7 @@ STC_DEF bool cstr_getdelim(cstr *self, const int delim, FILE *fp) {
 }
 
 STC_DEF cstr cstr_replace_sv(csview in, csview search, csview repl, int32_t count) {
-    cstr out = cstr_null;
+    cstr out = cstr_init();
     intptr_t from = 0; char* res;
     if (!count) count = INT32_MAX;
     if (search.size)
@@ -200,7 +200,7 @@ STC_DEF intptr_t cstr_vfmt(cstr* self, intptr_t start, const char* fmt, va_list 
 }
 
 STC_DEF cstr cstr_from_fmt(const char* fmt, ...) {
-    cstr s = cstr_null;
+    cstr s = cstr_init();
     va_list args;
     va_start(args, fmt);
     cstr_vfmt(&s, 0, fmt, args);

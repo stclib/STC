@@ -24,8 +24,8 @@ All cstr definitions and prototypes are available by including a single header f
 
 ## Methods
 ```c
-cstr        cstr_init(void);                                        // constructor; empty string
 cstr        cstr_lit(const char literal_only[]);                    // cstr from literal; no strlen() call.
+cstr        cstr_init(void);                                        // constructor; empty string
 cstr        cstr_from(const char* str);                             // constructor using strlen()
 cstr        cstr_from_n(const char* str, intptr_t n);               // constructor with n first bytes of str
 cstr        cstr_from_zv(zsview zv);                                // construct cstr from zsview

@@ -145,7 +145,7 @@ int main(void)
     // Insert only if "CYAN" is not in the map: create mapped value when needed only.
     hmap_cstr_result res = hmap_cstr_emplace_key(&umap, "CYAN");
     if (res.inserted)
-        res.ref->second = cstr_from("#00FFFF"); // must assign second if key was inserted.
+        res.ref->second = cstr_lit("#00FFFF"); // must assign second if key was inserted.
 
     // Output values by key
     printf("The HEX of color RED is:[%s]\n", cstr_str(hmap_cstr_at(&umap, "RED")));

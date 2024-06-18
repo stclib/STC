@@ -161,7 +161,7 @@
 // cstr(const char*), cstr(csview), arc_T(T) / box_T(T)
 #if defined i_key_cstr
   #define i_keyclass cstr
-  #define i_rawclass ccharptr
+  #define i_rawclass cstr_raw
   #define i_use_cmp
   #ifndef i_tag
     #define i_tag cstr

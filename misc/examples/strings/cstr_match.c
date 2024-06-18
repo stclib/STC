@@ -5,7 +5,7 @@
 
 int main(void)
 {
-    cstr ss = cstr_from("The quick brown fox jumps over the lazy dog.JPG");
+    cstr ss = cstr_lit("The quick brown fox jumps over the lazy dog.JPG");
 
     intptr_t pos = cstr_find_at(&ss, 0, "brown");
     printf("%" c_ZI " [%s]\n", pos, pos == c_NPOS ? "<NULL>" : cstr_str(&ss) + pos);

@@ -5,7 +5,7 @@
 
 int main(void)
 {
-    cstr str = cstr_from("We think in generalities, but we live in details.");
+    cstr str = cstr_lit("We think in generalities, but we live in details.");
     csview sv = cstr_sv(&str);
     csview sv1 = csview_substr_ex(sv, 3, 5);               // "think"
     intptr_t pos = csview_find(sv, "live");                // position of "live"

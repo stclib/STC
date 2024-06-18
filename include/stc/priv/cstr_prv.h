@@ -60,9 +60,8 @@ STC_API char* _cstr_internal_move(cstr* self, intptr_t pos1, intptr_t pos2);
 
 /**************************** PUBLIC API **********************************/
 
+#define cstr_init() (c_LITERAL(cstr){0})
 #define cstr_lit(literal) cstr_from_n(literal, c_litstrlen(literal))
-#define cstr_null (c_LITERAL(cstr){0})
-typedef const char* cstr_raw;
 
 STC_API char*       cstr_reserve(cstr* self, intptr_t cap);
 STC_API void        cstr_shrink_to_fit(cstr* self);
@@ -93,9 +92,6 @@ STC_INLINE csview cstr_sv(const cstr* s) {
     return cstr_is_long(s) ? c_LITERAL(csview){s->lon.data, cstr_l_size(s)}
                            : c_LITERAL(csview){s->sml.data, cstr_s_size(s)};
 }
-
-STC_INLINE cstr cstr_init(void)
-    { return cstr_null; }
 
 STC_INLINE cstr cstr_from_n(const char* str, const intptr_t len) {
     cstr s;
@@ -133,7 +129,7 @@ STC_INLINE cstr* cstr_take(cstr* self, const cstr s) {
 
 STC_INLINE cstr cstr_move(cstr* self) {
     cstr tmp = *self;
-    *self = cstr_null;
+    *self = cstr_init();
     return tmp;
 }
 

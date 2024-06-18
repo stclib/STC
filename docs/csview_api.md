@@ -117,7 +117,7 @@ uint64_t       csview_hash(const csview* x);
 
 | Name           | Value                | Usage                                        |
 |:---------------|:---------------------|:---------------------------------------------|
-| `c_SVARG(sv)`     | printf argument      | `printf("sv: %.*s\n", c_SVARG(sv));`            |
+| `c_SVARG(sv)`  | printf argument      | `printf("sv: %.*s\n", c_SVARG(sv));`         |
 
 ## Example
 ```c
@@ -127,13 +127,13 @@ uint64_t       csview_hash(const csview* x);
 
 int main(void)
 {
-    cstr str1 = cstr_from("We think in generalities, but we live in details.");
+    cstr str1 = cstr_lit("We think in generalities, but we live in details.");
                                                         // (quoting Alfred N. Whitehead)
 
-    csview ss1 = cstr_substr_ex(&str1, 3, 5);          // "think"
+    csview ss1 = cstr_substr_ex(&str1, 3, 5);           // "think"
     intptr_t pos = cstr_find(&str1, "live");            // position of "live" in str1
-    csview ss2 = cstr_substr_ex(&str1, pos, 4);        // get "live"
-    csview ss3 = cstr_slice_ex(&str1, -8, -1);         // get "details"
+    csview ss2 = cstr_substr_ex(&str1, pos, 4);         // get "live"
+    csview ss3 = cstr_slice_ex(&str1, -8, -1);          // get "details"
     printf("%.*s %.*s %.*s\n",
         c_SVARG(ss1), c_SVARG(ss2), c_SVARG(ss3));
     cstr s1 = cstr_lit("Apples are red");

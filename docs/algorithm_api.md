@@ -359,7 +359,7 @@ int main(void) {
 ```c
 #include "stc/cstr.h"
 
-cstr *str_p = c_new(cstr, cstr_from("Hello"));
+cstr *str_p = c_new(cstr, cstr_lit("Hello"));
 printf("%s\n", cstr_str(str_p));
 c_delete(cstr, str_p);
 ```
@@ -394,13 +394,13 @@ int* ip = c_const_cast(int*, cs);  // issues a warning!
 
 ### Predefined template parameter functions
 
-**ccharptr** - Non-owning `const char*` "class" element type: `#define i_keyclass ccharptr`
+**cstr_raw** - Non-owning `const char*` "class" element type: `#define i_keyclass cstr_raw`
 ```c
-typedef     const char* ccharptr;
-int         ccharptr_cmp(const ccharptr* x, const ccharptr* y);
-uint64_t    ccharptr_hash(const ccharptr* x);
-ccharptr    ccharptr_clone(ccharptr sp);
-void        ccharptr_drop(ccharptr* x);
+typedef     const char* cstr_raw;
+int         cstr_raw_cmp(const cstr_raw* x, const cstr_raw* y);
+uint64_t    cstr_raw_hash(const cstr_raw* x);
+cstr_raw    cstr_raw_clone(cstr_raw sp);
+void        cstr_raw_drop(cstr_raw* x);
 ```
 Default implementations
 ```c

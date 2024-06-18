@@ -71,11 +71,11 @@ void example3(void)
     SongSet_emplace(&set2, (SongView){"Michael Jackson", "Billie Jean"});
     /*
     // The previous line is identical to:
-        SongSet_insert(&set2, SongArc_make((Song){cstr_from("Michael Jackson"), cstr_from("Billie Jean")}));
+        SongSet_insert(&set2, SongArc_make((Song){cstr_lit("Michael Jackson"), cstr_lit("Billie Jean")}));
     // And similar, but not identical to (i.e. SongArc_make() combines malloc of Song and reference counter):
         Song* tmp = malloc(sizeof *tmp);
-        tmp->artist = cstr_from("Michael Jackson");
-        tmp->title = cstr_from("Billie Jean");
+        tmp->artist = cstr_lit("Michael Jackson");
+        tmp->title = cstr_lit("Billie Jean");
         SongSet_insert(&set2, SongArc_from_ptr(tmp));
     // NB: In the last two failed attempt to insert an "existing" element, SongSet will "drop" the given inputs.
     */

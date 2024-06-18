@@ -121,12 +121,12 @@
 #define c_arraylen(a) (intptr_t)(sizeof(a)/sizeof 0[a])
 
 // Non-owning c-string "class"
-typedef const char* ccharptr;
-#define ccharptr_cmp(xp, yp) strcmp(*(xp), *(yp))
-#define ccharptr_eq(xp, yp) (ccharptr_cmp(xp, yp) == 0)
-#define ccharptr_hash(p) c_hash_str(*(p))
-#define ccharptr_clone(s) (s)
-#define ccharptr_drop(p) ((void)p)
+typedef const char* cstr_raw;
+#define cstr_raw_cmp(xp, yp) strcmp(*(xp), *(yp))
+#define cstr_raw_eq(xp, yp) (cstr_raw_cmp(xp, yp) == 0)
+#define cstr_raw_hash(p) c_hash_str(*(p))
+#define cstr_raw_clone(s) (s)
+#define cstr_raw_drop(p) ((void)p)
 
 #define c_ROTL(x, k) (x << (k) | x >> (8*sizeof(x) - (k)))
 
