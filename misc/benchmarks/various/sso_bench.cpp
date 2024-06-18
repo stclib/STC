@@ -37,7 +37,7 @@ using StdSet = std::unordered_set<std::string, string_hash, std::equal_to<>>;
 //#define i_hash(txtp) std::hash<std::string_view>{}(*txtp)
 //#include "stc/hset.h"
 #define _i_is_set
-#include "stc/hmap-robin.h"
+#include "stc/hmap.h"
 
 
 
