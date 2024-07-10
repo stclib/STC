@@ -25,12 +25,9 @@
 
 int main(void)
 {
-    Vec vec = {0};
-    List list = {0};
-    c_defer(
-        Vec_drop(&vec),
-        List_drop(&list)
-    ){
+    c_with (Vec vec = {0}, Vec_drop(&vec))
+    c_with (List list = {0}, List_drop(&list))
+    {
         // POPULATE vec with shared pointers to Maps:
         Map *map;
         //map = Vec_push(&vec, Arc_from(Map_init()))->get;

@@ -41,7 +41,7 @@ while           |
 switch          { block_type |= LOOP; state = BRACES; }
 do              { block_type |= LOOP; state = BRACESDONE; }
 c_defer         |
-c_scoped        |
+c_with        |
 c_scope         { block_type = AUTO; state = BRACES; }
 \(              { if (state == BRACES) ++braces_lev; }
 \)              { if (state == BRACES && --braces_lev == 0) {

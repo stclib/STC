@@ -36,7 +36,7 @@ static cstr to_roman(int value)
 
 TEST(algorithm, cstr_append)
 {
-    c_scoped (cstr s = to_roman(2024), cstr_drop(&s))
+    c_with (cstr s = to_roman(2024), cstr_drop(&s))
     {
         EXPECT_STREQ("MMXXIV", cstr_str(&s));
     }

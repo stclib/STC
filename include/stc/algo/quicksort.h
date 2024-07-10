@@ -119,13 +119,13 @@ static inline void _c_MEMB(_quicksort_ij)(i_type* arr, intptr_t lo, intptr_t hi)
             do { rx = i_keyto(i_at(arr, i)); } while (i_less((&rx), (&pivot)) && ++i);
             do { rx = i_keyto(i_at(arr, j)); } while (i_less((&pivot), (&rx)) && --j);
             if (i > j) break;
-            c_swap(i_key, i_at_mut(arr, i), i_at_mut(arr, j));
+            c_swap(i_at_mut(arr, i), i_at_mut(arr, j));
             ++i; --j;
         } while (i <= j);
 
         if (j - lo > hi - i) {
-            c_swap(intptr_t, &lo, &i);
-            c_swap(intptr_t, &hi, &j);
+            c_swap(&lo, &i);
+            c_swap(&hi, &j);
         }
         if (j - lo > 64) _c_MEMB(_quicksort_ij)(arr, lo, j);
         else if (j > lo) _c_MEMB(_insertsort_ij)(arr, lo, j);

@@ -45,10 +45,6 @@ c_forpair (id, count, IMap, map)
 c_foreach_n (i, IMap, map, 3)
     printf(" %zd:(%d %d)", i.index, i.ref->first, i.ref->second);
 // 0:(3 2) 1:(5 4) 2:(7 3)
-
-// iterate with an already declared iter (useful in coroutines)
-c_foreach_it (iter, IMap, map)
-    printf(" (%d %d)", iter.ref->first, iter.ref->second);
 ```
 
 ### c_foritems
@@ -383,13 +379,16 @@ intptr_t n = c_arraylen(array);
 
 ### c_swap, c_const_cast
 ```c
-// Safe macro for swapping internals of two objects of same type:
-c_swap(hmap_int, &map1, &map2);
+// Side effect- and typesafe macro for swapping internals of two objects of same type:
+c_swap(&map1, &map2);
 
 // Type-safe casting a from const (pointer):
 const char cs[] = "Hello";
 char* s = c_const_cast(char*, cs); // OK
 int* ip = c_const_cast(int*, cs);  // issues a warning!
+
+// Type safe casting:
+#define tofloat(d) c_safe_cast(float, double, d)
 ```
 
 ### Predefined template parameter functions
@@ -418,14 +417,14 @@ General ***defer*** mechanics for resource acquisition. These macros allows you 
 freeing of the resources at the point where the acquisition takes place.
 The **checkscoped** utility described below, ensures that the `c_scope*` and `c_defer` macros are used correctly.
 
-| Usage                                     | Description                                               |
-|:------------------------------------------|:----------------------------------------------------------|
-| `c_defer (drop...) {}`                    | Defer `drop...` to end of scope                           |
-| `c_scope (init, drop) {}`                 | Execute `init` and defer executing `drop` to end of scope |
-| `c_scope (init, pred, drop) {}`           | Adds a predicate in order to exit early if init failed    |
-| `c_scoped (Type var=init, drop) {}`       | Declare `var`. Defer `drop...` to end of scope            |
-| `c_scoped (Type var=init, pred, drop) {}` | Adds a predicate in order to exit early if init failed    |
-| `continue`                                | Exit a defer/scope*-block without resource leak                  |
+| Usage                                   | Description                                               |
+|:----------------------------------------|:----------------------------------------------------------|
+| `c_defer (deinit...) {}`                | Defer `deinit...` to end of scope                         |
+| `c_scope (init, deinit) {}`             | Execute `init` and defer executing `deinit` to end of scope |
+| `c_scope (init, pred, deinit) {}`       | Adds a predicate in order to exit early if init failed    |
+| `c_with (Type var=init, deinit) {}`       | Declare and initialize `var`. Defer executing `deinit` to end of scope  |
+| `c_with (Type var=init, pred, deinit) {}` | Adds a predicate in order to exit early if init failed  |
+| `continue`                              | Exit a defer-/with-/scope-block without resource leakage  |
 
 ```c
 // `c_defer` executes the expression(s) when leaving scope.
@@ -442,18 +441,18 @@ c_scope (pthread_mutex_lock(&mut), pthread_mutex_unlock(&mut))
     /* Do syncronized work. */
 }
 
-// `c_scoped`: declare and init a new scoped variable and specify the deinitialize call.
-c_scoped (cstr str = cstr_lit("Hello"), cstr_drop(&str))
+// `c_with`: declare and init a new scoped variable and specify the deinitialize call.
+c_with (cstr str = cstr_lit("Hello"), cstr_drop(&str))
 {
     cstr_append(&str, " world");
     printf("%s\n", cstr_str(&str));
 }
 ```
-**Example 1**: Use multiple **c_scoped** in sequence:
+**Example 1**: Use multiple **c_with** in sequence:
 ```c
 bool ok = false;
-c_scoped (uint8_t* buf = malloc(BUF_SIZE), buf != NULL, free(buf))
-c_scoped (FILE* fp = fopen(fname, "rb"), fp != NULL, fclose(fp))
+c_with (uint8_t* buf = malloc(BUF_SIZE), buf != NULL, free(buf))
+c_with (FILE* fp = fopen(fname, "rb"), fp != NULL, fclose(fp))
 {
     int n = fread(buf, 1, BUF_SIZE, fp);
     if (n <= 0) continue; // NB! do not return here.
@@ -475,8 +474,8 @@ return ok;
 vec_cstr readFile(const char* name)
 {
     vec_cstr vec = {0}; // returned
-    c_scoped (FILE* fp = fopen(name, "r"), fp != NULL, fclose(fp))
-    c_scoped (cstr line = {0}, cstr_drop(&line))
+    c_with (FILE* fp = fopen(name, "r"), fp != NULL, fclose(fp))
+    c_with (cstr line = {0}, cstr_drop(&line))
         while (cstr_getline(&line, fp))
             vec_cstr_emplace(&vec, cstr_str(&line));
     return vec;
@@ -484,7 +483,7 @@ vec_cstr readFile(const char* name)
 
 int main(void)
 {
-    c_scoped (vec_cstr vec = readFile(__FILE__), vec_cstr_drop(&vec))
+    c_with (vec_cstr vec = readFile(__FILE__), vec_cstr_drop(&vec))
         c_foreach (i, vec_cstr, vec)
             printf("| %s\n", cstr_str(i.ref));
 }
@@ -495,7 +494,7 @@ The **checkscoped** program will check the source code for any misuses of the `c
 may lead to resource leakages. The `c_scope*`- macros are implemented as one-time executed **for-loops**,
 so any `return` or `break` appearing within such a block will lead to resource leaks, as it will disable
 the cleanup/drop method to be called. A `break` may originally be intended to break a loop or switch
-outside the `c_scoped` scope.
+outside the `c_with` scope.
 
 NOTE: One must always make sure to unwind temporary allocated resources before a `return` in C. However, by using `c_scope*`-macros,
 - it is much easier to automatically detect misplaced return/break between resource acquisition and destruction.
@@ -506,8 +505,8 @@ from a `c_scope`:
 ```c
 int flag = 0;
 for (int i = 0; i<n; ++i) {
-    c_scoped (cstr text = {0}, cstr_drop(&text))
-    c_scoped (List list = {0}, List_drop(&list))
+    c_with (cstr text = {0}, cstr_drop(&text))
+    c_with (List list = {0}, List_drop(&list))
     {
         for (int j = 0; j<m; ++j) {
             List_push_back(&list, i*j);
@@ -516,23 +515,23 @@ for (int i = 0; i<n; ++i) {
         }
         // WRONG:
         if (cond2())
-            break;      // checkscoped ERROR! break inside c_scoped.
+            break;      // checkscoped ERROR! break inside c_with.
 
         if (cond3())
-            return -1;  // checkscoped ERROR! return inside c_scoped
+            return -1;  // checkscoped ERROR! return inside c_with
 
         // CORRECT:
         if (cond2()) {
             flag = 1;   // flag to break outer for-loop
-            continue;   // cleanup and leave c_scoped block
+            continue;   // cleanup and leave c_with block
         }
         if (cond3()) {
             flag = -1;  // return -1
-            continue;   // cleanup and leave c_scoped block
+            continue;   // cleanup and leave c_with block
         }
         ...
     }
-    // do the return/break outside of c_scoped
+    // do the return/break outside of c_with
     if (flag < 0) return flag;
     else if (flag > 0) break;
     ...

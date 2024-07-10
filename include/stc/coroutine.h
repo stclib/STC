@@ -72,6 +72,7 @@ typedef enum {
 #define cco_initial(co) ((co)->cco_state == CCO_STATE_INIT)
 #define cco_suspended(co) ((co)->cco_state > CCO_STATE_INIT)
 #define cco_done(co) ((co)->cco_state == CCO_STATE_DONE)
+#define cco_active(co) ((co)->cco_state != CCO_STATE_DONE)
 
 #define cco_scope(co) \
     for (int* _state = &(co)->cco_state; *_state != CCO_STATE_DONE; *_state = CCO_STATE_DONE) \
@@ -208,9 +209,9 @@ typedef struct cco_runtime {
  * Iterate containers with already defined iterator (prefer to use in coroutines only):
  */
 
-#define c_foreach_it(existing_it, C, cnt) \
+#define cco_foreach(existing_it, C, cnt) \
     for (existing_it = C##_begin(&cnt); (existing_it).ref; C##_next(&existing_it))
-#define c_foreach_reverse_iter(existing_it, C, cnt) \
+#define cco_foreach_reverse(existing_it, C, cnt) \
     for (existing_it = C##_rbegin(&cnt); (existing_it).ref; C##_rnext(&existing_it))
 
 

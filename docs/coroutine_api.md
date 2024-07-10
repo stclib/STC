@@ -32,8 +32,8 @@ NB! ***cco_yield\*()*** / ***cco_await\*()*** may not be called from within a `s
 |           | `cco_flt_takewhile(predicate);`      | Use instead of *c_flt_takewhile(pred)* to ensure cleanup state |
 |           | `cco_flt_takewhile(predicate);`      | Use instead of *c_flt_takewhile(pred)* to ensure cleanup state |
 |           | ***Container iteration in coroutines***: ||
-|           | `c_foreach_it(external_it, ctype, cnt)` | Use iterator stored in coroutine object |
-|           | `c_foreach_reverse_iter(external_it, ctype, cnt)` | Iterate in reverse order     |
+|           | `cco_foreach(existing_it, ctype, cnt)` | Use existing iterator stored in coroutine object |
+|           | `cco_foreach_reverse(existing_it, ctype, cnt)` | Iterate in reverse order     |
 |           | ***Task objects***:                  ||
 |           | `cco_task_struct(Name, ...);`        | Define a coroutine task struct          |
 |           | `cco_await_task(task, cco_runtime* rt);`| Await for task to finish             |

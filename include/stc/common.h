@@ -88,9 +88,13 @@
 #endif
 #define c_container_of(p, C, m) ((C*)((char*)(1 ? (p) : &((C*)0)->m) - offsetof(C, m)))
 #define c_const_cast(Tp, p)     ((Tp)(1 ? (p) : (Tp)0))
-#define c_safe_cast(T, From, x) ((T)(1 ? (x) : (From){0}))
-#define c_swap(T, xp, yp)       do { T *_xp = xp, *_yp = yp, \
-                                    _tv = *_xp; *_xp = *_yp; *_yp = _tv; } while (0)
+#define c_swap(xp, yp)          do { char _tv[sizeof *(xp)]; \
+                                    void *_xp = xp, *_yp = (yp) + (1 ? 0 : sizeof((xp) == (yp))); \
+                                    memcpy(_tv, _xp, sizeof *(xp)); \
+                                    memcpy(_xp, _yp, sizeof *(xp)); \
+                                    memcpy(_yp, _tv, sizeof *(xp)); \
+                                } while (0)
+
 // use with gcc -Wconversion
 #define c_sizeof                (intptr_t)sizeof
 #define c_strlen(s)             (intptr_t)strlen(s)
@@ -99,9 +103,11 @@
 #define c_memmove(d, s, ilen)   memmove(d, s, c_i2u_size(ilen))
 #define c_memset(d, val, ilen)  memset(d, val, c_i2u_size(ilen))
 #define c_memcmp(a, b, ilen)    memcmp(a, b, c_i2u_size(ilen))
-#define c_u2i_size(u)           (intptr_t)(1 ? (u) : (size_t)1)
-#define c_i2u_size(i)           (size_t)(1 ? (i) : -1)
+// Mostly library internal, but may be useful in user code:
+#define c_u2i_size(u)           (intptr_t)(1 ? (u) : (size_t)1) // warns if u is signed
+#define c_i2u_size(i)           (size_t)(1 ? (i) : -1)          // warns if i is unsigned
 #define c_uless(a, b)           ((size_t)(a) < (size_t)(b))
+#define c_safe_cast(T, From, x) ((T)(1 ? (x) : (From){0}))
 
 // x and y are i_keyraw* type, defaults to i_key*:
 #define c_memcmp_eq(x, y)       (memcmp(x, y, sizeof *(x)) == 0)
@@ -244,18 +250,17 @@ STC_INLINE intptr_t c_next_pow2(intptr_t n) {
 #define c_defer(...) \
     for (int _i = 1; _i; _i = 0, __VA_ARGS__)
 
-#define c_scoped(...) c_MACRO_OVERLOAD(c_scoped, __VA_ARGS__)
-#define c_scoped_2(declvar, drop) \
-    for (declvar, *_i, **_ip = &_i; _ip; _ip = 0, drop)
-#define c_scoped_3(declvar, pred, drop) \
-    for (declvar, *_i, **_ip = &_i; _ip && (pred); _ip = 0, drop)
-#define c_with c_scoped // [deprecated]
+#define c_with(...) c_MACRO_OVERLOAD(c_with, __VA_ARGS__)
+#define c_with_2(declvar, deinit) \
+    for (declvar, *_i, **_ip = &_i; _ip; _ip = 0, deinit)
+#define c_with_3(declvar, pred, deinit) \
+    for (declvar, *_i, **_ip = &_i; _ip && (pred); _ip = 0, deinit)
 
 #define c_scope(...) c_MACRO_OVERLOAD(c_scope, __VA_ARGS__)
-#define c_scope_2(init, drop) \
-    for (int _i = (init, 1); _i; _i = 0, drop)
-#define c_scope_3(init, pred, drop) \
-    for (int _i = (init, 1); _i && (pred); _i = 0, drop)
+#define c_scope_2(init, deinit) \
+    for (int _i = (init, 1); _i; _i = 0, deinit)
+#define c_scope_3(init, pred, deinit) \
+    for (int _i = (init, 1); _i && (pred); _i = 0, deinit)
 
 #define c_drop(C, ...) \
     do { c_foritems (_i, C*, {__VA_ARGS__}) C##_drop(*_i.ref); } while(0)

@@ -47,7 +47,7 @@ TEST(cspan, slice) {
 #include "stc/stack.h"
 
 TEST(cspan, slice2) {
-    c_scoped (Stack stack = {0}, Stack_drop(&stack))
+    c_with (Stack stack = {0}, Stack_drop(&stack))
     {
         c_forrange (i, 10 * 20 * 30)
             Stack_push(&stack, i);

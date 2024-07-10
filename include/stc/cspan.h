@@ -273,14 +273,14 @@ STC_INLINE intptr_t _cspan_size(const cextent_t shape[], int rank) {
 STC_INLINE void _cspan_swap_axes(cextent_t shape[], cstride_t stride[], int i, int j, int rank) {
     (void)rank;
     c_assert(c_uless(i, rank) & c_uless(j, rank));
-    c_swap(cextent_t, shape + i, shape + j);
-    c_swap(cstride_t, stride + i, stride + j);
+    c_swap(shape + i, shape + j);
+    c_swap(stride + i, stride + j);
 }
 
 STC_INLINE void _cspan_transpose(cextent_t shape[], cstride_t stride[], int rank) {
     for (int i = 0; i < --rank; ++i) {
-        c_swap(cextent_t, shape + i, shape + rank);
-        c_swap(cstride_t, stride + i, stride + rank);
+        c_swap(shape + i, shape + rank);
+        c_swap(stride + i, stride + rank);
     }
 }
 

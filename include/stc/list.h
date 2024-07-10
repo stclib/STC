@@ -33,7 +33,7 @@
 
     int main(void)
     {
-        c_scoped (list_ix list = {0}, list_ix_drop(&list))
+        c_with (list_ix list = {0}, list_ix_drop(&list))
         {
             int n;
             for (int i = 0; i < 1000000; ++i) // one million

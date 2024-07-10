@@ -13,31 +13,33 @@ struct GenValue {
 static long get_value(struct GenValue* g)
 {
     cco_scope(g) {
-        c_foreach_it(g->it, IVec, *g->v)
+        cco_foreach (g->it, IVec, *g->v)
             cco_yield_v(*g->it.ref);
     }
-    return 0;
+    return 1L<<31;
 }
 
 struct Generator {
     struct GenValue x, y;
     int cco_state;
+    bool xact, yact;
     long value;
 };
 
 int interleaved(struct Generator* g)
 {
     cco_scope(g) {
-        bool a, b;
         do {
             g->value = get_value(&g->x);
-            if ((a = !cco_done(&g->x)))
+            g->xact = cco_active(&g->x);
+            if (g->xact)
                 cco_yield;
 
             g->value = get_value(&g->y);
-            if ((b = !cco_done(&g->y)))
+            g->yact = cco_active(&g->y);
+            if (g->yact)
                 cco_yield;
-        } while (a | b);
+        } while (g->xact | g->yact);
     }
     return 0;
 }

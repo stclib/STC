@@ -409,8 +409,8 @@ _c_MEMB(_bucket_insert_)(const i_type* self, const _m_keyraw* rkeyptr) {
             if (meta[res.idx].dist == 0)
                 break;
             if (meta[res.idx].dist < scur.dist) {
-                c_swap(struct hmap_meta, &scur, &meta[res.idx]);
-                c_swap(_m_value, &dcur, &self->table[res.idx]);
+                c_swap(&scur, &meta[res.idx]);
+                c_swap(&dcur, &self->table[res.idx]);
             }
         }
         meta[res.idx] = scur;
@@ -469,7 +469,7 @@ _c_MEMB(_reserve)(i_type* self, const intptr_t _newcap) {
             _m_result _res = _c_MEMB(_bucket_insert_)(&map, &r);
             *_res.ref = *d; // move
         }
-        c_swap(i_type, self, &map);
+        c_swap(self, &map);
     }
     i_free(map.meta, (map.bucket_count + (int)(map.meta != NULL))*c_sizeof *map.meta);
     i_free(map.table, map.bucket_count*c_sizeof *map.table);

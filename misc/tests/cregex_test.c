@@ -46,7 +46,7 @@ TEST(cregex, compile_match_anchors)
 TEST(cregex, compile_match_quantifiers1)
 {
     const char* inp;
-    c_scoped (cregex re = {0}, cregex_drop(&re)) {
+    c_with (cregex re = {0}, cregex_drop(&re)) {
         re = cregex_from("ä+");
         EXPECT_EQ(re.error, 0);
 
@@ -66,7 +66,7 @@ TEST(cregex, compile_match_quantifiers1)
 TEST(cregex, compile_match_quantifiers2)
 {
     const char* inp;
-    c_scoped (cregex re = {0}, cregex_drop(&re)) {
+    c_with (cregex re = {0}, cregex_drop(&re)) {
         re = cregex_from("bä*");
         EXPECT_EQ(re.error, 0);
 
@@ -187,7 +187,7 @@ TEST(cregex, compile_match_cap)
 TEST(cregex, search_all)
 {
     const char* inp;
-    c_scoped (cregex re = {0}, cregex_drop(&re))
+    c_with (cregex re = {0}, cregex_drop(&re))
     {
         re = cregex_from("ab");
         csview m = {0};
@@ -208,7 +208,7 @@ TEST(cregex, search_all)
 
 TEST(cregex, captures_len)
 {
-    c_scoped (cregex re = {0}, cregex_drop(&re)) {
+    c_with (cregex re = {0}, cregex_drop(&re)) {
        re = cregex_from("(ab(cd))(ef)");
        EXPECT_EQ(cregex_captures(&re), 3);
     }
@@ -217,7 +217,7 @@ TEST(cregex, captures_len)
 TEST(cregex, captures_cap)
 {
     const char* inp;
-    c_scoped (cregex re = {0}, cregex_drop(&re)) {
+    c_with (cregex re = {0}, cregex_drop(&re)) {
         re = cregex_from("(ab)((cd)+)");
         EXPECT_EQ(cregex_captures(&re), 3);
 

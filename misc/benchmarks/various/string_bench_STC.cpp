@@ -38,8 +38,8 @@
 vec_cstr read_file(const char* name)
 {
     vec_cstr data = {0};
-    c_scoped (FILE* f = fopen(name, "r"), f != 0, fclose(f))
-    c_scoped (cstr line = {0}, cstr_drop(&line)) {
+    c_with (FILE* f = fopen(name, "r"), f != 0, fclose(f))
+    c_with (cstr line = {0}, cstr_drop(&line)) {
         while (cstr_getline(&line, f))
             vec_cstr_push(&data, cstr_clone(line));
     }
@@ -187,12 +187,12 @@ const size_t MAX_LOOP = 2000;
 
 int main(void)
 {
-    c_scoped (vec_cstr vec_cstring = {0}, vec_cstr_drop(&vec_cstring))
-    c_scoped (vec_sv vec_cstringview = {0}, vec_sv_drop(&vec_cstringview))
-    c_scoped (smap_cstr mapTrans = {0}, smap_cstr_drop(&mapTrans))
-    c_scoped (smap_ssv mapSview = {0}, smap_ssv_drop(&mapSview))
-    c_scoped (hmap_cstr unordmapTrans = {0}, hmap_cstr_drop(&unordmapTrans))
-    c_scoped (hmap_ssv unordmapSview = {0}, hmap_ssv_drop(&unordmapSview))
+    c_with (vec_cstr vec_cstring = {0}, vec_cstr_drop(&vec_cstring))
+    c_with (vec_sv vec_cstringview = {0}, vec_sv_drop(&vec_cstringview))
+    c_with (smap_cstr mapTrans = {0}, smap_cstr_drop(&mapTrans))
+    c_with (smap_ssv mapSview = {0}, smap_ssv_drop(&mapSview))
+    c_with (hmap_cstr unordmapTrans = {0}, hmap_cstr_drop(&unordmapTrans))
+    c_with (hmap_ssv unordmapSview = {0}, hmap_ssv_drop(&unordmapSview))
     {
         std::cout << "Short String Benchmark" << std::endl;
         std::cout << "======================" << std::endl;
