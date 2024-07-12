@@ -351,6 +351,7 @@ int main(int argc, char* argv[])
            "BMAP = https://www.boost.org (unordered_flat_map)\n"
 #endif
            "HMAP = https://github.com/stclib/STC (**)\n"
+           "VMAP = https://github.com/JacksonAllan/Verstable\n"
            //"PMAP = https://github.com/greg7mdp/parallel-hashmap\n"
            "FMAP = https://github.com/skarupke/flat_hash_map\n"
            "TMAP = https://github.com/Tessil/robin-map\n"

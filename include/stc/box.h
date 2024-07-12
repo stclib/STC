@@ -161,12 +161,12 @@ STC_INLINE void _c_MEMB(_assign)(i_type* self, i_type* moved) {
 #endif
 
 #if defined _i_has_eq
-    STC_INLINE bool _c_MEMB(_raw_eq)(const _m_raw* rawx, const _m_raw* rawy)
-        { return i_eq(rawx, rawy); }
+    STC_INLINE bool _c_MEMB(_raw_eq)(const _m_raw* rx, const _m_raw* ry)
+        { return i_eq(rx, ry); }
 
     STC_INLINE bool _c_MEMB(_eq)(const i_type* self, const i_type* other) {
-        _m_raw rx = i_keyto(self->get), ry = i_keyto(other->get);
-        return i_eq((&rx), (&ry));
+        _m_raw rawx = i_keyto(self->get), rawy = i_keyto(other->get);
+        return i_eq((&rawx), (&rawy));
     }
 #else
     STC_INLINE bool _c_MEMB(_eq)(const i_type* self, const i_type* other)
