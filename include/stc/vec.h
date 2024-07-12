@@ -272,12 +272,6 @@ _c_MEMB(_sort)(i_type* self) {
     qsort(self->data, (size_t)self->_len, sizeof(_m_value),
           (int(*)(const void*, const void*))_c_MEMB(_value_cmp));
 }
-
-STC_INLINE _m_value*
-_c_MEMB(_bsearch)(const i_type* self, _m_value key) {
-    return (_m_value*)bsearch(&key, self->data, (size_t)self->_len, sizeof(_m_value),
-                              (int(*)(const void*, const void*))_c_MEMB(_value_cmp));
-}
 #endif // _i_has_cmp
 
 /* -------------------------- IMPLEMENTATION ------------------------- */

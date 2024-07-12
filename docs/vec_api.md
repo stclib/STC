@@ -56,7 +56,6 @@ vec_X_value*        vec_X_get_mut(vec_X* self, i_keyraw raw);             // fin
 vec_X_iter          vec_X_find(const vec_X* self, i_keyraw raw);
 vec_X_iter          vec_X_find_in(vec_X_iter i1, vec_X_iter i2, i_keyraw raw); // return vec_X_end() if not found
 void                vec_X_sort(vec_X* self);                              // qsort() from stdlib.h
-vec_X_value*        vec_X_bsearch(const vec_X* self, i_key value);        // bsearch() wrapper.
 
 vec_X_value*        vec_X_front(const vec_X* self);
 vec_X_value*        vec_X_back(const vec_X* self);

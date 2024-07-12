@@ -150,13 +150,10 @@ STC_INLINE void _c_MEMB(_assign)(i_type* self, i_type* moved) {
         { return i_cmp(rx, ry); }
 
     STC_INLINE int _c_MEMB(_cmp)(const i_type* self, const i_type* other) {
-        _m_raw rx = i_keyto(self->get), ry = i_keyto(other->get);
-        return i_cmp((&rx), (&ry));
+        _m_raw rawx = i_keyto(self->get), rawy = i_keyto(other->get);
+        return i_cmp((&rawx), (&rawy));
     }
 #else
-    STC_INLINE int _c_MEMB(_raw_cmp)(const _m_raw* rx, const _m_raw* ry)
-        { return (rx > ry) - (rx < ry); }
-
     STC_INLINE int _c_MEMB(_cmp)(const i_type* self, const i_type* other) {
         const _m_value *x = self->get, *y = other->get;
         return (x > y) - (x < y);
@@ -164,17 +161,14 @@ STC_INLINE void _c_MEMB(_assign)(i_type* self, i_type* moved) {
 #endif
 
 #if defined _i_has_eq
-    STC_INLINE bool _c_MEMB(_raw_eq)(const _m_raw* rx, const _m_raw* ry)
-        { return i_eq(rx, ry); }
+    STC_INLINE bool _c_MEMB(_raw_eq)(const _m_raw* rawx, const _m_raw* rawy)
+        { return i_eq(rawx, rawy); }
 
     STC_INLINE bool _c_MEMB(_eq)(const i_type* self, const i_type* other) {
         _m_raw rx = i_keyto(self->get), ry = i_keyto(other->get);
         return i_eq((&rx), (&ry));
     }
 #else
-    STC_INLINE bool _c_MEMB(_raw_eq)(const _m_raw* rx, const _m_raw* ry)
-        { return rx == ry; }
-
     STC_INLINE bool _c_MEMB(_eq)(const i_type* self, const i_type* other)
         { return self->get == other->get; }
 #endif
@@ -184,13 +178,10 @@ STC_INLINE void _c_MEMB(_assign)(i_type* self, i_type* moved) {
         { return i_hash(rx); }
 
     STC_INLINE uint64_t _c_MEMB(_hash)(const i_type* self) {
-        _m_raw rx = i_keyto(self->get);
-        return i_hash((&rx));
+        _m_raw raw = i_keyto(self->get);
+        return i_hash((&raw));
     }
 #else
-    STC_INLINE uint64_t _c_MEMB(_raw_hash)(const _m_raw* rx)
-        { return c_default_hash(&rx); }
-
     STC_INLINE uint64_t _c_MEMB(_hash)(const i_type* self)
         { return c_default_hash(&self->get); }
 #endif // i_no_hash

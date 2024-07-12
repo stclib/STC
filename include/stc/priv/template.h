@@ -32,6 +32,7 @@
   #define c_no_hash       (1<<4)
   #define c_use_cmp       (1<<5)
   #define c_use_eq        (1<<6)
+  #define c_use_cmp_eq    (c_use_cmp | c_use_eq)
   #define c_more          (1<<7)
 
   #define _c_MEMB(name) c_JOIN(i_type, name)
