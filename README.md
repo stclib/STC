@@ -631,11 +631,9 @@ Define and use the "private" container in the c-file:
 Sometimes it is useful to extend a container type to store extra data, e.g. a comparison
 or allocator function pointer or a context which the function pointers can use. Most
 libraries solve this by adding an opaque pointer (void*) or function pointer(s) into
-the data structure for the user to manage. This solution has a few disadvantages: the
-pointers are not typesafe, and they take up space when not needed. STC solves this by letting
-the user create a container wrapper struct where both the container and extra data fields can
-be stored. The template parameters may then access the extra data using the "container_of"
-technique.
+the data structure for the user to manage. Because most containers are templated,
+an extra template parameter, `i_aux` may be defined to extend the container with 
+typesafe custom attributes.
 
 The example below shows how to customize containers to work with PostgreSQL memory management.
 It adds a MemoryContext to each container by defining the `i_aux` template parameter. 
@@ -648,6 +646,7 @@ allocated size of the given pointer, unlike standard `realloc` and `free`.
 - `i_hash`, `i_eq`: **hmap** and **hset**
 - `i_eq`: **vec**, **deq**, **list**
 - `i_less`: **pque**
+
 ```c
 // stcpgs.h
 #define pgs_malloc(sz) MemoryContextAlloc(self->aux.memctx, sz)
