@@ -560,10 +560,11 @@ _c_MEMB(_clone_r_)(i_type* self, _m_node* src, int32_t sn) {
 STC_DEF i_type
 _c_MEMB(_clone)(i_type tree) {
     i_type clone = _c_MEMB(_with_capacity)(tree.size);
-    int32_t root = _c_MEMB(_clone_r_)(&clone, tree.nodes, tree.root);
-    clone.root = root;
-    clone.size = tree.size;
-    return clone;
+    tree.root = _c_MEMB(_clone_r_)(&clone, tree.nodes, tree.root);
+    tree.nodes = clone.nodes;
+    tree.disp = clone.disp;
+    tree.cap = clone.cap;
+    return tree;
 }
 #endif // !i_no_clone
 

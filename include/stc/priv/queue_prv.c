@@ -104,14 +104,17 @@ _c_MEMB(_shrink_to_fit)(i_type *self) {
 
 #if !defined i_no_clone
 STC_DEF i_type
-_c_MEMB(_clone)(i_type cx) {
-    intptr_t sz = _c_MEMB(_size)(&cx), j = 0;
-    i_type out = _c_MEMB(_with_capacity)(sz);
-    if (out.cbuf)
-        c_foreach (i, i_type, cx)
-            out.cbuf[j++] = i_keyclone((*i.ref));
-    out.end = sz;
-    return out;
+_c_MEMB(_clone)(i_type q) {
+    intptr_t sz = _c_MEMB(_size)(&q), j = 0;
+    i_type tmp = _c_MEMB(_with_capacity)(sz);
+    if (tmp.cbuf)
+        c_foreach (i, i_type, q)
+            tmp.cbuf[j++] = i_keyclone((*i.ref));
+    q.cbuf = tmp.cbuf;
+    q.capmask = tmp.capmask;
+    q.start = 0;
+    q.end = sz;
+    return q;
 }
 #endif // i_no_clone
 

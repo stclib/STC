@@ -25,8 +25,8 @@
 #ifndef STC_PQUE_H_INCLUDED
 #define STC_PQUE_H_INCLUDED
 #include "common.h"
-#include <stdlib.h>
 #include "types.h"
+#include <stdlib.h>
 #endif // STC_PQUE_H_INCLUDED
 
 #ifndef _i_prefix
@@ -140,10 +140,12 @@ _c_MEMB(_make_heap)(i_type* self) {
 
 #if !defined i_no_clone
 STC_DEF i_type _c_MEMB(_clone)(i_type q) {
-    i_type out = _c_MEMB(_with_capacity)(q._len);
-    for (; out._len < out._cap; ++q.data)
-        out.data[out._len++] = i_keyclone((*q.data));
-    return out;
+    i_type tmp = _c_MEMB(_with_capacity)(q._len);
+    for (; tmp._len < q._len; ++q.data)
+        tmp.data[tmp._len++] = i_keyclone((*q.data));
+    q.data = tmp.data;
+    q._cap = tmp._cap;
+    return q;
 }
 #endif
 

@@ -346,10 +346,12 @@ _c_MEMB(_erase_n)(i_type* self, const intptr_t idx, const intptr_t len) {
 
 #if !defined i_no_clone
 STC_DEF i_type
-_c_MEMB(_clone)(i_type cx) {
-    i_type out = {0};
-    _c_MEMB(_copy_n)(&out, 0, cx.data, cx._len);
-    return out;
+_c_MEMB(_clone)(i_type vec) {
+    i_type tmp = {0};
+    _c_MEMB(_copy_n)(&tmp, 0, vec.data, vec._len);
+    vec.data = tmp.data;
+    vec._cap = tmp._cap;
+    return vec;
 }
 
 STC_DEF _m_iter

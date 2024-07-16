@@ -30,10 +30,9 @@ THE SOFTWARE.
  * This is a extended version of regexp9, supporting UTF8 input, common
  * shorthand character classes, ++.
  */
-#include <stdbool.h>
-#include <string.h>
-#include "types.h" // csview, cstr types
 #include "common.h"
+#include "types.h" // csview, cstr types
+#include <string.h>
 
 enum {
     CREG_DEFAULT = 0,

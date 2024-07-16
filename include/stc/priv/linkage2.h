@@ -26,6 +26,8 @@
 #undef i_calloc
 #undef i_realloc
 #undef i_free
+#undef i_aux
+#undef _i_aux_struct
 
 #undef i_static
 #undef i_header

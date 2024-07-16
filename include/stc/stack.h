@@ -25,8 +25,8 @@
 #ifndef STC_STACK_H_INCLUDED
 #define STC_STACK_H_INCLUDED
 #include "common.h"
-#include <stdlib.h>
 #include "types.h"
+#include <stdlib.h>
 #endif // STC_STACK_H_INCLUDED
 
 #ifndef _i_prefix
@@ -158,12 +158,14 @@ STC_INLINE _m_value* _c_MEMB(_emplace)(i_type* self, _m_raw raw)
 #endif // !i_no_emplace
 
 #if !defined i_no_clone
-STC_INLINE i_type _c_MEMB(_clone)(i_type v) {
-    i_type out = {(_m_value *)i_malloc(v._len*c_sizeof(_m_value)), v._len, v._len};
-    if (!out.data) out._cap = 0;
-    else for (intptr_t i = 0; i < v._len; ++v.data)
-        out.data[i++] = i_keyclone((*v.data));
-    return out;
+STC_INLINE i_type _c_MEMB(_clone)(i_type s) {
+    i_type tmp = {(_m_value *)i_malloc(s._len*c_sizeof(_m_value)), s._len, s._len};
+    if (!tmp.data) tmp._cap = 0;
+    else for (intptr_t i = 0; i < s._len; ++s.data)
+        tmp.data[i++] = i_keyclone((*s.data));
+    s.data = tmp.data;
+    s._cap = tmp._cap;
+    return s;
 }
 
 STC_INLINE void _c_MEMB(_copy)(i_type *self, const i_type* other) {

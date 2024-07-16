@@ -20,6 +20,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+#ifdef i_aux
+  #define _i_aux_struct struct { i_aux } aux;
+#else
+  #define _i_aux_struct
+#endif
+
 #ifndef STC_TYPES_H_INCLUDED
 #define STC_TYPES_H_INCLUDED
 
@@ -114,6 +121,7 @@ typedef union {
     typedef struct SELF { \
         SELF##_value *cbuf; \
         intptr_t start, end, capmask; \
+        _i_aux_struct \
     } SELF; \
 \
     typedef struct { \
@@ -133,6 +141,7 @@ typedef union {
 \
     typedef struct SELF { \
         SELF##_node *last; \
+        _i_aux_struct \
     } SELF
 
 #define _c_htable_types(SELF, KEY, VAL, MAP_ONLY, SET_ONLY) \
@@ -160,6 +169,7 @@ typedef union {
         SELF##_value* table; \
         struct hmap_meta* meta; \
         intptr_t size, bucket_count; \
+        _i_aux_struct \
     } SELF
 
 #define _c_aatree_types(SELF, KEY, VAL, MAP_ONLY, SET_ONLY) \
@@ -186,6 +196,7 @@ typedef union {
     typedef struct SELF { \
         SELF##_node *nodes; \
         int32_t root, disp, head, size, cap; \
+        _i_aux_struct \
     } SELF
 
 #define _c_stack_fixed(SELF, VAL, CAP) \
@@ -196,15 +207,15 @@ typedef union {
 #define _c_stack_types(SELF, VAL) \
     typedef VAL SELF##_value; \
     typedef struct { SELF##_value *ref, *end; } SELF##_iter; \
-    typedef struct SELF { SELF##_value* data; intptr_t _len, _cap; } SELF
+    typedef struct SELF { SELF##_value* data; intptr_t _len, _cap; _i_aux_struct } SELF
 
 #define _c_vec_types(SELF, VAL) \
     typedef VAL SELF##_value; \
     typedef struct { SELF##_value *ref, *end; } SELF##_iter; \
-    typedef struct SELF { SELF##_value *data; intptr_t _len, _cap; } SELF
+    typedef struct SELF { SELF##_value *data; intptr_t _len, _cap; _i_aux_struct } SELF
 
 #define _c_pque_types(SELF, VAL) \
     typedef VAL SELF##_value; \
-    typedef struct SELF { SELF##_value* data; intptr_t _len, _cap; } SELF
+    typedef struct SELF { SELF##_value* data; intptr_t _len, _cap; _i_aux_struct } SELF
 
 #endif // STC_TYPES_H_INCLUDED

@@ -52,6 +52,12 @@
   #define i_free c_JOIN(i_allocator, _free)
 #endif
 
+#ifdef i_aux
+  #define _i_aux_struct struct { i_aux } aux;
+#else
+  #define _i_aux_struct
+#endif
+
 #if defined __clang__ && !defined __cplusplus
   #pragma clang diagnostic push
   #pragma clang diagnostic warning "-Wall"

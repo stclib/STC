@@ -638,40 +638,44 @@ be stored. The template parameters may then access the extra data using the "con
 technique.
 
 The example below shows how to customize containers to work with PostgreSQL memory management.
-It adds a MemoryContext to each container by defining the `i_extend` template parameter followed
-the by inclusion of `"stc/extend.h"`. Note that `pgs_realloc` and `pgs_free` is also passed the
+It adds a MemoryContext to each container by defining the `i_aux` template parameter. 
+Note that `pgs_realloc` and `pgs_free` is also passed the
 allocated size of the given pointer, unlike standard `realloc` and `free`.
+
+`i_aux` is accessible for customizing the following containers using template parameters:
+- `i_malloc`, `i_calloc`, `i_realloc`, `i_free`: **all containers**
+- `i_cmp`: **smap** and **sset**
+- `i_hash`, `i_eq`: **hmap** and **hset**
+- `i_eq`: **vec**, **deq**, **list**
+- `i_less`: **pque**
 ```c
 // stcpgs.h
-#define pgs_malloc(sz) MemoryContextAlloc(c_extend()->memctx, sz)
-#define pgs_calloc(n, sz) MemoryContextAllocZero(c_extend()->memctx, (n)*(sz))
+#define pgs_malloc(sz) MemoryContextAlloc(self->aux.memctx, sz)
+#define pgs_calloc(n, sz) MemoryContextAllocZero(self->aux.memctx, (n)*(sz))
 #define pgs_realloc(p, old_sz, sz) (p ? repalloc(p, sz) : pgs_malloc(sz))
 #define pgs_free(p, sz) (p ? pfree(p) : (void)0) // pfree/repalloc does not accept NULL.
 
+#define i_aux MemoryContext memctx;
 #define i_allocator pgs
 #define i_no_clone
-#define i_extend MemoryContext memctx;
-#include "stc/extend.h"
 ```
-To use it, define both `i_type` and `i_container` (the container type) before including the custom header:
+Usage is straight forward:
 ```c
-#define i_type IMap
-#define i_key int
-#define i_val int
-#define i_container smap
+#define i_TYPE IMap,int,int
 #include "stcpgs.h"
+#include "stc/smap.h"
 
 // Note the wrapper struct type is IMap_ext. IMap is accessed by .get
 void maptest()
 {
-    IMap_ext map = {.memctx=CurrentMemoryContext};
+    IMap map = {.aux={CurrentMemoryContext}};
     c_forrange (i, 1, 16)
-        IMap_insert(&map.get, i*i, i);
+        IMap_insert(&map, i*i, i); // uses pgs_malloc
 
-    c_foreach (i, IMap, map.get)
+    c_foreach (i, IMap, map)
         printf("%d:%d ", i.ref->first, i.ref->second);
 
-    IMap_drop(&map.get);
+    IMap_drop(&map);
 }
 ```
 ---

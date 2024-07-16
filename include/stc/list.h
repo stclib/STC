@@ -222,11 +222,12 @@ STC_INLINE bool _c_MEMB(_eq)(const i_type* self, const i_type* other) {
 
 #if !defined i_no_clone
 STC_DEF i_type
-_c_MEMB(_clone)(i_type cx) {
-    i_type out = {0};
-    c_foreach (it, i_type, cx)
-        _c_MEMB(_push_back)(&out, i_keyclone((*it.ref)));
-    return out;
+_c_MEMB(_clone)(i_type lst) {
+    i_type tmp = {0};
+    c_foreach (it, i_type, lst)
+        _c_MEMB(_push_back)(&tmp, i_keyclone((*it.ref)));
+    lst.last = tmp.last;
+    return lst;
 }
 #endif
 
