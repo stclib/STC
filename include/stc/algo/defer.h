@@ -1,7 +1,7 @@
 /* MIT License
  *
  * Copyright (c) 2024 Tyge Løvset
- * Based on Pieter Stevens DEFER.h, 2024
+ * Based on ideas from Pieter Stevens' DEFER.h, 2024
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,7 @@
 //
 // c_return(X): Call to return from current function inside an outermost
 //   c_scope level. This calls all the defers added in opposite order of
-//   definition, after which it returns X.
+//   definition before it returns X.
 //
 //   NB! c_return will only work correctly at the outermost c_scope level.
 //   For nested c_scope levels, use 'continue;' to exit current c_scope. The

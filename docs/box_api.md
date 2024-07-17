@@ -77,12 +77,14 @@ bool        box_X_value_eq(const i_key* x, const i_key* y);
 Create a vec and a set with owned pointers to int elements, using box.
 ```c
 #include <stdio.h>
+#include "stc/algo/defer.h"
+
 void int_drop(int* x) {
     printf("\n drop %d", *x);
 }
 
 #define i_TYPE IBox,int
-#define i_keydrop int_drop  // optional func, just to display elements destroyed
+#define i_keydrop int_drop  // just to display elements destroyed
 #define i_keyclone(x) x     // must be specified when i_keydrop is defined.
 #define i_use_cmp           // enable usage of default comparison == and < operators
 #include "stc/box.h"
@@ -99,31 +101,30 @@ int main(void)
 {
     IVec vec = c_init(IVec, {2021, 2012, 2022, 2015});
     ISet set = {0};
-    c_defer(
-      IVec_drop(&vec),
-      ISet_drop(&set)
-    ){
-        printf("vec:");
-        c_foreach (i, IVec, vec)
-            printf(" %d", *i.ref->get);
 
-        // add odd numbers from vec to set
-        c_foreach (i, IVec, vec)
-            if (*i.ref->get & 1)
-                ISet_insert(&set, IBox_clone(*i.ref));
+    printf("vec:");
+    c_foreach (i, IVec, vec)
+        printf(" %d", *i.ref->get);
 
-        // pop the two last elements in vec
-        IVec_pop(&vec);
-        IVec_pop(&vec);
+    // add odd numbers from vec to set
+    c_foreach (i, IVec, vec)
+        if (*i.ref->get & 1)
+            ISet_insert(&set, IBox_clone(*i.ref));
 
-        printf("\nvec:");
-        c_foreach (i, IVec, vec)
-            printf(" %d", *i.ref->get);
+    // pop the two last elements in vec
+    IVec_pop(&vec);
+    IVec_pop(&vec);
 
-        printf("\nset:");
-        c_foreach (i, ISet, set)
-            printf(" %d", *i.ref->get);
-    }
+    printf("\nvec:");
+    c_foreach (i, IVec, vec)
+        printf(" %d", *i.ref->get);
+
+    printf("\nset:");
+    c_foreach (i, ISet, set)
+        printf(" %d", *i.ref->get);
+
+    IVec_drop(&vec),
+    ISet_drop(&set)
 }
 ```
 Output:

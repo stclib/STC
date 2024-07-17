@@ -103,7 +103,7 @@ TEST(cregex, compile_match_class_simple)
         cregex re1 = cregex_from("\\s");
         cregex re2 = cregex_from("\\w");
         cregex re3 = cregex_from("\\D");
-        c_defer ({ c_drop(cregex, &re1, &re2, &re3); });
+        c_defer({ c_drop(cregex, &re1, &re2, &re3); });
 
         EXPECT_EQ(re1.error, 0);
         EXPECT_EQ(re2.error, 0);
@@ -127,7 +127,7 @@ TEST(cregex, compile_match_or)
 {
     c_scope {
         cregex re, re2;
-        c_defer ({ c_drop(cregex, &re, &re2); });
+        c_defer({ c_drop(cregex, &re, &re2); });
         
         re = cregex_from("as|df");
         EXPECT_EQ(re.error, 0);
