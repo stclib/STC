@@ -272,6 +272,7 @@ This example uses four different container types:
 [ [Run this code](https://godbolt.org/z/oEhMbGn6E) ]
 ```c
 #include <stdio.h>
+#include "stc/algo/defer.h"
 
 #define i_key int
 #include "stc/hset.h"   // hset_int: unordered/hash set (assume i_key is basic type, uses `==` operator)
@@ -291,18 +292,19 @@ struct Point { float x, y; };
 
 int main(void)
 {
-    // Define four empty containers
-    hset_int set = {0};
-    vec_pnt vec = {0};
-    list_int lst = {0};
-    smap_int map = {0};
+    c_scope {
+        // Define four empty containers
+        hset_int set = {0};
+        vec_pnt vec = {0};
+        list_int lst = {0};
+        smap_int map = {0};
+        c_defer({ // Drop the containers at scope exit
+            hset_int_drop(&set);
+            vec_pnt_drop(&vec);
+            list_int_drop(&lst);
+            smap_int_drop(&map);
+        });
 
-    c_defer( // Drop the containers at scope exit
-        hset_int_drop(&set),
-        vec_pnt_drop(&vec),
-        list_int_drop(&lst),
-        smap_int_drop(&map)
-    ){
         enum{N = 5};
         int nums[N] = {10, 20, 30, 40, 50};
         struct Point pts[N] = { {10, 1}, {20, 2}, {30, 3}, {40, 4}, {50, 5} };

@@ -414,33 +414,76 @@ void        c_default_drop(Type* p);                    // does nothing
 ---
 ## RAII scope macros
 General ***defer*** mechanics for resource acquisition. These macros allows you to specify the
-freeing of the resources at the point where the acquisition takes place.
-The **checkscoped** utility described below, ensures that the `c_scope*` and `c_defer` macros are used correctly.
+freeing of the resources nearby the point where the acquisition takes place.
 
-| Usage                                   | Description                                               |
-|:----------------------------------------|:----------------------------------------------------------|
-| `c_defer (deinit...) {}`                | Defer `deinit...` to end of scope                         |
-| `c_scope (init, deinit) {}`             | Execute `init` and defer executing `deinit` to end of scope |
-| `c_scope (init, pred, deinit) {}`       | Adds a predicate in order to exit early if init failed    |
-| `c_with (Type var=init, deinit) {}`       | Declare and initialize `var`. Defer executing `deinit` to end of scope  |
-| `c_with (Type var=init, pred, deinit) {}` | Adds a predicate in order to exit early if init failed  |
-| `continue`                              | Exit a defer-/with-/scope-block without resource leakage  |
+| Usage                | Description                                               |
+|:---------------------|:----------------------------------------------------------|
+| `c_scope { ... }`    | Create a defer scope.                                     |
+| `c_defer({ ... });`  | Add code ... to be deferred to end of scope, or before a `c_return`|
+| `c_return(x)`        | Call to return from current function inside an outermost `c_scope` level. |
+| | It calls all the defers in opposite order of definition, before it returns X   |
+
+NB! `c_return` will only work correctly at the outermost `c_scope` level.
+For nested c_scope levels, use **continue;** to exit current `c_scope`. The
+added defers will be called before it breaks out of the scope.
 
 ```c
-// `c_defer` executes the expression(s) when leaving scope.
-cstr s1 = cstr_lit("Hello"), s2 = cstr_lit("world");
-c_defer (cstr_drop(&s1), cstr_drop(&s2))
-{
+c_scope {
+    cstr s1 = cstr_lit("Hello"), s2 = cstr_lit("world");
+    c_defer({ c_drop(cstr, &s1, &s2); });
+
     printf("%s %s\n", cstr_str(&s1), cstr_str(&s2));
 }
 
-// `c_scope` initialize an already declared object or objects, and deinitializes at end of scope:
+// Lock/unlock mutexes:
 static pthread_mutex_t mut;
-c_scope (pthread_mutex_lock(&mut), pthread_mutex_unlock(&mut))
-{
+...
+c_scope {
+    pthread_mutex_lock(&mut);
+    c_defer({ pthread_mutex_unlock(&mut); });
     /* Do syncronized work. */
 }
+```
 
+**Example 1**: Use **c_scope** when there are resource dependencies:
+```c
+int read(void) {
+    c_scope {
+        FILE *f = fopen("example.txt", "r");
+        if (NULL == f)
+            c_return (-1);
+
+        c_defer({ fclose(f); });
+
+        int size;
+        if (1 != fscanf(f, "%i", &size))
+            c_return (-2);
+
+        int *nums = malloc(size * sizeof(int));
+        if (NULL == nums)
+            c_return (-3);
+
+        c_defer({ free(nums); });
+
+        for (int i = 0; i < size; ++i) {
+            int num;
+            if (1 != fscanf(f, "%i", &num))
+                c_return (-4);
+            nums[i] = num;
+        }
+    }
+    return 0;
+}
+```
+
+There is also a simpler `c_with` macro with similar functionality, but it does not support `c_defer/c_return`:
+| Usage                                   | Description                                               |
+|:----------------------------------------|:----------------------------------------------------------|
+| `c_with (Type var=init, deinit) {}`     | Declare and initialize `var`. Defer executing `deinit` to end of scope |
+| `c_with (Type var=init, pred, deinit) {}` | Adds a predicate in order to exit early if init failed  |
+| `continue`                              | Break out of a `c_with / c_scope` block without resource leakage  |
+
+```c
 // `c_with`: declare and init a new scoped variable and specify the deinitialize call.
 c_with (cstr str = cstr_lit("Hello"), cstr_drop(&str))
 {
@@ -448,19 +491,7 @@ c_with (cstr str = cstr_lit("Hello"), cstr_drop(&str))
     printf("%s\n", cstr_str(&str));
 }
 ```
-**Example 1**: Use multiple **c_with** in sequence:
-```c
-bool ok = false;
-c_with (uint8_t* buf = malloc(BUF_SIZE), buf != NULL, free(buf))
-c_with (FILE* fp = fopen(fname, "rb"), fp != NULL, fclose(fp))
-{
-    int n = fread(buf, 1, BUF_SIZE, fp);
-    if (n <= 0) continue; // NB! do not return here.
-    ...
-    ok = true;
-}
-return ok;
-```
+
 **Example 2**: Load each line of a text file into a vector of strings:
 ```c
 #include <errno.h>
@@ -486,54 +517,5 @@ int main(void)
     c_with (vec_cstr vec = readFile(__FILE__), vec_cstr_drop(&vec))
         c_foreach (i, vec_cstr, vec)
             printf("| %s\n", cstr_str(i.ref));
-}
-```
-
-### The **checkscoped** utility program (for RAII)
-The **checkscoped** program will check the source code for any misuses of the `c_scope*` macros which
-may lead to resource leakages. The `c_scope*`- macros are implemented as one-time executed **for-loops**,
-so any `return` or `break` appearing within such a block will lead to resource leaks, as it will disable
-the cleanup/drop method to be called. A `break` may originally be intended to break a loop or switch
-outside the `c_with` scope.
-
-NOTE: One must always make sure to unwind temporary allocated resources before a `return` in C. However, by using `c_scope*`-macros,
-- it is much easier to automatically detect misplaced return/break between resource acquisition and destruction.
-- it prevents forgetting to call the destructor at the end.
-
-The **checkscoped** utility will report any misusages. The following example shows how to correctly break/return
-from a `c_scope`:
-```c
-int flag = 0;
-for (int i = 0; i<n; ++i) {
-    c_with (cstr text = {0}, cstr_drop(&text))
-    c_with (List list = {0}, List_drop(&list))
-    {
-        for (int j = 0; j<m; ++j) {
-            List_push_back(&list, i*j);
-            if (cond1())
-                break;  // OK: breaks current for-loop only
-        }
-        // WRONG:
-        if (cond2())
-            break;      // checkscoped ERROR! break inside c_with.
-
-        if (cond3())
-            return -1;  // checkscoped ERROR! return inside c_with
-
-        // CORRECT:
-        if (cond2()) {
-            flag = 1;   // flag to break outer for-loop
-            continue;   // cleanup and leave c_with block
-        }
-        if (cond3()) {
-            flag = -1;  // return -1
-            continue;   // cleanup and leave c_with block
-        }
-        ...
-    }
-    // do the return/break outside of c_with
-    if (flag < 0) return flag;
-    else if (flag > 0) break;
-    ...
 }
 ```
