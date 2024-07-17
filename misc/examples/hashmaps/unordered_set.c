@@ -4,14 +4,15 @@
 #include "stc/cstr.h"
 #define i_key_cstr
 #include "stc/hset.h"
+#include "stc/algo/defer.h"
 
 int main(void)
 {
     // declaring set for storing string data-type
-    hset_cstr stringSet = {0};
-    c_defer(
-        hset_cstr_drop(&stringSet)
-    ){
+    c_scope {
+        hset_cstr stringSet = {0};
+        c_defer({ hset_cstr_drop(&stringSet); });
+
         // inserting various string, same string will be stored
         // once in set
         hset_cstr_emplace(&stringSet, "code");

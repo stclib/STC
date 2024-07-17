@@ -1,7 +1,7 @@
 #define i_import
 #include "stc/cregex.h"
 #include "stc/csview.h"
-#include "stc/algo/utility.h"
+#include "stc/algorithm.h"
 #include "ctest.h"
 
 #define M_START(m) ((m).buf - inp)
@@ -99,11 +99,12 @@ TEST(cregex, compile_match_escaped_chars)
 
 TEST(cregex, compile_match_class_simple)
 {
-    cregex re1 = cregex_from("\\s");
-    cregex re2 = cregex_from("\\w");
-    cregex re3 = cregex_from("\\D");
-    c_defer (cregex_drop(&re1), cregex_drop(&re2), cregex_drop(&re3))
-    {
+    c_scope {
+        cregex re1 = cregex_from("\\s");
+        cregex re2 = cregex_from("\\w");
+        cregex re3 = cregex_from("\\D");
+        c_defer ({ c_drop(cregex, &re1, &re2, &re3); });
+
         EXPECT_EQ(re1.error, 0);
         EXPECT_EQ(re2.error, 0);
         EXPECT_EQ(re3.error, 0);
@@ -124,9 +125,10 @@ TEST(cregex, compile_match_class_simple)
 
 TEST(cregex, compile_match_or)
 {
-    cregex re, re2;
-    c_defer (cregex_drop(&re), cregex_drop(&re2))
-    {
+    c_scope {
+        cregex re, re2;
+        c_defer ({ c_drop(cregex, &re, &re2); });
+        
         re = cregex_from("as|df");
         EXPECT_EQ(re.error, 0);
 
@@ -250,12 +252,13 @@ TEST(cregex, replace)
 {
     const char* pattern = "\\b(\\d\\d\\d\\d)-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])\\b";
     const char* input = "start date: 2015-12-31, end date: 2022-02-28";
-    cstr str = {0};
-    cregex re = {0};
-    c_defer(
-        cstr_drop(&str),
-        cregex_drop(&re)
-    ){
+    c_scope {
+        cstr str = {0};
+        cregex re = {0};
+        c_defer({
+            cstr_drop(&str);
+            cregex_drop(&re);
+        });
         // replace with a fixed string, extended all-in-one call:
         cstr_take(&str, cregex_replace_pattern(pattern, input, "YYYY-MM-DD"));
         EXPECT_STREQ(cstr_str(&str), "start date: YYYY-MM-DD, end date: YYYY-MM-DD");

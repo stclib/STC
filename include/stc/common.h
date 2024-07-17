@@ -88,8 +88,9 @@
 #endif
 #define c_container_of(p, C, m) ((C*)((char*)(1 ? (p) : &((C*)0)->m) - offsetof(C, m)))
 #define c_const_cast(Tp, p)     ((Tp)(1 ? (p) : (Tp)0))
-#define c_swap(xp, yp)          do { char _tv[sizeof *(xp)]; \
-                                    void *_xp = xp, *_yp = (yp) + (1 ? 0 : sizeof((xp) == (yp))); \
+#define c_swap(xp, yp)          do { (void) sizeof((xp) == (yp)); \
+                                    char _tv[sizeof *(xp)]; \
+                                    void *_xp = xp, *_yp = yp; \
                                     memcpy(_tv, _xp, sizeof *(xp)); \
                                     memcpy(_xp, _yp, sizeof *(xp)); \
                                     memcpy(_yp, _tv, sizeof *(xp)); \
@@ -247,20 +248,11 @@ STC_INLINE intptr_t c_next_pow2(intptr_t n) {
 #endif
 #define c_forlist(...) c_foritems(__VA_ARGS__) // [deprecated]
 
-#define c_defer(...) \
-    for (int _i = 1; _i; _i = 0, __VA_ARGS__)
-
 #define c_with(...) c_MACRO_OVERLOAD(c_with, __VA_ARGS__)
 #define c_with_2(declvar, deinit) \
     for (declvar, *_i, **_ip = &_i; _ip; _ip = 0, deinit)
 #define c_with_3(declvar, pred, deinit) \
     for (declvar, *_i, **_ip = &_i; _ip && (pred); _ip = 0, deinit)
-
-#define c_scope(...) c_MACRO_OVERLOAD(c_scope, __VA_ARGS__)
-#define c_scope_2(init, deinit) \
-    for (int _i = (init, 1); _i; _i = 0, deinit)
-#define c_scope_3(init, pred, deinit) \
-    for (int _i = (init, 1); _i && (pred); _i = 0, deinit)
 
 #define c_drop(C, ...) \
     do { c_foritems (_i, C*, {__VA_ARGS__}) C##_drop(*_i.ref); } while(0)

@@ -618,12 +618,11 @@ Define and use the "private" container in the c-file:
 ```c
 // Dataset.c
 #include "Dataset.h"
-#include "Point.h"                        // Point must be defined here.
+#include "Point.h"          // struct Point must be defined here.
 
-#define i_is_forward                      // flag that the container was forward declared.
-#define i_type PointVec
-#define i_val struct Point
-#include "stc/vec.h"                     // Implements PointVec with static linking by default
+#define i_TYPE PointVec, struct Point
+#define i_is_forward        // flag that the container was forward declared.
+#include "stc/vec.h"        // Implements PointVec with static linking by default
 ...
 ```
 ---
@@ -664,7 +663,6 @@ Usage is straight forward:
 #include "stcpgs.h"
 #include "stc/smap.h"
 
-// Note the wrapper struct type is IMap_ext. IMap is accessed by .get
 void maptest()
 {
     IMap map = {.aux={CurrentMemoryContext}};

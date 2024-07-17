@@ -71,19 +71,22 @@ point_key_cmp(const point* a, const point* b)
 #define i_cmp point_key_cmp
 #include "stc/smap.h"
 
+#include "stc/algo/defer.h"
+
 deq_point
 astar(cstr* maze, int width)
 {
     deq_point ret_path = {0};
-
-    pque_point front = {0};
-    smap_pstep from = {0};
-    smap_pcost costs = {0};
-    c_defer(
-        pque_point_drop(&front),
-        smap_pstep_drop(&from),
-        smap_pcost_drop(&costs)
-    ){
+    
+    c_scope {
+        pque_point front = {0};
+        smap_pstep from = {0};
+        smap_pcost costs = {0};
+        c_defer({
+            pque_point_drop(&front);
+            smap_pstep_drop(&from);
+            smap_pcost_drop(&costs);
+        });
         point start = point_from(maze, "@", width);
         point goal = point_from(maze, "!", width);
         smap_pcost_insert(&costs, start, 0);

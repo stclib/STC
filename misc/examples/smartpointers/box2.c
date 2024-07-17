@@ -1,5 +1,6 @@
 // example: https://doc.rust-lang.org/rust-by-example/std/box.html
 #include <stdio.h>
+#include "stc/algo/defer.h"
 
 typedef struct {
     double x;
@@ -42,22 +43,23 @@ int main(void) {
         .bottom_right = { .x=3.0, .y=-4.0 }
     };
 
-    // Heap allocated rectangle
-    BoxRect boxed_rectangle = BoxRect_from(c_LITERAL(Rectangle){
-        .top_left = origin(),
-        .bottom_right = { .x=3.0, .y=-4.0 }
-    });
-    // The output of functions can be boxed
-    BoxPoint boxed_point = BoxPoint_from(origin());
+    c_scope {
+        // Heap allocated rectangle
+        BoxRect boxed_rectangle = BoxRect_from(c_LITERAL(Rectangle){
+            .top_left = origin(),
+            .bottom_right = { .x=3.0, .y=-4.0 }
+        });
+        // The output of functions can be boxed
+        BoxPoint boxed_point = BoxPoint_from(origin());
 
-    // Create BoxBoxPoint from either a Point or a BoxPoint:
-    BoxBoxPoint box_in_a_box = BoxBoxPoint_from(origin());
+        // Create BoxBoxPoint from either a Point or a BoxPoint:
+        BoxBoxPoint box_in_a_box = BoxBoxPoint_from(origin());
 
-    c_defer(
-        BoxBoxPoint_drop(&box_in_a_box),
-        BoxPoint_drop(&boxed_point),
-        BoxRect_drop(&boxed_rectangle)
-    ){
+        c_defer({
+            BoxBoxPoint_drop(&box_in_a_box);
+            BoxPoint_drop(&boxed_point);
+            BoxRect_drop(&boxed_rectangle);
+        });
         printf("box_in_a_box: x = %g\n", BoxBoxPoint_toraw(&box_in_a_box).x);
 
         printf("Point occupies %d bytes on the stack\n",

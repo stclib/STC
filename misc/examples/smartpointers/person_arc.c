@@ -1,6 +1,7 @@
 /* box: heap allocated boxed type */
 #define i_implement
 #include "stc/cstr.h"
+#include "stc/algo/defer.h"
 
 typedef struct { cstr name, last; } Person;
 
@@ -40,17 +41,19 @@ void Person_drop(Person* p) {
 #include "stc/vec.h"
 
 
+
 int main(void)
 {
-    PSPtr p = PSPtr_from(Person_make("Laura", "Palmer"));
-    PSPtr q = PSPtr_from(Person_clone(*p.get)); // deep copy
-    Persons vec = {0};
+    c_scope {
+        PSPtr p = PSPtr_from(Person_make("Laura", "Palmer"));
+        PSPtr q = PSPtr_from(Person_clone(*p.get)); // deep copy
+        Persons vec = {0};
+        c_defer({
+            PSPtr_drop(&p);
+            PSPtr_drop(&q);
+            Persons_drop(&vec);
+        });
 
-    c_defer(
-        PSPtr_drop(&p),
-        PSPtr_drop(&q),
-        Persons_drop(&vec)
-    ){
         cstr_assign(&q.get->name, "Leland");
 
         printf("orig: %s %s\n", cstr_str(&p.get->name), cstr_str(&p.get->last));

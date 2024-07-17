@@ -4,16 +4,17 @@
 #define i_key int
 #define i_val int
 #include "stc/smap.h"
+#include "stc/algo/defer.h"
 
 int main(void)
 {
-
-    // empty map containers
-    smap_int gquiz1 = {0}, gquiz2 = {0};
-    c_defer(
-        smap_int_drop(&gquiz1),
-        smap_int_drop(&gquiz2)
-    ){
+    c_scope {
+        // empty map containers
+        smap_int gquiz1 = {0}, gquiz2 = {0};
+        c_defer({
+            smap_int_drop(&gquiz1);
+            smap_int_drop(&gquiz2);
+        });
         // insert elements in random order
         smap_int_insert(&gquiz1, 2, 30);
         smap_int_insert(&gquiz1, 4, 20);
