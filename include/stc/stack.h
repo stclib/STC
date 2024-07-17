@@ -223,5 +223,5 @@ _c_MEMB(_eq)(const i_type* self, const i_type* other) {
     return true;
 }
 #endif
-#include "priv/template2.h"
 #include "priv/linkage2.h"
+#include "priv/template2.h"

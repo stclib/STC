@@ -605,5 +605,5 @@ _c_MEMB(_drop)(const i_type* cself) {
 #undef _i_keyref
 #undef _i_MAP_ONLY
 #undef _i_SET_ONLY
-#include "priv/template2.h"
 #include "priv/linkage2.h"
+#include "priv/template2.h"

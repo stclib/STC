@@ -397,5 +397,5 @@ STC_DEF int _c_MEMB(_value_cmp)(const _m_value* x, const _m_value* y) {
 }
 #endif // _i_has_cmp
 #endif // i_implement
-#include "priv/template2.h"
 #include "priv/linkage2.h"
+#include "priv/template2.h"

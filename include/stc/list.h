@@ -409,5 +409,5 @@ STC_DEF bool _c_MEMB(_sort_with)(i_type* self, int(*cmp)(const _m_value*, const 
 }
 #endif // _i_has_cmp
 #endif // i_implement
-#include "priv/template2.h"
 #include "priv/linkage2.h"
+#include "priv/template2.h"

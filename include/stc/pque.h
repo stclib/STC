@@ -171,5 +171,5 @@ _c_MEMB(_push)(i_type* self, _m_value value) {
 
 #endif
 #undef _i_ispque
-#include "priv/template2.h"
 #include "priv/linkage2.h"
+#include "priv/template2.h"

@@ -213,5 +213,5 @@ STC_INLINE void _c_MEMB(_assign)(i_type* self, i_type arc) {
 #undef _i_atomic_inc
 #undef _i_atomic_dec_and_test
 #undef _i_is_arc
-#include "priv/template2.h"
 #include "priv/linkage2.h"
+#include "priv/template2.h"

@@ -21,18 +21,20 @@
  * SOFTWARE.
  */
 
-#undef i_allocator
-#undef i_malloc
-#undef i_calloc
-#undef i_realloc
-#undef i_free
-#undef i_aux
-#undef _i_aux_struct
+#ifndef i_more
+  #undef i_allocator
+  #undef i_malloc
+  #undef i_calloc
+  #undef i_realloc
+  #undef i_free
+  #undef i_aux
+  #undef _i_aux_struct
 
-#undef i_static
-#undef i_header
-#undef i_implement
-#undef i_import
+  #undef i_static
+  #undef i_header
+  #undef i_implement
+  #undef i_import
+#endif
 
 #if defined __clang__ && !defined __cplusplus
   #pragma clang diagnostic pop
