@@ -331,7 +331,7 @@ int main(void) {
 }
 ```
 Also sorting deq/queue (with ring buffer) is possible, and very fast. Note that `i_more`
-must be defined to extend the life of specified template parameters for use by quicksort:
+must be defined to retain the template parameters after #include deq.h for use by quicksort:
 ```c
 #define i_TYPE MyDeq,int
 #define i_more
@@ -340,11 +340,16 @@ must be defined to extend the life of specified template parameters for use by q
 #include <stdio.h>
 
 int main(void) {
-    MyDeq deq = c_init(MyDeq, {5, 3, 5, 9, 7, 4, 7}); // pushed back
-    c_foritems (i, int, {2, 4, 9, 3, 1, 2, 6, 4}) MyDeq_push_front(&deq, *i.ref);
-    MyDeq_quicksort(&deq);
-    c_foreach (i, MyDeq, deq) printf(" %d", *i.ref);
-    MyDeq_drop(&deq);
+    c_with (MyDeq deq, MyDeq_drop(&deq)) {
+        deq = c_init(MyDeq, {5, 3, 5, 9, 7, 4, 7}); // pushed back
+        c_foritems (i, int, {2, 4, 9, 3, 1, 2, 6, 4})
+            MyDeq_push_front(&deq, *i.ref);
+        
+        MyDeq_quicksort(&deq);
+        
+        c_foreach (i, MyDeq, deq)
+            printf(" %d", *i.ref);
+    }
 }
 ```
 
@@ -412,7 +417,7 @@ Type        c_default_toraw(const Type* p);             // return *p
 void        c_default_drop(Type* p);                    // does nothing
 ```
 ---
-## RAII scope macros
+## DEFER scope macros
 General ***defer*** mechanics for resource acquisition. These macros allows you to specify the
 freeing of the resources nearby the point where the acquisition takes place.
 
@@ -420,7 +425,7 @@ freeing of the resources nearby the point where the acquisition takes place.
 |:---------------------|:----------------------------------------------------------|
 | `c_scope { ... }`    | Create a defer scope.                                     |
 | `c_defer({ ... });`  | Add code ... to be deferred to end of scope, or before a `c_return`|
-| `c_return(x)`        | Call to return from current function inside an outermost `c_scope` level. |
+| `c_return x`         | Call to return from current function inside an outermost `c_scope` level. |
 | | It calls all the defers in opposite order of definition, before it returns X   |
 
 NB! `c_return` will only work correctly at the outermost `c_scope` level.
@@ -447,30 +452,31 @@ c_scope {
 
 **Example 1**: Use **c_scope** when there are resource dependencies:
 ```c
-int read(void) {
+int read_nums(void) {
     c_scope {
-        FILE *f = fopen("example.txt", "r");
+        FILE *f = fopen("nums.txt", "r");
         if (NULL == f)
-            c_return (-1);
+            c_return -1;
 
         c_defer({ fclose(f); });
 
         int size;
         if (1 != fscanf(f, "%i", &size))
-            c_return (-2);
+            c_return -2;
 
         int *nums = malloc(size * sizeof(int));
         if (NULL == nums)
-            c_return (-3);
+            c_return -3;
 
         c_defer({ free(nums); });
 
         for (int i = 0; i < size; ++i) {
             int num;
             if (1 != fscanf(f, "%i", &num))
-                c_return (-4);
+                c_return -4;
             nums[i] = num;
         }
+        // ... use nums array here
     }
     return 0;
 }
