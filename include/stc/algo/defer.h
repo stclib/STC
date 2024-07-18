@@ -24,7 +24,8 @@
 #ifndef STC_DEFER_H_INCLUDED
 #define STC_DEFER_H_INCLUDED
 
-// c_scope { ... }: Create a defer scope.
+// c_scope { ... }: Create a defer scope that allow up to 32 defer statements.
+// c_scope_max(N) { ... }: Create a defer scope that allow max N defer statements.
 //
 // c_defer({ ... }): Adds ... code that be deferred in the current c_scope.
 //
@@ -36,12 +37,9 @@
 //   For nested c_scope levels, use 'continue;' to exit current c_scope. The
 //   added defers will be called before it breaks out of the scope.
 
-#ifndef DEFER_MAX_STATEMENTS
-  #define DEFER_MAX_STATEMENTS 32
-#endif
-
-#define c_scope \
-    for (struct { int top, jmp[DEFER_MAX_STATEMENTS + 1]; } _defer = {.top=1, .jmp={-1}}; _defer.top >= 0; ) \
+#define c_scope c_scope_max(32)
+#define c_scope_max(N) \
+    for (struct { int top, jmp[N + 1]; } _defer = {.top=1, .jmp={-1}}; _defer.top >= 0; ) \
         _resume: switch (_defer.jmp[_defer.top--]) case 0:
 
 #define c_defer(...) do { \
