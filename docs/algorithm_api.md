@@ -421,16 +421,14 @@ void        c_default_drop(Type* p);                    // does nothing
 General ***defer*** mechanics for resource acquisition. These macros allows you to specify the
 freeing of the resources nearby the point where the acquisition takes place.
 
-| Usage                | Description                                               |
-|:---------------------|:----------------------------------------------------------|
-| `c_scope { ... }`    | Create a defer scope.                                     |
-| `c_defer({ ... });`  | Add code ... to be deferred to end of scope, or before a `c_return`|
-| `c_return x`         | Call to return from current function inside an outermost `c_scope` level. |
-| | It calls all the defers in opposite order of definition, before it returns X   |
+| Usage               | Description                                               |
+|:--------------------|:----------------------------------------------------------|
+| `c_scope { ... }`   | Create a defer scope.                                     |
+| `c_defer({ ... });` | Add code ... to be deferred to end of scope, or before a `c_return`|
+| `c_return x`        | Call to return from current function inside an outermost `c_scope` level. |
+| `continue`          | If at the c_scope level, it exits scope after defer statements are executed. |
 
-NB! `c_return` will only work correctly at the outermost `c_scope` level.
-For nested c_scope levels, use **continue;** to exit current `c_scope`. The
-added defers will be called before it breaks out of the scope.
+**Note**: `c_scope` will only compile with a single `c_scope`, as nested levels can not be supported.
 
 ```c
 c_scope {
@@ -446,6 +444,7 @@ static pthread_mutex_t mut;
 c_scope {
     pthread_mutex_lock(&mut);
     c_defer({ pthread_mutex_unlock(&mut); });
+
     /* Do syncronized work. */
 }
 ```

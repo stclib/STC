@@ -29,31 +29,32 @@
 //
 // c_defer({ ... }): Adds ... code that be deferred in the current c_scope.
 //
-// c_return x: Call to return from current function inside an outermost
-//   c_scope level. This calls all the defers added in opposite order of
-//   definition before it returns x.
+// c_return x: Call to return from current function. This calls all the defers
+//     added in opposite order of definition before it returns x.
 //
-//   NB! c_return will only work correctly at the outermost c_scope level.
-//   For nested c_scope levels, use 'continue;' to exit current c_scope. The
-//   added defers will be called before it breaks out of the scope.
+// continue: If at the c_scope level, it exits the scope after all the defer
+//     statements are executed in reverse order.
+//
+// Note: c_scope will only compile with a single c_scope, as nested levels
+//     can not be supported.
 
 #define c_scope c_scope_max(32)
 #define c_scope_max(N) \
-    for (struct { int top, jmp[N + 1]; } _defer = {.top=1, .jmp={-1}}; _defer.top >= 0; ) \
-        _resume: switch (_defer.jmp[_defer.top--]) case 0:
+    for (int _defer_top = 1, _defer_jmp[(N) + 1] = {-1}; _defer_top >= 0; ) \
+        _defer_next: switch (_defer_jmp[_defer_top--]) case 0:
 
 #define c_defer(...) do { \
-    _defer.jmp[++_defer.top] = __LINE__; \
+    _defer_jmp[++_defer_top] = __LINE__; \
     if (0) { \
         case __LINE__: do __VA_ARGS__ while (0); \
-        goto _resume; \
+        goto _defer_next; \
     } \
 } while (0)
 
 #define c_return \
-    if (_defer.top) { \
-        _defer.jmp[0] = __LINE__ + 1000000; \
-        goto _resume; \
+    if (_defer_top) { \
+        _defer_jmp[0] = __LINE__ + 1000000; \
+        goto _defer_next; \
     } else case __LINE__ + 1000000: return
 
 #endif // STC_DEFER_H_INCLUDED
