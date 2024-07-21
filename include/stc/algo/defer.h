@@ -78,6 +78,7 @@ int test_defer(int x) {
 
         c2_scope {
             c2_defer({ puts("c2: defer"); });
+            if (x == 1) continue;  // break out of c2_scope
             if (x == 2) c2_return 2;
             puts("c2: done");
         }
@@ -88,8 +89,8 @@ int test_defer(int x) {
     }
 
     cs_scope {
-        cs_defer({ puts("cx: defer"); });
-        puts("cx: done");
+        cs_defer({ puts("cs: defer"); });
+        puts("cs: done");
     }
 
     puts("DONE");

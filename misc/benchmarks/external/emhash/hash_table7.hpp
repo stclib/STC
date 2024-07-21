@@ -4,7 +4,7 @@
 //
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 // SPDX-License-Identifier: MIT
-// Copyright (c) 2019-2023 Huang Yuanbing & bailuzhou AT 163.com
+// Copyright (c) 2019-2024 Huang Yuanbing & bailuzhou AT 163.com
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -100,6 +100,7 @@ of resizing granularity. Ignoring variance, the expected occurrences of list siz
     #undef  EMH_SET
     #undef  EMH_BUCKET
     #undef  EMH_EMPTY
+    #undef  EMH_MASK
 #endif
 
 // likely/unlikely
@@ -137,14 +138,13 @@ of resizing granularity. Ignoring variance, the expected occurrences of list siz
     #define EMH_BUCKET(p,n)  p[n].bucket
     #define EMH_PKV(p,n)     p[n]
     #define EMH_NEW(key, val, bucket)\
-            new(_pairs + bucket) PairT(key, val, bucket);\
-            _num_filled ++; EMH_SET(bucket)
+            new(_pairs + bucket) PairT(key, val, bucket); _num_filled ++; EMH_SET(bucket)
 #endif
 
-#define EMH_MASK(bucket)               1 << (bucket % MASK_BIT)
-#define EMH_SET(bucket)                _bitmask[bucket / MASK_BIT] &= ~(EMH_MASK(bucket))
-#define EMH_CLS(bucket)                _bitmask[bucket / MASK_BIT] |= EMH_MASK(bucket)
-#define EMH_EMPTY(bitmask, bucket)     (_bitmask[bucket / MASK_BIT] & (EMH_MASK(bucket))) != 0
+#define EMH_MASK(n)       uint8_t(1 << (n % MASK_BIT))
+#define EMH_SET(n)        _bitmask[n / MASK_BIT] &= ~(EMH_MASK(n))
+#define EMH_CLS(n)        _bitmask[n / MASK_BIT] |= EMH_MASK(n)
+#define EMH_EMPTY(n)      (_bitmask[n / MASK_BIT] & (EMH_MASK(n))) != 0
 
 #if _WIN32
     #include <intrin.h>
@@ -163,7 +163,7 @@ namespace emhash7 {
     static constexpr size_type INACTIVE = 0 - 0x1ull;
 #else
     typedef uint32_t size_type;
-    static constexpr size_type INACTIVE = 0 - 0x1u;
+    static constexpr size_type INACTIVE = -1;
 #endif
 
 #ifndef EMH_MALIGN
@@ -315,7 +315,7 @@ class HashMap
 {
 #ifndef EMH_DEFAULT_LOAD_FACTOR
     constexpr static float EMH_DEFAULT_LOAD_FACTOR = 0.80f;
-    constexpr static float EMH_MIN_LOAD_FACTOR     = 0.25f; //< 0.5
+    constexpr static float EMH_MIN_LOAD_FACTOR     = 0.25f;
 #endif
 
 public:
@@ -358,7 +358,7 @@ public:
 #if EMH_ITER_SAFE
         iterator(const htype* hash_map, size_type bucket) : _map(hash_map), _bucket(bucket) { init(); }
 #else
-        iterator(const htype* hash_map, size_type bucket) : _map(hash_map), _bucket(bucket) { _from = -1; }
+        iterator(const htype* hash_map, size_type bucket) : _map(hash_map), _bucket(bucket) { _from = size_type(-1); }
 #endif
 
         void init()
@@ -463,7 +463,7 @@ public:
 #if EMH_ITER_SAFE
         const_iterator(const htype* hash_map, size_type bucket) : _map(hash_map), _bucket(bucket) { init(); }
 #else
-        const_iterator(const htype* hash_map, size_type bucket) : _map(hash_map), _bucket(bucket) { _from = -1; }
+        const_iterator(const htype* hash_map, size_type bucket) : _map(hash_map), _bucket(bucket) { _from = size_type(-1); }
 #endif
 
         void init()
@@ -683,13 +683,12 @@ public:
         auto* opairs = rhs._pairs;
 
         if (is_copy_trivially())
-            memcpy(_pairs, opairs, AllocSize(_num_buckets));
+            memcpy((char*)_pairs, opairs, AllocSize(_num_buckets));
         else {
-            memcpy(_pairs + _num_buckets, opairs + _num_buckets, EPACK_SIZE * sizeof(PairT) + (_num_buckets + 7) / 8 + BIT_PACK);
-            for (auto it = rhs.cbegin(); it.bucket() <= _mask; ++it) {
+            memcpy((char*)(_pairs + _num_buckets), opairs + _num_buckets, EPACK_SIZE * sizeof(PairT) + (_num_buckets + 7) / 8 + BIT_PACK);
+            for (auto it = rhs.cbegin(); it.bucket() < _num_buckets; ++it) {
                 const auto bucket = it.bucket();
-                EMH_BUCKET(_pairs, bucket) = EMH_BUCKET(opairs, bucket);
-                new(_pairs + bucket) PairT(opairs[bucket]);
+                new(_pairs + bucket) PairT(opairs[bucket]); EMH_BUCKET(_pairs, bucket) = EMH_BUCKET(opairs, bucket);
             }
         }
     }
@@ -744,8 +743,8 @@ public:
         if (_num_filled == 0)
             return end();
 
-        auto bucket = _mask;
-        while (EMH_EMPTY(_pairs, bucket)) bucket--;
+        auto bucket = _num_buckets - 1;
+        while (EMH_EMPTY(bucket)) bucket--;
         return {this, bucket};
     }
 
@@ -759,7 +758,7 @@ public:
     inline bool empty() const { return _num_filled == 0; }
 
     inline size_type bucket_count() const { return _num_buckets; }
-    inline float load_factor() const { return static_cast<float>(_num_filled) / (_mask + 1); }
+    inline float load_factor() const { return ((float)_num_filled) / (_mask + 1); }
 
     inline HashT& hash_function() const { return _hasher; }
     inline EqT& key_eq() const { return _eq; }
@@ -790,7 +789,7 @@ public:
     {
         const auto bucket = hash_key(key) & _mask;
         const auto next_bucket = EMH_BUCKET(_pairs, bucket);
-        if (EMH_EMPTY(_pairs, bucket))
+        if (EMH_EMPTY(bucket))
             return 0;
         else if (bucket == next_bucket)
             return bucket + 1;
@@ -802,7 +801,7 @@ public:
     //Returns the number of elements in bucket n.
     size_type bucket_size(const size_type bucket) const
     {
-        if (EMH_EMPTY(_pairs, bucket))
+        if (EMH_EMPTY(bucket))
             return 0;
 
         auto next_bucket = EMH_BUCKET(_pairs, bucket);
@@ -823,10 +822,9 @@ public:
 
     size_type get_main_bucket(const size_type bucket) const
     {
-        if (EMH_EMPTY(_pairs, bucket))
+        if (EMH_EMPTY(bucket))
             return INACTIVE;
 
-        auto next_bucket = EMH_BUCKET(_pairs, bucket);
         const auto& bucket_key = EMH_KEY(_pairs, bucket);
         const auto main_bucket = hash_key(bucket_key) & _mask;
         return main_bucket;
@@ -847,7 +845,7 @@ public:
 
     int get_bucket_info(const size_type bucket, size_type steps[], const size_type slots) const
     {
-        if (EMH_EMPTY(_pairs, bucket))
+        if (EMH_EMPTY(bucket))
             return -1;
 
         auto next_bucket = EMH_BUCKET(_pairs, bucket);
@@ -1328,7 +1326,7 @@ public:
     {
         if (!is_triviall_destructable() && _num_filled) {
             memset(_bitmask, 0xFFFFFFFF, (_num_buckets + 7) / 8);
-            if (_num_buckets < 8) _bitmask[0] = (1 << _num_buckets) - 1;
+            if (_num_buckets < 8) _bitmask[0] =  uint8_t((1 << _num_buckets) - 1);
         }
         else if (_num_filled)
             clearkv();
@@ -1371,8 +1369,8 @@ public:
 
         // no need alloc large bucket for small key sizeof(KeyT) < sizeof(int).
         // set small a max_load_factor, insert/reserve() will fail and introduce rehash issiue TODO: dothing ?
-        if (sizeof(KeyT) < sizeof(size_type) && buckets >= (1ul << (2 * 8)))
-            buckets = 2ul << (sizeof(KeyT) * 8);
+        //if (sizeof(KeyT) < sizeof(size_type) && buckets > (1ul << (sizeof(uint16_t) * 8)))
+        //    buckets = 2ul << (sizeof(KeyT) * 8);
 
         assert(buckets < max_size() && buckets > _num_filled);
         //TODO: throwOverflowError
@@ -1396,7 +1394,7 @@ public:
         memset(_bitmask, 0xFFFFFFFF, mask_byte);
         memset(((char*)_bitmask) + mask_byte, 0, BIT_PACK);
         if (num_buckets < 8)
-            _bitmask[0] = (1 << num_buckets) - 1;
+            _bitmask[0] = (uint8_t)((1 << num_buckets) - 1);
 
         //for (size_type src_bucket = 0; _num_filled < old_num_filled; src_bucket++) {
         for (size_type src_bucket = old_mask; _num_filled < old_num_filled; src_bucket --) {
@@ -1451,7 +1449,7 @@ private:
     size_type erase_key(const UType& key)
     {
         const auto bucket = hash_key(key) & _mask;
-        if (EMH_EMPTY(_pairs, bucket))
+        if (EMH_EMPTY(bucket))
             return INACTIVE;
 
         auto next_bucket = EMH_BUCKET(_pairs, bucket);
@@ -1495,7 +1493,7 @@ private:
     size_type erase_key(const UType& key)
     {
         const auto bucket = hash_key(key) & _mask;
-        if (EMH_EMPTY(_pairs, bucket))
+        if (EMH_EMPTY(bucket))
             return INACTIVE;
 
         auto next_bucket = EMH_BUCKET(_pairs, bucket);
@@ -1559,7 +1557,7 @@ private:
     size_type find_filled_hash(const K& key, const size_t key_hash) const
     {
         const auto bucket = key_hash & _mask;
-        if (EMH_EMPTY(_pairs, bucket))
+        if (EMH_EMPTY(bucket))
             return _num_buckets;
 
         auto next_bucket = bucket;
@@ -1581,7 +1579,7 @@ private:
     size_type find_filled_bucket(const K& key) const
     {
         const auto bucket = hash_key(key) & _mask;
-        if (EMH_EMPTY(_pairs, bucket))
+        if (EMH_EMPTY(bucket))
             return _num_buckets;
 
         auto next_bucket = bucket;
@@ -1634,7 +1632,7 @@ private:
     {
         const auto bucket = hash_key(key) & _mask;
         const auto& bucket_key = EMH_KEY(_pairs, bucket);
-        if (EMH_EMPTY(_pairs, bucket)) {
+        if (EMH_EMPTY(bucket)) {
             isempty = true;
             return bucket;
         }
@@ -1692,11 +1690,11 @@ private:
         if (EMH_LIKELY(bmask != 0))
             return bucket_from + CTZ(bmask);
 #else
-        const auto boset  = main_bucket % 8;
-        auto* const align = (uint8_t*)_bitmask + main_bucket / 8; (void)bucket_from;
+        const auto boset  = bucket_from % 8;
+        auto* const align = (uint8_t*)_bitmask + bucket_from / 8; (void)bucket_from;
         const size_t bmask  = (*(size_t*)(align) >> boset);// & 0xF0F0F0F0FF0FF0FFull;//
         if (EMH_LIKELY(bmask != 0))
-            return main_bucket + CTZ(bmask);
+            return bucket_from + CTZ(bmask);
 #endif
 
         const auto qmask = _mask / SIZE_BIT;
@@ -1707,9 +1705,9 @@ private:
                 return step * SIZE_BIT + CTZ(bmask3);
         }
 
-        auto next_bucket = (bucket_from + 0 * SIZE_BIT) & qmask;
+        //auto next_bucket = (bucket_from + 0 * SIZE_BIT) & qmask;
         auto& last = EMH_BUCKET(_pairs, _num_buckets);
-        for (size_type offset = 1; ; offset += 1) {
+        for (; ; ) {
             last &= qmask;
             const auto bmask2 = *((size_t*)_bitmask + last);
             if (bmask2 != 0)
@@ -1734,6 +1732,7 @@ private:
                 last = next_bucket;
                 return next_bucket * SIZE_BIT + CTZ(bmask1);
             }
+            offset += 1;
 #endif
         }
 
@@ -1796,7 +1795,7 @@ private:
     size_type find_unique_bucket(const KeyT& key)
     {
         const size_type bucket = hash_key(key) & _mask;
-        if (EMH_EMPTY(_pairs, bucket))
+        if (EMH_EMPTY(bucket))
             return bucket;
 
         //check current bucket_key is in main bucket or not
@@ -1818,7 +1817,7 @@ private:
     {
 #if __SIZEOF_INT128__ && EMH_INT_HASH == 1
         __uint128_t r = key; r *= KC;
-        return (uint64_t)(r >> 64) + (uint64_t)r;
+        return (uint64_t)(r >> 64) ^ (uint64_t)r;
 #elif EMH_INT_HASH == 2
         //MurmurHash3Mixer
         uint64_t h = key;
@@ -1830,7 +1829,7 @@ private:
         return h;
 #elif _WIN64 && EMH_INT_HASH == 1
         uint64_t high;
-        return _umul128(key, KC, &high) + high;
+        return _umul128(key, KC, &high) ^ high;
 #elif EMH_INT_HASH == 3
         auto ror  = (key >> 32) | (key << 32);
         auto low  = key * 0xA24BAED4963EE407ull;
