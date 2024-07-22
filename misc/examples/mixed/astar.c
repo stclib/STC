@@ -6,6 +6,7 @@
 //     https://www.redblobgames.com/pathfinding/a-star/introduction.html
 #define i_implement
 #include "stc/cstr.h"
+#include "stc/algo/defer.h"
 #include <stdio.h>
 
 typedef struct
@@ -71,7 +72,6 @@ point_key_cmp(const point* a, const point* b)
 #define i_cmp point_key_cmp
 #include "stc/smap.h"
 
-#include "stc/algo/defer.h"
 
 deq_point
 astar(cstr* maze, int width)
