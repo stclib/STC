@@ -24,46 +24,58 @@
 #ifndef STC_DEFER_H_INCLUDED
 #define STC_DEFER_H_INCLUDED
 
-// c_scope:
+// Fully portable two-level nested scoped DEFER for C99.
+
+// c1_scope:
 // ========
-// c_scope { ... }: Create a defer scope that allow up to 32 defer statements.
-// c_scope_max(N) { ... }: Create a defer scope that allow max N defer statements.
+// c1_scope { ... }: Create a defer scope that allow up to 32 defer statements.
+// c1_scope_max(N) { ... }: Create a defer scope that allow max N defer statements.
 //
-// c_defer({ ... }): Adds ... code that be deferred in the current c_scope.
+// c1_defer({ ... }): Adds ... code that be deferred in the current c1_scope.
 //
-// c_return x: Call to return from current function. This calls all the added
-//     defers in opposite order of definition, before it returns x.
+// c1_break: Break out of a c1_scope. It will break out of any nested loops/switch
+//     unlike regular break. Before breaking, it calls all added c1_defers in
+//     opposite order of definition, before it returns x.
 //
-// continue: If at the c_scope level, it exits the scope after all the defer
-//     statements are executed in reverse order.
+// c1_return x: Call to return from current function. This calls all added
+//     c1_defers in opposite order of definition, before it returns x.
+//
 //
 // CAVEAT 1: Unlike in other programming languages, the return expression
 //     is evaluated after deferred statements. The workaround is to assign
-//     the return expression to a local variable, and then c_return that.
+//     the return expression to a local variable, and then c1_return that.
 //
-// CAVEAT 2: Code will only compile with a single c_scope per function,
+// CAVEAT 2: Code will only compile with a single c1_scope per function,
 //     but it is possible to use multiple sequential cs_scope's within
-//     one function, or c2_scope immediately inside a c_scope (see below).
+//     one function, or c2_scope immediately inside a c1_scope (see below).
 
 // c2_scope:
 // =========
-// c2_scope, c2_defer() and c2_return can be used if you need a second defer
-// scope inside a c_scope. c2_scope is functionally identical to c_scope,
-// but the default max number of deferred statements are only 8 compared to
-// c_scope's 32. Use c2_scope_max(N) to control max number of statements.
+// c2_scope, c2_defer(), c2_break, c2_break_c1, and c2_return may be used when
+// you need a second defer scope inside a c1_scope. c2_scope is functionally
+// identical to c1_scope, but the default max number of deferred statements are
+// only 8 compared to c1_scope's 32. Use c2_scope_max(N) to control max number
+// of statements.
+//
+// c2_break: Break out of a c2_scope. It will break out of any nested loops/switch
+//     unlike regular break. Before breaking, it calls all added c2_defers in
+//     opposite order of definition, before it breaks out of c2_scope.
+//
+// c2_break_c1: Break out of a c2_scope + c1_scope. It will first call all added
+//     c2_defers, then all c1_defers before exiting c1_scope.
 //
 // NOTE: Placing a c2_scope inside another c2_scope (or cs_scope) is UB, but it
-//       is allowed to have multiple c2_scopes in sequence inside a c_scope.
+//     is allowed to have multiple c2_scopes in sequence inside a c1_scope.
 
 // cs_scope:
 // =========
-// cs_scope, cs_defer() and cs_return can be used if you need multiple sequential
-// defer scopes in a single function. cs_scope is functionally identical to c_scope,
-// but the default max number of deferred statements are only 8 compared to c_scope's 32.
-// Use cs_scope_max(N) to control max number of statements.
+// cs_scope, cs_defer(), cs_break, and cs_return may be used when you need multiple
+// sequential defer scopes in a single function. cs_scope is functionally identical
+// to c1_scope, but the default max number of deferred statements are only 8 compared
+// to c1_scope's 32. Use cs_scope_max(N) to control max number of statements.
 //
-// NOTE: Prefer to use c_scope as the first defer scope per function, as it is much
-//       faster, uses far less resources than cs_scope, and it may wrap a c2_scope.
+// NOTE: Prefer to use c1_scope as the first defer scope per function, as it is much
+//     faster, uses far less resources than cs_scope, and it may wrap a c2_scope.
 
 /*
 #include <stdio.h>
@@ -72,19 +84,19 @@
 int test_defer(int x) {
     printf("\nx=%d:\n", x);
 
-    c_scope {
-        c_defer({ puts("c: one"); });
-        if (x == -1) c_return -1;
+    c1_scope {
+        c1_defer({ puts("c: one"); });
+        if (x == -1) c1_return -1;
 
         c2_scope {
             c2_defer({ puts("c2: defer"); });
-            if (x == 1) continue;  // break out of c2_scope
+            if (x == 1) c2_break; // break out of c2_scope
             if (x == 2) c2_return 2;
             puts("c2: done");
         }
 
-        c_defer({ puts("c: two"); });
-        if (x == 1) continue;  // break out of c_scope
+        c1_defer({ puts("c: two"); });
+        if (x == 1) c1_break; // break out of c1_scope
         puts("c: done");
     }
 
@@ -105,12 +117,12 @@ int main() {
 }
 */
 
-#define c_scope c_scope_max(32)
-#define c_scope_max(N) \
+#define c1_scope c1_scope_max(32)
+#define c1_scope_max(N) \
     for (int _defer_top = 1, _defer_jmp[(N) + 1] = {-1}; _defer_top >= 0; ) \
         _defer_next: switch (_defer_jmp[_defer_top--]) case 0:
 
-#define c_defer(...) do { \
+#define c1_defer(...) do { \
     _defer_jmp[++_defer_top] = __LINE__; \
     if (0) { \
         case __LINE__: do __VA_ARGS__ while (0); \
@@ -118,7 +130,10 @@ int main() {
     } \
 } while (0)
 
-#define c_return \
+#define c1_break \
+        goto _defer_next
+
+#define c1_return \
     if (_defer_top) { \
         _defer_jmp[0] = __LINE__ + 1000000; \
         goto _defer_next; \
@@ -131,8 +146,8 @@ int main() {
 #define cs_scope cs_scope_max(8)
 #define cs_scope_max(N) \
     for (struct { int state, top; jmp_buf jmp[(N) + 1]; } _defer = {0}; \
-                  _defer.state == 0; \
-                  _defer.state = 1, setjmp(_defer.jmp[0]) ? (void)0 : longjmp(_defer.jmp[_defer.top], 1))
+                  _defer.state == 0 && !setjmp(_defer.jmp[0]); \
+                  _defer.state = 1, longjmp(_defer.jmp[_defer.top], 1))
 
 #define cs_defer(...) do { \
     if (setjmp(_defer.jmp[++_defer.top])) { \
@@ -140,6 +155,9 @@ int main() {
         longjmp(_defer.jmp[--_defer.top], 1); \
     } \
 } while (0)
+
+#define cs_break \
+    longjmp(_defer.jmp[_defer.top], 1)
 
 #define cs_return \
     if (!setjmp(_defer.jmp[0])) \
@@ -151,9 +169,16 @@ int main() {
 #define c2_scope cs_scope
 #define c2_scope_max cs_scope_max
 #define c2_defer cs_defer
-#define c2_return \
-    if (!setjmp(_defer.jmp[0])) {\
+#define c2_break cs_break
+
+#define c2_break_c1 \
+    if (!setjmp(_defer.jmp[0])) \
         longjmp(_defer.jmp[_defer.top], 1); \
-    } else c_return
+    else c1_break
+
+#define c2_return \
+    if (!setjmp(_defer.jmp[0])) \
+        longjmp(_defer.jmp[_defer.top], 1); \
+    else c1_return
 
 #endif // STC_DEFER_H_INCLUDED
