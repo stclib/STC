@@ -418,18 +418,40 @@ void        c_default_drop(Type* p);                    // does nothing
 ```
 ---
 ## DEFER scope macros
-General ***defer*** mechanics for resource acquisition. These macros allows you to specify the
-freeing of the resources nearby the point where the acquisition takes place.
 
-| Usage               | Description                                               |
+#### c_scope: General ***defer*** mechanics for resource acquisition and release. 
+| Usage               | Description |
 |:--------------------|:----------------------------------------------------------|
-| `c_scope { ... }`   | Create a defer scope.                                     |
-| `c_defer({ ... });` | Add code ... to be deferred to end of scope, or before a `c_return`|
-| `c_return x`        | Call to return from current function inside an outermost `c_scope` level. |
-| `continue`          | If at the c_scope level, it exits scope after defer statements are executed. |
+| `c_scope { ... }`   | Create a defer scope. Equal to `c_scope_max(50) { ... }`. |
+| `c_scope_max(N) { ... }` | Create a defer scope with max N defer statements. |
+| `c_defer({ ... });` | Add code ... to be deferred to end of `c_scope`, or until a `c_return`/`c_break`|
+| `c_return x;`       | Return `x` from current function after `c_defer` statements are executed. |
+| `c_break`           | Break `c_scope` after `c_defer` statements are executed. Breaks out from any local loop/switch too.|
 
-**Note**: `c_scope` will only compile with a single `c_scope`, as nested levels can not be supported.
+- *Note 1*: `c_return expr` evaluates `expr` *after* the deferred statements are executed. To ensure evaluation *before*, use: `{ Type ret = expr; c_return ret; }`
+- *Note 2*: Code compiles only with a single `c_scope` per function. Use `cs_scope` for additional defer scopes within a function.
 
+#### c2_scope: Level-2 nested defer scope inside a c_scope
+| Usage               | Description |
+|:--------------------|:----------------------------------------------------------|
+| `c2_scope { ... }`   | Create a level-2 defer scope anywhere inside a `c_scope`. Equal to `c2_scope_max(10) { ... }`. |
+| `c2_scope_max(N) { ... }` | Create a defer scope with max N defer statements. |
+| `c2_defer({ ... });` | Add code ... to be deferred to end of `c2_scope`, or until a `c2_return`/`c2_break`|
+| `c2_return x;`       | Return `x` from current function after `c2_defer` and `c_defer` statements are executed. |
+| `c2_break`           | Break `c2_scope` after `c2_defer` statements are executed. Breaks out from any local loop/switch too.|
+| `c2_break_c1`        | Break `c_scope` after `c2_defer` and `c_defer` statements are executed. Breaks out from any local loop/switch too. |
+
+#### cs_scope: Additional defer scopes within a function
+| Usage               |  Description |
+|:--------------------|:----------------------------------------------------------|
+| `cs_scope { ... }`   | Create a defer scope.  Equal to `cs_scope_max(10) { ... }`. |
+| `cs_scope_max(N) { ... }` | Create a defer scope with max N defer statements. |
+| `cs_defer({ ... });` | Add code ... to be deferred to end of `cs_scope`, or until a `cs_return`/`cs_break` |
+| `cs_return x;`       | Return `x` from current function. Executes statements from `cs_defer` before returning. |
+| `cs_break`           | Break `cs_scope` after `cs_defer` statements are executed. Breaks out from any local loop/switch too.|
+
+- *Note 3*: `cs_scope` shall *not* be used nested within other defer scopes.
+- *Note 4*: `cs_scope` is functionally equal to `c_scope`, but is much less speed/memory efficient.
 ```c
 c_scope {
     cstr s1 = cstr_lit("Hello"), s2 = cstr_lit("world");
