@@ -28,7 +28,7 @@
 
 // c_scope:
 // ========
-// c_scope { ... }: Create a defer scope that allow up to 32 defer statements.
+// c_scope { ... }: Create a defer scope that allow up to 50 defer statements.
 // c_scope_max(N) { ... }: Create a defer scope that allow max N defer statements.
 //
 // c_defer({ ... }): Adds ... code that be deferred in the current c_scope.
@@ -54,8 +54,8 @@
 // c2_scope, c2_defer(), c2_break, c2_break_c1, and c2_return may be used when
 // you need a second defer scope inside a c_scope. c2_scope is functionally
 // identical to c_scope, but the default max number of deferred statements are
-// only 8 compared to c_scope's 32. Use c2_scope_max(N) to control max number
-// of statements.
+// 16 compared to c_scope's 50. Use c2_scope_max(N) to control max number of
+// statements.
 //
 // c2_break: Break out of a c2_scope. It will break out of any nested loops/switch
 //     unlike regular break. Before breaking, it calls all added c2_defers in
@@ -71,8 +71,8 @@
 // =========
 // cs_scope, cs_defer(), cs_break, and cs_return may be used when you need multiple
 // sequential defer scopes in a single function. cs_scope is functionally identical
-// to c_scope, but the default max number of deferred statements are only 8 compared
-// to c_scope's 32. Use cs_scope_max(N) to control max number of statements.
+// to c_scope, but the default max number of deferred statements are 16 compared to
+// to c_scope's 50. Use cs_scope_max(N) to control max number of statements.
 //
 // NOTE: Prefer to use c_scope as the first defer scope per function, as it is much
 //     faster, uses far less resources than cs_scope, and it may wrap a c2_scope.
@@ -117,7 +117,7 @@ int main() {
 }
 */
 
-#define c_scope c_scope_max(32)
+#define c_scope c_scope_max(50)
 #define c_scope_max(N) \
     for (int _defer_top = 1, _defer_jmp[(N) + 1] = {-1}; _defer_top >= 0; ) \
         _defer_next: switch (_defer_jmp[_defer_top--]) case 0:
@@ -143,11 +143,11 @@ int main() {
 
 #include <setjmp.h>
 
-#define cs_scope cs_scope_max(8)
+#define cs_scope cs_scope_max(16)
 #define cs_scope_max(N) \
     for (struct { int top; jmp_buf jmp[(N) + 1]; } _defer = {0}; \
-                  !setjmp(_defer.jmp[0]); \
-                  longjmp(_defer.jmp[_defer.top], 1))
+         !setjmp(_defer.jmp[0]); \
+         longjmp(_defer.jmp[_defer.top], 1))
 
 #define cs_defer(...) do { \
     if (setjmp(_defer.jmp[++_defer.top])) { \
