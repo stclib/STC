@@ -33,9 +33,9 @@
 //
 // c_defer({ ... }): Adds ... code that be deferred in the current c_scope.
 //
-// c_break: Break out of a c_scope. It will break out of any nested loops/switch
-//     unlike regular break. Before breaking, it calls all added c_defers in
-//     opposite order of definition, before it returns x.
+// c_break: Break out of a c_scope. Unlike regular break it will also break
+//     out of any nested loops/switch. Before breaking, it calls all added
+//     c_defers in opposite order of definition, before it returns x.
 //
 // c_return x: Call to return from current function. This calls all added
 //     c_defers in opposite order of definition, before it returns x.
@@ -47,19 +47,19 @@
 //
 // CAVEAT 2: Code will only compile with a single c_scope per function,
 //     but it is possible to use multiple sequential cs_scope's within
-//     one function, or c2_scope immediately inside a c_scope (see below).
+//     one function, or c2_scope inside a c_scope (see below).
 
 // c2_scope:
 // =========
 // c2_scope, c2_defer(), c2_break, c2_break_c1, and c2_return may be used when
 // you need a second defer scope inside a c_scope. c2_scope is functionally
 // identical to c_scope, but the default max number of deferred statements are
-// 16 compared to c_scope's 50. Use c2_scope_max(N) to control max number of
+// 10 compared to c_scope's 50. Use c2_scope_max(N) to control max number of
 // statements.
 //
-// c2_break: Break out of a c2_scope. It will break out of any nested loops/switch
-//     unlike regular break. Before breaking, it calls all added c2_defers in
-//     opposite order of definition, before it breaks out of c2_scope.
+// c2_break: Break out of a c2_scope. Unlike regular break it will also break
+//     out of any nested loops/switch. Before breaking, it calls all c2_defers
+//     in opposite order of definition, before it breaks out of c2_scope.
 //
 // c2_break_c1: Break out of a c2_scope + c_scope. It will first call all added
 //     c2_defers, then all c_defers before exiting c_scope.
@@ -71,7 +71,7 @@
 // =========
 // cs_scope, cs_defer(), cs_break, and cs_return may be used when you need multiple
 // sequential defer scopes in a single function. cs_scope is functionally identical
-// to c_scope, but the default max number of deferred statements are 16 compared to
+// to c_scope, but the default max number of deferred statements are 10 compared to
 // to c_scope's 50. Use cs_scope_max(N) to control max number of statements.
 //
 // NOTE: Prefer to use c_scope as the first defer scope per function, as it is much
@@ -135,15 +135,15 @@ int main() {
 
 #define c_return \
     if (_defer_top) { \
-        _defer_jmp[0] = __LINE__ + 1000000; \
+        _defer_jmp[0] = -__LINE__ - 1; \
         goto _defer_next; \
-    } else /* fall through */ case __LINE__ + 1000000: return
+    } else /* fall through */ case -__LINE__ - 1: return
 
 // --------------------------------------------------------------------------
 
 #include <setjmp.h>
 
-#define cs_scope cs_scope_max(16)
+#define cs_scope cs_scope_max(10)
 #define cs_scope_max(N) \
     for (struct { int top; jmp_buf jmp[(N) + 1]; } _defer = {0}; \
          !setjmp(_defer.jmp[0]); \
