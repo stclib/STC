@@ -131,7 +131,7 @@ int main() {
 } while (0)
 
 #define c_break \
-        goto _defer_next
+    goto _defer_next
 
 #define c_return \
     if (_defer_top) { \
@@ -145,9 +145,9 @@ int main() {
 
 #define cs_scope cs_scope_max(8)
 #define cs_scope_max(N) \
-    for (struct { int state, top; jmp_buf jmp[(N) + 1]; } _defer = {0}; \
-                  _defer.state == 0 && !setjmp(_defer.jmp[0]); \
-                  _defer.state = 1, longjmp(_defer.jmp[_defer.top], 1))
+    for (struct { int top; jmp_buf jmp[(N) + 1]; } _defer = {0}; \
+                  !setjmp(_defer.jmp[0]); \
+                  longjmp(_defer.jmp[_defer.top], 1))
 
 #define cs_defer(...) do { \
     if (setjmp(_defer.jmp[++_defer.top])) { \
