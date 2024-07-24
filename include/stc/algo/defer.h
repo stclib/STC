@@ -46,7 +46,7 @@
 //     the return expression to a local variable, and then c_return that.
 //
 // CAVEAT 2: Code will only compile with a single c_scope per function,
-//     but it is possible to use multiple sequential cnx_scope's within
+//     but it is possible to use multiple sequential cx_scope's within
 //     one function, or c2_scope inside a c_scope (see below).
 
 // c2_scope:
@@ -64,18 +64,20 @@
 // c2_break_outer: Break out of a c2_scope + c_scope. It will first call all added
 //     c2_defers, then all c_defers before exiting c_scope.
 //
-// NOTE: Placing a c2_scope inside another c2_scope (or cnx_scope) is UB, but it
+// NOTE: Placing a c2_scope inside another c2_scope (or cx_scope) is UB, but it
 //     is allowed to have multiple c2_scopes in sequence inside a c_scope.
 
-// cnx_scope:
+// cx_scope:
 // =========
-// cnx_scope, cnx_defer(), cnx_break, and cnx_return may be used when you need
-// multiple sequential defer scopes in a single function. cnx_scope is functionally
-// identical to c_scope, but the default max number of deferred statements are 10.
-// Use cnx_scope_with_cap(N) to control max number of statements.
+// cx_scope, cx_defer(), cx_break, and cx_return may be used when you need extra
+// defer scopes within a single function. cx_scope is functionally identical
+// to c_scope, but the default max number of deferred statements are 10.
+// Use cx_scope_with_cap(N) to control max number of statements.
 //
-// NOTE: Prefer to use c_scope as the first defer scope per function, as it is much
-//     faster, uses far less resources than cnx_scope, and it may wrap a c2_scope.
+// NOTE: Prefer to use c_scope as the first defer scope per function as it is much
+//     faster, uses far less resources than cx_scope, and it may wrap a c2_scope.
+//
+// NOTE: cx_scope must not enclose or be enclosed by any other defer scopes.
 
 /*
 #include <stdio.h>
@@ -100,8 +102,8 @@ int test_defer(int x) {
         puts("c: done");
     }
 
-    cnx_scope {
-        cnx_defer({ puts("cnx: defer"); });
+    cx_scope {
+        cx_defer({ puts("cx: defer"); });
         puts("cb: done");
     }
 
@@ -143,33 +145,33 @@ int main() {
 
 #include <setjmp.h>
 
-#define cnx_scope cnx_scope_with_cap(10)
-#define cnx_scope_with_cap(N) \
+#define cx_scope cx_scope_with_cap(10)
+#define cx_scope_with_cap(N) \
     for (struct { int top; jmp_buf jmp[(N) + 1]; } _defer = {0}; \
          !setjmp(_defer.jmp[0]); \
          longjmp(_defer.jmp[_defer.top], 1))
 
-#define cnx_defer(...) do { \
+#define cx_defer(...) do { \
     if (setjmp(_defer.jmp[++_defer.top])) { \
         do __VA_ARGS__ while (0); \
         longjmp(_defer.jmp[--_defer.top], 1); \
     } \
 } while (0)
 
-#define cnx_break \
+#define cx_break \
     longjmp(_defer.jmp[_defer.top], 1)
 
-#define cnx_return \
+#define cx_return \
     if (!setjmp(_defer.jmp[0])) \
         longjmp(_defer.jmp[_defer.top], 1); \
     else return
 
 // --------------------------------------------------------------------------
 
-#define c2_scope cnx_scope
-#define c2_scope_with_cap cnx_scope_with_cap
-#define c2_defer cnx_defer
-#define c2_break cnx_break
+#define c2_scope cx_scope
+#define c2_scope_with_cap cx_scope_with_cap
+#define c2_defer cx_defer
+#define c2_break cx_break
 
 #define c2_break_outer \
     if (!setjmp(_defer.jmp[0])) \

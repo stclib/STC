@@ -429,7 +429,7 @@ void        c_default_drop(Type* p);                    // does nothing
 | `c_break`           | Break `c_scope` after `c_defer` statements are executed. Breaks out from any local loop/switch too.|
 
 - *Note 1*: `c_return expr` evaluates `expr` *after* the deferred statements are executed. To ensure evaluation *before*, use: `{ Type ret = expr; c_return ret; }`
-- *Note 2*: Code compiles only with a single `c_scope` per function. Use `cnx_scope` for additional defer scopes within a function.
+- *Note 2*: Code compiles only with a single `c_scope` per function. Use `cx_scope` for additional defer scopes within a function.
 
 Use of **c_scope** for managing resource dependencies:
 ```c
@@ -505,17 +505,17 @@ int main() {
 }
 ```
 
-#### cnx_scope: Additional/next defer scopes within a function
+#### cx_scope: Extra defer scopes within a single function
 | Usage               |  Description |
 |:--------------------|:----------------------------------------------------------|
-| `cnx_scope {...}`   | Create a defer scope.  Equal to `cnx_scope_with_cap(10) {...}`. |
-| `cnx_scope_with_cap(N) {...}` | Create a defer scope with max N defer statements. |
-| `cnx_defer({...});` | Add code ... to be deferred to end of `cnx_scope`, or until a `cnx_return`/`cnx_break` |
-| `cnx_return x;`       | Return `x` from current function. Executes statements from `cnx_defer` before returning. |
-| `cnx_break`           | Break `cnx_scope` after `cnx_defer` statements are executed. Breaks out from any local loop/switch too.|
+| `cx_scope {...}`    | Create a defer scope.  Equal to `cx_scope_with_cap(10) {...}`. |
+| `cx_scope_with_cap(N) {...}` | Create a defer scope with max N defer statements. |
+| `cx_defer({...});`  | Add code ... to be deferred to end of `cx_scope`, or until a `cx_return`/`cx_break` |
+| `cx_return x;`      | Return `x` from current function. Executes statements from `cx_defer` before returning. |
+| `cx_break`          | Break `cx_scope` after `cx_defer` statements are executed. Breaks out from any local loop/switch too.|
 
-- *Note 3*: `cnx_scope` must ***not*** be nested within other defer scopes.
-- *Note 4*: `cnx_scope` is functionally equal to `c_scope`, but is much less speed/memory efficient and it cannot enclose a `c2_scope`.
+- *Note 3*: `cx_scope` must ***not*** be nested within other defer scopes.
+- *Note 4*: `cx_scope` is functionally equal to `c_scope`, but is much less speed/memory efficient, and it cannot enclose a `c2_scope`.
 ```c
 void deferred(void) {
     c_scope {
@@ -525,9 +525,9 @@ void deferred(void) {
         printf("%s %s\n", cstr_str(&s1), cstr_str(&s2));
     }
 
-    cnx_scope {
+    cx_scope {
         pthread_mutex_lock(&mut);
-        cnx_defer( pthread_mutex_unlock(&mut); );
+        cx_defer( pthread_mutex_unlock(&mut); );
 
         /* Do syncronized work. */
     }
