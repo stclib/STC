@@ -429,49 +429,9 @@ void        c_default_drop(Type* p);                    // does nothing
 | `c_break`           | Break `c_scope` after `c_defer` statements are executed. Breaks out from any local loop/switch too.|
 
 - *Note 1*: `c_return expr` evaluates `expr` *after* the deferred statements are executed. To ensure evaluation *before*, use: `{ Type ret = expr; c_return ret; }`
-- *Note 2*: Code compiles only with a single `c_scope` per function. Use `cm_scope` for additional defer scopes within a function.
+- *Note 2*: Code compiles only with a single `c_scope` per function. Use `cnx_scope` for additional defer scopes within a function.
 
-#### c2_scope: Level-2 nested defer scope inside a c_scope
-| Usage               | Description |
-|:--------------------|:----------------------------------------------------------|
-| `c2_scope {...}`   | Create a level-2 defer scope anywhere inside a `c_scope`. Equal to `c2_scope_with_cap(10) {...}`. |
-| `c2_scope_with_cap(N) {...}` | Create a defer scope with max N defer statements. |
-| `c2_defer({...});` | Add code ... to be deferred to end of `c2_scope`, or until a `c2_return`/`c2_break`|
-| `c2_return x;`       | Return `x` from current function after `c2_defer` and `c_defer` statements are executed. |
-| `c2_break`           | Break `c2_scope` after `c2_defer` statements are executed. Breaks out from any local loop/switch too.|
-| `c2_break_c`         | Break `c_scope` after `c2_defer` and `c_defer` statements are executed. Breaks out from any local loop/switch too. |
-
-#### cm_scope: Multiple/additional defer scopes in series within a function
-| Usage               |  Description |
-|:--------------------|:----------------------------------------------------------|
-| `cm_scope {...}`   | Create a defer scope.  Equal to `cm_scope_with_cap(10) {...}`. |
-| `cm_scope_with_cap(N) {...}` | Create a defer scope with max N defer statements. |
-| `cm_defer({...});` | Add code ... to be deferred to end of `cm_scope`, or until a `cm_return`/`cm_break` |
-| `cm_return x;`       | Return `x` from current function. Executes statements from `cm_defer` before returning. |
-| `cm_break`           | Break `cm_scope` after `cm_defer` statements are executed. Breaks out from any local loop/switch too.|
-
-- *Note 3*: `cm_scope` must *not* be used nested within other defer scopes.
-- *Note 4*: `cm_scope` is functionally equal to `c_scope`, but is much less speed/memory efficient.
-```c
-c_scope {
-    cstr s1 = cstr_lit("Hello"), s2 = cstr_lit("world");
-    c_defer({ c_drop(cstr, &s1, &s2); });
-
-    printf("%s %s\n", cstr_str(&s1), cstr_str(&s2));
-}
-
-// Lock/unlock mutexes:
-static pthread_mutex_t mut;
-...
-c_scope {
-    pthread_mutex_lock(&mut);
-    c_defer({ pthread_mutex_unlock(&mut); });
-
-    /* Do syncronized work. */
-}
-```
-
-**Example 1**: Use **c_scope** when there are resource dependencies:
+Use of **c_scope** for managing resource dependencies:
 ```c
 int read_nums(void) {
     c_scope {
@@ -500,6 +460,77 @@ int read_nums(void) {
         // ... use nums array here
     }
     return 0;
+}
+```
+
+#### c2_scope: Level-2 nested defer scope inside a c_scope
+| Usage               | Description |
+|:--------------------|:----------------------------------------------------------|
+| `c2_scope {...}`   | Create a level-2 defer scope anywhere inside a `c_scope`. Equal to `c2_scope_with_cap(10) {...}`. |
+| `c2_scope_with_cap(N) {...}` | Create a defer scope with max N defer statements. |
+| `c2_defer({...});` | Add code ... to be deferred to end of `c2_scope`, or until a `c2_return`/`c2_break`|
+| `c2_return x;`       | Return `x` from current function after `c2_defer` and `c_defer` statements are executed. |
+| `c2_break`           | Break `c2_scope` after `c2_defer` statements are executed. Breaks out from any local loop/switch too.|
+| `c2_break_outer`         | Break `c_scope` after `c2_defer` and `c_defer` statements are executed. Breaks out from any local loop/switch too. |
+
+```c
+#include "stc/algorithm.h"
+#include <stdio.h>
+
+int process(int x) {
+    printf("\nx=%d:\n", x);
+
+    c_scope {
+        c_defer({ puts("c1:defer-one"); });
+        if (x == 5) c_return 5;
+        
+        c_defer({ puts("c1:defer-two"); });
+        if (x == 4) c_break;
+
+        c2_scope {
+            c2_defer({ puts("  c2:defer-one"); });
+            if (x == 3) c2_return 3;
+            if (x == 2) c2_break_outer; // break c_scope
+            if (x == 1) c2_break;       // break c2_scope
+            puts("  c2:end");
+        }
+        puts("c1:end");
+    }
+    puts("DONE");
+    return 0;
+}
+
+int main() {
+    for (int i = 0; i <= 5; ++i) process(i);
+}
+```
+
+#### cnx_scope: Additional/next defer scopes within a function
+| Usage               |  Description |
+|:--------------------|:----------------------------------------------------------|
+| `cnx_scope {...}`   | Create a defer scope.  Equal to `cnx_scope_with_cap(10) {...}`. |
+| `cnx_scope_with_cap(N) {...}` | Create a defer scope with max N defer statements. |
+| `cnx_defer({...});` | Add code ... to be deferred to end of `cnx_scope`, or until a `cnx_return`/`cnx_break` |
+| `cnx_return x;`       | Return `x` from current function. Executes statements from `cnx_defer` before returning. |
+| `cnx_break`           | Break `cnx_scope` after `cnx_defer` statements are executed. Breaks out from any local loop/switch too.|
+
+- *Note 3*: `cnx_scope` must ***not*** be nested within other defer scopes.
+- *Note 4*: `cnx_scope` is functionally equal to `c_scope`, but is much less speed/memory efficient and it cannot enclose a `c2_scope`.
+```c
+void deferred(void) {
+    c_scope {
+        cstr s1 = cstr_lit("Hello"), s2 = cstr_lit("world");
+        c_defer( c_drop(cstr, &s1, &s2); );
+
+        printf("%s %s\n", cstr_str(&s1), cstr_str(&s2));
+    }
+
+    cnx_scope {
+        pthread_mutex_lock(&mut);
+        cnx_defer( pthread_mutex_unlock(&mut); );
+
+        /* Do syncronized work. */
+    }
 }
 ```
 

@@ -10,6 +10,7 @@
 #include <algorithm>
 #endif
 
+// Use quicksort and binary_search from "quicksort.h"
 
 int main(int argc, char const *argv[])
 {
@@ -19,7 +20,7 @@ int main(int argc, char const *argv[])
     c_forrange (i, N)
         ivec_push(&v, crand() & mask);
 
-    ivec_sort(&v);
+    ivec_quicksort(&v);
 
     long long count = 0;
     clock_t t = clock();
@@ -27,17 +28,15 @@ int main(int argc, char const *argv[])
     c_forrange (i, N) {
         uint64_t r = crand() & mask;
         #ifdef __cplusplus
-        #define LABEL "std::binary_search"
-        count += std::binary_search(v.data, v.data + ivec_size(&v), r);
-        #elif defined BSEARCH
-        #define LABEL "bsearch"
-        count += ivec_bsearch(&v, r) != NULL;
+          #define LABEL "std::binary_search"
+          count += std::binary_search(v.data, v.data + ivec_size(&v), r);
         #else
-        #define LABEL "ivec_binary_search"
-        count += ivec_binary_search(&v, r) != -1;
+          #define LABEL "ivec_binary_search"
+          count += ivec_binary_search(&v, r) != -1;
         #endif
     }
     t = clock() - t;
-    printf("%s: count %lld %f\n", LABEL, count, (float)t/CLOCKS_PER_SEC);
+    printf("elements: %d\n", (int)N);
+    printf("%s: found %lld %f\n", LABEL, count, (float)t/CLOCKS_PER_SEC);
     ivec_drop(&v);
 }
