@@ -534,19 +534,28 @@ void deferred(void) {
 }
 ```
 
-There is also a simpler `c_with` macro with similar functionality, but it does not support `c_defer/c_return`:
-| Usage                                   | Description                                               |
-|:----------------------------------------|:----------------------------------------------------------|
-| `c_with (Type var=init, deinit) {}`     | Declare and initialize `var`. Defer executing `deinit` to end of scope |
-| `c_with (Type var=init, pred, deinit) {}` | Adds a predicate in order to exit early if init failed  |
-| `continue`                              | Break out of a `c_with / c_guard` block without resource leakage  |
+There is also a simpler `c_with` macro with similar functionality. It does not support `c_defer`/`c_return`/`c_break`,
+but you may use `continue` to break out of the scope:
+| Usage                                 | Description                                            |
+|:--------------------------------------|:-------------------------------------------------------|
+| `c_with (init, deinit) {}`            | Declare and/or initialize a variable. Defers execution of `deinit` to end of scope |
+| `c_with (init, condition, deinit) {}` | Adds a predicate in order to exit early if init fails  |
+| `continue`                            | Break out of a `c_with` scope without resource leakage |
 
 ```c
-// `c_with`: declare and init a new scoped variable and specify the deinitialize call.
+// declare and init a new scoped variable and specify the deinitialize call:
 c_with (cstr str = cstr_lit("Hello"), cstr_drop(&str))
 {
     cstr_append(&str, " world");
     printf("%s\n", cstr_str(&str));
+}
+
+pthread_mutex_t lock;
+...
+// use c_with without variable declaration:
+c_with (pthread_mutex_lock(&lock), pthread_mutex_unlock(&lock))
+{
+    // syncronized code
 }
 ```
 
