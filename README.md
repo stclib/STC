@@ -292,7 +292,7 @@ struct Point { float x, y; };
 
 int main(void)
 {
-    c_scope {
+    c_guard {
         // Define four empty containers
         hset_int set = {0};
         vec_pnt vec = {0};
@@ -633,11 +633,11 @@ Sometimes it is useful to extend a container type to store extra data, e.g. a co
 or allocator function pointer or a context which the function pointers can use. Most
 libraries solve this by adding an opaque pointer (void*) or function pointer(s) into
 the data structure for the user to manage. Because most containers are templated,
-an extra template parameter, `i_aux` may be defined to extend the container with 
+an extra template parameter, `i_aux` may be defined to extend the container with
 typesafe custom attributes.
 
 The example below shows how to customize containers to work with PostgreSQL memory management.
-It adds a MemoryContext to each container by defining the `i_aux` template parameter. 
+It adds a MemoryContext to each container by defining the `i_aux` template parameter.
 Note that `pgs_realloc` and `pgs_free` is also passed the
 allocated size of the given pointer, unlike standard `realloc` and `free`.
 

@@ -170,7 +170,7 @@ char*       c_strnstrn(const char* str, intptr_t slen, const char* needle, intpt
 #include "stc/algo/defer.h"
 
 int main(void) {
-    c_scope {
+    c_guard {
         cstr s0, s1, full_path;
         c_defer({ c_drop(cstr, &s0, &s1, &full_path); });
 

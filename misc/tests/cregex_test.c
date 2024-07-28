@@ -99,7 +99,7 @@ TEST(cregex, compile_match_escaped_chars)
 
 TEST(cregex, compile_match_class_simple)
 {
-    c_scope {
+    c_guard {
         cregex re1 = cregex_from("\\s");
         cregex re2 = cregex_from("\\w");
         cregex re3 = cregex_from("\\D");
@@ -125,10 +125,10 @@ TEST(cregex, compile_match_class_simple)
 
 TEST(cregex, compile_match_or)
 {
-    c_scope {
+    c_guard {
         cregex re, re2;
         c_defer({ c_drop(cregex, &re, &re2); });
-        
+
         re = cregex_from("as|df");
         EXPECT_EQ(re.error, 0);
 
@@ -252,7 +252,7 @@ TEST(cregex, replace)
 {
     const char* pattern = "\\b(\\d\\d\\d\\d)-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])\\b";
     const char* input = "start date: 2015-12-31, end date: 2022-02-28";
-    c_scope {
+    c_guard {
         cstr str = {0};
         cregex re = {0};
         c_defer({

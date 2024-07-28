@@ -6,7 +6,7 @@ int main(void)
 {
     cbits set = cbits_with_size(23, true);
     cbits s2;
-    c_scope {
+    c_guard {
         c_defer({
             cbits_drop(&set);
             cbits_drop(&s2);

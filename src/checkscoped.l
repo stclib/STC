@@ -1,4 +1,4 @@
-/* Check for illegal return/break/continue usage inside a STC-lib c_scope* block (RAII).
+/* Check for illegal return/break/continue usage inside a STC-lib c_guard* block (RAII).
  * Copyright Tyge Løvset, (c) 2024.
  */
 %{
@@ -42,7 +42,7 @@ switch          { block_type |= LOOP; state = BRACES; }
 do              { block_type |= LOOP; state = BRACESDONE; }
 c_defer         |
 c_with        |
-c_scope         { block_type = AUTO; state = BRACES; }
+c_guard         { block_type = AUTO; state = BRACES; }
 \(              { if (state == BRACES) ++braces_lev; }
 \)              { if (state == BRACES && --braces_lev == 0) {
                     state = BRACESDONE;
@@ -50,8 +50,8 @@ c_scope         { block_type = AUTO; state = BRACES; }
                 }
 if              { if (state == BRACESDONE) {
                     if (block_type == AUTO) {
-                      printf("%s:%d: warning: 'if' after c_scope* not enclosed in curly braces.\n"
-                             "    Make sure to enclose 'if - else' statement in { } after c_scope*.\n",
+                      printf("%s:%d: warning: 'if' after c_guard* not enclosed in curly braces.\n"
+                             "    Make sure to enclose 'if - else' statement in { } after c_guard*.\n",
                              fname, yylineno);
                       ++warnings;
                     }
@@ -67,20 +67,20 @@ if              { if (state == BRACESDONE) {
 \{              { if (state != BRACES) { block[++block_lev] = block_type; state = NORMAL; } }
 \}              { if (state != BRACES) block_type = block[--block_lev]; }
 return          { if (block_type == AUTO) {
-                    printf("%s:%d: error: 'return' used inside a c_scope*.\n"
-                           "    Use 'continue' to exit the current c_scope* before return.\n"
+                    printf("%s:%d: error: 'return' used inside a c_guard*.\n"
+                           "    Use 'continue' to exit the current c_guard* before return.\n"
                            , fname, yylineno);
                     ++errors;
                   } else if (block_type & AUTO) {
-                    printf("%s:%d: error: 'return' used in a loop inside a c_scope*.\n"
-                           "    Use 'break' to exit loop, then 'continue' to exit c_scope*.\n"
+                    printf("%s:%d: error: 'return' used in a loop inside a c_guard*.\n"
+                           "    Use 'break' to exit loop, then 'continue' to exit c_guard*.\n"
                            , fname, yylineno);
                     ++errors;
                   }
                 }
 break           { if (block_type == AUTO) {
-                    printf("%s:%d: error: 'break' used inside a c_scope*.\n"
-                           "    Use 'continue' to exit the current c_scope*.\n"
+                    printf("%s:%d: error: 'break' used inside a c_guard*.\n"
+                           "    Use 'continue' to exit the current c_guard*.\n"
                            , fname, yylineno);
                     ++errors;
                   }

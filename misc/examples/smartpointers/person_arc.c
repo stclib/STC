@@ -44,7 +44,7 @@ void Person_drop(Person* p) {
 
 int main(void)
 {
-    c_scope {
+    c_guard {
         PSPtr p = PSPtr_from(Person_make("Laura", "Palmer"));
         PSPtr q = PSPtr_from(Person_clone(*p.get)); // deep copy
         Persons vec = {0};

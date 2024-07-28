@@ -16,7 +16,7 @@
 
 int main(void)
 {
-    c_scope {
+    c_guard {
         hmap_cstr map = {0}, mclone = {0};
         vec_cstr keys = {0}, values = {0};
         list_cstr list = {0};

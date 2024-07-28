@@ -9,7 +9,7 @@
 int main(void)
 {
     // declaring set for storing string data-type
-    c_scope {
+    c_guard {
         hset_cstr stringSet = {0};
         c_defer({ hset_cstr_drop(&stringSet); });
 

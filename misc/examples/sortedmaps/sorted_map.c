@@ -8,7 +8,7 @@
 
 int main(void)
 {
-    c_scope {
+    c_guard {
         // empty map containers
         smap_int gquiz1 = {0}, gquiz2 = {0};
         c_defer({

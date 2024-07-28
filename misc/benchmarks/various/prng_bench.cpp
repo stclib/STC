@@ -33,6 +33,15 @@ uint64_t romu_trio(uint64_t s[3]) {
 
 /* sfc64 */
 
+static inline uint64_t sfc64m(uint64_t s[4]) {
+    uint64_t result = (s[0] ^ (s[3] += 0x9e3779b97f4a7c15)) + s[1];
+
+    s[0] = s[1] ^ (s[1] >> 11);
+    s[1] = s[2] + (s[2] << 3);
+    s[2] = rotl64(s[2], 24) + result;
+    return result;
+}
+
 static inline uint64_t sfc64(uint64_t s[4]) {
     uint64_t result = s[0] + s[1] + s[3]++;
     s[0] = s[1] ^ (s[1] >> 11);
@@ -160,6 +169,22 @@ int main(void)
 */
         beg = clock();
         for (size_t i = 0; i < N; i++)
+            recipient[i] = crand_u64(&rng);
+        end = clock();
+        cout << "crand64:\t"
+             << (float(end - beg) / CLOCKS_PER_SEC)
+             << "s: " << recipient[312] << endl;
+
+        beg = clock();
+        for (size_t i = 0; i < N; i++)
+            recipient[i] = sfc64m(rng.state);
+        end = clock();
+        cout << "sfc64m:\t\t"
+             << (float(end - beg) / CLOCKS_PER_SEC)
+             << "s: " << recipient[312] << endl;
+
+        beg = clock();
+        for (size_t i = 0; i < N; i++)
             recipient[i] = romu_trio(rng.state);
         end = clock();
         cout << "romu_trio:\t"
@@ -181,15 +206,6 @@ int main(void)
         cout << "sfc64:\t\t"
              << (float(end - beg) / CLOCKS_PER_SEC)
              << "s: " << recipient[312] << endl;
-
-        beg = clock();
-        for (size_t i = 0; i < N; i++)
-            recipient[i] = crand_u64(&rng);
-        end = clock();
-        cout << "crand64:\t"
-             << (float(end - beg) / CLOCKS_PER_SEC)
-             << "s: " << recipient[312] << endl;
-
 
         beg = clock();
         for (size_t i = 0; i < N; i++)

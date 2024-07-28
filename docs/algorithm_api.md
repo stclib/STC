@@ -419,22 +419,22 @@ void        c_default_drop(Type* p);                    // does nothing
 ---
 ## DEFER scope macros
 
-#### c_scope: General ***defer*** mechanics for resource acquisition and release.
+#### c_guard: General ***defer*** mechanics for resource acquisition and release.
 | Usage               | Description |
 |:--------------------|:----------------------------------------------------------|
-| `c_scope {...}`   | Create a defer scope. Equal to `c_scope_with_cap(50) {...}`. |
-| `c_scope_with_cap(N) {...}` | Create a defer scope with max N defer statements. |
-| `c_defer({...});` | Add code ... to be deferred to end of `c_scope`, or until a `c_return`/`c_break`|
+| `c_guard {...}`   | Create a defer scope. Equal to `c_guard_with_cap(32) {...}`. |
+| `c_guard_with_cap(N) {...}` | Create a defer scope with max N defer statements. |
+| `c_defer({...});` | Add code ... to be deferred to end of `c_guard`, or until a `c_return`/`c_break`|
 | `c_return x;`       | Return `x` from current function after `c_defer` statements are executed. |
-| `c_break`           | Break `c_scope` after `c_defer` statements are executed. Breaks out from any local loop/switch too.|
+| `c_break`           | Break `c_guard` after `c_defer` statements are executed. Breaks out from any local loop/switch too.|
 
 - *Note 1*: `c_return expr` evaluates `expr` *after* the deferred statements are executed. To ensure evaluation *before*, use: `{ Type ret = expr; c_return ret; }`
-- *Note 2*: Code compiles only with a single `c_scope` per function. Use `cx_scope` for additional defer scopes within a function.
+- *Note 2*: Code compiles only with a single `c_guard` per function. Use `cx_guard` for additional defer scopes within a function.
 
-Use of **c_scope** for managing resource dependencies:
+Use of **c_guard** for managing resource dependencies:
 ```c
 int read_nums(void) {
-    c_scope {
+    c_guard {
         FILE *f = fopen("nums.txt", "r");
         if (NULL == f)
             c_return -1;
@@ -463,15 +463,15 @@ int read_nums(void) {
 }
 ```
 
-#### c2_scope: Level-2 nested defer scope inside a c_scope
+#### c2_guard: Level-2 nested defer scope inside a c_guard
 | Usage               | Description |
 |:--------------------|:----------------------------------------------------------|
-| `c2_scope {...}`   | Create a level-2 defer scope anywhere inside a `c_scope`. Equal to `c2_scope_with_cap(10) {...}`. |
-| `c2_scope_with_cap(N) {...}` | Create a defer scope with max N defer statements. |
-| `c2_defer({...});` | Add code ... to be deferred to end of `c2_scope`, or until a `c2_return`/`c2_break`|
+| `c2_guard {...}`   | Create a level-2 defer scope anywhere inside a `c_guard`. Equal to `c2_guard_with_cap(8) {...}`. |
+| `c2_guard_with_cap(N) {...}` | Create a defer scope with max N defer statements. |
+| `c2_defer({...});` | Add code ... to be deferred to end of `c2_guard`, or until a `c2_return`/`c2_break`|
 | `c2_return x;`       | Return `x` from current function after `c2_defer` and `c_defer` statements are executed. |
-| `c2_break`           | Break `c2_scope` after `c2_defer` statements are executed. Breaks out from any local loop/switch too.|
-| `c2_break_outer`         | Break `c_scope` after `c2_defer` and `c_defer` statements are executed. Breaks out from any local loop/switch too. |
+| `c2_break`           | Break `c2_guard` after `c2_defer` statements are executed. Breaks out from any local loop/switch too.|
+| `c2_break_outer`         | Break `c_guard` after `c2_defer` and `c_defer` statements are executed. Breaks out from any local loop/switch too. |
 
 ```c
 #include "stc/algorithm.h"
@@ -480,18 +480,18 @@ int read_nums(void) {
 int process(int x) {
     printf("\nx=%d:\n", x);
 
-    c_scope {
+    c_guard {
         c_defer({ puts("c1:defer-one"); });
         if (x == 5) c_return 5;
-        
+
         c_defer({ puts("c1:defer-two"); });
         if (x == 4) c_break;
 
-        c2_scope {
+        c2_guard {
             c2_defer({ puts("  c2:defer-one"); });
             if (x == 3) c2_return 3;
-            if (x == 2) c2_break_outer; // break c_scope
-            if (x == 1) c2_break;       // break c2_scope
+            if (x == 2) c2_break_outer; // break c_guard
+            if (x == 1) c2_break;       // break c2_guard
             puts("  c2:end");
         }
         puts("c1:end");
@@ -505,27 +505,27 @@ int main() {
 }
 ```
 
-#### cx_scope: Extra defer scopes within a single function
+#### cx_guard: Extra defer scopes within a single function
 | Usage               |  Description |
 |:--------------------|:----------------------------------------------------------|
-| `cx_scope {...}`    | Create a defer scope.  Equal to `cx_scope_with_cap(10) {...}`. |
-| `cx_scope_with_cap(N) {...}` | Create a defer scope with max N defer statements. |
-| `cx_defer({...});`  | Add code ... to be deferred to end of `cx_scope`, or until a `cx_return`/`cx_break` |
+| `cx_guard {...}`    | Create a defer scope.  Equal to `cx_guard_with_cap(8) {...}`. |
+| `cx_guard_with_cap(N) {...}` | Create a defer scope with max N defer statements. |
+| `cx_defer({...});`  | Add code ... to be deferred to end of `cx_guard`, or until a `cx_return`/`cx_break` |
 | `cx_return x;`      | Return `x` from current function. Executes statements from `cx_defer` before returning. |
-| `cx_break`          | Break `cx_scope` after `cx_defer` statements are executed. Breaks out from any local loop/switch too.|
+| `cx_break`          | Break `cx_guard` after `cx_defer` statements are executed. Breaks out from any local loop/switch too.|
 
-- *Note 3*: `cx_scope` must ***not*** be nested within other defer scopes.
-- *Note 4*: `cx_scope` is functionally equal to `c_scope`, but is much less speed/memory efficient, and it cannot enclose a `c2_scope`.
+- *Note 3*: `cx_guard` must ***not*** be nested within other defer scopes.
+- *Note 4*: `cx_guard` is functionally equal to `c_guard`, but is much less speed/memory efficient, and it cannot enclose a `c2_guard`.
 ```c
 void deferred(void) {
-    c_scope {
+    c_guard {
         cstr s1 = cstr_lit("Hello"), s2 = cstr_lit("world");
         c_defer( c_drop(cstr, &s1, &s2); );
 
         printf("%s %s\n", cstr_str(&s1), cstr_str(&s2));
     }
 
-    cx_scope {
+    cx_guard {
         pthread_mutex_lock(&mut);
         cx_defer( pthread_mutex_unlock(&mut); );
 
@@ -539,7 +539,7 @@ There is also a simpler `c_with` macro with similar functionality, but it does n
 |:----------------------------------------|:----------------------------------------------------------|
 | `c_with (Type var=init, deinit) {}`     | Declare and initialize `var`. Defer executing `deinit` to end of scope |
 | `c_with (Type var=init, pred, deinit) {}` | Adds a predicate in order to exit early if init failed  |
-| `continue`                              | Break out of a `c_with / c_scope` block without resource leakage  |
+| `continue`                              | Break out of a `c_with / c_guard` block without resource leakage  |
 
 ```c
 // `c_with`: declare and init a new scoped variable and specify the deinitialize call.

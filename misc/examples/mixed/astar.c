@@ -77,8 +77,8 @@ deq_point
 astar(cstr* maze, int width)
 {
     deq_point ret_path = {0};
-    
-    c_scope {
+
+    c_guard {
         pque_point front = {0};
         smap_pstep from = {0};
         smap_pcost costs = {0};

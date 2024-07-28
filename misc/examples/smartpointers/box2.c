@@ -43,7 +43,7 @@ int main(void) {
         .bottom_right = { .x=3.0, .y=-4.0 }
     };
 
-    c_scope {
+    c_guard {
         // Heap allocated rectangle
         BoxRect boxed_rectangle = BoxRect_from(c_LITERAL(Rectangle){
             .top_left = origin(),
