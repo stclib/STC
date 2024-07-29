@@ -173,7 +173,7 @@ FMT_API void       _fmt_sprint(fmt_stream*, const char* fmt, ...);
 #if defined(_MSC_VER) && !defined(__clang__)
   #define _signed_char_hhd
 #else
-  #define _signed_char_hhd signed char: "hhd",
+  #define _signed_char_hhd signed char: "c",
 #endif
 #ifdef __GNUC__
   #define FMT_UNUSED __attribute__((unused))
@@ -185,7 +185,7 @@ FMT_API void       _fmt_sprint(fmt_stream*, const char* fmt, ...);
     _Bool: "d", \
     unsigned char: "hhu", \
     _signed_char_hhd \
-    char: "hhd", \
+    char: "c", \
     short: "hd", \
     unsigned short: "hu", \
     int: "d", \

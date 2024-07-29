@@ -425,11 +425,10 @@ void        c_default_drop(Type* p);                    // does nothing
 | `c_guard {...}`   | Create a defer scope. Equal to `c_guard_with_cap(32) {...}`. |
 | `c_guard_with_cap(N) {...}` | Create a defer scope with max N defer statements. |
 | `c_defer({...});` | Add code ... to be deferred to end of `c_guard`, or until a `c_return`/`c_break`|
-| `c_return x;`       | Return `x` from current function after `c_defer` statements are executed. |
+| `c_return(x);`      | Return `x` from current function after `c_defer` statements are executed. |
 | `c_break`           | Break `c_guard` after `c_defer` statements are executed. Breaks out from any local loop/switch too.|
 
-- *Note 1*: `c_return expr` evaluates `expr` *after* the deferred statements are executed. To ensure evaluation *before*, use: `{ Type ret = expr; c_return ret; }`
-- *Note 2*: Code compiles only with a single `c_guard` per function. Use `cx_guard` for additional defer scopes within a function.
+- *Note 1*: Code compiles only with a single `c_guard` per function. Use `cx_guard` for additional defer scopes within a function.
 
 Use of **c_guard** for managing resource dependencies:
 ```c
@@ -437,24 +436,24 @@ int read_nums(void) {
     c_guard {
         FILE *f = fopen("nums.txt", "r");
         if (NULL == f)
-            c_return -1;
+            c_return (-1);
 
         c_defer({ fclose(f); });
 
         int size;
         if (1 != fscanf(f, "%i", &size))
-            c_return -2;
+            c_return (-2);
 
         int *nums = malloc(size * sizeof(int));
         if (NULL == nums)
-            c_return -3;
+            c_return (-3);
 
         c_defer({ free(nums); });
 
         for (int i = 0; i < size; ++i) {
             int num;
             if (1 != fscanf(f, "%i", &num))
-                c_return -4;
+                c_return (-4);
             nums[i] = num;
         }
         // ... use nums array here
@@ -469,7 +468,7 @@ int read_nums(void) {
 | `c2_guard {...}`   | Create a level-2 defer scope anywhere inside a `c_guard`. Equal to `c2_guard_with_cap(8) {...}`. |
 | `c2_guard_with_cap(N) {...}` | Create a defer scope with max N defer statements. |
 | `c2_defer({...});` | Add code ... to be deferred to end of `c2_guard`, or until a `c2_return`/`c2_break`|
-| `c2_return x;`       | Return `x` from current function after `c2_defer` and `c_defer` statements are executed. |
+| `c2_return(x);`    | Return `x` from current function after `c2_defer` and `c_defer` statements are executed. |
 | `c2_break`           | Break `c2_guard` after `c2_defer` statements are executed. Breaks out from any local loop/switch too.|
 | `c2_break_outer`         | Break `c_guard` after `c2_defer` and `c_defer` statements are executed. Breaks out from any local loop/switch too. |
 
@@ -482,14 +481,14 @@ int process(int x) {
 
     c_guard {
         c_defer({ puts("c1:defer-one"); });
-        if (x == 5) c_return 5;
+        if (x == 5) c_return (5);
 
         c_defer({ puts("c1:defer-two"); });
         if (x == 4) c_break;
 
         c2_guard {
             c2_defer({ puts("  c2:defer-one"); });
-            if (x == 3) c2_return 3;
+            if (x == 3) c2_return (3);
             if (x == 2) c2_break_outer; // break c_guard
             if (x == 1) c2_break;       // break c2_guard
             puts("  c2:end");
@@ -511,7 +510,7 @@ int main() {
 | `cx_guard {...}`    | Create a defer scope.  Equal to `cx_guard_with_cap(8) {...}`. |
 | `cx_guard_with_cap(N) {...}` | Create a defer scope with max N defer statements. |
 | `cx_defer({...});`  | Add code ... to be deferred to end of `cx_guard`, or until a `cx_return`/`cx_break` |
-| `cx_return x;`      | Return `x` from current function. Executes statements from `cx_defer` before returning. |
+| `cx_return(x);`     | Return `x` from current function. Executes statements from `cx_defer` before returning. |
 | `cx_break`          | Break `cx_guard` after `cx_defer` statements are executed. Breaks out from any local loop/switch too.|
 
 - *Note 3*: `cx_guard` must ***not*** be nested within other defer scopes.
