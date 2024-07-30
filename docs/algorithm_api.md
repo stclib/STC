@@ -476,7 +476,6 @@ int read_nums(void) {
 | `c2_panic({...});` | Like `c_panic`, but executes first `c2_defer`+`c_defer` statements, then ... and exits `c_guard` scope. |
 | `c2_return(x);`    | Return `x` from current function after `c2_defer` and `c_defer` statements are executed. |
 | `c2_break`         | Break `c2_guard` after `c2_defer` statements are executed. Breaks out from any local loop/switch too.|
-| `c2_break_outer`   | Break `c_guard` after `c2_defer` and `c_defer` statements are executed. Breaks out from any local loop/switch too. |
 
 ```c
 #include "stc/algorithm.h"
@@ -495,8 +494,8 @@ int process(int x) {
         c2_guard {
             c2_defer({ puts("  c2:defer-one"); });
             if (x == 3) c2_return (3);
-            if (x == 2) c2_break_outer; // break c_guard
-            if (x == 1) c2_break;       // break c2_guard
+            if (x == 2) c2_panic({}); // break c_guard
+            if (x == 1) c2_break;     // break c2_guard
             puts("  c2:end");
         }
         puts("c1:end");

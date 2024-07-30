@@ -60,7 +60,7 @@
 
 // c2_guard:
 // =========
-// Use c2_guard, c2_defer, c2_break, c2_break_outer, and c2_return to have
+// Use c2_guard, c2_defer, c2_break, and c2_return to have
 // defer scopes inside a c_guard. c2_guard is functionally identical to
 // c_guard, but the default max number of deferred statements is 8.
 // Use c2_guard_max(N) to control max number of statements.
@@ -69,18 +69,14 @@
 //     out of any nested loop/switch. Before breaking, it calls all c2_defer
 //     in opposite order of definition, before it exit the c2_guard scope.
 //
-// c2_break_outer: Break out of a c2_guard + c_guard. It will first call all
-//     added c2_defer + c_defer in reverse before exiting the outer c_guard
-//     scope with a c_break.
-// 
 // c2_panic({ ... }): Like c_panic, but executes both c2_defers + c_defers,
 //     then the code in ..., and finally breaks out of the c_guard scope.
 //
-// c2_return(x): Like c2_break_outer. Finalizes with c_return(x), not c_break.
+// c2_return(x): Like c_return, but executes both c2_defers + c_defers first.
 //
 // NOTE4: Placing a c2_guard inside another c2_guard (or cx_guard) is UB, but it
 //     is allowed to have multiple c2_guard in sequence inside a c_guard.
-//     Use only c2_return, c2_break, and c2_break_outer inside a c2_guard.
+//     Use only c2_return, and c2_break inside a c2_guard.
 
 // cx_guard:
 // =========
@@ -111,7 +107,7 @@ int test_defer(int x) {
             c2_defer({ puts("c2-1: defer"); });
             if (x == 4) c2_return (4);
             if (x == 3) c2_break;
-            if (x == 2) c2_break_outer; // break out of c_guard
+            if (x == 2) c2_panic({}); // break out of c_guard
             puts("c2-1: done");
         }
         c2_guard {
@@ -211,12 +207,6 @@ int main() {
 #define c2_guard_max cx_guard_max
 #define c2_defer cx_defer
 #define c2_break cx_break
-
-#define c2_break_outer do { \
-    if (!setjmp(_defer.jmp[0])) \
-        longjmp(_defer.jmp[_defer.top], 1); \
-    else c_break; \
-} while (0)
 
 #define c2_return(x) c2_return_typed(__typeof__(x), x)
 #define c2_return_typed(T, x) do { \
