@@ -422,13 +422,17 @@ void        c_default_drop(Type* p);                    // does nothing
 #### c_guard: General ***defer*** mechanics for resource acquisition and release.
 | Usage               | Description |
 |:--------------------|:----------------------------------------------------------|
-| `c_guard {...}`   | Create a defer scope. Equal to `c_guard_with_cap(32) {...}`. |
-| `c_guard_with_cap(N) {...}` | Create a defer scope with max N defer statements. |
-| `c_defer({...});` | Add code ... to be deferred to end of `c_guard`, or until a `c_return`/`c_break`|
+| `c_guard {...}`     | Create a defer scope. Equal to `c_guard_max(32) {...}`. |
+| `c_guard_max(N) {...}` | Create a defer scope with max N defer statements. |
+| `c_defer({...});`   | Add code ... to be deferred to end of `c_guard`, or until a `c_return`/`c_break`|
 | `c_return(x);`      | Return `x` from current function after `c_defer` statements are executed. |
 | `c_break`           | Break `c_guard` after `c_defer` statements are executed. Breaks out from any local loop/switch too.|
 
-- *Note 1*: Code compiles only with a single `c_guard` per function. Use `cx_guard` for additional defer scopes within a function.
+- *Note 1*: `c_return(x)` uses __typeof__, which is not 100% portable, but is supported
+by virtually every C99 compiler, except MSVC prior to version 19.39 / VS17.9.
+Use `c_return_typed(Type, x)` in case no **typeof** support.
+- *Note 2*: Code compiles only with a single `c_guard` per function. See `c2_guard`/`cx_guard`
+for additional defer guards within a single function.
 
 Use of **c_guard** for managing resource dependencies:
 ```c
@@ -463,14 +467,14 @@ int read_nums(void) {
 ```
 
 #### c2_guard: Level-2 nested defer scope inside a c_guard
-| Usage               | Description |
-|:--------------------|:----------------------------------------------------------|
-| `c2_guard {...}`   | Create a level-2 defer scope anywhere inside a `c_guard`. Equal to `c2_guard_with_cap(8) {...}`. |
-| `c2_guard_with_cap(N) {...}` | Create a defer scope with max N defer statements. |
+| Usage              | Description |
+|:-------------------|:----------------------------------------------------------|
+| `c2_guard {...}`   | Create a level-2 defer scope anywhere inside a `c_guard`. Equal to `c2_guard_max(8) {...}`. |
+| `c2_guard_max(N) {...}` | Create a defer scope with max N defer statements. |
 | `c2_defer({...});` | Add code ... to be deferred to end of `c2_guard`, or until a `c2_return`/`c2_break`|
 | `c2_return(x);`    | Return `x` from current function after `c2_defer` and `c_defer` statements are executed. |
-| `c2_break`           | Break `c2_guard` after `c2_defer` statements are executed. Breaks out from any local loop/switch too.|
-| `c2_break_outer`         | Break `c_guard` after `c2_defer` and `c_defer` statements are executed. Breaks out from any local loop/switch too. |
+| `c2_break`         | Break `c2_guard` after `c2_defer` statements are executed. Breaks out from any local loop/switch too.|
+| `c2_break_outer`   | Break `c_guard` after `c2_defer` and `c_defer` statements are executed. Breaks out from any local loop/switch too. |
 
 ```c
 #include "stc/algorithm.h"
@@ -507,8 +511,8 @@ int main() {
 #### cx_guard: Extra defer scopes within a single function
 | Usage               |  Description |
 |:--------------------|:----------------------------------------------------------|
-| `cx_guard {...}`    | Create a defer scope.  Equal to `cx_guard_with_cap(8) {...}`. |
-| `cx_guard_with_cap(N) {...}` | Create a defer scope with max N defer statements. |
+| `cx_guard {...}`    | Create a defer scope.  Equal to `cx_guard_max(8) {...}`. |
+| `cx_guard_max(N) {...}` | Create a defer scope with max N defer statements. |
 | `cx_defer({...});`  | Add code ... to be deferred to end of `cx_guard`, or until a `cx_return`/`cx_break` |
 | `cx_return(x);`     | Return `x` from current function. Executes statements from `cx_defer` before returning. |
 | `cx_break`          | Break `cx_guard` after `cx_defer` statements are executed. Breaks out from any local loop/switch too.|

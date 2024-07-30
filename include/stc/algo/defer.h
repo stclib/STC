@@ -29,7 +29,7 @@
 // c_guard:
 // ========
 // c_guard { ... }: Create a defer scope that allow up to 32 defer statements.
-// c_guard_with_cap(N) { ... }: Defer scope that allow max N defer statements.
+// c_guard_max(N) { ... }: Defer scope that allow max N defer statements.
 //
 // c_defer({ ... }): Add code inside a c_guard scope which is deferred executed
 //     until a c_return, c_break, or exit of the scope occur.
@@ -59,7 +59,7 @@
 // Use c2_guard, c2_defer, c2_break, c2_break_outer, and c2_return to have
 // defer scopes inside a c_guard. c2_guard is functionally identical to
 // c_guard, but the default max number of deferred statements is 8.
-// Use c2_guard_with_cap(N) to control max number of statements.
+// Use c2_guard_max(N) to control max number of statements.
 //
 // c2_break: Break out of a c2_guard. Unlike regular break it will also break
 //     out of any nested loop/switch. Before breaking, it calls all c2_defer
@@ -80,7 +80,7 @@
 // Use cx_guard, cx_defer, cx_break, and cx_return to have additional defer
 // scopes within a single function. cx_guard is functionally identical to
 // c_guard, but the default max number of deferred statements is 8.
-// Use cx_guard_with_cap(N) to control max number of statements.
+// Use cx_guard_max(N) to control max number of statements.
 //
 // NOTE: cx_guard must not enclose or be enclosed by any other defer scopes.
 //
@@ -128,8 +128,8 @@ int main() {
 }
 */
 
-#define c_guard c_guard_with_cap(32)
-#define c_guard_with_cap(N) \
+#define c_guard c_guard_max(32)
+#define c_guard_max(N) \
     for (int _defer_top = 1, _defer_jmp[(N) + 1] = {-1}; _defer_top >= 0; ) \
         _defer_next: switch (_defer_jmp[_defer_top--]) case 0:
 
@@ -156,8 +156,8 @@ int main() {
 
 #include <setjmp.h>
 
-#define cx_guard cx_guard_with_cap(8)
-#define cx_guard_with_cap(N) \
+#define cx_guard cx_guard_max(8)
+#define cx_guard_max(N) \
     for (struct { int top; jmp_buf jmp[(N) + 1]; } _defer = {0}; \
          !setjmp(_defer.jmp[0]); \
          longjmp(_defer.jmp[_defer.top], 1))
@@ -183,7 +183,7 @@ int main() {
 // --------------------------------------------------------------------------
 
 #define c2_guard cx_guard
-#define c2_guard_with_cap cx_guard_with_cap
+#define c2_guard_max cx_guard_max
 #define c2_defer cx_defer
 #define c2_break cx_break
 

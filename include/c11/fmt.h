@@ -1,11 +1,11 @@
 #ifndef FMT_H_INCLUDED
 #define FMT_H_INCLUDED
 /*
-VER 2.2: NEW API:
+VER 2.3 API:
 void        fmt_print(fmt, ...);
 void        fmt_println(fmt, ...);
 void        fmt_printd(dst, fmt, ...);
-const char* fmt_tm(fmt, struct tm* tp);
+const char* fmt_time(fmt, const struct tm* tm, char *buf, int len);
 void        fmt_close(fmt_stream* ss);
 
   dst - destination, one of:
@@ -24,11 +24,11 @@ void        fmt_close(fmt_stream* ss);
     {{  }}  %       Print the '{', '}', and '%' characters.
 
 * C11 or higher required.
-* MAX 255 chars fmt string by default. MAX 12 arguments after fmt string.
+* MAX 127 chars fmt string by default. MAX 12 arguments after fmt string.
 * Define FMT_IMPLEMENT, STC_IMPLEMENT or i_implement prior to #include in one translation unit.
 * (c) operamint, 2022, MIT License.
 -----------------------------------------------------------------------------------
-#define FMT_IMPLEMENT
+#define i_implement
 #include "c11/fmt.h"
 
 int main(void) {
@@ -61,9 +61,9 @@ int main(void) {
     time_t now = time(NULL);
     struct tm t1 = *localtime(&now), t2 = t1;
     t2.tm_year += 2;
-    // NB! max 2 fmt_tm() calls per fmt_print()!
-    fmt_print("Dates: {} and {}\n", fmt_tm("%Y-%m-%d %X %Z", &t1),
-                                    fmt_tm("%Y-%m-%d %X %Z", &t2));
+    char b[2][64];
+    fmt_print("Dates: {} and {}\n", fmt_time("%Y-%m-%d %X %Z", &t1, b[0], 63),
+                                    fmt_time("%Y-%m-%d %X %Z", &t2, b[1], 63));
 }
 */
 #include <stdio.h>
@@ -105,8 +105,8 @@ typedef struct {
   #define FMT_API
 #endif
 
-struct tm;  /* Max 2 usages. Buffer = 64 chars. */
-FMT_API const char* fmt_tm(const char *fmt, const struct tm *tp);
+struct tm;
+FMT_API const char* fmt_time(const char *fmt, const struct tm* tm, char* buf, int len);
 FMT_API void        fmt_close(fmt_stream* ss);
 FMT_API int        _fmt_parse(char* p, int nargs, const char *fmt, ...);
 FMT_API void       _fmt_sprint(fmt_stream*, const char* fmt, ...);
@@ -215,11 +215,10 @@ FMT_DEF FMT_UNUSED void fmt_close(fmt_stream* ss) {
     free(ss->data);
 }
 
-FMT_DEF FMT_UNUSED const char* fmt_tm(const char *fmt, const struct tm *tp) {
-    static char buf[2][64];
-    static int i;
-    strftime(buf[(i = !i)], sizeof(buf[0]) - 1, fmt, tp);
-    return buf[i];
+FMT_DEF FMT_UNUSED
+const char* fmt_time(const char *fmt, const struct tm* tm, char* buf, int len) {
+    strftime(buf, (size_t)len, fmt, tm);
+    return buf;
 }
 
 FMT_DEF void _fmt_sprint(fmt_stream* ss, const char* fmt, ...) {
