@@ -425,12 +425,13 @@ void        c_default_drop(Type* p);                    // does nothing
 | `c_guard {...}`     | Create a defer scope. Equal to `c_guard_max(32) {...}`. |
 | `c_guard_max(N) {...}` | Create a defer scope with max N defer statements. |
 | `c_defer({...});`   | Add code ... to be deferred to end of `c_guard`, or until a `c_return`/`c_break`|
+| `c_panic({...});`   | Executes all deferred statements added, then the code ... May contain normal `return` or exit(). |
 | `c_return(x);`      | Return `x` from current function after `c_defer` statements are executed. |
 | `c_break`           | Break `c_guard` after `c_defer` statements are executed. Breaks out from any local loop/switch too.|
 
-- *Note 1*: `c_return(x)` uses __typeof__, which is not 100% portable, but is supported
+- *Note 1*: `c_return(x)` uses **typeof**, which is standard in C23, but supported
 by virtually every C99 compiler, except MSVC prior to version 19.39 / VS17.9.
-Use `c_return_typed(Type, x)` in case no **typeof** support.
+If **typeof** is not supported, use `c_return_typed(Type, x)`.
 - *Note 2*: Code compiles only with a single `c_guard` per function. See `c2_guard`/`cx_guard`
 for additional defer guards within a single function.
 
@@ -472,6 +473,7 @@ int read_nums(void) {
 | `c2_guard {...}`   | Create a level-2 defer scope anywhere inside a `c_guard`. Equal to `c2_guard_max(8) {...}`. |
 | `c2_guard_max(N) {...}` | Create a defer scope with max N defer statements. |
 | `c2_defer({...});` | Add code ... to be deferred to end of `c2_guard`, or until a `c2_return`/`c2_break`|
+| `c2_panic({...});` | Like `c_panic`, but executes first `c2_defer`+`c_defer` statements, then ... and exits `c_guard` scope. |
 | `c2_return(x);`    | Return `x` from current function after `c2_defer` and `c_defer` statements are executed. |
 | `c2_break`         | Break `c2_guard` after `c2_defer` statements are executed. Breaks out from any local loop/switch too.|
 | `c2_break_outer`   | Break `c_guard` after `c2_defer` and `c_defer` statements are executed. Breaks out from any local loop/switch too. |
