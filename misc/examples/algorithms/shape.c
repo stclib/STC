@@ -77,7 +77,7 @@ struct ShapeAPI Triangle_api = {
 // Polygon implementation
 // ============================================================
 
-#define i_TYPE PointVec,Point
+#define i_type PointVec,Point
 #include "stc/stack.h"
 
 typedef struct {

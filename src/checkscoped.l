@@ -32,7 +32,7 @@ STR \"([^"\\]|\\.)*\"
 {STR}           ;
 '\\?.'          ;
 c_foreach       |
-c_forpair       |
+c_foreach_kv    |
 c_forrange      |
 c_formatch      |
 c_formatch_sv   |

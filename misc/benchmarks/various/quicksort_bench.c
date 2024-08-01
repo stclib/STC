@@ -6,7 +6,7 @@
   #include <algorithm>
 #endif
 #define NDEBUG
-#define i_TYPE Ints,int
+#define i_type Ints,int
 #define i_more
 #include "stc/vec.h"
 #include "stc/algo/quicksort.h"

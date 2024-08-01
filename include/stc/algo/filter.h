@@ -22,7 +22,7 @@
 */
 /*
 #include <stdio.h>
-#define i_TYPE Vec, int
+#define i_type Vec, int
 #include "stc/cstack.h"
 #include "stc/algorithm.h"
 

@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include "stc/coroutine.h"
 
-#define i_TYPE Tasks, struct cco_task*
+#define i_type Tasks, struct cco_task*
 #define i_keydrop(x) { puts("free task"); free(*x); }
 #define i_no_clone
 #include "stc/queue.h"

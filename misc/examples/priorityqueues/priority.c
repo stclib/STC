@@ -3,7 +3,7 @@
 #include <time.h>
 #include "stc/crand.h"
 
-#define i_TYPE PQueue,int
+#define i_type PQueue,int
 #define i_cmp -c_default_cmp  // min-heap (increasing values)
 #include "stc/pque.h"
 

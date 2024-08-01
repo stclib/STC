@@ -5,7 +5,7 @@
 #include "stc/csview.h"
 #include "stc/algorithm.h"
 
-#define i_TYPE IVec,int
+#define i_type IVec,int
 #include "stc/stack.h"
 
 // filters and transforms:

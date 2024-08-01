@@ -3,7 +3,7 @@
 #include <time.h>
 #include "stc/crand.h"
 
-#define i_TYPE hmap_ui, uint64_t, int
+#define i_type hmap_ui, uint64_t, int
 #include "stc/hmap.h"
 
 static uint64_t seed = 12345;
@@ -27,7 +27,7 @@ static void test_repeats(void)
     hmap_ui_drop(&m);
 }
 
-#define i_TYPE hmap_uu, uint32_t, uint64_t
+#define i_type hmap_uu, uint32_t, uint64_t
 #include "stc/hmap.h"
 
 void test_distribution(void)

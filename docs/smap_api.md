@@ -15,7 +15,7 @@ See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) fo
 ## Header file and declaration
 
 ```c
-#define i_TYPE <ct>,<kt>,<vt> // shorthand to define i_type,i_key,i_val
+#define i_type <ct>,<kt>,<vt> // shorthand to define i_type,i_key,i_val
 #define i_type <t>            // container type name (default: smap_{i_key})
 #define i_key <t>             // key type: REQUIRED.
 #define i_val <t>             // mapped value type: REQUIRED.
@@ -233,7 +233,7 @@ static int Vec3i_cmp(const Vec3i* a, const Vec3i* b) {
     return a->z - b->z;
 }
 
-#define i_TYPE smap_vi, Vec3i, int
+#define i_type smap_vi, Vec3i, int
 #define i_cmp Vec3i_cmp
 #include "stc/smap.h"
 #include <stdio.h>
@@ -247,8 +247,8 @@ int main(void)
     smap_vi_insert(&vmap, (Vec3i){0, 0, 100}, 3);
     smap_vi_insert(&vmap, (Vec3i){100, 100, 100}, 4);
 
-    c_forpair (v, n, smap_vi, vmap)
-        printf("{ %3d, %3d, %3d }: %d\n", _.v->x, _.v->y, _.v->z, *_.n);
+    c_foreach_kv (v, n, smap_vi, vmap)
+        printf("{ %3d, %3d, %3d }: %d\n", v->x, v->y, v->z, *n);
 
     smap_vi_drop(&vmap);
 }

@@ -31,28 +31,28 @@ STC_DEF _m_iter _c_MEMB(_advance)(_m_iter it, intptr_t n) {
 }
 
 STC_DEF void
-_c_MEMB(_clear)(i_type* self) {
-    c_foreach (i, i_type, *self)
+_c_MEMB(_clear)(_i_self* self) {
+    c_foreach (i, _i_self, *self)
         { i_keydrop(i.ref); }
     self->start = 0, self->end = 0;
 }
 
 STC_DEF void
-_c_MEMB(_drop)(const i_type* cself) {
-    i_type* self = (i_type*)cself;
+_c_MEMB(_drop)(const _i_self* cself) {
+    _i_self* self = (_i_self*)cself;
     _c_MEMB(_clear)(self);
     i_free(self->cbuf, (self->capmask + 1)*c_sizeof(*self->cbuf));
 }
 
-STC_DEF i_type
+STC_DEF _i_self
 _c_MEMB(_with_capacity)(const intptr_t n) {
-    i_type cx = {0};
+    _i_self cx = {0};
     _c_MEMB(_reserve)(&cx, n);
     return cx;
 }
 
 STC_DEF bool
-_c_MEMB(_reserve)(i_type* self, const intptr_t n) {
+_c_MEMB(_reserve)(_i_self* self, const intptr_t n) {
     if (n <= self->capmask)
         return true;
     intptr_t oldpow2 = self->capmask + 1, newpow2 = c_next_pow2(n + 1);
@@ -75,7 +75,7 @@ _c_MEMB(_reserve)(i_type* self, const intptr_t n) {
 }
 
 STC_DEF _m_value*
-_c_MEMB(_push)(i_type* self, _m_value value) { // push_back
+_c_MEMB(_push)(_i_self* self, _m_value value) { // push_back
     intptr_t end = (self->end + 1) & self->capmask;
     if (end == self->start) { // full
         _c_MEMB(_reserve)(self, self->capmask + 3); // => 2x expand
@@ -88,14 +88,14 @@ _c_MEMB(_push)(i_type* self, _m_value value) { // push_back
 }
 
 STC_DEF void
-_c_MEMB(_shrink_to_fit)(i_type *self) {
+_c_MEMB(_shrink_to_fit)(_i_self *self) {
     intptr_t sz = _c_MEMB(_size)(self), j = 0;
     if (sz > self->capmask/2)
         return;
-    i_type out = _c_MEMB(_with_capacity)(sz);
+    _i_self out = _c_MEMB(_with_capacity)(sz);
     if (!out.cbuf)
         return;
-    c_foreach (i, i_type, *self)
+    c_foreach (i, _i_self, *self)
         out.cbuf[j++] = *i.ref;
     out.end = sz;
     i_free(self->cbuf, (self->capmask + 1)*c_sizeof(*self->cbuf));
@@ -103,12 +103,12 @@ _c_MEMB(_shrink_to_fit)(i_type *self) {
 }
 
 #if !defined i_no_clone
-STC_DEF i_type
-_c_MEMB(_clone)(i_type q) {
+STC_DEF _i_self
+_c_MEMB(_clone)(_i_self q) {
     intptr_t sz = _c_MEMB(_size)(&q), j = 0;
-    i_type tmp = _c_MEMB(_with_capacity)(sz);
+    _i_self tmp = _c_MEMB(_with_capacity)(sz);
     if (tmp.cbuf)
-        c_foreach (i, i_type, q)
+        c_foreach (i, _i_self, q)
             tmp.cbuf[j++] = i_keyclone((*i.ref));
     q.cbuf = tmp.cbuf;
     q.capmask = tmp.capmask;
@@ -120,7 +120,7 @@ _c_MEMB(_clone)(i_type q) {
 
 #if defined _i_has_eq
 STC_DEF bool
-_c_MEMB(_eq)(const i_type* self, const i_type* other) {
+_c_MEMB(_eq)(const _i_self* self, const _i_self* other) {
     if (_c_MEMB(_size)(self) != _c_MEMB(_size)(other)) return false;
     for (_m_iter i = _c_MEMB(_begin)(self), j = _c_MEMB(_begin)(other);
          i.ref; _c_MEMB(_next)(&i), _c_MEMB(_next)(&j))

@@ -33,11 +33,11 @@ int main(void)
     }
 
     // Print the gaussian bar chart
-    c_forpair (index, count, smap_int, hist) {
-        int n = (int)round((double)*_.count * StdDev * Scale * 2.5 / (double)N);
+    c_foreach_kv (index, count, smap_int, hist) {
+        int n = (int)round((double)*count * StdDev * Scale * 2.5 / (double)N);
         if (n > 0) {
             cstr_resize(&bar, n, '*');
-            printf("%4d %s\n", *_.index, cstr_str(&bar));
+            printf("%4d %s\n", *index, cstr_str(&bar));
         }
     }
     cstr_drop(&bar);

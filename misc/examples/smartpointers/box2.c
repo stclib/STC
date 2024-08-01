@@ -14,10 +14,10 @@ typedef struct {
     Point bottom_right;
 } Rectangle;
 
-#define i_TYPE BoxPoint,Point
+#define i_type BoxPoint,Point
 #include "stc/box.h"
 
-#define i_TYPE BoxRect,Rectangle
+#define i_type BoxRect,Rectangle
 #include "stc/box.h"
 
 // Box in box:

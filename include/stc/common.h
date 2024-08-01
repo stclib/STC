@@ -214,9 +214,11 @@ STC_INLINE intptr_t c_next_pow2(intptr_t n) {
          ; C##_next(&_.iter))
 
 #define c_foreach_kv(key, val, C, cnt) /* structured binding */ \
-    for (C##_iter _it; = C##_begin(&cnt); _it.ref; C##_next(&_it)) \
-    for (const C##_key* key = &_it.ref->first; key; key = NULL) \
-    for (C##_mapped* val = &_it.ref->second; val; val = NULL)
+    for (const C##_key *key, **_k = &key; _k; ) \
+    for (C##_mapped *val; _k; _k = NULL) \
+    for (C##_iter _it = C##_begin(&cnt); \
+         _it.ref && (key = &_it.ref->first, val = &_it.ref->second); \
+         C##_next(&_it))
 
 // c_forrange: python-like indexed iteration
 #define c_forrange(...) c_MACRO_OVERLOAD(c_forrange, __VA_ARGS__)

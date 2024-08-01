@@ -17,7 +17,7 @@ See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/contain
 ## Header file and declaration
 
 ```c
-#define i_TYPE <ct>,<kt>,<vt> // shorthand to define i_type,i_key,i_val
+#define i_type <ct>,<kt>,<vt> // shorthand to define i_type,i_key,i_val
 #define i_type <t>            // container type name (default: hmap_{i_key})
 #define i_key <t>             // key type: REQUIRED.
 #define i_val <t>             // mapped value type: REQUIRED.
@@ -210,7 +210,7 @@ Demonstrate hmap with plain-old-data key type Vec3i and int as mapped type: hmap
 #include <stdio.h>
 typedef struct { int x, y, z; } Vec3i;
 
-#define i_TYPE hmap_vi, Vec3i, int
+#define i_type hmap_vi, Vec3i, int
 #define i_eq c_memcmp_eq // bitwise equal
 #include "stc/hmap.h"
 
@@ -224,8 +224,8 @@ int main(void)
     hmap_vi_insert(&vecs, (Vec3i){  0,   0, 100}, 3);
     hmap_vi_insert(&vecs, (Vec3i){100, 100, 100}, 4);
 
-    c_forpair (v3, num, hmap_vi, vecs)
-        printf("{ %3d, %3d, %3d }: %d\n", _.v3->x, _.v3->y, _.v3->z, *_.num);
+    c_foreach_kv (v3, num, hmap_vi, vecs)
+        printf("{ %3d, %3d, %3d }: %d\n", v3->x, v3->y, v3->z, *num);
 
     hmap_vi_drop(&vecs);
 }
@@ -244,7 +244,7 @@ Inverse: demonstrate hmap with mapped POD type Vec3i: hmap<int, Vec3i>:
 #include <stdio.h>
 typedef struct { int x, y, z; } Vec3i;
 
-#define i_TYPE hmap_iv, int, Vec3i
+#define i_type hmap_iv, int, Vec3i
 #include "stc/hmap.h"
 
 int main(void)
@@ -256,8 +256,8 @@ int main(void)
     hmap_iv_insert(&vecs, 3, (Vec3i){  0,   0, 100});
     hmap_iv_insert(&vecs, 4, (Vec3i){100, 100, 100});
 
-    c_forpair (num, v3, hmap_iv, vecs)
-        printf("%d: { %3d, %3d, %3d }\n", *_.num, _.v3->x, _.v3->y, _.v3->z);
+    c_foreach_kv (num, v3, hmap_iv, vecs)
+        printf("%d: { %3d, %3d, %3d }\n", *num, v3->x, v3->y, v3->z);
 
     hmap_iv_drop(&vecs);
 }
@@ -323,8 +323,8 @@ int main(void)
     Viking_drop(&lookup);
 
     // Print the status of the vikings.
-    c_forpair (vik, hp, Vikings, vikings) {
-        printf("%s of %s has %d hp\n", cstr_str(&_.vik->name), cstr_str(&_.vik->country), *_.hp);
+    c_foreach_kv (vik, hp, Vikings, vikings) {
+        printf("%s of %s has %d hp\n", cstr_str(&vik->name), cstr_str(&vik->country), *hp);
     }
     Vikings_drop(&vikings);
 }
@@ -400,8 +400,8 @@ int main(void)
     Vikings_value* v = Vikings_get_mut(&vikings, (RViking){"Einar", "Norway"});
     v->second += 3; // add 3 hp points to Einar
 
-    c_forpair (vk, hp, Vikings, vikings) {
-        printf("%s of %s has %d hp\n", cstr_str(&_.vk->name), cstr_str(&_.vk->country), *_.hp);
+    c_foreach_kv (vk, hp, Vikings, vikings) {
+        printf("%s of %s has %d hp\n", cstr_str(&vk->name), cstr_str(&vk->country), *hp);
     }
     Vikings_drop(&vikings);
 }

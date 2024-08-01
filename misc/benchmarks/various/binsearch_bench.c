@@ -1,4 +1,4 @@
-#define i_TYPE ivec,int
+#define i_type ivec,int
 #define i_opt c_use_cmp | c_more
 #include "stc/vec.h"
 #include "stc/algo/quicksort.h"

@@ -25,7 +25,7 @@
 /*
 #include <stdio.h>
 
-#define i_TYPE sset_i,int
+#define i_type sset_i,int
 #include "stc/sset.h" // sorted set of int
 
 int main(void) {

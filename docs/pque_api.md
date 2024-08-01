@@ -8,7 +8,7 @@ See the c++ class [std::priority_queue](https://en.cppreference.com/w/cpp/contai
 ## Header file and declaration
 
 ```c
-#define i_TYPE <ct>,<kt> // shorthand to define i_type,i_key
+#define i_type <ct>,<kt> // shorthand to define i_type,i_key
 #define i_type <t>       // pque container type name (default: pque_{i_key})
 #define i_key <t>        // element type: REQUIRED. Defines pque_X_value
 #define i_less <f>       // compare two i_key* : REQUIRED IF i_key/i_keyraw is a non-integral type
@@ -65,7 +65,7 @@ i_key               pque_X_value_clone(i_key value);
 #include "stc/crand.h"
 #include <stdio.h>
 
-#define i_TYPE PriorityQ, int64_t
+#define i_type PriorityQ, int64_t
 #define i_cmp -c_default_cmp // min-heap
 #include "stc/pque.h"
 

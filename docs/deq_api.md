@@ -10,7 +10,7 @@ See the c++ class [std::deque](https://en.cppreference.com/w/cpp/container/deque
 ## Header file and declaration
 
 ```c
-#define i_TYPE <ct>,<kt> // shorthand to define i_type,i_key
+#define i_type <ct>,<kt> // shorthand to define i_type,i_key
 #define i_type <t>       // deq container type name (default: deq_{i_key})
 #define i_key <t>        // element type: REQUIRED. Defines deq_X_value
 #define i_cmp <f>        // three-way compare of two i_keyraw*.
@@ -99,7 +99,7 @@ void               deq_X_value_drop(deq_X_value* pval);
 
 ## Examples
 ```c
-#define i_TYPE Deque,int32_t
+#define i_type Deque,int32_t
 #include "stc/deq.h"
 #include <stdio.h>
 

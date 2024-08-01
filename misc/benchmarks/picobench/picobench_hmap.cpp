@@ -30,11 +30,11 @@ DEFMAP(map_i32, <int32_t, int32_t>);
 DEFMAP(map_u64, <uint64_t, uint64_t>);
 DEFMAP(map_str, <std::string, std::string>);
 
-#define i_TYPE hmap_i32, int32_t, int32_t
+#define i_type hmap_i32, int32_t, int32_t
 #define i_max_load_factor float(MaxLoadFactor100) / 100.0f
 #include "stc/hmap.h"
 
-#define i_TYPE hmap_u64, uint64_t, uint64_t
+#define i_type hmap_u64, uint64_t, uint64_t
 #define i_max_load_factor float(MaxLoadFactor100) / 100.0f
 #include "stc/hmap.h"
 

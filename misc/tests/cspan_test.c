@@ -43,7 +43,7 @@ TEST(cspan, slice) {
     EXPECT_EQ(45, sum2);
 }
 
-#define i_TYPE Stack,int
+#define i_type Stack,int
 #include "stc/stack.h"
 
 TEST(cspan, slice2) {
@@ -73,7 +73,7 @@ TEST(cspan, slice2) {
 }
 
 
-#define i_TYPE Tiles,Span3
+#define i_type Tiles,Span3
 #include "stc/stack.h"
 
 TEST_FIXTURE(cspan_cube) {

@@ -28,7 +28,7 @@ void stringdemo1(void)
     cstr_drop(&cs);
 }
 
-#define i_TYPE vec_ll, long long
+#define i_type vec_ll, long long
 #include "stc/vec.h"
 
 void vectordemo1(void)
@@ -118,7 +118,7 @@ void setdemo1(void)
     hset_int_drop(&nums);
 }
 
-#define i_TYPE hmap_ii,int,int
+#define i_type hmap_ii,int,int
 #include "stc/hmap.h"
 
 void mapdemo1(void)

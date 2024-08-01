@@ -3,7 +3,7 @@
 "No raw loops" - Sean Parent
 ## Ranged for-loops
 
-### c_foreach, c_foreach_reverse, c_foreach_n, c_forpair
+### c_foreach, c_foreach_reverse, c_foreach_n, c_foreach_kv
 ```c
 #include "stc/common.h"
 ```
@@ -15,10 +15,10 @@
 | `c_foreach_reverse (it, ctype, container)`| Iteratate all elements in reverse. *vec, deq, queue, stack* only! |
 | `c_foreach_reverse (it, ctype, it1, it2)`| Iteratate range [it1, it2) elements in reverse. |
 | `c_foreach_n (it, ctype, cnt, n)`        | Iterate up to n times using it.index and it.n |
-| `c_forpair (key, val, ctype, container)` | Iterate with structured binding           |
+| `c_foreach_kv (key, val, ctype, container)` | Iterate with structured binding           |
 
 ```c
-#define i_TYPE IMap,int,int
+#define i_type IMap,int,int
 #include "stc/smap.h"
 // ...
 IMap map = c_init(IMap, { {23,1}, {3,2}, {7,3}, {5,4}, {12,5} });
@@ -38,8 +38,8 @@ c_foreach (i, IMap, iter, IMap_end(&map))
 // 7 12 23
 
 // iterate with "structured binding":
-c_forpair (id, count, IMap, map)
-    printf(" (%d %d)", *_.id, *_.count);
+c_foreach_kv (id, count, IMap, map)
+    printf(" (%d %d)", *id, *count);
 
 // iterate first 3 with an index count enumeration
 c_foreach_n (i, IMap, map, 3)
@@ -163,7 +163,7 @@ It enables a subset of functional programming like in other popular languages.
 [ [Run this example](https://godbolt.org/z/7dP5a1s4s) ]
 ```c
 #include <stdio.h>
-#define i_TYPE Vec, int
+#define i_type Vec, int
 #include "stc/stack.h"
 #include "stc/algorithm.h"
 
@@ -239,11 +239,11 @@ Erase linearily in containers using a predicate. `value` is a pointer to each el
 #include "stc/cstr.h"
 #include "stc/algorithm.h"
 
-#define i_TYPE Vec,int
+#define i_type Vec,int
 #define i_use_cmp
 #include "stc/vec.h"
 
-#define i_TYPE List,int
+#define i_type List,int
 #define i_use_cmp
 #include "stc/list.h"
 
@@ -333,7 +333,7 @@ int main(void) {
 Also sorting deq/queue (with ring buffer) is possible, and very fast. Note that `i_more`
 must be defined to retain the template parameters after #include deq.h for use by quicksort:
 ```c
-#define i_TYPE MyDeq,int
+#define i_type MyDeq,int
 #define i_more
 #include "stc/deq.h" // deque
 #include "stc/algo/quicksort.h"

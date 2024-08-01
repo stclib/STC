@@ -17,10 +17,10 @@ using omap_i32 = std::map<int, int>;
 using omap_u64 = std::map<uint64_t, uint64_t>;
 using omap_str = std::map<std::string, std::string>;
 
-#define i_TYPE smap_i32, int32_t, int32_t
+#define i_type smap_i32, int32_t, int32_t
 #include "stc/smap.h"
 
-#define i_TYPE smap_u64, uint64_t, uint64_t
+#define i_type smap_u64, uint64_t, uint64_t
 #include "stc/smap.h"
 
 #define i_key_cstr

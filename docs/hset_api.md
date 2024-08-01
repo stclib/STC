@@ -7,7 +7,7 @@ A **hset** is an associative container that contains a set of unique objects of 
 ## Header file and declaration
 
 ```c
-#define i_TYPE <ct>,<kt> // shorthand to define i_type,i_key
+#define i_type <ct>,<kt> // shorthand to define i_type,i_key
 #define i_type <t>       // container type name (default: hset_{i_key})
 #define i_key <t>        // element type: REQUIRED. Defines hset_X_value
 #define i_hash <f>       // hash func i_keyraw*: REQUIRED IF i_keyraw is non-pod type

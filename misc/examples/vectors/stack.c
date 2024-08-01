@@ -1,11 +1,11 @@
 
 #include <stdio.h>
 
-#define i_TYPE stack_i, int
+#define i_type stack_i, int
 #define i_capacity 100
 #include "stc/stack.h"
 
-#define i_TYPE stack_c, char
+#define i_type stack_c, char
 #include "stc/stack.h"
 
 int main(void) {

@@ -18,7 +18,7 @@ uint64_t seed = 1, mask1 = 0xfffffff, mask2 = 0xffff;
 static float secs(Range s) { return (float)(s.t2 - s.t1) / CLOCKS_PER_SEC; }
 
 #define i_val size_t
-#define i_TYPE list_u64, uint64_t
+#define i_type list_u64, uint64_t
 #include "stc/list.h"
 
 #ifdef __cplusplus

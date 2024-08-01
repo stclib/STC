@@ -8,7 +8,7 @@ void int_drop(int* x) {
 // arc implements its own clone method using reference counting,
 // so 'i_keyclone' is not required to be defined (ignored).
 
-#define i_TYPE Arc,int      // set type name to be defined (instead of 'arc_int')
+#define i_type Arc,int      // set type name to be defined (instead of 'arc_int')
 #define i_keydrop int_drop  // optional, just to display the elements destroyed
 #define i_use_cmp           // enable default comparison (on int)
 #include "stc/arc.h"        // Arc

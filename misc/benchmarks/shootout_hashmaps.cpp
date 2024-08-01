@@ -33,11 +33,11 @@ typedef int64_t IValue;
 KHASH_MAP_INIT_INT64(ii, IValue)
 
 // STC hmap template definition
-#define i_TYPE hmap_ii,IKey,IValue
+#define i_type hmap_ii,IKey,IValue
 #define i_max_load_factor MAX_LOAD_FACTOR / 100.0f
 #include "stc/hmap.h"
 
-#define i_TYPE ivec,IKey
+#define i_type ivec,IKey
 #include "stc/stack.h"
 
 // Verstable map

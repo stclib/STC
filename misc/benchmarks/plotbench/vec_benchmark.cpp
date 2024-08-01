@@ -17,7 +17,7 @@ uint64_t seed = 1, mask1 = 0xfffffff, mask2 = 0xffff;
 
 static float secs(Range s) { return (float)(s.t2 - s.t1) / CLOCKS_PER_SEC; }
 
-#define i_TYPE vec_u64,uint64_t
+#define i_type vec_u64,uint64_t
 #include "stc/vec.h"
 
 #ifdef __cplusplus

@@ -50,8 +50,8 @@ int main(void)
     add(&map, "Anne Dickens", "Anne@myplace.com", "Development");
 
     c_foreach (i, Departments, map)
-        c_forpair (name, email, People, i.ref->second)
-            printf("%s: %s - %s\n", cstr_str(&i.ref->first), cstr_str(_.name), cstr_str(_.email));
+        c_foreach_kv (name, email, People, i.ref->second)
+            printf("%s: %s - %s\n", cstr_str(&i.ref->first), cstr_str(name), cstr_str(email));
     puts("");
 
     printf("found Nick Denton: %d\n", contains(&map, "Nick Denton"));

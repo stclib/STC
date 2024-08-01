@@ -8,7 +8,7 @@ See the c++ class [std::set](https://en.cppreference.com/w/cpp/container/set) fo
 ## Header file and declaration
 
 ```c
-#define i_TYPE <ct>,<kt> // shorthand to define i_type,i_key
+#define i_type <ct>,<kt> // shorthand to define i_type,i_key
 #define i_type <t>       // container type name (default: sset_{i_key})
 #define i_key <t>        // element type: REQUIRED. Defines sset_X_value
 #define i_cmp <f>        // three-way compare two i_keyraw* : REQUIRED IF i_keyraw is a non-integral type

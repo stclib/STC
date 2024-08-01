@@ -6,11 +6,11 @@
 forward_queue(queue_pnt, struct Point);
 
 typedef struct Point { int x, y; } Point;
-#define i_TYPE queue_pnt,Point
+#define i_type queue_pnt,Point
 #define i_is_forward
 #include "stc/queue.h"
 
-#define i_TYPE IntQ,int
+#define i_type IntQ,int
 #include "stc/queue.h"
 
 int main(void) {

@@ -57,18 +57,18 @@ point_key_cmp(const point* a, const point* b)
     return (i == j) ? 0 : (i < j) ? -1 : 1;
 }
 
-#define i_TYPE pque_point, point
+#define i_type pque_point, point
 #define i_cmp point_cmp_priority
 #include "stc/pque.h"
 
-#define i_TYPE deq_point, point
+#define i_type deq_point, point
 #include "stc/deq.h"
 
-#define i_TYPE smap_pcost, point, int
+#define i_type smap_pcost, point, int
 #define i_cmp point_key_cmp
 #include "stc/smap.h"
 
-#define i_TYPE smap_pstep, point, point
+#define i_type smap_pstep, point, point
 #define i_cmp point_key_cmp
 #include "stc/smap.h"
 

@@ -54,7 +54,7 @@ Containers
 
 Algorithms
 ----------
-- [***Ranged for-loops*** - c_foreach, c_forpair, c_foritems](docs/algorithm_api.md#ranged-for-loops)
+- [***Ranged for-loops*** - c_foreach, c_foreach_kv, c_foritems](docs/algorithm_api.md#ranged-for-loops)
 - [***Range algorithms*** - c_forrange, crange, c_filter](docs/algorithm_api.md#range-algorithms)
 - [***Generic algorithms*** - c_init, c_find_if, c_erase_if, quicksort, lower_bound, ...](docs/algorithm_api.md#generic-algorithms)
 - [***Coroutines*** - ergonomic portable coroutines](docs/coroutine_api.md)
@@ -171,7 +171,7 @@ like **cstr** and **cbits** are generic/templated. No type casting is used, so c
 templated types in C++. However, to specify template parameters with STC, you define them as macros prior to
 including the container, e.g.
 ```c
-#define i_TYPE Floats, float // Container type (name, element type)
+#define i_type Floats, float // Container type (name, element type)
 #include "stc/vec.h"         // "instantiate" the desired container type
 #include <stdio.h>
 
@@ -197,7 +197,7 @@ Switching to a different container type, e.g. a sorted set (sset):
 
 [ [Run this code](https://godbolt.org/z/ehzns5Pd9) ]
 ```c
-#define i_TYPE Floats, float
+#define i_type Floats,float
 #include "stc/sset.h" // Use a sorted set instead
 #include <stdio.h>
 
@@ -231,7 +231,7 @@ Let's make a vector of vectors, which can be cloned. All of its element vectors 
 #include <stdio.h>
 #include "stc/algorithm.h"
 
-#define i_TYPE Vec,float
+#define i_type Vec,float
 #define i_use_cmp        // enable default ==, < and hash operations
 #include "stc/vec.h"
 
@@ -279,7 +279,7 @@ This example uses four different container types:
 
 struct Point { float x, y; };
 // Define cvec_pnt and enable linear search by defining i_eq
-#define i_TYPE vec_pnt, struct Point
+#define i_type vec_pnt, struct Point
 #define i_eq(a, b) (a->x == b->x && a->y == b->y)
 #include "stc/vec.h"    // vec_pnt: vector of struct Point
 
@@ -287,7 +287,7 @@ struct Point { float x, y; };
 #define i_use_cmp       // enable sort/search. Use native `<` and `==` operators
 #include "stc/list.h"   // list_int: singly linked list
 
-#define i_TYPE smap_int, int, int
+#define i_type smap_int, int, int
 #include "stc/smap.h"  // sorted map int => int
 
 int main(void)
@@ -541,7 +541,7 @@ Define `i_type` instead of `i_tag`, or `i_TYPE` to define both `i_type` and `i_k
 ```c
 #define i_type MyVec
 #define i_key int
-// #define i_TYPE MyVec,int // shorthand
+// #define i_type MyVec,int // shorthand
 #include "stc/vec.h"
 
 MyVec vec = {0};
@@ -568,7 +568,7 @@ Create a dedicated header for the container type instance:
 // Do not to include user defined headers here if they use templated containers themselves
 
 // NB! struct Point must be complete at this point!
-#define i_TYPE PointVec,struct Point
+#define i_type PointVec,struct Point
 #define i_header    // Do not implement, only expose API
 #include "stc/vec.h"
 
@@ -622,7 +622,7 @@ Define and use the "private" container in the c-file:
 #include "Dataset.h"
 #include "Point.h"          // struct Point must be defined here.
 
-#define i_TYPE PointVec, struct Point
+#define i_type PointVec, struct Point
 #define i_is_forward        // flag that the container was forward declared.
 #include "stc/vec.h"        // Implements PointVec with static linking by default
 ...
@@ -661,7 +661,7 @@ allocated size of the given pointer, unlike standard `realloc` and `free`.
 ```
 Usage is straight forward:
 ```c
-#define i_TYPE IMap,int,int
+#define i_type IMap,int,int
 #include "stcpgs.h"
 #include "stc/smap.h"
 

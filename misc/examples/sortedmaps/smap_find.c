@@ -8,7 +8,7 @@
 #define i_val_cstr
 #include "stc/smap.h"
 
-#define i_TYPE vec_istr, smap_istr_raw
+#define i_type vec_istr, smap_istr_raw
 #include "stc/vec.h"
 
 void print_elem(smap_istr_raw p) {

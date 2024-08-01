@@ -3,7 +3,7 @@
 #define i_implement
 #include "stc/cstr.h"
 
-#define i_TYPE IBox,long
+#define i_type IBox,long
 #include "stc/box.h" // unique_ptr<long> alike.
 
 // hmap of cstr => IBox
@@ -25,8 +25,8 @@ int main(void)
     Boxmap_emplace(&map, "Test3", 3);
     Boxmap_emplace(&map, "Test4", 4);
 
-    c_forpair (name, number, Boxmap, map)
-        printf("%s: %ld\n", cstr_str(_.name), *_.number->get);
+    c_foreach_kv (name, number, Boxmap, map)
+        printf("%s: %ld\n", cstr_str(name), *number->get);
     puts("");
 
     Boxmap_drop(&map);

@@ -54,8 +54,8 @@ int main(void)
     printf("Review for Jane: %s\n", cstr_str(hmap_cstr_at(&book_reviews, "Pride and Prejudice")));
 
     // Iterate over everything.
-    c_forpair (book, review, hmap_cstr, book_reviews) {
-        printf("%s: \"%s\"\n", cstr_str(_.book), cstr_str(_.review));
+    c_foreach_kv (book, review, hmap_cstr, book_reviews) {
+        printf("%s: \"%s\"\n", cstr_str(book), cstr_str(review));
     }
 
     hmap_cstr_drop(&book_reviews);

@@ -91,7 +91,7 @@ Iterate tokens in an input string split by a separator string:
 - `it.token` is a csview of the current token.
 
 ```c
-c_fortoken (i, ", ", "hello, one, two, three")
+c_fortoken_sv (i, ", ", c_sv("hello, one, two, three"))
     printf("'%.*s' ", c_SVARG(i.token));
 // 'hello' 'one' 'two' 'three'
 ```

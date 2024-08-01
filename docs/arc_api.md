@@ -21,7 +21,7 @@ See similar c++ class [std::shared_ptr](https://en.cppreference.com/w/cpp/memory
 ## Header file and declaration
 
 ```c
-#define i_TYPE <ct>,<kt>   // shorthand to define i_type,i_key
+#define i_type <ct>,<kt>   // shorthand to define i_type,i_key
 #define i_type <t>         // arc container type name (default: arc_{i_key})
 #define i_key <t>          // element type: REQUIRED. Defines arc_X_value
 #define i_keyclass <t>     // Use instead of i_key when functions {i_key}_clone,
@@ -146,15 +146,15 @@ int main(void)
 
     puts("S1");
     c_foreach (i, Stack, s1) {
-        c_forpair (name, year, Map, *i.ref->get)
-            printf("  %s:%d", cstr_str(_.name), *_.year);
+        c_foreach_kv (name, year, Map, *i.ref->get)
+            printf("  %s:%d", cstr_str(name), *year);
         puts("");
     }
 
     puts("S2");
     c_foreach (i, Stack, s2) {
-        c_forpair (name, year, Map, *i.ref->get)
-            printf("  %s:%d", cstr_str(_.name), *_.year);
+        c_foreach_kv (name, year, Map, *i.ref->get)
+            printf("  %s:%d", cstr_str(name), *year);
         puts("");
     }
     puts("");

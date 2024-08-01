@@ -4,7 +4,7 @@
 
 #include <stdio.h>
 
-#define i_TYPE IPQue,int
+#define i_type IPQue,int
 #define i_aux bool(*less)(const int*, const int*);
 #define i_less(x, y) self->aux.less(x, y)
 #include "stc/pque.h"

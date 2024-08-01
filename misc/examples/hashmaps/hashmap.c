@@ -41,8 +41,8 @@ int main(void) {
     hmap_cstr_erase(&contacts, "Ashley");
 
     puts("");
-    c_forpair (contact, number, hmap_cstr, contacts) {
-        printf("Calling %s: %s\n", cstr_str(_.contact), call(cstr_str(_.number)));
+    c_foreach_kv (contact, number, hmap_cstr, contacts) {
+        printf("Calling %s: %s\n", cstr_str(contact), call(cstr_str(number)));
     }
     puts("");
 

@@ -35,7 +35,7 @@
   #define c_use_cmp_eq    (c_use_cmp | c_use_eq)
   #define c_more          (1<<7)
 
-  #define _c_MEMB(name) c_JOIN(i_type, name)
+  #define _c_MEMB(name) c_JOIN(_i_self, name)
   #define _c_DEFTYPES(macro, SELF, ...) c_EXPAND(macro(SELF, __VA_ARGS__))
   #define _m_value _c_MEMB(_value)
   #define _m_key _c_MEMB(_key)
@@ -84,28 +84,35 @@
 #elif defined i_val_box
   #define i_val_arcbox i_val_box
 #endif
-
-#if defined i_TYPE && defined _i_is_map
-  #define i_type c_SELECT(_c_SEL31, i_TYPE)
-  #define i_key c_SELECT(_c_SEL32, i_TYPE)
-  #define i_val c_SELECT(_c_SEL33, i_TYPE)
-#elif defined i_TYPE
-  #define i_type c_SELECT(_c_SEL21, i_TYPE)
-  #define i_key c_SELECT(_c_SEL22, i_TYPE)
-#endif
-#ifndef i_type
-  #define i_type c_JOIN(_i_prefix, i_tag)
-#endif
-
 #if defined i_keyboxed || defined i_valboxed
   #error "i_keyboxed, i_valboxed is not supported. " \
          "Use: i_key_box, i_val_box, i_key_arc, i_val_arc."
 #endif
 
+#ifdef i_TYPE // [deprecated]
+  #define i_type i_TYPE
+#endif
+#if defined i_type && !(defined i_key || defined i_key_cstr || \
+                        defined i_keyclass || defined i_key_arcbox)
+  #if defined _i_is_map
+    #define _i_self c_SELECT(_c_SEL31, i_type)
+    #define i_key c_SELECT(_c_SEL32, i_type)
+    #define i_val c_SELECT(_c_SEL33, i_type)
+  #else
+    #define _i_self c_SELECT(_c_SEL21, i_type)
+    #define i_key c_SELECT(_c_SEL22, i_type)
+  #endif
+#elif defined i_type
+  #define _i_self i_type
+#else
+  #define _i_self c_JOIN(_i_prefix, i_tag)
+#endif
+
 #if !(defined i_key || defined i_key_cstr || \
       defined i_keyclass || defined i_key_arcbox)
+
   #if defined _i_is_map
-    #error "i_key* must be defined for maps"
+    #error "i_key* must be defined for maps, or via #define i_type Type,Key,Val"
   #endif
 
   #if defined i_val_cstr

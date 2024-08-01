@@ -1,7 +1,7 @@
 #include <time.h>
 #include <stdio.h>
 
-#define i_TYPE hmap_u64, uint64_t, uint64_t
+#define i_type hmap_u64, uint64_t, uint64_t
 #define i_max_load_factor 0.8f
 #include "stc/hmap.h"
 

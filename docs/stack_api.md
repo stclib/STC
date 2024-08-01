@@ -8,7 +8,7 @@ See the c++ class [std::stack](https://en.cppreference.com/w/cpp/container/stack
 ## Header file and declaration
 
 ```c
-#define i_TYPE <ct>,<kt> // shorthand to define i_type,i_key
+#define i_type <ct>,<kt> // shorthand to define i_type,i_key
 #define i_type <t>       // container type name (default: stack_{i_key})
 #define i_key <t>        // element type: REQUIRED. Defines stack_X_value
 #define i_keydrop <f>    // destroy value func - defaults to empty destruct
@@ -73,7 +73,7 @@ void                stack_X_value_drop(vec_X_value* pval);
 
 ## Example
 ```c
-#define i_TYPE IStack,int
+#define i_type IStack,int
 #include "stc/stack.h"
 
 #include <stdio.h>

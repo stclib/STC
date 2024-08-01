@@ -12,7 +12,7 @@ See the c++ class [std::vector](https://en.cppreference.com/w/cpp/container/vect
 ## Header file and declaration
 
 ```c
-#define i_TYPE <ct>,<kt> // shorthand to define i_type,i_key
+#define i_type <ct>,<kt> // shorthand to define i_type,i_key
 #define i_type <t>       // container type name (default: vec_{i_key})
 #define i_key <t>        // element type: REQUIRED. Defines vec_X_value
 #define i_cmp <f>        // three-way compare two i_keyraw*

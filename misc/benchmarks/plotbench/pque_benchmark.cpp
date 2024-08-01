@@ -3,7 +3,7 @@
 #define i_static
 #include "stc/crand.h"
 
-#define i_TYPE pque_flt, float
+#define i_type pque_flt, float
 #define i_cmp -c_default_cmp
 #include "stc/pque.h"
 

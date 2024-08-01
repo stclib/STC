@@ -1,10 +1,10 @@
 // This implements the std::map insert c++ example at:
 // https://docs.microsoft.com/en-us/cpp/standard-library/map-class?view=msvc-160#example-19
 
-#define i_TYPE smap_ii, int, int
+#define i_type smap_ii, int, int
 #include "stc/smap.h"
 
-#define i_TYPE vec_ii, smap_ii_value
+#define i_type vec_ii, smap_ii_value
 #include "stc/vec.h"
 
 #define i_implement

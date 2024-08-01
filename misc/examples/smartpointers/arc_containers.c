@@ -65,15 +65,15 @@ int main(void)
 
         puts("VEC");
         c_foreach (i, Vec, vec) {
-            c_forpair (name, year, Map, *i.ref->get)
-                printf(" %s:%d", cstr_str(_.name), *_.year);
+            c_foreach_kv (name, year, Map, *i.ref->get)
+                printf(" %s:%d", cstr_str(name), *year);
             puts("");
         }
 
         puts("LIST");
         c_foreach (i, List, list) {
-            c_forpair (name, year, Map, *i.ref->get)
-                printf(" %s:%d", cstr_str(_.name), *_.year);
+            c_foreach_kv (name, year, Map, *i.ref->get)
+                printf(" %s:%d", cstr_str(name), *year);
             puts("");
         }
     }

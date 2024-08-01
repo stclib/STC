@@ -8,7 +8,7 @@
 #define i_implement
 #include "stc/cstr.h"
 
-#define i_TYPE FloatStack,float
+#define i_type FloatStack,float
 #include "stc/stack.h"
 
 #define i_type StackList

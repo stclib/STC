@@ -17,7 +17,7 @@ int point_cmp(const Point* a, const Point* b) {
     return c ? c : a->y - b->y;
 }
 
-#define i_TYPE PMap,Point,int
+#define i_type PMap,Point,int
 #define i_cmp point_cmp
 #define i_is_forward
 #include "stc/smap.h"
@@ -48,12 +48,12 @@ int main(void)
     });
     SSet sset = {0};
 
-    c_forpair (p, i, PMap, pmap)
-        printf(" (%d,%d: %d)", _.p->x, _.p->y, *_.i);
+    c_foreach_kv (p, i, PMap, pmap)
+        printf(" (%d,%d: %d)", p->x, p->y, *i);
     puts("");
 
-    c_forpair (i, j, SMap, smap)
-        printf(" (%s: %s)\n", cstr_str(_.i), cstr_str(_.j));
+    c_foreach_kv (i, j, SMap, smap)
+        printf(" (%s: %s)\n", cstr_str(i), cstr_str(j));
 
     SSet_emplace(&sset, "Hello, friend");
     SSet_emplace(&sset, "Goodbye, foe");

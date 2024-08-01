@@ -10,10 +10,10 @@ int main(void)
     hmap_cstr_emplace(&m, "Test short", "This is a short string");
     hmap_cstr_emplace(&m, "Test long ", "This is a longer string");
 
-    c_forpair (k, v, hmap_cstr, m)
+    c_foreach_kv (k, v, hmap_cstr, m)
         printf("%s: '%s' Len=%d, Is long: %s\n",
-                cstr_str(_.k), cstr_str(_.v), (int)cstr_size(_.v),
-                cstr_is_long(_.v) ? "true" : "false");
+                cstr_str(k), cstr_str(v), (int)cstr_size(v),
+                cstr_is_long(v) ? "true" : "false");
 
     hmap_cstr_drop(&m);
 }

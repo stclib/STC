@@ -17,15 +17,15 @@ inline static int ipair_cmp(const ipair_t* a, const ipair_t* b) {
     return c ? c : c_default_cmp(&a->y, &b->y);
 }
 
-#define i_TYPE vec_ip, ipair_t
+#define i_type vec_ip, ipair_t
 #define i_cmp ipair_cmp
 #include "stc/vec.h"
 
-#define i_TYPE list_ip, ipair_t
+#define i_type list_ip, ipair_t
 #define i_cmp ipair_cmp
 #include "stc/list.h"
 
-#define i_TYPE pque_flt,float
+#define i_type pque_flt,float
 #include "stc/pque.h"
 
 int main(void)
@@ -77,8 +77,8 @@ int main(void)
     hmap_nat_emplace(&countries, "Norway", 0).ref->second += 20;
     hmap_nat_emplace(&countries, "Finland", 0).ref->second += 20;
 
-    c_forpair (country, health, hmap_nat, countries)
-        printf("%s: %d\n", cstr_str(_.country), *_.health);
+    c_foreach_kv (country, health, hmap_nat, countries)
+        printf("%s: %d\n", cstr_str(country), *health);
     puts("");
     hmap_nat_drop(&countries);
 

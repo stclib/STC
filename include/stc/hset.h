@@ -23,7 +23,7 @@
 
 // Unordered set - implemented as closed hashing with linear probing and no tombstones.
 /*
-#define i_TYPE iset,int
+#define i_type iset,int
 #include "stc/hset.h"
 #include <stdio.h>
 

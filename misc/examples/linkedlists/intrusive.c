@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 
-#define i_TYPE List,int
+#define i_type List,int
 #define i_use_cmp
 #include "stc/list.h"
 

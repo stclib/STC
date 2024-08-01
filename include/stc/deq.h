@@ -40,51 +40,51 @@
 #undef _pop
 #undef _pull
 
-STC_API _m_value*   _c_MEMB(_push_front)(i_type* self, _m_value value);
-STC_API _m_iter     _c_MEMB(_insert_n)(i_type* self, intptr_t idx, const _m_value* arr, intptr_t n);
-STC_API _m_iter     _c_MEMB(_insert_uninit)(i_type* self, intptr_t idx, intptr_t n);
-STC_API void        _c_MEMB(_erase_n)(i_type* self, intptr_t idx, intptr_t n);
+STC_API _m_value*   _c_MEMB(_push_front)(_i_self* self, _m_value value);
+STC_API _m_iter     _c_MEMB(_insert_n)(_i_self* self, intptr_t idx, const _m_value* arr, intptr_t n);
+STC_API _m_iter     _c_MEMB(_insert_uninit)(_i_self* self, intptr_t idx, intptr_t n);
+STC_API void        _c_MEMB(_erase_n)(_i_self* self, intptr_t idx, intptr_t n);
 
 STC_INLINE const _m_value*
-_c_MEMB(_at)(const i_type* self, intptr_t idx)
+_c_MEMB(_at)(const _i_self* self, intptr_t idx)
     { return self->cbuf + _cbuf_topos(self, idx); }
 
 STC_INLINE _m_value*
-_c_MEMB(_at_mut)(i_type* self, intptr_t idx)
+_c_MEMB(_at_mut)(_i_self* self, intptr_t idx)
     { return self->cbuf + _cbuf_topos(self, idx); }
 
 STC_INLINE _m_value*
-_c_MEMB(_push_back)(i_type* self, _m_value val)
+_c_MEMB(_push_back)(_i_self* self, _m_value val)
     { return  _c_MEMB(_push)(self, val); }
 
 STC_INLINE void
-_c_MEMB(_pop_back)(i_type* self) {
+_c_MEMB(_pop_back)(_i_self* self) {
     c_assert(!_c_MEMB(_is_empty)(self));
     self->end = (self->end - 1) & self->capmask;
     i_keydrop((self->cbuf + self->end));
 }
 
-STC_INLINE _m_value _c_MEMB(_pull_back)(i_type* self) { // move back out of deq
+STC_INLINE _m_value _c_MEMB(_pull_back)(_i_self* self) { // move back out of deq
     c_assert(!_c_MEMB(_is_empty)(self));
     self->end = (self->end - 1) & self->capmask;
     return self->cbuf[self->end];
 }
 
 STC_INLINE _m_iter
-_c_MEMB(_insert_at)(i_type* self, _m_iter it, const _m_value val) {
+_c_MEMB(_insert_at)(_i_self* self, _m_iter it, const _m_value val) {
     intptr_t idx = _cbuf_toidx(self, it.pos);
     return _c_MEMB(_insert_n)(self, idx, &val, 1);
 }
 
 STC_INLINE _m_iter
-_c_MEMB(_erase_at)(i_type* self, _m_iter it) {
+_c_MEMB(_erase_at)(_i_self* self, _m_iter it) {
     _c_MEMB(_erase_n)(self, _cbuf_toidx(self, it.pos), 1);
     if (it.pos == self->end) it.ref = NULL;
     return it;
 }
 
 STC_INLINE _m_iter
-_c_MEMB(_erase_range)(i_type* self, _m_iter it1, _m_iter it2) {
+_c_MEMB(_erase_range)(_i_self* self, _m_iter it1, _m_iter it2) {
     intptr_t idx1 = _cbuf_toidx(self, it1.pos);
     intptr_t idx2 = _cbuf_toidx(self, it2.pos);
     _c_MEMB(_erase_n)(self, idx1, idx2 - idx1);
@@ -94,18 +94,18 @@ _c_MEMB(_erase_range)(i_type* self, _m_iter it1, _m_iter it2) {
 
 #if !defined i_no_emplace
 STC_API _m_iter
-_c_MEMB(_emplace_n)(i_type* self, intptr_t idx, const _m_raw* raw, intptr_t n);
+_c_MEMB(_emplace_n)(_i_self* self, intptr_t idx, const _m_raw* raw, intptr_t n);
 
 STC_INLINE _m_value*
-_c_MEMB(_emplace_front)(i_type* self, const _m_raw raw)
+_c_MEMB(_emplace_front)(_i_self* self, const _m_raw raw)
     { return _c_MEMB(_push_front)(self, i_keyfrom(raw)); }
 
 STC_INLINE _m_value*
-_c_MEMB(_emplace_back)(i_type* self, const _m_raw raw)
+_c_MEMB(_emplace_back)(_i_self* self, const _m_raw raw)
     { return _c_MEMB(_push)(self, i_keyfrom(raw)); }
 
 STC_INLINE _m_iter
-_c_MEMB(_emplace_at)(i_type* self, _m_iter it, const _m_raw raw)
+_c_MEMB(_emplace_at)(_i_self* self, _m_iter it, const _m_raw raw)
     { return _c_MEMB(_insert_at)(self, it, i_keyfrom(raw)); }
 #endif
 
@@ -113,17 +113,17 @@ _c_MEMB(_emplace_at)(i_type* self, _m_iter it, const _m_raw raw)
 STC_API _m_iter _c_MEMB(_find_in)(_m_iter p1, _m_iter p2, _m_raw raw);
 
 STC_INLINE _m_iter
-_c_MEMB(_find)(const i_type* self, _m_raw raw) {
+_c_MEMB(_find)(const _i_self* self, _m_raw raw) {
     return _c_MEMB(_find_in)(_c_MEMB(_begin)(self), _c_MEMB(_end)(self), raw);
 }
 
 STC_INLINE const _m_value*
-_c_MEMB(_get)(const i_type* self, _m_raw raw) {
+_c_MEMB(_get)(const _i_self* self, _m_raw raw) {
     return _c_MEMB(_find_in)(_c_MEMB(_begin)(self), _c_MEMB(_end)(self), raw).ref;
 }
 
 STC_INLINE _m_value*
-_c_MEMB(_get_mut)(i_type* self, _m_raw raw)
+_c_MEMB(_get_mut)(_i_self* self, _m_raw raw)
     { return (_m_value *) _c_MEMB(_get)(self, raw); }
 #endif
 
@@ -133,7 +133,7 @@ _c_MEMB(_get_mut)(i_type* self, _m_raw raw)
 #include "priv/queue_prv.c"
 
 STC_DEF _m_value*
-_c_MEMB(_push_front)(i_type* self, _m_value value) {
+_c_MEMB(_push_front)(_i_self* self, _m_value value) {
     intptr_t start = (self->start - 1) & self->capmask;
     if (start == self->end) { // full
         _c_MEMB(_reserve)(self, self->capmask + 3); // => 2x expand
@@ -146,7 +146,7 @@ _c_MEMB(_push_front)(i_type* self, _m_value value) {
 }
 
 STC_DEF void
-_c_MEMB(_erase_n)(i_type* self, const intptr_t idx, const intptr_t n) {
+_c_MEMB(_erase_n)(_i_self* self, const intptr_t idx, const intptr_t n) {
     const intptr_t len = _c_MEMB(_size)(self);
     for (intptr_t i = idx + n - 1; i >= idx; --i)
         i_keydrop(_c_MEMB(_at_mut)(self, i));
@@ -156,7 +156,7 @@ _c_MEMB(_erase_n)(i_type* self, const intptr_t idx, const intptr_t n) {
 }
 
 STC_DEF _m_iter
-_c_MEMB(_insert_uninit)(i_type* self, const intptr_t idx, const intptr_t n) {
+_c_MEMB(_insert_uninit)(_i_self* self, const intptr_t idx, const intptr_t n) {
     const intptr_t len = _c_MEMB(_size)(self);
     _m_iter it = {._s=self};
     if (len + n > self->capmask)
@@ -174,7 +174,7 @@ _c_MEMB(_insert_uninit)(i_type* self, const intptr_t idx, const intptr_t n) {
 }
 
 STC_DEF _m_iter
-_c_MEMB(_insert_n)(i_type* self, const intptr_t idx, const _m_value* arr, const intptr_t n) {
+_c_MEMB(_insert_n)(_i_self* self, const intptr_t idx, const _m_value* arr, const intptr_t n) {
     _m_iter it = _c_MEMB(_insert_uninit)(self, idx, n);
     for (intptr_t i = idx, j = 0; j < n; ++i, ++j)
         *_c_MEMB(_at_mut)(self, i) = arr[j];
@@ -183,7 +183,7 @@ _c_MEMB(_insert_n)(i_type* self, const intptr_t idx, const _m_value* arr, const 
 
 #if !defined i_no_emplace
 STC_DEF _m_iter
-_c_MEMB(_emplace_n)(i_type* self, const intptr_t idx, const _m_raw* raw, const intptr_t n) {
+_c_MEMB(_emplace_n)(_i_self* self, const intptr_t idx, const _m_raw* raw, const intptr_t n) {
     _m_iter it = _c_MEMB(_insert_uninit)(self, idx, n);
     for (intptr_t i = idx, j = 0; j < n; ++i, ++j)
         *_c_MEMB(_at_mut)(self, i) = i_keyfrom(raw[j]);

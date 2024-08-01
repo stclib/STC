@@ -13,7 +13,7 @@ uint64_t Person_hash(const Person* p);
 #define i_use_cmp
 #include "stc/arc.h"
 
-#define i_TYPE IPtr,int
+#define i_type IPtr,int
 #define i_keydrop(x) printf("drop: %d\n", *x)
 #define i_use_cmp
 #include "stc/arc.h"

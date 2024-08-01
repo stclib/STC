@@ -23,8 +23,9 @@
 /* Generic Quicksort in C, performs as fast as c++ std::sort().
 template params:
 #define i_key           - value type [required]
-#define i_less          - less function. default: *x < *y
-#define i_type name     - define {{name}}_quicksort(), else {{i_key}}s_quicksort().
+#define i_less          - optional less function. default: *x < *y
+#define i_type name     - optional, define {{name}}_quicksort(), else {{i_key}}s_quicksort().
+#define i_type name,key - alternative way to define both i_type and i_key.
 
 // ex1:
 #include <stdio.h>
@@ -79,15 +80,20 @@ int main(void) {
 
 #ifndef _i_template
   #define _i_is_arr
-  #ifdef i_TYPE
-    #define i_type c_SELECT(_c_SEL21, i_TYPE)
-    #define i_key c_SELECT(_c_SEL22, i_TYPE)
+  #if defined i_TYPE // [deprecated]
+    #define i_type i_TYPE
+  #endif
+  #if defined i_type && !defined i_key
+    #define _i_self c_SELECT(_c_SEL21, i_type)
+    #define i_key c_SELECT(_c_SEL22, i_type)
   #elif !defined i_key
     #error "i_key not defined"
-  #elif !defined i_type
-    #define i_type c_JOIN(i_key, s)
+  #elif defined i_type
+    #define _i_self i_type
+  #else
+    #define _i_self c_JOIN(i_key, s)
   #endif
-  typedef i_key i_type, c_JOIN(i_type, _value), c_JOIN(i_type, _raw);
+  typedef i_key _i_self, c_JOIN(_i_self, _value), c_JOIN(_i_self, _raw);
   #define i_at(arr, idx) (&arr[idx])
   #define i_at_mut i_at
 #else
@@ -98,7 +104,7 @@ int main(void) {
 
 // quick sort
 
-static inline void _c_MEMB(_insertsort_ij)(i_type* self, intptr_t lo, intptr_t hi) {
+static inline void _c_MEMB(_insertsort_ij)(_i_self* self, intptr_t lo, intptr_t hi) {
     for (intptr_t j = lo, i = lo + 1; i <= hi; j = i, ++i) {
         _m_value x = *i_at(self, i);
         _m_raw rx = i_keyto(&x);
@@ -112,7 +118,7 @@ static inline void _c_MEMB(_insertsort_ij)(i_type* self, intptr_t lo, intptr_t h
     }
 }
 
-static inline void _c_MEMB(_quicksort_ij)(i_type* self, intptr_t lo, intptr_t hi) {
+static inline void _c_MEMB(_quicksort_ij)(_i_self* self, intptr_t lo, intptr_t hi) {
     intptr_t i = lo, j;
     while (lo < hi) {
         _m_raw pivot = i_keyto(i_at(self, (intptr_t)(lo + (hi - lo)*7LL/16))), rx;
@@ -138,7 +144,7 @@ static inline void _c_MEMB(_quicksort_ij)(i_type* self, intptr_t lo, intptr_t hi
 // lower bound
 
 static inline intptr_t // -1 = not found
-_c_MEMB(_lower_bound_range)(const i_type* self, const _m_raw raw, intptr_t first, intptr_t last) {
+_c_MEMB(_lower_bound_range)(const _i_self* self, const _m_raw raw, intptr_t first, intptr_t last) {
     intptr_t count = last - first, step = count/2;
 
     while (count > 0) {
@@ -161,7 +167,7 @@ _c_MEMB(_lower_bound_range)(const i_type* self, const _m_raw raw, intptr_t first
 // binary search
 
 static inline intptr_t // -1 = not found
-_c_MEMB(_binary_search_range)(const i_type* self, const _m_raw raw, intptr_t first, intptr_t last) {
+_c_MEMB(_binary_search_range)(const _i_self* self, const _m_raw raw, intptr_t first, intptr_t last) {
     intptr_t res = _c_MEMB(_lower_bound_range)(self, raw, first, last);
     if (res != -1) {
         const _m_raw rx = i_keyto(i_at(self, res));
@@ -172,28 +178,28 @@ _c_MEMB(_binary_search_range)(const i_type* self, const _m_raw raw, intptr_t fir
 
 #ifdef _i_is_arr
 
-static inline void _c_MEMB(_quicksort)(i_type* arr, intptr_t n)
+static inline void _c_MEMB(_quicksort)(_i_self* arr, intptr_t n)
     { _c_MEMB(_quicksort_ij)(arr, 0, n - 1); }
 
 static inline intptr_t // -1 = not found
-_c_MEMB(_lower_bound)(const i_type* arr, const _m_raw raw, intptr_t n)
+_c_MEMB(_lower_bound)(const _i_self* arr, const _m_raw raw, intptr_t n)
     { return _c_MEMB(_lower_bound_range)(arr, raw, 0, n); }
 
 static inline intptr_t // -1 = not found
-_c_MEMB(_binary_search)(const i_type* arr, const _m_raw raw, intptr_t n)
+_c_MEMB(_binary_search)(const _i_self* arr, const _m_raw raw, intptr_t n)
     { return _c_MEMB(_binary_search_range)(arr, raw, 0, n); }
 
 #else
 
-static inline void _c_MEMB(_quicksort)(i_type* self)
+static inline void _c_MEMB(_quicksort)(_i_self* self)
     { _c_MEMB(_quicksort_ij)(self, 0, _c_MEMB(_size)(self) - 1); }
 
 static inline intptr_t // -1 = not found
-_c_MEMB(_lower_bound)(const i_type* self, const _m_raw raw)
+_c_MEMB(_lower_bound)(const _i_self* self, const _m_raw raw)
     { return _c_MEMB(_lower_bound_range)(self, raw, 0, _c_MEMB(_size)(self)); }
 
 static inline intptr_t // -1 = not found
-_c_MEMB(_binary_search)(const i_type* self, const _m_raw raw)
+_c_MEMB(_binary_search)(const _i_self* self, const _m_raw raw)
     { return _c_MEMB(_binary_search_range)(self, raw, 0, _c_MEMB(_size)(self)); }
 
 #endif

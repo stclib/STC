@@ -16,7 +16,7 @@ uint64_t seed = 1, mask1 = 0xffffffff;
 
 static float secs(Range s) { return (float)(s.t2 - s.t1) / CLOCKS_PER_SEC; }
 
-#define i_TYPE hmap_u64, uint64_t, uint64_t
+#define i_type hmap_u64, uint64_t, uint64_t
 #include "stc/hmap.h"
 
 #ifdef __cplusplus

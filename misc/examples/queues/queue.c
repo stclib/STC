@@ -1,7 +1,7 @@
 #include "stc/crand.h"
 #include <stdio.h>
 
-#define i_TYPE queue_i, int
+#define i_type queue_i, int
 #include "stc/queue.h"
 
 int main(void) {

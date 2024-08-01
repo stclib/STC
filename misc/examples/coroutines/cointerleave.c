@@ -1,7 +1,7 @@
 // https://www.youtube.com/watch?v=8sEe-4tig_A
 #include <stdio.h>
 #include "stc/coroutine.h"
-#define i_TYPE IVec,int
+#define i_type IVec,int
 #include "stc/vec.h"
 
 struct GenValue {

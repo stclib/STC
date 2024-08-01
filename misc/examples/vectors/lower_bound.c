@@ -1,11 +1,11 @@
 #include <stdio.h>
 
-#define i_TYPE IVec,int
+#define i_type IVec,int
 #define i_opt c_use_cmp | c_more
 #include "stc/vec.h"
 #include "stc/algo/quicksort.h"
 
-#define i_TYPE ISet,int
+#define i_type ISet,int
 #include "stc/sset.h"
 
 int main(void)

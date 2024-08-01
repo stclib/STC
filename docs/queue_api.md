@@ -7,7 +7,7 @@ See the c++ class [std::queue](https://en.cppreference.com/w/cpp/container/queue
 
 ## Header file and declaration
 ```c
-#define i_TYPE <ct>,<kt> // shorthand to define i_type,i_key
+#define i_type <ct>,<kt> // shorthand to define i_type,i_key
 #define i_type <t>       // queue container type name (default: queue_{i_key})
 #define i_key <t>        // element type: REQUIRED. Defines queue_X_value
 #define i_keydrop <f>    // destroy value func - defaults to empty destruct
@@ -70,7 +70,7 @@ void                queue_X_value_drop(queue_X_value* pval);
 
 ## Examples
 ```c
-#define i_TYPE queue,int
+#define i_type queue,int
 #include "stc/queue.h"
 
 #include <stdio.h>

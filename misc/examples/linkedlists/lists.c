@@ -3,7 +3,7 @@
 #include "stc/algorithm.h"
 #include "stc/crand.h"
 
-#define i_TYPE DList,double
+#define i_type DList,double
 #define i_use_cmp
 #include "stc/list.h"
 

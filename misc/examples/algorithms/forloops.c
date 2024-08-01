@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include "stc/algorithm.h"
 
-#define i_TYPE IVec,int
+#define i_type IVec,int
 #include "stc/stack.h"
 
-#define i_TYPE IMap,int,int
+#define i_type IMap,int,int
 #include "stc/hmap.h"
 
 
@@ -43,8 +43,8 @@ int main(void)
         printf(" (%d %d)", i.ref->first, i.ref->second);
 
     puts("\n\nc_forpair:");
-    c_forpair (key, val, IMap, map)
-        printf(" (%d %d)", *_.key, *_.val);
+    c_foreach_kv (key, val, IMap, map)
+        printf(" (%d %d)", *key, *val);
 
     #define f_isOdd() (*value & 1)
 
