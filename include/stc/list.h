@@ -68,7 +68,7 @@
 #define _clist_tonode(vp) c_safe_cast(_m_node*, _m_value*, vp)
 
 #define _c_list_insert_entry_after(ref, val) \
-    _m_node *entry = (_m_node *)i_malloc(c_sizeof *entry); entry->value = val; \
+    _m_node *entry = _i_malloc(_m_node, 1); entry->value = val; \
     _c_list_insert_after_node(ref, entry)
 
 #define _c_list_insert_after_node(ref, entry) \

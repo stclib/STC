@@ -54,12 +54,12 @@ STC_INLINE i_type _c_MEMB(_init)(void) {
 }
 
 STC_INLINE i_type _c_MEMB(_with_capacity)(intptr_t cap) {
-    i_type out = {(_m_value *) i_malloc(cap*c_sizeof(_m_value)), 0, cap};
+    i_type out = {_i_malloc(_m_value, cap), 0, cap};
     return out;
 }
 
 STC_INLINE i_type _c_MEMB(_with_size)(intptr_t size, _m_value null) {
-    i_type out = {(_m_value *) i_malloc(size*c_sizeof null), size, size};
+    i_type out = {_i_malloc(_m_value, size), size, size};
     while (size) out.data[--size] = null;
     return out;
 }
@@ -159,7 +159,7 @@ STC_INLINE _m_value* _c_MEMB(_emplace)(i_type* self, _m_raw raw)
 
 #if !defined i_no_clone
 STC_INLINE i_type _c_MEMB(_clone)(i_type s) {
-    i_type tmp = {(_m_value *)i_malloc(s._len*c_sizeof(_m_value)), s._len, s._len};
+    i_type tmp = {_i_malloc(_m_value, s._len), s._len, s._len};
     if (!tmp.data) tmp._cap = 0;
     else for (intptr_t i = 0; i < s._len; ++s.data)
         tmp.data[i++] = i_keyclone((*s.data));

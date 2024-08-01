@@ -107,14 +107,14 @@ STC_INLINE long _c_MEMB(_use_count)(const i_type* self)
 
 STC_INLINE i_type _c_MEMB(_from_ptr)(_m_value* p) {
     i_type arc = {p};
-    *(arc.use_count = _i_alloc(catomic_long)) = 1;
+    *(arc.use_count = _i_malloc(catomic_long, 1)) = 1;
     return arc;
 }
 
 // c++: std::make_shared<_m_value>(val)
 STC_INLINE i_type _c_MEMB(_make)(_m_value val) {
     i_type arc;
-    struct _c_MEMB(_rep_)* rep = _i_alloc(struct _c_MEMB(_rep_));
+    struct _c_MEMB(_rep_)* rep = _i_malloc(struct _c_MEMB(_rep_), 1);
     *(arc.use_count = &rep->counter) = 1;
     *(arc.get = &rep->value) = val;
     return arc;

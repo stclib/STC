@@ -6,7 +6,7 @@
 
 int main(void)
 {
-    puts("Split with c_fortoken (csview):");
+    puts("Split with c_fortoken_sv():");
 
     c_fortoken_sv (i, " ", c_sv("Hello World C99!"))
         printf("'%.*s'\n", c_SVARG(i.token));

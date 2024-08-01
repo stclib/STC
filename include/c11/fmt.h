@@ -60,10 +60,11 @@ int main(void) {
 
     time_t now = time(NULL);
     struct tm t1 = *localtime(&now), t2 = t1;
-    t2.tm_year += 2;
-    char b[2][64];
-    fmt_print("Dates: {} and {}\n", fmt_time("%Y-%m-%d %X %Z", &t1, b[0], 63),
-                                    fmt_time("%Y-%m-%d %X %Z", &t2, b[1], 63));
+    t2.tm_hour += 48;
+    mktime(&t2);
+    char ts[2][64];
+    fmt_print("Dates: {} and {}\n", fmt_time("%Y-%m-%d %X %Z", &t1, ts[0], 63),
+                                    fmt_time("%Y-%m-%d %X %Z", &t2, ts[1], 63));
 }
 */
 #include <stdio.h>

@@ -424,7 +424,7 @@ _c_MEMB(_bucket_insert_)(const i_type* self, const _m_keyraw* rkeyptr) {
     STC_DEF i_type
     _c_MEMB(_clone)(i_type map) {
         if (map.bucket_count) {
-            _m_value *d = (_m_value *)i_malloc(map.bucket_count*c_sizeof *d);
+            _m_value *d = _i_malloc(_m_value, map.bucket_count);
             const intptr_t _mbytes = (map.bucket_count + 1)*c_sizeof *map.meta;
             struct hmap_meta *m = (struct hmap_meta *)i_malloc(_mbytes);
             if (d && m) {
@@ -453,8 +453,8 @@ _c_MEMB(_reserve)(i_type* self, const intptr_t _newcap) {
     _newbucks = c_next_pow2(_newbucks);
 
     i_type map = {
-        (_m_value *)i_malloc(_newbucks*c_sizeof(_m_value)),
-        (struct hmap_meta *)i_calloc(_newbucks + 1, c_sizeof(struct hmap_meta)),
+        _i_malloc(_m_value, _newbucks),
+        _i_calloc(struct hmap_meta, _newbucks + 1),
         self->size, _newbucks
     };
 

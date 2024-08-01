@@ -35,18 +35,22 @@ c_foreach       |
 c_forpair       |
 c_forrange      |
 c_formatch      |
-c_fortoken      |
+c_formatch_sv   |
+c_fortoken_sv   |
 for             |
 while           |
 switch          { block_type |= LOOP; state = BRACES; }
 do              { block_type |= LOOP; state = BRACESDONE; }
-c_defer         |
-c_with        |
-c_guard         { block_type = AUTO; state = BRACES; }
+c_with          |
+c_guard_max     |
+c2_guard_max    |
+cx_guard_max    { block_type = AUTO; state = BRACES; }
+c_guard         |
+c2_guard        |
+cx_guard        { block_type = AUTO; state = BRACESDONE; }
 \(              { if (state == BRACES) ++braces_lev; }
-\)              { if (state == BRACES && --braces_lev == 0) {
+\)              { if (state == BRACES && --braces_lev == 0)
                     state = BRACESDONE;
-                  }
                 }
 if              { if (state == BRACESDONE) {
                     if (block_type == AUTO) {

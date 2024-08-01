@@ -62,14 +62,14 @@
 #define c_SELECT(S, ...) c_EXPAND(S(__VA_ARGS__)) // c_EXPAND for MSVC
 
 #ifndef __cplusplus
-    #define _i_alloc(T)         ((T*)i_malloc(c_sizeof(T)))
-    #define _i_new(T, ...)      ((T*)memcpy(_i_alloc(T), ((T[]){__VA_ARGS__}), sizeof(T)))
+    #define _i_malloc(T, n)     ((T*)i_malloc((n)*c_sizeof(T)))
+    #define _i_calloc(T, n)     ((T*)i_calloc(n, c_sizeof(T)))
     #define c_new(T, ...)       ((T*)memcpy(malloc(sizeof(T)), ((T[]){__VA_ARGS__}), sizeof(T)))
     #define c_LITERAL(T)        (T)
 #else
     #include <new>
-    #define _i_alloc(T)         static_cast<T*>(i_malloc(c_sizeof(T)))
-    #define _i_new(T, ...)      new (_i_alloc(T)) T(__VA_ARGS__)
+    #define _i_malloc(T, n)     static_cast<T*>(i_malloc((n)*c_sizeof(T)))
+    #define _i_calloc(T, n)     static_cast<T*>(i_calloc(n, c_sizeof(T)))
     #define c_new(T, ...)       new (malloc(sizeof(T))) T(__VA_ARGS__)
     #define c_LITERAL(T)        T
 #endif
@@ -208,10 +208,15 @@ STC_INLINE intptr_t c_next_pow2(intptr_t n) {
     for (struct {C##_iter iter; C##_value* ref; intptr_t index, n;} it = {.iter=C##_begin(&cnt), .n=N} \
          ; (it.ref = it.iter.ref) && it.index < it.n; C##_next(&it.iter), ++it.index)
 
-#define c_forpair(key, val, C, cnt) /* structured binding */ \
+#define c_forpair(key, val, C, cnt) /* [deprecated] */ \
     for (struct {C##_iter iter; const C##_key* key; C##_mapped* val;} _ = {.iter=C##_begin(&cnt)} \
          ; _.iter.ref && (_.key = &_.iter.ref->first, _.val = &_.iter.ref->second) \
          ; C##_next(&_.iter))
+
+#define c_foreach_kv(key, val, C, cnt) /* structured binding */ \
+    for (C##_iter _it; = C##_begin(&cnt); _it.ref; C##_next(&_it)) \
+    for (const C##_key* key = &_it.ref->first; key; key = NULL) \
+    for (C##_mapped* val = &_it.ref->second; val; val = NULL)
 
 // c_forrange: python-like indexed iteration
 #define c_forrange(...) c_MACRO_OVERLOAD(c_forrange, __VA_ARGS__)

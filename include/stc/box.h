@@ -90,7 +90,7 @@ STC_INLINE i_type _c_MEMB(_from_ptr)(_m_value* p)
 
 // c++: std::make_unique<i_key>(val)
 STC_INLINE i_type _c_MEMB(_make)(_m_value val) {
-    i_type box = {_i_alloc(_m_value)};
+    i_type box = {_i_malloc(_m_value, 1)};
     *box.get = val;
     return box;
 }
@@ -125,7 +125,7 @@ STC_INLINE i_type _c_MEMB(_from)(_m_raw raw)
 
 #if !defined i_no_clone
     STC_INLINE i_type _c_MEMB(_clone)(i_type other) {
-        i_type out = {_i_alloc(_m_value)};
+        i_type out = {_i_malloc(_m_value, 1)};
         *out.get = i_keyclone((*other.get));
         return out;
     }
