@@ -145,6 +145,9 @@ typedef enum {
  *   Gen_next(&it);
  *   return it;
  * }
+ * ....
+ * c_foreach (i, Gen, gen)
+	printf("%d ", *i.ref);
  */
 
 #define cco_iter_struct(Gen, ...) \
@@ -154,6 +157,11 @@ typedef enum {
         int cco_state; \
         __VA_ARGS__ \
     } Gen##_iter
+
+/* Using c_filter with generators:
+ */
+#define cco_flt_take(n) (c_flt_take(n), _base.done ? _it.cco_state = CCO_STATE_FINAL : 1)
+#define cco_flt_takewhile(pred) (c_flt_takewhile(pred), _base.done ? _it.cco_state = CCO_STATE_FINAL : 1)
 
 
 /*
@@ -196,14 +204,6 @@ typedef struct cco_runtime {
     for (struct { int result, top; struct cco_task* stack[STACKDEPTH]; } rt = {.stack={cco_cast_task(task)}}; \
          (((rt.result = cco_resume_task(rt.stack[rt.top], (cco_runtime*)&rt)) & \
            ~rt.stack[rt.top]->cco_expect) || --rt.top >= 0); )
-
-
-/*
- * Use with c_filter:
- */
-
-#define cco_flt_take(n) (c_flt_take(n), _fl.done ? _it.cco_state = CCO_STATE_FINAL : 1)
-#define cco_flt_takewhile(pred) (c_flt_takewhile(pred), _fl.done ? _it.cco_state = CCO_STATE_FINAL : 1)
 
 /*
  * Iterate containers with already defined iterator (prefer to use in coroutines only):

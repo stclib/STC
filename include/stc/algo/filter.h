@@ -30,8 +30,8 @@ int main(void)
 {
     Vec vec = c_init(Vec, {1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 9, 10, 11, 12, 5});
 
-    c_filter(Vec, vec
-         , c_flt_skipwhile(*value < 3)  // skip leading values < 3
+    c_filter(Vec, vec, true
+        && c_flt_skipwhile(*value < 3)  // skip leading values < 3
         && (*value & 1) == 1            // then use odd values only
         && c_flt_map(*value * 2)        // multiply by 2
         && c_flt_takewhile(*value < 20) // stop if mapped *value >= 20
@@ -48,12 +48,12 @@ int main(void)
 #include "../common.h"
 
 // ------- c_filter --------
+#define c_flt_take(n) _flt_take(&_base, n)
 #define c_flt_skip(n) (c_flt_counter() > (n))
-#define c_flt_take(n) _flt_take(&_fl, n)
-#define c_flt_skipwhile(pred) (_fl.sb[_fl.sb_top++] |= !(pred))
-#define c_flt_takewhile(pred) _flt_takewhile(&_fl, pred)
-#define c_flt_counter() (++_fl.sn[++_fl.sn_top])
-#define c_flt_getcount() (_fl.sn[_fl.sn_top])
+#define c_flt_takewhile(pred) _flt_takewhile(&_base, pred)
+#define c_flt_skipwhile(pred) (_base.sb[_base.sb_top++] |= !(pred))
+#define c_flt_counter() (++_base.sn[++_base.sn_top])
+#define c_flt_getcount() (_base.sn[_base.sn_top])
 #define c_flt_map(expr) (_mapped = (expr), value = &_mapped)
 #define c_flt_src _it.ref
 
@@ -70,11 +70,11 @@ int main(void)
     _c_filter(C, start, _r, pred)
 
 #define _c_filter(C, start, rev, pred) do { \
-    struct _flt_base _fl = {0}; \
+    struct _flt_base _base = {0}; \
     C##_iter _it = start; \
     C##_value *value = _it.ref, _mapped; \
-    for ((void)_mapped ; !_fl.done & (_it.ref != NULL) ; \
-         C##rev##next(&_it), value = _it.ref, _fl.sn_top=0, _fl.sb_top=0) \
+    for ((void)_mapped ; !_base.done & (_it.ref != NULL) ; \
+         C##rev##next(&_it), value = _it.ref, _base.sn_top=0, _base.sb_top=0) \
       (void)(pred); \
 } while (0)
 
@@ -100,25 +100,25 @@ int main(void)
 #define c_flt_src2 _it2.ref
 
 #define _c_filter_zip(C1, start1, C2, start2, rev, pred) do { \
-    struct _flt_base _fl = {0}; \
+    struct _flt_base _base = {0}; \
     C1##_iter _it1 = start1; \
     C2##_iter _it2 = start2; \
     C1##_value* value1 = _it1.ref, _mapped1; (void)_mapped1; \
     C2##_value* value2 = _it2.ref, _mapped2; (void)_mapped2; \
-    for (; !_fl.done & (_it1.ref != NULL) & (_it2.ref != NULL); \
+    for (; !_base.done & (_it1.ref != NULL) & (_it2.ref != NULL); \
          C1##rev##next(&_it1), value1 = _it1.ref, C2##rev##next(&_it2), value2 = _it2.ref, \
-         _fl.sn_top=0, _fl.sb_top=0) \
+         _base.sn_top=0, _base.sb_top=0) \
       (void)(pred); \
 } while (0)
 
 // ------- c_forfilter --------
 // c_forfilter allows to execute imperative statements for each element
-// as it is a for-loop, e.g., calling nested generic algorithms instead
-// of defining a wrapper-function for it:
+// as it is a for-loop, e.g., calling nested generic statements instead
+// of defining a function/expression for it:
 /*
     Vec vec = ..., vec2 = ...;
-    c_forfilter (i, Vec, vec
-         , c_fflt_skipwhile(i, *i.ref < 3)  // skip leading values < 3
+    c_forfilter (i, Vec, vec, true
+        && c_fflt_skipwhile(i, *i.ref < 3)  // skip leading values < 3
         && (*i.ref & 1) == 1                // then use odd values only
         && c_fflt_map(i, *i.ref * 2)        // multiply by 2
         && c_fflt_takewhile(i, *i.ref < 20) // stop if mapped *i.ref >= 20
@@ -126,14 +126,14 @@ int main(void)
         c_eraseremove_if(Vec, &vec2, *value == *i.ref);
     }
 */
+#define c_fflt_take(i, n) _flt_take(&i.base, n)
 #define c_fflt_skip(i, n) (c_fflt_counter(i) > (n))
-#define c_fflt_take(i, n) _flt_take(&i._fl, n)
-#define c_fflt_skipwhile(i, pred) (i._fl.sb[i._fl.sb_top++] |= !(pred))
-#define c_fflt_takewhile(i, pred) _flt_takewhile(&i._fl, pred)
-#define c_fflt_counter(i) (++i._fl.sn[++i._fl.sn_top])
-#define c_fflt_getcount(i) (i._fl.sn[i._fl.sn_top])
-#define c_fflt_map(i, expr) (i._mapped = (expr), i.ref = &i._mapped)
-#define c_fflt_src(i) i._it.ref
+#define c_fflt_takewhile(i, pred) _flt_takewhile(&i.base, pred)
+#define c_fflt_skipwhile(i, pred) (i.base.sb[i.base.sb_top++] |= !(pred))
+#define c_fflt_counter(i) (++i.base.sn[++i.base.sn_top])
+#define c_fflt_getcount(i) (i.base.sn[i.base.sn_top])
+#define c_fflt_map(i, expr) (i.mapped = (expr), i.ref = &i.mapped)
+#define c_fflt_src(i) i.iter.ref
 
 #define c_forfilter(i, C, cnt, pred) \
     _c_forfilter(i, C, C##_begin(&cnt), _, pred)
@@ -148,9 +148,9 @@ int main(void)
     _c_forfilter(i, C, start, _r, pred)
 
 #define _c_forfilter(i, C, start, rev, pred) \
-    for (struct {C##_iter _it; C##_value *ref, _mapped; struct _flt_base _fl;} \
-         i = {._it=start, .ref=i._it.ref} ; !i._fl.done & (i._it.ref != NULL) ; \
-         C##rev##next(&i._it), i.ref = i._it.ref, i._fl.sn_top=0, i._fl.sb_top=0) \
+    for (struct {C##_iter iter; C##_value *ref, mapped; struct _flt_base base;} \
+         i = {.iter=start, .ref=i.iter.ref} ; !i.base.done & (i.iter.ref != NULL) ; \
+         C##rev##next(&i.iter), i.ref = i.iter.ref, i.base.sn_top=0, i.base.sb_top=0) \
       if (!(pred)) ; else
 
 // ------------------------ private -------------------------
@@ -164,15 +164,15 @@ struct _flt_base {
     uint32_t sn[c_NFILTERS];
 };
 
-static inline bool _flt_take(struct _flt_base* fl, uint32_t n) {
-    uint32_t k = ++fl->sn[++fl->sn_top];
-    fl->done |= (k >= n);
+static inline bool _flt_take(struct _flt_base* base, uint32_t n) {
+    uint32_t k = ++base->sn[++base->sn_top];
+    base->done |= (k >= n);
     return n > 0;
 }
 
-static inline bool _flt_takewhile(struct _flt_base* fl, bool pred) {
-    bool skip = (fl->sb[fl->sb_top++] |= !pred);
-    fl->done |= skip;
+static inline bool _flt_takewhile(struct _flt_base* base, bool pred) {
+    bool skip = (base->sb[base->sb_top++] |= !pred);
+    base->done |= skip;
     return !skip;
 }
 

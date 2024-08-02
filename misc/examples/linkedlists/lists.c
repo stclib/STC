@@ -21,17 +21,17 @@ int main(void) {
     c_filter(DList, list, sum += *value);
     printf("%f\n", sum);
 
-    // Print 10 first items (using c_filter):
-    c_filter(DList, list,
-        (printf("%4d: %10f\n", c_flt_counter(), *value), c_flt_take(10))
-    );
+    // Print 10 first items using c_filter:
+    c_filter(DList, list, true 
+        && c_flt_take(10)
+        && printf("%4d: %10f\n", c_flt_getcount(), *value));
 
     puts("sort:");
     DList_sort(&list); // qsort O(n*log n)
 
-    // Alternative way to print 10 first items:
-    c_foreach_n (i, DList, list, 10)
-        printf("%4d: %10f\n", (int)i.index + 1, *i.ref);
+    c_filter(DList, list, true 
+        && c_flt_take(10)
+        && printf("%4d: %10f\n", c_flt_getcount(), *value));
 
     DList_drop(&list);
     list = c_init(DList, {10, 20, 30, 40, 30, 50});

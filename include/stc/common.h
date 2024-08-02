@@ -204,21 +204,16 @@ STC_INLINE intptr_t c_next_pow2(intptr_t n) {
     for (C##_iter it = (start), *_endref = c_safe_cast(C##_iter*, C##_value*, endref) \
          ; it.ref != (C##_value*)_endref; C##rev##next(&it))
 
-#define c_foreach_n(it, C, cnt, N) /* iterate up to N items */ \
-    for (struct {C##_iter iter; C##_value* ref; intptr_t index, n;} it = {.iter=C##_begin(&cnt), .n=N} \
-         ; (it.ref = it.iter.ref) && it.index < it.n; C##_next(&it.iter), ++it.index)
-
-#define c_forpair(key, val, C, cnt) /* [deprecated] */ \
-    for (struct {C##_iter iter; const C##_key* key; C##_mapped* val;} _ = {.iter=C##_begin(&cnt)} \
-         ; _.iter.ref && (_.key = &_.iter.ref->first, _.val = &_.iter.ref->second) \
-         ; C##_next(&_.iter))
-
 #define c_foreach_kv(key, val, C, cnt) /* structured binding */ \
     for (const C##_key *key, **_k = &key; _k; ) \
     for (C##_mapped *val; _k; _k = NULL) \
     for (C##_iter _it = C##_begin(&cnt); \
          _it.ref && (key = &_it.ref->first, val = &_it.ref->second); \
          C##_next(&_it))
+
+#define c_forlist(...) 'c_forlist not_supported. Use c_foritems'   // [removed]
+#define c_forpair(...) 'c_forpair not_supported. Use c_foreach_kv' // [removed]
+#define c_foreach_n(...) 'c_foreach_n not_supported. Use c_forfilter' // [removed]
 
 // c_forrange: python-like indexed iteration
 #define c_forrange(...) c_MACRO_OVERLOAD(c_forrange, __VA_ARGS__)
@@ -253,7 +248,6 @@ STC_INLINE intptr_t c_next_pow2(intptr_t n) {
     #define c_hash_mix(...) \
         _c_hash_mix(std::array<uint64_t, c_NUMARGS(__VA_ARGS__)>{__VA_ARGS__}.data(), c_NUMARGS(__VA_ARGS__))
 #endif
-#define c_forlist(...) c_foritems(__VA_ARGS__) // [deprecated]
 
 #define c_with(...) c_MACRO_OVERLOAD(c_with, __VA_ARGS__)
 #define c_with_2(init, deinit) \

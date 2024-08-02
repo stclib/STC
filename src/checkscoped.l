@@ -31,12 +31,14 @@ STR \"([^"\\]|\\.)*\"
 ^[ \t]*#.*      ;
 {STR}           ;
 '\\?.'          ;
-c_foreach       |
+c_foreach_reverse |
 c_foreach_kv    |
+c_foreach       |
 c_forrange      |
-c_formatch      |
-c_formatch_sv   |
 c_fortoken_sv   |
+c_formatch_sv   |
+c_formatch      |
+c_forfilter     |
 for             |
 while           |
 switch          { block_type |= LOOP; state = BRACES; }
