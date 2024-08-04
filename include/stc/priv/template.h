@@ -48,15 +48,6 @@
   #define _m_node _c_MEMB(_node)
 #endif
 
-#if defined i_keyclass2
-  #define i_keyclass c_SELECT(_c_SEL21, i_keyclass2)
-  #define i_keyraw c_SELECT(_c_SEL22, i_keyclass2)
-#endif
-#if defined i_valclass2
-  #define i_valclass c_SELECT(_c_SEL21, i_valclass2)
-  #define i_valraw c_SELECT(_c_SEL22, i_valclass2)
-#endif
-
 #if defined i_key_str // [deprecated]
   #define i_key_cstr
   #define i_tag str
@@ -102,41 +93,6 @@
   #define _i_self i_type
 #else
   #define _i_self c_JOIN(_i_prefix, i_tag)
-#endif
-
-#if !(defined i_key || defined i_key_cstr || \
-      defined i_keyclass || defined i_key_arcbox)
-  #if defined _i_is_map
-    #error "i_key* must be defined for maps, or via #define i_type Type,Key,Val"
-  #endif
-
-  #if defined i_val_cstr
-    #define i_key_cstr i_val_cstr
-  #endif
-  #if defined i_val_arcbox
-    #define i_key_arcbox i_val_arcbox
-  #endif
-  #if defined i_valclass
-    #define i_keyclass i_valclass
-  #endif
-  #if defined i_val
-    #define i_key i_val
-  #endif
-  #if defined i_valraw
-    #define i_keyraw i_valraw
-  #endif
-  #if defined i_valclone
-    #define i_keyclone i_valclone
-  #endif
-  #if defined i_valfrom
-    #define i_keyfrom i_valfrom
-  #endif
-  #if defined i_valto
-    #define i_keyto i_valto
-  #endif
-  #if defined i_valdrop
-    #define i_keydrop i_valdrop
-  #endif
 #endif
 
 #define i_no_emplace

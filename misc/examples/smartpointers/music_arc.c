@@ -37,7 +37,8 @@ struct {
 
 // Define the shared pointer type SongArc and conversion functions to SongView:
 #define i_type SongArc
-#define i_keyclass2 Song,SongView // define both i_keyclass and i_keyraw
+#define i_keyclass Song // bind _clone(), _drop()
+#define i_keyraw SongView
 #define i_keyto(x) ((SongView){.artist=cstr_str(&x->artist), .title=cstr_str(&x->title)})
 #define i_keyfrom(sw) ((Song){.artist=cstr_from(sw.artist), .title=cstr_from(sw.title)})
 // If commenting the next two lines (or either), containers uses object pointer equal and hashing

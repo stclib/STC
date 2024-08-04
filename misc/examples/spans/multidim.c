@@ -1,6 +1,6 @@
 // Example based on https://en.cppreference.com/w/cpp/container/mdspan
 #include <stdio.h>
-#define i_val int
+#define i_key int
 #include "stc/stack.h"
 #define i_implement
 #include "stc/cspan.h"

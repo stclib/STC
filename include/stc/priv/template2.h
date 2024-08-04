@@ -37,7 +37,6 @@
 #undef i_key_box
 #undef i_key_arcbox // [deprecated]
 #undef i_keyclass
-#undef i_keyclass2  // i_keyclass, i_keyraw
 #undef i_rawclass   // i_keyraw with i_cmp, i_eq, i_hash "members"
 #undef i_keyclone
 #undef i_keyfrom
@@ -57,7 +56,6 @@
 #undef i_val_box
 #undef i_val_arcbox // [deprecated]
 #undef i_valclass
-#undef i_valclass2  // i_valclass, i_valraw
 #undef i_valclone
 #undef i_valfrom
 #undef i_valto
