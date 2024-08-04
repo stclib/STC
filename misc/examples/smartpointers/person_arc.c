@@ -36,8 +36,8 @@ void Person_drop(Person* p) {
 #include "stc/arc.h"
 
 #define i_type Persons
-#define i_key_arc PSPtr // binds PSPtr_cmp, PSPtr_drop...
-#define i_use_cmp
+#define i_key_arc PSPtr // binds PSPtr_clone(), PSPtr_drop()
+#define i_use_cmp       // binds PSPtr_cmp()
 #include "stc/vec.h"
 
 

@@ -361,43 +361,48 @@ Viking Viking_clone(Viking vk) {
     return vk;
 }
 
-// Define Viking lookup struct with hash, cmp, and convertion functions between Viking and RViking structs:
+// Define RawVik, a Viking lookup struct with eq, hash and convertion functions between them:
 
-typedef struct RViking {
+typedef struct RawVik {
     const char* name;
     const char* country;
-} RViking;
+} RawVik;
 
-static inline int RViking_cmp(const RViking* rx, const RViking* ry) {
-    int c = strcmp(rx->name, ry->name);
-    return c ? c : strcmp(rx->country, ry->country);
+static inline bool RawVik_eq(const RawVik* rx, const RawVik* ry) {
+    return strcmp(rx->name, ry->name)==0 && strcmp(rx->country, ry->country)==0;
 }
 
-static inline Viking Viking_from(RViking raw) { // note: parameter is by value
+static inline uint64_t RawVik_hash(const RawVik* rv) {
+    return c_hash_mix(c_hash_str(rv->name), c_hash_str(rv->country));
+}
+
+static inline Viking Viking_from(RawVik raw) { // note: parameter is by value
     Viking v = {cstr_from(raw.name), cstr_from(raw.country)}; return v;
 }
 
-static inline RViking Viking_toraw(const Viking* vp) {
-    RViking rv = {cstr_str(&vp->name), cstr_str(&vp->country)}; return rv;
+static inline RawVik Viking_toraw(const Viking* vp) {
+    RawVik rv = {cstr_str(&vp->name), cstr_str(&vp->country)}; return rv;
 }
 
 // With this in place, we define the Viking => int hash map type:
 #define i_type      Vikings
-#define i_rawclass RViking     // lookup type ; binds _cmp, _hash (unless overridden)
-#define i_keyclass Viking      // key type    ; binds _drop, _clone, _from, _toraw
-#define i_val       int         // mapped type
-#define i_hash(rp)  c_hash_mix(c_hash_str(rp->name), c_hash_str(rp->country))
+#define i_keyclass  Viking  // key "class" ; binds Viking_drop, Viking_clone
+                            // (and _from, _toraw if i_rawclass/i_keyraw defined)
+#define i_rawclass  RawVik  // lookup "class" ; binds RawVik_cmp, RawVik_eq, RawVik_hash
+                            // (unless overridden). Only _eq is needed for hmaps.
+#define i_val       int     // mapped type
 #include "stc/hmap.h"
 
 int main(void)
 {
     Vikings vikings = {0};
-    Vikings_emplace(&vikings, (RViking){"Einar", "Norway"}, 20);
-    Vikings_emplace(&vikings, (RViking){"Olaf", "Denmark"}, 24);
-    Vikings_emplace(&vikings, (RViking){"Harald", "Iceland"}, 12);
-    Vikings_emplace(&vikings, (RViking){"Björn", "Sweden"}, 10);
+    Vikings_emplace(&vikings, (RawVik){"Einar", "Norway"}, 20);
+    Vikings_emplace(&vikings, (RawVik){"Olaf", "Denmark"}, 24);
+    Vikings_emplace(&vikings, (RawVik){"Harald", "Iceland"}, 12);
+    Vikings_emplace(&vikings, (RawVik){"Björn", "Sweden"}, 10);
 
-    Vikings_value* v = Vikings_get_mut(&vikings, (RViking){"Einar", "Norway"});
+    // Lookup is using RawVik, not Viking:
+    Vikings_value* v = Vikings_get_mut(&vikings, (RawVik){"Einar", "Norway"});
     v->second += 3; // add 3 hp points to Einar
 
     c_foreach_kv (vk, hp, Vikings, vikings) {

@@ -94,7 +94,11 @@
 #endif
 #if defined i_type && !(defined i_key || defined i_key_cstr || \
                         defined i_keyclass || defined i_key_arcbox)
-  #if defined _i_is_map
+  #if defined i_rawclass && !defined i_keyraw
+    #define _i_self i_type
+    #define i_key i_rawclass
+    #define i_keyto c_default_toraw
+  #elif defined _i_is_map
     #define _i_self c_SELECT(_c_SEL31, i_type)
     #define i_key c_SELECT(_c_SEL32, i_type)
     #define i_val c_SELECT(_c_SEL33, i_type)
@@ -110,7 +114,6 @@
 
 #if !(defined i_key || defined i_key_cstr || \
       defined i_keyclass || defined i_key_arcbox)
-
   #if defined _i_is_map
     #error "i_key* must be defined for maps, or via #define i_type Type,Key,Val"
   #endif

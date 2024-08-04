@@ -29,8 +29,8 @@ void Person_drop(Person* p) {
 }
 
 #define i_type PBox
-#define i_keyclass Person // "class" binds _cmp, _clone, _drop functions.
-#define i_use_cmp
+#define i_keyclass Person // "class" binds _clone, _drop functions.
+#define i_use_cmp         // binds _cmp function
 #include "stc/box.h"
 
 #define i_type Persons
