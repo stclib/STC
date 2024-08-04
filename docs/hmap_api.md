@@ -36,11 +36,9 @@ See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/contain
 #define i_valfrom <f>         // convertion func i_valraw => i_val
 #define i_valto <f>           // convertion func i_val* => i_valraw
 
-#define i_tag <s>             // alternative typename: hmap_{i_tag}. i_tag defaults to i_key
 #include "stc/hmap.h"
 ```
-`X` should be replaced by the value of `i_tag` in all of the following documentation.
-
+In the following, `X` is the value of `i_key` unless `i_type` is specified.
 ## Methods
 
 ```c

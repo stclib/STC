@@ -33,10 +33,9 @@ See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) fo
 #define i_valfrom <f>         // convertion func i_valraw => i_val
 #define i_valto <f>           // convertion func i_val* => i_valraw
 
-#define i_tag <s>             // alternative typename: smap_{i_tag}. i_tag defaults to i_key
 #include "stc/smap.h"
 ```
-`X` should be replaced by the value of `i_tag` in all of the following documentation.
+In the following, `X` is the value of `i_key` unless `i_type` is specified.
 
 ## Methods
 
@@ -107,7 +106,7 @@ void                 smap_X_value_drop(smap_X_value* pval);
 #define i_implement
 #include "stc/cstr.h"
 
-#define i_key_cstr // special macro for i_key = cstr, i_tag = str
+#define i_key_cstr // special macro for i_key = cstr
 #define i_val_cstr // ditto
 #include "stc/smap.h"
 

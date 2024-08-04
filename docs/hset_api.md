@@ -20,10 +20,9 @@ A **hset** is an associative container that contains a set of unique objects of 
 #define i_keyfrom <f>    // convertion func i_keyraw => i_key - defaults to plain copy
 #define i_keyto <f>      // convertion func i_key* => i_keyraw - defaults to plain copy
 
-#define i_tag <s>        // alternative typename: hmap_{i_tag}. i_tag defaults to i_key
 #include "stc/hset.h"
 ```
-`X` should be replaced by the value of `i_tag` in all of the following documentation.
+In the following, `X` is the value of `i_key` unless `i_type` is specified.
 
 ## Methods
 

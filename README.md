@@ -423,10 +423,8 @@ Only functions required by the container type is required to be defined. E.g.:
     - *Type_hash()* and *Type_eq()* are only required by **hmap**, **hset** and smart pointers.
     - *Type_cmp()* is not used by **stack** and **hmap/hset**.
     - *Type_clone()* is not used if *#define i_opt c_no_clone* is specified.
-- `i_key_cstr` - Sets `i_keyclass` = *cstr*, `i_tag` = *cstr*, and `i_keyraw` = *const char*\*. Defines both type convertion
+- `i_key_cstr` - Sets `i_keyclass` = *cstr*, `i_keyraw` = *const char*\*. Defines both type convertion
 `i_keyfrom`, `i_keyto`, and sets `i_cmp`, `i_eq`, `i_hash` functions with *const char\*\** as argument.
-- `i_key_ssv` - Sets `i_keyclass` = *cstr*, `i_tag` = *ssv*, and `i_keyraw` = *csview\**. Defines both type convertion
-`i_keyfrom`, `i_keyto`, and sets `i_cmp`, `i_eq`, `i_hash` functions with *csview\** as argument.
 - `i_key_arc`, `i_key_box` *Type* - Use when *Type* is a smart pointer **arc** or **box**. Defines *i_keyclass = Type*, and *i_keyraw = Type\**.
 NB: Do not use when defining arc/box types themselves.
 - `i_valclass` *Type*, `i_val_cstr`, `i_val_arc`, `i_val_box` - Similar rules as for ***key***.
@@ -537,11 +535,11 @@ last example on the **hmap** page demonstrates how to specify a map with non-tri
 ---
 ## User-defined container type name
 
-Define `i_type` instead of `i_tag`, or `i_TYPE` to define both `i_type` and `i_key`:
+Define `i_type` and/or `i_key`:
 ```c
+// #define i_type MyVec,int // shorthand
 #define i_type MyVec
 #define i_key int
-// #define i_type MyVec,int // shorthand
 #include "stc/vec.h"
 
 MyVec vec = {0};

@@ -30,7 +30,6 @@
 #undef i_capacity
 
 #undef i_key
-#undef i_key2       // i_key, i_keyraw
 #undef i_keyraw
 #undef i_key_cstr
 #undef i_key_str    // [deprecated]

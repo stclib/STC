@@ -31,10 +31,9 @@ See similar c++ class [std::unique_ptr](https://en.cppreference.com/w/cpp/memory
 #define i_keyraw <t>     // convertion type (lookup): default to {i_key}
 #define i_keyto <f>      // convertion func i_key* => i_keyraw: REQUIRED IF i_keyraw defined.
 #define i_keyfrom <f>    // from-raw func.
-#define i_tag <s>        // alternative typename: box_{i_tag}. i_tag defaults to i_key
 #include "stc/box.h"
 ```
-`X` should be replaced by the value of `i_tag` in all of the following documentation.
+In the following, `X` is the value of `i_key` unless `i_type` is specified.
 Unless `c_use_cmp` is defined, comparison between i_key's is not needed/available. Will then
 compare the pointer addresses when used. Additionally, `c_no_clone` or `i_is_fwd` may be defined.
 

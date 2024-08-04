@@ -48,14 +48,6 @@
   #define _m_node _c_MEMB(_node)
 #endif
 
-#if defined i_key2
-  #define i_key c_SELECT(_c_SEL21, i_key2)
-  #define i_keyraw c_SELECT(_c_SEL22, i_key2)
-#endif
-#if defined i_val2
-  #define i_val c_SELECT(_c_SEL21, i_val2)
-  #define i_valraw c_SELECT(_c_SEL22, i_val2)
-#endif
 #if defined i_keyclass2
   #define i_keyclass c_SELECT(_c_SEL21, i_keyclass2)
   #define i_keyraw c_SELECT(_c_SEL22, i_keyclass2)
@@ -92,8 +84,8 @@
 #ifdef i_TYPE // [deprecated]
   #define i_type i_TYPE
 #endif
-#if defined i_type && !(defined i_key || defined i_key_cstr || \
-                        defined i_keyclass || defined i_key_arcbox)
+#if defined i_type && !(defined i_key || defined i_keyclass || \
+                        defined i_key_cstr || defined i_key_arcbox)
   #if defined i_rawclass && !defined i_keyraw
     #define _i_self i_type
     #define i_key i_rawclass
@@ -182,8 +174,7 @@
   #define i_rawclass c_JOIN(i_key_arcbox, _raw)
 #endif
 
-// Check for i_keyclass and i_rawclass, and fill in missing defs:
-// Element "class" type with possible assoc. convertion type and "member" functions.
+// Check for i_keyclass and i_rawclass, and fill in missing defs.
 #if defined i_rawclass
   #define i_keyraw i_rawclass
 #elif defined i_keyclass && !defined i_keyraw

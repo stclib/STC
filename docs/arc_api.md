@@ -40,10 +40,9 @@ See similar c++ class [std::shared_ptr](https://en.cppreference.com/w/cpp/memory
 #define i_keyfrom <f>      // from-raw func.
 
 #define i_opt c_no_atomic  // Non-atomic reference counting, like Rust Rc.
-#define i_tag <s>          // alternative typename: arc_{i_tag}. i_tag defaults to i_key
 #include "stc/arc.h"
 ```
-`X` should be replaced by the value of `i_tag` in all of the following documentation.
+In the following, `X` is the value of `i_key` unless `i_type` is specified.
 
 ## Methods
 ```c
