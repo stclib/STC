@@ -106,8 +106,8 @@ crange&     c_iota(start, stop, step);      // l-value, otherwise like crange_ma
 // 1. All primes less than 32: See below for c_filter() and is_prime()
 crange r1 = crange_make(3, 32, 2);
 printf("2"); // first prime
-c_filter(crange, r1
-     , is_prime(*value)
+c_filter(crange, r1, true
+    && is_prime(*value)
     && printf(" %zi", *value)
 );
 // 2 3 5 7 11 13 17 19 23 29 31
@@ -115,8 +115,8 @@ c_filter(crange, r1
 // 2. The first 11 primes:
 // c_iota() can be used as argument to c_filter.
 printf("2");
-c_filter(crange, c_iota(3)
-     , is_prime(*value)
+c_filter(crange, c_iota(3), true
+    && is_prime(*value)
     && (printf(" %zi", *value), c_flt_take(10))
 );
 // 2 3 5 7 11 13 17 19 23 29 31

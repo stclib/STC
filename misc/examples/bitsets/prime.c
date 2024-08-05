@@ -40,13 +40,13 @@ int main(void)
         if (cbits_test(&primes, i/2)) printf(" %d", (int)i);
     puts("\n");
 
-    puts("Show the last 50 primes using a temporary crange generator:");
+    puts("Show the last 50 primes using a temporary crange generator, 10 per line:");
 
-    c_filter(crange, c_iota(n - 1, 1, -2)
-         , cbits_test(&primes, *value/2)
+    c_filter(crange, c_iota(n - 1, 1, -2), true
+        && cbits_test(&primes, *value/2)
+        && printf("%d ", (int) *value)
         && c_flt_take(50)
-        && (printf("%d ", (int) *value),
-            c_flt_getcount() % 10 == 0)
+        && c_flt_getcount() % 10 == 0
         && printf("\n")
     );
     cbits_drop(&primes);

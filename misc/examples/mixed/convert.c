@@ -46,7 +46,7 @@ int main(void)
 
         puts("\nCOPY MAP TO VECS:");
         c_filter(hmap_cstr, mclone, (vec_cstr_push(&keys, cstr_clone(value->first)),
-                                    vec_cstr_push(&values, cstr_clone(value->second))));
+                                     vec_cstr_push(&values, cstr_clone(value->second))));
         // print both keys and values zipped
         c_filter_zip(vec_cstr, keys, values,
             printf("  %s: %s\n", cstr_str(value1), cstr_str(value2)));

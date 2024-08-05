@@ -49,8 +49,8 @@ int main(void)
     #define f_isOdd() (*value & 1)
 
     puts("\n\nc_filter:");
-    c_filter(IVec, vec
-         , f_isOdd()
+    c_filter(IVec, vec, true
+        && f_isOdd()
         && c_flt_skip(4)
         && (printf(" %d", *value), c_flt_take(4))
     );

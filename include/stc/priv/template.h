@@ -69,9 +69,13 @@
   #define i_type i_TYPE
 #endif
 #if defined i_cmpclass
-  #define i_rawclass i_cmpclass
-  #define i_use_cmp
-  #define i_use_eq
+  #define i_rawclass c_SELECT(_c_SEL21, i_cmpclass)
+  #if (c_SELECT(_c_SEL22, i_cmpclass)) & c_use_cmp
+    #define i_use_cmp
+  #endif
+  #if (c_SELECT(_c_SEL22, i_cmpclass)) & c_use_eq
+    #define i_use_eq
+  #endif
 #endif
 
 #if defined i_type && !(defined i_key || defined i_keyclass || \

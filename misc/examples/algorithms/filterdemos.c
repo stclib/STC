@@ -22,8 +22,8 @@ void demo1(void)
     puts("");
 
     int sum = 0;
-    c_filter(IVec, vec
-         , c_flt_skipwhile(*value != 80)
+    c_filter(IVec, vec, true
+        && c_flt_skipwhile(*value != 80)
         && c_flt_skip(1)
         && f_isEven()
         && f_skipValue(80)
@@ -48,8 +48,8 @@ fn main() {
 void demo2(void)
 {
     IVec vector = {0};
-    c_filter(crange, c_iota(0)           // Infinite range of integers
-         , c_flt_skipwhile(*value != 11) // Skip initial numbers unequal 11
+    c_filter(crange, c_iota(0), true     // Infinite range of integers
+        && c_flt_skipwhile(*value != 11) // Skip initial numbers unequal 11
         && (*value % 2) != 0             // Collect odd numbers
         && (c_flt_map(*value * *value),  // Square each number
             IVec_push(&vector, *value),  // Populate output IVec
@@ -75,7 +75,7 @@ fn main() {
 }
 */
 #define i_type SVec
-#define i_cmpclass csview
+#define i_cmpclass csview, c_use_eq
 #include "stc/vec.h"
 
 void demo3(void)
@@ -86,8 +86,8 @@ void demo3(void)
         SVec_push(&words, i.token);
 
     SVec words_containing_i = {0};
-    c_filter(SVec, words
-         , csview_contains(*value, "i")
+    c_filter(SVec, words, true
+        && csview_contains(*value, "i")
         && SVec_push(&words_containing_i, *value)
     );
     c_foreach (w, SVec, words_containing_i)
@@ -108,8 +108,8 @@ void demo4(void)
     cstr out = {0};
     char chr[4];
 
-    c_filter(csview, s
-         , utf8_isupper(utf8_peek(value))
+    c_filter(csview, s, true
+        && utf8_isupper(utf8_peek(value))
         && (utf8_encode(chr, utf8_tolower(utf8_peek(value))),
             cstr_push(&out, chr))
     );
