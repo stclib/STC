@@ -429,11 +429,12 @@ void        c_default_drop(Type* p);                    // does nothing
 | `c_return(x);`      | Return `x` from current function after `c_defer` statements are executed. |
 | `c_break`           | Break `c_guard` after `c_defer` statements are executed. Breaks out from any local loop/switch too.|
 
-- *Note 1*: `c_return(x)` uses **typeof**, which is standard in C23, but supported
-by virtually every C99 compiler, except MSVC prior to version 19.39 / VS17.9.
-If **typeof** is not supported, use `c_return_typed(Type, x)`.
-- *Note 2*: Code compiles only with a single `c_guard` per function. See `c2_guard`/`cx_guard`
-for additional defer guards within a single function.
+- *Note 1*: `c_guard` can only guard variables already defined, i.e.,
+do not define variables inside the `c_guard` scope which are referred
+to by `c_defer`/`c_panic`.
+- *Note 2*: `c_return(x)` uses **typeof**, which is standard in C23,
+but supported by virtually every C99 compiler, except MSVC prior to
+MSVC VS17.9. If **typeof** is not supported, use `c_return_typed(Type, x)`.
 
 Use of **c_guard** for managing resource dependencies:
 ```c
@@ -468,6 +469,8 @@ int read_nums(void) {
 ```
 
 #### c2_guard: Level-2 nested defer scope inside a c_guard
+Code compiles only with a single `c_guard` per function. Use `c2_guard`/`cx_guard` for
+additional defer guards within a single function.
 | Usage              | Description |
 |:-------------------|:----------------------------------------------------------|
 | `c2_guard {...}`   | Create a level-2 defer scope anywhere inside a `c_guard`. Equal to `c2_guard_max(8) {...}`. |

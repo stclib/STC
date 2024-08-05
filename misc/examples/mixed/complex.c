@@ -12,7 +12,7 @@
 #include "stc/stack.h"
 
 #define i_type StackList
-#define i_keyclass FloatStack  // "class" picks up _clone, _drop, _cmp
+#define i_keyclass FloatStack  // "class" picks up _clone, _drop
 #include "stc/list.h"
 
 #define i_type ListMap

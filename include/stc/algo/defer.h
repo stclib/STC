@@ -46,15 +46,19 @@
 //     calls all added c_defers in opposite order of definition, before
 //     it returns the evaluated result of x.
 //
-// NOTE1: c_return(x) uses `typeof`, which is standard in C23 but supported
-//     by virtually every C99 compiler, except MSVC prior to VS17.9.
-//     If `typeof` is not available, use c_return_typed(Type, x).
+// NOTE1: c_guard can only guard variables already defined, i.e.,
+//     do not define variables inside the c_guard scope which are
+//     referred to by c_defer/c_panic.
 //
-// NOTE2: `return` must not be used anywhere inside a defer scope. Use
-//     `break` and `continue` only in local loops/switch. Else use c_return
-//     and c_break.
+// NOTE2: c_return(x) uses `typeof`, which is standard C23, but also
+//     supported by virtually every C99 compiler except MSVC prior to
+//     VS17.9. If `typeof` is not available, use c_return_typed(Type, x).
 //
-// NOTE3: Code will only compile with one c_guard per function, but it is
+// NOTE3: `return` must not be used anywhere inside a defer scope (except
+//     in argument to c_panic). Use `break` and `continue` only in local
+//     loops/switch. Else use c_return and c_break.
+//
+// NOTE4: Code will only compile with one c_guard per function, but it is
 //     possible to have c2_guard inside a c_guard, or multiple cx_guard's
 //     in sequence within a single function (see below).
 

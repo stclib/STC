@@ -75,8 +75,8 @@ fn main() {
 }
 */
 #define i_type SVec
-#define i_keyclass csview
-#include "stc/stack.h"
+#define i_cmpclass csview
+#include "stc/vec.h"
 
 void demo3(void)
 {
@@ -92,8 +92,12 @@ void demo3(void)
     );
     c_foreach (w, SVec, words_containing_i)
         printf(" %.*s", c_SVARG(*w.ref));
-
     puts("");
+
+
+    SVec_iter it = SVec_find(&words, c_sv("sentence"));
+    if (it.ref) printf("found: %.*s\n", c_SVARG(*it.ref));
+
     c_drop(SVec, &words, &words_containing_i);
 }
 

@@ -48,33 +48,32 @@
   #define _m_node _c_MEMB(_node)
 #endif
 
-#if defined i_key_str // [deprecated]
-  #define i_key_cstr
-  #define i_tag str
-#elif defined i_key_arc
+#if defined i_key_arc
   #define i_key_arcbox i_key_arc
 #elif defined i_key_box
   #define i_key_arcbox i_key_box
+#elif defined i_key_str // [deprecated]
+  #define i_key_cstr
+  #define i_tag str
 #endif
 
-#if defined i_val_str // [deprecated]
-  #define i_val_cstr
-  #ifndef i_tag
-    #define i_tag str
-  #endif
-#elif defined i_val_arc
+#if defined i_val_arc
   #define i_val_arcbox i_val_arc
 #elif defined i_val_box
   #define i_val_arcbox i_val_box
-#endif
-#if defined i_keyboxed || defined i_valboxed
-  #error "i_keyboxed, i_valboxed is not supported. " \
-         "Use: i_key_box, i_val_box, i_key_arc, i_val_arc."
+#elif defined i_val_str // [deprecated]
+  #define i_val_cstr
+  #define i_tag str
 #endif
 
 #ifdef i_TYPE // [deprecated]
   #define i_type i_TYPE
 #endif
+#ifdef i_cmpclass
+  #define i_rawclass i_cmpclass
+  #define i_use_cmp
+#endif
+
 #if defined i_type && !(defined i_key || defined i_keyclass || \
                         defined i_key_cstr || defined i_key_arcbox)
   #if defined i_rawclass && !defined i_keyraw
@@ -117,14 +116,11 @@
 #endif
 
 // Handle predefined element-types with lookup convertion types:
-// cstr(const char*), cstr(csview), arc_T(T) / box_T(T)
+// cstr_from(const char*) and arc_T_from(T) / box_T_from(T)
 #if defined i_key_cstr
   #define i_keyclass cstr
   #define i_rawclass cstr_raw
   #define i_use_cmp
-  #ifndef i_tag
-    #define i_tag cstr
-  #endif
 #elif defined i_key_arcbox
   #define i_keyclass i_key_arcbox
   #define i_rawclass c_JOIN(i_key_arcbox, _raw)
@@ -178,15 +174,16 @@
 #endif
 
 #if !defined i_key
-  #error "No i_key or i_val defined"
+  #error "No i_key defined"
 #elif defined i_keyraw ^ defined i_keyto
   #error "Both i_keyraw/i_valraw and i_keyto/i_valto must be defined, if any"
 #elif !defined i_no_clone && (defined i_keyclone ^ defined i_keydrop)
   #error "Both i_keyclone/i_valclone and i_keydrop/i_valdrop must be defined, if any (unless i_no_clone defined)."
+#elif defined i_keyboxed || defined i_valboxed
+  #error "i_keyboxed / i_valboxed not supported. " \
+         "Use: i_key_box/i_key_arc ; i_val_box/i_val_arc."
 #elif defined i_from || defined i_drop
-  #error "i_from / i_drop not supported. Define i_keyfrom/i_valfrom and/or i_keydrop/i_valdrop instead"
-//#elif defined i_keyraw && defined _i_is_hash && !(defined i_hash && (defined _i_has_cmp || defined i_eq))
-//  #error "For hmap/hset, both i_hash and i_eq (or i_cmp) must be defined when i_keyraw is defined."
+  #error "i_from / i_drop not supported. Use i_keyfrom/i_keydrop ; i_valfrom/i_valdrop"
 #elif defined i_keyraw && defined i_use_cmp && !defined _i_has_cmp
   #error "For smap/sset/pque, i_cmp or i_less must be defined when i_keyraw is defined."
 #endif
