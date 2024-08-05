@@ -177,6 +177,9 @@ STC_INLINE void _c_MEMB(_assign)(_i_self* self, _i_self arc) {
         return i_cmp((&rawx), (&rawy));
     }
 #else
+    STC_INLINE int _c_MEMB(_raw_cmp)(const _m_raw* rx, const _m_raw* ry)
+        { return (rx > ry) - (rx < ry); }
+
     STC_INLINE int _c_MEMB(_cmp)(const _i_self* self, const _i_self* other) {
         const _m_value *x = self->get, *y = other->get;
         return (x > y) - (x < y);
@@ -192,6 +195,9 @@ STC_INLINE void _c_MEMB(_assign)(_i_self* self, _i_self arc) {
         return i_eq((&rawx), (&rawy));
     }
 #else
+    STC_INLINE bool _c_MEMB(_raw_eq)(const _m_raw* rx, const _m_raw* ry)
+        { return rx == ry; }
+
     STC_INLINE bool _c_MEMB(_eq)(const _i_self* self, const _i_self* other)
         { return self->get == other->get; }
 #endif
@@ -205,6 +211,9 @@ STC_INLINE void _c_MEMB(_assign)(_i_self* self, _i_self arc) {
         return i_hash((&raw));
     }
 #else
+    STC_INLINE uint64_t _c_MEMB(_raw_hash)(const _m_raw* rx)
+        { return c_default_hash(&rx); }
+
     STC_INLINE uint64_t _c_MEMB(_hash)(const _i_self* self)
         { return c_default_hash(&self->get); }
 #endif // i_no_hash

@@ -32,7 +32,6 @@
   #define c_no_hash       (1<<4)
   #define c_use_cmp       (1<<5)
   #define c_use_eq        (1<<6)
-  #define c_use_cmp_eq    (c_use_cmp | c_use_eq)
   #define c_more          (1<<7)
 
   #define _c_MEMB(name) c_JOIN(_i_self, name)
@@ -69,9 +68,10 @@
 #ifdef i_TYPE // [deprecated]
   #define i_type i_TYPE
 #endif
-#ifdef i_cmpclass
+#if defined i_cmpclass
   #define i_rawclass i_cmpclass
   #define i_use_cmp
+  #define i_use_eq
 #endif
 
 #if defined i_type && !(defined i_key || defined i_keyclass || \
