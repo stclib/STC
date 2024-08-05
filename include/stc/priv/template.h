@@ -76,10 +76,10 @@
 
 #if defined i_type && !(defined i_key || defined i_keyclass || \
                         defined i_key_cstr || defined i_key_arcbox)
-  #if defined i_rawclass && !defined i_keyraw
+  #if defined i_rawclass
     #define _i_self i_type
     #define i_key i_rawclass
-    #define i_keyto c_default_toraw
+    #define i_keytoraw c_default_toraw
   #elif defined _i_is_map
     #define _i_self c_SELECT(_c_SEL31, i_type)
     #define i_key c_SELECT(_c_SEL32, i_type)
@@ -147,8 +147,8 @@
   #elif !defined i_keyfrom && !defined i_no_clone
     #define i_keyfrom c_JOIN(i_key, _clone)
   #endif
-  #if !defined i_keyto && defined i_keyraw
-    #define i_keyto c_JOIN(i_key, _toraw)
+  #if !defined i_keytoraw && defined i_keyraw
+    #define i_keytoraw c_JOIN(i_key, _toraw)
   #endif
 #endif
 
@@ -175,8 +175,8 @@
 
 #if !defined i_key
   #error "No i_key defined"
-#elif defined i_keyraw ^ defined i_keyto
-  #error "Both i_keyraw/i_valraw and i_keyto/i_valto must be defined, if any"
+#elif defined i_keyraw ^ defined i_keytoraw
+  #error "Both i_keyraw/i_valraw and i_keytoraw/i_valtoraw must be defined, if any"
 #elif !defined i_no_clone && (defined i_keyclone ^ defined i_keydrop)
   #error "Both i_keyclone/i_valclone and i_keydrop/i_valdrop must be defined, if any (unless i_no_clone defined)."
 #elif defined i_keyboxed || defined i_valboxed
@@ -184,6 +184,8 @@
          "Use: i_key_box/i_key_arc ; i_val_box/i_val_arc."
 #elif defined i_from || defined i_drop
   #error "i_from / i_drop not supported. Use i_keyfrom/i_keydrop ; i_valfrom/i_valdrop"
+#elif defined i_keyto || defined i_valto
+  #error i_keyto/i_valto not supported. Use i_keytoraw/i_valtoraw
 #elif defined i_keyraw && defined i_use_cmp && !defined _i_has_cmp
   #error "For smap/sset/pque, i_cmp or i_less must be defined when i_keyraw is defined."
 #endif
@@ -218,7 +220,7 @@
 #endif
 #ifndef i_keyraw
   #define i_keyraw i_key
-  #define i_keyto c_default_toraw
+  #define i_keytoraw c_default_toraw
 #endif
 #ifndef i_keyclone
   #define i_keyclone c_default_clone
@@ -250,15 +252,15 @@
   #elif !defined i_valfrom && !defined i_no_clone
     #define i_valfrom c_JOIN(i_val, _clone)
   #endif
-  #if !defined i_valto && defined i_valraw
-    #define i_valto c_JOIN(i_val, _toraw)
+  #if !defined i_valtoraw && defined i_valraw
+    #define i_valtoraw c_JOIN(i_val, _toraw)
   #endif
 #endif
 
 #ifndef i_val
   #error "i_val* must be defined for maps"
-#elif defined i_valraw ^ defined i_valto
-  #error "Both i_valraw and i_valto must be defined, if any"
+#elif defined i_valraw ^ defined i_valtoraw
+  #error "Both i_valraw and i_valtoraw must be defined, if any"
 #elif !defined i_no_clone && (defined i_valclone ^ defined i_valdrop)
   #error "Both i_valclone and i_valdrop must be defined, if any"
 #endif
@@ -272,7 +274,7 @@
 #endif
 #ifndef i_valraw
   #define i_valraw i_val
-  #define i_valto c_default_toraw
+  #define i_valtoraw c_default_toraw
 #endif
 #ifndef i_valclone
   #define i_valclone c_default_clone

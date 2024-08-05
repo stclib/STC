@@ -195,7 +195,7 @@ _c_MEMB(_emplace_n)(_i_self* self, const intptr_t idx, const _m_raw* raw, const 
 STC_DEF _m_iter
 _c_MEMB(_find_in)(_m_iter i1, _m_iter i2, _m_raw raw) {
     for (; i1.pos != i2.pos; _c_MEMB(_next)(&i1)) {
-        const _m_raw r = i_keyto(i1.ref);
+        const _m_raw r = i_keytoraw(i1.ref);
         if (i_eq((&raw), (&r)))
             break;
     }

@@ -183,8 +183,8 @@ _c_MEMB(_emplace_key)(_i_self* self, _m_keyraw rkey) {
 #endif // !i_no_emplace
 
 STC_INLINE _m_raw _c_MEMB(_value_toraw)(const _m_value* val) {
-    return _i_SET_ONLY( i_keyto(val) )
-           _i_MAP_ONLY( c_LITERAL(_m_raw){i_keyto((&val->first)), i_valto((&val->second))} );
+    return _i_SET_ONLY( i_keytoraw(val) )
+           _i_MAP_ONLY( c_LITERAL(_m_raw){i_keytoraw((&val->first)), i_valtoraw((&val->second))} );
 }
 
 STC_INLINE void _c_MEMB(_value_drop)(_m_value* _val) {
@@ -194,7 +194,7 @@ STC_INLINE void _c_MEMB(_value_drop)(_m_value* _val) {
 
 STC_INLINE _m_result
 _c_MEMB(_insert)(_i_self* self, _m_key _key _i_MAP_ONLY(, _m_mapped _mapped)) {
-    _m_result _res = _c_MEMB(_insert_entry_)(self, i_keyto((&_key)));
+    _m_result _res = _c_MEMB(_insert_entry_)(self, i_keytoraw((&_key)));
     if (_res.inserted)
         { *_i_keyref(_res.ref) = _key; _i_MAP_ONLY( _res.ref->second = _mapped; )}
     else
@@ -203,7 +203,7 @@ _c_MEMB(_insert)(_i_self* self, _m_key _key _i_MAP_ONLY(, _m_mapped _mapped)) {
 }
 
 STC_INLINE _m_value* _c_MEMB(_push)(_i_self* self, _m_value _val) {
-    _m_result _res = _c_MEMB(_insert_entry_)(self, i_keyto(_i_keyref(&_val)));
+    _m_result _res = _c_MEMB(_insert_entry_)(self, i_keytoraw(_i_keyref(&_val)));
     if (_res.inserted)
         *_res.ref = _val;
     else
@@ -281,7 +281,7 @@ STC_INLINE bool
 _c_MEMB(_eq)(const _i_self* self, const _i_self* other) {
     if (_c_MEMB(_size)(self) != _c_MEMB(_size)(other)) return false;
     for (_m_iter i = _c_MEMB(_begin)(self); i.ref; _c_MEMB(_next)(&i)) {
-        const _m_keyraw _raw = i_keyto(_i_keyref(i.ref));
+        const _m_keyraw _raw = i_keytoraw(_i_keyref(i.ref));
         if (!_c_MEMB(_contains)(other, _raw)) return false;
     }
     return true;
@@ -341,7 +341,7 @@ STC_DEF void _c_MEMB(_clear)(_i_self* self) {
 #ifdef _i_is_map
     STC_DEF _m_result
     _c_MEMB(_insert_or_assign)(_i_self* self, _m_key _key, _m_mapped _mapped) {
-        _m_result _res = _c_MEMB(_insert_entry_)(self, i_keyto((&_key)));
+        _m_result _res = _c_MEMB(_insert_entry_)(self, i_keytoraw((&_key)));
         _m_mapped* _mp = _res.ref ? &_res.ref->second : &_mapped;
         if (_res.inserted)
             _res.ref->first = _key;
@@ -375,7 +375,7 @@ _c_MEMB(_bucket_lookup_)(const _i_self* self, const _m_keyraw* rkeyptr) {
 
     while (_res.dist <= self->meta[_res.idx].dist) {
         if (self->meta[_res.idx].hashx == _res.hashx) {
-            const _m_keyraw _raw = i_keyto(_i_keyref(&self->table[_res.idx]));
+            const _m_keyraw _raw = i_keytoraw(_i_keyref(&self->table[_res.idx]));
             if (i_eq((&_raw), rkeyptr)) {
                 _res.ref = &self->table[_res.idx];
                 break;
@@ -465,7 +465,7 @@ _c_MEMB(_reserve)(_i_self* self, const intptr_t _newcap) {
         const struct hmap_meta* m = self->meta;
 
         for (intptr_t i = 0; i < _oldbucks; ++i, ++d) if ((m++)->dist) {
-            _m_keyraw r = i_keyto(_i_keyref(d));
+            _m_keyraw r = i_keytoraw(_i_keyref(d));
             _m_result _res = _c_MEMB(_bucket_insert_)(&map, &r);
             *_res.ref = *d; // move
         }

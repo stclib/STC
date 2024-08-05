@@ -39,7 +39,7 @@ struct {
 #define i_type SongArc
 #define i_keyclass Song // bind _clone(), _drop()
 #define i_keyraw SongView
-#define i_keyto(x) ((SongView){.artist=cstr_str(&x->artist), .title=cstr_str(&x->title)})
+#define i_keytoraw(x) ((SongView){.artist=cstr_str(&x->artist), .title=cstr_str(&x->title)})
 #define i_keyfrom(sw) ((Song){.artist=cstr_from(sw.artist), .title=cstr_from(sw.title)})
 // If commenting the next two lines (or either), containers uses object pointer equal and hashing
 // provided by arc instead of object content comparison (i.e. "The Times They Are A Changing" will appear more than once).

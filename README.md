@@ -407,24 +407,24 @@ Key:
 - `i_keyclone` *Func* - **[required if]** *i_keydrop* is defined (exception for **arc**, as it shares).
 - `i_keyraw` *Type* - Convertion "raw" type - defaults to *i_key*.
 - `i_keyfrom` *Func* - Convertion func *i_key* <= *i_keyraw*.
-- `i_keyto` *Func*  - Convertion func *i_key*\* => *i_keyraw*. **[required if]** *i_keyraw* is defined
+- `i_keytoraw` *Func*  - Convertion func *i_key*\* => *i_keyraw*. **[required if]** *i_keyraw* is defined
 
 Val: (hmap/smap mapped value only)
 - `i_valdrop` *Func* - Destroy mapped or value func - defaults to empty destruct.
 - `i_valclone` *Func* - **[required if]** *i_valdrop* is defined.
 - `i_valraw` *Type*  - Convertion "raw" type - defaults to *i_val*.
 - `i_valfrom` *Func* - Convertion func *i_val* <= *i_valraw*.
-- `i_valto` *Func* - Convertion func *i_val*\* => *i_valraw*.
+- `i_valtoraw` *Func* - Convertion func *i_val*\* => *i_valraw*.
 
 Specials: Meta-template parameters. Use instead of `i_key` / `i_val`.
 - `i_keyclass` *Type* - Auto-set standard named functions: *Type_clone()*, *Type_drop()*, *Type_cmp()*, *Type_eq()*, *Type_hash()*.
-If `i_keyraw` is defined, it sets `i_keyto` = *Type_toraw()* and `i_keyfrom` = *Type_from()*.
+If `i_keyraw` is defined, it sets `i_keytoraw` = *Type_toraw()* and `i_keyfrom` = *Type_from()*.
 Only functions required by the container type is required to be defined. E.g.:
     - *Type_hash()* and *Type_eq()* are only required by **hmap**, **hset** and smart pointers.
     - *Type_cmp()* is not used by **stack** and **hmap/hset**.
     - *Type_clone()* is not used if *#define i_opt c_no_clone* is specified.
 - `i_key_cstr` - Sets `i_keyclass` = *cstr*, `i_keyraw` = *const char*\*. Defines both type convertion
-`i_keyfrom`, `i_keyto`, and sets `i_cmp`, `i_eq`, `i_hash` functions with *const char\*\** as argument.
+`i_keyfrom`, `i_keytoraw`, and sets `i_cmp`, `i_eq`, `i_hash` functions with *const char\*\** as argument.
 - `i_key_arc`, `i_key_box` *Type* - Use when *Type* is a smart pointer **arc** or **box**. Defines *i_keyclass = Type*, and *i_keyraw = Type\**.
 NB: Do not use when defining arc/box types themselves.
 - `i_valclass` *Type*, `i_val_cstr`, `i_val_arc`, `i_val_box` - Similar rules as for ***key***.

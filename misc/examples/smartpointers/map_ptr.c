@@ -8,7 +8,7 @@
 #define i_val long*
 #define i_valraw long
 #define i_valfrom(raw) c_new(long, raw)
-#define i_valto(x) **x
+#define i_valtoraw(x) **x
 #define i_valclone(x) c_new(long, *x)
 #define i_valdrop(x) free(*x)
 #include "stc/hmap.h"

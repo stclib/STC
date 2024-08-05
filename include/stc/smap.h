@@ -138,9 +138,9 @@ _c_MEMB(_clear)(_i_self* self)
 
 STC_INLINE _m_raw
 _c_MEMB(_value_toraw)(const _m_value* val) {
-    return _i_SET_ONLY( i_keyto(val) )
-           _i_MAP_ONLY( c_LITERAL(_m_raw){i_keyto((&val->first)),
-                                        i_valto((&val->second))} );
+    return _i_SET_ONLY( i_keytoraw(val) )
+           _i_MAP_ONLY( c_LITERAL(_m_raw){i_keytoraw((&val->first)),
+                                          i_valtoraw((&val->second))} );
 }
 
 STC_INLINE void
@@ -216,7 +216,7 @@ _c_MEMB(_eq)(const _i_self* self, const _i_self* other) {
     if (_c_MEMB(_size)(self) != _c_MEMB(_size)(other)) return false;
     _m_iter i = _c_MEMB(_begin)(self), j = _c_MEMB(_begin)(other);
     for (; i.ref; _c_MEMB(_next)(&i), _c_MEMB(_next)(&j)) {
-        const _m_keyraw _rx = i_keyto(_i_keyref(i.ref)), _ry = i_keyto(_i_keyref(j.ref));
+        const _m_keyraw _rx = i_keytoraw(_i_keyref(i.ref)), _ry = i_keytoraw(_i_keyref(j.ref));
         if (!(i_eq((&_rx), (&_ry)))) return false;
     }
     return true;
@@ -225,7 +225,7 @@ _c_MEMB(_eq)(const _i_self* self, const _i_self* other) {
 
 STC_INLINE _m_result
 _c_MEMB(_insert)(_i_self* self, _m_key _key _i_MAP_ONLY(, _m_mapped _mapped)) {
-    _m_result _res = _c_MEMB(_insert_entry_)(self, i_keyto((&_key)));
+    _m_result _res = _c_MEMB(_insert_entry_)(self, i_keytoraw((&_key)));
     if (_res.inserted)
         { *_i_keyref(_res.ref) = _key; _i_MAP_ONLY( _res.ref->second = _mapped; )}
     else
@@ -235,7 +235,7 @@ _c_MEMB(_insert)(_i_self* self, _m_key _key _i_MAP_ONLY(, _m_mapped _mapped)) {
 
 STC_INLINE _m_value*
 _c_MEMB(_push)(_i_self* self, _m_value _val) {
-    _m_result _res = _c_MEMB(_insert_entry_)(self, i_keyto(_i_keyref(&_val)));
+    _m_result _res = _c_MEMB(_insert_entry_)(self, i_keytoraw(_i_keyref(&_val)));
     if (_res.inserted)
         *_res.ref = _val;
     else
@@ -342,7 +342,7 @@ _c_MEMB(_new_node_)(_i_self* self, int level) {
 #ifdef _i_is_map
     STC_DEF _m_result
     _c_MEMB(_insert_or_assign)(_i_self* self, _m_key _key, _m_mapped _mapped) {
-        _m_result _res = _c_MEMB(_insert_entry_)(self, i_keyto((&_key)));
+        _m_result _res = _c_MEMB(_insert_entry_)(self, i_keytoraw((&_key)));
         _m_mapped* _mp = _res.ref ? &_res.ref->second : &_mapped;
         if (_res.inserted)
             _res.ref->first = _key;
@@ -374,7 +374,7 @@ _c_MEMB(_find_it)(const _i_self* self, _m_keyraw rkey, _m_iter* out) {
     _m_node *d = out->_d = self->nodes;
     out->_top = 0;
     while (tn) {
-        int c; const _m_keyraw _raw = i_keyto(_i_keyref(&d[tn].value));
+        int c; const _m_keyraw _raw = i_keytoraw(_i_keyref(&d[tn].value));
         if ((c = i_cmp((&_raw), (&rkey))) < 0)
             tn = d[tn].link[1];
         else if (c > 0)
@@ -427,7 +427,7 @@ _c_MEMB(_insert_entry_i_)(_i_self* self, int32_t tn, const _m_keyraw* rkey, _m_r
     int c, top = 0, dir = 0;
     while (tx) {
         up[top++] = tx;
-        const _m_keyraw _raw = i_keyto(_i_keyref(&d[tx].value));
+        const _m_keyraw _raw = i_keytoraw(_i_keyref(&d[tx].value));
         if (!(c = i_cmp((&_raw), rkey)))
             { _res->ref = &d[tx].value; return tn; }
         dir = (c < 0);
@@ -466,7 +466,7 @@ _c_MEMB(_erase_r_)(_i_self *self, int32_t tn, const _m_keyraw* rkey, int *erased
     _m_node *d = self->nodes;
     if (tn == 0)
         return 0;
-    _m_keyraw raw = i_keyto(_i_keyref(&d[tn].value));
+    _m_keyraw raw = i_keytoraw(_i_keyref(&d[tn].value));
     int32_t tx; int c = i_cmp((&raw), rkey);
     if (c != 0)
         d[tn].link[c < 0] = _c_MEMB(_erase_r_)(self, d[tn].link[c < 0], rkey, erased);
@@ -478,7 +478,7 @@ _c_MEMB(_erase_r_)(_i_self *self, int32_t tn, const _m_keyraw* rkey, int *erased
             while (d[tx].link[1])
                 tx = d[tx].link[1];
             d[tn].value = d[tx].value; /* move */
-            raw = i_keyto(_i_keyref(&d[tn].value));
+            raw = i_keytoraw(_i_keyref(&d[tn].value));
             d[tn].link[0] = _c_MEMB(_erase_r_)(self, d[tn].link[0], &raw, erased);
         } else { /* unlink node */
             tx = tn;
@@ -514,10 +514,10 @@ _c_MEMB(_erase)(_i_self* self, _m_keyraw rkey) {
 
 STC_DEF _m_iter
 _c_MEMB(_erase_at)(_i_self* self, _m_iter it) {
-    _m_keyraw raw = i_keyto(_i_keyref(it.ref));
+    _m_keyraw raw = i_keytoraw(_i_keyref(it.ref));
     _c_MEMB(_next)(&it);
     if (it.ref) {
-        _m_keyraw nxt = i_keyto(_i_keyref(it.ref));
+        _m_keyraw nxt = i_keytoraw(_i_keyref(it.ref));
         _c_MEMB(_erase)(self, raw);
         _c_MEMB(_find_it)(self, nxt, &it);
     } else
@@ -533,14 +533,14 @@ _c_MEMB(_erase_range)(_i_self* self, _m_iter it1, _m_iter it2) {
         return it1;
     }
     _m_key k1 = *_i_keyref(it1.ref), k2 = *_i_keyref(it2.ref);
-    _m_keyraw r1 = i_keyto((&k1));
+    _m_keyraw r1 = i_keytoraw((&k1));
     for (;;) {
         if (memcmp(&k1, &k2, sizeof k1) == 0)
             return it1;
         _c_MEMB(_next)(&it1);
         k1 = *_i_keyref(it1.ref);
         _c_MEMB(_erase)(self, r1);
-        r1 = i_keyto((&k1));
+        r1 = i_keytoraw((&k1));
         _c_MEMB(_find_it)(self, r1, &it1);
     }
 }

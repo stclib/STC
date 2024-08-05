@@ -28,13 +28,13 @@ See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/contain
 #define i_keyclone <f>        // REQUIRED IF i_keydrop defined
 #define i_keyraw <t>          // convertion "raw" type - defaults to i_key
 #define i_keyfrom <f>         // convertion func i_keyraw => i_key
-#define i_keyto <f>           // convertion func i_key* => i_keyraw
+#define i_keytoraw <f>        // convertion func i_key* => i_keyraw
 
 #define i_valdrop <f>         // destroy value func - defaults to empty destruct
 #define i_valclone <f>        // REQUIRED IF i_valdrop defined
 #define i_valraw <t>          // convertion "raw" type - defaults to i_val
 #define i_valfrom <f>         // convertion func i_valraw => i_val
-#define i_valto <f>           // convertion func i_val* => i_valraw
+#define i_valtoraw <f>           // convertion func i_val* => i_valraw
 
 #include "stc/hmap.h"
 ```

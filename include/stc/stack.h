@@ -178,7 +178,7 @@ STC_INLINE _m_value _c_MEMB(_value_clone)(_m_value val)
     { return i_keyclone(val); }
 
 STC_INLINE i_keyraw _c_MEMB(_value_toraw)(const _m_value* val)
-    { return i_keyto(val); }
+    { return i_keytoraw(val); }
 #endif // !i_no_clone
 
 STC_INLINE _m_iter _c_MEMB(_begin)(const _i_self* self) {
@@ -217,7 +217,7 @@ STC_INLINE bool
 _c_MEMB(_eq)(const _i_self* self, const _i_self* other) {
     if (self->_len != other->_len) return false;
     for (intptr_t i = 0; i < self->_len; ++i) {
-        const _m_raw _rx = i_keyto(self->data+i), _ry = i_keyto(other->data+i);
+        const _m_raw _rx = i_keytoraw(self->data+i), _ry = i_keytoraw(other->data+i);
         if (!(i_eq((&_rx), (&_ry)))) return false;
     }
     return true;

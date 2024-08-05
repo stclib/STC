@@ -31,7 +31,7 @@ See the c++ class [std::list](https://en.cppreference.com/w/cpp/container/list) 
 #define i_keyclone <f>   // REQUIRED IF i_keydrop defined
 
 #define i_keyraw <t>     // convertion "raw" type (default: {i_key})
-#define i_keyto <f>      // convertion func i_key* => i_keyraw
+#define i_keytoraw <f>   // convertion func i_key* => i_keyraw
 #define i_keyfrom <f>    // convertion func i_keyraw => i_key
 #include "stc/list.h"
 ```

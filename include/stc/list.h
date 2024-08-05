@@ -151,7 +151,7 @@ STC_INLINE void         _c_MEMB(_pop_front)(_i_self* self)
                             { c_assert(!_c_MEMB(_is_empty)(self)); _c_MEMB(_erase_after_node)(self, self->last); }
 STC_INLINE _m_value*    _c_MEMB(_front)(const _i_self* self) { return &self->last->next->value; }
 STC_INLINE _m_value*    _c_MEMB(_back)(const _i_self* self) { return &self->last->value; }
-STC_INLINE _m_raw       _c_MEMB(_value_toraw)(const _m_value* pval) { return i_keyto(pval); }
+STC_INLINE _m_raw       _c_MEMB(_value_toraw)(const _m_value* pval) { return i_keytoraw(pval); }
 STC_INLINE void         _c_MEMB(_value_drop)(_m_value* pval) { i_keydrop(pval); }
 
 STC_INLINE intptr_t
@@ -210,7 +210,7 @@ _c_MEMB(_get_mut)(_i_self* self, _m_raw val) {
 STC_INLINE bool _c_MEMB(_eq)(const _i_self* self, const _i_self* other) {
     _m_iter i = _c_MEMB(_begin)(self), j = _c_MEMB(_begin)(other);
     for (; i.ref && j.ref; _c_MEMB(_next)(&i), _c_MEMB(_next)(&j)) {
-        const _m_raw _rx = i_keyto(i.ref), _ry = i_keyto(j.ref);
+        const _m_raw _rx = i_keytoraw(i.ref), _ry = i_keytoraw(j.ref);
         if (!(i_eq((&_rx), (&_ry)))) return false;
     }
     return !(i.ref || j.ref);
@@ -359,7 +359,7 @@ _c_MEMB(_split_off)(_i_self* self, _m_iter it1, _m_iter it2) {
 STC_DEF _m_iter
 _c_MEMB(_find_in)(_m_iter it1, _m_iter it2, _m_raw val) {
     c_foreach (it, _i_self, it1, it2) {
-        _m_raw r = i_keyto(it.ref);
+        _m_raw r = i_keytoraw(it.ref);
         if (i_eq((&r), (&val)))
             return it;
     }
@@ -372,7 +372,7 @@ _c_MEMB(_remove)(_i_self* self, _m_raw val) {
     _m_node *prev = self->last, *node;
     if (prev) do {
         node = prev->next;
-        _m_raw r = i_keyto((&node->value));
+        _m_raw r = i_keytoraw((&node->value));
         if (i_eq((&r), (&val))) {
             _c_MEMB(_erase_after_node)(self, prev), ++n;
             if (!self->last) break;
@@ -385,7 +385,7 @@ _c_MEMB(_remove)(_i_self* self, _m_raw val) {
 
 #if defined _i_has_cmp
 STC_DEF int _c_MEMB(_sort_cmp_)(const _m_value* x, const _m_value* y) {
-    const _m_raw a = i_keyto(x), b = i_keyto(y);
+    const _m_raw a = i_keytoraw(x), b = i_keytoraw(y);
     return i_cmp((&a), (&b));
 }
 

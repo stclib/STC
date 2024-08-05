@@ -75,7 +75,7 @@ STC_INLINE intptr_t     _c_MEMB(_capacity)(const _i_self* self)
 STC_INLINE bool         _c_MEMB(_is_empty)(const _i_self* self)
                             { return self->start == self->end; }
 STC_INLINE _m_raw       _c_MEMB(_value_toraw)(const _m_value* pval)
-                            { return i_keyto(pval); }
+                            { return i_keytoraw(pval); }
 
 STC_INLINE _m_value*    _c_MEMB(_front)(const _i_self* self)
                             { return self->cbuf + self->start; }

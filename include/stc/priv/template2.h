@@ -41,7 +41,7 @@
 #undef i_cmpclass   // like i_keyraw, but defines i_use_cmp as well (always implement comparisons)
 #undef i_keyclone
 #undef i_keyfrom
-#undef i_keyto
+#undef i_keytoraw
 #undef i_cmp
 #undef i_less
 #undef i_eq
@@ -59,7 +59,7 @@
 #undef i_valclass
 #undef i_valclone
 #undef i_valfrom
-#undef i_valto
+#undef i_valtoraw
 #undef i_valdrop
 
 #undef i_use_cmp

@@ -20,7 +20,7 @@ See the c++ class [std::deque](https://en.cppreference.com/w/cpp/container/deque
 
 #define i_keyraw <t>     // convertion "raw" type - defaults to i_key
 #define i_keyfrom <f>    // convertion func i_keyraw => i_key
-#define i_keyto <f>      // convertion func i_key* => i_keyraw
+#define i_keytoraw <f>   // convertion func i_key* => i_keyraw
 
 #include "stc/deq.h"
 ```

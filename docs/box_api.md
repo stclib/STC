@@ -29,7 +29,7 @@ See similar c++ class [std::unique_ptr](https://en.cppreference.com/w/cpp/memory
 #define i_keyclone <f>   // REQUIRED if i_keydrop is defined, unless 'i_opt c_no_clone' is defined.
 
 #define i_keyraw <t>     // convertion type (lookup): default to {i_key}
-#define i_keyto <f>      // convertion func i_key* => i_keyraw: REQUIRED IF i_keyraw defined.
+#define i_keytoraw <f>   // convertion func i_key* => i_keyraw: REQUIRED IF i_keyraw defined.
 #define i_keyfrom <f>    // from-raw func.
 #include "stc/box.h"
 ```

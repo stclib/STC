@@ -107,9 +107,9 @@ int main(void) {
 static inline void _c_MEMB(_insertsort_ij)(_i_self* self, intptr_t lo, intptr_t hi) {
     for (intptr_t j = lo, i = lo + 1; i <= hi; j = i, ++i) {
         _m_value x = *i_at(self, i);
-        _m_raw rx = i_keyto(&x);
+        _m_raw rx = i_keytoraw(&x);
         while (j >= 0) {
-            _m_raw ry = i_keyto(i_at(self, j));
+            _m_raw ry = i_keytoraw(i_at(self, j));
             if (!(i_less((&rx), (&ry)))) break;
             *i_at_mut(self, j + 1) = *i_at(self, j);
             --j;
@@ -121,11 +121,11 @@ static inline void _c_MEMB(_insertsort_ij)(_i_self* self, intptr_t lo, intptr_t 
 static inline void _c_MEMB(_quicksort_ij)(_i_self* self, intptr_t lo, intptr_t hi) {
     intptr_t i = lo, j;
     while (lo < hi) {
-        _m_raw pivot = i_keyto(i_at(self, (intptr_t)(lo + (hi - lo)*7LL/16))), rx;
+        _m_raw pivot = i_keytoraw(i_at(self, (intptr_t)(lo + (hi - lo)*7LL/16))), rx;
         j = hi;
         do {
-            do { rx = i_keyto(i_at(self, i)); } while (i_less((&rx), (&pivot)) && ++i);
-            do { rx = i_keyto(i_at(self, j)); } while (i_less((&pivot), (&rx)) && --j);
+            do { rx = i_keytoraw(i_at(self, i)); } while (i_less((&rx), (&pivot)) && ++i);
+            do { rx = i_keytoraw(i_at(self, j)); } while (i_less((&pivot), (&rx)) && --j);
             if (i > j) break;
             c_swap(i_at_mut(self, i), i_at_mut(self, j));
             ++i; --j;
@@ -151,7 +151,7 @@ _c_MEMB(_lower_bound_range)(const _i_self* self, const _m_raw raw, intptr_t firs
         intptr_t it = first;
         it += step;
 
-        const _m_raw rx = i_keyto(i_at(self, it));
+        const _m_raw rx = i_keytoraw(i_at(self, it));
         if (i_less((&rx), (&raw))) {
             first = ++it;
             count -= step + 1;
@@ -170,7 +170,7 @@ static inline intptr_t // -1 = not found
 _c_MEMB(_binary_search_range)(const _i_self* self, const _m_raw raw, intptr_t first, intptr_t last) {
     intptr_t res = _c_MEMB(_lower_bound_range)(self, raw, first, last);
     if (res != -1) {
-        const _m_raw rx = i_keyto(i_at(self, res));
+        const _m_raw rx = i_keytoraw(i_at(self, res));
         if (i_less((&raw), (&rx))) res = -1;
     }
     return res;

@@ -139,7 +139,7 @@ STC_INLINE void         _c_MEMB(_copy)(_i_self* self, const _i_self* other) {
 STC_INLINE intptr_t     _c_MEMB(_size)(const _i_self* self) { return self->_len; }
 STC_INLINE intptr_t     _c_MEMB(_capacity)(const _i_self* self) { return self->_cap; }
 STC_INLINE bool         _c_MEMB(_is_empty)(const _i_self* self) { return !self->_len; }
-STC_INLINE _m_raw       _c_MEMB(_value_toraw)(const _m_value* val) { return i_keyto(val); }
+STC_INLINE _m_raw       _c_MEMB(_value_toraw)(const _m_value* val) { return i_keytoraw(val); }
 STC_INLINE _m_value*    _c_MEMB(_front)(const _i_self* self) { return self->data; }
 STC_INLINE _m_value*    _c_MEMB(_back)(const _i_self* self)
                             { return self->data + self->_len - 1; }
@@ -257,7 +257,7 @@ STC_INLINE bool
 _c_MEMB(_eq)(const _i_self* self, const _i_self* other) {
     if (self->_len != other->_len) return false;
     for (intptr_t i = 0; i < self->_len; ++i) {
-        const _m_raw _rx = i_keyto(self->data+i), _ry = i_keyto(other->data+i);
+        const _m_raw _rx = i_keytoraw(self->data+i), _ry = i_keytoraw(other->data+i);
         if (!(i_eq((&_rx), (&_ry)))) return false;
     }
     return true;
@@ -381,7 +381,7 @@ STC_DEF _m_iter
 _c_MEMB(_find_in)(_m_iter i1, _m_iter i2, _m_raw raw) {
     const _m_value* p2 = _it2_ptr(i1, i2);
     for (; i1.ref != p2; ++i1.ref) {
-        const _m_raw r = i_keyto(i1.ref);
+        const _m_raw r = i_keytoraw(i1.ref);
         if (i_eq((&raw), (&r)))
             return i1;
     }
@@ -391,8 +391,8 @@ _c_MEMB(_find_in)(_m_iter i1, _m_iter i2, _m_raw raw) {
 #endif
 #if defined _i_has_cmp
 STC_DEF int _c_MEMB(_value_cmp)(const _m_value* x, const _m_value* y) {
-    const _m_raw rx = i_keyto(x);
-    const _m_raw ry = i_keyto(y);
+    const _m_raw rx = i_keytoraw(x);
+    const _m_raw ry = i_keytoraw(y);
     return i_cmp((&rx), (&ry));
 }
 #endif // _i_has_cmp

@@ -125,7 +125,7 @@ _c_MEMB(_eq)(const _i_self* self, const _i_self* other) {
     for (_m_iter i = _c_MEMB(_begin)(self), j = _c_MEMB(_begin)(other);
          i.ref; _c_MEMB(_next)(&i), _c_MEMB(_next)(&j))
     {
-        const _m_raw _rx = i_keyto(i.ref), _ry = i_keyto(j.ref);
+        const _m_raw _rx = i_keytoraw(i.ref), _ry = i_keytoraw(j.ref);
         if (!(i_eq((&_rx), (&_ry)))) return false;
     }
     return true;

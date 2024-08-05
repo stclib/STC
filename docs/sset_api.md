@@ -17,7 +17,7 @@ See the c++ class [std::set](https://en.cppreference.com/w/cpp/container/set) fo
 
 #define i_keyraw <t>     // convertion "raw" type - defaults to i_key
 #define i_keyfrom <f>    // convertion func i_keyraw => i_key - defaults to plain copy
-#define i_keyto <f>      // convertion func i_key* => i_keyraw - defaults to plain copy
+#define i_keytoraw <f>   // convertion func i_key* => i_keyraw - defaults to plain copy
 
 #include "stc/sset.h"
 ```

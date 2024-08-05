@@ -121,7 +121,7 @@ STC_INLINE _i_self _c_MEMB(_make)(_m_value val) {
 }
 
 STC_INLINE _m_raw _c_MEMB(_toraw)(const _i_self* self)
-    { return i_keyto(self->get); }
+    { return i_keytoraw(self->get); }
 
 STC_INLINE _i_self _c_MEMB(_move)(_i_self* self) {
     _i_self arc = *self;
@@ -173,7 +173,7 @@ STC_INLINE void _c_MEMB(_assign)(_i_self* self, _i_self arc) {
         { return i_cmp(rx, ry); }
 
     STC_INLINE int _c_MEMB(_cmp)(const _i_self* self, const _i_self* other) {
-        _m_raw rawx = i_keyto(self->get), rawy = i_keyto(other->get);
+        _m_raw rawx = i_keytoraw(self->get), rawy = i_keytoraw(other->get);
         return i_cmp((&rawx), (&rawy));
     }
 #else
@@ -188,7 +188,7 @@ STC_INLINE void _c_MEMB(_assign)(_i_self* self, _i_self arc) {
         { return i_eq(rx, ry); }
 
     STC_INLINE bool _c_MEMB(_eq)(const _i_self* self, const _i_self* other) {
-        _m_raw rawx = i_keyto(self->get), rawy = i_keyto(other->get);
+        _m_raw rawx = i_keytoraw(self->get), rawy = i_keytoraw(other->get);
         return i_eq((&rawx), (&rawy));
     }
 #else
@@ -201,7 +201,7 @@ STC_INLINE void _c_MEMB(_assign)(_i_self* self, _i_self arc) {
         { return i_hash(rx); }
 
     STC_INLINE uint64_t _c_MEMB(_hash)(const _i_self* self) {
-        _m_raw raw = i_keyto(self->get);
+        _m_raw raw = i_keytoraw(self->get);
         return i_hash((&raw));
     }
 #else
