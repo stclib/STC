@@ -137,7 +137,7 @@ STC_INLINE _m_value*    _c_MEMB(_emplace)(_i_self* self, _m_raw raw)
                             { return _c_MEMB(_push_back)(self, i_keyfrom(raw)); }
 #endif // !i_no_emplace
 
-STC_INLINE _i_self       _c_MEMB(_init)(void) { return c_LITERAL(_i_self){NULL}; }
+STC_INLINE _i_self       _c_MEMB(_init)(void) { return c_literal(_i_self){NULL}; }
 STC_INLINE void         _c_MEMB(_put_n)(_i_self* self, const _m_raw* raw, intptr_t n)
                             { while (n--) _c_MEMB(_push_back)(self, i_keyfrom(*raw++)); }
 STC_INLINE _i_self       _c_MEMB(_from_n)(const _m_raw* raw, intptr_t n)
@@ -165,12 +165,12 @@ _c_MEMB(_count)(const _i_self* self) {
 STC_INLINE _m_iter
 _c_MEMB(_begin)(const _i_self* self) {
     _m_value* head = self->last ? &self->last->next->value : NULL;
-    return c_LITERAL(_m_iter){head, &self->last, self->last};
+    return c_literal(_m_iter){head, &self->last, self->last};
 }
 
 STC_INLINE _m_iter
 _c_MEMB(_end)(const _i_self* self)
-    { (void)self; return c_LITERAL(_m_iter){NULL}; }
+    { (void)self; return c_literal(_m_iter){NULL}; }
 
 STC_INLINE void
 _c_MEMB(_next)(_m_iter* it) {

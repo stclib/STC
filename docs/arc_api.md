@@ -28,16 +28,16 @@ See similar c++ class [std::shared_ptr](https://en.cppreference.com/w/cpp/memory
                            //   {i_key}_drop and {i_keyraw}_cmp exist.
 #define i_key_arc <t>      // Use instead of i_key when key itself is an arc-type.
 #define i_key_box <t>      // Use instead of i_key when key  is a box-type.
-#define i_cmp <f>          // three-way compareison. REQUIRED IF i_key is a non-integral type
+#define i_cmp <fn>         // three-way compareison. REQUIRED IF i_key is a non-integral type
                            // Note that containers of arcs will "inherit" i_cmp
                            // when using arc in containers with i_val_arc MyArc - ie. the i_type.
 #define i_use_cmp          // may be defined instead of i_cmp when i_key is an integral/native-type.
-#define i_keydrop <f>      // destroy element func - defaults to empty destruct
-#define i_keyclone <f>     // REQUIRED if i_keydrop is defined, unless 'i_opt c_no_clone' is defined.
+#define i_keydrop <fn>     // destroy element func - defaults to empty destruct
+#define i_keyclone <fn>    // REQUIRED if i_keydrop is defined, unless 'i_opt c_no_clone' is defined.
 
 #define i_keyraw <t>       // convertion type (lookup): default to {i_key}
-#define i_keytoraw <f>     // convertion func i_key* => i_keyraw: REQUIRED IF i_keyraw defined.
-#define i_keyfrom <f>      // from-raw func.
+#define i_keytoraw <fn>    // convertion func i_key* => i_keyraw: REQUIRED IF i_keyraw defined.
+#define i_keyfrom <fn>     // from-raw func.
 
 #define i_opt c_no_atomic  // Non-atomic reference counting, like Rust Rc.
 #include "stc/arc.h"

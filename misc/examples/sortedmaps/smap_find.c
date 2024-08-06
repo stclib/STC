@@ -48,12 +48,12 @@ int main(void)
     print_collection_smap_istr(&m1);
 
     typedef vec_istr_value pair;
-    vec_istr_push(&v, c_LITERAL(pair){43, "Tc"});
-    vec_istr_push(&v, c_LITERAL(pair){41, "Nb"});
-    vec_istr_push(&v, c_LITERAL(pair){46, "Pd"});
-    vec_istr_push(&v, c_LITERAL(pair){42, "Mo"});
-    vec_istr_push(&v, c_LITERAL(pair){44, "Ru"});
-    vec_istr_push(&v, c_LITERAL(pair){44, "Ru"}); // attempt a duplicate
+    vec_istr_push(&v, c_literal(pair){43, "Tc"});
+    vec_istr_push(&v, c_literal(pair){41, "Nb"});
+    vec_istr_push(&v, c_literal(pair){46, "Pd"});
+    vec_istr_push(&v, c_literal(pair){42, "Mo"});
+    vec_istr_push(&v, c_literal(pair){44, "Ru"});
+    vec_istr_push(&v, c_literal(pair){44, "Ru"}); // attempt a duplicate
 
     puts("Inserting the following vector data into m1:");
     print_collection_vec_istr(&v);

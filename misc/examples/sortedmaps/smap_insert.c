@@ -32,7 +32,7 @@ int main(void)
     // insert single values
     smap_ii m1 = {0};
     smap_ii_insert(&m1, 1, 10);
-    smap_ii_push(&m1, c_LITERAL(smap_ii_value){2, 20});
+    smap_ii_push(&m1, c_literal(smap_ii_value){2, 20});
 
     puts("The original key and mapped values of m1 are:");
     print_ii(m1);
@@ -59,11 +59,11 @@ int main(void)
     smap_ii m2 = {0};
     vec_ii v = {0};
     typedef vec_ii_value ipair;
-    vec_ii_push(&v, c_LITERAL(ipair){43, 294});
-    vec_ii_push(&v, c_LITERAL(ipair){41, 262});
-    vec_ii_push(&v, c_LITERAL(ipair){45, 330});
-    vec_ii_push(&v, c_LITERAL(ipair){42, 277});
-    vec_ii_push(&v, c_LITERAL(ipair){44, 311});
+    vec_ii_push(&v, c_literal(ipair){43, 294});
+    vec_ii_push(&v, c_literal(ipair){41, 262});
+    vec_ii_push(&v, c_literal(ipair){45, 330});
+    vec_ii_push(&v, c_literal(ipair){42, 277});
+    vec_ii_push(&v, c_literal(ipair){44, 311});
 
     puts("Inserting the following vector data into m2:");
     c_foreach (e, vec_ii, v)

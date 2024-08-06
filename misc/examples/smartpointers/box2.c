@@ -26,12 +26,12 @@ typedef struct {
 #include "stc/box.h" // BoxBoxPoint
 
 Point origin(void) {
-    return c_LITERAL(Point){ .x=1.0, .y=2.0 };
+    return c_literal(Point){ .x=1.0, .y=2.0 };
 }
 
 BoxPoint boxed_origin(void) {
     // Allocate this point on the heap, and return a pointer to it
-    return BoxPoint_from(c_LITERAL(Point){ .x=1.0, .y=2.0 });
+    return BoxPoint_from(c_literal(Point){ .x=1.0, .y=2.0 });
 }
 
 
@@ -45,7 +45,7 @@ int main(void) {
 
     c_guard {
         // Heap allocated rectangle
-        BoxRect boxed_rectangle = BoxRect_from(c_LITERAL(Rectangle){
+        BoxRect boxed_rectangle = BoxRect_from(c_literal(Rectangle){
             .top_left = origin(),
             .bottom_right = { .x=3.0, .y=-4.0 }
         });

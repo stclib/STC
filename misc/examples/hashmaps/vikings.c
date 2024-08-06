@@ -55,12 +55,12 @@ static inline RawVik Viking_toraw(const Viking* vp) {
 int main(void)
 {
     Vikings vikings = {0};
-    Vikings_emplace(&vikings, c_LITERAL(RawVik){"Einar", "Norway"}, 20);
-    Vikings_emplace(&vikings, c_LITERAL(RawVik){"Olaf", "Denmark"}, 24);
-    Vikings_emplace(&vikings, c_LITERAL(RawVik){"Harald", "Iceland"}, 12);
-    Vikings_emplace(&vikings, c_LITERAL(RawVik){"Björn", "Sweden"}, 10);
+    Vikings_emplace(&vikings, c_literal(RawVik){"Einar", "Norway"}, 20);
+    Vikings_emplace(&vikings, c_literal(RawVik){"Olaf", "Denmark"}, 24);
+    Vikings_emplace(&vikings, c_literal(RawVik){"Harald", "Iceland"}, 12);
+    Vikings_emplace(&vikings, c_literal(RawVik){"Björn", "Sweden"}, 10);
 
-    Vikings_value* vv = Vikings_get_mut(&vikings, c_LITERAL(RawVik){"Einar", "Norway"});
+    Vikings_value* vv = Vikings_get_mut(&vikings, c_literal(RawVik){"Einar", "Norway"});
     if (vv) vv->second += 3; // add 3 hp points to Einar
 
     c_foreach (i, Vikings, vikings) {

@@ -60,7 +60,7 @@ STC_API char* _cstr_internal_move(cstr* self, intptr_t pos1, intptr_t pos2);
 
 /**************************** PUBLIC API **********************************/
 
-#define cstr_init() (c_LITERAL(cstr){0})
+#define cstr_init() (c_literal(cstr){0})
 #define cstr_lit(literal) cstr_from_n(literal, c_litstrlen(literal))
 
 STC_API char*       cstr_reserve(cstr* self, intptr_t cap);
@@ -81,16 +81,16 @@ STC_API cstr        cstr_replace_sv(csview sv, csview search, csview repl, int32
 STC_API uint64_t    cstr_hash(const cstr *self);
 
 STC_INLINE cstr_buf cstr_buffer(cstr* s) {
-    return cstr_is_long(s) ? c_LITERAL(cstr_buf){s->lon.data, cstr_l_size(s), cstr_l_cap(s)}
-                           : c_LITERAL(cstr_buf){s->sml.data, cstr_s_size(s), cstr_s_cap};
+    return cstr_is_long(s) ? c_literal(cstr_buf){s->lon.data, cstr_l_size(s), cstr_l_cap(s)}
+                           : c_literal(cstr_buf){s->sml.data, cstr_s_size(s), cstr_s_cap};
 }
 STC_INLINE zsview cstr_zv(const cstr* s) {
-    return cstr_is_long(s) ? c_LITERAL(zsview){s->lon.data, cstr_l_size(s)}
-                           : c_LITERAL(zsview){s->sml.data, cstr_s_size(s)};
+    return cstr_is_long(s) ? c_literal(zsview){s->lon.data, cstr_l_size(s)}
+                           : c_literal(zsview){s->sml.data, cstr_s_size(s)};
 }
 STC_INLINE csview cstr_sv(const cstr* s) {
-    return cstr_is_long(s) ? c_LITERAL(csview){s->lon.data, cstr_l_size(s)}
-                           : c_LITERAL(csview){s->sml.data, cstr_s_size(s)};
+    return cstr_is_long(s) ? c_literal(csview){s->lon.data, cstr_l_size(s)}
+                           : c_literal(csview){s->sml.data, cstr_s_size(s)};
 }
 
 STC_INLINE cstr cstr_from_n(const char* str, const intptr_t len) {
@@ -211,11 +211,11 @@ STC_INLINE csview cstr_u8_chr(const cstr* self, intptr_t u8idx) {
 
 STC_INLINE cstr_iter cstr_begin(const cstr* self) {
     csview sv = cstr_sv(self);
-    if (!sv.size) return c_LITERAL(cstr_iter){.ref = NULL};
-    return c_LITERAL(cstr_iter){.chr = {sv.buf, utf8_chr_size(sv.buf)}};
+    if (!sv.size) return c_literal(cstr_iter){.ref = NULL};
+    return c_literal(cstr_iter){.chr = {sv.buf, utf8_chr_size(sv.buf)}};
 }
 STC_INLINE cstr_iter cstr_end(const cstr* self) {
-    (void)self; return c_LITERAL(cstr_iter){NULL};
+    (void)self; return c_literal(cstr_iter){NULL};
 }
 STC_INLINE void cstr_next(cstr_iter* it) {
     it->ref += it->chr.size;

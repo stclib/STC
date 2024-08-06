@@ -136,7 +136,7 @@ STC_INLINE bool _cbits_disjoint(const uintptr_t* set, const uintptr_t* other, co
 
 typedef struct { uintptr_t *buffer; intptr_t _size; } i_type;
 
-STC_INLINE cbits cbits_init(void) { return c_LITERAL(cbits){NULL}; }
+STC_INLINE cbits cbits_init(void) { return c_literal(cbits){NULL}; }
 STC_INLINE void cbits_drop(cbits* self) { i_free(self->buffer, _cbits_bytes(self->_size)); }
 STC_INLINE intptr_t cbits_size(const cbits* self) { return self->_size; }
 

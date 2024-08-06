@@ -25,10 +25,10 @@ int main(void)
 {
     MyStruct my = {0};
 
-    vec_pnt_push(&my.pntvec, c_LITERAL(Point){42, 14});
-    vec_pnt_push(&my.pntvec, c_LITERAL(Point){32, 94});
-    vec_pnt_push(&my.pntvec, c_LITERAL(Point){62, 81});
-    vec_pnt_push(&my.pntvec, c_LITERAL(Point){32, 91});
+    vec_pnt_push(&my.pntvec, c_literal(Point){42, 14});
+    vec_pnt_push(&my.pntvec, c_literal(Point){32, 94});
+    vec_pnt_push(&my.pntvec, c_literal(Point){62, 81});
+    vec_pnt_push(&my.pntvec, c_literal(Point){32, 91});
 
     vec_pnt_sort(&my.pntvec);
 

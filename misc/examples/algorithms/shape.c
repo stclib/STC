@@ -138,7 +138,7 @@ int main(void)
 {
     Shapes shapes = {0};
 
-    Triangle* tri1 = c_new(Triangle, Triangle_from(c_LITERAL(Point){5, 7}, c_LITERAL(Point){12, 7}, c_LITERAL(Point){12, 20}));
+    Triangle* tri1 = c_new(Triangle, Triangle_from(c_literal(Point){5, 7}, c_literal(Point){12, 7}, c_literal(Point){12, 20}));
     Polygon* pol1 = c_new(Polygon, Polygon_init());
     Polygon* pol2 = c_new(Polygon, Polygon_init());
 

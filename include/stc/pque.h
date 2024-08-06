@@ -44,7 +44,7 @@ STC_API void        _c_MEMB(_erase_at)(_i_self* self, intptr_t idx);
 STC_API _m_value*   _c_MEMB(_push)(_i_self* self, _m_value value);
 
 STC_INLINE _i_self _c_MEMB(_init)(void)
-    { return c_LITERAL(_i_self){NULL}; }
+    { return c_literal(_i_self){NULL}; }
 
 STC_INLINE void _c_MEMB(_put_n)(_i_self* self, const _m_raw* raw, intptr_t n)
     { while (n--) _c_MEMB(_push)(self, i_keyfrom(*raw++)); }

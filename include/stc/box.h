@@ -80,13 +80,13 @@ _c_DEFTYPES(_c_box_types, _i_self, i_key);
 
 // constructors (take ownership)
 STC_INLINE _i_self _c_MEMB(_init)(void)
-    { return c_LITERAL(_i_self){NULL}; }
+    { return c_literal(_i_self){NULL}; }
 
 STC_INLINE long _c_MEMB(_use_count)(const _i_self* self)
     { return (long)(self->get != NULL); }
 
 STC_INLINE _i_self _c_MEMB(_from_ptr)(_m_value* p)
-    { return c_LITERAL(_i_self){p}; }
+    { return c_literal(_i_self){p}; }
 
 // c++: std::make_unique<i_key>(val)
 STC_INLINE _i_self _c_MEMB(_make)(_m_value val) {

@@ -118,7 +118,7 @@ STC_INLINE _m_result
 _c_MEMB(_insert_entry_)(_i_self* self, _m_keyraw rkey) {
     if (self->size >= (intptr_t)((float)self->bucket_count * (i_max_load_factor)))
         if (!_c_MEMB(_reserve)(self, (intptr_t)(self->size*3/2 + 2)))
-            return c_LITERAL(_m_result){0};
+            return c_literal(_m_result){0};
 
     _m_result res = _c_MEMB(_bucket_insert_)(self, &rkey);
     self->size += res.inserted;
@@ -184,7 +184,7 @@ _c_MEMB(_emplace_key)(_i_self* self, _m_keyraw rkey) {
 
 STC_INLINE _m_raw _c_MEMB(_value_toraw)(const _m_value* val) {
     return _i_SET_ONLY( i_keytoraw(val) )
-           _i_MAP_ONLY( c_LITERAL(_m_raw){i_keytoraw((&val->first)), i_valtoraw((&val->second))} );
+           _i_MAP_ONLY( c_literal(_m_raw){i_keytoraw((&val->first)), i_valtoraw((&val->second))} );
 }
 
 STC_INLINE void _c_MEMB(_value_drop)(_m_value* _val) {
@@ -230,7 +230,7 @@ STC_INLINE _i_self _c_MEMB(_from_n)(const _m_raw* raw, intptr_t n)
 STC_API _m_iter _c_MEMB(_begin)(const _i_self* self);
 
 STC_INLINE _m_iter _c_MEMB(_end)(const _i_self* self)
-    { (void)self; return c_LITERAL(_m_iter){0}; }
+    { (void)self; return c_literal(_m_iter){0}; }
 
 STC_INLINE void _c_MEMB(_next)(_m_iter* it) {
     while ((++it->ref, (++it->_mref)->dist == 0)) ;
@@ -246,7 +246,7 @@ STC_INLINE _m_iter
 _c_MEMB(_find)(const _i_self* self, _m_keyraw rkey) {
     _m_value* ref;
     if (self->size && (ref = _c_MEMB(_bucket_lookup_)(self, &rkey).ref))
-        return c_LITERAL(_m_iter){ref,
+        return c_literal(_m_iter){ref,
                                   &self->table[self->bucket_count],
                                   &self->meta[ref - self->table]};
     return _c_MEMB(_end)(self);

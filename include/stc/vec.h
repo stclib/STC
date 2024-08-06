@@ -88,7 +88,7 @@ STC_API _m_iter         _c_MEMB(_insert_uninit)(_i_self* self, intptr_t idx, int
 #if defined _i_has_eq
 STC_API _m_iter         _c_MEMB(_find_in)(_m_iter it1, _m_iter it2, _m_raw raw);
 #endif
-STC_INLINE _i_self       _c_MEMB(_init)(void) { return c_LITERAL(_i_self){0}; }
+STC_INLINE _i_self       _c_MEMB(_init)(void) { return c_literal(_i_self){0}; }
 STC_INLINE void         _c_MEMB(_value_drop)(_m_value* val) { i_keydrop(val); }
 
 STC_INLINE _m_value*
@@ -207,19 +207,19 @@ _c_MEMB(_at_mut)(_i_self* self, const intptr_t idx) {
 
 STC_INLINE _m_iter _c_MEMB(_begin)(const _i_self* self) {
     intptr_t n = self->_len;
-    return c_LITERAL(_m_iter){n ? self->data : NULL, self->data + n};
+    return c_literal(_m_iter){n ? self->data : NULL, self->data + n};
 }
 
 STC_INLINE _m_iter _c_MEMB(_rbegin)(const _i_self* self) {
     intptr_t n = self->_len;
-    return c_LITERAL(_m_iter){n ? self->data + n - 1 : NULL, self->data - 1};
+    return c_literal(_m_iter){n ? self->data + n - 1 : NULL, self->data - 1};
 }
 
 STC_INLINE _m_iter _c_MEMB(_end)(const _i_self* self)
-    { (void)self; return c_LITERAL(_m_iter){0}; }
+    { (void)self; return c_literal(_m_iter){0}; }
 
 STC_INLINE _m_iter _c_MEMB(_rend)(const _i_self* self)
-    { (void)self; return c_LITERAL(_m_iter){0}; }
+    { (void)self; return c_literal(_m_iter){0}; }
 
 STC_INLINE void _c_MEMB(_next)(_m_iter* it)
     { if (++it->ref == it->end) it->ref = NULL; }
@@ -331,7 +331,7 @@ _c_MEMB(_insert_uninit)(_i_self* self, const intptr_t idx, const intptr_t n) {
     _m_value* pos = self->data + idx;
     c_memmove(pos + n, pos, (self->_len - idx)*c_sizeof *pos);
     self->_len += n;
-    return c_LITERAL(_m_iter){pos, self->data + self->_len};
+    return c_literal(_m_iter){pos, self->data + self->_len};
 }
 
 STC_DEF _m_iter
@@ -341,7 +341,7 @@ _c_MEMB(_erase_n)(_i_self* self, const intptr_t idx, const intptr_t len) {
         { i_keydrop(p); }
     c_memmove(d, p, (end - p)*c_sizeof *d);
     self->_len -= len;
-    return c_LITERAL(_m_iter){p == end ? NULL : d, end - len};
+    return c_literal(_m_iter){p == end ? NULL : d, end - len};
 }
 
 #if !defined i_no_clone

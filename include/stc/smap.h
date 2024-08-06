@@ -139,7 +139,7 @@ _c_MEMB(_clear)(_i_self* self)
 STC_INLINE _m_raw
 _c_MEMB(_value_toraw)(const _m_value* val) {
     return _i_SET_ONLY( i_keytoraw(val) )
-           _i_MAP_ONLY( c_LITERAL(_m_raw){i_keytoraw((&val->first)),
+           _i_MAP_ONLY( c_literal(_m_raw){i_keytoraw((&val->first)),
                                           i_valtoraw((&val->second))} );
 }
 
@@ -298,7 +298,7 @@ _c_MEMB(_reserve)(_i_self* self, const intptr_t cap) {
                                                       (cap + 1)*c_sizeof(_m_node));
     if (!nodes)
         return false;
-    nodes[0] = c_LITERAL(_m_node){0};
+    nodes[0] = c_literal(_m_node){0};
     self->nodes = nodes;
     self->cap = (int32_t)cap;
     return true;

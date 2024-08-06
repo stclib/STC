@@ -100,7 +100,7 @@ _c_DEFTYPES(_c_arc_types, _i_self, i_key);
 struct _c_MEMB(_rep_) { catomic_long counter; i_key value; };
 
 STC_INLINE _i_self _c_MEMB(_init)(void)
-    { return c_LITERAL(_i_self){NULL, NULL}; }
+    { return c_literal(_i_self){NULL, NULL}; }
 
 STC_INLINE long _c_MEMB(_use_count)(const _i_self* self)
     { return self->use_count ? *self->use_count : 0; }

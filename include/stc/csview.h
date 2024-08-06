@@ -42,9 +42,9 @@ STC_API csview      csview_substr_ex(csview sv, intptr_t pos, intptr_t n);
 STC_API csview      csview_token(csview sv, const char* sep, intptr_t* start);
 
 STC_INLINE csview   csview_from(const char* str)
-    { return c_LITERAL(csview){str, c_strlen(str)}; }
+    { return c_literal(csview){str, c_strlen(str)}; }
 STC_INLINE csview   csview_from_n(const char* str, intptr_t n)
-    { return c_LITERAL(csview){str, n}; }
+    { return c_literal(csview){str, n}; }
 
 STC_INLINE void     csview_clear(csview* self) { *self = csview_init(); }
 STC_INLINE intptr_t csview_size(csview sv) { return sv.size; }
@@ -92,11 +92,11 @@ STC_INLINE const char* csview_at(csview sv, intptr_t idx)
 
 /* utf8 iterator */
 STC_INLINE csview_iter csview_begin(const csview* self) {
-    return c_LITERAL(csview_iter){.u8 = {{self->buf, utf8_chr_size(self->buf)},
+    return c_literal(csview_iter){.u8 = {{self->buf, utf8_chr_size(self->buf)},
                                           self->buf + self->size}};
 }
 STC_INLINE csview_iter csview_end(const csview* self) {
-    return c_LITERAL(csview_iter){.u8 = {{0}, self->buf + self->size}};
+    return c_literal(csview_iter){.u8 = {{0}, self->buf + self->size}};
 }
 STC_INLINE void csview_next(csview_iter* it) {
     it->ref += it->chr.size;

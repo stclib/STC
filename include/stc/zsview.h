@@ -38,7 +38,7 @@
 #define             zsview_toraw(self) (self)->str
 
 STC_INLINE zsview   zsview_from(const char* str)
-                        { return c_LITERAL(zsview){str, c_strlen(str)}; }
+                        { return c_literal(zsview){str, c_strlen(str)}; }
 STC_INLINE void     zsview_clear(zsview* self) { *self = c_zv(""); }
 STC_INLINE csview   zsview_sv(zsview rs) { return c_sv_2(rs.str, rs.size); }
 
@@ -97,11 +97,11 @@ STC_INLINE bool zsview_u8_valid(zsview rs) // requires linking with utf8 symbols
 
 /* utf8 iterator */
 STC_INLINE zsview_iter zsview_begin(const zsview* self) {
-    return c_LITERAL(zsview_iter){.chr = {self->str, utf8_chr_size(self->str)}};
+    return c_literal(zsview_iter){.chr = {self->str, utf8_chr_size(self->str)}};
 }
 
 STC_INLINE zsview_iter zsview_end(const zsview* self) {
-    (void)self; return c_LITERAL(zsview_iter){.ref = NULL};
+    (void)self; return c_literal(zsview_iter){.ref = NULL};
 }
 
 STC_INLINE void zsview_next(zsview_iter* it) {

@@ -80,20 +80,12 @@ int main(void) {
 
 #ifndef _i_template
   #define _i_is_arr
-  #if defined i_TYPE // [deprecated]
-    #define i_type i_TYPE
-  #endif
-  #if defined i_type && !defined i_key
-    #define _i_self c_SELECT(_c_SEL21, i_type)
-    #define i_key c_SELECT(_c_SEL22, i_type)
-  #elif !defined i_key
+  #if !defined i_key
     #error "i_key not defined"
-  #elif defined i_type
-    #define _i_self i_type
-  #else
-    #define _i_self c_JOIN(i_key, s)
+  #elif !defined i_type
+    #define i_type c_JOIN(i_key, s)
   #endif
-  typedef i_key _i_self, c_JOIN(_i_self, _value), c_JOIN(_i_self, _raw);
+  typedef i_key i_type, c_JOIN(i_type, _value), c_JOIN(i_type, _raw);
   #define i_at(arr, idx) (&arr[idx])
   #define i_at_mut i_at
 #else

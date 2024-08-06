@@ -11,13 +11,13 @@ See the c++ class [std::priority_queue](https://en.cppreference.com/w/cpp/contai
 #define i_type <ct>,<kt> // shorthand to define i_type,i_key
 #define i_type <t>       // pque container type name (default: pque_{i_key})
 #define i_key <t>        // element type: REQUIRED. Defines pque_X_value
-#define i_less <f>       // compare two i_key* : REQUIRED IF i_key/i_keyraw is a non-integral type
-#define i_keydrop <f>    // destroy value func - defaults to empty destruct
-#define i_keyclone <f>   // REQUIRED IF i_keydrop defined
+#define i_less <fn>      // compare two i_key* : REQUIRED IF i_key/i_keyraw is a non-integral type
+#define i_keydrop <fn>   // destroy value func - defaults to empty destruct
+#define i_keyclone <fn>  // REQUIRED IF i_keydrop defined
 
 #define i_keyraw <t>     // convertion type
-#define i_keyfrom <f>    // convertion func i_keyraw => i_key
-#define i_keytoraw <f>   // convertion func i_key* => i_keyraw.
+#define i_keyfrom <fn>   // convertion func i_keyraw => i_key
+#define i_keytoraw <fn>  // convertion func i_key* => i_keyraw.
 
 #include "stc/pque.h"
 ```

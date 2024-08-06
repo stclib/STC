@@ -97,23 +97,23 @@ STC_INLINE _m_value _c_MEMB(_pull)(_i_self* self) { // move front out of queue
 }
 
 STC_INLINE _m_iter _c_MEMB(_begin)(const _i_self* self) {
-    return c_LITERAL(_m_iter){
+    return c_literal(_m_iter){
         .ref=_c_MEMB(_is_empty)(self) ? NULL : self->cbuf + self->start,
         .pos=self->start, ._s=self};
 }
 
 STC_INLINE _m_iter _c_MEMB(_rbegin)(const _i_self* self) {
     intptr_t pos = (self->end - 1) & self->capmask;
-    return c_LITERAL(_m_iter){
+    return c_literal(_m_iter){
         .ref=_c_MEMB(_is_empty)(self) ? NULL : self->cbuf + pos,
         .pos=pos, ._s=self};
 }
 
 STC_INLINE _m_iter _c_MEMB(_end)(const _i_self* self)
-    { (void)self; return c_LITERAL(_m_iter){0}; }
+    { (void)self; return c_literal(_m_iter){0}; }
 
 STC_INLINE _m_iter _c_MEMB(_rend)(const _i_self* self)
-    { (void)self; return c_LITERAL(_m_iter){0}; }
+    { (void)self; return c_literal(_m_iter){0}; }
 
 STC_INLINE void _c_MEMB(_next)(_m_iter* it) {
     if (it->pos != it->_s->capmask) { ++it->ref; ++it->pos; }
