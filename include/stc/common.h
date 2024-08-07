@@ -102,13 +102,15 @@ typedef uintptr_t uptr;
 #endif
 #define c_container_of(p, C, m) ((C*)((char*)(1 ? (p) : &((C*)0)->m) - offsetof(C, m)))
 #define c_const_cast(Tp, p)     ((Tp)(1 ? (p) : (Tp)0))
-#define c_swap(xp, yp)          do { (void) sizeof((xp) == (yp)); \
-                                    char _tv[sizeof *(xp)]; \
-                                    void *_xp = xp, *_yp = yp; \
-                                    memcpy(_tv, _xp, sizeof *(xp)); \
-                                    memcpy(_xp, _yp, sizeof *(xp)); \
-                                    memcpy(_yp, _tv, sizeof *(xp)); \
-                                } while (0)
+
+#define c_swap(xp, yp) do { \
+    (void)sizeof((xp) == (yp)); \
+    char _tv[sizeof *(xp)]; \
+    void *_xp = xp, *_yp = yp; \
+    memcpy(_tv, _xp, sizeof *(xp)); \
+    memcpy(_xp, _yp, sizeof *(xp)); \
+    memcpy(_yp, _tv, sizeof *(xp)); \
+} while (0)
 
 // use with gcc -Wconversion
 #define c_sizeof                (intptr_t)sizeof
@@ -205,29 +207,34 @@ STC_INLINE intptr_t c_next_pow2(intptr_t n) {
 #define c_foreach(...) c_MACRO_OVERLOAD(c_foreach, __VA_ARGS__)
 #define c_foreach_3(it, C, cnt) \
     for (C##_iter it = C##_begin(&cnt); it.ref; C##_next(&it))
-#define c_foreach_4(it, C, start, finish) \
-    _c_foreach(it, C, start, (finish).ref, _)
+#define c_foreach_4(it, C, start, end) \
+    _c_foreach(it, C, start, (end).ref, _)
 
 #define c_foreach_reverse(...) c_MACRO_OVERLOAD(c_foreach_reverse, __VA_ARGS__)
 #define c_foreach_reverse_3(it, C, cnt) /* works for stack, vec, queue, deq */ \
     for (C##_iter it = C##_rbegin(&cnt); it.ref; C##_rnext(&it))
-#define c_foreach_reverse_4(it, C, start, finish) \
-    _c_foreach(it, C, start, (finish).ref, _r)
+#define c_foreach_reverse_4(it, C, start, end) \
+    _c_foreach(it, C, start, (end).ref, _r)
 
 #define _c_foreach(it, C, start, endref, rev) /* private */ \
     for (C##_iter it = (start), *_endref = c_safe_cast(C##_iter*, C##_value*, endref) \
          ; it.ref != (C##_value*)_endref; C##rev##next(&it))
 
-#define c_foreach_kv(key, val, C, cnt) /* structured binding */ \
+#define c_foreach_kv(...) c_MACRO_OVERLOAD(c_foreach_kv, __VA_ARGS__)
+#define _c_foreach_kv(key, val, C, start, endref) /* structured binding for maps */ \
     for (const C##_key *key, **_k = &key; _k; ) \
     for (C##_mapped *val; _k; _k = NULL) \
-    for (C##_iter _it = C##_begin(&cnt); \
-         _it.ref && (key = &_it.ref->first, val = &_it.ref->second); \
+    for (C##_iter _it = start, *_endref = c_safe_cast(C##_iter*, C##_value*, endref) ; \
+         _it.ref != (C##_value*)_endref && (key = &_it.ref->first, val = &_it.ref->second); \
          C##_next(&_it))
+
+#define c_foreach_kv_4(key, val, C, cnt) \
+        _c_foreach_kv(key, val, C, C##_begin(&cnt), NULL)
+#define c_foreach_kv_5(key, val, C, start, end) \
+        _c_foreach_kv(key, val, C, start, (end).ref)
 
 #define c_forlist(...) 'c_forlist not_supported. Use c_foritems'   // [removed]
 #define c_forpair(...) 'c_forpair not_supported. Use c_foreach_kv' // [removed]
-#define c_foreach_n(...) 'c_foreach_n not_supported. Use c_forfilter' // [removed]
 
 // c_forrange: python-like indexed iteration
 #define c_forrange(...) c_MACRO_OVERLOAD(c_forrange, __VA_ARGS__)
