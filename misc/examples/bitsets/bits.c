@@ -1,16 +1,14 @@
 #include <stdio.h>
 #include "stc/cbits.h"
-#include "stc/algo/defer.h"
 
 int main(void)
 {
     cbits set = cbits_with_size(23, true);
     cbits s2;
-    c_guard {
-        c_defer({
-            cbits_drop(&set);
-            cbits_drop(&s2);
-        });
+    c_deferred(
+        cbits_drop(&set),
+        cbits_drop(&s2)
+    ){
         printf("count %d, %d\n", (int)cbits_count(&set), (int)cbits_size(&set));
         cbits s1 = cbits_from("1110100110111");
         char buf[256];

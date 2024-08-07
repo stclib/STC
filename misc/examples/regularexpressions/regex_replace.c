@@ -1,7 +1,6 @@
 #define i_import
 #include "stc/cregex.h"
 #include "stc/csview.h"
-#include "stc/algo/defer.h"
 
 bool add_10_years(int i, csview match, cstr* out) {
     if (i == 1) { // group 1 matches year
@@ -18,14 +17,12 @@ int main(void)
     const char* pattern = "\\b(\\d\\d\\d\\d)-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])\\b";
     const char* input = "start date: 2015-12-31, end date: 2022-02-28";
 
-    c_guard {
-        cstr str = {0};
-        cregex re = {0};
-        c_defer({
-            cregex_drop(&re);
-            cstr_drop(&str);
-        });
-
+    cstr str = {0};
+    cregex re = {0};
+    c_deferred(
+        cregex_drop(&re),
+        cstr_drop(&str)
+    ){
         printf("INPUT: %s\n", input);
 
         /* replace with a fixed string, extended all-in-one call: */

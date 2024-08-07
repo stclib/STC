@@ -6,7 +6,6 @@
 //     https://www.redblobgames.com/pathfinding/a-star/introduction.html
 #define i_implement
 #include "stc/cstr.h"
-#include "stc/algo/defer.h"
 #include <stdio.h>
 
 typedef struct
@@ -78,15 +77,14 @@ astar(cstr* maze, int width)
 {
     deq_point ret_path = {0};
 
-    c_guard {
-        pque_point front = {0};
-        smap_pstep from = {0};
-        smap_pcost costs = {0};
-        c_defer({
-            pque_point_drop(&front);
-            smap_pstep_drop(&from);
-            smap_pcost_drop(&costs);
-        });
+    pque_point front = {0};
+    smap_pstep from = {0};
+    smap_pcost costs = {0};
+    c_deferred(
+        pque_point_drop(&front),
+        smap_pstep_drop(&from),
+        smap_pcost_drop(&costs)
+    ){
         point start = point_from(maze, "@", width);
         point goal = point_from(maze, "!", width);
         smap_pcost_insert(&costs, start, 0);

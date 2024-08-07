@@ -167,13 +167,12 @@ char*       c_strnstrn(const char* str, intptr_t slen, const char* needle, intpt
 ```c
 #define i_implement
 #include "stc/cstr.h"
-#include "stc/algo/defer.h"
 
 int main(void) {
-    c_guard {
-        cstr s0, s1, full_path;
-        c_defer({ c_drop(cstr, &s0, &s1, &full_path); });
-
+    cstr s0, s1, full_path;
+    c_deferred(
+        cstr_drop(&s0), cstr_drop(&s1), cstr_drop(&full_path)
+    ){
         s0 = cstr_lit("Initialization without using strlen().");
         printf("%s\nLength: %" c_ZI "\n\n", cstr_str(&s0), cstr_size(&s0));
 

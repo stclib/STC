@@ -76,7 +76,6 @@ bool        box_X_value_eq(const i_key* x, const i_key* y);
 Create a vec and a set with owned pointers to int elements, using box.
 ```c
 #include <stdio.h>
-#include "stc/algo/defer.h"
 
 void int_drop(int* x) {
     printf("\n drop %d", *x);

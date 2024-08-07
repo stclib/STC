@@ -262,6 +262,9 @@ STC_INLINE intptr_t c_next_pow2(intptr_t n) {
 #define c_with_3(init, condition, deinit) \
     for (int _i = 1; _i; ) for (init; _i && (condition); _i = 0, deinit)
 
+#define c_deferred(...) \
+    for (int _i = 1; _i; _i = 0, __VA_ARGS__)
+
 #define c_drop(C, ...) \
     do { c_foritems (_i, C*, {__VA_ARGS__}) C##_drop(*_i.ref); } while(0)
 

@@ -417,9 +417,9 @@ Type        c_default_toraw(const Type* p);             // return *p
 void        c_default_drop(Type* p);                    // does nothing
 ```
 ---
-## DEFER scope macros
+## RAII scope macros
 
-#### c_guard: General ***defer*** mechanics for resource acquisition and release.
+#### c_guard: GNUC ***defer*** mechanics for resource acquisition and release.
 | Usage               | Description |
 |:--------------------|:----------------------------------------------------------|
 | `c_guard {...}`     | Create a defer scope. Equal to `c_guard_max(32) {...}`. |
@@ -435,6 +435,15 @@ to by `c_defer`/`c_panic`.
 - *Note 2*: `c_return(x)` uses **typeof**, which is standard in C23,
 but supported by virtually every C99 compiler, except MSVC prior to
 MSVC VS17.9. If **typeof** is not supported, use `c_return_typed(Type, x)`.
+
+*Note*: `c_guard` requires computed goto's GNUC extension.
+
+*Note*: Regular `return`, `break` and `continue` must not be used
+anywhere inside a defer scope (except inside a `c_panic` clause).
+Use `c_return` and `c_break` to exit clause, otherwise assertion fails.
+
+*Note*: Nested `c_guard`s are not supported, as `c_return` will only
+execute the innermost defers before returning.
 
 Use of **c_guard** for managing resource dependencies:
 ```c
@@ -463,88 +472,18 @@ int read_nums(void) {
             nums[i] = num;
         }
         // ... use nums array here
+        c_break; // will assert fail if forgotten.
     }
     return 0;
 }
 ```
 
-#### c2_guard: Level-2 nested defer scope inside a c_guard
-Code compiles only with a single `c_guard` per function. Use `c2_guard`/`cx_guard` for
-additional defer guards within a single function.
-| Usage              | Description |
-|:-------------------|:----------------------------------------------------------|
-| `c2_guard {...}`   | Create a level-2 defer scope anywhere inside a `c_guard`. Equal to `c2_guard_max(8) {...}`. |
-| `c2_guard_max(N) {...}` | Create a defer scope with max N defer statements. |
-| `c2_defer({...});` | Add code ... to be deferred to end of `c2_guard`, or until a `c2_return`/`c2_break`|
-| `c2_panic({...});` | Like `c_panic`, but executes first `c2_defer`+`c_defer` statements, then ... and exits `c_guard` scope. |
-| `c2_return(x);`    | Return `x` from current function after `c2_defer` and `c_defer` statements are executed. |
-| `c2_break`         | Break `c2_guard` after `c2_defer` statements are executed. Breaks out from any local loop/switch too.|
-
-```c
-#include "stc/algorithm.h"
-#include <stdio.h>
-
-int process(int x) {
-    printf("\nx=%d:\n", x);
-
-    c_guard {
-        c_defer({ puts("c1:defer-one"); });
-        if (x == 5) c_return (5);
-
-        c_defer({ puts("c1:defer-two"); });
-        if (x == 4) c_break;
-
-        c2_guard {
-            c2_defer({ puts("  c2:defer-one"); });
-            if (x == 3) c2_return (3);
-            if (x == 2) c2_panic({}); // break c_guard
-            if (x == 1) c2_break;     // break c2_guard
-            puts("  c2:end");
-        }
-        puts("c1:end");
-    }
-    puts("DONE");
-    return 0;
-}
-
-int main() {
-    for (int i = 0; i <= 5; ++i) process(i);
-}
-```
-
-#### cx_guard: Extra defer scopes within a single function
-| Usage               |  Description |
-|:--------------------|:----------------------------------------------------------|
-| `cx_guard {...}`    | Create a defer scope.  Equal to `cx_guard_max(8) {...}`. |
-| `cx_guard_max(N) {...}` | Create a defer scope with max N defer statements. |
-| `cx_defer({...});`  | Add code ... to be deferred to end of `cx_guard`, or until a `cx_return`/`cx_break` |
-| `cx_return(x);`     | Return `x` from current function. Executes statements from `cx_defer` before returning. |
-| `cx_break`          | Break `cx_guard` after `cx_defer` statements are executed. Breaks out from any local loop/switch too.|
-
-- *Note 3*: `cx_guard` must ***not*** be nested within other defer scopes.
-- *Note 4*: `cx_guard` is functionally equal to `c_guard`, but is much less speed/memory efficient, and it cannot enclose a `c2_guard`.
-```c
-void deferred(void) {
-    c_guard {
-        cstr s1 = cstr_lit("Hello"), s2 = cstr_lit("world");
-        c_defer( c_drop(cstr, &s1, &s2); );
-
-        printf("%s %s\n", cstr_str(&s1), cstr_str(&s2));
-    }
-
-    cx_guard {
-        pthread_mutex_lock(&mut);
-        cx_defer( pthread_mutex_unlock(&mut); );
-
-        /* Do syncronized work. */
-    }
-}
-```
-
-There is also a simpler `c_with` macro with similar functionality. It does not support `c_defer`/`c_return`/`c_break`,
-but you may use `continue` to break out of the scope:
+There is also portable `c_deferred` and `c_with` macros with similar functionality.
+It does not support `c_defer`/`c_return`/`c_break`, but you may use `continue` to
+break out of the scope:
 | Usage                                 | Description                                            |
 |:--------------------------------------|:-------------------------------------------------------|
+| `c_deferred (deinit, ...) {}`         | Defers execution of `deinit`s to end of scope |
 | `c_with (init, deinit) {}`            | Declare and/or initialize a variable. Defers execution of `deinit` to end of scope |
 | `c_with (init, condition, deinit) {}` | Adds a predicate in order to exit early if init fails  |
 | `continue`                            | Break out of a `c_with` scope without resource leakage |

@@ -4,6 +4,5 @@
 #include "algo/crange.h"
 #include "algo/filter.h"
 #include "algo/utility.h"
-#include "algo/defer.h"
 
 #endif // STC_ALGORITHM_H_INCLUDED

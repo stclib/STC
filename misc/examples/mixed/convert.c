@@ -12,22 +12,18 @@
 #define i_key_cstr
 #include "stc/list.h"
 
-#include "stc/algo/defer.h"
-
 int main(void)
 {
-    c_guard {
-        hmap_cstr map = {0}, mclone = {0};
-        vec_cstr keys = {0}, values = {0};
-        list_cstr list = {0};
-        c_defer({
-            hmap_cstr_drop(&map);
-            hmap_cstr_drop(&mclone);
-            vec_cstr_drop(&keys);
-            vec_cstr_drop(&values);
-            list_cstr_drop(&list);
-        });
-
+    hmap_cstr map = {0}, mclone = {0};
+    vec_cstr keys = {0}, values = {0};
+    list_cstr list = {0};
+    c_deferred(
+        hmap_cstr_drop(&map),
+        hmap_cstr_drop(&mclone),
+        vec_cstr_drop(&keys),
+        vec_cstr_drop(&values),
+        list_cstr_drop(&list)
+    ){
         map = c_init(hmap_cstr, {
             {"green", "#00ff00"},
             {"blue", "#0000ff"},

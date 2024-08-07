@@ -44,12 +44,9 @@ while           |
 switch          { block_type |= LOOP; state = BRACES; }
 do              { block_type |= LOOP; state = BRACESDONE; }
 c_with          |
+c_deferred      |
 c_guard_max     |
-c2_guard_max    |
-cx_guard_max    { block_type = AUTO; state = BRACES; }
 c_guard         |
-c2_guard        |
-cx_guard        { block_type = AUTO; state = BRACESDONE; }
 \(              { if (state == BRACES) ++braces_lev; }
 \)              { if (state == BRACES && --braces_lev == 0)
                     state = BRACESDONE;
