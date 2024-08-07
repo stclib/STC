@@ -107,9 +107,9 @@ typedef uintptr_t uptr;
     (void)sizeof((xp) == (yp)); \
     char _tv[sizeof *(xp)]; \
     void *_xp = xp, *_yp = yp; \
-    memcpy(_tv, _xp, sizeof *(xp)); \
-    memcpy(_xp, _yp, sizeof *(xp)); \
-    memcpy(_yp, _tv, sizeof *(xp)); \
+    memcpy(_tv, _xp, sizeof _tv); \
+    memcpy(_xp, _yp, sizeof _tv); \
+    memcpy(_yp, _tv, sizeof _tv); \
 } while (0)
 
 // use with gcc -Wconversion
