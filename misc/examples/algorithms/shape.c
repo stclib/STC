@@ -122,8 +122,7 @@ struct ShapeAPI Polygon_api = {
 // Test
 // ============================================================
 
-#define i_type Shapes
-#define i_key Shape*
+#define i_type Shapes, Shape*
 #define i_keydrop(x) Shape_delete(*x)
 #define i_no_clone
 #include "stc/stack.h"

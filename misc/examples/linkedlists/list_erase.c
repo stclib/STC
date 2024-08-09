@@ -1,8 +1,7 @@
 // erasing from list
 #include <stdio.h>
 
-#define i_type IList
-#define i_key int
+#define i_type IList,int
 #include "stc/list.h"
 
 int main(void)

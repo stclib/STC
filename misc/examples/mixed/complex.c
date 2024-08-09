@@ -11,13 +11,12 @@
 #define i_type FloatStack,float
 #include "stc/stack.h"
 
-#define i_type StackList
-#define i_keyclass FloatStack  // "class" picks up _clone, _drop
+#define i_class StackList, FloatStack // "class" binds _clone, _drop
 #include "stc/list.h"
 
 #define i_type ListMap
 #define i_key int
-#define i_valclass StackList   // "class" picks up _clone, _drop
+#define i_valclass StackList   // "valclass" binds _clone, _drop
 #include "stc/hmap.h"
 
 #define i_type MapMap

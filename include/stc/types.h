@@ -62,7 +62,8 @@ typedef union {
 #define c_sv(...) c_MACRO_OVERLOAD(c_sv, __VA_ARGS__)
 #define c_sv_1(literal) c_sv_2(literal, c_litstrlen(literal))
 #define c_sv_2(str, n) (c_literal(csview){str, n})
-#define c_SVARG(sv) (int)(sv).size, (sv).buf // printf("%.*s\n", c_SVARG(sv));
+#define c_SVFMT "%.*s"
+#define c_SVARG(sv) (int)(sv).size, (sv).buf // printf(c_SVFMT "\n", c_SVARG(sv));
 #define c_SV(sv) c_SVARG(sv) // [deprecated]
 
 // zsview : zero-terminated string view

@@ -40,9 +40,8 @@ OlympicLoc OlympicLoc_clone(OlympicLoc loc);
 void       OlympicLoc_drop(OlympicLoc* self);
 
 // Create a list<OlympicLoc>, can be sorted by year.
-#define i_type list_OL
-#define i_keyclass OlympicLoc // binds _clone and _drop.
-#define i_use_cmp             // binds _cmp (for sorting)
+#define i_class list_OL, OlympicLoc  // binds _clone() and _drop().
+#define i_use_cmp                    // binds _cmp() (for sorting)
 #include "stc/list.h"
 
 // Create a smap<cstr, list_OL> where key is country name

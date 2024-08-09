@@ -29,10 +29,8 @@ int point_cmp(const Point* a, const Point* b) {
 #include "stc/list.h"
 
 void MyStruct_drop(MyStruct* s);
-#define i_type MyList
-#define i_key MyStruct
-#define i_keydrop MyStruct_drop   // define drop function
-#define i_no_clone                // must explicitely exclude or define cloning support because of drop.
+#define i_class MyList, MyStruct  // bind _drop() function
+#define i_no_clone                // explicitely exclude cloning support because of class/drop.
 #include "stc/list.h"
 
 void MyStruct_drop(MyStruct* s) {

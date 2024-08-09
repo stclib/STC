@@ -29,8 +29,7 @@ void Person_drop(Person* p) {
     c_drop(cstr, &p->name, &p->last);
 }
 
-#define i_type PSPtr
-#define i_keyclass Person // ensure Person_drop
+#define i_class PSPtr, Person // binds Person_clone, Person_drop
 #define i_use_cmp
 #include "stc/arc.h"
 

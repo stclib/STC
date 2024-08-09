@@ -117,8 +117,8 @@
 #define c_default_eq(x, y)      (*(x) == *(y))
 #define c_default_less(x, y)    (*(x) < *(y))
 #define c_default_cmp(x, y)     (c_default_less(y, x) - c_default_less(x, y))
-#define c_default_hash(d)       c_hash_pod(d)
-#define c_hash_pod(d)           c_hash_n(d, sizeof *(d))
+#define c_default_hash(p)       c_hash(p)
+#define c_hash(p)               c_hash_n(p, sizeof *(p))
 
 #define c_default_clone(v)      (v)
 #define c_default_toraw(vp)     (*(vp))

@@ -78,8 +78,11 @@
   #endif
 #endif
 
-#if defined i_type && !(defined i_key || defined i_keyclass || \
-                        defined i_key_cstr || defined i_key_arcbox)
+#ifdef i_class
+  #define _i_self c_SELECT(_c_SEL21, i_class)
+  #define i_keyclass c_SELECT(_c_SEL22, i_class)
+#elif defined i_type && !(defined i_key || defined i_keyclass || \
+                          defined i_key_cstr || defined i_key_arcbox)
   #if defined i_rawclass
     #define _i_self i_type
     #define i_key i_rawclass
@@ -94,7 +97,7 @@
   #endif
 #elif defined i_type
   #define _i_self i_type
-#else
+#elif !defined _i_self
   #define _i_self c_JOIN(_i_prefix, i_tag)
 #endif
 

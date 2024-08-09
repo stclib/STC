@@ -25,6 +25,7 @@
 #else
 #undef i_TYPE
 #undef i_type
+#undef i_class
 #undef i_tag
 #undef i_opt
 #undef i_capacity
