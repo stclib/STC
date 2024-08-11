@@ -138,7 +138,7 @@ using_cspan_tuple(7); using_cspan_tuple(8);
     cspan_from_n(array, c_arraylen(array))
 
 #define cspan_from(container) \
-    cspan_from_n((container)->data, (container)->_len)
+    cspan_from_n((container)->data, (container)->size)
 
 // cspan_subspan on 1d spans
 //

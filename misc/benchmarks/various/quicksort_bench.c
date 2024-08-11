@@ -31,7 +31,7 @@ void testsort(Ints *a, int size, const char *desc) {
 #elif defined QSORT
     printf("qsort: "); qsort(a->data, size, sizeof *a->data, cmp_int);
 #else
-    printf("STC sort_n: "); Ints_quicksort(a);
+    printf("STC quicksort: "); Ints_quicksort(a);
 #endif
     t = clock() - t;
 
@@ -41,7 +41,7 @@ void testsort(Ints *a, int size, const char *desc) {
 
 
 int main(int argc, char *argv[]) {
-    size_t i, size = argc > 1 ? strtoull(argv[1], NULL, 0) : 10000000;
+    isize i, size = argc > 1 ? strtoll(argv[1], NULL, 0) : 10000000;
     uint64_t s[3] = {(uint64_t)time(NULL), 3456789123, 789123456};
 
     Ints a = Ints_with_capacity(size);
@@ -49,22 +49,25 @@ int main(int argc, char *argv[]) {
     for (i = 0; i < size; i++)
         Ints_push(&a, romutrio(s) & (1U << 30) - 1);
     testsort(&a, size, "random");
+
     for (i = 0; i < 20; i++)
         printf(" %d", (int)*Ints_at(&a, i));
     puts("");
     for (i = 1; i < size; i++)
         if (Ints_at(&a, i - 1) > Ints_at(&a, i))
             { printf("sort error\n"); exit(-1); };
-
     for (i = 0; i < size; i++)
         *Ints_at_mut(&a, i) = i;
     testsort(&a, size, "sorted");
+
     for (i = 0; i < size; i++)
         *Ints_at_mut(&a, i) = size - i;
     testsort(&a, size, "reverse sorted");
+
     for (i = 0; i < size; i++)
         *Ints_at_mut(&a, i) = 126735;
     testsort(&a, size, "constant");
+
     for (i = 0; i < size; i++)
         *Ints_at_mut(&a, i) = i + 1;
     *Ints_at_mut(&a, size - 1) = 0;

@@ -14,7 +14,7 @@
 
 int main(int argc, char const *argv[])
 {
-    intptr_t N = 5000000;
+    isize N = 5000000;
     unsigned mask = (1 << 23) - 1;
     ivec v = {0};
     c_forrange (i, N)

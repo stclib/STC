@@ -1269,7 +1269,7 @@ int
 cregex_find_4(const cregex* re, const char* input, csview match[], int mflags) {
     int res = _regexec(re->prog, input, cregex_captures(re) + 1, match, mflags);
     switch (res) {
-    case 1: return CREG_OK;
+    case 1: return match[0].size == 0 ? CREG_NOMATCH : CREG_OK;
     case 0: return CREG_NOMATCH;
     default: return CREG_MATCHERROR;
     }

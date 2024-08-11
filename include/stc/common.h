@@ -99,16 +99,17 @@
 } while (0)
 
 // use with gcc -Wconversion
-#define c_sizeof                (intptr_t)sizeof
-#define c_strlen(s)             (intptr_t)strlen(s)
+typedef ptrdiff_t               isize;
+#define c_sizeof                (isize)sizeof
+#define c_strlen(s)             (isize)strlen(s)
 #define c_strncmp(a, b, ilen)   strncmp(a, b, c_i2u_size(ilen))
 #define c_memcpy(d, s, ilen)    memcpy(d, s, c_i2u_size(ilen))
 #define c_memmove(d, s, ilen)   memmove(d, s, c_i2u_size(ilen))
 #define c_memset(d, val, ilen)  memset(d, val, c_i2u_size(ilen))
 #define c_memcmp(a, b, ilen)    memcmp(a, b, c_i2u_size(ilen))
 // Mostly library internal, but may be useful in user code:
-#define c_u2i_size(u)           (intptr_t)(1 ? (u) : (size_t)1) // warns if u is signed
-#define c_i2u_size(i)           (size_t)(1 ? (i) : -1)          // warns if i is unsigned
+#define c_u2i_size(u)           (isize)(1 ? (u) : (size_t)1) // warns if u is signed
+#define c_i2u_size(i)           (size_t)(1 ? (i) : -1)       // warns if i is unsigned
 #define c_uless(a, b)           ((size_t)(a) < (size_t)(b))
 #define c_safe_cast(T, From, x) ((T)(1 ? (x) : (From){0}))
 
@@ -127,7 +128,7 @@
 /* Function macros and others */
 
 #define c_litstrlen(literal) (c_sizeof("" literal) - 1)
-#define c_arraylen(a) (intptr_t)(sizeof(a)/sizeof 0[a])
+#define c_arraylen(a) (isize)(sizeof(a)/sizeof 0[a])
 
 // Non-owning c-string "class"
 typedef const char* cstr_raw;
@@ -139,7 +140,7 @@ typedef const char* cstr_raw;
 
 #define c_ROTL(x, k) (x << (k) | x >> (8*sizeof(x) - (k)))
 
-STC_INLINE uint64_t c_hash_n(const void* key, intptr_t len) {
+STC_INLINE uint64_t c_hash_n(const void* key, isize len) {
     uint32_t u4; uint64_t u8;
     switch (len) {
         case 8: memcpy(&u8, key, 8); return u8*0xc6a4a7935bd1e99d;
@@ -165,8 +166,8 @@ STC_INLINE uint64_t _c_hash_mix(uint64_t h[], int n) { // n > 0
     return h[0];
 }
 
-STC_INLINE char* c_strnstrn(const char *str, intptr_t slen,
-                              const char *needle, intptr_t nlen) {
+STC_INLINE char* c_strnstrn(const char *str, isize slen,
+                            const char *needle, isize nlen) {
     if (!nlen) return (char *)str;
     if (nlen > slen) return NULL;
     slen -= nlen;
@@ -178,7 +179,7 @@ STC_INLINE char* c_strnstrn(const char *str, intptr_t slen,
     return NULL;
 }
 
-STC_INLINE intptr_t c_next_pow2(intptr_t n) {
+STC_INLINE isize c_next_pow2(isize n) {
     n--;
     n |= n >> 1, n |= n >> 2;
     n |= n >> 4, n |= n >> 8;
@@ -227,9 +228,9 @@ STC_INLINE intptr_t c_next_pow2(intptr_t n) {
 #define c_forrange_1(stop) c_forrange_3(_i, 0, stop)
 #define c_forrange_2(i, stop) c_forrange_3(i, 0, stop)
 #define c_forrange_3(i, start, stop) \
-    for (intptr_t i=start, _end=stop; i < _end; ++i)
+    for (isize i=start, _end=stop; i < _end; ++i)
 #define c_forrange_4(i, start, stop, step) \
-    for (intptr_t i=start, _inc=step, _end=(intptr_t)(stop) - (_inc > 0) \
+    for (isize i=start, _inc=step, _end=(isize)(stop) - (_inc > 0) \
          ; (_inc > 0) ^ (i > _end); i += _inc)
 
 #ifndef __cplusplus
@@ -245,7 +246,7 @@ STC_INLINE intptr_t c_next_pow2(intptr_t n) {
     #include <initializer_list>
     #include <array>
     template <class C, class T>
-    inline C _from_n(C (*func)(const T[], intptr_t), std::initializer_list<T> il)
+    inline C _from_n(C (*func)(const T[], isize), std::initializer_list<T> il)
         { return func(&*il.begin(), il.size()); }
     #define c_init(C, ...) _from_n<C,C##_raw>(C##_from_n, __VA_ARGS__)
     #define c_foritems(it, T, ...) \

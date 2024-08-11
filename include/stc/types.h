@@ -62,9 +62,10 @@ typedef union {
 #define c_sv(...) c_MACRO_OVERLOAD(c_sv, __VA_ARGS__)
 #define c_sv_1(literal) c_sv_2(literal, c_litstrlen(literal))
 #define c_sv_2(str, n) (c_literal(csview){str, n})
-#define c_SVFMT "%.*s"
-#define c_SVARG(sv) (int)(sv).size, (sv).buf // printf(c_SVFMT "\n", c_SVARG(sv));
-#define c_SV(sv) c_SVARG(sv) // [deprecated]
+#define c_svfmt "%.*s"
+#define c_svarg(sv) (int)(sv).size, (sv).buf // printf(c_svfmt "\n", c_svarg(sv));
+#define c_SVARG(sv) c_svarg(sv) // [deprecated]
+#define c_SV(sv) c_svarg(sv) // [deprecated]
 
 // zsview : zero-terminated string view
 typedef csview_value zsview_value;
@@ -196,27 +197,27 @@ typedef union {
 \
     typedef struct SELF { \
         SELF##_node *nodes; \
-        int32_t root, disp, head, size, cap; \
+        int32_t root, disp, head, size, capacity; \
         _i_aux_struct \
     } SELF
 
 #define _c_stack_fixed(SELF, VAL, CAP) \
     typedef VAL SELF##_value; \
     typedef struct { SELF##_value *ref, *end; } SELF##_iter; \
-    typedef struct SELF { SELF##_value data[CAP]; intptr_t _len; } SELF
+    typedef struct SELF { SELF##_value data[CAP]; intptr_t size; } SELF
 
 #define _c_stack_types(SELF, VAL) \
     typedef VAL SELF##_value; \
     typedef struct { SELF##_value *ref, *end; } SELF##_iter; \
-    typedef struct SELF { SELF##_value* data; intptr_t _len, _cap; _i_aux_struct } SELF
+    typedef struct SELF { SELF##_value* data; intptr_t size, capacity; _i_aux_struct } SELF
 
 #define _c_vec_types(SELF, VAL) \
     typedef VAL SELF##_value; \
     typedef struct { SELF##_value *ref, *end; } SELF##_iter; \
-    typedef struct SELF { SELF##_value *data; intptr_t _len, _cap; _i_aux_struct } SELF
+    typedef struct SELF { SELF##_value *data; intptr_t size, capacity; _i_aux_struct } SELF
 
 #define _c_pque_types(SELF, VAL) \
     typedef VAL SELF##_value; \
-    typedef struct SELF { SELF##_value* data; intptr_t _len, _cap; _i_aux_struct } SELF
+    typedef struct SELF { SELF##_value* data; intptr_t size, capacity; _i_aux_struct } SELF
 
 #endif // STC_TYPES_H_INCLUDED

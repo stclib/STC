@@ -115,7 +115,7 @@ STC_API void            _c_MEMB(_next)(_m_iter* it);
 STC_INLINE _i_self       _c_MEMB(_init)(void) { _i_self tree = {0}; return tree; }
 STC_INLINE bool         _c_MEMB(_is_empty)(const _i_self* cx) { return cx->size == 0; }
 STC_INLINE intptr_t     _c_MEMB(_size)(const _i_self* cx) { return cx->size; }
-STC_INLINE intptr_t     _c_MEMB(_capacity)(const _i_self* cx) { return cx->cap; }
+STC_INLINE intptr_t     _c_MEMB(_capacity)(const _i_self* cx) { return cx->capacity; }
 STC_INLINE _m_iter      _c_MEMB(_find)(const _i_self* self, _m_keyraw rkey)
                             { _m_iter it; _c_MEMB(_find_it)(self, rkey, &it); return it; }
 STC_INLINE bool         _c_MEMB(_contains)(const _i_self* self, _m_keyraw rkey)
@@ -292,15 +292,15 @@ _c_MEMB(_begin)(const _i_self* self) {
 
 STC_DEF bool
 _c_MEMB(_reserve)(_i_self* self, const intptr_t cap) {
-    if (cap <= self->cap)
+    if (cap <= self->capacity)
         return false;
-    _m_node* nodes = (_m_node*)i_realloc(self->nodes, (self->cap + 1)*c_sizeof(_m_node),
+    _m_node* nodes = (_m_node*)i_realloc(self->nodes, (self->capacity + 1)*c_sizeof(_m_node),
                                                       (cap + 1)*c_sizeof(_m_node));
     if (!nodes)
         return false;
     nodes[0] = c_literal(_m_node){0};
     self->nodes = nodes;
-    self->cap = (int32_t)cap;
+    self->capacity = (int32_t)cap;
     return true;
 }
 
@@ -329,7 +329,7 @@ _c_MEMB(_new_node_)(_i_self* self, int level) {
         tn = self->disp;
         self->disp = self->nodes[tn].link[1];
     } else {
-        if (self->head == self->cap)
+        if (self->head == self->capacity)
             if (!_c_MEMB(_reserve)(self, self->head*3/2 + 4))
                 return 0;
         tn = ++self->head; /* start with 1, 0 is nullnode. */
@@ -563,7 +563,7 @@ _c_MEMB(_clone)(_i_self tree) {
     tree.root = _c_MEMB(_clone_r_)(&clone, tree.nodes, tree.root);
     tree.nodes = clone.nodes;
     tree.disp = clone.disp;
-    tree.cap = clone.cap;
+    tree.capacity = clone.capacity;
     return tree;
 }
 #endif // !i_no_clone
@@ -592,9 +592,9 @@ _c_MEMB(_drop_r_)(_m_node* d, int32_t tn) {
 STC_DEF void
 _c_MEMB(_drop)(const _i_self* cself) {
     _i_self* self = (_i_self*)cself;
-    if (self->cap) {
+    if (self->capacity) {
         _c_MEMB(_drop_r_)(self->nodes, self->root);
-        i_free(self->nodes, (self->cap + 1)*c_sizeof(_m_node));
+        i_free(self->nodes, (self->capacity + 1)*c_sizeof(_m_node));
     }
 }
 

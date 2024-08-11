@@ -18,21 +18,21 @@ int main(void)
         IVec_quicksort(&vec);
 
         key = 100;
-        intptr_t res = IVec_lower_bound(&vec, key);
+        isize res = IVec_lower_bound(&vec, key);
         if (res != -1)
             printf("Sorted Vec %d: lower bound: %d\n", key, vec.data[res]); // 500
 
         key = 10;
-        intptr_t it1 = IVec_lower_bound(&vec, key);
+        isize it1 = IVec_lower_bound(&vec, key);
         if (it1 != -1)
             printf("Sorted Vec %3d: lower_bound: %d\n", key, vec.data[it1]); // 30
 
         key = 600;
-        intptr_t it2 = IVec_binary_search(&vec, key);
+        isize it2 = IVec_binary_search(&vec, key);
         if (it2 != -1)
             printf("Sorted Vec %d: bin. search: %d\n", key, vec.data[it2]); // 600
 
-        for (intptr_t i = it1; i != it2; ++i)
+        for (isize i = it1; i != it2; ++i)
             printf(" %d\n", vec.data[i]);
 
         puts("");
