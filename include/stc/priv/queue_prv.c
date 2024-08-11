@@ -21,9 +21,9 @@
  * SOFTWARE.
  */
 
-STC_DEF _m_iter _c_MEMB(_advance)(_m_iter it, intptr_t n) {
-    intptr_t len = _c_MEMB(_size)(it._s);
-    intptr_t pos = it.pos, idx = _cbuf_toidx(it._s, pos);
+STC_DEF _m_iter _c_MEMB(_advance)(_m_iter it, isize n) {
+    isize len = _c_MEMB(_size)(it._s);
+    isize pos = it.pos, idx = _cbuf_toidx(it._s, pos);
     it.pos = (pos + n) & it._s->capmask;
     it.ref += it.pos - pos;
     if (!c_uless(idx + n, len)) it.ref = NULL;
@@ -45,21 +45,21 @@ _c_MEMB(_drop)(const _i_self* cself) {
 }
 
 STC_DEF _i_self
-_c_MEMB(_with_capacity)(const intptr_t n) {
+_c_MEMB(_with_capacity)(const isize n) {
     _i_self cx = {0};
     _c_MEMB(_reserve)(&cx, n);
     return cx;
 }
 
 STC_DEF bool
-_c_MEMB(_reserve)(_i_self* self, const intptr_t n) {
+_c_MEMB(_reserve)(_i_self* self, const isize n) {
     if (n <= self->capmask)
         return true;
-    intptr_t oldpow2 = self->capmask + 1, newpow2 = c_next_pow2(n + 1);
+    isize oldpow2 = self->capmask + 1, newpow2 = c_next_pow2(n + 1);
     _m_value* d = (_m_value *)i_realloc(self->cbuf, oldpow2*c_sizeof *d, newpow2*c_sizeof *d);
     if (!d)
         return false;
-    intptr_t head = oldpow2 - self->start;
+    isize head = oldpow2 - self->start;
     if (self->start <= self->end)
         ;
     else if (head < self->end) {
@@ -76,7 +76,7 @@ _c_MEMB(_reserve)(_i_self* self, const intptr_t n) {
 
 STC_DEF _m_value*
 _c_MEMB(_push)(_i_self* self, _m_value value) { // push_back
-    intptr_t end = (self->end + 1) & self->capmask;
+    isize end = (self->end + 1) & self->capmask;
     if (end == self->start) { // full
         _c_MEMB(_reserve)(self, self->capmask + 3); // => 2x expand
         end = (self->end + 1) & self->capmask;
@@ -89,7 +89,7 @@ _c_MEMB(_push)(_i_self* self, _m_value value) { // push_back
 
 STC_DEF void
 _c_MEMB(_shrink_to_fit)(_i_self *self) {
-    intptr_t sz = _c_MEMB(_size)(self), j = 0;
+    isize sz = _c_MEMB(_size)(self), j = 0;
     if (sz > self->capmask/2)
         return;
     _i_self out = _c_MEMB(_with_capacity)(sz);
@@ -105,7 +105,7 @@ _c_MEMB(_shrink_to_fit)(_i_self *self) {
 #if !defined i_no_clone
 STC_DEF _i_self
 _c_MEMB(_clone)(_i_self q) {
-    intptr_t sz = _c_MEMB(_size)(&q), j = 0;
+    isize sz = _c_MEMB(_size)(&q), j = 0;
     _i_self tmp = _c_MEMB(_with_capacity)(sz);
     if (tmp.cbuf)
         c_foreach (i, _i_self, q)

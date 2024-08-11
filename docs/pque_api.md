@@ -27,17 +27,17 @@ In the following, `X` is the value of `i_key` unless `i_type` is specified.
 
 ```c
 pque_X              pque_X_init(void);                    // create empty pri-queue.
-pque_X              pque_X_with_capacity(intptr_t cap);
-pque_X              pque_X_with_size(intptr_t size, i_key null);
+pque_X              pque_X_with_capacity(isize cap);
+pque_X              pque_X_with_size(isize size, i_key null);
 pque_X              pque_X_clone(pque_X pq);
 
 void                pque_X_clear(pque_X* self);
-bool                pque_X_reserve(pque_X* self, intptr_t n);
+bool                pque_X_reserve(pque_X* self, isize n);
 void                pque_X_shrink_to_fit(pque_X* self);
 void                pque_X_copy(pque_X* self, const pque_X* other);
 void                pque_X_drop(pque_X* self);        // destructor
 
-intptr_t            pque_X_size(const pque_X* self);
+isize               pque_X_size(const pque_X* self);
 bool                pque_X_is_empty(const pque_X* self);
 const i_key*        pque_X_top(const pque_X* self);
 
@@ -47,7 +47,7 @@ void                pque_X_emplace(pque_X* self, i_keyraw raw); // converts from
 
 void                pque_X_pop(pque_X* self);
 i_key               pque_X_pull(const pque_X* self);
-void                pque_X_erase_at(pque_X* self, intptr_t idx);
+void                pque_X_erase_at(pque_X* self, isize idx);
 
 i_key               pque_X_value_clone(i_key value);
 ```
@@ -70,7 +70,7 @@ i_key               pque_X_value_clone(i_key value);
 
 int main(void)
 {
-    intptr_t N = 10000000;
+    isize N = 10000000;
     crand_t rng = crand_init(1234);
     crand_uniform_t dist = crand_uniform_init(0, N * 10);
 

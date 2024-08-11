@@ -27,8 +27,8 @@ In the following, `X` is the value of `i_key` unless `i_type` is specified.
 
 ```c
 sset_X              sset_X_init(void);
-sset_X              sset_X_with_capacity(intptr_t cap);
-bool                sset_X_reserve(sset_X* self, intptr_t cap);
+sset_X              sset_X_with_capacity(isize cap);
+bool                sset_X_reserve(sset_X* self, isize cap);
 void                sset_X_shrink_to_fit(sset_X* self);
 sset_X              sset_X_clone(sset_x set);
 
@@ -37,8 +37,8 @@ void                sset_X_copy(sset_X* self, const sset_X* other);
 void                sset_X_drop(sset_X* self);                                             // destructor
 
 bool                sset_X_is_empty(const sset_X* self);
-intptr_t            sset_X_size(const sset_X* self);
-intptr_t            sset_X_capacity(const sset_X* self);
+isize               sset_X_size(const sset_X* self);
+isize               sset_X_capacity(const sset_X* self);
 
 const sset_X_value* sset_X_get(const sset_X* self, i_keyraw rkey);                         // const get
 sset_X_value*       sset_X_get_mut(sset_X* self, i_keyraw rkey);                           // return NULL if not found

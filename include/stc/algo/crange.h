@@ -47,7 +47,7 @@ int main(void)
 
 #include "../common.h"
 
-typedef intptr_t crange_value;
+typedef isize crange_value;
 typedef struct { crange_value start, end, step, value; } crange;
 typedef struct { crange_value *ref, end, step; } crange_iter;
 

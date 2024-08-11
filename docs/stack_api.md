@@ -26,24 +26,24 @@ In the following, `X` is the value of `i_key` unless `i_type` is specified.
 
 ```c
 stack_X             stack_X_init(void);
-stack_X             stack_X_with_capacity(intptr_t cap);
-stack_X             stack_X_with_size(intptr_t size, i_key fill);
+stack_X             stack_X_with_capacity(isize cap);
+stack_X             stack_X_with_size(isize size, i_key fill);
 stack_X             stack_X_clone(stack_X st);
 
 void                stack_X_clear(stack_X* self);
-bool                stack_X_reserve(stack_X* self, intptr_t n);
+bool                stack_X_reserve(stack_X* self, isize n);
 void                stack_X_shrink_to_fit(stack_X* self);
-i_key*              stack_X_append_uninit(stack_X* self, intptr_t n);
+i_key*              stack_X_append_uninit(stack_X* self, isize n);
 void                stack_X_copy(stack_X* self, const stack_X* other);
 void                stack_X_drop(stack_X* self);                       // destructor
 
-intptr_t            stack_X_size(const stack_X* self);
-intptr_t            stack_X_capacity(const stack_X* self);
+isize               stack_X_size(const stack_X* self);
+isize               stack_X_capacity(const stack_X* self);
 bool                stack_X_is_empty(const stack_X* self);
 
 i_key*              stack_X_top(const stack_X* self);
-const i_key*        stack_X_at(const stack_X* self, intptr_t idx);
-i_key*              stack_X_at_mut(stack_X* self, intptr_t idx);
+const i_key*        stack_X_at(const stack_X* self, isize idx);
+i_key*              stack_X_at_mut(stack_X* self, isize idx);
 
 i_key*              stack_X_push(stack_X* self, i_key value);
 i_key*              stack_X_emplace(stack_X* self, i_keyraw raw);

@@ -39,29 +39,29 @@ STC_INLINE int utf8_chr_size(const char *s) {
 }
 
 /* number of codepoints in the utf8 string s */
-STC_INLINE intptr_t utf8_size(const char *s) {
-    intptr_t size = 0;
+STC_INLINE isize utf8_size(const char *s) {
+    isize size = 0;
     while (*s)
         size += (*++s & 0xC0) != 0x80;
     return size;
 }
 
-STC_INLINE intptr_t utf8_size_n(const char *s, intptr_t nbytes) {
-    intptr_t size = 0;
+STC_INLINE isize utf8_size_n(const char *s, isize nbytes) {
+    isize size = 0;
     while ((nbytes-- != 0) & (*s != 0)) {
         size += (*++s & 0xC0) != 0x80;
     }
     return size;
 }
 
-STC_INLINE const char* utf8_at(const char *s, intptr_t index) {
+STC_INLINE const char* utf8_at(const char *s, isize index) {
     while ((index > 0) & (*s != 0))
         index -= (*++s & 0xC0) != 0x80;
     return s;
 }
 
-STC_INLINE intptr_t utf8_pos(const char* s, intptr_t index)
-    { return (intptr_t)(utf8_at(s, index) - s); }
+STC_INLINE isize utf8_pos(const char* s, isize index)
+    { return (isize)(utf8_at(s, index) - s); }
 
 // ------------------------------------------------------
 // The following requires linking with utf8 symbols.
@@ -85,7 +85,7 @@ extern uint32_t utf8_tolower(uint32_t c);
 extern uint32_t utf8_toupper(uint32_t c);
 extern bool     utf8_iscased(uint32_t c);
 extern bool     utf8_isword(uint32_t c);
-extern bool     utf8_valid_n(const char* s, intptr_t nbytes);
+extern bool     utf8_valid_n(const char* s, isize nbytes);
 extern int      utf8_icmp_sv(csview s1, csview s2);
 extern int      utf8_encode(char *out, uint32_t c);
 extern uint32_t utf8_peek_off(const char *s, int offset);

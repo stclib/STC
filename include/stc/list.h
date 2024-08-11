@@ -97,7 +97,7 @@ STC_API _m_iter         _c_MEMB(_erase_at)(_i_self* self, _m_iter it);
 STC_API _m_iter         _c_MEMB(_erase_range)(_i_self* self, _m_iter it1, _m_iter it2);
 #if defined _i_has_eq
 STC_API _m_iter         _c_MEMB(_find_in)(_m_iter it1, _m_iter it2, _m_raw val);
-STC_API intptr_t        _c_MEMB(_remove)(_i_self* self, _m_raw val);
+STC_API isize           _c_MEMB(_remove)(_i_self* self, _m_raw val);
 #endif
 #if defined _i_has_cmp
 STC_API bool            _c_MEMB(_sort_with)(_i_self* self, int(*cmp)(const _m_value*, const _m_value*));
@@ -107,7 +107,7 @@ STC_INLINE bool         _c_MEMB(_sort)(_i_self* self)
 #endif
 STC_API void            _c_MEMB(_reverse)(_i_self* self);
 STC_API _m_iter         _c_MEMB(_splice)(_i_self* self, _m_iter it, _i_self* other);
-STC_API _i_self          _c_MEMB(_split_off)(_i_self* self, _m_iter it1, _m_iter it2);
+STC_API _i_self         _c_MEMB(_split_off)(_i_self* self, _m_iter it1, _m_iter it2);
 STC_API _m_value*       _c_MEMB(_push_back_node)(_i_self* self, _m_node* node);
 STC_API _m_value*       _c_MEMB(_insert_after_node)(_i_self* self, _m_node* ref, _m_node* node);
 STC_API _m_node*        _c_MEMB(_unlink_after_node)(_i_self* self, _m_node* ref);
@@ -116,7 +116,7 @@ STC_INLINE _m_node*     _c_MEMB(_get_node)(_m_value* pval) { return _clist_tonod
 STC_INLINE _m_node*     _c_MEMB(_unlink_front_node)(_i_self* self)
                             { return _c_MEMB(_unlink_after_node)(self, self->last); }
 #if !defined i_no_clone
-STC_API _i_self          _c_MEMB(_clone)(_i_self cx);
+STC_API _i_self         _c_MEMB(_clone)(_i_self cx);
 STC_INLINE _m_value     _c_MEMB(_value_clone)(_m_value val) { return i_keyclone(val); }
 
 STC_INLINE void
@@ -137,12 +137,12 @@ STC_INLINE _m_value*    _c_MEMB(_emplace)(_i_self* self, _m_raw raw)
                             { return _c_MEMB(_push_back)(self, i_keyfrom(raw)); }
 #endif // !i_no_emplace
 
-STC_INLINE _i_self       _c_MEMB(_init)(void) { return c_literal(_i_self){NULL}; }
-STC_INLINE void         _c_MEMB(_put_n)(_i_self* self, const _m_raw* raw, intptr_t n)
+STC_INLINE _i_self      _c_MEMB(_init)(void) { return c_literal(_i_self){NULL}; }
+STC_INLINE void         _c_MEMB(_put_n)(_i_self* self, const _m_raw* raw, isize n)
                             { while (n--) _c_MEMB(_push_back)(self, i_keyfrom(*raw++)); }
-STC_INLINE _i_self       _c_MEMB(_from_n)(const _m_raw* raw, intptr_t n)
+STC_INLINE _i_self      _c_MEMB(_from_n)(const _m_raw* raw, isize n)
                             { _i_self cx = {0}; _c_MEMB(_put_n)(&cx, raw, n); return cx; }
-STC_INLINE bool         _c_MEMB(_reserve)(_i_self* self, intptr_t n) { (void)(self + n); return true; }
+STC_INLINE bool         _c_MEMB(_reserve)(_i_self* self, isize n) { (void)(self + n); return true; }
 STC_INLINE bool         _c_MEMB(_is_empty)(const _i_self* self) { return self->last == NULL; }
 STC_INLINE void         _c_MEMB(_clear)(_i_self* self) { _c_MEMB(_drop)(self); }
 STC_INLINE _m_value*    _c_MEMB(_push)(_i_self* self, _m_value value)
@@ -154,9 +154,9 @@ STC_INLINE _m_value*    _c_MEMB(_back)(const _i_self* self) { return &self->last
 STC_INLINE _m_raw       _c_MEMB(_value_toraw)(const _m_value* pval) { return i_keytoraw(pval); }
 STC_INLINE void         _c_MEMB(_value_drop)(_m_value* pval) { i_keydrop(pval); }
 
-STC_INLINE intptr_t
+STC_INLINE isize
 _c_MEMB(_count)(const _i_self* self) {
-    intptr_t n = 1; const _m_node *node = self->last;
+    isize n = 1; const _m_node *node = self->last;
     if (!node) return 0;
     while ((node = node->next) != self->last) ++n;
     return n;
@@ -366,9 +366,9 @@ _c_MEMB(_find_in)(_m_iter it1, _m_iter it2, _m_raw val) {
     it2.ref = NULL; return it2;
 }
 
-STC_DEF intptr_t
+STC_DEF isize
 _c_MEMB(_remove)(_i_self* self, _m_raw val) {
-    intptr_t n = 0;
+    isize n = 0;
     _m_node *prev = self->last, *node;
     if (prev) do {
         node = prev->next;
@@ -390,11 +390,11 @@ STC_DEF int _c_MEMB(_sort_cmp_)(const _m_value* x, const _m_value* y) {
 }
 
 STC_DEF bool _c_MEMB(_sort_with)(_i_self* self, int(*cmp)(const _m_value*, const _m_value*)) {
-    intptr_t len = 0, cap = 0;
+    isize len = 0, cap = 0;
     _m_value *arr = NULL, *p = NULL;
     c_foreach (i, _i_self, *self) {
         if (len == cap) {
-            intptr_t cap_n = cap + cap/2 + 8;
+            isize cap_n = cap + cap/2 + 8;
             if (!(p = (_m_value *)i_realloc(arr, cap*c_sizeof *p, cap_n*c_sizeof *p)))
                 goto done;
             arr = p, cap = cap_n;

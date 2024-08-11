@@ -32,25 +32,25 @@ In the following, `X` is the value of `i_key` unless `i_type` is specified.
 
 ```c
 vec_X               vec_X_init(void);
-vec_X               vec_X_with_size(intptr_t size, i_key null);
-vec_X               vec_X_with_capacity(intptr_t size);
+vec_X               vec_X_with_size(isize size, i_key null);
+vec_X               vec_X_with_capacity(isize size);
 vec_X               vec_X_clone(vec_X vec);
 
 void                vec_X_clear(vec_X* self);
 void                vec_X_copy(vec_X* self, const vec_X* other);
-vec_X_iter          vec_X_copy_n(vec_X* self, intptr_t idx, const i_key* arr, intptr_t n);
-bool                vec_X_reserve(vec_X* self, intptr_t cap);
-bool                vec_X_resize(vec_X* self, intptr_t size, i_key null);
+vec_X_iter          vec_X_copy_n(vec_X* self, isize idx, const i_key* arr, isize n);
+bool                vec_X_reserve(vec_X* self, isize cap);
+bool                vec_X_resize(vec_X* self, isize size, i_key null);
 void                vec_X_shrink_to_fit(vec_X* self);
 void                vec_X_drop(vec_X* self);                              // destructor
 
 bool                vec_X_is_empty(const vec_X* self);
-intptr_t            vec_X_size(const vec_X* self);
-intptr_t            vec_X_capacity(const vec_X* self);
+isize               vec_X_size(const vec_X* self);
+isize               vec_X_capacity(const vec_X* self);
 
-const vec_X_value*  vec_X_at(const vec_X* self, intptr_t idx);
+const vec_X_value*  vec_X_at(const vec_X* self, isize idx);
 const vec_X_value*  vec_X_get(const vec_X* self, i_keyraw raw);           // return NULL if not found
-vec_X_value*        vec_X_at_mut(vec_X* self, intptr_t idx);              // return mutable at idx
+vec_X_value*        vec_X_at_mut(vec_X* self, isize idx);              // return mutable at idx
 vec_X_value*        vec_X_get_mut(vec_X* self, i_keyraw raw);             // find mutable value
 vec_X_iter          vec_X_find(const vec_X* self, i_keyraw raw);
 vec_X_iter          vec_X_find_in(vec_X_iter i1, vec_X_iter i2, i_keyraw raw); // return vec_X_end() if not found
@@ -68,14 +68,14 @@ void                vec_X_pop(vec_X* self);                               // des
 void                vec_X_pop_back(vec_X* self);                          // alias for pop
 vec_X_value         vec_X_pull(vec_X* self);                              // move out last element
 
-vec_X_iter          vec_X_insert_n(vec_X* self, intptr_t idx, const i_key arr[], intptr_t n); // move values
+vec_X_iter          vec_X_insert_n(vec_X* self, isize idx, const i_key arr[], isize n); // move values
 vec_X_iter          vec_X_insert_at(vec_X* self, vec_X_iter it, i_key value);  // move value
-vec_X_iter          vec_X_insert_uninit(vec_X* self, intptr_t idx, intptr_t n); // return iter at idx
+vec_X_iter          vec_X_insert_uninit(vec_X* self, isize idx, isize n); // return iter at idx
 
-vec_X_iter          vec_X_emplace_n(vec_X* self, intptr_t idx, const i_keyraw raw[], intptr_t n);
+vec_X_iter          vec_X_emplace_n(vec_X* self, isize idx, const i_keyraw raw[], isize n);
 vec_X_iter          vec_X_emplace_at(vec_X* self, vec_X_iter it, i_keyraw raw);
 
-vec_X_iter          vec_X_erase_n(vec_X* self, intptr_t idx, intptr_t n);
+vec_X_iter          vec_X_erase_n(vec_X* self, isize idx, isize n);
 vec_X_iter          vec_X_erase_at(vec_X* self, vec_X_iter it);
 vec_X_iter          vec_X_erase_range(vec_X* self, vec_X_iter it1, vec_X_iter it2);
 

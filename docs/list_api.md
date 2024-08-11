@@ -49,7 +49,7 @@ void                list_X_copy(list_X* self, const list_X* other);
 void                list_X_drop(list_X* self);                                        // destructor
 
 bool                list_X_is_empty(const list_X* list);
-intptr_t            list_X_count(const list_X* list);                                 // size() in O(n) time
+isize               list_X_count(const list_X* list);                                 // size() in O(n) time
 
 list_X_value*       list_X_back(const list_X* self);
 list_X_value*       list_X_front(const list_X* self);
@@ -68,7 +68,7 @@ list_X_iter         list_X_emplace_at(list_X* self, list_X_iter it, i_keyraw raw
 void                list_X_pop_front(list_X* self);
 list_X_iter         list_X_erase_at(list_X* self, list_X_iter it);                    // return iter after it
 list_X_iter         list_X_erase_range(list_X* self, list_X_iter it1, list_X_iter it2);
-intptr_t            list_X_remove(list_X* self, i_keyraw raw);                        // removes all matches
+isize               list_X_remove(list_X* self, i_keyraw raw);                        // removes all matches
 
 list_X              list_X_split_off(list_X* self, list_X_iter i1, list_X_iter i2);   // split off [i1, i2)
 list_X_iter         list_X_splice(list_X* self, list_X_iter it, list_X* other);       // return updated valid it

@@ -81,10 +81,10 @@ int main(void) {
 typedef i_keyraw _m_raw;
 STC_API void            _c_MEMB(_drop)(const _i_self* cself);
 STC_API void            _c_MEMB(_clear)(_i_self* self);
-STC_API bool            _c_MEMB(_reserve)(_i_self* self, intptr_t cap);
-STC_API bool            _c_MEMB(_resize)(_i_self* self, intptr_t size, _m_value null);
-STC_API _m_iter         _c_MEMB(_erase_n)(_i_self* self, intptr_t idx, intptr_t n);
-STC_API _m_iter         _c_MEMB(_insert_uninit)(_i_self* self, intptr_t idx, intptr_t n);
+STC_API bool            _c_MEMB(_reserve)(_i_self* self, isize cap);
+STC_API bool            _c_MEMB(_resize)(_i_self* self, isize size, _m_value null);
+STC_API _m_iter         _c_MEMB(_erase_n)(_i_self* self, isize idx, isize n);
+STC_API _m_iter         _c_MEMB(_insert_uninit)(_i_self* self, isize idx, isize n);
 #if defined _i_has_eq
 STC_API _m_iter         _c_MEMB(_find_in)(_m_iter it1, _m_iter it2, _m_raw raw);
 #endif
@@ -101,15 +101,15 @@ _c_MEMB(_push)(_i_self* self, _m_value value) {
     return v;
 }
 
-STC_INLINE void _c_MEMB(_put_n)(_i_self* self, const _m_raw* raw, intptr_t n)
+STC_INLINE void _c_MEMB(_put_n)(_i_self* self, const _m_raw* raw, isize n)
     { while (n--) _c_MEMB(_push)(self, i_keyfrom((*raw))), ++raw; }
 
-STC_INLINE _i_self _c_MEMB(_from_n)(const _m_raw* raw, intptr_t n)
+STC_INLINE _i_self _c_MEMB(_from_n)(const _m_raw* raw, isize n)
     { _i_self cx = {0}; _c_MEMB(_put_n)(&cx, raw, n); return cx; }
 
 #if !defined i_no_emplace
 STC_API _m_iter
-_c_MEMB(_emplace_n)(_i_self* self, intptr_t idx, const _m_raw raw[], intptr_t n);
+_c_MEMB(_emplace_n)(_i_self* self, isize idx, const _m_raw raw[], isize n);
 
 STC_INLINE _m_value* _c_MEMB(_emplace)(_i_self* self, _m_raw raw) {
     return _c_MEMB(_push)(self, i_keyfrom(raw));
@@ -123,8 +123,8 @@ STC_INLINE _m_iter _c_MEMB(_emplace_at)(_i_self* self, _m_iter it, _m_raw raw) {
 #endif // !i_no_emplace
 
 #if !defined i_no_clone
-STC_API _i_self          _c_MEMB(_clone)(_i_self cx);
-STC_API _m_iter         _c_MEMB(_copy_n)(_i_self* self, intptr_t idx, const _m_value arr[], intptr_t n);
+STC_API _i_self         _c_MEMB(_clone)(_i_self cx);
+STC_API _m_iter         _c_MEMB(_copy_n)(_i_self* self, isize idx, const _m_value arr[], isize n);
 
 STC_INLINE _m_value     _c_MEMB(_value_clone)(_m_value val)
                             { return i_keyclone(val); }
@@ -136,8 +136,8 @@ STC_INLINE void         _c_MEMB(_copy)(_i_self* self, const _i_self* other) {
                         }
 #endif // !i_no_clone
 
-STC_INLINE intptr_t     _c_MEMB(_size)(const _i_self* self) { return self->size; }
-STC_INLINE intptr_t     _c_MEMB(_capacity)(const _i_self* self) { return self->capacity; }
+STC_INLINE isize        _c_MEMB(_size)(const _i_self* self) { return self->size; }
+STC_INLINE isize        _c_MEMB(_capacity)(const _i_self* self) { return self->capacity; }
 STC_INLINE bool         _c_MEMB(_is_empty)(const _i_self* self) { return !self->size; }
 STC_INLINE _m_raw       _c_MEMB(_value_toraw)(const _m_value* val) { return i_keytoraw(val); }
 STC_INLINE _m_value*    _c_MEMB(_front)(const _i_self* self) { return self->data; }
@@ -153,14 +153,14 @@ STC_INLINE _m_value*    _c_MEMB(_push_back)(_i_self* self, _m_value value)
 STC_INLINE void         _c_MEMB(_pop_back)(_i_self* self) { _c_MEMB(_pop)(self); }
 
 STC_INLINE _i_self
-_c_MEMB(_with_size)(const intptr_t size, _m_value null) {
+_c_MEMB(_with_size)(const isize size, _m_value null) {
     _i_self cx = {0};
     _c_MEMB(_resize)(&cx, size, null);
     return cx;
 }
 
 STC_INLINE _i_self
-_c_MEMB(_with_capacity)(const intptr_t cap) {
+_c_MEMB(_with_capacity)(const isize cap) {
     _i_self cx = {0};
     _c_MEMB(_reserve)(&cx, cap);
     return cx;
@@ -172,7 +172,7 @@ _c_MEMB(_shrink_to_fit)(_i_self* self) {
 }
 
 STC_INLINE _m_iter
-_c_MEMB(_insert_n)(_i_self* self, const intptr_t idx, const _m_value arr[], const intptr_t n) {
+_c_MEMB(_insert_n)(_i_self* self, const isize idx, const _m_value arr[], const isize n) {
     _m_iter it = _c_MEMB(_insert_uninit)(self, idx, n);
     if (it.ref)
         c_memcpy(it.ref, arr, n*c_sizeof *arr);
@@ -195,23 +195,23 @@ _c_MEMB(_erase_range)(_i_self* self, _m_iter i1, _m_iter i2) {
 }
 
 STC_INLINE const _m_value*
-_c_MEMB(_at)(const _i_self* self, const intptr_t idx) {
+_c_MEMB(_at)(const _i_self* self, const isize idx) {
     c_assert(idx < self->size); return self->data + idx;
 }
 
 STC_INLINE _m_value*
-_c_MEMB(_at_mut)(_i_self* self, const intptr_t idx) {
+_c_MEMB(_at_mut)(_i_self* self, const isize idx) {
     c_assert(idx < self->size); return self->data + idx;
 }
 
 
 STC_INLINE _m_iter _c_MEMB(_begin)(const _i_self* self) {
-    intptr_t n = self->size;
+    isize n = self->size;
     return c_literal(_m_iter){n ? self->data : NULL, self->data + n};
 }
 
 STC_INLINE _m_iter _c_MEMB(_rbegin)(const _i_self* self) {
-    intptr_t n = self->size;
+    isize n = self->size;
     return c_literal(_m_iter){n ? self->data + n - 1 : NULL, self->data - 1};
 }
 
@@ -232,10 +232,10 @@ STC_INLINE _m_iter _c_MEMB(_advance)(_m_iter it, size_t n) {
     return it;
 }
 
-STC_INLINE intptr_t _c_MEMB(_index)(const _i_self* self, _m_iter it)
+STC_INLINE isize _c_MEMB(_index)(const _i_self* self, _m_iter it)
     { return (it.ref - self->data); }
 
-STC_INLINE void _c_MEMB(_adjust_end_)(_i_self* self, intptr_t n)
+STC_INLINE void _c_MEMB(_adjust_end_)(_i_self* self, isize n)
     { self->size += n; }
 
 #if defined _i_has_eq
@@ -256,7 +256,7 @@ _c_MEMB(_get_mut)(const _i_self* self, _m_raw raw)
 STC_INLINE bool
 _c_MEMB(_eq)(const _i_self* self, const _i_self* other) {
     if (self->size != other->size) return false;
-    for (intptr_t i = 0; i < self->size; ++i) {
+    for (isize i = 0; i < self->size; ++i) {
         const _m_raw _rx = i_keytoraw(self->data+i), _ry = i_keytoraw(other->data+i);
         if (!(i_eq((&_rx), (&_ry)))) return false;
     }
@@ -297,7 +297,7 @@ _c_MEMB(_drop)(const _i_self* cself) {
 }
 
 STC_DEF bool
-_c_MEMB(_reserve)(_i_self* self, const intptr_t cap) {
+_c_MEMB(_reserve)(_i_self* self, const isize cap) {
     if (cap > self->capacity || (cap && cap == self->size)) {
         _m_value* d = (_m_value*)i_realloc(self->data, self->capacity*c_sizeof *d,
                                                        cap*c_sizeof *d);
@@ -310,20 +310,20 @@ _c_MEMB(_reserve)(_i_self* self, const intptr_t cap) {
 }
 
 STC_DEF bool
-_c_MEMB(_resize)(_i_self* self, const intptr_t len, _m_value null) {
+_c_MEMB(_resize)(_i_self* self, const isize len, _m_value null) {
     if (!_c_MEMB(_reserve)(self, len))
         return false;
-    const intptr_t n = self->size;
-    for (intptr_t i = len; i < n; ++i)
+    const isize n = self->size;
+    for (isize i = len; i < n; ++i)
         { i_keydrop((self->data + i)); }
-    for (intptr_t i = n; i < len; ++i)
+    for (isize i = n; i < len; ++i)
         self->data[i] = null;
     self->size = len;
     return true;
 }
 
 STC_DEF _m_iter
-_c_MEMB(_insert_uninit)(_i_self* self, const intptr_t idx, const intptr_t n) {
+_c_MEMB(_insert_uninit)(_i_self* self, const isize idx, const isize n) {
     if (self->size + n > self->capacity)
         if (!_c_MEMB(_reserve)(self, self->size*3/2 + n))
             return _c_MEMB(_end)(self);
@@ -335,9 +335,9 @@ _c_MEMB(_insert_uninit)(_i_self* self, const intptr_t idx, const intptr_t n) {
 }
 
 STC_DEF _m_iter
-_c_MEMB(_erase_n)(_i_self* self, const intptr_t idx, const intptr_t len) {
+_c_MEMB(_erase_n)(_i_self* self, const isize idx, const isize len) {
     _m_value* d = self->data + idx, *p = d, *end = self->data + self->size;
-    for (intptr_t i = 0; i < len; ++i, ++p)
+    for (isize i = 0; i < len; ++i, ++p)
         { i_keydrop(p); }
     c_memmove(d, p, (end - p)*c_sizeof *d);
     self->size -= len;
@@ -355,8 +355,8 @@ _c_MEMB(_clone)(_i_self vec) {
 }
 
 STC_DEF _m_iter
-_c_MEMB(_copy_n)(_i_self* self, const intptr_t idx,
-                 const _m_value arr[], const intptr_t n) {
+_c_MEMB(_copy_n)(_i_self* self, const isize idx,
+                 const _m_value arr[], const isize n) {
     _m_iter it = _c_MEMB(_insert_uninit)(self, idx, n);
     if (it.ref)
         for (_m_value* p = it.ref, *q = p + n; p != q; ++arr)
@@ -367,7 +367,7 @@ _c_MEMB(_copy_n)(_i_self* self, const intptr_t idx,
 
 #if !defined i_no_emplace
 STC_DEF _m_iter
-_c_MEMB(_emplace_n)(_i_self* self, const intptr_t idx, const _m_raw raw[], intptr_t n) {
+_c_MEMB(_emplace_n)(_i_self* self, const isize idx, const _m_raw raw[], isize n) {
     _m_iter it = _c_MEMB(_insert_uninit)(self, idx, n);
     if (it.ref)
         for (_m_value* p = it.ref; n--; ++raw, ++p)

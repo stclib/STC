@@ -101,7 +101,7 @@ STC_API _m_result       _c_MEMB(_emplace)(_i_self* self, _m_keyraw rkey _i_MAP_O
 STC_API _i_self          _c_MEMB(_clone)(_i_self tree);
 #endif // !i_no_clone
 STC_API void            _c_MEMB(_drop)(const _i_self* cself);
-STC_API bool            _c_MEMB(_reserve)(_i_self* self, intptr_t cap);
+STC_API bool            _c_MEMB(_reserve)(_i_self* self, isize cap);
 STC_API _m_value*       _c_MEMB(_find_it)(const _i_self* self, _m_keyraw rkey, _m_iter* out);
 STC_API _m_iter         _c_MEMB(_lower_bound)(const _i_self* self, _m_keyraw rkey);
 STC_API _m_value*       _c_MEMB(_front)(const _i_self* self);
@@ -112,10 +112,10 @@ STC_API _m_iter         _c_MEMB(_erase_range)(_i_self* self, _m_iter it1, _m_ite
 STC_API _m_iter         _c_MEMB(_begin)(const _i_self* self);
 STC_API void            _c_MEMB(_next)(_m_iter* it);
 
-STC_INLINE _i_self       _c_MEMB(_init)(void) { _i_self tree = {0}; return tree; }
+STC_INLINE _i_self      _c_MEMB(_init)(void) { _i_self tree = {0}; return tree; }
 STC_INLINE bool         _c_MEMB(_is_empty)(const _i_self* cx) { return cx->size == 0; }
-STC_INLINE intptr_t     _c_MEMB(_size)(const _i_self* cx) { return cx->size; }
-STC_INLINE intptr_t     _c_MEMB(_capacity)(const _i_self* cx) { return cx->capacity; }
+STC_INLINE isize        _c_MEMB(_size)(const _i_self* cx) { return cx->size; }
+STC_INLINE isize        _c_MEMB(_capacity)(const _i_self* cx) { return cx->capacity; }
 STC_INLINE _m_iter      _c_MEMB(_find)(const _i_self* self, _m_keyraw rkey)
                             { _m_iter it; _c_MEMB(_find_it)(self, rkey, &it); return it; }
 STC_INLINE bool         _c_MEMB(_contains)(const _i_self* self, _m_keyraw rkey)
@@ -126,7 +126,7 @@ STC_INLINE _m_value*    _c_MEMB(_get_mut)(_i_self* self, _m_keyraw rkey)
                             { _m_iter it; return _c_MEMB(_find_it)(self, rkey, &it); }
 
 STC_INLINE _i_self
-_c_MEMB(_with_capacity)(const intptr_t cap) {
+_c_MEMB(_with_capacity)(const isize cap) {
     _i_self tree = {0};
     _c_MEMB(_reserve)(&tree, cap);
     return tree;
@@ -244,7 +244,7 @@ _c_MEMB(_push)(_i_self* self, _m_value _val) {
 }
 
 STC_INLINE void
-_c_MEMB(_put_n)(_i_self* self, const _m_raw* raw, intptr_t n) {
+_c_MEMB(_put_n)(_i_self* self, const _m_raw* raw, isize n) {
     while (n--)
 #if defined _i_is_set && defined i_no_emplace
         _c_MEMB(_insert)(self, *raw++);
@@ -258,7 +258,7 @@ _c_MEMB(_put_n)(_i_self* self, const _m_raw* raw, intptr_t n) {
 }
 
 STC_INLINE _i_self
-_c_MEMB(_from_n)(const _m_raw* raw, intptr_t n)
+_c_MEMB(_from_n)(const _m_raw* raw, isize n)
     { _i_self cx = {0}; _c_MEMB(_put_n)(&cx, raw, n); return cx; }
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
@@ -291,7 +291,7 @@ _c_MEMB(_begin)(const _i_self* self) {
 }
 
 STC_DEF bool
-_c_MEMB(_reserve)(_i_self* self, const intptr_t cap) {
+_c_MEMB(_reserve)(_i_self* self, const isize cap) {
     if (cap <= self->capacity)
         return false;
     _m_node* nodes = (_m_node*)i_realloc(self->nodes, (self->capacity + 1)*c_sizeof(_m_node),

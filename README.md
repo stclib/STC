@@ -677,11 +677,11 @@ void maptest()
 ## Memory efficiency
 
 STC is generally very memory efficient. Memory usage for the different containers:
-- **cstr**, **vec**, **stack**, **pque**: 1 pointer, 2 intptr_t + memory for elements.
-- **csview**, 1 pointer, 1 intptr_t. Does not own data!
+- **cstr**, **vec**, **stack**, **pque**: 1 pointer, 2 isize + memory for elements.
+- **csview**, 1 pointer, 1 isize. Does not own data!
 - **cspan**, 1 pointer and 2 \* dimension \* int32_t. Does not own data!
 - **list**: Type size: 1 pointer. Each node allocates a struct to store its value and a next pointer.
-- **deq**, **queue**:  Type size: 2 pointers, 2 intptr_t. Otherwise like *vec*.
+- **deq**, **queue**:  Type size: 2 pointers, 2 isize. Otherwise like *vec*.
 - **hmap/hset**: Type size: 2 pointers, 2 int32_t (default). *hmap* uses one table of keys+value, and one table of precomputed hash-value/used bucket, which occupies only one byte per bucket. The closed hashing has a default max load factor of 85%, and hash table scales by 1.5x when reaching that.
 - **smap/sset**: Type size: 1 pointer. *smap* manages its own ***array of tree-nodes*** for allocation efficiency. Each node uses two 32-bit ints for child nodes, and one byte for `level`, but has ***no parent node***.
 - **arc**: Type size: 1 pointer, 1 long for the reference counter + memory for the shared element.

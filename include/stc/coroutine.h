@@ -219,7 +219,7 @@ typedef struct cco_runtime {
  * Semaphore
  */
 
-typedef struct { intptr_t count; } cco_semaphore;
+typedef struct { ptrdiff_t count; } cco_semaphore;
 
 #define cco_await_semaphore(sem) cco_await_semaphore_and_return(sem, CCO_AWAIT)
 #define cco_await_semaphore_and_return(sem, ret) \

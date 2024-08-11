@@ -79,7 +79,7 @@ typedef struct _Reprog
     _Reinst  *startinst;     /* start pc */
     _Reflags flags;
     int nsubids;
-    intptr_t allocsize;
+    isize allocsize;
     _Reclass cclass[_NCLASS]; /* .data */
     _Reinst  firstinst[];    /* .text : originally 5 elements? */
 } _Reprog;
@@ -349,7 +349,7 @@ typedef struct _Parser
     bool lastwasand;     /* Last token was _operand */
     short nbra;
     short nclass;
-    intptr_t instcap;
+    isize instcap;
     _Rune yyrune;         /* last lex'd rune */
     _Reclass *yyclassp;   /* last lex'd class */
     _Reclass* classp;
@@ -553,10 +553,10 @@ _optimize(_Parser *par, _Reprog *pp)
     if ((par->freep - pp->firstinst)*2 > par->instcap)
         return pp;
 
-    intptr_t ipp = (intptr_t)pp; // convert pointer to intptr_t!
-    intptr_t new_allocsize = c_sizeof(_Reprog) + (par->freep - pp->firstinst)*c_sizeof(_Reinst);
+    isize ipp = (isize)pp; // convert pointer to isize!
+    isize new_allocsize = c_sizeof(_Reprog) + (par->freep - pp->firstinst)*c_sizeof(_Reinst);
     _Reprog *npp = (_Reprog *)i_realloc(pp, pp->allocsize, new_allocsize);
-    ptrdiff_t diff = (intptr_t)npp - ipp;
+    ptrdiff_t diff = (isize)npp - ipp;
 
     if ((npp == NULL) | (diff == 0))
         return (_Reprog *)ipp;
@@ -851,8 +851,8 @@ _regcomp1(_Reprog *pp, _Parser *par, const char *s, int cflags)
     _Token token;
 
     /* get memory for the program. estimated max usage */
-    intptr_t instcap = 5 + 6*c_strlen(s);
-    intptr_t new_allocsize = c_sizeof(_Reprog) + instcap*c_sizeof(_Reinst);
+    isize instcap = 5 + 6*c_strlen(s);
+    isize new_allocsize = c_sizeof(_Reprog) + instcap*c_sizeof(_Reinst);
     pp = (_Reprog *)i_realloc(pp, pp ? pp->allocsize : 0, new_allocsize);
     if (! pp) {
         par->error = CREG_OUTOFMEMORY;
@@ -1147,7 +1147,7 @@ _regexec2(const _Reprog *progp,    /* program to run */
     _Relist *relists;
 
     /* mark space */
-    intptr_t sz = 2 * _BIGLISTSIZE*c_sizeof(_Relist);
+    isize sz = 2 * _BIGLISTSIZE*c_sizeof(_Relist);
     relists = (_Relist *)i_malloc(sz);
     if (relists == NULL)
         return -1;
@@ -1214,7 +1214,7 @@ static void
 _build_subst(const char* replace, int nmatch, const csview match[],
              bool (*mfun)(int, csview, cstr*), cstr* subst) {
     cstr_buf buf = cstr_buffer(subst);
-    intptr_t len = 0, cap = buf.cap;
+    isize len = 0, cap = buf.cap;
     char* dst = buf.data;
     cstr mstr = {0};
 
@@ -1298,7 +1298,7 @@ cregex_replace_sv_6(const cregex* re, csview input, const char* replace, int cou
 
     while (count-- && cregex_find_sv(re, input, match) == CREG_OK) {
         _build_subst(replace, nmatch, match, mfun, &subst);
-        const intptr_t mpos = (match[0].buf - input.buf);
+        const isize mpos = (match[0].buf - input.buf);
         if (copy & (mpos > 0)) cstr_append_n(&out, input.buf, mpos);
         cstr_append_s(&out, subst);
         input.buf = match[0].buf + match[0].size;

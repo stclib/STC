@@ -41,8 +41,8 @@ In the following, `X` is the value of `i_key` unless `i_type` is specified.
 
 ```c
 smap_X               smap_X_init(void);
-sset_X               smap_X_with_capacity(intptr_t cap);
-bool                 smap_X_reserve(smap_X* self, intptr_t cap);
+sset_X               smap_X_with_capacity(isize cap);
+bool                 smap_X_reserve(smap_X* self, isize cap);
 void                 smap_X_shrink_to_fit(smap_X* self);
 smap_X               smap_X_clone(smap_x map);
 
@@ -51,8 +51,8 @@ void                 smap_X_copy(smap_X* self, const smap_X* other);
 void                 smap_X_drop(smap_X* self);                                               // destructor
 
 bool                 smap_X_is_empty(const smap_X* self);
-intptr_t             smap_X_size(const smap_X* self);
-intptr_t             smap_X_capacity(const smap_X* self);
+isize                smap_X_size(const smap_X* self);
+isize                smap_X_capacity(const smap_X* self);
 
 const smap_X_mapped* smap_X_at(const smap_X* self, i_keyraw rkey);                            // rkey must be in map
 smap_X_mapped*       smap_X_at_mut(smap_X* self, i_keyraw rkey);                              // mutable at
@@ -81,7 +81,7 @@ smap_X_iter          smap_X_erase_range(smap_X* self, smap_X_iter it1, smap_X_it
 smap_X_iter          smap_X_begin(const smap_X* self);
 smap_X_iter          smap_X_end(const smap_X* self);
 void                 smap_X_next(smap_X_iter* iter);
-smap_X_iter          smap_X_advance(smap_X_iter it, intptr_t n);
+smap_X_iter          smap_X_advance(smap_X_iter it, isize n);
 
 smap_X_value         smap_X_value_clone(smap_X_value val);
 smap_X_raw           smap_X_value_toraw(const smap_X_value* pval);

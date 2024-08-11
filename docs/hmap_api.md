@@ -43,20 +43,20 @@ In the following, `X` is the value of `i_key` unless `i_type` is specified.
 
 ```c
 hmap_X                hmap_X_init(void);
-hmap_X                hmap_X_with_capacity(intptr_t cap);
+hmap_X                hmap_X_with_capacity(isize cap);
 hmap_X                hmap_X_clone(hmap_x map);
 
 void                  hmap_X_clear(hmap_X* self);
 void                  hmap_X_copy(hmap_X* self, const hmap_X* other);
 float                 hmap_X_max_load_factor(const hmap_X* self);                       // default: 0.85f
-bool                  hmap_X_reserve(hmap_X* self, intptr_t size);
+bool                  hmap_X_reserve(hmap_X* self, isize size);
 void                  hmap_X_shrink_to_fit(hmap_X* self);
 void                  hmap_X_drop(hmap_X* self);                                        // destructor
 
 bool                  hmap_X_is_empty(const hmap_X* self );
-intptr_t              hmap_X_size(const hmap_X* self);
-intptr_t              hmap_X_capacity(const hmap_X* self);                              // buckets * max_load_factor
-intptr_t              hmap_X_bucket_count(const hmap_X* self);                          // num. of allocated buckets
+isize                 hmap_X_size(const hmap_X* self);
+isize                 hmap_X_capacity(const hmap_X* self);                              // buckets * max_load_factor
+isize                 hmap_X_bucket_count(const hmap_X* self);                          // num. of allocated buckets
 
 const hmap_X_mapped*  hmap_X_at(const hmap_X* self, i_keyraw rkey);                     // rkey must be in map
 hmap_X_mapped*        hmap_X_at_mut(hmap_X* self, i_keyraw rkey);                       // mutable at
@@ -87,10 +87,10 @@ hmap_X_raw            hmap_X_value_toraw(hmap_X_value* pval);
 ```
 Free helper functions:
 ```c
-uint64_t              c_hash_n(const void *data, intptr_t n);               // generic hash function of n bytes
+uint64_t              c_hash_n(const void *data, isize n);               // generic hash function of n bytes
 uint64_t              c_hash_str(const char *str);                          // string hash function, uses strlen()
 uint64_t              c_hash_mix(uint64_t h1, uint64_t h2, ...);            // mix/combine computed hashes
-uint64_t              c_next_pow2(intptr_t k);                              // get next power of 2 >= k
+uint64_t              c_next_pow2(isize k);                              // get next power of 2 >= k
 
 // hash/equal template default functions:
 uint64_t              c_default_hash(const T *obj);                         // alias for c_hash_n(obj, sizeof *obj)

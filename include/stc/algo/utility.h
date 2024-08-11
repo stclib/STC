@@ -71,7 +71,7 @@
 // Use with: stack, vec, deq, queue:
 #define c_eraseremove_if(C, cnt_ptr, pred) do { \
     C* _cnt = cnt_ptr; \
-    intptr_t _n = 0; \
+    isize _n = 0; \
     const C##_value* value; \
     C##_iter _i, _it = C##_begin(_cnt); \
     while ((value = _it.ref) && !(pred)) \

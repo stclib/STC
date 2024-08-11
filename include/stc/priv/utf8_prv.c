@@ -74,7 +74,7 @@ uint32_t utf8_peek_off(const char* s, int pos) {
     return utf8_peek(s);
 }
 
-bool utf8_valid_n(const char* s, intptr_t nbytes) {
+bool utf8_valid_n(const char* s, isize nbytes) {
     utf8_decode_t d = {.state=0};
     while ((nbytes-- != 0) & (*s != 0))
         utf8_decode(&d, (uint8_t)*s++);
@@ -122,7 +122,7 @@ uint32_t utf8_toupper(uint32_t c) {
 
 int utf8_icmp_sv(const csview s1, const csview s2) {
     utf8_decode_t d1 = {.state=0}, d2 = {.state=0};
-    intptr_t j1 = 0, j2 = 0;
+    isize j1 = 0, j2 = 0;
     while ((j1 < s1.size) & (j2 < s2.size)) {
         do { utf8_decode(&d1, (uint8_t)s1.buf[j1++]); } while (d1.state);
         do { utf8_decode(&d2, (uint8_t)s2.buf[j2++]); } while (d2.state);

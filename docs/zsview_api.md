@@ -23,16 +23,16 @@ All zsview definitions and prototypes are available by including a single header
 ```c
 zsview          c_zv(const char literal_only[]);                // create from string literal only
 zsview          zsview_from(const char* str);                   // construct from const char*
-zsview          zsview_from_pos(zsview zv, intptr_t pos);       // subview starting from pos to eos.
-zsview          zsview_last(zsview zv, intptr_t count);         // subview of the last count bytes
+zsview          zsview_from_pos(zsview zv, isize pos);       // subview starting from pos to eos.
+zsview          zsview_last(zsview zv, isize count);         // subview of the last count bytes
 
-intptr_t        zsview_size(zsview zv);
+isize           zsview_size(zsview zv);
 bool            zsview_is_empty(zsview zv);                     // check if size == 0
 void            zsview_clear(zsview* self);
 
 csview          zsview_sv(zsview zv);                           // convert to csview type
 bool            zsview_equals(zsview zv, const char* str);
-intptr_t        zsview_find(zsview zv, const char* str);
+isize           zsview_find(zsview zv, const char* str);
 bool            zsview_contains(zsview zv, const char* str);
 bool            zsview_starts_with(zsview zv, const char* str);
 bool            zsview_ends_with(zsview zv, const char* str);
@@ -40,13 +40,13 @@ bool            zsview_ends_with(zsview zv, const char* str);
 zsview_iter     zsview_begin(const zsview* self);
 zsview_iter     zsview_end(const zsview* self);
 void            zsview_next(zsview_iter* it);                   // next utf8 codepoint
-zsview_iter     zsview_advance(zsview_iter it, intptr_t u8pos); // advance +/- codepoints
+zsview_iter     zsview_advance(zsview_iter it, isize u8pos); // advance +/- codepoints
 
 /* utf8 */
-const char*     zsview_u8_at(zsview zv, intptr_t u8idx);
-zsview          zsview_u8_from_pos(zsview zv, intptr_t u8idx);  // subview starting from u8idx
-zsview          zsview_u8_last(zsview zv, intptr_t u8len);      // subview of the last u8len codepoints
-intptr_t        zsview_u8_size(zsview zv);
+const char*     zsview_u8_at(zsview zv, isize u8idx);
+zsview          zsview_u8_from_pos(zsview zv, isize u8idx);  // subview starting from u8idx
+zsview          zsview_u8_last(zsview zv, isize u8len);      // subview of the last u8len codepoints
+isize           zsview_u8_size(zsview zv);
 bool            zsview_u8_valid(zsview zv);                     // requires linking with utf8 symbols
 ```
 
@@ -61,15 +61,15 @@ uint64_t        zsview_hash(const zsview* x);
 #### UTF8 helper methods
 ```c
                 // from utf8.h
-intptr_t        utf8_size(const char *s);
-intptr_t        utf8_size_n(const char *s, intptr_t nbytes);        // number of UTF8 codepoints within n bytes
-const char*     utf8_at(const char *s, intptr_t index);             // from UTF8 index to char* position
-intptr_t        utf8_pos(const char* s, intptr_t index);            // from UTF8 index to byte index position
+isize           utf8_size(const char *s);
+isize           utf8_size_n(const char *s, isize nbytes);        // number of UTF8 codepoints within n bytes
+const char*     utf8_at(const char *s, isize index);             // from UTF8 index to char* position
+isize           utf8_pos(const char* s, isize index);            // from UTF8 index to byte index position
 unsigned        utf8_chr_size(const char* s);                       // UTF8 character size: 1-4
 
                 // requires linking with utf8 symbols
 bool            utf8_valid(const char* s);
-bool            utf8_valid_n(const char* s, intptr_t nbytes);
+bool            utf8_valid_n(const char* s, isize nbytes);
 uint32_t        utf8_decode(utf8_decode_t *d, uint8_t byte);        // decode next byte to utf8, return state.
 unsigned        utf8_encode(char *out, uint32_t codepoint);         // encode unicode cp into out buffer
 uint32_t        utf8_peek(const char* s);                           // codepoint value of character at s
@@ -80,7 +80,7 @@ uint32_t        utf8_peek_off(const char* s, int offset);           // codepoint
 
 | Type name      | Type definition                              | Used to represent...     |
 |:---------------|:---------------------------------------------|:-------------------------|
-| `zsview`       | `struct { const char *str; intptr_t size; }` | The string view type   |
+| `zsview`       | `struct { const char *str; isize size; }` | The string view type   |
 | `zsview_value` | `const char`                                 | The element type         |
 | `zsview_iter`  | `union { zsview_value *ref; csview chr; }`   | UTF8 iterator           |
 

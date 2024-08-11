@@ -101,7 +101,7 @@ crange&     c_iota(start);                  // returns an l-value; will generate
 crange&     c_iota(start, stop);            // l-value, otherwise like crange_make(start, stop)
 crange&     c_iota(start, stop, step);      // l-value, otherwise like crange_make(start, stop, step)
 ```
- The **crange_value** type is *intptr_t*. Variables *start*, *stop*, and *step* are of type *crange_value*. Note that **crange** does not have *_end()* and *_advance()* functions; e.g. will not compile when used with *c_filter_pairwise()*.
+ The **crange_value** type is *isize*. Variables *start*, *stop*, and *step* are of type *crange_value*. Note that **crange** does not have *_end()* and *_advance()* functions; e.g. will not compile when used with *c_filter_pairwise()*.
 ```c
 // 1. All primes less than 32: See below for c_filter() and is_prime()
 crange r1 = crange_make(3, 32, 2);
@@ -316,7 +316,7 @@ if (result)
 The **quicksort**, **quicksort_ij** algorithm is about twice as fast as *qsort()*,
 and typically simpler to use. You may customize `i_type` and the comparison function
 `i_cmp` or `i_less`. All containers with random access may be sorted, including regular C-arrays.
-- `void MyType_quicksort(MyType* cnt, intptr_t n);`
+- `void MyType_quicksort(MyType* cnt, isize n);`
 
 There is a [benchmark/test file here](../misc/benchmarks/various/quicksort_bench.c).
 ```c
@@ -370,16 +370,16 @@ Memory allocator wrappers which uses signed sizes. Note that the signatures for
 *c_realloc()* and *c_free()* have an extra size parameter. These will be used as
 default unless `i_malloc`, `i_calloc`, `i_realloc`, and `i_free` are defined. See
 [Per container-instance customization](../README.md#per-container-instance-customization)
-- `void* c_malloc(intptr_t sz)`
-- `void* c_calloc(intptr_t sz)`
-- `void* c_realloc(void* old_p, intptr_t old_sz, intptr_t new_sz)`
-- `void c_free(void* p, intptr_t sz)`
+- `void* c_malloc(isize sz)`
+- `void* c_calloc(isize sz)`
+- `void* c_realloc(void* old_p, isize old_sz, isize new_sz)`
+- `void c_free(void* p, isize sz)`
 
 ### c_arraylen
 Return number of elements in an array. array must not be a pointer!
 ```c
 int array[] = {1, 2, 3, 4};
-intptr_t n = c_arraylen(array);
+isize n = c_arraylen(array);
 ```
 
 ### c_swap, c_const_cast

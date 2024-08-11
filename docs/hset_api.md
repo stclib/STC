@@ -28,20 +28,20 @@ In the following, `X` is the value of `i_key` unless `i_type` is specified.
 
 ```c
 hset_X              hset_X_init(void);
-hset_X              hset_X_with_capacity(intptr_t cap);
+hset_X              hset_X_with_capacity(isize cap);
 hset_X              hset_X_clone(hset_x set);
 
 void                hset_X_clear(hset_X* self);
 void                hset_X_copy(hset_X* self, const hset_X* other);
 float               hset_X_max_load_factor(const hset_X* self);              // default: 0.85
-bool                hset_X_reserve(hset_X* self, intptr_t size);
+bool                hset_X_reserve(hset_X* self, isize size);
 void                hset_X_shrink_to_fit(hset_X* self);
 void                hset_X_drop(hset_X* self);                               // destructor
 
 bool                hset_X_is_empty(const hset_X* self);
-intptr_t            hset_X_size(const hset_X* self);                         // num. of allocated buckets
-intptr_t            hset_X_capacity(const hset_X* self);                     // buckets * max_load_factor
-intptr_t            hset_X_bucket_count(const hset_X* self);
+isize               hset_X_size(const hset_X* self);                         // num. of allocated buckets
+isize               hset_X_capacity(const hset_X* self);                     // buckets * max_load_factor
+isize               hset_X_bucket_count(const hset_X* self);
 
 bool                hset_X_contains(const hset_X* self, i_keyraw rkey);
 const hset_X_value* hset_X_get(const hset_X* self, i_keyraw rkey);          // return NULL if not found

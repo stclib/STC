@@ -41,7 +41,7 @@ int main(void) {
         printf(" %d", nums[i]);
     puts("");
 
-    intptr_t idx = ints_binary_search(nums, 25, c_arraylen(nums));
+    isize idx = ints_binary_search(nums, 25, c_arraylen(nums));
     if (idx != -1) printf("found: %d\n", nums[idx]);
 
     idx = ints_lower_bound(nums, 200, c_arraylen(nums));
@@ -67,7 +67,7 @@ int main(void) {
         printf(" %d", *i.ref);
     puts("");
 
-    intptr_t idx = IDeq_binary_search(&nums, 25);
+    isize idx = IDeq_binary_search(&nums, 25);
     if (idx != -1) printf("found: %d\n", *IDeq_at(&nums, idx));
 
     idx = IDeq_lower_bound(&nums, 200);
@@ -96,8 +96,8 @@ int main(void) {
 
 // quick sort
 
-static inline void _c_MEMB(_insertsort_ij)(_i_self* self, intptr_t lo, intptr_t hi) {
-    for (intptr_t j = lo, i = lo + 1; i <= hi; j = i, ++i) {
+static inline void _c_MEMB(_insertsort_ij)(_i_self* self, isize lo, isize hi) {
+    for (isize j = lo, i = lo + 1; i <= hi; j = i, ++i) {
         _m_value x = *i_at(self, i);
         _m_raw rx = i_keytoraw(&x);
         while (j >= 0) {
@@ -110,10 +110,10 @@ static inline void _c_MEMB(_insertsort_ij)(_i_self* self, intptr_t lo, intptr_t 
     }
 }
 
-static inline void _c_MEMB(_quicksort_ij)(_i_self* self, intptr_t lo, intptr_t hi) {
-    intptr_t i = lo, j;
+static inline void _c_MEMB(_quicksort_ij)(_i_self* self, isize lo, isize hi) {
+    isize i = lo, j;
     while (lo < hi) {
-        _m_raw pivot = i_keytoraw(i_at(self, (intptr_t)(lo + (hi - lo)*7LL/16))), rx;
+        _m_raw pivot = i_keytoraw(i_at(self, (isize)(lo + (hi - lo)*7LL/16))), rx;
         j = hi;
         do {
             do { rx = i_keytoraw(i_at(self, i)); } while (i_less((&rx), (&pivot)) && ++i);
@@ -135,12 +135,12 @@ static inline void _c_MEMB(_quicksort_ij)(_i_self* self, intptr_t lo, intptr_t h
 
 // lower bound
 
-static inline intptr_t // -1 = not found
-_c_MEMB(_lower_bound_range)(const _i_self* self, const _m_raw raw, intptr_t first, intptr_t last) {
-    intptr_t count = last - first, step = count/2;
+static inline isize // -1 = not found
+_c_MEMB(_lower_bound_range)(const _i_self* self, const _m_raw raw, isize first, isize last) {
+    isize count = last - first, step = count/2;
 
     while (count > 0) {
-        intptr_t it = first;
+        isize it = first;
         it += step;
 
         const _m_raw rx = i_keytoraw(i_at(self, it));
@@ -158,9 +158,9 @@ _c_MEMB(_lower_bound_range)(const _i_self* self, const _m_raw raw, intptr_t firs
 
 // binary search
 
-static inline intptr_t // -1 = not found
-_c_MEMB(_binary_search_range)(const _i_self* self, const _m_raw raw, intptr_t first, intptr_t last) {
-    intptr_t res = _c_MEMB(_lower_bound_range)(self, raw, first, last);
+static inline isize // -1 = not found
+_c_MEMB(_binary_search_range)(const _i_self* self, const _m_raw raw, isize first, isize last) {
+    isize res = _c_MEMB(_lower_bound_range)(self, raw, first, last);
     if (res != -1) {
         const _m_raw rx = i_keytoraw(i_at(self, res));
         if (i_less((&raw), (&rx))) res = -1;
@@ -170,15 +170,15 @@ _c_MEMB(_binary_search_range)(const _i_self* self, const _m_raw raw, intptr_t fi
 
 #ifdef _i_is_arr
 
-static inline void _c_MEMB(_quicksort)(_i_self* arr, intptr_t n)
+static inline void _c_MEMB(_quicksort)(_i_self* arr, isize n)
     { _c_MEMB(_quicksort_ij)(arr, 0, n - 1); }
 
-static inline intptr_t // -1 = not found
-_c_MEMB(_lower_bound)(const _i_self* arr, const _m_raw raw, intptr_t n)
+static inline isize // -1 = not found
+_c_MEMB(_lower_bound)(const _i_self* arr, const _m_raw raw, isize n)
     { return _c_MEMB(_lower_bound_range)(arr, raw, 0, n); }
 
-static inline intptr_t // -1 = not found
-_c_MEMB(_binary_search)(const _i_self* arr, const _m_raw raw, intptr_t n)
+static inline isize // -1 = not found
+_c_MEMB(_binary_search)(const _i_self* arr, const _m_raw raw, isize n)
     { return _c_MEMB(_binary_search_range)(arr, raw, 0, n); }
 
 #else
@@ -186,11 +186,11 @@ _c_MEMB(_binary_search)(const _i_self* arr, const _m_raw raw, intptr_t n)
 static inline void _c_MEMB(_quicksort)(_i_self* self)
     { _c_MEMB(_quicksort_ij)(self, 0, _c_MEMB(_size)(self) - 1); }
 
-static inline intptr_t // -1 = not found
+static inline isize // -1 = not found
 _c_MEMB(_lower_bound)(const _i_self* self, const _m_raw raw)
     { return _c_MEMB(_lower_bound_range)(self, raw, 0, _c_MEMB(_size)(self)); }
 
-static inline intptr_t // -1 = not found
+static inline isize // -1 = not found
 _c_MEMB(_binary_search)(const _i_self* self, const _m_raw raw)
     { return _c_MEMB(_binary_search_range)(self, raw, 0, _c_MEMB(_size)(self)); }
 

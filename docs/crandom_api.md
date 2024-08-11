@@ -66,7 +66,7 @@ double              crand_normal(crand_t* rng, crand_normal_t* dist);
 #include "stc/cstr.h"
 
 // Declare int => int sorted map. Use typetag 'i' for ints.
-#define i_type smap_i, int, intptr_t
+#define i_type smap_i, int, isize
 #include "stc/smap.h"
 
 int main(void)
