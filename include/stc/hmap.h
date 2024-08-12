@@ -74,7 +74,7 @@ struct hmap_meta { uint16_t hashx:6, dist:10; }; // dist: 0=empty, 1=PSL 0, 2=PS
 #define _i_is_hash
 #include "priv/template.h"
 #ifndef i_is_forward
-  _c_DEFTYPES(_c_htable_types, _i_self, i_key, i_val, _i_MAP_ONLY, _i_SET_ONLY);
+  _c_DEFTYPES(_c_htable_types, Self, i_key, i_val, _i_MAP_ONLY, _i_SET_ONLY);
 #endif
 
 _i_MAP_ONLY( struct _m_value {
@@ -89,25 +89,25 @@ typedef _i_SET_ONLY( i_keyraw )
                               _m_rmapped second; } )
 _m_raw;
 
-STC_API _i_self          _c_MEMB(_with_capacity)(isize cap);
+STC_API Self          _c_MEMB(_with_capacity)(isize cap);
 #if !defined i_no_clone
-STC_API _i_self          _c_MEMB(_clone)(_i_self map);
+STC_API Self          _c_MEMB(_clone)(Self map);
 #endif
-STC_API void            _c_MEMB(_drop)(const _i_self* cself);
-STC_API void            _c_MEMB(_clear)(_i_self* self);
-STC_API bool            _c_MEMB(_reserve)(_i_self* self, isize capacity);
-STC_API void            _c_MEMB(_erase_entry)(_i_self* self, _m_value* val);
-STC_API float           _c_MEMB(_max_load_factor)(const _i_self* self);
-STC_API isize           _c_MEMB(_capacity)(const _i_self* map);
-static _m_result        _c_MEMB(_bucket_lookup_)(const _i_self* self, const _m_keyraw* rkeyptr);
-static _m_result        _c_MEMB(_bucket_insert_)(const _i_self* self, const _m_keyraw* rkeyptr);
+STC_API void            _c_MEMB(_drop)(const Self* cself);
+STC_API void            _c_MEMB(_clear)(Self* self);
+STC_API bool            _c_MEMB(_reserve)(Self* self, isize capacity);
+STC_API void            _c_MEMB(_erase_entry)(Self* self, _m_value* val);
+STC_API float           _c_MEMB(_max_load_factor)(const Self* self);
+STC_API isize           _c_MEMB(_capacity)(const Self* map);
+static _m_result        _c_MEMB(_bucket_lookup_)(const Self* self, const _m_keyraw* rkeyptr);
+static _m_result        _c_MEMB(_bucket_insert_)(const Self* self, const _m_keyraw* rkeyptr);
 
-STC_INLINE _i_self       _c_MEMB(_init)(void) { _i_self map = {0}; return map; }
-STC_INLINE void         _c_MEMB(_shrink_to_fit)(_i_self* self) { _c_MEMB(_reserve)(self, (isize)self->size); }
-STC_INLINE bool         _c_MEMB(_is_empty)(const _i_self* map) { return !map->size; }
-STC_INLINE isize        _c_MEMB(_size)(const _i_self* map) { return (isize)map->size; }
-STC_INLINE isize        _c_MEMB(_bucket_count)(_i_self* map) { return map->bucket_count; }
-STC_INLINE bool         _c_MEMB(_contains)(const _i_self* self, _m_keyraw rkey)
+STC_INLINE Self       _c_MEMB(_init)(void) { Self map = {0}; return map; }
+STC_INLINE void         _c_MEMB(_shrink_to_fit)(Self* self) { _c_MEMB(_reserve)(self, (isize)self->size); }
+STC_INLINE bool         _c_MEMB(_is_empty)(const Self* map) { return !map->size; }
+STC_INLINE isize        _c_MEMB(_size)(const Self* map) { return (isize)map->size; }
+STC_INLINE isize        _c_MEMB(_bucket_count)(Self* map) { return map->bucket_count; }
+STC_INLINE bool         _c_MEMB(_contains)(const Self* self, _m_keyraw rkey)
                             { return self->size && _c_MEMB(_bucket_lookup_)(self, &rkey).ref; }
 
 #ifndef i_max_load_factor
@@ -115,7 +115,7 @@ STC_INLINE bool         _c_MEMB(_contains)(const _i_self* self, _m_keyraw rkey)
 #endif
 
 STC_INLINE _m_result
-_c_MEMB(_insert_entry_)(_i_self* self, _m_keyraw rkey) {
+_c_MEMB(_insert_entry_)(Self* self, _m_keyraw rkey) {
     if (self->size >= (isize)((float)self->bucket_count * (i_max_load_factor)))
         if (!_c_MEMB(_reserve)(self, (isize)(self->size*3/2 + 2)))
             return c_literal(_m_result){0};
@@ -126,26 +126,26 @@ _c_MEMB(_insert_entry_)(_i_self* self, _m_keyraw rkey) {
 }
 
 #ifdef _i_is_map
-    STC_API _m_result _c_MEMB(_insert_or_assign)(_i_self* self, _m_key key, _m_mapped mapped);
+    STC_API _m_result _c_MEMB(_insert_or_assign)(Self* self, _m_key key, _m_mapped mapped);
     #if !defined i_no_emplace
-        STC_API _m_result  _c_MEMB(_emplace_or_assign)(_i_self* self, _m_keyraw rkey, _m_rmapped rmapped);
+        STC_API _m_result  _c_MEMB(_emplace_or_assign)(Self* self, _m_keyraw rkey, _m_rmapped rmapped);
     #endif
 
     STC_INLINE const _m_mapped*
-    _c_MEMB(_at)(const _i_self* self, _m_keyraw rkey) {
+    _c_MEMB(_at)(const Self* self, _m_keyraw rkey) {
         _m_result res = _c_MEMB(_bucket_lookup_)(self, &rkey);
         c_assert(res.ref);
         return &res.ref->second;
     }
 
     STC_INLINE _m_mapped*
-    _c_MEMB(_at_mut)(_i_self* self, _m_keyraw rkey)
+    _c_MEMB(_at_mut)(Self* self, _m_keyraw rkey)
         { return (_m_mapped*)_c_MEMB(_at)(self, rkey); }
 #endif // _i_is_map
 
 #if !defined i_no_clone
     STC_INLINE void
-    _c_MEMB(_copy)(_i_self *self, const _i_self* other) {
+    _c_MEMB(_copy)(Self *self, const Self* other) {
         if (self->table == other->table)
             return;
         _c_MEMB(_drop)(self);
@@ -162,7 +162,7 @@ _c_MEMB(_insert_entry_)(_i_self* self, _m_keyraw rkey) {
 
 #if !defined i_no_emplace
     STC_INLINE _m_result
-    _c_MEMB(_emplace)(_i_self* self, _m_keyraw rkey _i_MAP_ONLY(, _m_rmapped rmapped)) {
+    _c_MEMB(_emplace)(Self* self, _m_keyraw rkey _i_MAP_ONLY(, _m_rmapped rmapped)) {
         _m_result _res = _c_MEMB(_insert_entry_)(self, rkey);
         if (_res.inserted) {
             *_i_keyref(_res.ref) = i_keyfrom(rkey);
@@ -173,7 +173,7 @@ _c_MEMB(_insert_entry_)(_i_self* self, _m_keyraw rkey) {
 
 #ifdef _i_is_map
 STC_INLINE _m_result
-_c_MEMB(_emplace_key)(_i_self* self, _m_keyraw rkey) {
+_c_MEMB(_emplace_key)(Self* self, _m_keyraw rkey) {
     _m_result _res = _c_MEMB(_insert_entry_)(self, rkey);
     if (_res.inserted)
         _res.ref->first = i_keyfrom(rkey);
@@ -193,7 +193,7 @@ STC_INLINE void _c_MEMB(_value_drop)(_m_value* _val) {
 }
 
 STC_INLINE _m_result
-_c_MEMB(_insert)(_i_self* self, _m_key _key _i_MAP_ONLY(, _m_mapped _mapped)) {
+_c_MEMB(_insert)(Self* self, _m_key _key _i_MAP_ONLY(, _m_mapped _mapped)) {
     _m_result _res = _c_MEMB(_insert_entry_)(self, i_keytoraw((&_key)));
     if (_res.inserted)
         { *_i_keyref(_res.ref) = _key; _i_MAP_ONLY( _res.ref->second = _mapped; )}
@@ -202,7 +202,7 @@ _c_MEMB(_insert)(_i_self* self, _m_key _key _i_MAP_ONLY(, _m_mapped _mapped)) {
     return _res;
 }
 
-STC_INLINE _m_value* _c_MEMB(_push)(_i_self* self, _m_value _val) {
+STC_INLINE _m_value* _c_MEMB(_push)(Self* self, _m_value _val) {
     _m_result _res = _c_MEMB(_insert_entry_)(self, i_keytoraw(_i_keyref(&_val)));
     if (_res.inserted)
         *_res.ref = _val;
@@ -211,7 +211,7 @@ STC_INLINE _m_value* _c_MEMB(_push)(_i_self* self, _m_value _val) {
     return _res.ref;
 }
 
-STC_INLINE void _c_MEMB(_put_n)(_i_self* self, const _m_raw* raw, isize n) {
+STC_INLINE void _c_MEMB(_put_n)(Self* self, const _m_raw* raw, isize n) {
     while (n--)
 #if defined _i_is_set && defined i_no_emplace
         _c_MEMB(_insert)(self, *raw++);
@@ -224,12 +224,12 @@ STC_INLINE void _c_MEMB(_put_n)(_i_self* self, const _m_raw* raw, isize n) {
 #endif
 }
 
-STC_INLINE _i_self _c_MEMB(_from_n)(const _m_raw* raw, isize n)
-    { _i_self cx = {0}; _c_MEMB(_put_n)(&cx, raw, n); return cx; }
+STC_INLINE Self _c_MEMB(_from_n)(const _m_raw* raw, isize n)
+    { Self cx = {0}; _c_MEMB(_put_n)(&cx, raw, n); return cx; }
 
-STC_API _m_iter _c_MEMB(_begin)(const _i_self* self);
+STC_API _m_iter _c_MEMB(_begin)(const Self* self);
 
-STC_INLINE _m_iter _c_MEMB(_end)(const _i_self* self)
+STC_INLINE _m_iter _c_MEMB(_end)(const Self* self)
     { (void)self; return c_literal(_m_iter){0}; }
 
 STC_INLINE void _c_MEMB(_next)(_m_iter* it) {
@@ -243,7 +243,7 @@ STC_INLINE _m_iter _c_MEMB(_advance)(_m_iter it, size_t n) {
 }
 
 STC_INLINE _m_iter
-_c_MEMB(_find)(const _i_self* self, _m_keyraw rkey) {
+_c_MEMB(_find)(const Self* self, _m_keyraw rkey) {
     _m_value* ref;
     if (self->size && (ref = _c_MEMB(_bucket_lookup_)(self, &rkey).ref))
         return c_literal(_m_iter){ref,
@@ -253,16 +253,16 @@ _c_MEMB(_find)(const _i_self* self, _m_keyraw rkey) {
 }
 
 STC_INLINE const _m_value*
-_c_MEMB(_get)(const _i_self* self, _m_keyraw rkey) {
+_c_MEMB(_get)(const Self* self, _m_keyraw rkey) {
     return self->size ? _c_MEMB(_bucket_lookup_)(self, &rkey).ref : NULL;
 }
 
 STC_INLINE _m_value*
-_c_MEMB(_get_mut)(_i_self* self, _m_keyraw rkey)
+_c_MEMB(_get_mut)(Self* self, _m_keyraw rkey)
     { return (_m_value*)_c_MEMB(_get)(self, rkey); }
 
 STC_INLINE int
-_c_MEMB(_erase)(_i_self* self, _m_keyraw rkey) {
+_c_MEMB(_erase)(Self* self, _m_keyraw rkey) {
     _m_value* ref;
     if (self->size && (ref = _c_MEMB(_bucket_lookup_)(self, &rkey).ref))
         { _c_MEMB(_erase_entry)(self, ref); return 1; }
@@ -270,7 +270,7 @@ _c_MEMB(_erase)(_i_self* self, _m_keyraw rkey) {
 }
 
 STC_INLINE _m_iter
-_c_MEMB(_erase_at)(_i_self* self, _m_iter it) {
+_c_MEMB(_erase_at)(Self* self, _m_iter it) {
     _c_MEMB(_erase_entry)(self, it.ref);
     if (it._mref->dist == 0)
         _c_MEMB(_next)(&it);
@@ -278,7 +278,7 @@ _c_MEMB(_erase_at)(_i_self* self, _m_iter it) {
 }
 
 STC_INLINE bool
-_c_MEMB(_eq)(const _i_self* self, const _i_self* other) {
+_c_MEMB(_eq)(const Self* self, const Self* other) {
     if (_c_MEMB(_size)(self) != _c_MEMB(_size)(other)) return false;
     for (_m_iter i = _c_MEMB(_begin)(self); i.ref; _c_MEMB(_next)(&i)) {
         const _m_keyraw _raw = i_keytoraw(_i_keyref(i.ref));
@@ -290,7 +290,7 @@ _c_MEMB(_eq)(const _i_self* self, const _i_self* other) {
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined(i_implement) || defined(i_static)
 
-STC_DEF _m_iter _c_MEMB(_begin)(const _i_self* self) {
+STC_DEF _m_iter _c_MEMB(_begin)(const Self* self) {
     _m_iter it = {self->table, self->table+self->bucket_count, self->meta};
     if (it._mref)
         while (it._mref->dist == 0)
@@ -299,21 +299,21 @@ STC_DEF _m_iter _c_MEMB(_begin)(const _i_self* self) {
     return it;
 }
 
-STC_DEF float _c_MEMB(_max_load_factor)(const _i_self* self) {
+STC_DEF float _c_MEMB(_max_load_factor)(const Self* self) {
     (void)self; return (float)(i_max_load_factor);
 }
 
-STC_DEF isize _c_MEMB(_capacity)(const _i_self* map) {
+STC_DEF isize _c_MEMB(_capacity)(const Self* map) {
     return (isize)((float)map->bucket_count * (i_max_load_factor));
 }
 
-STC_DEF _i_self _c_MEMB(_with_capacity)(const isize cap) {
-    _i_self map = {0};
+STC_DEF Self _c_MEMB(_with_capacity)(const isize cap) {
+    Self map = {0};
     _c_MEMB(_reserve)(&map, cap);
     return map;
 }
 
-static void _c_MEMB(_wipe_)(_i_self* self) {
+static void _c_MEMB(_wipe_)(Self* self) {
     if (self->size == 0)
         return;
     _m_value* d = self->table, *_end = &d[self->bucket_count];
@@ -323,8 +323,8 @@ static void _c_MEMB(_wipe_)(_i_self* self) {
             _c_MEMB(_value_drop)(d);
 }
 
-STC_DEF void _c_MEMB(_drop)(const _i_self* cself) {
-    _i_self* self = (_i_self*)cself;
+STC_DEF void _c_MEMB(_drop)(const Self* cself) {
+    Self* self = (Self*)cself;
     if (self->bucket_count > 0) {
         _c_MEMB(_wipe_)(self);
         i_free(self->meta, (self->bucket_count + 1)*c_sizeof *self->meta);
@@ -332,7 +332,7 @@ STC_DEF void _c_MEMB(_drop)(const _i_self* cself) {
     }
 }
 
-STC_DEF void _c_MEMB(_clear)(_i_self* self) {
+STC_DEF void _c_MEMB(_clear)(Self* self) {
     _c_MEMB(_wipe_)(self);
     self->size = 0;
     c_memset(self->meta, 0, c_sizeof(struct hmap_meta)*self->bucket_count);
@@ -340,7 +340,7 @@ STC_DEF void _c_MEMB(_clear)(_i_self* self) {
 
 #ifdef _i_is_map
     STC_DEF _m_result
-    _c_MEMB(_insert_or_assign)(_i_self* self, _m_key _key, _m_mapped _mapped) {
+    _c_MEMB(_insert_or_assign)(Self* self, _m_key _key, _m_mapped _mapped) {
         _m_result _res = _c_MEMB(_insert_entry_)(self, i_keytoraw((&_key)));
         _m_mapped* _mp = _res.ref ? &_res.ref->second : &_mapped;
         if (_res.inserted)
@@ -353,7 +353,7 @@ STC_DEF void _c_MEMB(_clear)(_i_self* self) {
 
     #if !defined i_no_emplace
     STC_DEF _m_result
-    _c_MEMB(_emplace_or_assign)(_i_self* self, _m_keyraw rkey, _m_rmapped rmapped) {
+    _c_MEMB(_emplace_or_assign)(Self* self, _m_keyraw rkey, _m_rmapped rmapped) {
         _m_result _res = _c_MEMB(_insert_entry_)(self, rkey);
         if (_res.inserted)
             _res.ref->first = i_keyfrom(rkey);
@@ -368,7 +368,7 @@ STC_DEF void _c_MEMB(_clear)(_i_self* self) {
 #endif // _i_is_map
 
 static _m_result
-_c_MEMB(_bucket_lookup_)(const _i_self* self, const _m_keyraw* rkeyptr) {
+_c_MEMB(_bucket_lookup_)(const Self* self, const _m_keyraw* rkeyptr) {
     const uint64_t _hash = i_hash(rkeyptr);
     const size_t _idxmask = (size_t)self->bucket_count - 1;
     _m_result _res = {.idx=_hash & _idxmask, .hashx=(uint8_t)((_hash >> 24) & _hashmask), .dist=1};
@@ -388,7 +388,7 @@ _c_MEMB(_bucket_lookup_)(const _i_self* self, const _m_keyraw* rkeyptr) {
 }
 
 static _m_result
-_c_MEMB(_bucket_insert_)(const _i_self* self, const _m_keyraw* rkeyptr) {
+_c_MEMB(_bucket_insert_)(const Self* self, const _m_keyraw* rkeyptr) {
     _m_result res = _c_MEMB(_bucket_lookup_)(self, rkeyptr);
     if (res.ref) // bucket exists
         return res;
@@ -421,8 +421,8 @@ _c_MEMB(_bucket_insert_)(const _i_self* self, const _m_keyraw* rkeyptr) {
 
 
 #if !defined i_no_clone
-    STC_DEF _i_self
-    _c_MEMB(_clone)(_i_self map) {
+    STC_DEF Self
+    _c_MEMB(_clone)(Self map) {
         if (map.bucket_count) {
             _m_value *d = _i_malloc(_m_value, map.bucket_count);
             const isize _mbytes = (map.bucket_count + 1)*c_sizeof *map.meta;
@@ -445,14 +445,14 @@ _c_MEMB(_bucket_insert_)(const _i_self* self, const _m_keyraw* rkeyptr) {
 #endif
 
 STC_DEF bool
-_c_MEMB(_reserve)(_i_self* self, const isize _newcap) {
+_c_MEMB(_reserve)(Self* self, const isize _newcap) {
     const isize _oldbucks = self->bucket_count;
     if (_newcap != self->size && _newcap <= _oldbucks)
         return true;
     isize _newbucks = (isize)((float)_newcap / (i_max_load_factor)) + 4;
     _newbucks = c_next_pow2(_newbucks);
 
-    _i_self map = {
+    Self map = {
         _i_malloc(_m_value, _newbucks),
         _i_calloc(struct hmap_meta, _newbucks + 1),
         self->size, _newbucks
@@ -477,7 +477,7 @@ _c_MEMB(_reserve)(_i_self* self, const isize _newcap) {
 }
 
 STC_DEF void
-_c_MEMB(_erase_entry)(_i_self* self, _m_value* _val) {
+_c_MEMB(_erase_entry)(Self* self, _m_value* _val) {
     _m_value* d = self->table;
     struct hmap_meta *m = self->meta;
     size_t i = (size_t)(_val - d), j = i;

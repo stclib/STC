@@ -34,7 +34,7 @@
   #define c_use_eq        (1<<6)
   #define c_more          (1<<7)
 
-  #define _c_MEMB(name) c_JOIN(_i_self, name)
+  #define _c_MEMB(name) c_JOIN(Self, name)
   #define _c_DEFTYPES(macro, SELF, ...) c_EXPAND(macro(SELF, __VA_ARGS__))
   #define _m_value _c_MEMB(_value)
   #define _m_key _c_MEMB(_key)
@@ -79,26 +79,26 @@
 #endif
 
 #ifdef i_class
-  #define _i_self c_SELECT(_c_SEL21, i_class)
+  #define Self c_SELECT(_c_SEL21, i_class)
   #define i_keyclass c_SELECT(_c_SEL22, i_class)
 #elif defined i_type && !(defined i_key || defined i_keyclass || \
                           defined i_key_cstr || defined i_key_arcbox)
   #if defined i_rawclass
-    #define _i_self i_type
+    #define Self i_type
     #define i_key i_rawclass
-    #define i_keytoraw c_default_toraw
+    #define i_keytoraw(xp) *xp
   #elif defined _i_is_map
-    #define _i_self c_SELECT(_c_SEL31, i_type)
+    #define Self c_SELECT(_c_SEL31, i_type)
     #define i_key c_SELECT(_c_SEL32, i_type)
     #define i_val c_SELECT(_c_SEL33, i_type)
   #else
-    #define _i_self c_SELECT(_c_SEL21, i_type)
+    #define Self c_SELECT(_c_SEL21, i_type)
     #define i_key c_SELECT(_c_SEL22, i_type)
   #endif
 #elif defined i_type
-  #define _i_self i_type
-#elif !defined _i_self
-  #define _i_self c_JOIN(_i_prefix, i_tag)
+  #define Self i_type
+#elif !defined Self
+  #define Self c_JOIN(_i_prefix, i_tag)
 #endif
 
 #define i_no_emplace

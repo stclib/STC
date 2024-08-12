@@ -95,42 +95,42 @@ typedef i_keyraw _m_raw;
   #define _i_atomic_dec_and_test(v) !(--*(v))
 #endif
 #ifndef i_is_forward
-_c_DEFTYPES(_c_arc_types, _i_self, i_key);
+_c_DEFTYPES(_c_arc_types, Self, i_key);
 #endif
 struct _c_MEMB(_rep_) { catomic_long counter; i_key value; };
 
-STC_INLINE _i_self _c_MEMB(_init)(void)
-    { return c_literal(_i_self){NULL, NULL}; }
+STC_INLINE Self _c_MEMB(_init)(void)
+    { return c_literal(Self){NULL, NULL}; }
 
-STC_INLINE long _c_MEMB(_use_count)(const _i_self* self)
+STC_INLINE long _c_MEMB(_use_count)(const Self* self)
     { return self->use_count ? *self->use_count : 0; }
 
-STC_INLINE _i_self _c_MEMB(_from_ptr)(_m_value* p) {
-    _i_self arc = {p};
+STC_INLINE Self _c_MEMB(_from_ptr)(_m_value* p) {
+    Self arc = {p};
     *(arc.use_count = _i_malloc(catomic_long, 1)) = 1;
     return arc;
 }
 
 // c++: std::make_shared<_m_value>(val)
-STC_INLINE _i_self _c_MEMB(_make)(_m_value val) {
-    _i_self arc;
+STC_INLINE Self _c_MEMB(_make)(_m_value val) {
+    Self arc;
     struct _c_MEMB(_rep_)* rep = _i_malloc(struct _c_MEMB(_rep_), 1);
     *(arc.use_count = &rep->counter) = 1;
     *(arc.get = &rep->value) = val;
     return arc;
 }
 
-STC_INLINE _m_raw _c_MEMB(_toraw)(const _i_self* self)
+STC_INLINE _m_raw _c_MEMB(_toraw)(const Self* self)
     { return i_keytoraw(self->get); }
 
-STC_INLINE _i_self _c_MEMB(_move)(_i_self* self) {
-    _i_self arc = *self;
+STC_INLINE Self _c_MEMB(_move)(Self* self) {
+    Self arc = *self;
     self->get = NULL, self->use_count = NULL;
     return arc;
 }
 
-STC_INLINE void _c_MEMB(_drop)(const _i_self* cself) {
-    _i_self* self = (_i_self*)cself;
+STC_INLINE void _c_MEMB(_drop)(const Self* cself) {
+    Self* self = (Self*)cself;
     if (_i_atomic_dec_and_test(self->use_count)) {
         i_keydrop(self->get);
         if ((char *)self->get != (char *)self->use_count + offsetof(struct _c_MEMB(_rep_), value)) {
@@ -142,27 +142,27 @@ STC_INLINE void _c_MEMB(_drop)(const _i_self* cself) {
     }
 }
 
-STC_INLINE void _c_MEMB(_reset_to)(_i_self* self, _m_value* p) {
+STC_INLINE void _c_MEMB(_reset_to)(Self* self, _m_value* p) {
     _c_MEMB(_drop)(self);
     *self = _c_MEMB(_from_ptr)(p);
 }
 
-STC_INLINE _i_self _c_MEMB(_from)(_m_raw raw)
+STC_INLINE Self _c_MEMB(_from)(_m_raw raw)
     { return _c_MEMB(_make)(i_keyfrom(raw)); }
 
 // does not use i_keyclone, so OK to always define.
-STC_INLINE _i_self _c_MEMB(_clone)(_i_self arc) {
+STC_INLINE Self _c_MEMB(_clone)(Self arc) {
     _i_atomic_inc(arc.use_count);
     return arc;
 }
 
 // take ownership of unowned
-STC_INLINE void _c_MEMB(_take)(_i_self* self, _i_self unowned) {
+STC_INLINE void _c_MEMB(_take)(Self* self, Self unowned) {
     _c_MEMB(_drop)(self);
     *self = unowned;
 }
 // share ownership with arc
-STC_INLINE void _c_MEMB(_assign)(_i_self* self, _i_self arc) {
+STC_INLINE void _c_MEMB(_assign)(Self* self, Self arc) {
     _i_atomic_inc(arc.use_count);
     _c_MEMB(_drop)(self);
     *self = arc;
@@ -172,7 +172,7 @@ STC_INLINE void _c_MEMB(_assign)(_i_self* self, _i_self arc) {
     STC_INLINE int _c_MEMB(_raw_cmp)(const _m_raw* rx, const _m_raw* ry)
         { return i_cmp(rx, ry); }
 
-    STC_INLINE int _c_MEMB(_cmp)(const _i_self* self, const _i_self* other) {
+    STC_INLINE int _c_MEMB(_cmp)(const Self* self, const Self* other) {
         _m_raw rawx = i_keytoraw(self->get), rawy = i_keytoraw(other->get);
         return i_cmp((&rawx), (&rawy));
     }
@@ -180,7 +180,7 @@ STC_INLINE void _c_MEMB(_assign)(_i_self* self, _i_self arc) {
     STC_INLINE int _c_MEMB(_raw_cmp)(const _m_raw* rx, const _m_raw* ry)
         { return (rx > ry) - (rx < ry); }
 
-    STC_INLINE int _c_MEMB(_cmp)(const _i_self* self, const _i_self* other) {
+    STC_INLINE int _c_MEMB(_cmp)(const Self* self, const Self* other) {
         const _m_value *x = self->get, *y = other->get;
         return (x > y) - (x < y);
     }
@@ -190,7 +190,7 @@ STC_INLINE void _c_MEMB(_assign)(_i_self* self, _i_self arc) {
     STC_INLINE bool _c_MEMB(_raw_eq)(const _m_raw* rx, const _m_raw* ry)
         { return i_eq(rx, ry); }
 
-    STC_INLINE bool _c_MEMB(_eq)(const _i_self* self, const _i_self* other) {
+    STC_INLINE bool _c_MEMB(_eq)(const Self* self, const Self* other) {
         _m_raw rawx = i_keytoraw(self->get), rawy = i_keytoraw(other->get);
         return i_eq((&rawx), (&rawy));
     }
@@ -198,7 +198,7 @@ STC_INLINE void _c_MEMB(_assign)(_i_self* self, _i_self arc) {
     STC_INLINE bool _c_MEMB(_raw_eq)(const _m_raw* rx, const _m_raw* ry)
         { return rx == ry; }
 
-    STC_INLINE bool _c_MEMB(_eq)(const _i_self* self, const _i_self* other)
+    STC_INLINE bool _c_MEMB(_eq)(const Self* self, const Self* other)
         { return self->get == other->get; }
 #endif
 
@@ -206,7 +206,7 @@ STC_INLINE void _c_MEMB(_assign)(_i_self* self, _i_self arc) {
     STC_INLINE uint64_t _c_MEMB(_raw_hash)(const _m_raw* rx)
         { return i_hash(rx); }
 
-    STC_INLINE uint64_t _c_MEMB(_hash)(const _i_self* self) {
+    STC_INLINE uint64_t _c_MEMB(_hash)(const Self* self) {
         _m_raw raw = i_keytoraw(self->get);
         return i_hash((&raw));
     }
@@ -214,7 +214,7 @@ STC_INLINE void _c_MEMB(_assign)(_i_self* self, _i_self arc) {
     STC_INLINE uint64_t _c_MEMB(_raw_hash)(const _m_raw* rx)
         { return c_default_hash(&rx); }
 
-    STC_INLINE uint64_t _c_MEMB(_hash)(const _i_self* self)
+    STC_INLINE uint64_t _c_MEMB(_hash)(const Self* self)
         { return c_default_hash(&self->get); }
 #endif // i_no_hash
 

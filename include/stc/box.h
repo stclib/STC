@@ -75,69 +75,69 @@ int main(void) {
 typedef i_keyraw _m_raw;
 
 #ifndef i_is_forward
-_c_DEFTYPES(_c_box_types, _i_self, i_key);
+_c_DEFTYPES(_c_box_types, Self, i_key);
 #endif
 
 // constructors (take ownership)
-STC_INLINE _i_self _c_MEMB(_init)(void)
-    { return c_literal(_i_self){NULL}; }
+STC_INLINE Self _c_MEMB(_init)(void)
+    { return c_literal(Self){NULL}; }
 
-STC_INLINE long _c_MEMB(_use_count)(const _i_self* self)
+STC_INLINE long _c_MEMB(_use_count)(const Self* self)
     { return (long)(self->get != NULL); }
 
-STC_INLINE _i_self _c_MEMB(_from_ptr)(_m_value* p)
-    { return c_literal(_i_self){p}; }
+STC_INLINE Self _c_MEMB(_from_ptr)(_m_value* p)
+    { return c_literal(Self){p}; }
 
 // c++: std::make_unique<i_key>(val)
-STC_INLINE _i_self _c_MEMB(_make)(_m_value val) {
-    _i_self box = {_i_malloc(_m_value, 1)};
+STC_INLINE Self _c_MEMB(_make)(_m_value val) {
+    Self box = {_i_malloc(_m_value, 1)};
     *box.get = val;
     return box;
 }
 
-STC_INLINE _m_raw _c_MEMB(_toraw)(const _i_self* self)
+STC_INLINE _m_raw _c_MEMB(_toraw)(const Self* self)
     { return i_keytoraw(self->get); }
 
 // destructor
-STC_INLINE void _c_MEMB(_drop)(const _i_self* cself) {
-    _i_self* self = (_i_self*)cself;
+STC_INLINE void _c_MEMB(_drop)(const Self* cself) {
+    Self* self = (Self*)cself;
     i_keydrop(self->get);
     i_free(self->get, c_sizeof *self->get);
 }
 
-STC_INLINE _i_self _c_MEMB(_move)(_i_self* self) {
-    _i_self box = *self;
+STC_INLINE Self _c_MEMB(_move)(Self* self) {
+    Self box = *self;
     self->get = NULL;
     return box;
 }
 
-STC_INLINE _m_value* _c_MEMB(_release)(_i_self* self)
+STC_INLINE _m_value* _c_MEMB(_release)(Self* self)
     { return _c_MEMB(_move)(self).get; }
 
 // take ownership of p
-STC_INLINE void _c_MEMB(_reset_to)(_i_self* self, _m_value* p) {
+STC_INLINE void _c_MEMB(_reset_to)(Self* self, _m_value* p) {
     _c_MEMB(_drop)(self);
     self->get = p;
 }
 
-STC_INLINE _i_self _c_MEMB(_from)(_m_raw raw)
+STC_INLINE Self _c_MEMB(_from)(_m_raw raw)
     { return _c_MEMB(_make)(i_keyfrom(raw)); }
 
 #if !defined i_no_clone
-    STC_INLINE _i_self _c_MEMB(_clone)(_i_self other) {
-        _i_self out = {_i_malloc(_m_value, 1)};
+    STC_INLINE Self _c_MEMB(_clone)(Self other) {
+        Self out = {_i_malloc(_m_value, 1)};
         *out.get = i_keyclone((*other.get));
         return out;
     }
 #endif // !i_no_clone
 
 // take ownership of unowned
-STC_INLINE void _c_MEMB(_take)(_i_self* self, _i_self unowned) {
+STC_INLINE void _c_MEMB(_take)(Self* self, Self unowned) {
     _c_MEMB(_drop)(self);
     *self = unowned;
 }
 // transfer ownership from moved; set moved to NULL
-STC_INLINE void _c_MEMB(_assign)(_i_self* self, _i_self* moved) {
+STC_INLINE void _c_MEMB(_assign)(Self* self, Self* moved) {
     if (moved->get == self->get)
         return;
     _c_MEMB(_drop)(self);
@@ -149,7 +149,7 @@ STC_INLINE void _c_MEMB(_assign)(_i_self* self, _i_self* moved) {
     STC_INLINE int _c_MEMB(_raw_cmp)(const _m_raw* rx, const _m_raw* ry)
         { return i_cmp(rx, ry); }
 
-    STC_INLINE int _c_MEMB(_cmp)(const _i_self* self, const _i_self* other) {
+    STC_INLINE int _c_MEMB(_cmp)(const Self* self, const Self* other) {
         _m_raw rawx = i_keytoraw(self->get), rawy = i_keytoraw(other->get);
         return i_cmp((&rawx), (&rawy));
     }
@@ -157,7 +157,7 @@ STC_INLINE void _c_MEMB(_assign)(_i_self* self, _i_self* moved) {
     STC_INLINE int _c_MEMB(_raw_cmp)(const _m_raw* rx, const _m_raw* ry)
         { return (rx > ry) - (rx < ry); }
 
-    STC_INLINE int _c_MEMB(_cmp)(const _i_self* self, const _i_self* other) {
+    STC_INLINE int _c_MEMB(_cmp)(const Self* self, const Self* other) {
         const _m_value *x = self->get, *y = other->get;
         return (x > y) - (x < y);
     }
@@ -167,7 +167,7 @@ STC_INLINE void _c_MEMB(_assign)(_i_self* self, _i_self* moved) {
     STC_INLINE bool _c_MEMB(_raw_eq)(const _m_raw* rx, const _m_raw* ry)
         { return i_eq(rx, ry); }
 
-    STC_INLINE bool _c_MEMB(_eq)(const _i_self* self, const _i_self* other) {
+    STC_INLINE bool _c_MEMB(_eq)(const Self* self, const Self* other) {
         _m_raw rawx = i_keytoraw(self->get), rawy = i_keytoraw(other->get);
         return i_eq((&rawx), (&rawy));
     }
@@ -175,7 +175,7 @@ STC_INLINE void _c_MEMB(_assign)(_i_self* self, _i_self* moved) {
     STC_INLINE bool _c_MEMB(_raw_eq)(const _m_raw* rx, const _m_raw* ry)
         { return rx == ry; }
 
-    STC_INLINE bool _c_MEMB(_eq)(const _i_self* self, const _i_self* other)
+    STC_INLINE bool _c_MEMB(_eq)(const Self* self, const Self* other)
         { return self->get == other->get; }
 #endif
 
@@ -183,7 +183,7 @@ STC_INLINE void _c_MEMB(_assign)(_i_self* self, _i_self* moved) {
     STC_INLINE uint64_t _c_MEMB(_raw_hash)(const _m_raw* rx)
         { return i_hash(rx); }
 
-    STC_INLINE uint64_t _c_MEMB(_hash)(const _i_self* self) {
+    STC_INLINE uint64_t _c_MEMB(_hash)(const Self* self) {
         _m_raw raw = i_keytoraw(self->get);
         return i_hash((&raw));
     }
@@ -191,7 +191,7 @@ STC_INLINE void _c_MEMB(_assign)(_i_self* self, _i_self* moved) {
     STC_INLINE uint64_t _c_MEMB(_raw_hash)(const _m_raw* rx)
         { return c_default_hash(&rx); }
 
-    STC_INLINE uint64_t _c_MEMB(_hash)(const _i_self* self)
+    STC_INLINE uint64_t _c_MEMB(_hash)(const Self* self)
         { return c_default_hash(&self->get); }
 #endif // i_no_hash
 

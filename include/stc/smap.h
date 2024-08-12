@@ -75,7 +75,7 @@ int main(void) {
 #define _i_sorted
 #include "priv/template.h"
 #ifndef i_is_forward
-  _c_DEFTYPES(_c_aatree_types, _i_self, i_key, i_val, _i_MAP_ONLY, _i_SET_ONLY);
+  _c_DEFTYPES(_c_aatree_types, Self, i_key, i_val, _i_MAP_ONLY, _i_SET_ONLY);
 #endif
 
 _i_MAP_ONLY( struct _m_value {
@@ -95,45 +95,45 @@ typedef _i_SET_ONLY( _m_keyraw )
         _m_raw;
 
 #if !defined i_no_emplace
-STC_API _m_result       _c_MEMB(_emplace)(_i_self* self, _m_keyraw rkey _i_MAP_ONLY(, _m_rmapped rmapped));
+STC_API _m_result       _c_MEMB(_emplace)(Self* self, _m_keyraw rkey _i_MAP_ONLY(, _m_rmapped rmapped));
 #endif // !i_no_emplace
 #if !defined i_no_clone
-STC_API _i_self          _c_MEMB(_clone)(_i_self tree);
+STC_API Self          _c_MEMB(_clone)(Self tree);
 #endif // !i_no_clone
-STC_API void            _c_MEMB(_drop)(const _i_self* cself);
-STC_API bool            _c_MEMB(_reserve)(_i_self* self, isize cap);
-STC_API _m_value*       _c_MEMB(_find_it)(const _i_self* self, _m_keyraw rkey, _m_iter* out);
-STC_API _m_iter         _c_MEMB(_lower_bound)(const _i_self* self, _m_keyraw rkey);
-STC_API _m_value*       _c_MEMB(_front)(const _i_self* self);
-STC_API _m_value*       _c_MEMB(_back)(const _i_self* self);
-STC_API int             _c_MEMB(_erase)(_i_self* self, _m_keyraw rkey);
-STC_API _m_iter         _c_MEMB(_erase_at)(_i_self* self, _m_iter it);
-STC_API _m_iter         _c_MEMB(_erase_range)(_i_self* self, _m_iter it1, _m_iter it2);
-STC_API _m_iter         _c_MEMB(_begin)(const _i_self* self);
+STC_API void            _c_MEMB(_drop)(const Self* cself);
+STC_API bool            _c_MEMB(_reserve)(Self* self, isize cap);
+STC_API _m_value*       _c_MEMB(_find_it)(const Self* self, _m_keyraw rkey, _m_iter* out);
+STC_API _m_iter         _c_MEMB(_lower_bound)(const Self* self, _m_keyraw rkey);
+STC_API _m_value*       _c_MEMB(_front)(const Self* self);
+STC_API _m_value*       _c_MEMB(_back)(const Self* self);
+STC_API int             _c_MEMB(_erase)(Self* self, _m_keyraw rkey);
+STC_API _m_iter         _c_MEMB(_erase_at)(Self* self, _m_iter it);
+STC_API _m_iter         _c_MEMB(_erase_range)(Self* self, _m_iter it1, _m_iter it2);
+STC_API _m_iter         _c_MEMB(_begin)(const Self* self);
 STC_API void            _c_MEMB(_next)(_m_iter* it);
 
-STC_INLINE _i_self      _c_MEMB(_init)(void) { _i_self tree = {0}; return tree; }
-STC_INLINE bool         _c_MEMB(_is_empty)(const _i_self* cx) { return cx->size == 0; }
-STC_INLINE isize        _c_MEMB(_size)(const _i_self* cx) { return cx->size; }
-STC_INLINE isize        _c_MEMB(_capacity)(const _i_self* cx) { return cx->capacity; }
-STC_INLINE _m_iter      _c_MEMB(_find)(const _i_self* self, _m_keyraw rkey)
+STC_INLINE Self      _c_MEMB(_init)(void) { Self tree = {0}; return tree; }
+STC_INLINE bool         _c_MEMB(_is_empty)(const Self* cx) { return cx->size == 0; }
+STC_INLINE isize        _c_MEMB(_size)(const Self* cx) { return cx->size; }
+STC_INLINE isize        _c_MEMB(_capacity)(const Self* cx) { return cx->capacity; }
+STC_INLINE _m_iter      _c_MEMB(_find)(const Self* self, _m_keyraw rkey)
                             { _m_iter it; _c_MEMB(_find_it)(self, rkey, &it); return it; }
-STC_INLINE bool         _c_MEMB(_contains)(const _i_self* self, _m_keyraw rkey)
+STC_INLINE bool         _c_MEMB(_contains)(const Self* self, _m_keyraw rkey)
                             { _m_iter it; return _c_MEMB(_find_it)(self, rkey, &it) != NULL; }
-STC_INLINE const _m_value* _c_MEMB(_get)(const _i_self* self, _m_keyraw rkey)
+STC_INLINE const _m_value* _c_MEMB(_get)(const Self* self, _m_keyraw rkey)
                             { _m_iter it; return _c_MEMB(_find_it)(self, rkey, &it); }
-STC_INLINE _m_value*    _c_MEMB(_get_mut)(_i_self* self, _m_keyraw rkey)
+STC_INLINE _m_value*    _c_MEMB(_get_mut)(Self* self, _m_keyraw rkey)
                             { _m_iter it; return _c_MEMB(_find_it)(self, rkey, &it); }
 
-STC_INLINE _i_self
+STC_INLINE Self
 _c_MEMB(_with_capacity)(const isize cap) {
-    _i_self tree = {0};
+    Self tree = {0};
     _c_MEMB(_reserve)(&tree, cap);
     return tree;
 }
 
 STC_INLINE void
-_c_MEMB(_clear)(_i_self* self)
+_c_MEMB(_clear)(Self* self)
     { _c_MEMB(_drop)(self); *self = _c_MEMB(_init)(); }
 
 STC_INLINE _m_raw
@@ -158,7 +158,7 @@ _c_MEMB(_value_clone)(_m_value _val) {
 }
 
 STC_INLINE void
-_c_MEMB(_copy)(_i_self *self, const _i_self* other) {
+_c_MEMB(_copy)(Self *self, const Self* other) {
     if (self->nodes == other->nodes)
         return;
     _c_MEMB(_drop)(self);
@@ -166,21 +166,21 @@ _c_MEMB(_copy)(_i_self *self, const _i_self* other) {
 }
 
 STC_INLINE void
-_c_MEMB(_shrink_to_fit)(_i_self *self) {
-    _i_self tmp = _c_MEMB(_clone)(*self);
+_c_MEMB(_shrink_to_fit)(Self *self) {
+    Self tmp = _c_MEMB(_clone)(*self);
     _c_MEMB(_drop)(self); *self = tmp;
 }
 #endif // !i_no_clone
 
-STC_API _m_result _c_MEMB(_insert_entry_)(_i_self* self, _m_keyraw rkey);
+STC_API _m_result _c_MEMB(_insert_entry_)(Self* self, _m_keyraw rkey);
 
 #ifdef _i_is_map
-    STC_API _m_result _c_MEMB(_insert_or_assign)(_i_self* self, _m_key key, _m_mapped mapped);
+    STC_API _m_result _c_MEMB(_insert_or_assign)(Self* self, _m_key key, _m_mapped mapped);
     #if !defined i_no_emplace
-        STC_API _m_result  _c_MEMB(_emplace_or_assign)(_i_self* self, _m_keyraw rkey, _m_rmapped rmapped);
+        STC_API _m_result  _c_MEMB(_emplace_or_assign)(Self* self, _m_keyraw rkey, _m_rmapped rmapped);
 
         STC_INLINE _m_result
-        _c_MEMB(_emplace_key)(_i_self* self, _m_keyraw rkey) {
+        _c_MEMB(_emplace_key)(Self* self, _m_keyraw rkey) {
             _m_result res = _c_MEMB(_insert_entry_)(self, rkey);
             if (res.inserted)
                 res.ref->first = i_keyfrom(rkey);
@@ -188,16 +188,16 @@ STC_API _m_result _c_MEMB(_insert_entry_)(_i_self* self, _m_keyraw rkey);
         }
     #endif
     STC_INLINE const _m_mapped*
-    _c_MEMB(_at)(const _i_self* self, _m_keyraw rkey)
+    _c_MEMB(_at)(const Self* self, _m_keyraw rkey)
         { _m_iter it; return &_c_MEMB(_find_it)(self, rkey, &it)->second; }
 
     STC_INLINE _m_mapped*
-    _c_MEMB(_at_mut)(_i_self* self, _m_keyraw rkey)
+    _c_MEMB(_at_mut)(Self* self, _m_keyraw rkey)
         { _m_iter it; return &_c_MEMB(_find_it)(self, rkey, &it)->second; }
 #endif // _i_is_map
 
 STC_INLINE _m_iter
-_c_MEMB(_end)(const _i_self* self) {
+_c_MEMB(_end)(const Self* self) {
     _m_iter it; (void)self;
     it.ref = NULL, it._top = 0, it._tn = 0;
     return it;
@@ -212,7 +212,7 @@ _c_MEMB(_advance)(_m_iter it, size_t n) {
 
 #if defined _i_has_eq
 STC_INLINE bool
-_c_MEMB(_eq)(const _i_self* self, const _i_self* other) {
+_c_MEMB(_eq)(const Self* self, const Self* other) {
     if (_c_MEMB(_size)(self) != _c_MEMB(_size)(other)) return false;
     _m_iter i = _c_MEMB(_begin)(self), j = _c_MEMB(_begin)(other);
     for (; i.ref; _c_MEMB(_next)(&i), _c_MEMB(_next)(&j)) {
@@ -224,7 +224,7 @@ _c_MEMB(_eq)(const _i_self* self, const _i_self* other) {
 #endif
 
 STC_INLINE _m_result
-_c_MEMB(_insert)(_i_self* self, _m_key _key _i_MAP_ONLY(, _m_mapped _mapped)) {
+_c_MEMB(_insert)(Self* self, _m_key _key _i_MAP_ONLY(, _m_mapped _mapped)) {
     _m_result _res = _c_MEMB(_insert_entry_)(self, i_keytoraw((&_key)));
     if (_res.inserted)
         { *_i_keyref(_res.ref) = _key; _i_MAP_ONLY( _res.ref->second = _mapped; )}
@@ -234,7 +234,7 @@ _c_MEMB(_insert)(_i_self* self, _m_key _key _i_MAP_ONLY(, _m_mapped _mapped)) {
 }
 
 STC_INLINE _m_value*
-_c_MEMB(_push)(_i_self* self, _m_value _val) {
+_c_MEMB(_push)(Self* self, _m_value _val) {
     _m_result _res = _c_MEMB(_insert_entry_)(self, i_keytoraw(_i_keyref(&_val)));
     if (_res.inserted)
         *_res.ref = _val;
@@ -244,7 +244,7 @@ _c_MEMB(_push)(_i_self* self, _m_value _val) {
 }
 
 STC_INLINE void
-_c_MEMB(_put_n)(_i_self* self, const _m_raw* raw, isize n) {
+_c_MEMB(_put_n)(Self* self, const _m_raw* raw, isize n) {
     while (n--)
 #if defined _i_is_set && defined i_no_emplace
         _c_MEMB(_insert)(self, *raw++);
@@ -257,9 +257,9 @@ _c_MEMB(_put_n)(_i_self* self, const _m_raw* raw, isize n) {
 #endif
 }
 
-STC_INLINE _i_self
+STC_INLINE Self
 _c_MEMB(_from_n)(const _m_raw* raw, isize n)
-    { _i_self cx = {0}; _c_MEMB(_put_n)(&cx, raw, n); return cx; }
+    { Self cx = {0}; _c_MEMB(_put_n)(&cx, raw, n); return cx; }
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined(i_implement) || defined(i_static)
@@ -280,7 +280,7 @@ _c_MEMB(_next)(_m_iter *it) {
 }
 
 STC_DEF _m_iter
-_c_MEMB(_begin)(const _i_self* self) {
+_c_MEMB(_begin)(const Self* self) {
     _m_iter it;
     it.ref = NULL;
     it._d = self->nodes, it._top = 0;
@@ -291,7 +291,7 @@ _c_MEMB(_begin)(const _i_self* self) {
 }
 
 STC_DEF bool
-_c_MEMB(_reserve)(_i_self* self, const isize cap) {
+_c_MEMB(_reserve)(Self* self, const isize cap) {
     if (cap <= self->capacity)
         return false;
     _m_node* nodes = (_m_node*)i_realloc(self->nodes, (self->capacity + 1)*c_sizeof(_m_node),
@@ -305,7 +305,7 @@ _c_MEMB(_reserve)(_i_self* self, const isize cap) {
 }
 
 STC_DEF _m_value*
-_c_MEMB(_front)(const _i_self* self) {
+_c_MEMB(_front)(const Self* self) {
     _m_node *d = self->nodes;
     int32_t tn = self->root;
     while (d[tn].link[0])
@@ -314,7 +314,7 @@ _c_MEMB(_front)(const _i_self* self) {
 }
 
 STC_DEF _m_value*
-_c_MEMB(_back)(const _i_self* self) {
+_c_MEMB(_back)(const Self* self) {
     _m_node *d = self->nodes;
     int32_t tn = self->root;
     while (d[tn].link[1])
@@ -323,7 +323,7 @@ _c_MEMB(_back)(const _i_self* self) {
 }
 
 static int32_t
-_c_MEMB(_new_node_)(_i_self* self, int level) {
+_c_MEMB(_new_node_)(Self* self, int level) {
     int32_t tn;
     if (self->disp) {
         tn = self->disp;
@@ -341,7 +341,7 @@ _c_MEMB(_new_node_)(_i_self* self, int level) {
 
 #ifdef _i_is_map
     STC_DEF _m_result
-    _c_MEMB(_insert_or_assign)(_i_self* self, _m_key _key, _m_mapped _mapped) {
+    _c_MEMB(_insert_or_assign)(Self* self, _m_key _key, _m_mapped _mapped) {
         _m_result _res = _c_MEMB(_insert_entry_)(self, i_keytoraw((&_key)));
         _m_mapped* _mp = _res.ref ? &_res.ref->second : &_mapped;
         if (_res.inserted)
@@ -354,7 +354,7 @@ _c_MEMB(_new_node_)(_i_self* self, int level) {
 
     #if !defined i_no_emplace
     STC_DEF _m_result
-    _c_MEMB(_emplace_or_assign)(_i_self* self, _m_keyraw rkey, _m_rmapped rmapped) {
+    _c_MEMB(_emplace_or_assign)(Self* self, _m_keyraw rkey, _m_rmapped rmapped) {
         _m_result _res = _c_MEMB(_insert_entry_)(self, rkey);
         if (_res.inserted)
             _res.ref->first = i_keyfrom(rkey);
@@ -369,7 +369,7 @@ _c_MEMB(_new_node_)(_i_self* self, int level) {
 #endif // !_i_is_map
 
 STC_DEF _m_value*
-_c_MEMB(_find_it)(const _i_self* self, _m_keyraw rkey, _m_iter* out) {
+_c_MEMB(_find_it)(const Self* self, _m_keyraw rkey, _m_iter* out) {
     int32_t tn = self->root;
     _m_node *d = out->_d = self->nodes;
     out->_top = 0;
@@ -386,7 +386,7 @@ _c_MEMB(_find_it)(const _i_self* self, _m_keyraw rkey, _m_iter* out) {
 }
 
 STC_DEF _m_iter
-_c_MEMB(_lower_bound)(const _i_self* self, _m_keyraw rkey) {
+_c_MEMB(_lower_bound)(const Self* self, _m_keyraw rkey) {
     _m_iter it;
     _c_MEMB(_find_it)(self, rkey, &it);
     if (!it.ref && it._top) {
@@ -421,7 +421,7 @@ _c_MEMB(_split_)(_m_node *d, int32_t tn) {
 }
 
 STC_DEF int32_t
-_c_MEMB(_insert_entry_i_)(_i_self* self, int32_t tn, const _m_keyraw* rkey, _m_result* _res) {
+_c_MEMB(_insert_entry_i_)(Self* self, int32_t tn, const _m_keyraw* rkey, _m_result* _res) {
     int32_t up[64], tx = tn;
     _m_node* d = self->nodes;
     int c, top = 0, dir = 0;
@@ -453,7 +453,7 @@ _c_MEMB(_insert_entry_i_)(_i_self* self, int32_t tn, const _m_keyraw* rkey, _m_r
 }
 
 STC_DEF _m_result
-_c_MEMB(_insert_entry_)(_i_self* self, _m_keyraw rkey) {
+_c_MEMB(_insert_entry_)(Self* self, _m_keyraw rkey) {
     _m_result res = {NULL};
     int32_t tn = _c_MEMB(_insert_entry_i_)(self, self->root, &rkey, &res);
     self->root = tn;
@@ -462,7 +462,7 @@ _c_MEMB(_insert_entry_)(_i_self* self, _m_keyraw rkey) {
 }
 
 STC_DEF int32_t
-_c_MEMB(_erase_r_)(_i_self *self, int32_t tn, const _m_keyraw* rkey, int *erased) {
+_c_MEMB(_erase_r_)(Self *self, int32_t tn, const _m_keyraw* rkey, int *erased) {
     _m_node *d = self->nodes;
     if (tn == 0)
         return 0;
@@ -502,7 +502,7 @@ _c_MEMB(_erase_r_)(_i_self *self, int32_t tn, const _m_keyraw* rkey, int *erased
 }
 
 STC_DEF int
-_c_MEMB(_erase)(_i_self* self, _m_keyraw rkey) {
+_c_MEMB(_erase)(Self* self, _m_keyraw rkey) {
     int erased = 0;
     int32_t root = _c_MEMB(_erase_r_)(self, self->root, &rkey, &erased);
     if (!erased)
@@ -513,7 +513,7 @@ _c_MEMB(_erase)(_i_self* self, _m_keyraw rkey) {
 }
 
 STC_DEF _m_iter
-_c_MEMB(_erase_at)(_i_self* self, _m_iter it) {
+_c_MEMB(_erase_at)(Self* self, _m_iter it) {
     _m_keyraw raw = i_keytoraw(_i_keyref(it.ref));
     _c_MEMB(_next)(&it);
     if (it.ref) {
@@ -526,7 +526,7 @@ _c_MEMB(_erase_at)(_i_self* self, _m_iter it) {
 }
 
 STC_DEF _m_iter
-_c_MEMB(_erase_range)(_i_self* self, _m_iter it1, _m_iter it2) {
+_c_MEMB(_erase_range)(Self* self, _m_iter it1, _m_iter it2) {
     if (!it2.ref) {
         while (it1.ref)
             it1 = _c_MEMB(_erase_at)(self, it1);
@@ -547,7 +547,7 @@ _c_MEMB(_erase_range)(_i_self* self, _m_iter it1, _m_iter it2) {
 
 #if !defined i_no_clone
 STC_DEF int32_t
-_c_MEMB(_clone_r_)(_i_self* self, _m_node* src, int32_t sn) {
+_c_MEMB(_clone_r_)(Self* self, _m_node* src, int32_t sn) {
     if (sn == 0)
         return 0;
     int32_t tx, tn = _c_MEMB(_new_node_)(self, src[sn].level);
@@ -557,9 +557,9 @@ _c_MEMB(_clone_r_)(_i_self* self, _m_node* src, int32_t sn) {
     return tn;
 }
 
-STC_DEF _i_self
-_c_MEMB(_clone)(_i_self tree) {
-    _i_self clone = _c_MEMB(_with_capacity)(tree.size);
+STC_DEF Self
+_c_MEMB(_clone)(Self tree) {
+    Self clone = _c_MEMB(_with_capacity)(tree.size);
     tree.root = _c_MEMB(_clone_r_)(&clone, tree.nodes, tree.root);
     tree.nodes = clone.nodes;
     tree.disp = clone.disp;
@@ -570,7 +570,7 @@ _c_MEMB(_clone)(_i_self tree) {
 
 #if !defined i_no_emplace
 STC_DEF _m_result
-_c_MEMB(_emplace)(_i_self* self, _m_keyraw rkey _i_MAP_ONLY(, _m_rmapped rmapped)) {
+_c_MEMB(_emplace)(Self* self, _m_keyraw rkey _i_MAP_ONLY(, _m_rmapped rmapped)) {
     _m_result res = _c_MEMB(_insert_entry_)(self, rkey);
     if (res.inserted) {
         *_i_keyref(res.ref) = i_keyfrom(rkey);
@@ -590,8 +590,8 @@ _c_MEMB(_drop_r_)(_m_node* d, int32_t tn) {
 }
 
 STC_DEF void
-_c_MEMB(_drop)(const _i_self* cself) {
-    _i_self* self = (_i_self*)cself;
+_c_MEMB(_drop)(const Self* cself) {
+    Self* self = (Self*)cself;
     if (self->capacity) {
         _c_MEMB(_drop_r_)(self->nodes, self->root);
         i_free(self->nodes, (self->capacity + 1)*c_sizeof(_m_node));

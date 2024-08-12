@@ -74,5 +74,5 @@
 #undef _i_has_eq
 #undef _i_prefix
 #undef _i_template
-#undef _i_self
+#undef Self
 #endif

@@ -37,55 +37,55 @@
 #ifndef i_is_forward
 #ifdef i_capacity
   #define i_no_clone
-  _c_DEFTYPES(_c_stack_fixed, _i_self, i_key, i_capacity);
+  _c_DEFTYPES(_c_stack_fixed, Self, i_key, i_capacity);
 #else
-  _c_DEFTYPES(_c_stack_types, _i_self, i_key);
+  _c_DEFTYPES(_c_stack_types, Self, i_key);
 #endif
 #endif
 typedef i_keyraw _m_raw;
 
 #ifdef i_capacity
-STC_INLINE void _c_MEMB(_init)(_i_self* self)
+STC_INLINE void _c_MEMB(_init)(Self* self)
     { self->size = 0; }
 #else
-STC_INLINE _i_self _c_MEMB(_init)(void) {
-    _i_self out = {0};
+STC_INLINE Self _c_MEMB(_init)(void) {
+    Self out = {0};
     return out;
 }
 
-STC_INLINE _i_self _c_MEMB(_with_capacity)(isize cap) {
-    _i_self out = {_i_malloc(_m_value, cap), 0, cap};
+STC_INLINE Self _c_MEMB(_with_capacity)(isize cap) {
+    Self out = {_i_malloc(_m_value, cap), 0, cap};
     return out;
 }
 
-STC_INLINE _i_self _c_MEMB(_with_size)(isize size, _m_value null) {
-    _i_self out = {_i_malloc(_m_value, size), size, size};
+STC_INLINE Self _c_MEMB(_with_size)(isize size, _m_value null) {
+    Self out = {_i_malloc(_m_value, size), size, size};
     while (size) out.data[--size] = null;
     return out;
 }
 #endif // i_capacity
 
-STC_INLINE void _c_MEMB(_clear)(_i_self* self) {
+STC_INLINE void _c_MEMB(_clear)(Self* self) {
     _m_value *p = self->data + self->size;
     while (p-- != self->data) { i_keydrop(p); }
     self->size = 0;
 }
 
-STC_INLINE void _c_MEMB(_drop)(const _i_self* cself) {
-    _i_self* self = (_i_self*)cself;
+STC_INLINE void _c_MEMB(_drop)(const Self* cself) {
+    Self* self = (Self*)cself;
     _c_MEMB(_clear)(self);
 #ifndef i_capacity
     i_free(self->data, self->capacity*c_sizeof(*self->data));
 #endif
 }
 
-STC_INLINE isize _c_MEMB(_size)(const _i_self* self)
+STC_INLINE isize _c_MEMB(_size)(const Self* self)
     { return self->size; }
 
-STC_INLINE bool _c_MEMB(_is_empty)(const _i_self* self)
+STC_INLINE bool _c_MEMB(_is_empty)(const Self* self)
     { return !self->size; }
 
-STC_INLINE isize _c_MEMB(_capacity)(const _i_self* self) {
+STC_INLINE isize _c_MEMB(_capacity)(const Self* self) {
 #ifndef i_capacity
     return self->capacity;
 #else
@@ -96,7 +96,7 @@ STC_INLINE isize _c_MEMB(_capacity)(const _i_self* self) {
 STC_INLINE void _c_MEMB(_value_drop)(_m_value* val)
     { i_keydrop(val); }
 
-STC_INLINE bool _c_MEMB(_reserve)(_i_self* self, isize n) {
+STC_INLINE bool _c_MEMB(_reserve)(Self* self, isize n) {
     if (n < self->size) return true;
 #ifndef i_capacity
     _m_value *d = (_m_value *)i_realloc(self->data, self->capacity*c_sizeof *d, n*c_sizeof *d);
@@ -105,7 +105,7 @@ STC_INLINE bool _c_MEMB(_reserve)(_i_self* self, isize n) {
     return false;
 }
 
-STC_INLINE _m_value* _c_MEMB(_append_uninit)(_i_self *self, isize n) {
+STC_INLINE _m_value* _c_MEMB(_append_uninit)(Self *self, isize n) {
     isize len = self->size;
     if (len + n > _c_MEMB(_capacity)(self))
         if (!_c_MEMB(_reserve)(self, len*3/2 + n))
@@ -114,19 +114,19 @@ STC_INLINE _m_value* _c_MEMB(_append_uninit)(_i_self *self, isize n) {
     return self->data + len;
 }
 
-STC_INLINE void _c_MEMB(_shrink_to_fit)(_i_self* self)
+STC_INLINE void _c_MEMB(_shrink_to_fit)(Self* self)
     { _c_MEMB(_reserve)(self, self->size); }
 
-STC_INLINE const _m_value* _c_MEMB(_top)(const _i_self* self)
+STC_INLINE const _m_value* _c_MEMB(_top)(const Self* self)
     { return &self->data[self->size - 1]; }
 
-STC_INLINE _m_value* _c_MEMB(_back)(const _i_self* self)
+STC_INLINE _m_value* _c_MEMB(_back)(const Self* self)
     { return (_m_value*) &self->data[self->size - 1]; }
 
-STC_INLINE _m_value* _c_MEMB(_front)(const _i_self* self)
+STC_INLINE _m_value* _c_MEMB(_front)(const Self* self)
     { return (_m_value*) &self->data[0]; }
 
-STC_INLINE _m_value* _c_MEMB(_push)(_i_self* self, _m_value val) {
+STC_INLINE _m_value* _c_MEMB(_push)(Self* self, _m_value val) {
     if (self->size == _c_MEMB(_capacity)(self))
         if (!_c_MEMB(_reserve)(self, self->size*3/2 + 4))
             return NULL;
@@ -134,32 +134,32 @@ STC_INLINE _m_value* _c_MEMB(_push)(_i_self* self, _m_value val) {
     *vp = val; return vp;
 }
 
-STC_INLINE void _c_MEMB(_pop)(_i_self* self)
+STC_INLINE void _c_MEMB(_pop)(Self* self)
     { c_assert(self->size); _m_value* p = &self->data[--self->size]; i_keydrop(p); }
 
-STC_INLINE _m_value _c_MEMB(_pull)(_i_self* self)
+STC_INLINE _m_value _c_MEMB(_pull)(Self* self)
     { c_assert(self->size); return self->data[--self->size]; }
 
-STC_INLINE void _c_MEMB(_put_n)(_i_self* self, const _m_raw* raw, isize n)
+STC_INLINE void _c_MEMB(_put_n)(Self* self, const _m_raw* raw, isize n)
     { while (n--) _c_MEMB(_push)(self, i_keyfrom((*raw))), ++raw; }
 
-STC_INLINE _i_self _c_MEMB(_from_n)(const _m_raw* raw, isize n)
-    { _i_self cx = {0}; _c_MEMB(_put_n)(&cx, raw, n); return cx; }
+STC_INLINE Self _c_MEMB(_from_n)(const _m_raw* raw, isize n)
+    { Self cx = {0}; _c_MEMB(_put_n)(&cx, raw, n); return cx; }
 
-STC_INLINE const _m_value* _c_MEMB(_at)(const _i_self* self, isize idx)
+STC_INLINE const _m_value* _c_MEMB(_at)(const Self* self, isize idx)
     { c_assert(idx < self->size); return self->data + idx; }
 
-STC_INLINE _m_value* _c_MEMB(_at_mut)(_i_self* self, isize idx)
+STC_INLINE _m_value* _c_MEMB(_at_mut)(Self* self, isize idx)
     { c_assert(idx < self->size); return self->data + idx; }
 
 #if !defined i_no_emplace
-STC_INLINE _m_value* _c_MEMB(_emplace)(_i_self* self, _m_raw raw)
+STC_INLINE _m_value* _c_MEMB(_emplace)(Self* self, _m_raw raw)
     { return _c_MEMB(_push)(self, i_keyfrom(raw)); }
 #endif // !i_no_emplace
 
 #if !defined i_no_clone
-STC_INLINE _i_self _c_MEMB(_clone)(_i_self s) {
-    _i_self tmp = {_i_malloc(_m_value, s.size), s.size, s.size};
+STC_INLINE Self _c_MEMB(_clone)(Self s) {
+    Self tmp = {_i_malloc(_m_value, s.size), s.size, s.size};
     if (!tmp.data) tmp.capacity = 0;
     else for (isize i = 0; i < s.size; ++s.data)
         tmp.data[i++] = i_keyclone((*s.data));
@@ -168,7 +168,7 @@ STC_INLINE _i_self _c_MEMB(_clone)(_i_self s) {
     return s;
 }
 
-STC_INLINE void _c_MEMB(_copy)(_i_self *self, const _i_self* other) {
+STC_INLINE void _c_MEMB(_copy)(Self *self, const Self* other) {
     if (self->data == other->data) return;
     _c_MEMB(_drop)(self);
     *self = _c_MEMB(_clone)(*other);
@@ -181,20 +181,20 @@ STC_INLINE i_keyraw _c_MEMB(_value_toraw)(const _m_value* val)
     { return i_keytoraw(val); }
 #endif // !i_no_clone
 
-STC_INLINE _m_iter _c_MEMB(_begin)(const _i_self* self) {
+STC_INLINE _m_iter _c_MEMB(_begin)(const Self* self) {
     isize n = self->size; _m_value* d = (_m_value*)self->data;
     return c_literal(_m_iter){n ? d : NULL, d + n};
 }
 
-STC_INLINE _m_iter _c_MEMB(_rbegin)(const _i_self* self) {
+STC_INLINE _m_iter _c_MEMB(_rbegin)(const Self* self) {
     isize n = self->size; _m_value* d = (_m_value*)self->data;
     return c_literal(_m_iter){n ? d + n - 1 : NULL, d - 1};
 }
 
-STC_INLINE _m_iter _c_MEMB(_end)(const _i_self* self)
+STC_INLINE _m_iter _c_MEMB(_end)(const Self* self)
     { (void)self; return c_literal(_m_iter){0}; }
 
-STC_INLINE _m_iter _c_MEMB(_rend)(const _i_self* self)
+STC_INLINE _m_iter _c_MEMB(_rend)(const Self* self)
     { (void)self; return c_literal(_m_iter){0}; }
 
 STC_INLINE void _c_MEMB(_next)(_m_iter* it)
@@ -206,18 +206,18 @@ STC_INLINE void _c_MEMB(_rnext)(_m_iter* it)
 STC_INLINE _m_iter _c_MEMB(_advance)(_m_iter it, size_t n)
     { if ((it.ref += n) >= it.end) it.ref = NULL ; return it; }
 
-STC_INLINE isize _c_MEMB(_index)(const _i_self* self, _m_iter it)
+STC_INLINE isize _c_MEMB(_index)(const Self* self, _m_iter it)
     { return (it.ref - self->data); }
 
-STC_INLINE void _c_MEMB(_adjust_end_)(_i_self* self, isize n)
+STC_INLINE void _c_MEMB(_adjust_end_)(Self* self, isize n)
     { self->size += n; }
 
 #if defined _i_has_eq
 STC_INLINE bool
-_c_MEMB(_eq)(const _i_self* self, const _i_self* other) {
+_c_MEMB(_eq)(const Self* self, const Self* other) {
     if (self->size != other->size) return false;
     for (isize i = 0; i < self->size; ++i) {
-        const _m_raw _rx = i_keytoraw(self->data+i), _ry = i_keytoraw(other->data+i);
+        const _m_raw _rx = i_keytoraw((self->data+i)), _ry = i_keytoraw((other->data+i));
         if (!(i_eq((&_rx), (&_ry)))) return false;
     }
     return true;
