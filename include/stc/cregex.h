@@ -77,17 +77,17 @@ typedef struct {
 } cregex;
 
 typedef struct {
-    const cregex* re;
-    union { const char* str; csview sv; } in;
+    const cregex* regex;
+    csview input;
     csview match[CREG_MAX_CAPTURES];
 } cregex_iter;
 
-#define c_formatch(it, _re, _input) \
-    for (cregex_iter it = {.re=_re, .in={.str=_input}, .match={{0}}}; \
-         cregex_find_4(it.re, it.in.str, it.match, CREG_NEXT) == CREG_OK; )
-#define c_formatch_sv(it, _re, _input_sv) \
-    for (cregex_iter it = {.re=_re, .in={.sv=_input_sv}, .match={{0}}}; \
-         cregex_find_sv(it.re, it.in.sv, it.match, CREG_NEXT) == CREG_OK; )
+#define c_formatch(it, re, string) \
+    for (cregex_iter it = {.regex=re, .input={.buf=string,.size=-1}, .match={{0}}}; \
+         cregex_find_4(it.regex, it.input.buf, it.match, CREG_NEXT) == CREG_OK && it.match[0].size > 0; )
+#define c_formatch_sv(it, re, strview) \
+    for (cregex_iter it = {.regex=re, .input=strview, .match={{0}}}; \
+         cregex_find_sv(it.regex, it.input, it.match, CREG_NEXT) == CREG_OK && it.match[0].size > 0; )
 
 STC_INLINE cregex cregex_init(void) {
     cregex re = {0};
