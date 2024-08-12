@@ -95,7 +95,7 @@
     #define Self c_SELECT(_c_SEL21, i_type)
     #define i_key c_SELECT(_c_SEL22, i_type)
   #endif
-#elif defined i_type
+#elif !defined Self && defined i_type
   #define Self i_type
 #elif !defined Self
   #define Self c_JOIN(_i_prefix, i_tag)
