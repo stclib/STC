@@ -98,7 +98,7 @@ typedef _i_SET_ONLY( _m_keyraw )
 STC_API _m_result       _c_MEMB(_emplace)(Self* self, _m_keyraw rkey _i_MAP_ONLY(, _m_rmapped rmapped));
 #endif // !i_no_emplace
 #if !defined i_no_clone
-STC_API Self          _c_MEMB(_clone)(Self tree);
+STC_API Self            _c_MEMB(_clone)(Self tree);
 #endif // !i_no_clone
 STC_API void            _c_MEMB(_drop)(const Self* cself);
 STC_API bool            _c_MEMB(_reserve)(Self* self, isize cap);
@@ -112,7 +112,7 @@ STC_API _m_iter         _c_MEMB(_erase_range)(Self* self, _m_iter it1, _m_iter i
 STC_API _m_iter         _c_MEMB(_begin)(const Self* self);
 STC_API void            _c_MEMB(_next)(_m_iter* it);
 
-STC_INLINE Self      _c_MEMB(_init)(void) { Self tree = {0}; return tree; }
+STC_INLINE Self         _c_MEMB(_init)(void) { Self tree = {0}; return tree; }
 STC_INLINE bool         _c_MEMB(_is_empty)(const Self* cx) { return cx->size == 0; }
 STC_INLINE isize        _c_MEMB(_size)(const Self* cx) { return cx->size; }
 STC_INLINE isize        _c_MEMB(_capacity)(const Self* cx) { return cx->capacity; }

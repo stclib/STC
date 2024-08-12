@@ -107,7 +107,7 @@ STC_INLINE bool         _c_MEMB(_sort)(Self* self)
 #endif
 STC_API void            _c_MEMB(_reverse)(Self* self);
 STC_API _m_iter         _c_MEMB(_splice)(Self* self, _m_iter it, Self* other);
-STC_API Self         _c_MEMB(_split_off)(Self* self, _m_iter it1, _m_iter it2);
+STC_API Self            _c_MEMB(_split_off)(Self* self, _m_iter it1, _m_iter it2);
 STC_API _m_value*       _c_MEMB(_push_back_node)(Self* self, _m_node* node);
 STC_API _m_value*       _c_MEMB(_insert_after_node)(Self* self, _m_node* ref, _m_node* node);
 STC_API _m_node*        _c_MEMB(_unlink_after_node)(Self* self, _m_node* ref);
@@ -116,7 +116,7 @@ STC_INLINE _m_node*     _c_MEMB(_get_node)(_m_value* pval) { return _clist_tonod
 STC_INLINE _m_node*     _c_MEMB(_unlink_front_node)(Self* self)
                             { return _c_MEMB(_unlink_after_node)(self, self->last); }
 #if !defined i_no_clone
-STC_API Self         _c_MEMB(_clone)(Self cx);
+STC_API Self            _c_MEMB(_clone)(Self cx);
 STC_INLINE _m_value     _c_MEMB(_value_clone)(_m_value val) { return i_keyclone(val); }
 
 STC_INLINE void
@@ -137,10 +137,10 @@ STC_INLINE _m_value*    _c_MEMB(_emplace)(Self* self, _m_raw raw)
                             { return _c_MEMB(_push_back)(self, i_keyfrom(raw)); }
 #endif // !i_no_emplace
 
-STC_INLINE Self      _c_MEMB(_init)(void) { return c_literal(Self){NULL}; }
+STC_INLINE Self         _c_MEMB(_init)(void) { return c_literal(Self){NULL}; }
 STC_INLINE void         _c_MEMB(_put_n)(Self* self, const _m_raw* raw, isize n)
                             { while (n--) _c_MEMB(_push_back)(self, i_keyfrom(*raw++)); }
-STC_INLINE Self      _c_MEMB(_from_n)(const _m_raw* raw, isize n)
+STC_INLINE Self         _c_MEMB(_from_n)(const _m_raw* raw, isize n)
                             { Self cx = {0}; _c_MEMB(_put_n)(&cx, raw, n); return cx; }
 STC_INLINE bool         _c_MEMB(_reserve)(Self* self, isize n) { (void)(self + n); return true; }
 STC_INLINE bool         _c_MEMB(_is_empty)(const Self* self) { return self->last == NULL; }

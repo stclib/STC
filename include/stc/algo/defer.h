@@ -33,11 +33,11 @@
 //
 // c_panic({ ... }): Executes all added deferred statements in reverse
 //     followed by the code in ..., and breaks the guarded scope. It is
-//     allowed to call `return` or exit() in the code block.
+//     allowed to call `return`or exit() in the code block.
 //
 // c_break: Break out of a c_guard. Unlike regular break it will also break
 //     out of any nested loop/switch. Before breaking, it calls all added
-//     c_defers in opposite order of definition, before it exits the scope.
+//     c_defers in opposite order of definition, before it leaves the scope.
 //
 // c_return(x): Return from current function. It first evaluates x, then
 //     calls all added c_defers in opposite order of definition, before
@@ -47,7 +47,7 @@
 //
 // NOTE2: Regular `return`, `break` and `continue` must not be used
 //     anywhere inside a defer scope (except inside a c_panic clause).
-//     Use c_return and c_break to exit clause, otherwise assertion fails.
+//     Use c_return and c_break to leave clause, otherwise assertion fails.
 //
 // NOTE3: Nested c_guard's are not supported, as c_return will only
 //     execute the innermost defers before returning.
@@ -64,8 +64,8 @@
 
 #define c_guard c_guard_max(16)
 #define c_guard_max(N) \
-    for (struct { int top; void *jmp[(N) + 1]; jmp_buf brk; } _defer = {0} \
-        ; !setjmp(_defer.brk) \
+    for (struct { int top; void *jmp[(N) + 1]; jmp_buf leave; } _defer = {0} \
+        ; !setjmp(_defer.leave) \
         ; assert(!"missing c_return / c_break"))
 
 #define c_defer(...) _Defer(__LINE__, __VA_ARGS__)
@@ -85,7 +85,7 @@
     _defer.jmp[0] = &&c_JOIN0(_defer_brk, n); \
     goto *_defer.jmp[_defer.top]; \
     c_JOIN0(_defer_brk, n): do __VA_ARGS__ while (0); \
-    longjmp(_defer.brk, 1); \
+    longjmp(_defer.leave, 1); \
 } while (0)
 
 #define _Return(n, T, x) do { \

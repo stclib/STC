@@ -89,9 +89,9 @@ typedef _i_SET_ONLY( i_keyraw )
                               _m_rmapped second; } )
 _m_raw;
 
-STC_API Self          _c_MEMB(_with_capacity)(isize cap);
+STC_API Self            _c_MEMB(_with_capacity)(isize cap);
 #if !defined i_no_clone
-STC_API Self          _c_MEMB(_clone)(Self map);
+STC_API Self            _c_MEMB(_clone)(Self map);
 #endif
 STC_API void            _c_MEMB(_drop)(const Self* cself);
 STC_API void            _c_MEMB(_clear)(Self* self);
@@ -102,7 +102,7 @@ STC_API isize           _c_MEMB(_capacity)(const Self* map);
 static _m_result        _c_MEMB(_bucket_lookup_)(const Self* self, const _m_keyraw* rkeyptr);
 static _m_result        _c_MEMB(_bucket_insert_)(const Self* self, const _m_keyraw* rkeyptr);
 
-STC_INLINE Self       _c_MEMB(_init)(void) { Self map = {0}; return map; }
+STC_INLINE Self         _c_MEMB(_init)(void) { Self map = {0}; return map; }
 STC_INLINE void         _c_MEMB(_shrink_to_fit)(Self* self) { _c_MEMB(_reserve)(self, (isize)self->size); }
 STC_INLINE bool         _c_MEMB(_is_empty)(const Self* map) { return !map->size; }
 STC_INLINE isize        _c_MEMB(_size)(const Self* map) { return (isize)map->size; }

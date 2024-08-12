@@ -275,7 +275,7 @@ _c_MEMB(_sort)(Self* self) {
 #endif // _i_has_cmp
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if defined(i_implement) || defined(i_static)
+#if defined i_implement || defined i_static
 
 STC_DEF void
 _c_MEMB(_clear)(Self* self) {
@@ -300,7 +300,7 @@ STC_DEF bool
 _c_MEMB(_reserve)(Self* self, const isize cap) {
     if (cap > self->capacity || (cap && cap == self->size)) {
         _m_value* d = (_m_value*)i_realloc(self->data, self->capacity*c_sizeof *d,
-                                                       cap*c_sizeof *d);
+                                           cap*c_sizeof *d);
         if (!d)
             return false;
         self->data = d;

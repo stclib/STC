@@ -50,9 +50,8 @@ int main(void) {
 
 // ex2: Test on a deque !!
 #include <stdio.h>
-#define i_type IDeq
-#define i_key int
-#define i_opt c_use_cmp | c_more // retain input template params to be reused by quicksort.h
+#define i_type IDeq, int
+#define i_more // retain input template params to be reused by quicksort.h
 #include "stc/deq.h"
 #include "stc/algo/quicksort.h"
 
@@ -79,7 +78,7 @@ int main(void) {
 #include "../common.h"
 
 #ifndef _i_template
-  #define _i_is_arr
+  #define _i_is_array
   #if defined i_type && !defined i_key
     #define Self c_SELECT(_c_SEL21, i_type)
     #define i_key c_SELECT(_c_SEL22, i_type)
@@ -172,7 +171,7 @@ _c_MEMB(_binary_search_range)(const Self* self, const _m_raw raw, isize first, i
     return res;
 }
 
-#ifdef _i_is_arr
+#ifdef _i_is_array
 
 static inline void _c_MEMB(_quicksort)(Self* arr, isize n)
     { _c_MEMB(_quicksort_ij)(arr, 0, n - 1); }
@@ -200,7 +199,7 @@ _c_MEMB(_binary_search)(const Self* self, const _m_raw raw)
 
 #endif
 
-#undef _i_is_arr
+#undef _i_is_array
 #undef i_at
 #undef i_at_mut
 #include "../priv/template2.h"

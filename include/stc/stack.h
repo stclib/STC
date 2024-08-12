@@ -212,6 +212,18 @@ STC_INLINE isize _c_MEMB(_index)(const Self* self, _m_iter it)
 STC_INLINE void _c_MEMB(_adjust_end_)(Self* self, isize n)
     { self->size += n; }
 
+#if defined _i_has_cmp
+STC_INLINE int _c_MEMB(_value_cmp)(const _m_value* x, const _m_value* y) {
+    const _m_raw rx = i_keytoraw(x), ry = i_keytoraw(y);
+    return i_cmp((&rx), (&ry));
+}
+
+STC_INLINE void _c_MEMB(_sort)(Self* self) {
+    qsort(self->data, (size_t)self->size, sizeof(_m_value),
+          (int(*)(const void*, const void*))_c_MEMB(_value_cmp));
+}
+#endif // _i_has_cmp
+
 #if defined _i_has_eq
 STC_INLINE bool
 _c_MEMB(_eq)(const Self* self, const Self* other) {
