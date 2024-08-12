@@ -25,75 +25,75 @@
 
 // zsview is a "zero-terminated string view". It replaces zsview.
 
-#ifndef STC_CZVIEW_H_INCLUDED
-#define STC_CZVIEW_H_INCLUDED
+#ifndef STC_ZSVIEW_H_INCLUDED
+#define STC_ZSVIEW_H_INCLUDED
 
 #include "common.h"
 #include "types.h"
 #include "priv/utf8_prv.h"
 
 #define             zsview_init() c_zv("")
-#define             zsview_clone(rs) c_default_clone(rs)
+#define             zsview_clone(zs) c_default_clone(zs)
 #define             zsview_drop(self) c_default_drop(self)
 #define             zsview_toraw(self) (self)->str
 
 STC_INLINE zsview   zsview_from(const char* str)
                         { return c_literal(zsview){str, c_strlen(str)}; }
 STC_INLINE void     zsview_clear(zsview* self) { *self = c_zv(""); }
-STC_INLINE csview   zsview_sv(zsview rs) { return c_sv_2(rs.str, rs.size); }
+STC_INLINE csview   zsview_sv(zsview zs) { return c_sv_2(zs.str, zs.size); }
 
-STC_INLINE isize zsview_size(zsview rs) { return rs.size; }
-STC_INLINE bool     zsview_is_empty(zsview rs) { return rs.size == 0; }
+STC_INLINE isize zsview_size(zsview zs) { return zs.size; }
+STC_INLINE bool     zsview_is_empty(zsview zs) { return zs.size == 0; }
 
-STC_INLINE bool zsview_equals(zsview rs, const char* str) {
+STC_INLINE bool zsview_equals(zsview zs, const char* str) {
     isize n = c_strlen(str);
-    return rs.size == n && !c_memcmp(rs.str, str, n);
+    return zs.size == n && !c_memcmp(zs.str, str, n);
 }
 
-STC_INLINE isize zsview_find(zsview rs, const char* search) {
-    char* res = strstr(rs.str, search);
-    return res ? (res - rs.str) : c_NPOS;
+STC_INLINE isize zsview_find(zsview zs, const char* search) {
+    char* res = strstr(zs.str, search);
+    return res ? (res - zs.str) : c_NPOS;
 }
 
-STC_INLINE bool zsview_contains(zsview rs, const char* str)
-    { return zsview_find(rs, str) != c_NPOS; }
+STC_INLINE bool zsview_contains(zsview zs, const char* str)
+    { return zsview_find(zs, str) != c_NPOS; }
 
-STC_INLINE bool zsview_starts_with(zsview rs, const char* str) {
+STC_INLINE bool zsview_starts_with(zsview zs, const char* str) {
     isize n = c_strlen(str);
-    return n > rs.size ? false : !c_memcmp(rs.str, str, n);
+    return n > zs.size ? false : !c_memcmp(zs.str, str, n);
 }
 
-STC_INLINE bool zsview_ends_with(zsview rs, const char* str) {
+STC_INLINE bool zsview_ends_with(zsview zs, const char* str) {
     isize n = c_strlen(str);
-    return n > rs.size ? false : !c_memcmp(rs.str + rs.size - n, str, n);
+    return n > zs.size ? false : !c_memcmp(zs.str + zs.size - n, str, n);
 }
 
-STC_INLINE zsview zsview_from_pos(zsview rs, isize pos) {
-    if (pos < rs.size) { rs.str += pos; rs.size -= pos; }
-    return rs;
+STC_INLINE zsview zsview_from_pos(zsview zs, isize pos) {
+    if (pos < zs.size) { zs.str += pos; zs.size -= pos; }
+    return zs;
 }
 
-STC_INLINE zsview zsview_last(zsview rs, isize count)
-    { return zsview_from_pos(rs, rs.size - count); }
+STC_INLINE zsview zsview_last(zsview zs, isize count)
+    { return zsview_from_pos(zs, zs.size - count); }
 
 /* utf8 */
-STC_INLINE isize zsview_u8_size(zsview rs)
-    { return utf8_size(rs.str); }
+STC_INLINE isize zsview_u8_size(zsview zs)
+    { return utf8_size(zs.str); }
 
-STC_INLINE const char* zsview_u8_at(zsview rs, isize u8idx)
-    { return utf8_at(rs.str, u8idx); }
+STC_INLINE const char* zsview_u8_at(zsview zs, isize u8idx)
+    { return utf8_at(zs.str, u8idx); }
 
-STC_INLINE zsview zsview_u8_from_pos(zsview rs, isize u8idx)
-    { return zsview_from_pos(rs, utf8_pos(rs.str, u8idx)); }
+STC_INLINE zsview zsview_u8_from_pos(zsview zs, isize u8idx)
+    { return zsview_from_pos(zs, utf8_pos(zs.str, u8idx)); }
 
-STC_INLINE zsview zsview_u8_last(zsview rs, isize u8len) {
-    const char* p = rs.str + rs.size;
-    while (u8len && p != rs.str) u8len -= (*--p & 0xC0) != 0x80;
-    return zsview_from_pos(rs, p - rs.str);
+STC_INLINE zsview zsview_u8_last(zsview zs, isize u8len) {
+    const char* p = zs.str + zs.size;
+    while (u8len && p != zs.str) u8len -= (*--p & 0xC0) != 0x80;
+    return zsview_from_pos(zs, p - zs.str);
 }
 
-STC_INLINE bool zsview_u8_valid(zsview rs) // requires linking with utf8 symbols
-    { return utf8_valid_n(rs.str, rs.size); }
+STC_INLINE bool zsview_u8_valid(zsview zs) // requires linking with utf8 symbols
+    { return utf8_valid_n(zs.str, zs.size); }
 
 /* utf8 iterator */
 STC_INLINE zsview_iter zsview_begin(const zsview* self) {
@@ -137,7 +137,7 @@ STC_INLINE bool zsview_eq(const zsview* x, const zsview* y)
 STC_INLINE uint64_t zsview_hash(const zsview *self)
     { return c_hash_n(self->str, self->size); }
 
-#endif // STC_CZVIEW_H_INCLUDED
+#endif // STC_ZSVIEW_H_INCLUDED
 
 #if defined i_import
   #include "priv/utf8_prv.c"
