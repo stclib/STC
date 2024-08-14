@@ -33,8 +33,10 @@ struct {
     const char* title;
 } typedef SongView;
 
-bool static inline SongView_eq(const SongView* xw, const SongView* yw)
-    { return strcmp(xw->artist, yw->artist)==0 && strcmp(xw->title, yw->title)==0; }
+bool static inline SongView_cmp(const SongView* xw, const SongView* yw)
+    { int c = strcmp(xw->artist, yw->artist); return c ? c : strcmp(xw->title, yw->title); }
+
+#define SongView_eq(x, y) SongView_cmp(x, y)==0
 
 uint64_t static inline SongView_hash(const SongView* xw)
     { return c_hash_mix(c_hash_str(xw->artist), c_hash_str(xw->title)); }
@@ -42,8 +44,7 @@ uint64_t static inline SongView_hash(const SongView* xw)
 
 // Define the shared pointer type SongArc and conversion functions to SongView:
 #define i_class SongArc, Song // binds Song_clone(), Song_drop()
-#define i_rawclass SongView   // Element view type
-#define i_use_eq // use SongView_eq() + SongView_hash() instead of comparing pointers
+#define i_cmpclass SongView   // Element view type
 #define i_keytoraw(x) ((SongView){.artist=cstr_str(&x->artist), .title=cstr_str(&x->title)})
 #define i_keyfrom(sw) ((Song){.artist=cstr_from(sw.artist), .title=cstr_from(sw.title)})
 #include "stc/arc.h"

@@ -75,7 +75,7 @@ fn main() {
 }
 */
 #define i_type SVec
-#define i_cmpclass csview, c_use_eq
+#define i_cmpclass csview
 #include "stc/vec.h"
 
 void demo3(void)

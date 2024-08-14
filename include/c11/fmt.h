@@ -120,6 +120,7 @@ FMT_API void       _fmt_sprint(fmt_stream*, const char* fmt, ...);
 #define fmt_println(...) fmt_printd((fmt_stream*)0, __VA_ARGS__)
 #define fmt_printd(...) fmt_OVERLOAD(fmt_printd, __VA_ARGS__)
 #define fmt_sv "{:.*s}"
+#define fmt_svarg(sv) (int)(sv).size, (sv).buf
 
 /* Primary function. */
 #define fmt_printd2(to, fmt) \

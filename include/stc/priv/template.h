@@ -68,14 +68,10 @@
 #ifdef i_TYPE // [deprecated]
   #define i_type i_TYPE
 #endif
+
 #if defined i_cmpclass
-  #define i_rawclass c_SELECT(_c_SEL21, i_cmpclass)
-  #if (c_SELECT(_c_SEL22, i_cmpclass)) & c_use_cmp
-    #define i_use_cmp
-  #endif
-  #if (c_SELECT(_c_SEL22, i_cmpclass)) & c_use_eq
-    #define i_use_eq
-  #endif
+  #define i_use_cmp
+  #define i_use_eq
 #endif
 
 #ifdef i_class
@@ -83,9 +79,9 @@
   #define i_keyclass c_SELECT(_c_SEL22, i_class)
 #elif defined i_type && !(defined i_key || defined i_keyclass || \
                           defined i_key_cstr || defined i_key_arcbox)
-  #if defined i_rawclass
+  #if defined i_cmpclass
     #define Self i_type
-    #define i_key i_rawclass
+    #define i_key i_cmpclass
     #define i_keytoraw(xp) *xp
   #elif defined _i_is_map
     #define Self c_SELECT(_c_SEL31, i_type)
@@ -126,18 +122,19 @@
 // cstr_from(const char*) and arc_T_from(T) / box_T_from(T)
 #if defined i_key_cstr
   #define i_keyclass cstr
-  #define i_rawclass cstr_raw
+  #define i_cmpclass cstr_raw
   #define i_use_cmp
 #elif defined i_key_arcbox
   #define i_keyclass i_key_arcbox
-  #define i_rawclass c_JOIN(i_key_arcbox, _raw)
+  #define i_cmpclass c_JOIN(i_key_arcbox, _raw)
+  #define i_use_cmp
 #endif
 
-// Check for i_keyclass and i_rawclass, and fill in missing defs.
-#if defined i_rawclass
-  #define i_keyraw i_rawclass
+// Check for i_keyclass and i_cmpclass, and fill in missing defs.
+#if defined i_cmpclass
+  #define i_keyraw i_cmpclass
 #elif defined i_keyclass && !defined i_keyraw
-  #define i_rawclass i_key
+  #define i_cmpclass i_key
 #endif
 
 // Bind to i_key "class members": _clone, _drop, _from and _toraw (when conditions are met).
@@ -168,7 +165,7 @@
 #endif
 
 // Bind to i_keyraw "class members": _cmp, _eq and _hash (when conditions are met).
-#if defined i_rawclass
+#if defined i_cmpclass
   #if !(defined i_cmp || defined i_less) && (defined i_use_cmp || defined _i_sorted || defined _i_ispque)
     #define i_cmp c_JOIN(i_keyraw, _cmp)
   #endif

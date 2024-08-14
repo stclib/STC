@@ -38,8 +38,7 @@
 #undef i_key_box
 #undef i_key_arcbox // [deprecated]
 #undef i_keyclass
-#undef i_rawclass   // define i_keyraw, and bind i_cmp, i_eq, i_hash "members"
-#undef i_cmpclass   // like i_keyraw, but also defines i_use_cmp and i_use_eq (use _cmp/_less/_eq functions)
+#undef i_cmpclass   // define i_keyraw, and bind i_cmp, i_eq, i_hash "members"
 #undef i_keyclone
 #undef i_keyfrom
 #undef i_keytoraw
