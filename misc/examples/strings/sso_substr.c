@@ -1,6 +1,5 @@
-#define i_implement
+#define STC_IMPLEMENT
 #include "stc/cstr.h"
-#define i_implement
 #include "stc/csview.h"
 
 int main(void)
@@ -8,10 +7,11 @@ int main(void)
     cstr str = cstr_lit("We think in generalities, but we live in details.");
     csview sv = cstr_sv(&str);
     csview sv1 = csview_substr_ex(sv, 3, 5);               // "think"
-    isize pos = csview_find(sv, "live");                // position of "live"
+    isize pos = csview_find(sv, "live");                   // position of "live"
     csview sv2 = csview_substr_ex(sv, pos, 4);             // "live"
     csview sv3 = csview_slice_ex(sv, -8, -1);              // "details"
-    printf("%.*s, %.*s, %.*s\n", c_SVARG(sv1), c_SVARG(sv2), c_SVARG(sv3));
+    printf(c_svfmt ", " c_svfmt ", " c_svfmt "\n",
+           c_svarg(sv1), c_svarg(sv2), c_svarg(sv3));
 
     cstr_assign(&str, "apples are green or red");
     sv = cstr_sv(&str);

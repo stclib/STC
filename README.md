@@ -724,7 +724,7 @@ STC is generally very memory efficient. Memory usage for the different container
 - Renamed c_flt_count(i) => `c_flt_counter(i)`
 - Renamed c_flt_last(i) => `c_flt_getcount(i)`
 - Renamed c_ARRAYLEN() => c_arraylen()
-- Removed deprecated c_ARGSV(). Use c_SVARG()
+- Removed deprecated c_ARGSV(). Use c_svarg()
 - Removed c_PAIR
 
 ## Version 4.1.1
@@ -737,7 +737,7 @@ Major changes:
     - [crange](docs/algorithm_api.md#crange) - similar to [boost::irange](https://www.boost.org/doc/libs/release/libs/range/doc/html/range/reference/ranges/irange.html) integer range generator.
     - [c_forfilter](docs/algorithm_api.md#c_forfilter) - ranges-like view filtering.
     - [quicksort](include/stc/algo/quicksort.h) - fast quicksort with [custom inline comparison](misc/benchmarks/various/quicksort_bench.c).
-- Renamed `c_ARGSV()` => `c_SVARG()`: **csview** print arg. Note `c_sv()` is shorthand for *csview_from()*.
+- Renamed `c_ARGSV()` => `c_svarg()`: **csview** print arg. Note `c_sv()` is shorthand for *csview_from()*.
 - Support for [uppercase flow-control](include/stc/priv/altnames.h) macro names in common.h.
 - Some API changes in **cregex** and **cstr**.
 - Create single header container versions with python script.

@@ -91,12 +91,12 @@ void demo3(void)
         && SVec_push(&words_containing_i, *value)
     );
     c_foreach (w, SVec, words_containing_i)
-        printf(" %.*s", c_SVARG(*w.ref));
+        printf(" " c_svfmt, c_svarg(*w.ref));
     puts("");
 
 
     SVec_iter it = SVec_find(&words, c_sv("sentence"));
-    if (it.ref) printf("found: %.*s\n", c_SVARG(*it.ref));
+    if (it.ref) printf("found: " c_svfmt "\n", c_svarg(*it.ref));
 
     c_drop(SVec, &words, &words_containing_i);
 }
