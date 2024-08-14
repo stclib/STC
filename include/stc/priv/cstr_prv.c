@@ -160,7 +160,7 @@ STC_DEF bool cstr_getdelim(cstr *self, const int delim, FILE *fp) {
     }
 }
 
-STC_DEF cstr cstr_replace_sv(csview in, csview search, csview repl, int32_t count) {
+STC_DEF cstr cstr_from_replace(csview in, csview search, csview repl, int32_t count) {
     cstr out = cstr_init();
     isize from = 0; char* res;
     if (!count) count = INT32_MAX;

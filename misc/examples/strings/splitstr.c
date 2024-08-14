@@ -6,9 +6,9 @@
 
 int main(void)
 {
-    puts("Split with c_fortoken_sv():");
+    puts("Split with c_fortoken():");
 
-    c_fortoken_sv (i, " ", c_sv("Hello World C99!"))
+    c_fortoken (i, " ", "Hello World C99!")
         printf("'%.*s'\n", c_SVARG(i.token));
 
     puts("\nSplit with c_formatch (regex):");

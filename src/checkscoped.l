@@ -36,6 +36,7 @@ c_foreach_kv    |
 c_foreach       |
 c_forrange      |
 c_fortoken_sv   |
+c_fortoken      |
 c_formatch_sv   |
 c_formatch      |
 c_forfilter     |

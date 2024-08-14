@@ -10,7 +10,7 @@ STC - Smart Template Containers
 - Changed coroutine "keyword" `cco_yield();` => **cco_yield;**
 - Renamed several function `stc_xxxxx()` => **c_xxxxx()** in `common.h` and `algo/*.h`.
 - Renamed all member functions `TYPE_empty()` => **TYPE_is_empty()**.
-- Swapped 2nd and 3rd argument in `c_fortoken*()` to make it consistent with all other `c_for*()`, i.e, input object is third/last.
+- Swapped 2nd and 3rd argument in `c_fortoken()` to make it consistent with all other `c_for*()`, i.e, input object is third/last.
 - Renamed templated STC header files. The new default container names are based on the new file names:
   - **vec.h** (from `cvec.h`)
   - **deq.h** (from `cdeq.h`)

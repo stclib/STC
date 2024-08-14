@@ -80,9 +80,9 @@ fn main() {
 
 void demo3(void)
 {
-    csview sentence = c_sv("This is a sentence in C99.");
+    const char* sentence = "This is a sentence in C99.";
     SVec words = {0};
-    c_fortoken_sv (i, " ", sentence) // split words
+    c_fortoken (i, " ", sentence) // split words
         SVec_push(&words, i.token);
 
     SVec words_containing_i = {0};

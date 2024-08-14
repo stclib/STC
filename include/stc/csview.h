@@ -35,7 +35,7 @@
 #define             csview_clone(sv) c_default_clone(sv)
 
 STC_API csview_iter csview_advance(csview_iter it, isize u8pos);
-STC_API isize    csview_find_sv(csview sv, csview search);
+STC_API isize       csview_find_sv(csview sv, csview search);
 STC_API uint64_t    csview_hash(const csview *self);
 STC_API csview      csview_slice_ex(csview sv, isize p1, isize p2);
 STC_API csview      csview_substr_ex(csview sv, isize pos, isize n);
@@ -47,7 +47,7 @@ STC_INLINE csview   csview_from_n(const char* str, isize n)
     { return c_literal(csview){str, n}; }
 
 STC_INLINE void     csview_clear(csview* self) { *self = csview_init(); }
-STC_INLINE isize csview_size(csview sv) { return sv.size; }
+STC_INLINE isize    csview_size(csview sv) { return sv.size; }
 STC_INLINE bool     csview_is_empty(csview sv) { return sv.size == 0; }
 
 STC_INLINE bool csview_equals_sv(csview sv1, csview sv2)
@@ -126,10 +126,13 @@ STC_INLINE csview csview_u8_last(csview sv, isize u8len) {
 STC_INLINE bool csview_u8_valid(csview sv) // requires linking with utf8 symbols
     { return utf8_valid_n(sv.buf, sv.size); }
 
-#define c_fortoken_sv(it, separator, input_sv) \
-    for (struct { csview in, token; const char* sep; isize pos; } \
-         it = {.in=input_sv, .sep=separator} ; \
-         it.pos <= it.in.size && (it.token = csview_token(it.in, it.sep, &it.pos)).buf ; )
+#define c_fortoken_sv(it, separator, sv) \
+    for (struct { csview input, token; const char* sep; isize pos; } \
+         it = {.input=sv, .sep=separator} ; \
+         it.pos <= it.input.size && (it.token = csview_token(it.input, it.sep, &it.pos)).buf ; )
+
+#define c_fortoken(it, separator, str) \
+    c_fortoken_sv(it, separator, csview_from(str))
 
 /* ---- Container helper functions ---- */
 
