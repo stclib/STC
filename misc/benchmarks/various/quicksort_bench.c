@@ -7,9 +7,8 @@
 #endif
 #define NDEBUG
 #define i_type Ints,int
-#define i_more
+#define i_use_cmp
 #include "stc/vec.h"
-#include "stc/algo/quicksort.h"
 
 #define ROTL(d,bits) ((d<<(bits)) | (d>>(8*sizeof(d)-(bits))))
 uint64_t romutrio(uint64_t s[3]) {
@@ -31,7 +30,7 @@ void testsort(Ints *a, int size, const char *desc) {
 #elif defined QSORT
     printf("qsort: "); qsort(a->data, size, sizeof *a->data, cmp_int);
 #else
-    printf("STC quicksort: "); Ints_quicksort(a);
+    printf("STC quicksort: "); Ints_sort(a);
 #endif
     t = clock() - t;
 

@@ -13,8 +13,10 @@ See the c++ class [std::deque](https://en.cppreference.com/w/cpp/container/deque
 #define i_type <ct>,<kt> // shorthand to define i_type,i_key
 #define i_type <t>       // deq container type name (default: deq_{i_key})
 #define i_key <t>        // element type: REQUIRED. Defines deq_X_value
-#define i_cmp <fn>       // three-way compare of two i_keyraw*.
-#define i_use_cmp        // may be defined instead of i_cmp when i_key is an integral/native-type.
+
+#define i_use_cmp        // enable sorting, binary_search and lower_bound
+#define i_cmp <fn>       // three-way compare two i_keyraw's
+
 #define i_keydrop <fn>   // destroy value func - defaults to empty destruct
 #define i_keyclone <fn>  // REQUIRED IF i_keydrop is defined
 
@@ -29,62 +31,66 @@ In the following, `X` is the value of `i_key` unless `i_type` is specified.
 ## Methods
 
 ```c
-deq_X              deq_X_init(void);
-deq_X              deq_X_with_capacity(isize size);
-deq_X              deq_X_clone(deq_X deq);
+deq_X               deq_X_init(void);
+deq_X               deq_X_with_capacity(isize size);
+deq_X               deq_X_clone(deq_X deq);
 
-void               deq_X_clear(deq_X* self);
-void               deq_X_copy(deq_X* self, const deq_X* other);
-bool               deq_X_reserve(deq_X* self, isize cap);
-void               deq_X_shrink_to_fit(deq_X* self);
-void               deq_X_drop(deq_X* self);                                      // destructor
+void                deq_X_clear(deq_X* self);
+void                deq_X_copy(deq_X* self, const deq_X* other);
+bool                deq_X_reserve(deq_X* self, isize cap);
+void                deq_X_shrink_to_fit(deq_X* self);
+void                deq_X_drop(deq_X* self);                                     // destructor
 
-bool               deq_X_is_empty(const deq_X* self);
-isize              deq_X_size(const deq_X* self);
-isize              deq_X_capacity(const deq_X* self);
+bool                deq_X_is_empty(const deq_X* self);
+isize               deq_X_size(const deq_X* self);
+isize               deq_X_capacity(const deq_X* self);
 
-const deq_X_value* deq_X_at(const deq_X* self, isize idx);
-deq_X_value*       deq_X_at_mut(deq_X* self, isize idx);
-const deq_X_value* deq_X_get(const deq_X* self, i_keyraw raw);                   // return NULL if not found
-deq_X_value*       deq_X_get_mut(deq_X* self, i_keyraw raw);                     // mutable get
-deq_X_iter         deq_X_find(const deq_X* self, i_keyraw raw);
-deq_X_iter         deq_X_find_in(deq_X_iter i1, deq_X_iter i2, i_keyraw raw);   // return vec_X_end() if not found
+const deq_X_value*  deq_X_at(const deq_X* self, isize idx);
+deq_X_value*        deq_X_at_mut(deq_X* self, isize idx);
+const deq_X_value*  deq_X_get(const deq_X* self, i_keyraw raw);                 // return NULL if not found
+deq_X_value*        deq_X_get_mut(deq_X* self, i_keyraw raw);                   // mutable get
+deq_X_iter          deq_X_find(const deq_X* self, i_keyraw raw);
+deq_X_iter          deq_X_find_in(deq_X_iter i1, deq_X_iter i2, i_keyraw raw);  // return vec_X_end() if not found
 
-deq_X_value*       deq_X_front(const deq_X* self);
-deq_X_value*       deq_X_back(const deq_X* self);
+void                deq_X_sort(deq_X* self);                                    // quicksort from algo/sort.h
+isize               deq_X_lower_bound(const deq_X* self, const i_keyraw raw);    // return -1 if not found
+isize               deq_X_binary_search(const deq_X* self, const i_keyraw raw);  // return -1 if not found
 
-deq_X_value*       deq_X_push_front(deq_X* self, i_key value);
-deq_X_value*       deq_X_emplace_front(deq_X* self, i_keyraw raw);
-void               deq_X_pop_front(deq_X* self);
-deq_X_value        deq_X_pull_front(deq_X* self);                                // move out front element
+deq_X_value*        deq_X_front(const deq_X* self);
+deq_X_value*        deq_X_back(const deq_X* self);
 
-deq_X_value*       deq_X_push_back(deq_X* self, i_key value);
-deq_X_value*       deq_X_push(deq_X* self, i_key value);                         // alias for push_back()
-deq_X_value*       deq_X_emplace_back(deq_X* self, i_keyraw raw);
-deq_X_value*       deq_X_emplace(deq_X* self, i_keyraw raw);                     // alias for emplace_back()
-void               deq_X_pop_back(deq_X* self);
-deq_X_value        deq_X_pull_back(deq_X* self);                                 // move out last element
+deq_X_value*        deq_X_push_front(deq_X* self, i_key value);
+deq_X_value*        deq_X_emplace_front(deq_X* self, i_keyraw raw);
+void                deq_X_pop_front(deq_X* self);
+deq_X_value         deq_X_pull_front(deq_X* self);                                // move out front element
 
-deq_X_iter         deq_X_insert_n(deq_X* self, isize idx, const i_key[] arr, isize n);  // move values
-deq_X_iter         deq_X_insert_at(deq_X* self, deq_X_iter it, i_key value);    // move value
-deq_X_iter         deq_X_insert_uninit(deq_X* self, isize idx, isize n);   // uninitialized data
+deq_X_value*        deq_X_push_back(deq_X* self, i_key value);
+deq_X_value*        deq_X_push(deq_X* self, i_key value);                         // alias for push_back()
+deq_X_value*        deq_X_emplace_back(deq_X* self, i_keyraw raw);
+deq_X_value*        deq_X_emplace(deq_X* self, i_keyraw raw);                     // alias for emplace_back()
+void                deq_X_pop_back(deq_X* self);
+deq_X_value         deq_X_pull_back(deq_X* self);                                 // move out last element
+
+deq_X_iter          deq_X_insert_n(deq_X* self, isize idx, const i_key[] arr, isize n);  // move values
+deq_X_iter          deq_X_insert_at(deq_X* self, deq_X_iter it, i_key value);    // move value
+deq_X_iter          deq_X_insert_uninit(deq_X* self, isize idx, isize n);        // uninitialized data
                     // copy values:
-deq_X_iter         deq_X_emplace_n(deq_X* self, isize idx, const i_keyraw[] arr, isize n);
-deq_X_iter         deq_X_emplace_at(deq_X* self, deq_X_iter it, i_keyraw raw);
+deq_X_iter          deq_X_emplace_n(deq_X* self, isize idx, const i_keyraw[] arr, isize n);
+deq_X_iter          deq_X_emplace_at(deq_X* self, deq_X_iter it, i_keyraw raw);
 
-void               deq_X_erase_n(deq_X* self, isize idx, isize n);
-deq_X_iter         deq_X_erase_at(deq_X* self, deq_X_iter it);
-deq_X_iter         deq_X_erase_range(deq_X* self, deq_X_iter it1, deq_X_iter it2);
+void                deq_X_erase_n(deq_X* self, isize idx, isize n);
+deq_X_iter          deq_X_erase_at(deq_X* self, deq_X_iter it);
+deq_X_iter          deq_X_erase_range(deq_X* self, deq_X_iter it1, deq_X_iter it2);
 
-deq_X_iter         deq_X_begin(const deq_X* self);
-deq_X_iter         deq_X_end(const deq_X* self);
-void               deq_X_next(deq_X_iter* it);
-deq_X_iter         deq_X_advance(deq_X_iter it, isize n);
+deq_X_iter          deq_X_begin(const deq_X* self);
+deq_X_iter          deq_X_end(const deq_X* self);
+void                deq_X_next(deq_X_iter* it);
+deq_X_iter          deq_X_advance(deq_X_iter it, isize n);
 
-bool               deq_X_eq(const deq_X* c1, const deq_X* c2); // require i_eq/i_cmp/i_less.
-deq_X_value        deq_X_value_clone(deq_X_value val);
-deq_X_raw          deq_X_value_toraw(const deq_X_value* pval);
-void               deq_X_value_drop(deq_X_value* pval);
+bool                deq_X_eq(const deq_X* c1, const deq_X* c2); // require i_eq/i_cmp/i_less.
+deq_X_value         deq_X_value_clone(deq_X_value val);
+deq_X_raw           deq_X_value_toraw(const deq_X_value* pval);
+void                deq_X_value_drop(deq_X_value* pval);
 ```
 
 ## Types

@@ -14,9 +14,13 @@ See the c++ class [std::stack](https://en.cppreference.com/w/cpp/container/stack
 #define i_keydrop <fn>   // destroy value func - defaults to empty destruct
 #define i_keyclone <fn>  // REQUIRED IF i_keydrop defined
 
+#define i_use_cmp        // enable sorting, binary_search and lower_bound
+#define i_cmp <fn>       // three-way compare two i_keyraw's
+
 #define i_keyraw <t>     // convertion "raw" type - defaults to i_key
 #define i_keyfrom <fn>   // convertion func i_keyraw => i_key
 #define i_keytoraw <fn>  // convertion func i_key* => i_keyraw
+
 
 #include "stc/stack.h"
 ```
@@ -50,6 +54,10 @@ i_key*              stack_X_emplace(stack_X* self, i_keyraw raw);
 
 void                stack_X_pop(stack_X* self);                        // destroy last element
 stack_X_value       stack_X_pull(stack_X* self);                       // move out last element
+
+void                stack_X_sort(stack_X* self);                                    // quicksort from algo/sort.h
+isize               stack_X_lower_bound(const stack_X* self, const i_keyraw raw);   // return -1 if not found
+isize               stack_X_binary_search(const stack_X* self, const i_keyraw raw); // return -1 if not found
 
 stack_X_iter        stack_X_begin(const stack_X* self);
 stack_X_iter        stack_X_end(const stack_X* self);

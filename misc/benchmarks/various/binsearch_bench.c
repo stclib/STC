@@ -1,7 +1,6 @@
 #define i_type ivec,int
-#define i_opt c_use_cmp | c_more
+#define i_use_cmp
 #include "stc/vec.h"
-#include "stc/algo/quicksort.h"
 #include "stc/crand.h"
 
 #include <stdio.h>
@@ -10,7 +9,7 @@
 #include <algorithm>
 #endif
 
-// Use quicksort and binary_search from "quicksort.h"
+// Use quicksort and binary_search from "algo/sort.h"
 
 int main(int argc, char const *argv[])
 {
@@ -20,7 +19,7 @@ int main(int argc, char const *argv[])
     c_forrange (i, N)
         ivec_push(&v, crand() & mask);
 
-    ivec_quicksort(&v);
+    ivec_sort(&v);
 
     long long count = 0;
     clock_t t = clock();

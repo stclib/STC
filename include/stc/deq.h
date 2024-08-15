@@ -125,7 +125,11 @@ _c_MEMB(_get)(const Self* self, _m_raw raw) {
 STC_INLINE _m_value*
 _c_MEMB(_get_mut)(Self* self, _m_raw raw)
     { return (_m_value *) _c_MEMB(_get)(self, raw); }
-#endif
+#endif // _i_has_eq
+
+#if defined _i_has_cmp
+#include "algo/sort.h"
+#endif // _i_has_cmp
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined(i_implement) || defined(i_static)

@@ -249,12 +249,7 @@ STC_INLINE bool _c_MEMB(_eq)(const Self* self, const Self* other) {
 #endif // _i_has_eq
 
 #if defined _i_has_cmp
-STC_API int _c_MEMB(_value_cmp)(const _m_value* x, const _m_value* y);
-
-STC_INLINE void _c_MEMB(_sort)(Self* self) {
-    qsort(self->data, (size_t)self->size, sizeof(_m_value),
-          (int(*)(const void*, const void*))_c_MEMB(_value_cmp));
-}
+#include "algo/sort.h"
 #endif // _i_has_cmp
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
@@ -358,8 +353,8 @@ _c_MEMB(_emplace_n)(Self* self, const isize idx, const _m_raw raw[], isize n) {
     return it;
 }
 #endif // !i_no_emplace
-#if defined _i_has_eq
 
+#if defined _i_has_eq
 STC_DEF _m_iter
 _c_MEMB(_find_in)(_m_iter i1, _m_iter i2, _m_raw raw) {
     const _m_value* p2 = _it2_ptr(i1, i2);
@@ -371,14 +366,7 @@ _c_MEMB(_find_in)(_m_iter i1, _m_iter i2, _m_raw raw) {
     i2.ref = NULL;
     return i2;
 }
-#endif
-#if defined _i_has_cmp
-STC_DEF int _c_MEMB(_value_cmp)(const _m_value* x, const _m_value* y) {
-    const _m_raw rx = i_keytoraw(x);
-    const _m_raw ry = i_keytoraw(y);
-    return i_cmp((&rx), (&ry));
-}
-#endif // _i_has_cmp
+#endif //  _i_has_eq
 #endif // i_implement
 #include "priv/linkage2.h"
 #include "priv/template2.h"

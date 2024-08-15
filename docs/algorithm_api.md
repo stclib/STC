@@ -321,12 +321,12 @@ and typically simpler to use. You may customize `i_type` and the comparison func
 There is a [benchmark/test file here](../misc/benchmarks/various/quicksort_bench.c).
 ```c
 #define i_key int                    // note: "container" type becomes `ints` (i_type can override).
-#include "stc/algo/quicksort.h"
+#include "stc/algo/sort.h"
 #include <stdio.h>
 
 int main(void) {
     int nums[] = {5, 3, 5, 9, 7, 4, 7, 2, 4, 9, 3, 1, 2, 6, 4};
-    ints_quicksort(nums, c_arraylen(nums)); // note: function name derived from i_key
+    ints_sort(nums, c_arraylen(nums)); // note: function name derived from i_key
     c_forrange (i, c_arraylen(arr)) printf(" %d", arr[i]);
 }
 ```
@@ -334,9 +334,8 @@ Also sorting deq/queue (with ring buffer) is possible, and very fast. Note that 
 must be defined to retain the template parameters after #include deq.h for use by quicksort:
 ```c
 #define i_type MyDeq,int
-#define i_more
+#define i_use_cmp // enable sorting
 #include "stc/deq.h" // deque
-#include "stc/algo/quicksort.h"
 #include <stdio.h>
 
 int main(void) {
@@ -345,7 +344,7 @@ int main(void) {
         c_foritems (i, int, {2, 4, 9, 3, 1, 2, 6, 4})
             MyDeq_push_front(&deq, *i.ref);
 
-        MyDeq_quicksort(&deq);
+        MyDeq_sort(&deq);
 
         c_foreach (i, MyDeq, deq)
             printf(" %d", *i.ref);

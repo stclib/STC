@@ -1,9 +1,8 @@
 #include <stdio.h>
 
 #define i_type IVec,int
-#define i_opt c_use_cmp | c_more
+#define i_use_cmp
 #include "stc/vec.h"
-#include "stc/algo/quicksort.h"
 
 #define i_type ISet,int
 #include "stc/sset.h"
@@ -15,7 +14,7 @@ int main(void)
         int key;
         IVec vec = c_init(IVec, {40, 600, 1, 7000, 2, 500, 30});
 
-        IVec_quicksort(&vec);
+        IVec_sort(&vec);
 
         key = 100;
         isize res = IVec_lower_bound(&vec, key);

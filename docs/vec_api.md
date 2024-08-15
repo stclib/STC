@@ -15,10 +15,11 @@ See the c++ class [std::vector](https://en.cppreference.com/w/cpp/container/vect
 #define i_type <ct>,<kt> // shorthand to define i_type,i_key
 #define i_type <t>       // container type name (default: vec_{i_key})
 #define i_key <t>        // element type: REQUIRED. Defines vec_X_value
-#define i_cmp <fn>       // three-way compare two i_keyraw*
-#define i_use_cmp        // may be defined instead of i_cmp when i_key is an integral/native-type.
 #define i_keydrop <fn>   // destroy value func - defaults to empty destruct
 #define i_keyclone <fn>  // REQUIRED IF i_keydrop defined
+
+#define i_use_cmp        // enable sorting, binary_search and lower_bound
+#define i_cmp <fn>       // three-way compare two i_keyraw*
 
 #define i_keyraw <t>     // convertion "raw" type - defaults to i_key
 #define i_keyfrom <fn>   // convertion func i_keyraw => i_key
@@ -49,19 +50,23 @@ isize               vec_X_size(const vec_X* self);
 isize               vec_X_capacity(const vec_X* self);
 
 const vec_X_value*  vec_X_at(const vec_X* self, isize idx);
-const vec_X_value*  vec_X_get(const vec_X* self, i_keyraw raw);           // return NULL if not found
-vec_X_value*        vec_X_at_mut(vec_X* self, isize idx);              // return mutable at idx
-vec_X_value*        vec_X_get_mut(vec_X* self, i_keyraw raw);             // find mutable value
+vec_X_value*        vec_X_at_mut(vec_X* self, isize idx);                       // return mutable at idx
+const vec_X_value*  vec_X_get(const vec_X* self, i_keyraw raw);                 // return NULL if not found
+vec_X_value*        vec_X_get_mut(vec_X* self, i_keyraw raw);                   // find mutable value
+
 vec_X_iter          vec_X_find(const vec_X* self, i_keyraw raw);
-vec_X_iter          vec_X_find_in(vec_X_iter i1, vec_X_iter i2, i_keyraw raw); // return vec_X_end() if not found
-void                vec_X_sort(vec_X* self);                              // qsort() from stdlib.h
+vec_X_iter          vec_X_find_in(vec_X_iter i1, vec_X_iter i2, i_keyraw raw);  // return vec_X_end() if not found
+
+void                vec_X_sort(vec_X* self);                                    // quicksort from algo/sort.h
+isize               vec_X_lower_bound(const vec_X* self, const i_keyraw raw);   // return -1 if not found
+isize               vec_X_binary_search(const vec_X* self, const i_keyraw raw); // return -1 if not found
 
 vec_X_value*        vec_X_front(const vec_X* self);
 vec_X_value*        vec_X_back(const vec_X* self);
 
 vec_X_value*        vec_X_push(vec_X* self, i_key value);
-vec_X_value*        vec_X_emplace(vec_X* self, i_keyraw raw);
 vec_X_value*        vec_X_push_back(vec_X* self, i_key value);            // alias for push
+vec_X_value*        vec_X_emplace(vec_X* self, i_keyraw raw);
 vec_X_value*        vec_X_emplace_back(vec_X* self, i_keyraw raw);        // alias for emplace
 
 void                vec_X_pop(vec_X* self);                               // destroy last element
