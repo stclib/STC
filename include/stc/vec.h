@@ -66,7 +66,7 @@ int main(void) {
 #include <stdlib.h>
 #include <string.h>
 
-#define _it2_ptr(it1, it2) (it1.ref && !it2.ref ? it2.end : it2.ref)
+#define _it2_ptr(it1, it2) (it1.ref && !it2.ref ? it1.end : it2.ref)
 #define _it_ptr(it) (it.ref ? it.ref : it.end)
 #endif // STC_VEC_H_INCLUDED
 
@@ -87,12 +87,11 @@ STC_API _m_iter         _c_MEMB(_erase_n)(Self* self, isize idx, isize n);
 STC_API _m_iter         _c_MEMB(_insert_uninit)(Self* self, isize idx, isize n);
 #if defined _i_has_eq
 STC_API _m_iter         _c_MEMB(_find_in)(_m_iter it1, _m_iter it2, _m_raw raw);
-#endif
-STC_INLINE Self       _c_MEMB(_init)(void) { return c_literal(Self){0}; }
+#endif // _i_has_eq
+STC_INLINE Self         _c_MEMB(_init)(void) { return c_literal(Self){0}; }
 STC_INLINE void         _c_MEMB(_value_drop)(_m_value* val) { i_keydrop(val); }
 
-STC_INLINE _m_value*
-_c_MEMB(_push)(Self* self, _m_value value) {
+STC_INLINE _m_value* _c_MEMB(_push)(Self* self, _m_value value) {
     if (self->size == self->capacity)
         if (!_c_MEMB(_reserve)(self, self->size*2 + 4))
             return NULL;
@@ -108,22 +107,20 @@ STC_INLINE Self _c_MEMB(_from_n)(const _m_raw* raw, isize n)
     { Self cx = {0}; _c_MEMB(_put_n)(&cx, raw, n); return cx; }
 
 #if !defined i_no_emplace
-STC_API _m_iter
-_c_MEMB(_emplace_n)(Self* self, isize idx, const _m_raw raw[], isize n);
+STC_API _m_iter _c_MEMB(_emplace_n)(Self* self, isize idx, const _m_raw raw[], isize n);
 
-STC_INLINE _m_value* _c_MEMB(_emplace)(Self* self, _m_raw raw) {
-    return _c_MEMB(_push)(self, i_keyfrom(raw));
-}
-STC_INLINE _m_value* _c_MEMB(_emplace_back)(Self* self, _m_raw raw) {
-     return _c_MEMB(_push)(self, i_keyfrom(raw));
-}
-STC_INLINE _m_iter _c_MEMB(_emplace_at)(Self* self, _m_iter it, _m_raw raw) {
-    return _c_MEMB(_emplace_n)(self, _it_ptr(it) - self->data, &raw, 1);
-}
+STC_INLINE _m_value* _c_MEMB(_emplace)(Self* self, _m_raw raw)
+    { return _c_MEMB(_push)(self, i_keyfrom(raw)); }
+
+STC_INLINE _m_value* _c_MEMB(_emplace_back)(Self* self, _m_raw raw)
+    { return _c_MEMB(_push)(self, i_keyfrom(raw)); }
+
+STC_INLINE _m_iter _c_MEMB(_emplace_at)(Self* self, _m_iter it, _m_raw raw)
+    { return _c_MEMB(_emplace_n)(self, _it_ptr(it) - self->data, &raw, 1); }
 #endif // !i_no_emplace
 
 #if !defined i_no_clone
-STC_API Self         _c_MEMB(_clone)(Self cx);
+STC_API Self            _c_MEMB(_clone)(Self cx);
 STC_API _m_iter         _c_MEMB(_copy_n)(Self* self, isize idx, const _m_value arr[], isize n);
 
 STC_INLINE _m_value     _c_MEMB(_value_clone)(_m_value val)
@@ -152,22 +149,19 @@ STC_INLINE _m_value*    _c_MEMB(_push_back)(Self* self, _m_value value)
                             { return _c_MEMB(_push)(self, value); }
 STC_INLINE void         _c_MEMB(_pop_back)(Self* self) { _c_MEMB(_pop)(self); }
 
-STC_INLINE Self
-_c_MEMB(_with_size)(const isize size, _m_value null) {
+STC_INLINE Self _c_MEMB(_with_size)(const isize size, _m_value null) {
     Self cx = {0};
     _c_MEMB(_resize)(&cx, size, null);
     return cx;
 }
 
-STC_INLINE Self
-_c_MEMB(_with_capacity)(const isize cap) {
+STC_INLINE Self _c_MEMB(_with_capacity)(const isize cap) {
     Self cx = {0};
     _c_MEMB(_reserve)(&cx, cap);
     return cx;
 }
 
-STC_INLINE void
-_c_MEMB(_shrink_to_fit)(Self* self) {
+STC_INLINE void _c_MEMB(_shrink_to_fit)(Self* self) {
     _c_MEMB(_reserve)(self, _c_MEMB(_size)(self));
 }
 
@@ -179,28 +173,23 @@ _c_MEMB(_insert_n)(Self* self, const isize idx, const _m_value arr[], const isiz
     return it;
 }
 
-STC_INLINE _m_iter
-_c_MEMB(_insert_at)(Self* self, _m_iter it, const _m_value value) {
+STC_INLINE _m_iter _c_MEMB(_insert_at)(Self* self, _m_iter it, const _m_value value) {
     return _c_MEMB(_insert_n)(self, _it_ptr(it) - self->data, &value, 1);
 }
 
-STC_INLINE _m_iter
-_c_MEMB(_erase_at)(Self* self, _m_iter it) {
+STC_INLINE _m_iter _c_MEMB(_erase_at)(Self* self, _m_iter it) {
     return _c_MEMB(_erase_n)(self, it.ref - self->data, 1);
 }
 
-STC_INLINE _m_iter
-_c_MEMB(_erase_range)(Self* self, _m_iter i1, _m_iter i2) {
+STC_INLINE _m_iter _c_MEMB(_erase_range)(Self* self, _m_iter i1, _m_iter i2) {
     return _c_MEMB(_erase_n)(self, i1.ref - self->data, _it2_ptr(i1, i2) - i1.ref);
 }
 
-STC_INLINE const _m_value*
-_c_MEMB(_at)(const Self* self, const isize idx) {
+STC_INLINE const _m_value* _c_MEMB(_at)(const Self* self, const isize idx) {
     c_assert(idx < self->size); return self->data + idx;
 }
 
-STC_INLINE _m_value*
-_c_MEMB(_at_mut)(Self* self, const isize idx) {
+STC_INLINE _m_value* _c_MEMB(_at_mut)(Self* self, const isize idx) {
     c_assert(idx < self->size); return self->data + idx;
 }
 
@@ -239,22 +228,17 @@ STC_INLINE void _c_MEMB(_adjust_end_)(Self* self, isize n)
     { self->size += n; }
 
 #if defined _i_has_eq
-STC_INLINE _m_iter
-_c_MEMB(_find)(const Self* self, _m_raw raw) {
+STC_INLINE _m_iter _c_MEMB(_find)(const Self* self, _m_raw raw) {
     return _c_MEMB(_find_in)(_c_MEMB(_begin)(self), _c_MEMB(_end)(self), raw);
 }
 
-STC_INLINE const _m_value*
-_c_MEMB(_get)(const Self* self, _m_raw raw) {
-    return _c_MEMB(_find)(self, raw).ref;
-}
+STC_INLINE const _m_value* _c_MEMB(_get)(const Self* self, _m_raw raw)
+    { return _c_MEMB(_find)(self, raw).ref; }
 
-STC_INLINE _m_value*
-_c_MEMB(_get_mut)(const Self* self, _m_raw raw)
+STC_INLINE _m_value* _c_MEMB(_get_mut)(const Self* self, _m_raw raw)
     { return (_m_value*) _c_MEMB(_get)(self, raw); }
 
-STC_INLINE bool
-_c_MEMB(_eq)(const Self* self, const Self* other) {
+STC_INLINE bool _c_MEMB(_eq)(const Self* self, const Self* other) {
     if (self->size != other->size) return false;
     for (isize i = 0; i < self->size; ++i) {
         const _m_raw _rx = i_keytoraw((self->data+i)), _ry = i_keytoraw((other->data+i));
@@ -262,13 +246,12 @@ _c_MEMB(_eq)(const Self* self, const Self* other) {
     }
     return true;
 }
-#endif
+#endif // _i_has_eq
 
 #if defined _i_has_cmp
 STC_API int _c_MEMB(_value_cmp)(const _m_value* x, const _m_value* y);
 
-STC_INLINE void
-_c_MEMB(_sort)(Self* self) {
+STC_INLINE void _c_MEMB(_sort)(Self* self) {
     qsort(self->data, (size_t)self->size, sizeof(_m_value),
           (int(*)(const void*, const void*))_c_MEMB(_value_cmp));
 }

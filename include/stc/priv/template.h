@@ -82,7 +82,7 @@
   #if defined i_cmpclass
     #define Self i_type
     #define i_key i_cmpclass
-    #define i_keytoraw(xp) *xp
+    #define i_keytoraw c_default_toraw
   #elif defined _i_is_map
     #define Self c_SELECT(_c_SEL31, i_type)
     #define i_key c_SELECT(_c_SEL32, i_type)
@@ -141,18 +141,18 @@
 #if defined i_keyclass
   #define i_key i_keyclass
   #if !defined i_keyclone && !defined i_no_clone
-    #define i_keyclone c_JOIN(i_key, _clone)
+    #define i_keyclone c_JOIN(i_keyclass, _clone)
   #endif
   #ifndef i_keydrop
-    #define i_keydrop c_JOIN(i_key, _drop)
+    #define i_keydrop c_JOIN(i_keyclass, _drop)
   #endif
   #if !defined i_keyfrom && defined i_keyraw
-    #define i_keyfrom c_JOIN(i_key, _from)
+    #define i_keyfrom c_JOIN(i_keyclass, _from)
   #elif !defined i_keyfrom && !defined i_no_clone
-    #define i_keyfrom c_JOIN(i_key, _clone)
+    #define i_keyfrom c_JOIN(i_keyclass, _clone)
   #endif
   #if !defined i_keytoraw && defined i_keyraw
-    #define i_keytoraw c_JOIN(i_key, _toraw)
+    #define i_keytoraw c_JOIN(i_keyclass, _toraw)
   #endif
 #endif
 
@@ -165,15 +165,15 @@
 #endif
 
 // Bind to i_keyraw "class members": _cmp, _eq and _hash (when conditions are met).
-#if defined i_cmpclass
+#if defined i_cmpclass // => i_keyraw
   #if !(defined i_cmp || defined i_less) && (defined i_use_cmp || defined _i_sorted || defined _i_ispque)
-    #define i_cmp c_JOIN(i_keyraw, _cmp)
+    #define i_cmp c_JOIN(i_cmpclass, _cmp)
   #endif
   #if !defined i_eq && (defined i_use_eq || defined i_hash || defined _i_is_hash)
-    #define i_eq c_JOIN(i_keyraw, _eq)
+    #define i_eq c_JOIN(i_cmpclass, _eq)
   #endif
   #if !(defined i_hash || defined i_no_hash)
-    #define i_hash c_JOIN(i_keyraw, _hash)
+    #define i_hash c_JOIN(i_cmpclass, _hash)
   #endif
 #endif
 
@@ -197,12 +197,12 @@
 // Fill in missing i_eq, i_less, i_cmp functions with defaults.
 #if !defined i_eq && defined i_cmp
   #define i_eq(x, y) (i_cmp(x, y)) == 0
-#elif !defined i_eq // && !defined i_keyraw
+#elif !defined i_eq
   #define i_eq(x, y) *x == *y // works for integral types
 #endif
 #if !defined i_less && defined i_cmp
   #define i_less(x, y) (i_cmp(x, y)) < 0
-#elif !defined i_less // && !defined i_keyraw
+#elif !defined i_less
   #define i_less(x, y) *x < *y // works for integral types
 #endif
 #if !defined i_cmp && defined i_less
@@ -246,18 +246,18 @@
 #ifdef i_valclass
   #define i_val i_valclass
   #if !defined i_valclone && !defined i_no_clone
-    #define i_valclone c_JOIN(i_val, _clone)
+    #define i_valclone c_JOIN(i_valclass, _clone)
   #endif
   #ifndef i_valdrop
-    #define i_valdrop c_JOIN(i_val, _drop)
+    #define i_valdrop c_JOIN(i_valclass, _drop)
   #endif
   #if !defined i_valfrom && defined i_valraw
-    #define i_valfrom c_JOIN(i_val, _from)
+    #define i_valfrom c_JOIN(i_valclass, _from)
   #elif !defined i_valfrom && !defined i_no_clone
-    #define i_valfrom c_JOIN(i_val, _clone)
+    #define i_valfrom c_JOIN(i_valclass, _clone)
   #endif
   #if !defined i_valtoraw && defined i_valraw
-    #define i_valtoraw c_JOIN(i_val, _toraw)
+    #define i_valtoraw c_JOIN(i_valclass, _toraw)
   #endif
 #endif
 
