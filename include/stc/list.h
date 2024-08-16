@@ -26,28 +26,32 @@
     it also support both push_back() and push_front(), unlike std::forward_list:
 
     #include <stdio.h>
-    #include "stc/crand.h"
+    #include "stc/algo/random.h"
 
-    #define i_type list_ix,int64_t
+    #define i_type List,long
+    #define i_use_cmp // enable sorting, use default *x < *y comparison
     #include "stc/list.h"
 
     int main(void)
     {
-        c_with (list_ix list = {0}, list_ix_drop(&list))
-        {
-            int n;
-            for (int i = 0; i < 1000000; ++i) // one million
-                list_ix_push_back(&list, crand() >> 32);
-            n = 0;
-            c_foreach (i, clist_ix, list)
-                if (++n % 10000 == 0) printf("%8d: %10zu\n", n, *i.ref);
-            // Sort them...
-            list_ix_sort(&list); // qsort O(n*log n)
-            n = 0;
-            puts("sorted");
-            c_foreach (i, list_ix, list)
-                if (++n % 10000 == 0) printf("%8d: %10zu\n", n, *i.ref);
-        }
+        List list = {0};
+
+        for (int i = 0; i < 5000000; ++i) // five million
+            List_push_back(&list, crandom() & (1<<24) - 1;
+
+        int n = 0;
+        c_foreach (i, List, list)
+            if (++n % 100000 == 0) printf("%8d: %10zu\n", n, *i.ref);
+
+        // Sort them...
+        List_sort(&list); // algo/sort.h quicksort
+
+        n = 0;
+        puts("sorted");
+        c_foreach (i, List, list)
+            if (++n % 100000 == 0) printf("%8d: %10zu\n", n, *i.ref);
+
+        List_drop(&list);
     }
 */
 #include "priv/linkage.h"
