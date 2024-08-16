@@ -1,4 +1,4 @@
-# STC [crand](../include/stc/crand.h): Pseudo Random Number Generator
+# STC [crandom](../include/stc/algo/random.h): Pseudo Random Number Generator
 ![Random](pics/random.jpg)
 
 This features a *64-bit PRNG* named **crand64**, and can generate bounded uniform and normal
@@ -30,38 +30,33 @@ correlation tests. The 16- and 32-bit variants also passes PractRand up to their
 
 All crand definitions and prototypes are available by including a single header file.
 ```c
-#include "stc/crand.h"
+#include "stc/algo/random.h"
 ```
 
 ## Methods
 
 ```c
-void                csrand(uint64_t seed);                                // seed global crand64 prng
-uint64_t            crand(void);                                          // global crand_u64(rng)
-double              crandf(void);                                         // global crand_f64(rng)
+void        csrandom(uint64_t seed);                    // seed global crand64 prng
+uint64_t    crandom(void);                              // global crandom_r(rng)
+double      crandom_float(void);                        // global crandom_float_r(rng)
+double      crandom_normal(crandom_normal_distr* d);    // global crandom_normal_r(rng, d)
 
-crand_t             crand_init(uint64_t seed);
-uint64_t            crand_u64(crand_t* rng);                              // range [0, 2^64 - 1]
-double              crand_f64(crand_t* rng);                              // range [0.0, 1.0)
-
-crand_uniform_t     crand_uniform_init(int64_t low, int64_t high);        // uniform-distribution range
-int64_t             crand_uniform(crand_t* rng, crand_uniform_t* dist);
-
-crand_normal_t      crand_normal_init(double mean, double stddev);        // normal-gauss distribution
-double              crand_normal(crand_t* rng, crand_normal_t* dist);
+crandom_s   crandom_rng(uint64_t seed);
+uint64_t    crandom_r(crandom_s* rng);                  // range [0, 2^64 - 1]
+double      crandom_float_r(crandom_s* rng);            // range [0.0, 1.0)
+double      crandom_normal_r(crandom_s* rng, crandom_normal_distr* d);
 ```
 ## Types
 
-| Name               | Type definition                           | Used to represent...         |
-|:-------------------|:------------------------------------------|:-----------------------------|
-| `crand_t`          | `struct {uint64_t state[4];}`             | The PRNG engine type         |
-| `crand_uniform_t`  | `struct {int64_t lower; uint64_t range;}` | Integer uniform distribution |
-| `crand_normal_t`   | `struct {double mean, stddev;}`           | Normal distribution type     |
+| Name                   | Type definition                   | Used to represent...         |
+|:-----------------------|:----------------------------------|:-----------------------------|
+| `crandom_s`            | `struct {uint64_t data[3];}`      | The PRNG engine type         |
+| `crandom_normal_distr` | `struct {double mean, stddev;}`   | Normal distribution type     |
 
 ## Example
 ```c
 #include <time.h>
-#include "stc/crand.h"
+#include "stc/algo/random.h"
 #define i_implement
 #include "stc/cstr.h"
 
@@ -78,13 +73,13 @@ int main(void)
 
     // Setup random engine with normal distribution.
     uint64_t seed = time(NULL);
-    crand_t rng = crand_init(seed);
-    crand_normal_t dist = crand_normal_init(Mean, StdDev);
+    crandom_s rng = crandom_rng(seed);
+    crandom_normal_distr dist = {.mean=Mean, .stddev=StdDev};
 
     // Create histogram map
     smap_i mhist = {0};
     c_forrange (N) {
-        int index = (int)round(crand_normal(&rng, &dist));
+        int index = (int)round(crandom_normal_r(&rng, &dist));
         smap_i_emplace(&mhist, index, 0).ref->second += 1;
     }
 

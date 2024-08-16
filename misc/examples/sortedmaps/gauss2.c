@@ -3,7 +3,7 @@
 
 #define i_implement
 #include "stc/cstr.h"
-#include "stc/crand.h"
+#include "stc/algo/random.h"
 
 // Declare int -> int sorted map.
 #define i_key int
@@ -14,21 +14,23 @@ int main(void)
 {
     enum {N = 5000000};
     uint64_t seed = (uint64_t)time(NULL);
-    crand_t rng = crand_init(seed);
-    const double Mean = round(crand_f64(&rng)*98.0 - 49.0), StdDev = crand_f64(&rng)*10.0 + 1.0, Scale = 74.0;
+    csrandom(seed);
+    const double Mean = round(crandom_float()*98.0 - 49.0),
+                 StdDev = crandom_float()*10.0 + 1.0,
+                 Scale = 74.0;
 
     printf("Demo of gaussian / normal distribution of %d random samples\n", N);
     printf("Mean %f, StdDev %f\n", Mean, StdDev);
 
     // Setup random engine with normal distribution.
-    crand_normal_t dist = crand_normal_init(Mean, StdDev);
+    crandom_normal_distr dist = {.mean=Mean, .stddev=StdDev};
 
     // Create and init histogram map with defered destruct
     smap_int hist = {0};
     cstr bar = {0};
 
     c_forrange (N) {
-        int index = (int)round(crand_normal(&rng, &dist));
+        int index = (int)round(crandom_normal(&dist));
         smap_int_insert(&hist, index, 0).ref->second += 1;
     }
 

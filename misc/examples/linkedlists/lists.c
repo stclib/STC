@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <time.h>
 #include "stc/algorithm.h"
-#include "stc/crand.h"
 
 #define i_type DList,double
 #define i_use_cmp
@@ -11,10 +10,10 @@ int main(void) {
     const int n = 3000000;
     DList list = {0};
 
-    csrand(1234567);
+    csrandom(1234567);
     int m = 0;
     c_forrange (n)
-        DList_push_back(&list, crandf()*n + 100), ++m;
+        DList_push_back(&list, crandom_float()*n + 100), ++m;
 
     printf("sum of %d: ", m);
     double sum = 0.0;
@@ -22,14 +21,14 @@ int main(void) {
     printf("%f\n", sum);
 
     // Print 10 first items using c_filter:
-    c_filter(DList, list, true 
+    c_filter(DList, list, true
         && c_flt_take(10)
         && printf("%4d: %10f\n", c_flt_getcount(), *value));
 
     puts("sort:");
     DList_sort(&list); // qsort O(n*log n)
 
-    c_filter(DList, list, true 
+    c_filter(DList, list, true
         && c_flt_take(10)
         && printf("%4d: %10f\n", c_flt_getcount(), *value));
 

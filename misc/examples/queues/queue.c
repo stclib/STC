@@ -1,4 +1,4 @@
-#include "stc/crand.h"
+#include "stc/algo/random.h"
 #include <stdio.h>
 
 #define i_type queue_i, int
@@ -6,20 +6,18 @@
 
 int main(void) {
     int n = 1000000;
-    crand_uniform_t dist;
-    crand_t rng = crand_init(1234);
-    dist = crand_uniform_init(0, n);
+    crandom_s rng = crandom_rng(1234);
 
     queue_i queue = {0};
 
     // Push ten million random numbers onto the queue.
     c_forrange (n)
-        queue_i_push(&queue, (int)crand_uniform(&rng, &dist));
+        queue_i_push(&queue, crandom_r(&rng) & ((1 << 20) - 1));
 
     // Push or pop on the queue ten million times
     printf("%d\n", n);
     c_forrange (n) { // forrange uses initial n only.
-        int r = (int)crand_uniform(&rng, &dist);
+        int r = (int)crandom_r(&rng) & ((1 << 20) - 1);
         if (r & 1)
             ++n, queue_i_push(&queue, r);
         else

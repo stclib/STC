@@ -1,7 +1,7 @@
 #define i_type ivec,int
 #define i_use_cmp
 #include "stc/vec.h"
-#include "stc/crand.h"
+#include "stc/algo/random.h"
 
 #include <stdio.h>
 #include <time.h>
@@ -17,7 +17,7 @@ int main(int argc, char const *argv[])
     unsigned mask = (1 << 23) - 1;
     ivec v = {0};
     c_forrange (i, N)
-        ivec_push(&v, crand() & mask);
+        ivec_push(&v, crandom() & mask);
 
     ivec_sort(&v);
 
@@ -25,7 +25,7 @@ int main(int argc, char const *argv[])
     clock_t t = clock();
     //csrand(0);
     c_forrange (i, N) {
-        uint64_t r = crand() & mask;
+        uint64_t r = crandom() & mask;
         #ifdef __cplusplus
           #define LABEL "std::binary_search"
           count += std::binary_search(v.data, v.data + ivec_size(&v), r);

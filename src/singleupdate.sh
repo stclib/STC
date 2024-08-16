@@ -4,6 +4,7 @@ python singleheader.py $d/include/c11/fmt.h   $d/../stcsingle/c11/fmt.h
 python singleheader.py $d/include/stc/algorithm.h $d/../stcsingle/stc/algorithm.h
 python singleheader.py $d/include/stc/coroutine.h $d/../stcsingle/stc/coroutine.h
 python singleheader.py $d/include/stc/algo/sort.h $d/../stcsingle/stc/algo/sort.h
+python singleheader.py $d/include/stc/algo/crandom.h $d/../stcsingle/stc/algo/crandom.h
 python singleheader.py $d/include/stc/arc.h    $d/../stcsingle/stc/arc.h
 python singleheader.py $d/include/stc/cbits.h   $d/../stcsingle/stc/cbits.h
 python singleheader.py $d/include/stc/box.h    $d/../stcsingle/stc/box.h
@@ -14,7 +15,6 @@ python singleheader.py $d/include/stc/hmap.h    $d/../stcsingle/stc/hmap.h
 python singleheader.py $d/include/stc/coption.h $d/../stcsingle/stc/coption.h
 python singleheader.py $d/include/stc/pque.h   $d/../stcsingle/stc/pque.h
 python singleheader.py $d/include/stc/queue.h  $d/../stcsingle/stc/queue.h
-python singleheader.py $d/include/stc/crand.h   $d/../stcsingle/stc/crand.h
 python singleheader.py $d/include/stc/cregex.h  $d/../stcsingle/stc/cregex.h
 python singleheader.py $d/include/stc/hset.h    $d/../stcsingle/stc/hset.h
 python singleheader.py $d/include/stc/smap.h   $d/../stcsingle/stc/smap.h

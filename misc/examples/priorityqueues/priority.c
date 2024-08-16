@@ -1,7 +1,7 @@
 
 #include <stdio.h>
 #include <time.h>
-#include "stc/crand.h"
+#include "stc/algo/random.h"
 
 #define i_type PQueue,int
 #define i_cmp -c_default_cmp  // min-heap (increasing values)
@@ -9,22 +9,20 @@
 
 int main(void) {
     int N = 10000000;
-    crand_t rng = crand_init((uint64_t)time(NULL));
-    crand_uniform_t dist = crand_uniform_init(0, N * 10);
-
+    crandom_s rng = crandom_rng(time(NULL));
     PQueue heap = {0};
 
     // Push ten million random numbers to priority queue
     printf("Push %d numbers\n", N);
     c_forrange (N)
-        PQueue_push(&heap, (int)crand_uniform(&rng, &dist));
+        PQueue_push(&heap, crandom_r(&rng) & ((1<<20) - 1));
 
     // push some negative numbers too.
     c_foritems (i, int, {-231, -32, -873, -4, -343})
         PQueue_push(&heap, *i.ref);
 
     c_forrange (N)
-        PQueue_push(&heap, (int)crand_uniform(&rng, &dist));
+        PQueue_push(&heap, crandom_r(&rng) & ((1<<20) - 1));
 
     puts("Extract the hundred smallest.");
     c_forrange (100) {

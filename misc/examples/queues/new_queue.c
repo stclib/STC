@@ -1,4 +1,4 @@
-#include "stc/crand.h"
+#include "stc/algo/random.h"
 #include "stc/types.h"
 #include <stdio.h>
 #include <time.h>
@@ -15,20 +15,19 @@ typedef struct Point { int x, y; } Point;
 
 int main(void) {
     int n = 50000000;
-    crand_t rng = crand_init((uint64_t)time(NULL));
-    crand_uniform_t dist = crand_uniform_init(0, n);
+    crandom_s rng = crandom_rng(time(NULL));
 
     IntQ Q = {0};
 
     // Push 50'000'000 random numbers onto the queue.
     c_forrange (n)
-        IntQ_push(&Q, (int)crand_uniform(&rng, &dist));
+        IntQ_push(&Q, crandom_r(&rng) & ((1<<24) - 1));
 
     // Push or pop on the queue 50 million times
     printf("befor: size %" c_ZI ", capacity %" c_ZI "\n", IntQ_size(&Q), IntQ_capacity(&Q));
 
     c_forrange (n) {
-        int r = (int)crand_uniform(&rng, &dist);
+        int r = crandom_r(&rng) & ((1<<24) - 1);
         if (r & 3)
             IntQ_push(&Q, r);
         else

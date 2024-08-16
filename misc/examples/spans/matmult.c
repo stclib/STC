@@ -59,7 +59,7 @@ void recursive_matrix_product(Mat A, Mat B, OutMat C)
 
 #define i_type Values,double
 #include "stc/stack.h"
-#include "stc/crand.h"
+#include "stc/algo/random.h"
 
 int main(void)
 {
@@ -67,7 +67,7 @@ int main(void)
 
   Values values = {0};
   for (int i=0; i < N*D1*D2; ++i)
-      Values_push(&values, (crandf() - 0.5)*4.0);
+      Values_push(&values, (crandom_float() - 0.5)*4.0);
 
   double out[D1*D2];
   Mat3 data = cspan_md_layout(c_ROWMAJOR, values.data, N, D1, D2);

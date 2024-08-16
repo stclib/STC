@@ -1,7 +1,7 @@
 // https://en.wikipedia.org/wiki/Dining_philosophers_problem
 #include <stdio.h>
 #include <time.h>
-#include "stc/crand.h"
+#include "stc/algo/random.h"
 #include "stc/coroutine.h"
 
 // Define the number of philosophers and forks
@@ -32,7 +32,7 @@ int philosopher(struct Philosopher* p)
     double duration;
     cco_scope(p) {
         while (1) {
-            duration = 1.0 + crandf()*2.0;
+            duration = 1.0 + crandom_float()*2.0;
             printf("Philosopher %d is thinking for %.0f minutes...\n", p->id, duration*10);
             cco_await_timer(&p->tm, duration);
 
@@ -40,7 +40,7 @@ int philosopher(struct Philosopher* p)
             cco_await_semaphore(p->left_fork);
             cco_await_semaphore(p->right_fork);
 
-            duration = 0.5 + crandf();
+            duration = 0.5 + crandom_float();
             printf("Philosopher %d is eating for %.0f minutes...\n", p->id, duration*10);
             cco_await_timer(&p->tm, duration);
 
@@ -92,7 +92,7 @@ int main(void)
     cco_reset(&dine);
     int n=0;
     cco_timer tm = cco_timer_from(5.0); // seconds
-    csrand((uint64_t)time(NULL));
+    csrandom((uint64_t)time(NULL));
 
     cco_run_coroutine(dining(&dine))
     {

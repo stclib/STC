@@ -61,7 +61,7 @@ i_key               pque_X_value_clone(i_key value);
 
 ## Example
 ```c
-#include "stc/crand.h"
+#include "stc/algo/random.h"
 #include <stdio.h>
 
 #define i_type PriorityQ, int64_t
@@ -71,14 +71,11 @@ i_key               pque_X_value_clone(i_key value);
 int main(void)
 {
     isize N = 10000000;
-    crand_t rng = crand_init(1234);
-    crand_uniform_t dist = crand_uniform_init(0, N * 10);
-
     PriorityQ numbers = {0};
 
     // Push ten million random numbers to priority queue.
     c_forrange (N)
-        PriorityQ_push(&numbers, crand_uniform(&rng, &dist));
+        PriorityQ_push(&numbers, crandom() & ((1 << 21) - 1));
 
     // Add some negative ones.
     int nums[] = {-231, -32, -873, -4, -343};

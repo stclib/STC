@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <time.h>
-#include "stc/crand.h"
+#include "stc/algo/random.h"
 
 #define MAX_LOAD_FACTOR 80
 
@@ -230,7 +230,7 @@ KHASH_MAP_INIT_INT64(ii, IValue)
 void fisher_yates_shuffle(IKey a[], size_t n) {
     --n;
     for (size_t i = 0; i < n; i++) {
-        size_t j = i + (crand() % (n - i)); // swap element with random later element
+        size_t j = i + (crandom() % (n - i)); // swap element with random later element
         IKey t = a[i];
         a[i] = a[j];
         a[j] = t;

@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <time.h>
 #define i_static
-#include "stc/crand.h"
+#include "stc/algo/random.h"
 
 #ifdef __cplusplus
 #include <vector>
@@ -27,8 +27,8 @@ Sample test_std_vector() {
     {
         s.test[INSERT].t1 = clock();
         container con;
-        csrand(seed);
-        c_forrange (N) con.push_back(crand() & mask1);
+        csrandom(seed);
+        c_forrange (N) con.push_back(crandom() & mask1);
         s.test[INSERT].t2 = clock();
         s.test[INSERT].sum = con.size();
         s.test[ERASE].t1 = clock();
@@ -37,8 +37,8 @@ Sample test_std_vector() {
         s.test[ERASE].sum = con.size();
      }{
         container con;
-        csrand(seed);
-        c_forrange (N) con.push_back(crand() & mask2);
+        csrandom(seed);
+        c_forrange (N) con.push_back(crandom() & mask2);
         s.test[FIND].t1 = clock();
         uint64_t sum = 0;
         c_forrange (R) c_forrange (i, N) sum += con[i];
@@ -66,8 +66,8 @@ Sample test_stc_vector() {
     {
         s.test[INSERT].t1 = clock();
         vec_u64 con = {0};
-        csrand(seed);
-        c_forrange (N) vec_u64_push(&con, crand() & mask1);
+        csrandom(seed);
+        c_forrange (N) vec_u64_push(&con, crandom() & mask1);
         s.test[INSERT].t2 = clock();
         s.test[INSERT].sum = vec_u64_size(&con);
         s.test[ERASE].t1 = clock();
@@ -76,9 +76,9 @@ Sample test_stc_vector() {
         s.test[ERASE].sum = vec_u64_size(&con);
         vec_u64_drop(&con);
      }{
-        csrand(seed);
+        csrandom(seed);
         vec_u64 con = {0};
-        c_forrange (N) vec_u64_push(&con, crand() & mask2);
+        c_forrange (N) vec_u64_push(&con, crandom() & mask2);
         s.test[FIND].t1 = clock();
         uint64_t sum = 0;
         c_forrange (R) c_forrange (i, N) sum += con.data[i];

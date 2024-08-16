@@ -1,7 +1,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <time.h>
-#include "stc/crand.h"
+#include "stc/algo/random.h"
 
 #define i_type hmap_ui, uint64_t, int
 #include "stc/hmap.h"
@@ -15,11 +15,11 @@ static void test_repeats(void)
     static const uint64_t mask = (1ull << BITS) - 1;
 
     printf("birthday paradox: value range: 2^%d, testing repeats of 2^%d values\n", BITS, BITS_TEST);
-    crand_t rng = crand_init(seed);
+    crandom_s rng = crandom_rng(seed);
 
     hmap_ui m = hmap_ui_with_capacity(N);
     c_forrange (i, N) {
-        uint64_t k = crand_u64(&rng) & mask;
+        uint64_t k = crandom_r(&rng) & mask;
         int v = hmap_ui_insert(&m, k, 0).ref->second += 1;
         if (v > 1) printf("repeated value %" PRIu64 " (%d) at 2^%d\n",
                           k, v, (int)log2((double)i));
@@ -34,12 +34,12 @@ void test_distribution(void)
 {
     enum {BITS = 26};
     printf("distribution test: 2^%d values\n", BITS);
-    crand_t rng = crand_init(seed);
+    crandom_s rng = crandom_rng(seed);
     const size_t N = 1ull << BITS ;
 
     hmap_uu map = {0};
     c_forrange (N) {
-        uint64_t k = crand_u64(&rng);
+        uint64_t k = crandom_r(&rng);
         hmap_uu_insert(&map, k & 0xf, 0).ref->second += 1;
     }
 
