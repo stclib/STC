@@ -100,10 +100,7 @@ STC_API _m_iter         _c_MEMB(_find_in)(_m_iter it1, _m_iter it2, _m_raw val);
 STC_API isize           _c_MEMB(_remove)(Self* self, _m_raw val);
 #endif
 #if defined _i_has_cmp
-STC_API bool            _c_MEMB(_sort_with)(Self* self, int(*cmp)(const _m_value*, const _m_value*));
-STC_API int             _c_MEMB(_sort_cmp_)(const _m_value*, const _m_value*);
-STC_INLINE bool         _c_MEMB(_sort)(Self* self)
-                            { return _c_MEMB(_sort_with)(self, _c_MEMB(_sort_cmp_)); }
+STC_API bool            _c_MEMB(_sort)(Self* self);
 #endif
 STC_API void            _c_MEMB(_reverse)(Self* self);
 STC_API _m_iter         _c_MEMB(_splice)(Self* self, _m_iter it, Self* other);
@@ -384,12 +381,11 @@ _c_MEMB(_remove)(Self* self, _m_raw val) {
 #endif
 
 #if defined _i_has_cmp
-STC_DEF int _c_MEMB(_sort_cmp_)(const _m_value* x, const _m_value* y) {
-    const _m_raw a = i_keytoraw(x), b = i_keytoraw(y);
-    return i_cmp((&a), (&b));
-}
+#define _sort_ij _sort_ij_
+#include "algo/sort.h"
+#undef _sort_ij
 
-STC_DEF bool _c_MEMB(_sort_with)(Self* self, int(*cmp)(const _m_value*, const _m_value*)) {
+STC_DEF bool _c_MEMB(_sort)(Self* self) {
     isize len = 0, cap = 0;
     _m_value *arr = NULL, *p = NULL;
     c_foreach (i, Self, *self) {
@@ -401,7 +397,10 @@ STC_DEF bool _c_MEMB(_sort_with)(Self* self, int(*cmp)(const _m_value*, const _m
         }
         arr[len++] = *i.ref;
     }
-    qsort(arr, (size_t)len, sizeof *arr, (int(*)(const void*, const void*))cmp);
+    _m_node* keep = self->last;
+    self->last = (_m_node *)arr;
+    _c_MEMB(_sort_ij_)(self, 0, len - 1);
+    self->last = keep;
     c_foreach (i, Self, *self)
         *i.ref = *p++;
     done: i_free(arr, cap*c_sizeof *arr);

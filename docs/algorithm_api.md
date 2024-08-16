@@ -330,8 +330,7 @@ int main(void) {
     c_forrange (i, c_arraylen(arr)) printf(" %d", arr[i]);
 }
 ```
-Also sorting deq/queue (with ring buffer) is possible, and very fast. Note that `i_more`
-must be defined to retain the template parameters after #include deq.h for use by quicksort:
+Also deq/queue (with ring buffer) and linked lists may be sorted, e.g.:
 ```c
 #define i_type MyDeq,int
 #define i_use_cmp // enable sorting

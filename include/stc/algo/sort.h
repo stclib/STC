@@ -92,16 +92,20 @@ int main(void) {
   #define i_at(arr, idx) (&(arr)[idx])
   #define i_at_mut i_at
   #include "../priv/template.h"
+#elif defined _sort_ij // from list.h
+  #define i_at(self, idx) (&((_m_value *)(self)->last)[idx])
+  #define i_at_mut i_at
 #else
   #define i_at(self, idx) _c_MEMB(_at)(self, idx)
   #define i_at_mut(self, idx) _c_MEMB(_at_mut)(self, idx)
 #endif
 
 STC_API void _c_MEMB(_sort_ij)(Self* self, isize lo, isize hi);
+
+#ifdef _i_is_array
 STC_API isize _c_MEMB(_lower_bound_range)(const Self* self, const _m_raw raw, isize first, isize last);
 STC_API isize _c_MEMB(_binary_search_range)(const Self* self, const _m_raw raw, isize first, isize last);
 
-#ifdef _i_is_array
 static inline void _c_MEMB(_sort)(Self* arr, isize n)
     { _c_MEMB(_sort_ij)(arr, 0, n - 1); }
 
@@ -113,7 +117,9 @@ static inline isize // -1 = not found
 _c_MEMB(_binary_search)(const Self* arr, const _m_raw raw, isize n)
     { return _c_MEMB(_binary_search_range)(arr, raw, 0, n); }
 
-#else
+#elif !defined _sort_ij
+STC_API isize _c_MEMB(_lower_bound_range)(const Self* self, const _m_raw raw, isize first, isize last);
+STC_API isize _c_MEMB(_binary_search_range)(const Self* self, const _m_raw raw, isize first, isize last);
 
 static inline void _c_MEMB(_sort)(Self* self)
     { _c_MEMB(_sort_ij)(self, 0, _c_MEMB(_size)(self) - 1); }
@@ -167,6 +173,7 @@ STC_DEF void _c_MEMB(_sort_ij)(Self* self, isize lo, isize hi) {
     }
 }
 
+#ifndef _sort_ij
 STC_DEF isize // -1 = not found
 _c_MEMB(_lower_bound_range)(const Self* self, const _m_raw raw, isize first, isize last) {
     isize count = last - first, step = count/2;
@@ -197,6 +204,7 @@ _c_MEMB(_binary_search_range)(const Self* self, const _m_raw raw, isize first, i
     }
     return res;
 }
+#endif // _sort_ij
 #endif // IMPLEMENTATION
 
 #ifdef _i_is_array
