@@ -17,7 +17,7 @@ void std_test(void)
     csrandom(seed);
     clock_t start = clock();
     c_forrange (i, N)
-        pq.push((float) crandom_float()*100000.0);
+        pq.push((float) crandom_real()*100000.0);
 
     printf("Built priority queue: %f secs\n", (float)(clock() - start)/(float)CLOCKS_PER_SEC);
     printf("%g ", pq.top());
@@ -41,7 +41,7 @@ void stc_test(void)
         csrandom(seed);
         clock_t start = clock();
         c_forrange (i, N) {
-            PrQue_push(&pq, (float)crandom_float()*100000);
+            PrQue_push(&pq, (float)crandom_real()*100000);
         }
 
         printf("Built priority queue: %f secs\n", (float)(clock() - start)/(float)CLOCKS_PER_SEC);

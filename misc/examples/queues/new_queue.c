@@ -15,7 +15,7 @@ typedef struct Point { int x, y; } Point;
 
 int main(void) {
     int n = 50000000;
-    crandom_s rng = crandom_rng(time(NULL));
+    crandom_s rng = crandom_make(time(NULL));
 
     IntQ Q = {0};
 

@@ -6,7 +6,7 @@
 
 int main(void) {
     int n = 1000000;
-    crandom_s rng = crandom_rng(1234);
+    crandom_s rng = crandom_make(1234);
 
     queue_i queue = {0};
 

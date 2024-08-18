@@ -1,34 +1,11 @@
 # STC [crandom](../include/stc/algo/random.h): Pseudo Random Number Generator
 ![Random](pics/random.jpg)
 
-This features a *64-bit PRNG* named **crand64**, and can generate bounded uniform and normal
+This features a *64-bit or 32-bit PRNG* named **crandom**, and can generate integers and normal
 distributed random numbers.
 
 See [random](https://en.cppreference.com/w/cpp/header/random) for similar c++ functionality.
 
-## Description
-
-**crand64** is a very fast PRNG, suited for parallel usage. It is based on *sfc64*, but has a
-different output function and state size. It features a Weyl-sequence as part of its state.
-
-**crand64** is faster or equally fast as *wyrand*, *xoshiro\*\**, *sfc64*, and *romu_trio*
-with both **clang 16.0** and **gcc 13.1** from the [prng_bench.c](../misc/benchmarks/various/prng_bench.cpp)
-on windows 11, Ryzen 7 5700X. (clang does not optimize *xoshiro\*\** and *sfc64* as well as gcc does).
-
-**crand64** has no jump *function*, but each odd number Weyl-increment (state[4]) starts a new
-unique 2^64 *minimum* length period, i.e. virtually unlimitied number of unique threads.
-In contrast, *wyrand* and *sfc64* have only a (total) minimum period of 2^64 (*romu_trio* has
-no guarantees), and may therefore not be suited for massive parallel usage (for purists).
-
-**crand64** does not require multiplication or 128-bit integer operations. It has 320 bit state,
-where 64-bits are constant per instance.
-
-**crand64** passes *PractRand* (tested up to 8TB output), Vigna's Hamming weight test, and simple
-correlation tests. The 16- and 32-bit variants also passes PractRand up to their size limits.
-
-## Header file
-
-All crand definitions and prototypes are available by including a single header file.
 ```c
 #include "stc/algo/random.h"
 ```
@@ -36,21 +13,21 @@ All crand definitions and prototypes are available by including a single header 
 ## Methods
 
 ```c
-void        csrandom(uint64_t seed);                    // seed global crand64 prng
-uint64_t    crandom(void);                              // global crandom_r(rng)
-double      crandom_float(void);                        // global crandom_float_r(rng)
-double      crandom_normal(crandom_normal_distr* d);    // global crandom_normal_r(rng, d)
+void        csrandom(uintptr_t seed);                   // seed global crand64 prng
+uintptr_t   crandom(void);                              // global crandom_r(rng)
+cranreal    crandom_real(void);                         // global crandom_real_r(rng)
+cranreal    crandom_normal(crandom_normal_distr* d);    // global crandom_normal_r(rng, d)
 
-crandom_s   crandom_rng(uint64_t seed);
-uint64_t    crandom_r(crandom_s* rng);                  // range [0, 2^64 - 1]
-double      crandom_float_r(crandom_s* rng);            // range [0.0, 1.0)
-double      crandom_normal_r(crandom_s* rng, crandom_normal_distr* d);
+crandom_s   crandom_make(uintptr_t seed);               // make a crandom_s from a seed value
+uintptr_t   crandom_r(crandom_s* rng);                  // range [0, UINTPTR_MAX]
+cranreal    crandom_real_r(crandom_s* rng);             // range [0.0, 1.0)
+cranreal    crandom_normal_r(crandom_s* rng, crandom_normal_distr* d);
 ```
 ## Types
 
 | Name                   | Type definition                   | Used to represent...         |
 |:-----------------------|:----------------------------------|:-----------------------------|
-| `crandom_s`            | `struct {uint64_t data[3];}`      | The PRNG engine type         |
+| `crandom_s`            | `struct {uintptr_t data[3];}`     | The PRNG engine type         |
 | `crandom_normal_distr` | `struct {double mean, stddev;}`   | Normal distribution type     |
 
 ## Example
@@ -73,7 +50,7 @@ int main(void)
 
     // Setup random engine with normal distribution.
     uint64_t seed = time(NULL);
-    crandom_s rng = crandom_rng(seed);
+    crandom_s rng = crandom_make(seed);
     crandom_normal_distr dist = {.mean=Mean, .stddev=StdDev};
 
     // Create histogram map

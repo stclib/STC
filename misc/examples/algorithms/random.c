@@ -7,7 +7,7 @@ int main(void)
 {
     const long long N = 10000000, range = 1000000;
     const uint64_t seed = (uint64_t)time(NULL);
-    crandom_s rng = crandom_rng(seed);
+    crandom_s rng = crandom_make(seed);
     clock_t t;
 
     printf("Compare speed of full and unbiased ranged random numbers...\n");
@@ -21,7 +21,7 @@ int main(void)
            (double)t/CLOCKS_PER_SEC, N, (double)(sum/N));
 
     sum = 0;
-    rng = crandom_rng(seed);
+    rng = crandom_make(seed);
     t = clock();
     c_forrange (N)  {
         sum += (int32_t)crandom_r(&rng) % (range + 1); // biased
