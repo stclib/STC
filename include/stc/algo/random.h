@@ -28,7 +28,7 @@
 
 #if defined STC_RANDOM64 || (!defined STC_RANDOM32 && UINTPTR_MAX == UINT64_MAX)
 typedef struct { uint64_t data[3]; } crandom_s;
-typedef double cranreal;
+typedef double crandom_real_type;
 #define logf log
 #define sqrtf sqrt
 
@@ -47,16 +47,18 @@ static inline uint64_t crandom_r(crandom_s* state) { // romu_trio64
     s[2] = zp - yp; s[2] = (s[2]<<44) | (s[2]>>20);
     return xp;
 }
-static inline cranreal crandom_real_r(crandom_s* state)
+static inline double crandom_real_r(crandom_s* state)
     { return (int64_t)crandom_r(state) * (0.5/(1ull<<63)) + 0.5; }
 
 static inline crandom_s* _romu3(void) {
     static crandom_s s = {{0xa4c1f32680f70c55,0x6f68261b57e7a770,0xe220a838bf5c9dde}};
     return &s;
 }
+
 #else // 32-bit
+
 typedef struct { uint32_t data[3]; } crandom_s;
-typedef float cranreal;
+typedef float crandom_real_type;
 
 static inline void csrandom_r(crandom_s* state, uint32_t seed) {
     uint32_t* s = state->data;
@@ -73,7 +75,7 @@ static inline uint32_t crandom_r(crandom_s* state) { // romu_trio32
     s[2] = zp - yp; s[2] = (s[2]<<22) | (s[2]>>10);
     return xp;
 }
-static inline cranreal crandom_real_r(crandom_s* state)
+static inline float crandom_real_r(crandom_s* state)
     { return (int32_t)crandom_r(state) * (0.5f/(1u<<31)) + 0.5f; }
 
 static inline crandom_s* _romu3(void) {
@@ -94,18 +96,18 @@ static inline crandom_s crandom_make(uintptr_t seed) {
 static inline uintptr_t crandom(void)
     { return crandom_r(_romu3()); }
 
-static inline cranreal crandom_real(void)
+static inline crandom_real_type crandom_real(void)
     { return crandom_real_r(_romu3()); }
 
 
 typedef struct {
-    cranreal mean, stddev;
-    cranreal _next;
+    crandom_real_type mean, stddev;
+    crandom_real_type _next;
     int _has_next;
 } crandom_normal_distr;
 
-static inline cranreal crandom_normal_r(crandom_s* state, crandom_normal_distr* d) {
-    cranreal v1, v2, sq, rt;
+static inline crandom_real_type crandom_normal_r(crandom_s* state, crandom_normal_distr* d) {
+    crandom_real_type v1, v2, sq, rt;
     if (d->_has_next++ & 1)
         return d->_next*d->stddev + d->mean;
     do {
@@ -118,7 +120,7 @@ static inline cranreal crandom_normal_r(crandom_s* state, crandom_normal_distr* 
     return (v1*rt)*d->stddev + d->mean;
 }
 
-static inline cranreal crandom_normal(crandom_normal_distr* d)
+static inline crandom_real_type crandom_normal(crandom_normal_distr* d)
     { return crandom_normal_r(_romu3(), d); }
 
 #undef logf
