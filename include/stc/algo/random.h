@@ -48,7 +48,7 @@ static inline uint64_t crandom_r(crandom_s* state) { // romu_trio64
     return xp;
 }
 static inline double crandom_real_r(crandom_s* state)
-    { return (int64_t)crandom_r(state) * (0.5/(1ull<<63)) + 0.5; }
+    { return (double)(int64_t)crandom_r(state) * (0.5/(1ull<<63)) + 0.5; }
 
 static inline crandom_s* _romu3(void) {
     static crandom_s s = {{0xa4c1f32680f70c55,0x6f68261b57e7a770,0xe220a838bf5c9dde}};
@@ -76,7 +76,7 @@ static inline uint32_t crandom_r(crandom_s* state) { // romu_trio32
     return xp;
 }
 static inline float crandom_real_r(crandom_s* state)
-    { return (int32_t)crandom_r(state) * (0.5f/(1u<<31)) + 0.5f; }
+    { return (float)(int32_t)crandom_r(state) * (0.5f/(1u<<31)) + 0.5f; }
 
 static inline crandom_s* _romu3(void) {
     static crandom_s s = {{0xa4c1f326,0x6f68261b,0xe220a838}};
@@ -87,11 +87,8 @@ static inline crandom_s* _romu3(void) {
 static inline void csrandom(uintptr_t seed)
     { csrandom_r(_romu3(), seed); }
 
-static inline crandom_s crandom_make(uintptr_t seed) {
-    crandom_s state;
-    csrandom_r(&state, seed);
-    return state;
-}
+static inline crandom_s crandom_make(uintptr_t seed)
+    { crandom_s s; csrandom_r(&s, seed); return s; }
 
 static inline uintptr_t crandom(void)
     { return crandom_r(_romu3()); }
@@ -99,14 +96,41 @@ static inline uintptr_t crandom(void)
 static inline crandom_real_type crandom_real(void)
     { return crandom_real_r(_romu3()); }
 
+// ===== crandom_uniform =====
+
+typedef struct {
+    int64_t low;
+    uint32_t range, threshold;
+} crandom_uniform_dist;
+
+static inline crandom_uniform_dist
+crandom_uniform_lowhigh(int64_t low, int64_t high) { // high - low < UINT32_MAX
+    crandom_uniform_dist dist = {low, (uint32_t)(high - low + 1)};
+    dist.threshold = (uint32_t)(0 - dist.range) % dist.range;
+    return dist;
+}
+
+static inline int64_t
+crandom_uniform_r(crandom_s* rng, crandom_uniform_dist* d) {
+    uint64_t r;
+    do { r = (uint32_t)crandom_r(rng)*(uint64_t)d->range; } while ((uint32_t)r < d->threshold);
+    return d->low + (int64_t)(r >> 32);
+}
+
+static inline int64_t
+crandom_uniform(crandom_uniform_dist* d)
+    { return crandom_uniform_r(_romu3(), d); }
+
+// ===== crandom_normal =====
 
 typedef struct {
     crandom_real_type mean, stddev;
     crandom_real_type _next;
     int _has_next;
-} crandom_normal_distr;
+} crandom_normal_dist;
 
-static inline crandom_real_type crandom_normal_r(crandom_s* state, crandom_normal_distr* d) {
+static inline crandom_real_type
+crandom_normal_r(crandom_s* state, crandom_normal_dist* d) {
     crandom_real_type v1, v2, sq, rt;
     if (d->_has_next++ & 1)
         return d->_next*d->stddev + d->mean;
@@ -120,7 +144,8 @@ static inline crandom_real_type crandom_normal_r(crandom_s* state, crandom_norma
     return (v1*rt)*d->stddev + d->mean;
 }
 
-static inline crandom_real_type crandom_normal(crandom_normal_distr* d)
+static inline crandom_real_type
+crandom_normal(crandom_normal_dist* d)
     { return crandom_normal_r(_romu3(), d); }
 
 #undef logf
