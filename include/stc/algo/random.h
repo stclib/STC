@@ -49,20 +49,20 @@ static inline uint64_t crand64_r(crand64_state* rng, uint64_t stream) {
 }
 
 static inline double crand64_real_r(crand64_state* rng, uint64_t stream)
-    { return (double)(int64_t)crand64_r(rng, stream) * (0.5/(1ull<<63)) + 0.5; }
+    { return (double)(crand64_r(rng, stream) >> 11) * 0x1.0p-53; }
 
 static inline crand64_state* _stc64(void) {
-    static crand64_state s = {{0xa4c1f32680f70c55,0x6f68261b57e7a770,0xe220a838bf5c9dde,0xbf58476d1ce4e5b9}};
+    static crand64_state s = {{0x9e3779bb07979af0,0x6f682616bae3641a,0xe220a8397b1dcdaf,0x1}};
     return &s;
 }
 
-static inline void crand64_seed(uintptr_t seed)
+static inline void crand64_seed(uint64_t seed)
     { crand64_seed_r(_stc64(), seed); }
 
-static inline crand64_state crand64_make(uintptr_t seed)
+static inline crand64_state crand64_make(uint64_t seed)
     { crand64_state s; crand64_seed_r(&s, seed); return s; }
 
-static inline uintptr_t crand64(void)
+static inline uint64_t crand64(void)
     { return crand64_r(_stc64(), 1); }
 
 static inline double crand64_real(void)
@@ -131,6 +131,7 @@ static inline void crand32_seed_r(crand32_state* rng, uint32_t seed) {
     s[0] = seed*0x9e3779b9; s[0] ^= s[0] >> 16;
     s[1] = s[0]*0x21f0aaad; s[1] ^= s[1] >> 15;
     s[2] = s[1]*0x735a2d97; s[2] ^= s[2] >> 15;
+    s[3] = seed;
 }
 
 // Minimum period length 2^32 per stream. 2^31 streams (odd numbers only)
@@ -144,10 +145,10 @@ static inline uint32_t crand32_r(crand32_state* rng, uint32_t stream) {
 }
 
 static inline float crand32_real_r(crand32_state* rng, uint32_t stream)
-    { return (float)(int32_t)crand32_r(rng, stream) * (0.5f/(1u<<31)) + 0.5f; }
+    { return (float)(crand32_r(rng, stream) >> 9) * 0x1.0p-23f; }
 
 static inline crand32_state* _stc32(void) {
-    static crand32_state s = {{0xa4c1f326,0x6f68261b,0xe220a838,0xa0b428db}};
+    static crand32_state s = {{0x9e37e78e,0x6eab1ba1,0x64625032,0x1}};
     return &s;
 }
 
