@@ -32,7 +32,7 @@ int philosopher(struct Philosopher* p)
     double duration;
     cco_scope(p) {
         while (1) {
-            duration = 1.0 + crandom_real()*2.0;
+            duration = 1.0 + crand64_real()*2.0;
             printf("Philosopher %d is thinking for %.0f minutes...\n", p->id, duration*10);
             cco_await_timer(&p->tm, duration);
 
@@ -40,7 +40,7 @@ int philosopher(struct Philosopher* p)
             cco_await_semaphore(p->left_fork);
             cco_await_semaphore(p->right_fork);
 
-            duration = 0.5 + crandom_real();
+            duration = 0.5 + crand64_real();
             printf("Philosopher %d is eating for %.0f minutes...\n", p->id, duration*10);
             cco_await_timer(&p->tm, duration);
 
@@ -92,7 +92,7 @@ int main(void)
     cco_reset(&dine);
     int n=0;
     cco_timer tm = cco_timer_from(5.0); // seconds
-    csrandom((uint64_t)time(NULL));
+    crand64_seed((uint64_t)time(NULL));
 
     cco_run_coroutine(dining(&dine))
     {

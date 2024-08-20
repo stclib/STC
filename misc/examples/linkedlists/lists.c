@@ -10,10 +10,10 @@ int main(void) {
     const int n = 3000000;
     DList list = {0};
 
-    csrandom(1234567);
+    crand64_seed(1234567);
     int m = 0;
     c_forrange (n)
-        DList_push_back(&list, crandom_real()*n + 100), ++m;
+        DList_push_back(&list, crand64_real()*n + 100), ++m;
 
     printf("sum of %d: ", m);
     double sum = 0.0;

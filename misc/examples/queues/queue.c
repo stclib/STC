@@ -1,23 +1,23 @@
-#include "stc/algo/random.h"
 #include <stdio.h>
+#include "stc/algo/random.h"
 
 #define i_type queue_i, int
 #include "stc/queue.h"
 
 int main(void) {
     int n = 1000000;
-    crandom_s rng = crandom_make(1234);
+    crand64_seed(1234);
 
     queue_i queue = {0};
 
     // Push ten million random numbers onto the queue.
     c_forrange (n)
-        queue_i_push(&queue, crandom_r(&rng) & ((1 << 20) - 1));
+        queue_i_push(&queue, crand64() & ((1 << 20) - 1));
 
     // Push or pop on the queue ten million times
     printf("%d\n", n);
     c_forrange (n) { // forrange uses initial n only.
-        int r = (int)crandom_r(&rng) & ((1 << 20) - 1);
+        int r = (int)crand64() & ((1 << 20) - 1);
         if (r & 1)
             ++n, queue_i_push(&queue, r);
         else

@@ -13,23 +13,23 @@ int main(void)
 {
     enum {N = 5000000};
     uint64_t seed = (uint64_t)time(NULL);
-    csrandom(seed);
-    const double Mean = round(crandom_real()*98.0 - 49.0),
-                 StdDev = crandom_real()*10.0 + 1.0,
+    crand64_seed(seed);
+    const double Mean = round(crand64_real()*98.0 - 49.0),
+                 StdDev = crand64_real()*10.0 + 1.0,
                  Scale = 74.0;
 
     printf("Demo of gaussian / normal distribution of %d random samples\n", N);
     printf("Mean %f, StdDev %f\n", Mean, StdDev);
 
     // Setup random normal distribution.
-    crandom_normal_dist dist = {.mean=Mean, .stddev=StdDev};
+    crand64_normal_dist dist = {.mean=Mean, .stddev=StdDev};
 
     // Create and init histogram map with defered destruct
     SortedMap hist = {0};
     cstr bar = {0};
 
     c_forrange (N) {
-        int index = (int)round(crandom_normal(&dist));
+        int index = (int)round(crand64_normal(&dist));
         SortedMap_insert(&hist, index, 0).ref->second += 1;
     }
 

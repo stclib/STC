@@ -9,20 +9,20 @@
 
 int main(void) {
     int N = 10000000;
-    crandom_s rng = crandom_make(time(NULL));
+    crand64_state rng = crand64_make(time(NULL));
     PQueue heap = {0};
 
     // Push ten million random numbers to priority queue
     printf("Push %d numbers\n", N);
     c_forrange (N)
-        PQueue_push(&heap, crandom_r(&rng) & ((1<<20) - 1));
+        PQueue_push(&heap, crand64_r(&rng, 1) & ((1<<20) - 1));
 
     // push some negative numbers too.
     c_foritems (i, int, {-231, -32, -873, -4, -343})
         PQueue_push(&heap, *i.ref);
 
     c_forrange (N)
-        PQueue_push(&heap, crandom_r(&rng) & ((1<<20) - 1));
+        PQueue_push(&heap, crand64_r(&rng, 1) & ((1<<20) - 1));
 
     puts("Extract the hundred smallest.");
     c_forrange (100) {

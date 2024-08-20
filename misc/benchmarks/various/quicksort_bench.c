@@ -28,9 +28,9 @@ void testsort(Ints *a, int size, const char *desc) {
 #ifdef __cplusplus
     printf("std::sort: "); std::sort(a->data, a->data + size);
 #elif defined QSORT
-    printf("qsort: "); qsort(a->data, size, sizeof *a->data, cmp_int);
+    printf("stdlib qsort: "); qsort(a->data, size, sizeof *a->data, cmp_int);
 #else
-    printf("STC quicksort: "); Ints_sort(a);
+    printf("STC sort: "); Ints_sort(a);
 #endif
     t = clock() - t;
 

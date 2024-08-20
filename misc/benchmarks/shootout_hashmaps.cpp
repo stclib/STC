@@ -230,7 +230,7 @@ KHASH_MAP_INIT_INT64(ii, IValue)
 void fisher_yates_shuffle(IKey a[], size_t n) {
     --n;
     for (size_t i = 0; i < n; i++) {
-        size_t j = i + (crandom() % (n - i)); // swap element with random later element
+        size_t j = i + (crand64() % (n - i)); // swap element with random later element
         IKey t = a[i];
         a[i] = a[j];
         a[j] = t;

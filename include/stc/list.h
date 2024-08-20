@@ -37,7 +37,7 @@
         List list = {0};
 
         for (int i = 0; i < 5000000; ++i) // five million
-            List_push_back(&list, crandom() & (1<<24) - 1;
+            List_push_back(&list, crand64() & (1<<24) - 1;
 
         int n = 0;
         c_foreach (i, List, list)
@@ -385,9 +385,9 @@ _c_MEMB(_remove)(Self* self, _m_raw val) {
 #endif
 
 #if defined _i_has_cmp
-#define _sort_ij _sort_ij_
+#define _sort_lowhigh _sort_lowhigh_
 #include "algo/sort.h"
-#undef _sort_ij
+#undef _sort_lowhigh
 
 STC_DEF bool _c_MEMB(_sort)(Self* self) {
     isize len = 0, cap = 0;
@@ -403,7 +403,7 @@ STC_DEF bool _c_MEMB(_sort)(Self* self) {
     }
     _m_node* keep = self->last;
     self->last = (_m_node *)arr;
-    _c_MEMB(_sort_ij_)(self, 0, len - 1);
+    _c_MEMB(_sort_lowhigh_)(self, 0, len - 1);
     self->last = keep;
     c_foreach (i, Self, *self)
         *i.ref = *p++;

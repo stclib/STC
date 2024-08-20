@@ -33,9 +33,9 @@ uint64_t romu_trio(uint64_t s[3]) {
 
 /* sfc64 */
 
-static inline uint64_t sfc64m(uint64_t s[4]) {
-    uint64_t result = (s[0] ^ (s[3] += 0x9e3779b97f4a7c15)) + s[1];
-
+static inline uint64_t sfc64m(uint64_t s[4], uint64_t stream) {
+    //uint64_t result = (s[0] ^ (s[3] += stream)) + s[1];
+    uint64_t result = (s[0]^(s[3] += stream)) + s[1];
     s[0] = s[1] ^ (s[1] >> 11);
     s[1] = s[2] + (s[2] << 3);
     s[2] = rotl64(s[2], 24) + result;
@@ -177,7 +177,7 @@ int main(void)
 
         beg = clock();
         for (size_t i = 0; i < N; i++)
-            recipient[i] = sfc64m(rng.state);
+            recipient[i] = sfc64m(rng.state, 1);
         end = clock();
         cout << "sfc64m:\t\t"
              << (float(end - beg) / CLOCKS_PER_SEC)

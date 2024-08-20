@@ -59,7 +59,7 @@ Algorithms
 - [***Generic algorithms*** - c_init, c_find_if, c_erase_if, quicksort, lower_bound, ...](docs/algorithm_api.md#generic-algorithms)
 - [***Coroutines*** - ergonomic portable coroutines](docs/coroutine_api.md)
 - [***Regular expressions*** - Rob Pike's Plan 9 regexp modernized!](docs/cregex_api.md)
-- [***Random numbers*** - a very fast *PRNG* based on *SFC64*](docs/crandom_api.md)
+- [***Random numbers*** - a very fast *PRNG* based on *SFC64*](docs/random_api.md)
 - [***Command line argument parser*** - similar to *getopt()*](docs/coption_api.md)
 
 ---

@@ -1,8 +1,10 @@
-# STC [crandom](../include/stc/algo/random.h): Pseudo Random Number Generator
+# STC [crand64](../include/stc/algo/random.h): Pseudo Random Number Generator
 ![Random](pics/random.jpg)
 
-This features a 64-bit or 32-bit PRNG, and can generate integers, reals, normal distributed,
-and unbiased uniform random numbers. It currently use the romuTrio PRNG.
+This features both a 64-bit and a 32-bit PRNG API. It can generate integers, reals, normal distributed,
+and unbiased uniform random numbers. It uses the STC64 variant of the extremely fast and excellent SFC64
+PRNG, which uses no multiplication. It adds a "stream" parameter and modifies the output function slightly.
+The PRNG can generate 2^63 unique streams where each has theoretical minimum 2^64 period lengths.
 
 See [random](https://en.cppreference.com/w/cpp/header/random) for similar c++ functionality.
 
@@ -10,30 +12,30 @@ See [random](https://en.cppreference.com/w/cpp/header/random) for similar c++ fu
 #include "stc/algo/random.h"
 ```
 
-## Methods
+## Methods (64-bit API)
 
 ```c
-void                 csrandom(uintptr_t seed);                   // seed global crandom() prng
-uintptr_t            crandom(void);                              // global crandom_r(rng)
-crandom_real_type    crandom_real(void);                         // global crandom_real_r(rng)
-crandom_real_type    crandom_normal(crandom_normal_dist* d);     // global crandom_normal_r(rng, d)
-int64_t              crandom_uniform(crandom_uniform_dist* d);   // global crandom_uniform_r(rng, d)
+void                 crand64_seed(uint64_t seed);                        // set global crand64() seed
+uint64_t             crand64(void);                                      // global crand64_r(rng)
+double               crand64_real(void);                                 // global crand64_real_r(rng)
+double               crand64_normal(crand64_normal_dist* d);             // global crand64_normal_r(rng, d)
+crand64_uniform_dist crand64_uniform_lowhigh(int64_t low, int64_t high); // create a uniform distribution
+int64_t              crand64_uniform(crand64_uniform_dist* d);           // global crand64_uniform_r(rng, d)
 
-crandom_s            crandom_make(uintptr_t seed);               // create a crandom_s state from a seed value
-crandom_uniform_dist crandom_uniform_lowhigh(int64_t low, int64_t high); // create a uniform distribution
-uintptr_t            crandom_r(crandom_s* rng);                  // reentrant; return rnd in [0, UINTPTR_MAX]
-crandom_real_type    crandom_real_r(crandom_s* rng);             // reentrant; return rnd in [0.0, 1.0)
-crandom_real_type    crandom_normal_r(crandom_s* rng, crandom_normal_dist* d); // return normal distributed rnd's
-int64_t              crandom_uniform_r(crandom_s* rng, crandom_uniform_dist* d); // return rnd in [low, high]
+crand64_state        crand64_make(uint64_t seed);                        // create a crand64_state state from a seed value
+uint64_t             crand64_r(crand64_state* rng, uint64_t strm);       // reentrant; return rnd in [0, UINTPTR_MAX]
+double               crand64_real_r(crand64_state* rng, uint64_t strm);  // reentrant; return rnd in [0.0, 1.0)
+double               crand64_normal_r(crand64_state* rng, uint64_t strm, crand64_normal_dist* d);   // return normal distributed rnd's
+int64_t              crand64_uniform_r(crand64_state* rng, uint64_t strm, crand64_uniform_dist* d); // return rnd in [low, high]
 ```
+Note that `strm` must be an odd number.
 ## Types
 
 | Name                   | Type definition                   | Used to represent...         |
 |:-----------------------|:----------------------------------|:-----------------------------|
-| `crandom_s`            | `struct {uintptr_t data[3];}`     | The PRNG engine type         |
-| `crandom_normal_dist`  | `struct {double mean, stddev;}`   | Normal distribution struct     |
-| `crandom_uniform_dist` | `struct {...}`                    | Uniform int distribution struct |
-| `crandom_real_type`    | `double` or `float`               | result type, depends on target platform |
+| `crand64_state`        | `struct {uint64_t data[3];}`      | The PRNG engine type         |
+| `crand64_normal_dist`  | `struct {double mean, stddev;}`   | Normal distribution struct     |
+| `crand64_uniform_dist` | `struct {...}`                    | Uniform int distribution struct |
 
 ## Example
 ```c
@@ -51,15 +53,15 @@ int main(void)
     enum {N = 10000000};
     printf("Demo of gaussian / normal distribution of %d random samples\n", N);
 
-    // Setup random engine with normal distribution.
+    // Setup a reentrant random number engine with normal distribution.
     uint64_t seed = time(NULL);
-    crandom_s rng = crandom_make(seed);
-    crandom_normal_dist dist = {.mean=-12.0, .stddev=6.0};
+    crand64_state rng = crand64_make(seed);
+    crand64_normal_dist dist = {.mean=-12.0, .stddev=6.0};
 
     // Create histogram map
     SortedMap mhist = {0};
     c_forrange (N) {
-        int index = (int)round(crandom_normal_r(&rng, &dist));
+        int index = (int)round(crand64_normal_r(&rng, 1, &dist));
         SortedMap_insert(&mhist, index, 0).ref->second += 1;
     }
 

@@ -68,21 +68,9 @@ int main(void) {
 }
 */
 #include <stdio.h>
-#include <stdint.h>
 #include <stddef.h>
 #include <assert.h>
-
-#define fmt_OVERLOAD(name, ...) \
-    fmt_JOIN(name, fmt_NUMARGS(__VA_ARGS__))(__VA_ARGS__)
-#define fmt_CONCAT(a, b) a ## b
-#define fmt_JOIN(a, b) fmt_CONCAT(a, b)
-#define fmt_EXPAND(...) __VA_ARGS__
-#define fmt_NUMARGS(...) _fmt_APPLY_ARG_N((__VA_ARGS__, _fmt_RSEQ_N))
-
-#define _fmt_APPLY_ARG_N(args) fmt_EXPAND(_fmt_ARG_N args)
-#define _fmt_RSEQ_N 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
-#define _fmt_ARG_N(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, \
-                   _14, _15, _16, N, ...) N
+#include "../stc/common.h"
 
 #if defined FMT_NDEBUG || defined STC_NDEBUG || defined NDEBUG
 #  define fmt_OK(exp) (void)(exp)
@@ -118,55 +106,55 @@ FMT_API void       _fmt_sprint(fmt_stream*, const char* fmt, ...);
 
 #define fmt_print(...) fmt_printd(stdout, __VA_ARGS__)
 #define fmt_println(...) fmt_printd((fmt_stream*)0, __VA_ARGS__)
-#define fmt_printd(...) fmt_OVERLOAD(fmt_printd, __VA_ARGS__)
+#define fmt_printd(...) c_MACRO_OVERLOAD(fmt_printd, __VA_ARGS__)
 #define fmt_sv "{:.*s}"
 #define fmt_svarg(sv) (int)(sv).size, (sv).buf
 
 /* Primary function. */
-#define fmt_printd2(to, fmt) \
+#define fmt_printd_2(to, fmt) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 0, fmt); \
-        fmt_OK(_n == 0); _fmt_fn(to)(to, fmt); } while (0)
-#define fmt_printd3(to, fmt, c) \
+         fmt_OK(_n == 0); _fmt_fn(to)(to, fmt); } while (0)
+#define fmt_printd_3(to, fmt, c) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 1, fmt, _fc(c)); \
-        fmt_OK(_n == 1); _fmt_fn(to)(to, _fs, c); } while (0)
-#define fmt_printd4(to, fmt, c, d) \
+         fmt_OK(_n == 1); _fmt_fn(to)(to, _fs, c); } while (0)
+#define fmt_printd_4(to, fmt, c, d) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 2, fmt, _fc(c), _fc(d)); \
-        fmt_OK(_n == 2); _fmt_fn(to)(to, _fs, c, d); } while (0)
-#define fmt_printd5(to, fmt, c, d, e) \
+         fmt_OK(_n == 2); _fmt_fn(to)(to, _fs, c, d); } while (0)
+#define fmt_printd_5(to, fmt, c, d, e) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 3, fmt, _fc(c), _fc(d), _fc(e)); \
-        fmt_OK(_n == 3); _fmt_fn(to)(to, _fs, c, d, e); } while (0)
-#define fmt_printd6(to, fmt, c, d, e, f) \
+         fmt_OK(_n == 3); _fmt_fn(to)(to, _fs, c, d, e); } while (0)
+#define fmt_printd_6(to, fmt, c, d, e, f) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 4, fmt, _fc(c), _fc(d), _fc(e), _fc(f)); \
-        fmt_OK(_n == 4); _fmt_fn(to)(to, _fs, c, d, e, f); } while (0)
-#define fmt_printd7(to, fmt, c, d, e, f, g) \
+         fmt_OK(_n == 4); _fmt_fn(to)(to, _fs, c, d, e, f); } while (0)
+#define fmt_printd_7(to, fmt, c, d, e, f, g) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 5, fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g)); \
-        fmt_OK(_n == 5); _fmt_fn(to)(to, _fs, c, d, e, f, g); } while (0)
-#define fmt_printd8(to, fmt, c, d, e, f, g, h) \
+         fmt_OK(_n == 5); _fmt_fn(to)(to, _fs, c, d, e, f, g); } while (0)
+#define fmt_printd_8(to, fmt, c, d, e, f, g, h) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 6, fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h)); \
-        fmt_OK(_n == 6); _fmt_fn(to)(to, _fs, c, d, e, f, g, h); } while (0)
-#define fmt_printd9(to, fmt, c, d, e, f, g, h, i) \
+         fmt_OK(_n == 6); _fmt_fn(to)(to, _fs, c, d, e, f, g, h); } while (0)
+#define fmt_printd_9(to, fmt, c, d, e, f, g, h, i) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 7, fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h), _fc(i)); \
-        fmt_OK(_n == 7); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i); } while (0)
-#define fmt_printd10(to, fmt, c, d, e, f, g, h, i, j) \
+         fmt_OK(_n == 7); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i); } while (0)
+#define fmt_printd_10(to, fmt, c, d, e, f, g, h, i, j) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 8, fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h), \
                                                                      _fc(i), _fc(j)); \
-        fmt_OK(_n == 8); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i, j); } while (0)
-#define fmt_printd11(to, fmt, c, d, e, f, g, h, i, j, k) \
+         fmt_OK(_n == 8); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i, j); } while (0)
+#define fmt_printd_11(to, fmt, c, d, e, f, g, h, i, j, k) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 9, fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h), \
                                                                      _fc(i), _fc(j), _fc(k)); \
-        fmt_OK(_n == 9); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i, j, k); } while (0)
-#define fmt_printd12(to, fmt, c, d, e, f, g, h, i, j, k, m) \
+         fmt_OK(_n == 9); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i, j, k); } while (0)
+#define fmt_printd_12(to, fmt, c, d, e, f, g, h, i, j, k, m) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 10, fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h), \
                                                                       _fc(i), _fc(j), _fc(k), _fc(m)); \
-        fmt_OK(_n == 10); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i, j, k, m); } while (0)
-#define fmt_printd13(to, fmt, c, d, e, f, g, h, i, j, k, m, n) \
+         fmt_OK(_n == 10); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i, j, k, m); } while (0)
+#define fmt_printd_13(to, fmt, c, d, e, f, g, h, i, j, k, m, n) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 11, fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h), \
                                                                       _fc(i), _fc(j), _fc(k), _fc(m), _fc(n)); \
-        fmt_OK(_n == 11); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i, j, k, m, n); } while (0)
-#define fmt_printd14(to, fmt, c, d, e, f, g, h, i, j, k, m, n, o) \
+         fmt_OK(_n == 11); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i, j, k, m, n); } while (0)
+#define fmt_printd_14(to, fmt, c, d, e, f, g, h, i, j, k, m, n, o) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 12, fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h), \
                                                                       _fc(i), _fc(j), _fc(k), _fc(m), _fc(n), _fc(o)); \
-        fmt_OK(_n == 12); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i, j, k, m, n, o); } while (0)
+         fmt_OK(_n == 12); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i, j, k, m, n, o); } while (0)
 
 #define _fmt_fn(x) _Generic ((x), \
     FILE*: fprintf, \

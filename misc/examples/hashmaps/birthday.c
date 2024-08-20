@@ -15,11 +15,11 @@ static void test_repeats(void)
     static const uint64_t mask = (1ull << BITS) - 1;
 
     printf("birthday paradox: value range: 2^%d, testing repeats of 2^%d values\n", BITS, BITS_TEST);
-    crandom_s rng = crandom_make(seed);
+    crand64_state rng = crand64_make(seed);
 
     hmap_ui m = hmap_ui_with_capacity(N);
     c_forrange (i, N) {
-        uint64_t k = crandom_r(&rng) & mask;
+        uint64_t k = crand64_r(&rng, 1) & mask;
         int v = hmap_ui_insert(&m, k, 0).ref->second += 1;
         if (v > 1) printf("repeated value %" PRIu64 " (%d) at 2^%d\n",
                           k, v, (int)log2((double)i));
@@ -34,12 +34,12 @@ void test_distribution(void)
 {
     enum {BITS = 26};
     printf("distribution test: 2^%d values\n", BITS);
-    crandom_s rng = crandom_make(seed);
+    crand64_state rng = crand64_make(seed);
     const size_t N = 1ull << BITS ;
 
     hmap_uu map = {0};
     c_forrange (N) {
-        uint64_t k = crandom_r(&rng);
+        uint64_t k = crand64_r(&rng, 1);
         hmap_uu_insert(&map, k & 0xf, 0).ref->second += 1;
     }
 

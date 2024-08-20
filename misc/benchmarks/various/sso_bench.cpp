@@ -51,7 +51,7 @@ static inline const char* randomString(int strsize) {
     static char str[256];
     union { uint64_t u8; uint8_t b[8]; } r;
     for (int i = 0; i < strsize; ++i) {
-        if ((i & 7) == 0) r.u8 = crandom() & 0x3f3f3f3f3f3f3f3f;
+        if ((i & 7) == 0) r.u8 = crand64() & 0x3f3f3f3f3f3f3f3f;
         str[i] = CHARS[r.b[i & 7]];
     }
     str[strsize] = 0;

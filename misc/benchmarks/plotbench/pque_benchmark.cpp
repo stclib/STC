@@ -14,10 +14,10 @@ static const int N = 2500000;
 void std_test(void)
 {
     std::priority_queue<float, std::vector<float>, std::greater<float>> pq;
-    csrandom(seed);
+    crand64_seed(seed);
     clock_t start = clock();
     c_forrange (i, N)
-        pq.push((float) crandom_real()*100000.0);
+        pq.push((float) crand64_real()*100000.0);
 
     printf("Built priority queue: %f secs\n", (float)(clock() - start)/(float)CLOCKS_PER_SEC);
     printf("%g ", pq.top());
@@ -38,10 +38,10 @@ void stc_test(void)
     PrQue pq = {0};
     c_deferred(PrQue_drop(&pq))
     {
-        csrandom(seed);
+        crand64_seed(seed);
         clock_t start = clock();
         c_forrange (i, N) {
-            PrQue_push(&pq, (float)crandom_real()*100000);
+            PrQue_push(&pq, (float)crand64_real()*100000);
         }
 
         printf("Built priority queue: %f secs\n", (float)(clock() - start)/(float)CLOCKS_PER_SEC);

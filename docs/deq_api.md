@@ -53,8 +53,8 @@ deq_X_iter          deq_X_find(const deq_X* self, i_keyraw raw);
 deq_X_iter          deq_X_find_in(deq_X_iter i1, deq_X_iter i2, i_keyraw raw);  // return vec_X_end() if not found
 
 void                deq_X_sort(deq_X* self);                                    // quicksort from algo/sort.h
-isize               deq_X_lower_bound(const deq_X* self, const i_keyraw raw);    // return -1 if not found
-isize               deq_X_binary_search(const deq_X* self, const i_keyraw raw);  // return -1 if not found
+isize               deq_X_lower_bound(const deq_X* self, const i_keyraw raw);   // return -1 if not found
+isize               deq_X_binary_search(const deq_X* self, const i_keyraw raw); // return -1 if not found
 
 deq_X_value*        deq_X_front(const deq_X* self);
 deq_X_value*        deq_X_back(const deq_X* self);
@@ -62,18 +62,18 @@ deq_X_value*        deq_X_back(const deq_X* self);
 deq_X_value*        deq_X_push_front(deq_X* self, i_key value);
 deq_X_value*        deq_X_emplace_front(deq_X* self, i_keyraw raw);
 void                deq_X_pop_front(deq_X* self);
-deq_X_value         deq_X_pull_front(deq_X* self);                                // move out front element
+deq_X_value         deq_X_pull_front(deq_X* self);                              // move out front element
 
 deq_X_value*        deq_X_push_back(deq_X* self, i_key value);
-deq_X_value*        deq_X_push(deq_X* self, i_key value);                         // alias for push_back()
+deq_X_value*        deq_X_push(deq_X* self, i_key value);                       // alias for push_back()
 deq_X_value*        deq_X_emplace_back(deq_X* self, i_keyraw raw);
-deq_X_value*        deq_X_emplace(deq_X* self, i_keyraw raw);                     // alias for emplace_back()
+deq_X_value*        deq_X_emplace(deq_X* self, i_keyraw raw);                   // alias for emplace_back()
 void                deq_X_pop_back(deq_X* self);
-deq_X_value         deq_X_pull_back(deq_X* self);                                 // move out last element
+deq_X_value         deq_X_pull_back(deq_X* self);                               // move out last element
 
 deq_X_iter          deq_X_insert_n(deq_X* self, isize idx, const i_key[] arr, isize n);  // move values
-deq_X_iter          deq_X_insert_at(deq_X* self, deq_X_iter it, i_key value);    // move value
-deq_X_iter          deq_X_insert_uninit(deq_X* self, isize idx, isize n);        // uninitialized data
+deq_X_iter          deq_X_insert_at(deq_X* self, deq_X_iter it, i_key value);   // move value
+deq_X_iter          deq_X_insert_uninit(deq_X* self, isize idx, isize n);       // uninitialized data
                     // copy values:
 deq_X_iter          deq_X_emplace_n(deq_X* self, isize idx, const i_keyraw[] arr, isize n);
 deq_X_iter          deq_X_emplace_at(deq_X* self, deq_X_iter it, i_keyraw raw);
@@ -97,8 +97,8 @@ void                deq_X_value_drop(deq_X_value* pval);
 
 | Type name         | Type definition                    | Used to represent...   |
 |:------------------|:-----------------------------------|:-----------------------|
-| `deq_X`           | `struct { deq_X_value* data; }`    | The deq type          |
-| `deq_X_value`     | `i_key`                            | The deq value type    |
+| `deq_X`           | `struct { deq_X_value* data; }`    | The deq type           |
+| `deq_X_value`     | `i_key`                            | The deq value type     |
 | `deq_X_raw`       | `i_keyraw`                         | The raw value type     |
 | `deq_X_iter`      | `struct { deq_X_value* ref; }`     | The iterator type      |
 
