@@ -127,16 +127,24 @@ STC_INLINE bool _cbits_disjoint(const uintptr_t* set, const uintptr_t* other, co
 
 #endif // STC_CBITS_H_INCLUDED
 
-#define _i_memb(name) c_JOIN(i_type, name)
+#if defined i_type
+  #define Self c_SELECT(_c_SEL21, i_type)
+  #define _i_length c_SELECT(_c_SEL22, i_type)
+#elif defined _i_length
+  #define Self c_JOIN(cbits, _i_length)
+#else
+  #define Self cbits
+#endif
 
-#if !defined i_capacity // DYNAMIC SIZE BITARRAY
+#define _i_MEMB(name) c_JOIN(Self, name)
 
+
+#if !defined _i_length // DYNAMIC SIZE BITARRAY
+
+typedef struct { uintptr_t *buffer; isize _size; } Self;
 #define _i_assert(x) c_assert(x)
-#define i_type cbits
 
-typedef struct { uintptr_t *buffer; isize _size; } i_type;
-
-STC_INLINE cbits cbits_init(void) { return c_literal(cbits){NULL}; }
+STC_INLINE cbits cbits_init(void) { return c_literal(cbits){0}; }
 STC_INLINE void cbits_drop(cbits* self) { i_free(self->buffer, _cbits_bytes(self->_size)); }
 STC_INLINE isize cbits_size(const cbits* self) { return self->_size; }
 
@@ -198,123 +206,114 @@ STC_INLINE cbits cbits_with_pattern(const isize size, const uintptr_t pattern) {
     return set;
 }
 
-#else // i_capacity: FIXED SIZE BITARRAY
+#else // _i_length: FIXED SIZE BITARRAY
 
 #define _i_assert(x) (void)0
-#ifndef i_type
-#define i_type c_JOIN(cbits, i_capacity)
-#endif
 
-typedef struct { uintptr_t buffer[(i_capacity - 1)/64 + 1]; } i_type;
+typedef struct { uintptr_t buffer[(_i_length - 1)/_cbits_BN + 1]; } Self;
 
-STC_INLINE void     _i_memb(_init)(i_type* self) { memset(self->buffer, 0, i_capacity*8); }
-STC_INLINE void     _i_memb(_drop)(i_type* self) { (void)self; }
-STC_INLINE isize _i_memb(_size)(const i_type* self) { (void)self; return i_capacity; }
-STC_INLINE i_type   _i_memb(_move)(i_type* self) { return *self; }
+STC_INLINE void     _i_MEMB(_init)(Self* self) { memset(self->buffer, 0, sizeof self->buffer); }
+STC_INLINE void     _i_MEMB(_drop)(Self* self) { (void)self; }
+STC_INLINE isize    _i_MEMB(_size)(const Self* self) { (void)self; return _i_length; }
+STC_INLINE Self     _i_MEMB(_move)(Self* self) { return *self; }
+STC_INLINE Self*    _i_MEMB(_take)(Self* self, Self other) { *self = other; return self; }
+STC_INLINE Self     _i_MEMB(_clone)(Self other) { return other; }
+STC_INLINE Self*    _i_MEMB(_copy)(Self* self, const Self* other) { *self = *other; return self; }
+STC_INLINE void     _i_MEMB(_set_all)(Self *self, const bool value);
+STC_INLINE void     _i_MEMB(_set_pattern)(Self *self, const uintptr_t pattern);
 
-STC_INLINE i_type*  _i_memb(_take)(i_type* self, i_type other)
-    { *self = other; return self; }
-
-STC_INLINE i_type _i_memb(_clone)(i_type other)
-    { return other; }
-
-STC_INLINE i_type* _i_memb(_copy)(i_type* self, const i_type* other)
-    { *self = *other; return self; }
-
-STC_INLINE void _i_memb(_set_all)(i_type *self, const bool value);
-STC_INLINE void _i_memb(_set_pattern)(i_type *self, const uintptr_t pattern);
-
-STC_INLINE i_type _i_memb(_with_size)(const isize size, const bool value) {
-    c_assert(size <= i_capacity);
-    i_type set; _i_memb(_set_all)(&set, value);
+STC_INLINE Self _i_MEMB(_with_size)(const isize size, const bool value) {
+    c_assert(size <= _i_length);
+    Self set; _i_MEMB(_set_all)(&set, value);
     return set;
 }
 
-STC_INLINE i_type _i_memb(_with_pattern)(const isize size, const uintptr_t pattern) {
-    c_assert(size <= i_capacity);
-    i_type set; _i_memb(_set_pattern)(&set, pattern);
+STC_INLINE Self _i_MEMB(_with_pattern)(const isize size, const uintptr_t pattern) {
+    c_assert(size <= _i_length);
+    Self set; _i_MEMB(_set_pattern)(&set, pattern);
     return set;
 }
-#endif // i_capacity
+#endif // _i_length
 
 // COMMON:
 
-STC_INLINE void _i_memb(_set_all)(i_type *self, const bool value)
-    { c_memset(self->buffer, value? ~0 : 0, _cbits_bytes(_i_memb(_size)(self))); }
+STC_INLINE void _i_MEMB(_set_all)(Self *self, const bool value)
+    { c_memset(self->buffer, value? ~0 : 0, _cbits_bytes(_i_MEMB(_size)(self))); }
 
-STC_INLINE void _i_memb(_set_pattern)(i_type *self, const uintptr_t pattern) {
-    isize n = _cbits_words(_i_memb(_size)(self));
+STC_INLINE void _i_MEMB(_set_pattern)(Self *self, const uintptr_t pattern) {
+    isize n = _cbits_words(_i_MEMB(_size)(self));
     while (n--) self->buffer[n] = pattern;
 }
 
-STC_INLINE bool _i_memb(_test)(const i_type* self, const isize i)
+STC_INLINE bool _i_MEMB(_test)(const Self* self, const isize i)
     { return (self->buffer[i/_cbits_BN] & _cbits_bit(i)) != 0; }
 
-STC_INLINE bool _i_memb(_at)(const i_type* self, const isize i)
+STC_INLINE bool _i_MEMB(_at)(const Self* self, const isize i)
     { return (self->buffer[i/_cbits_BN] & _cbits_bit(i)) != 0; }
 
-STC_INLINE void _i_memb(_set)(i_type *self, const isize i)
+STC_INLINE void _i_MEMB(_set)(Self *self, const isize i)
     { self->buffer[i/_cbits_BN] |= _cbits_bit(i); }
 
-STC_INLINE void _i_memb(_reset)(i_type *self, const isize i)
+STC_INLINE void _i_MEMB(_reset)(Self *self, const isize i)
     { self->buffer[i/_cbits_BN] &= ~_cbits_bit(i); }
 
-STC_INLINE void _i_memb(_set_value)(i_type *self, const isize i, const bool b) {
+STC_INLINE void _i_MEMB(_set_value)(Self *self, const isize i, const bool b) {
     self->buffer[i/_cbits_BN] ^= ((uintptr_t)-(int)b ^ self->buffer[i/_cbits_BN]) & _cbits_bit(i);
 }
 
-STC_INLINE void _i_memb(_flip)(i_type *self, const isize i)
+STC_INLINE void _i_MEMB(_flip)(Self *self, const isize i)
     { self->buffer[i/_cbits_BN] ^= _cbits_bit(i); }
 
-STC_INLINE void _i_memb(_flip_all)(i_type *self) {
-    isize n = _cbits_words(_i_memb(_size)(self));
+STC_INLINE void _i_MEMB(_flip_all)(Self *self) {
+    isize n = _cbits_words(_i_MEMB(_size)(self));
     while (n--) self->buffer[n] ^= ~(uintptr_t)0;
 }
 
-STC_INLINE i_type _i_memb(_from)(const char* str) {
+STC_INLINE Self _i_MEMB(_from)(const char* str) {
     isize n = c_strlen(str);
-    i_type set = _i_memb(_with_size)(n, false);
-    while (n--) if (str[n] == '1') _i_memb(_set)(&set, n);
+    Self set = _i_MEMB(_with_size)(n, false);
+    while (n--) if (str[n] == '1') _i_MEMB(_set)(&set, n);
     return set;
 }
 
 /* Intersection */
-STC_INLINE void _i_memb(_intersect)(i_type *self, const i_type* other) {
+STC_INLINE void _i_MEMB(_intersect)(Self *self, const Self* other) {
     _i_assert(self->_size == other->_size);
-    isize n = _cbits_words(_i_memb(_size)(self));
+    isize n = _cbits_words(_i_MEMB(_size)(self));
     while (n--) self->buffer[n] &= other->buffer[n];
 }
 /* Union */
-STC_INLINE void _i_memb(_union)(i_type *self, const i_type* other) {
+STC_INLINE void _i_MEMB(_union)(Self *self, const Self* other) {
     _i_assert(self->_size == other->_size);
-    isize n = _cbits_words(_i_memb(_size)(self));
+    isize n = _cbits_words(_i_MEMB(_size)(self));
     while (n--) self->buffer[n] |= other->buffer[n];
 }
 /* Exclusive disjunction */
-STC_INLINE void _i_memb(_xor)(i_type *self, const i_type* other) {
+STC_INLINE void _i_MEMB(_xor)(Self *self, const Self* other) {
     _i_assert(self->_size == other->_size);
-    isize n = _cbits_words(_i_memb(_size)(self));
+    isize n = _cbits_words(_i_MEMB(_size)(self));
     while (n--) self->buffer[n] ^= other->buffer[n];
 }
 
-STC_INLINE isize _i_memb(_count)(const i_type* self)
-    { return _cbits_count(self->buffer, _i_memb(_size)(self)); }
+STC_INLINE isize _i_MEMB(_count)(const Self* self)
+    { return _cbits_count(self->buffer, _i_MEMB(_size)(self)); }
 
-STC_INLINE char* _i_memb(_to_str)(const i_type* self, char* out, isize start, isize stop)
-    { return _cbits_to_str(self->buffer, _i_memb(_size)(self), out, start, stop); }
+STC_INLINE char* _i_MEMB(_to_str)(const Self* self, char* out, isize start, isize stop)
+    { return _cbits_to_str(self->buffer, _i_MEMB(_size)(self), out, start, stop); }
 
-STC_INLINE bool _i_memb(_subset_of)(const i_type* self, const i_type* other) {
+STC_INLINE bool _i_MEMB(_subset_of)(const Self* self, const Self* other) {
     _i_assert(self->_size == other->_size);
-    return _cbits_subset_of(self->buffer, other->buffer, _i_memb(_size)(self));
+    return _cbits_subset_of(self->buffer, other->buffer, _i_MEMB(_size)(self));
 }
 
-STC_INLINE bool _i_memb(_disjoint)(const i_type* self, const i_type* other) {
+STC_INLINE bool _i_MEMB(_disjoint)(const Self* self, const Self* other) {
     _i_assert(self->_size == other->_size);
-    return _cbits_disjoint(self->buffer, other->buffer, _i_memb(_size)(self));
+    return _cbits_disjoint(self->buffer, other->buffer, _i_MEMB(_size)(self));
 }
 
 #include "priv/linkage2.h"
-#undef _i_memb
-#undef _i_assert
-#undef i_capacity
 #undef i_type
+#undef _i_length
+#undef _i_MEMB
+#undef _i_assert
+#undef Self
