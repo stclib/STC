@@ -130,8 +130,6 @@ STC_INLINE bool _cbits_disjoint(const uintptr_t* set, const uintptr_t* other, co
 #if defined i_type
   #define Self c_SELECT(_c_SEL21, i_type)
   #define _i_length c_SELECT(_c_SEL22, i_type)
-#elif defined _i_length
-  #define Self c_JOIN(cbits, _i_length)
 #else
   #define Self cbits
 #endif

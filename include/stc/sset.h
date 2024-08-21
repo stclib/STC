@@ -25,19 +25,19 @@
 /*
 #include <stdio.h>
 
-#define i_type sset_i,int
+#define i_type Intset,int
 #include "stc/sset.h" // sorted set of int
 
 int main(void) {
-    sset_i s = {0};
-    sset_i_insert(&s, 5);
-    sset_i_insert(&s, 8);
-    sset_i_insert(&s, 3);
-    sset_i_insert(&s, 5);
+    Intset s = {0};
+    Intset_insert(&s, 5);
+    Intset_insert(&s, 8);
+    Intset_insert(&s, 3);
+    Intset_insert(&s, 5);
 
-    c_foreach (k, sset_i, s)
+    c_foreach (k, Intset, s)
         printf("set %d\n", *k.ref);
-    sset_i_drop(&s);
+    Intset_drop(&s);
 }
 */
 

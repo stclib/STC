@@ -22,6 +22,8 @@
  */
 #include "priv/linkage.h"
 
+// Stack - a simplified vec type without linear search and insert/erase inside the stack.
+
 #ifndef STC_STACK_H_INCLUDED
 #define STC_STACK_H_INCLUDED
 #include "common.h"

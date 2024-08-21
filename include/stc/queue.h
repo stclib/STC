@@ -22,6 +22,8 @@
  */
 #include "priv/linkage.h"
 
+// Queue. Implemented as a ring buffer.
+
 #ifndef STC_QUEUE_H_INCLUDED
 #define STC_QUEUE_H_INCLUDED
 #include "common.h"

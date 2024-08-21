@@ -23,7 +23,7 @@
 #define i_header // external linkage by default. override with i_static.
 #include "priv/linkage.h"
 
-// zsview is a "zero-terminated string view". It replaces zsview.
+// zsview is a zero-terminated string view.
 
 #ifndef STC_ZSVIEW_H_INCLUDED
 #define STC_ZSVIEW_H_INCLUDED

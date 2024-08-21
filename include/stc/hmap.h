@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-// Unordered set/map - implemented as closed hashing with linear probing and no tombstones.
+// Unordered set/map - implemented with the robin-hood hashing scheme.
 /*
 #include <stdio.h>
 

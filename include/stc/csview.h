@@ -23,6 +23,8 @@
 #define i_header // external linkage by default. override with i_static.
 #include "priv/linkage.h"
 
+// csview is a non-zero-terminated string view.
+
 #ifndef STC_CSVIEW_H_INCLUDED
 #define STC_CSVIEW_H_INCLUDED
 
