@@ -272,22 +272,21 @@ This example uses four different container types:
 [ [Run this code](https://godbolt.org/z/oEhMbGn6E) ]
 ```c
 #include <stdio.h>
-#include "stc/algo/defer.h"
 
-#define i_key int
-#include "stc/hset.h"   // hset_int: unordered/hash set (assume i_key is basic type, uses `==` operator)
+#define i_type hset_int,int
+#include "stc/hset.h"   // unordered/hash set (assume i_key is basic type, uses `==` operator)
 
 struct Point { float x, y; };
 // Define cvec_pnt and enable linear search by defining i_eq
 #define i_type vec_pnt, struct Point
 #define i_eq(a, b) (a->x == b->x && a->y == b->y)
-#include "stc/vec.h"    // vec_pnt: vector of struct Point
+#include "stc/vec.h"    // vector of struct Point
 
-#define i_key int
+#define i_type list_int,int
 #define i_use_cmp       // enable sort/search. Use native `<` and `==` operators
-#include "stc/list.h"   // list_int: singly linked list
+#include "stc/list.h"   // singly linked list
 
-#define i_type smap_int, int, int
+#define i_type smap_int,int,int
 #include "stc/smap.h"  // sorted map int => int
 
 int main(void)

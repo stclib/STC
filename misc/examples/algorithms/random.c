@@ -7,7 +7,7 @@ int main(void)
 {
     const long long N = 10000000, range = 1000000;
     const uint64_t seed = (uint64_t)time(NULL);
-    crand64_state rng = crand64_make(seed);
+    crand64_rng rng = crand64_make(seed);
     clock_t t;
 
     printf("Compare speed of full and unbiased ranged random numbers...\n");

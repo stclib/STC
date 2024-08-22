@@ -15,7 +15,7 @@ typedef struct Point { int x, y; } Point;
 
 int main(void) {
     int n = 50000000;
-    crand64_state rng = crand64_make(time(NULL));
+    crand64_rng rng = crand64_make(time(NULL));
 
     IntQ Q = {0};
 
