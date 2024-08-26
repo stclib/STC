@@ -76,7 +76,7 @@ typedef struct {
 } crand64_uniform_dist;
 
 static inline crand64_uniform_dist
-crand64_uniform_minmax(int64_t low, int64_t high) {
+crand64_uniform_from(int64_t low, int64_t high) {
     crand64_uniform_dist d = {low, (uint64_t)(high - low + 1)};
     d.threshold = (uint64_t)(0 - d.range) % d.range;
     return d;
@@ -172,7 +172,7 @@ typedef struct {
 } crand32_uniform_dist;
 
 static inline crand32_uniform_dist
-crand32_uniform_minmax(int32_t low, int32_t high) {
+crand32_uniform_from(int32_t low, int32_t high) {
     crand32_uniform_dist d = {low, (uint32_t)(high - low + 1)};
     d.threshold = (uint32_t)(0 - d.range) % d.range;
     return d;

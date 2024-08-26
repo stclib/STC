@@ -22,7 +22,7 @@
  */
 
 #ifndef i_is_forward
-_c_DEFTYPES(_c_deq_types, Self, i_key);
+_c_DEFTYPES(_c_deque_types, Self, i_key);
 #endif
 typedef i_keyraw _m_raw;
 

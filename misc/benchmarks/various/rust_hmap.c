@@ -10,14 +10,10 @@ uint64_t romu_rotl(uint64_t val, uint32_t r) {
 }
 
 uint64_t romu_trio(uint64_t s[3]) {
-   const uint64_t xp = s[0],
-                  yp = s[1],
-                  zp = s[2];
+   const uint64_t xp = s[0], yp = s[1], zp = s[2];
    s[0] = 15241094284759029579u * zp;
-   s[1] = yp - xp;
-   s[1] = romu_rotl(s[1], 12);
-   s[2] = zp - yp;
-   s[2] = romu_rotl(s[2], 44);
+   s[1] = yp - xp; s[1] = romu_rotl(s[1], 12);
+   s[2] = zp - yp; s[2] = romu_rotl(s[2], 44);
    return xp;
 }
 

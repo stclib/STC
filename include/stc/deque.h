@@ -24,16 +24,16 @@
 
 // Deque - double ended queue. Implemented as a ring buffer, extension of queue.
 
-#ifndef STC_DEQ_H_INCLUDED
-#define STC_DEQ_H_INCLUDED
+#ifndef STC_DEQUE_H_INCLUDED
+#define STC_DEQUE_H_INCLUDED
 #include "common.h"
 #include "types.h"
 #include <stdlib.h>
 #include <string.h>
-#endif // STC_DEQ_H_INCLUDED
+#endif // STC_DEQUE_H_INCLUDED
 
 #ifndef _i_prefix
-  #define _i_prefix deq_
+  #define _i_prefix deque_
 #endif
 #define _pop _pop_front
 #define _pull _pull_front
@@ -66,7 +66,7 @@ _c_MEMB(_pop_back)(Self* self) {
     i_keydrop((self->cbuf + self->end));
 }
 
-STC_INLINE _m_value _c_MEMB(_pull_back)(Self* self) { // move back out of deq
+STC_INLINE _m_value _c_MEMB(_pull_back)(Self* self) { // move back out of deque
     c_assert(!_c_MEMB(_is_empty)(self));
     self->end = (self->end - 1) & self->capmask;
     return self->cbuf[self->end];

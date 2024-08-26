@@ -50,8 +50,8 @@ KHASH_MAP_INIT_INT64(ii, IValue)
 #include "external/verstable.h"
 
 
-#define SEED(s) rng = crand_init(s)
-#define RAND(N) (crand_u64(&rng) & (((uint64_t)1 << N) - 1))
+#define SEED(s) crand64_seed(s)
+#define RAND(N) (crand64() & (((uint64_t)1 << N) - 1))
 
 #define HMAP_SETUP(X, Key, Value) hmap_##X map = hmap_##X##_init()
 #define HMAP_PUT(X, key, val)     hmap_##X##_insert_or_assign(&map, key, val).ref->second
@@ -342,7 +342,6 @@ int main(int argc, char* argv[])
     unsigned keybits = argc >= 3 ? atoi(argv[2]) : DEFAULT_KEYBITS;
     unsigned n = n_mill * 1000000;
     unsigned N1 = n, N2 = n, N3 = n, N4 = n, N5 = n;
-    crand_t rng;
     size_t seed = 123456; // time(NULL);
 
     printf("\nUnordered hash map shootout\n");

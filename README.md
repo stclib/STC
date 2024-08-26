@@ -13,7 +13,7 @@ STC - Smart Template Containers
 - Swapped 2nd and 3rd argument in `c_fortoken()` to make it consistent with all other `c_for*()`, i.e, input object is third/last.
 - Renamed templated STC header files. The new default container names are based on the new file names:
   - **vec.h** (from `cvec.h`)
-  - **deq.h** (from `cdeq.h`)
+  - **deque.h** (from `cdeq.h`)
   - **list.h** (from `clist.h`)
   - **stack.h** (from `cstack.h`)
   - **queue.h** (from `cqueue.h`)
@@ -40,7 +40,7 @@ Containers
 - [***list*** - forward linked list](docs/list_api.md)
 - [***stack*** - stack type](docs/stack_api.md)
 - [***vec*** - vector type](docs/vec_api.md)
-- [***deq*** - double ended queue (deque)](docs/deq_api.md)
+- [***deque*** - double-ended queue](docs/deque_api.md)
 - [***queue*** - queue type](docs/queue_api.md)
 - [***pque*** - priority queue](docs/pque_api.md)
 - [***hmap*** - hashmap (unordered)](docs/hmap_api.md)
@@ -219,7 +219,7 @@ Comparison/lookup functions are enabled by default for associative containers an
 
 Note that for `#define i_keyclass Type`, defining `i_use_cmp` means that *Type_cmp()* function is expected to exist (along with *Type_clone()* and *Type_drop()*).
 
-To summarize, `i_use_cmp` is only needed to enable comparison (sort/search) functions when defining stack, vec, queue, deq, arc, box. With built-in types, it enables the comparison operators, whereas for keyclass types, it binds comparison to its Type_cmp() function.
+To summarize, `i_use_cmp` is only needed to enable comparison (sort/search) functions when defining stack, vec, queue, deque, arc, box. With built-in types, it enables the comparison operators, whereas for keyclass types, it binds comparison to its Type_cmp() function.
 
 If an element destructor `i_keydrop` is defined, `i_keyclone` function is required.
 *Alternatively `#define i_opt c_no_clone` to disable container cloning.*
@@ -439,7 +439,7 @@ For the containers marked ***optional***, the features are disabled if the templ
 | Container         | find (integral type) | sort (integral type) |\|| find (struct elem) | sort (struct elem) | optional |
 |:------------------|:---------------------|:---------------------|:-|:-----------------|:-------------------|:---------|
 | stack, queue      | n/a                  | n/a                  || n/a                | n/a                | n/a      |
-| vec, deq, list    | `i_use_cmp`          | `i_use_cmp`          || `i_eq`             | `i_cmp` / `i_less` | yes      |
+| vec, deque, list  | `i_use_cmp`          | `i_use_cmp`          || `i_eq`             | `i_cmp` / `i_less` | yes      |
 | box, arc          | `i_use_cmp`          | `i_use_cmp`          || `i_eq` + `i_hash`  | `i_cmp` / `i_less` | yes      |
 | hmap, hset        |                      | n/a                  || `i_eq` + `i_hash`  | n/a                | no       |
 | smap, sset        |                      |                      || `i_cmp` / `i_less` | `i_cmp` / `i_less` | no       |
@@ -462,11 +462,11 @@ the **emplace** functions are ***not*** available (or needed), as it can easier 
 
 | non-emplace: Move          | emplace: Embedded copy         | Container                                   |
 |:---------------------------|:-------------------------------|:--------------------------------------------|
-| insert(), push()           | emplace()                      | hmap, smap, hset, sset                    |
-| insert_or_assign()         | emplace_or_assign()            | hmap, smap                                 |
-| push()                     | emplace()                      | queue, pque, stack                       |
-| push_back(), push()        | emplace_back()                 | deq, list, vec                           |
-| push_front()               | emplace_front()                | deq, list                                 |
+| insert(), push()           | emplace()                      | hmap, smap, hset, sset      |
+| insert_or_assign()         | emplace_or_assign()            | hmap, smap                  |
+| push()                     | emplace()                      | queue, pque, stack          |
+| push_back(), push()        | emplace_back()                 | deque, list, vec            |
+| push_front()               | emplace_front()                | deque, list                 |
 
 Strings are the most commonly used non-trivial data type. STC containers have proper pre-defined
 definitions for cstr container elements, so they are fail-safe to use both with the **emplace**
@@ -521,13 +521,13 @@ last example on the **hmap** page demonstrates how to specify a map with non-tri
 ---
 ## The *erase* methods
 
-| Name                      | Description                  | Container                                   |
-|:--------------------------|:-----------------------------|:--------------------------------------------|
-| erase()                   | key based                    | smap, sset, hmap, hset, cstr              |
-| erase_at()                | iterator based               | smap, sset, hmap, hset, vec, deq, list |
-| erase_range()             | iterator based               | smap, sset, vec, deq, list             |
-| erase_n()                 | index based                  | vec, deq, cstr                            |
-| remove()                  | remove all matching values   | list                                       |
+| Name                      | Description                  | Container                                |
+|:--------------------------|:-----------------------------|:-----------------------------------------|
+| erase()                   | key based                    | smap, sset, hmap, hset, cstr             |
+| erase_at()                | iterator based               | smap, sset, hmap, hset, vec, deque, list |
+| erase_range()             | iterator based               | smap, sset, vec, deque, list             |
+| erase_n()                 | index based                  | vec, deque, cstr                         |
+| remove()                  | remove all matching values   | list                                     |
 
 ---
 ## User-defined container type name
@@ -640,7 +640,7 @@ allocated size of the given pointer, unlike standard `realloc` and `free`.
 - `i_malloc`, `i_calloc`, `i_realloc`, `i_free`: **all containers**
 - `i_cmp`: **smap** and **sset**
 - `i_hash`, `i_eq`: **hmap** and **hset**
-- `i_eq`: **vec**, **deq**, **list**
+- `i_eq`: **vec**, **deque**, **list**
 - `i_less`: **pque**
 
 ```c
@@ -680,7 +680,7 @@ STC is generally very memory efficient. Memory usage for the different container
 - **csview**, 1 pointer, 1 isize. Does not own data!
 - **cspan**, 1 pointer and 2 \* dimension \* int32_t. Does not own data!
 - **list**: Type size: 1 pointer. Each node allocates a struct to store its value and a next pointer.
-- **deq**, **queue**:  Type size: 2 pointers, 2 isize. Otherwise like *vec*.
+- **deque**, **queue**:  Type size: 2 pointers, 2 isize. Otherwise like *vec*.
 - **hmap/hset**: Type size: 2 pointers, 2 int32_t (default). *hmap* uses one table of keys+value, and one table of precomputed hash-value/used bucket, which occupies only one byte per bucket. The closed hashing has a default max load factor of 85%, and hash table scales by 1.5x when reaching that.
 - **smap/sset**: Type size: 1 pointer. *smap* manages its own ***array of tree-nodes*** for allocation efficiency. Each node uses two 32-bit ints for child nodes, and one byte for `level`, but has ***no parent node***.
 - **arc**: Type size: 1 pointer, 1 long for the reference counter + memory for the shared element.
@@ -697,13 +697,13 @@ STC is generally very memory efficient. Memory usage for the different container
         - Much improved with some new API and added features.
     - Removed deprecated "stc/crandom.h". Use `"stc/crand.h"` with the new API.
         - Reverted names _unif and _norm back to `_uniform` and `_normal`.
-    - Removed default comparison for **list**, **vec** and **deq**:
+    - Removed default comparison for **list**, **vec** and **deque**:
         - Define `i_use_cmp` to enable comparison for built-in i_key types (<, ==).
         - Use of `i_keyclass` still expects comparison functions to be defined.
         - Use of `i_key_arc/i_key_box` compares stored pointers instead of pointed to values if comparison not defined.
     - Renamed input enum flags for ***cregex***-functions.
 - **cspan**: Added **column-major** order (fortran) multidimensional spans and transposed views (changed representation of strides).
-- All new faster and smaller **queue** and **deq** implementations, using a circular buffer.
+- All new faster and smaller **queue** and **deque** implementations, using a circular buffer.
 - Renamed i_extern => `i_import` (i_extern deprecated).
     - Define `i_import` before `#include "stc/cstr.h"` will also define full utf8 case conversions.
     - Define `i_import` before `#include "stc/cregex.h"` will also define cstr + utf8 tables.
@@ -750,7 +750,7 @@ Major changes:
 - New + renamed loop iteration/scope macros:
     - `c_foritems`: macro replacing *c_forarray* and *c_apply*. Iterate a compound literal list.
 - Updated **cstr**, now always takes self as pointer, like all containers except csview.
-- Updated **vec**, **deq**, changed `*_range*` function names.
+- Updated **vec**, **deque**, changed `*_range*` function names.
 
 ## Changes version 3.8
 - Overhauled some **cstr** and **csview** API:

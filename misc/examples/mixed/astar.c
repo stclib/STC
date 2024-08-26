@@ -56,43 +56,43 @@ point_key_cmp(const point* a, const point* b)
     return (i == j) ? 0 : (i < j) ? -1 : 1;
 }
 
-#define i_type pque_point, point
+#define i_type pqueue_pnt, point
 #define i_cmp point_cmp_priority
 #include "stc/pque.h"
 
-#define i_type deq_point, point
-#include "stc/deq.h"
+#define i_type deque_pnt, point
+#include "stc/deque.h"
 
-#define i_type smap_pcost, point, int
+#define i_type smap_pcost, point,int
 #define i_cmp point_key_cmp
 #include "stc/smap.h"
 
-#define i_type smap_pstep, point, point
+#define i_type smap_pstep, point,point
 #define i_cmp point_key_cmp
 #include "stc/smap.h"
 
 
-deq_point
+deque_pnt
 astar(cstr* maze, int width)
 {
-    deq_point ret_path = {0};
+    deque_pnt ret_path = {0};
 
-    pque_point front = {0};
+    pqueue_pnt front = {0};
     smap_pstep from = {0};
     smap_pcost costs = {0};
     c_deferred(
-        pque_point_drop(&front),
+        pqueue_pnt_drop(&front),
         smap_pstep_drop(&from),
         smap_pcost_drop(&costs)
     ){
         point start = point_from(maze, "@", width);
         point goal = point_from(maze, "!", width);
         smap_pcost_insert(&costs, start, 0);
-        pque_point_push(&front, start);
-        while (!pque_point_is_empty(&front))
+        pqueue_pnt_push(&front, start);
+        while (!pqueue_pnt_is_empty(&front))
         {
-            point current = *pque_point_top(&front);
-            pque_point_pop(&front);
+            point current = *pqueue_pnt_top(&front);
+            pqueue_pnt_pop(&front);
             if (point_equal(&current, &goal))
                 break;
             point deltas[] = {
@@ -112,7 +112,7 @@ astar(cstr* maze, int width)
                     {
                         smap_pcost_insert(&costs, next, new_cost);
                         next.priorty = new_cost + abs(goal.x - next.x) + abs(goal.y - next.y);
-                        pque_point_push(&front, next);
+                        pqueue_pnt_push(&front, next);
                         smap_pstep_insert(&from, next, current);
                     }
                 }
@@ -121,10 +121,10 @@ astar(cstr* maze, int width)
         point current = goal;
         while (!point_equal(&current, &start))
         {
-            deq_point_push_front(&ret_path, current);
+            deque_pnt_push_front(&ret_path, current);
             current = *smap_pstep_at(&from, current);
         }
-        deq_point_push_front(&ret_path, start);
+        deque_pnt_push_front(&ret_path, start);
     }
     return ret_path;
 }
@@ -158,13 +158,13 @@ main(void)
         "#########################################################################\n"
     );
     int width = (int)cstr_find(&maze, "\n") + 1;
-    deq_point ret_path = astar(&maze, width);
+    deque_pnt ret_path = astar(&maze, width);
 
-    c_foreach (it, deq_point, ret_path)
+    c_foreach (it, deque_pnt, ret_path)
         cstr_data(&maze)[point_index(it.ref)] = 'x';
 
     printf("%s", cstr_str(&maze));
 
-    deq_point_drop(&ret_path);
+    deque_pnt_drop(&ret_path);
     cstr_drop(&maze);
 }

@@ -19,7 +19,7 @@ void                 crand64_seed(uint64_t seed);                        // set 
 uint64_t             crand64(void);                                      // global crand64_r(rng)
 double               crand64_real(void);                                 // global crand64_real_r(rng)
 double               crand64_normal(crand64_normal_dist* d);             // global crand64_normal_r(rng, d)
-crand64_uniform_dist crand64_uniform_minmax(int64_t low, int64_t high);  // create a uniform distribution
+crand64_uniform_dist crand64_uniform_from(int64_t low, int64_t high);    // create a uniform distribution
 int64_t              crand64_uniform(crand64_uniform_dist* d);           // global crand64_uniform_r(rng, d)
 
 crand64_rng          crand64_make(uint64_t seed);                        // create a crand64_rng state from a seed value

@@ -198,7 +198,7 @@ STC_INLINE isize c_next_pow2(isize n) {
     _c_foreach(it, C, start, (end).ref, _)
 
 #define c_foreach_reverse(...) c_MACRO_OVERLOAD(c_foreach_reverse, __VA_ARGS__)
-#define c_foreach_reverse_3(it, C, cnt) /* works for stack, vec, queue, deq */ \
+#define c_foreach_reverse_3(it, C, cnt) /* works for stack, vec, queue, deque */ \
     for (C##_iter it = C##_rbegin(&cnt); it.ref; C##_rnext(&it))
 #define c_foreach_reverse_4(it, C, start, end) \
     _c_foreach(it, C, start, (end).ref, _r)

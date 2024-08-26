@@ -5,9 +5,8 @@
 
 enum{ N=1<<22 }; // 4.2 mill.
 #define i_static
-#include "stc/crand.h"
-#define i_type cbits
-#define i_len N
+#include "stc/algo/random.h"
+#define i_type cbits, N
 #include "stc/cbits.h"
 
 inline unsigned long get_time_in_ms()
@@ -39,12 +38,12 @@ int main(int argc, char **argv)
     one_sec_delay();
 
     total = 0;
-    csrand(seed);
+    crand64_seed(seed);
     current_time = get_time_in_ms();
 
     c_forrange (40 * N)
     {
-        uint64_t r = crand();
+        uint64_t r = crand64();
         bools[r & (N-1)] = r & 1<<29;
     }
 
@@ -66,13 +65,13 @@ int main(int argc, char **argv)
     one_sec_delay();
 
     total = 0;
-    csrand(seed);
+    crand64_seed(seed);
     current_time = get_time_in_ms();
     bitset<N> bits;
 
     c_forrange (40 * N)
     {
-        uint64_t r = crand();
+        uint64_t r = crand64();
         bits[r & (N-1)] = r & 1<<29;
     }
 
@@ -92,13 +91,13 @@ int main(int argc, char **argv)
     one_sec_delay();
 
     total = 0;
-    csrand(seed);
+    crand64_seed(seed);
     current_time = get_time_in_ms();
     cbits bits2 = cbits_with_size(N, false);
 
     c_forrange (40 * N)
     {
-        uint64_t r = crand();
+        uint64_t r = crand64();
         cbits_set_value(&bits2, r & (N-1), r & 1<<29);
     }
 

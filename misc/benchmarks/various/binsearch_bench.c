@@ -23,7 +23,7 @@ int main(int argc, char const *argv[])
 
     long long count = 0;
     clock_t t = clock();
-    //csrand(0);
+    //crand64_seed(1);
     c_forrange (i, N) {
         uint64_t r = crand64() & mask;
         #ifdef __cplusplus

@@ -68,7 +68,7 @@
 // c_eraseremove_if
 // --------------------------------
 
-// Use with: stack, vec, deq, queue:
+// Use with: stack, vec, deque, queue:
 #define c_eraseremove_if(C, cnt_ptr, pred) do { \
     C* _cnt = cnt_ptr; \
     isize _n = 0; \

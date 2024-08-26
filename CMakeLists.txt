@@ -31,7 +31,7 @@ if(BUILD_TESTING)
 	target_link_libraries(stctest PRIVATE stc m)
 	add_test(NAME stctest COMMAND stctest)
 
-	# foreach(name IN ITEMS deq list hmap smap vec)
+	# foreach(name IN ITEMS deque list hmap smap vec)
 	#	add_executable(${name} misc/benchmarks/plotbench/${name}_benchmark.cpp)
 	#	target_link_libraries(${name} PRIVATE stc m)
 	#	add_test(NAME ${name} COMMAND ${name})

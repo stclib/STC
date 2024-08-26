@@ -9,7 +9,7 @@ python singleheader.py $d/include/stc/arc.h    $d/../stcsingle/stc/arc.h
 python singleheader.py $d/include/stc/cbits.h   $d/../stcsingle/stc/cbits.h
 python singleheader.py $d/include/stc/box.h    $d/../stcsingle/stc/box.h
 python singleheader.py $d/include/stc/common.h $d/../stcsingle/stc/common.h
-python singleheader.py $d/include/stc/deq.h    $d/../stcsingle/stc/deq.h
+python singleheader.py $d/include/stc/deque.h    $d/../stcsingle/stc/deque.h
 python singleheader.py $d/include/stc/list.h   $d/../stcsingle/stc/list.h
 python singleheader.py $d/include/stc/hmap.h    $d/../stcsingle/stc/hmap.h
 python singleheader.py $d/include/stc/coption.h $d/../stcsingle/stc/coption.h

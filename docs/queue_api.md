@@ -62,10 +62,10 @@ void                queue_X_value_drop(queue_X_value* pval);
 
 | Type name          | Type definition     | Used to represent...    |
 |:-------------------|:--------------------|:------------------------|
-| `queue_X`          | `deq_X`             | The queue type          |
+| `queue_X`          | `deque_X`           | The queue type          |
 | `queue_X_value`    | `i_key`             | The queue element type  |
 | `queue_X_raw`      | `i_keyraw`          | queue raw value type    |
-| `queue_X_iter`     | `deq_X_iter`        | queue iterator          |
+| `queue_X_iter`     | `deque_X_iter`      | queue iterator          |
 
 ## Examples
 ```c

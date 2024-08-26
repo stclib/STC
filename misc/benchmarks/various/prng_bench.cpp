@@ -2,7 +2,6 @@
 #include <iostream>
 #include <ctime>
 #include <random>
-#include "stc/crand.h"
 
 static inline uint64_t rotl64(const uint64_t x, const int k)
   { return (x << k) | (x >> (64 - k)); }
@@ -34,8 +33,7 @@ uint64_t romu_trio(uint64_t s[3]) {
 /* sfc64 */
 
 static inline uint64_t sfc64m(uint64_t s[4], uint64_t stream) {
-    //uint64_t result = (s[0] ^ (s[3] += stream)) + s[1];
-    uint64_t result = (s[0]^(s[3] += stream)) + s[1];
+    uint64_t result = (s[0] ^ (s[3] += stream)) + s[1];
     s[0] = s[1] ^ (s[1] >> 11);
     s[1] = s[2] + (s[2] << 3);
     s[2] = rotl64(s[2], 24) + result;
@@ -130,22 +128,22 @@ int main(void)
 {
     enum {N = 500000000};
     uint16_t* recipient = new uint16_t[N];
-    static crand_t rng;
-    init_state(rng.state, 12345123);
+    static uint64_t rng[4];
+    init_state(rng, 12345123);
     std::mt19937 mt(12345123);
 
     cout << "WARMUP"  << endl;
     for (size_t i = 0; i < N; i++)
-         recipient[i] = wyrand64(rng.state);
+         recipient[i] = wyrand64(rng);
 
     clock_t beg, end;
     for (size_t ti = 0; ti < 2; ti++) {
-        init_state(rng.state, 12345123);
+        init_state(rng, 12345123);
         cout << endl << "ROUND " << ti+1 << " ---------" << endl;
 /*
         beg = clock();
         for (size_t i = 0; i < N; i++)
-            recipient[i] = sfc32((uint32_t *)rng.state);
+            recipient[i] = sfc32((uint32_t *)rng);
         end = clock();
         cout << "sfc32:\t\t"
              << (float(end - beg) / CLOCKS_PER_SEC)
@@ -153,7 +151,7 @@ int main(void)
 
         beg = clock();
         for (size_t i = 0; i < N; i++)
-            recipient[i] = stc32((uint32_t *)rng.state);
+            recipient[i] = stc32((uint32_t *)rng);
         end = clock();
         cout << "stc32:\t\t"
              << (float(end - beg) / CLOCKS_PER_SEC)
@@ -161,7 +159,7 @@ int main(void)
 
         beg = clock();
         for (size_t i = 0; i < N; i++)
-            recipient[i] = pcg32((uint32_t *)rng.state);
+            recipient[i] = pcg32((uint32_t *)rng);
         end = clock();
         cout << "pcg32:\t\t"
              << (float(end - beg) / CLOCKS_PER_SEC)
@@ -169,23 +167,7 @@ int main(void)
 */
         beg = clock();
         for (size_t i = 0; i < N; i++)
-            recipient[i] = crand_u64(&rng);
-        end = clock();
-        cout << "crand64:\t"
-             << (float(end - beg) / CLOCKS_PER_SEC)
-             << "s: " << recipient[312] << endl;
-
-        beg = clock();
-        for (size_t i = 0; i < N; i++)
-            recipient[i] = sfc64m(rng.state, 1);
-        end = clock();
-        cout << "sfc64m:\t\t"
-             << (float(end - beg) / CLOCKS_PER_SEC)
-             << "s: " << recipient[312] << endl;
-
-        beg = clock();
-        for (size_t i = 0; i < N; i++)
-            recipient[i] = romu_trio(rng.state);
+            recipient[i] = romu_trio(rng);
         end = clock();
         cout << "romu_trio:\t"
              << (float(end - beg) / CLOCKS_PER_SEC)
@@ -193,7 +175,7 @@ int main(void)
 
         beg = clock();
         for (size_t i = 0; i < N; i++)
-            recipient[i] = wyrand64(rng.state);
+            recipient[i] = wyrand64(rng);
         end = clock();
         cout << "wyrand64:\t"
              << (float(end - beg) / CLOCKS_PER_SEC)
@@ -201,7 +183,7 @@ int main(void)
 
         beg = clock();
         for (size_t i = 0; i < N; i++)
-            recipient[i] = sfc64(rng.state);
+            recipient[i] = sfc64(rng);
         end = clock();
         cout << "sfc64:\t\t"
              << (float(end - beg) / CLOCKS_PER_SEC)
@@ -209,7 +191,7 @@ int main(void)
 
         beg = clock();
         for (size_t i = 0; i < N; i++)
-            recipient[i] = xoroshiro128plus(rng.state);
+            recipient[i] = xoroshiro128plus(rng);
         end = clock();
         cout << "xoroshiro128+:\t"
              << (float(end - beg) / CLOCKS_PER_SEC)
@@ -217,7 +199,15 @@ int main(void)
 
         beg = clock();
         for (size_t i = 0; i < N; i++)
-            recipient[i] = xoshiro256starstar(rng.state);
+            recipient[i] = sfc64m(rng, 1);
+        end = clock();
+        cout << "sfc64m:\t\t"
+             << (float(end - beg) / CLOCKS_PER_SEC)
+             << "s: " << recipient[312] << endl;
+
+        beg = clock();
+        for (size_t i = 0; i < N; i++)
+            recipient[i] = xoshiro256starstar(rng);
         end = clock();
         cout << "xoshiro256**:\t"
              << (float(end - beg) / CLOCKS_PER_SEC)

@@ -12,7 +12,7 @@
 |:-----------------------------------------|:------------------------------------------|
 | `c_foreach (it, ctype, container)`       | Iteratate all elements                    |
 | `c_foreach (it, ctype, it1, it2)`        | Iterate the range [it1, it2)              |
-| `c_foreach_reverse (it, ctype, container)`| Iteratate all elements in reverse. *vec, deq, queue, stack* only! |
+| `c_foreach_reverse (it, ctype, container)`| Iteratate elements in reverse: *vec, deque, queue, stack* |
 | `c_foreach_reverse (it, ctype, it1, it2)`| Iteratate range [it1, it2) elements in reverse. |
 | `c_foreach_n (it, ctype, cnt, n)`        | Iterate up to n times using it.index and it.n |
 | `c_foreach_kv (key, val, ctype, container)` | Iterate with structured binding           |
@@ -126,7 +126,7 @@ c_filter(crange, c_iota(3), true
 Functional programming with chained `&&` filtering. `value` is the pointer to current value.
 It enables a subset of functional programming like in other popular languages.
 
-- **Note 1**: The **_reverse** variants only works with *vec, deq, stack, queue* containers.
+- **Note 1**: The **_reverse** variants only works with *vec, deque, stack, queue* containers.
 - **Note 2**: There is also a `c_forfilter` loop variant of `c_filter`. It uses the filter namings
 `c_fflt_skip(it, numItems)`, etc. See [filter.h](../include/stc/algo/filter.h).
 
@@ -232,7 +232,7 @@ Copy linearily in containers using a predicate. `value` is a pointer to each ele
 ### c_erase_if, c_eraseremove_if
 Erase linearily in containers using a predicate. `value` is a pointer to each element in predicate.
 - `c_erase_if(CntType, cnt_ptr, pred)`. Use with **list**, **hmap**, **hset**, **smap**, and **sset**.
-- `c_eraseremove_if(CntType, cnt_ptr, pred)`. Use with **stack**, **vec**, **deq**, and **queue** only.
+- `c_eraseremove_if(CntType, cnt_ptr, pred)`. Use with **stack**, **vec**, **deque**, and **queue** only.
 ```c
 #include <stdio.h>
 #define i_static
@@ -330,16 +330,17 @@ int main(void) {
     c_forrange (i, c_arraylen(arr)) printf(" %d", arr[i]);
 }
 ```
-Also deq/queue (with ring buffer) and linked lists may be sorted, e.g.:
+Also deque/queue (with ring buffer) and linked lists may be sorted, e.g.:
 ```c
 #define i_type MyDeq,int
 #define i_use_cmp // enable sorting
-#include "stc/deq.h" // deque
+#include "stc/deque.h" // deque
 #include <stdio.h>
 
 int main(void) {
-    c_with (MyDeq deq, MyDeq_drop(&deq)) {
-        deq = c_init(MyDeq, {5, 3, 5, 9, 7, 4, 7}); // pushed back
+    MyDeq deq = c_init(MyDeq, {5, 3, 5, 9, 7, 4, 7});
+    c_deferred (MyDeq_drop(&deq))
+    {
         c_foritems (i, int, {2, 4, 9, 3, 1, 2, 6, 4})
             MyDeq_push_front(&deq, *i.ref);
 

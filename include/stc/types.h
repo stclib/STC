@@ -35,7 +35,7 @@
 
 #define forward_arc(C, VAL) _c_arc_types(C, VAL)
 #define forward_box(C, VAL) _c_box_types(C, VAL)
-#define forward_deq(C, VAL) _c_deq_types(C, VAL)
+#define forward_deq(C, VAL) _c_deque_types(C, VAL)
 #define forward_list(C, VAL) _c_list_types(C, VAL)
 #define forward_hmap(C, KEY, VAL) _c_htable_types(C, KEY, VAL, c_true, c_false)
 #define forward_hset(C, KEY) _c_htable_types(C, cset, KEY, KEY, c_false, c_true)
@@ -43,7 +43,7 @@
 #define forward_sset(C, KEY) _c_aatree_types(C, KEY, KEY, c_false, c_true)
 #define forward_stack(C, VAL) _c_stack_types(C, VAL)
 #define forward_pque(C, VAL) _c_pque_types(C, VAL)
-#define forward_queue(C, VAL) _c_deq_types(C, VAL)
+#define forward_queue(C, VAL) _c_deque_types(C, VAL)
 #define forward_vec(C, VAL) _c_vec_types(C, VAL)
 
 // csview : non-null terminated string view
@@ -117,7 +117,7 @@ typedef union {
         SELF##_value* get; \
     } SELF
 
-#define _c_deq_types(SELF, VAL) \
+#define _c_deque_types(SELF, VAL) \
     typedef VAL SELF##_value; \
 \
     typedef struct SELF { \

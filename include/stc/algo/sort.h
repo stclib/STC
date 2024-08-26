@@ -52,7 +52,7 @@ int main(void) {
 #include <stdio.h>
 #define i_type IDeq, int
 #define i_use_cmp
-#include "stc/deq.h"
+#include "stc/deque.h"
 
 int main(void) {
     IDeq nums = c_init(IDeq, {5434, 25, 245, 1, 654, 33, 543, 21});

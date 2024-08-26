@@ -17,8 +17,8 @@ uint64_t seed = 1, mask1 = 0xfffffff, mask2 = 0xffff;
 
 static float secs(Range s) { return (float)(s.t2 - s.t1) / CLOCKS_PER_SEC; }
 
-#define i_type deq_u64, uint64_t
-#include "stc/deq.h"
+#define i_type Deque, uint64_t
+#include "stc/deque.h"
 
 #ifdef __cplusplus
 Sample test_std_deque() {
@@ -63,39 +63,39 @@ Sample test_std_deque() { Sample s = {"std-deque"}; return s;}
 
 
 Sample test_stc_deque() {
-    typedef deq_u64 container;
+    typedef Deque container;
     Sample s = {"STC,deque"};
     {
         s.test[INSERT].t1 = clock();
         container con = {0};
-        //deq_u64_reserve(&con, N);
+        //Deque_reserve(&con, N);
         csrand(seed);
-        c_forrange (N/3) deq_u64_push_front(&con, crand() & mask1);
-        c_forrange (N/3) {deq_u64_push_back(&con, crand() & mask1); deq_u64_pop_front(&con);}
-        c_forrange (N/3) deq_u64_push_back(&con, crand() & mask1);
+        c_forrange (N/3) Deque_push_front(&con, crand() & mask1);
+        c_forrange (N/3) {Deque_push_back(&con, crand() & mask1); Deque_pop_front(&con);}
+        c_forrange (N/3) Deque_push_back(&con, crand() & mask1);
         s.test[INSERT].t2 = clock();
-        s.test[INSERT].sum = deq_u64_size(&con);
+        s.test[INSERT].sum = Deque_size(&con);
         s.test[ERASE].t1 = clock();
-        c_forrange (deq_u64_size(&con)/2) { deq_u64_pop_front(&con); deq_u64_pop_back(&con); }
+        c_forrange (Deque_size(&con)/2) { Deque_pop_front(&con); Deque_pop_back(&con); }
         s.test[ERASE].t2 = clock();
-        s.test[ERASE].sum = deq_u64_size(&con);
-        deq_u64_drop(&con);
+        s.test[ERASE].sum = Deque_size(&con);
+        Deque_drop(&con);
      }{
         csrand(seed);
         container con = {0};
-        c_forrange (N) deq_u64_push_back(&con, crand() & mask2);
+        c_forrange (N) Deque_push_back(&con, crand() & mask2);
         s.test[FIND].t1 = clock();
         size_t sum = 0;
-        c_forrange (R) c_forrange (i, N) sum += *deq_u64_at(&con, i);
+        c_forrange (R) c_forrange (i, N) sum += *Deque_at(&con, i);
         s.test[FIND].t2 = clock();
         s.test[FIND].sum = sum;
         s.test[ITER].t1 = clock();
         sum = 0;
-        c_forrange (R) c_foreach (i, deq_u64, con) sum += *i.ref;
+        c_forrange (R) c_foreach (i, Deque, con) sum += *i.ref;
         s.test[ITER].t2 = clock();
         s.test[ITER].sum = sum;
         s.test[DESTRUCT].t1 = clock();
-        deq_u64_drop(&con);
+        Deque_drop(&con);
      }
      s.test[DESTRUCT].t2 = clock();
      s.test[DESTRUCT].sum = 0;

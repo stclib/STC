@@ -2,10 +2,10 @@
 
 #define i_type IDeq,int
 #define i_use_cmp
-#include "stc/deq.h"
+#include "stc/deque.h"
 
 
-TEST(deq, basics) {
+TEST(deque, basics) {
     IDeq d = c_init(IDeq, {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12});
     EXPECT_EQ(12, IDeq_size(&d));
 
