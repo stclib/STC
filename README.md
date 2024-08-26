@@ -17,7 +17,7 @@ STC - Smart Template Containers
   - **list.h** (from `clist.h`)
   - **stack.h** (from `cstack.h`)
   - **queue.h** (from `cqueue.h`)
-  - **pque.h** (from `cpque.h`)
+  - **pqueue.h** (from `cpque.h`)
   - **hmap.h** (from `cmap.h`)
   - **hset.h** (from `cset.h`)
   - **smap.h** (from `csmap.h`)
@@ -42,7 +42,7 @@ Containers
 - [***vec*** - vector type](docs/vec_api.md)
 - [***deque*** - double-ended queue](docs/deque_api.md)
 - [***queue*** - queue type](docs/queue_api.md)
-- [***pque*** - priority queue](docs/pque_api.md)
+- [***pqueue*** - priority queue](docs/pqueue_api.md)
 - [***hmap*** - hashmap (unordered)](docs/hmap_api.md)
 - [***hset*** - hashset (unordered)](docs/hset_api.md)
 - [***smap*** - sorted binary tree map](docs/smap_api.md)
@@ -215,7 +215,7 @@ int main(void)
     Floats_drop(&nums);
 }
 ```
-Comparison/lookup functions are enabled by default for associative containers and priority queue (hmap, hset, smap, sset, pque). To enable it for the remaining containers, define `i_cmp` or `i_less` (and optionally `i_eq`) on the element type. If the element is an integral type, simply define `i_use_cmp` to use `<` and `==` operators for comparisons.
+Comparison/lookup functions are enabled by default for associative containers and priority queue (hmap, hset, smap, sset, pqueue). To enable it for the remaining containers, define `i_cmp` or `i_less` (and optionally `i_eq`) on the element type. If the element is an integral type, simply define `i_use_cmp` to use `<` and `==` operators for comparisons.
 
 Note that for `#define i_keyclass Type`, defining `i_use_cmp` means that *Type_cmp()* function is expected to exist (along with *Type_clone()* and *Type_drop()*).
 
@@ -443,7 +443,7 @@ For the containers marked ***optional***, the features are disabled if the templ
 | box, arc          | `i_use_cmp`          | `i_use_cmp`          || `i_eq` + `i_hash`  | `i_cmp` / `i_less` | yes      |
 | hmap, hset        |                      | n/a                  || `i_eq` + `i_hash`  | n/a                | no       |
 | smap, sset        |                      |                      || `i_cmp` / `i_less` | `i_cmp` / `i_less` | no       |
-| pque              | n/a                  |                      || n/a                | `i_cmp` / `i_less` | no       |
+| pqueue            | n/a                  |                      || n/a                | `i_cmp` / `i_less` | no       |
 
 ---
 ## The *emplace* methods
@@ -460,11 +460,11 @@ container.
 **Note**: For containers with integral/trivial element types, or when neither `i_keyraw/i_valraw` is defined,
 the **emplace** functions are ***not*** available (or needed), as it can easier lead to mistakes.
 
-| non-emplace: Move          | emplace: Embedded copy         | Container                                   |
-|:---------------------------|:-------------------------------|:--------------------------------------------|
+| non-emplace: Move          | emplace: Embedded copy         | Container                   |
+|:---------------------------|:-------------------------------|:----------------------------|
 | insert(), push()           | emplace()                      | hmap, smap, hset, sset      |
 | insert_or_assign()         | emplace_or_assign()            | hmap, smap                  |
-| push()                     | emplace()                      | queue, pque, stack          |
+| push()                     | emplace()                      | queue, pqueue, stack        |
 | push_back(), push()        | emplace_back()                 | deque, list, vec            |
 | push_front()               | emplace_front()                | deque, list                 |
 
@@ -641,7 +641,7 @@ allocated size of the given pointer, unlike standard `realloc` and `free`.
 - `i_cmp`: **smap** and **sset**
 - `i_hash`, `i_eq`: **hmap** and **hset**
 - `i_eq`: **vec**, **deque**, **list**
-- `i_less`: **pque**
+- `i_less`: **pqueue**
 
 ```c
 // stcpgs.h
@@ -676,7 +676,7 @@ void maptest()
 ## Memory efficiency
 
 STC is generally very memory efficient. Memory usage for the different containers:
-- **cstr**, **vec**, **stack**, **pque**: 1 pointer, 2 isize + memory for elements.
+- **cstr**, **vec**, **stack**, **pqueue**: 1 pointer, 2 isize + memory for elements.
 - **csview**, 1 pointer, 1 isize. Does not own data!
 - **cspan**, 1 pointer and 2 \* dimension \* int32_t. Does not own data!
 - **list**: Type size: 1 pointer. Each node allocates a struct to store its value and a next pointer.

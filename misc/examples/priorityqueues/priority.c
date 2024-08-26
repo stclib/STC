@@ -5,7 +5,7 @@
 
 #define i_type PQueue,int
 #define i_cmp -c_default_cmp  // min-heap (increasing values)
-#include "stc/pque.h"
+#include "stc/pqueue.h"
 
 int main(void) {
     int N = 10000000;

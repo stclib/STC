@@ -4,7 +4,7 @@
 
 #define i_type PrQue,float
 #define i_cmp -c_default_cmp
-#include "stc/pque.h"
+#include "stc/pqueue.h"
 
 #include <queue>
 

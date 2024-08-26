@@ -166,7 +166,7 @@
 
 // Bind to i_keyraw "class members": _cmp, _eq and _hash (when conditions are met).
 #if defined i_cmpclass // => i_keyraw
-  #if !(defined i_cmp || defined i_less) && (defined i_use_cmp || defined _i_sorted || defined _i_ispque)
+  #if !(defined i_cmp || defined i_less) && (defined i_use_cmp || defined _i_sorted || defined _i_is_pqueue)
     #define i_cmp c_JOIN(i_cmpclass, _cmp)
   #endif
   #if !defined i_eq && (defined i_use_eq || defined i_hash || defined _i_is_hash)
@@ -191,7 +191,7 @@
 #elif defined i_keyto || defined i_valto
   #error i_keyto/i_valto not supported. Use i_keytoraw/i_valtoraw
 #elif defined i_keyraw && defined i_use_cmp && !defined _i_has_cmp
-  #error "For smap/sset/pque, i_cmp or i_less must be defined when i_keyraw is defined."
+  #error "For smap/sset/pqueue, i_cmp or i_less must be defined when i_keyraw is defined."
 #endif
 
 // Fill in missing i_eq, i_less, i_cmp functions with defaults.

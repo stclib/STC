@@ -13,7 +13,7 @@ python singleheader.py $d/include/stc/deque.h    $d/../stcsingle/stc/deque.h
 python singleheader.py $d/include/stc/list.h   $d/../stcsingle/stc/list.h
 python singleheader.py $d/include/stc/hmap.h    $d/../stcsingle/stc/hmap.h
 python singleheader.py $d/include/stc/coption.h $d/../stcsingle/stc/coption.h
-python singleheader.py $d/include/stc/pque.h   $d/../stcsingle/stc/pque.h
+python singleheader.py $d/include/stc/pqueue.h   $d/../stcsingle/stc/pqueue.h
 python singleheader.py $d/include/stc/queue.h  $d/../stcsingle/stc/queue.h
 python singleheader.py $d/include/stc/cregex.h  $d/../stcsingle/stc/cregex.h
 python singleheader.py $d/include/stc/hset.h    $d/../stcsingle/stc/hset.h

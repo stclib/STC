@@ -25,27 +25,27 @@ inline static int ipair_cmp(const ipair_t* a, const ipair_t* b) {
 #define i_cmp ipair_cmp
 #include "stc/list.h"
 
-#define i_type pque_flt,float
-#include "stc/pque.h"
+#define i_type pqueue_flt,float
+#include "stc/pqueue.h"
 
 int main(void)
 {
     // VEC FLOAT / PRIORITY QUEUE
 
-    pque_flt floats = {0};
+    pqueue_flt floats = {0};
     const float nums[] = {4.0f, 2.0f, 5.0f, 3.0f, 1.0f};
 
     // PRIORITY QUEUE
     c_forrange (i, c_arraylen(nums))
-        pque_flt_push(&floats, nums[i]);
+        pqueue_flt_push(&floats, nums[i]);
 
     puts("\npop and show high priorites first:");
-    while (! pque_flt_is_empty(&floats)) {
-        printf("%.1f ", (double)*pque_flt_top(&floats));
-        pque_flt_pop(&floats);
+    while (! pqueue_flt_is_empty(&floats)) {
+        printf("%.1f ", (double)*pqueue_flt_top(&floats));
+        pqueue_flt_pop(&floats);
     }
     puts("\n");
-    pque_flt_drop(&floats);
+    pqueue_flt_drop(&floats);
 
     // CMAP ID
 

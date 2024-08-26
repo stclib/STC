@@ -1,4 +1,4 @@
-# STC [pque](../include/stc/pque.h): Priority Queue
+# STC [pqueue](../include/stc/pqueue.h): Priority Queue
 
 A priority queue is a container adaptor that provides constant time lookup of the largest (by default) element, at the expense of logarithmic insertion and extraction.
 A user-provided ***i_cmp*** may be defined to set the ordering, e.g. using ***-c_default_cmp*** would cause the smallest element to appear as the top() value.
@@ -9,8 +9,8 @@ See the c++ class [std::priority_queue](https://en.cppreference.com/w/cpp/contai
 
 ```c
 #define i_type <ct>,<kt> // shorthand to define i_type,i_key
-#define i_type <t>       // pque container type name (default: pque_{i_key})
-#define i_key <t>        // element type: REQUIRED. Defines pque_X_value
+#define i_type <t>       // pqueue container type name (default: pqueue_{i_key})
+#define i_key <t>        // element type: REQUIRED. Defines pqueue_X_value
 #define i_less <fn>      // compare two i_key* : REQUIRED IF i_key/i_keyraw is a non-integral type
 #define i_keydrop <fn>   // destroy value func - defaults to empty destruct
 #define i_keyclone <fn>  // REQUIRED IF i_keydrop defined
@@ -19,45 +19,45 @@ See the c++ class [std::priority_queue](https://en.cppreference.com/w/cpp/contai
 #define i_keyfrom <fn>   // convertion func i_keyraw => i_key
 #define i_keytoraw <fn>  // convertion func i_key* => i_keyraw.
 
-#include "stc/pque.h"
+#include "stc/pqueue.h"
 ```
 In the following, `X` is the value of `i_key` unless `i_type` is specified.
 
 ## Methods
 
 ```c
-pque_X              pque_X_init(void);                    // create empty pri-queue.
-pque_X              pque_X_with_capacity(isize cap);
-pque_X              pque_X_with_size(isize size, i_key null);
-pque_X              pque_X_clone(pque_X pq);
+pqueue_X            pqueue_X_init(void);                    // create empty pri-queue.
+pqueue_X            pqueue_X_with_capacity(isize cap);
+pqueue_X            pqueue_X_with_size(isize size, i_key null);
+pqueue_X            pqueue_X_clone(pqueue_X pq);
 
-void                pque_X_clear(pque_X* self);
-bool                pque_X_reserve(pque_X* self, isize n);
-void                pque_X_shrink_to_fit(pque_X* self);
-void                pque_X_copy(pque_X* self, const pque_X* other);
-void                pque_X_drop(pque_X* self);        // destructor
+void                pqueue_X_clear(pqueue_X* self);
+bool                pqueue_X_reserve(pqueue_X* self, isize n);
+void                pqueue_X_shrink_to_fit(pqueue_X* self);
+void                pqueue_X_copy(pqueue_X* self, const pqueue_X* other);
+void                pqueue_X_drop(pqueue_X* self);        // destructor
 
-isize               pque_X_size(const pque_X* self);
-bool                pque_X_is_empty(const pque_X* self);
-const i_key*        pque_X_top(const pque_X* self);
+isize               pqueue_X_size(const pqueue_X* self);
+bool                pqueue_X_is_empty(const pqueue_X* self);
+const i_key*        pqueue_X_top(const pqueue_X* self);
 
-void                pque_X_make_heap(pque_X* self);  // heapify the vector.
-void                pque_X_push(pque_X* self, i_key value);
-void                pque_X_emplace(pque_X* self, i_keyraw raw); // converts from raw
+void                pqueue_X_make_heap(pqueue_X* self);  // heapify the vector.
+void                pqueue_X_push(pqueue_X* self, i_key value);
+void                pqueue_X_emplace(pqueue_X* self, i_keyraw raw); // converts from raw
 
-void                pque_X_pop(pque_X* self);
-i_key               pque_X_pull(const pque_X* self);
-void                pque_X_erase_at(pque_X* self, isize idx);
+void                pqueue_X_pop(pqueue_X* self);
+i_key               pqueue_X_pull(const pqueue_X* self);
+void                pqueue_X_erase_at(pqueue_X* self, isize idx);
 
-i_key               pque_X_value_clone(i_key value);
+i_key               pqueue_X_value_clone(i_key value);
 ```
 
 ## Types
 
 | Type name         | Type definition                      | Used to represent...    |
 |:------------------|:-------------------------------------|:------------------------|
-| `pque_X`          | `struct {pque_X_value* data; ...}`   | The pque type          |
-| `pque_X_value`    | `i_key`                              | The pque element type  |
+| `pqueue_X`        | `struct {pqueue_X_value* data; ...}` | The pqueue type          |
+| `pqueue_X_value`  | `i_key`                              | The pqueue element type  |
 
 ## Example
 ```c
@@ -66,7 +66,7 @@ i_key               pque_X_value_clone(i_key value);
 
 #define i_type PriorityQ, int64_t
 #define i_cmp -c_default_cmp // min-heap
-#include "stc/pque.h"
+#include "stc/pqueue.h"
 
 int main(void)
 {

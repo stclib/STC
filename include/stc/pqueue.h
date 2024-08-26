@@ -30,12 +30,12 @@
 #endif // STC_PQUE_H_INCLUDED
 
 #ifndef _i_prefix
-  #define _i_prefix pque_
+  #define _i_prefix pqueue_
 #endif
-#define _i_ispque
+#define _i_is_pqueue
 #include "priv/template.h"
 #ifndef i_is_forward
-  _c_DEFTYPES(_c_pque_types, Self, i_key);
+  _c_DEFTYPES(_c_pqueue_types, Self, i_key);
 #endif
 typedef i_keyraw _m_raw;
 
@@ -170,6 +170,6 @@ _c_MEMB(_push)(Self* self, _m_value value) {
 }
 
 #endif
-#undef _i_ispque
+#undef _i_is_pqueue
 #include "priv/linkage2.h"
 #include "priv/template2.h"

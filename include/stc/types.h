@@ -42,7 +42,7 @@
 #define forward_smap(C, KEY, VAL) _c_aatree_types(C, KEY, VAL, c_true, c_false)
 #define forward_sset(C, KEY) _c_aatree_types(C, KEY, KEY, c_false, c_true)
 #define forward_stack(C, VAL) _c_stack_types(C, VAL)
-#define forward_pque(C, VAL) _c_pque_types(C, VAL)
+#define forward_pqueue(C, VAL) _c_pqueue_types(C, VAL)
 #define forward_queue(C, VAL) _c_deque_types(C, VAL)
 #define forward_vec(C, VAL) _c_vec_types(C, VAL)
 
@@ -216,7 +216,7 @@ typedef union {
     typedef struct { SELF##_value *ref, *end; } SELF##_iter; \
     typedef struct SELF { SELF##_value *data; ptrdiff_t size, capacity; _i_aux_struct } SELF
 
-#define _c_pque_types(SELF, VAL) \
+#define _c_pqueue_types(SELF, VAL) \
     typedef VAL SELF##_value; \
     typedef struct SELF { SELF##_value* data; ptrdiff_t size, capacity; _i_aux_struct } SELF
 

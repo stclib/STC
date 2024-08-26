@@ -58,7 +58,7 @@ point_key_cmp(const point* a, const point* b)
 
 #define i_type pqueue_pnt, point
 #define i_cmp point_cmp_priority
-#include "stc/pque.h"
+#include "stc/pqueue.h"
 
 #define i_type deque_pnt, point
 #include "stc/deque.h"
