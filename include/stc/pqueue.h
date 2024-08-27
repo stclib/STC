@@ -22,12 +22,12 @@
  */
 #include "priv/linkage.h"
 
-#ifndef STC_PQUE_H_INCLUDED
-#define STC_PQUE_H_INCLUDED
+#ifndef STC_PQUEUE_H_INCLUDED
+#define STC_PQUEUE_H_INCLUDED
 #include "common.h"
 #include "types.h"
 #include <stdlib.h>
-#endif // STC_PQUE_H_INCLUDED
+#endif // STC_PQUEUIE_H_INCLUDED
 
 #ifndef _i_prefix
   #define _i_prefix pqueue_

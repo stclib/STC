@@ -59,7 +59,7 @@ static inline crand64_rng* _stc64(void) {
 static inline void crand64_seed(uint64_t seed)
     { crand64_seed_r(_stc64(), seed); }
 
-static inline crand64_rng crand64_make(uint64_t seed)
+static inline crand64_rng crand64_from(uint64_t seed)
     { crand64_rng s; crand64_seed_r(&s, seed); return s; }
 
 static inline uint64_t crand64(void)
@@ -155,7 +155,7 @@ static inline crand32_rng* _stc32(void) {
 static inline void crand32_seed(uint32_t seed)
     { crand32_seed_r(_stc32(), seed); }
 
-static inline crand32_rng crand32_make(uint32_t seed)
+static inline crand32_rng crand32_from(uint32_t seed)
     { crand32_rng s; crand32_seed_r(&s, seed); return s; }
 
 static inline uint32_t crand32(void)

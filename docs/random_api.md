@@ -22,7 +22,7 @@ double               crand64_normal(crand64_normal_dist* d);             // glob
 crand64_uniform_dist crand64_uniform_from(int64_t low, int64_t high);    // create a uniform distribution
 int64_t              crand64_uniform(crand64_uniform_dist* d);           // global crand64_uniform_r(rng, d)
 
-crand64_rng          crand64_make(uint64_t seed);                        // create a crand64_rng state from a seed value
+crand64_rng          crand64_from(uint64_t seed);                        // create a crand64_rng state from a seed value
 uint64_t             crand64_r(crand64_rng* rng, uint64_t strm);         // reentrant; return rnd in [0, UINTPTR_MAX]
 double               crand64_real_r(crand64_rng* rng, uint64_t strm);    // reentrant; return rnd in [0.0, 1.0)
 double               crand64_normal_r(crand64_rng* rng, uint64_t strm, crand64_normal_dist* d);   // return normal distributed rnd's
@@ -55,7 +55,7 @@ int main(void)
 
     // Setup a reentrant random number engine with normal distribution.
     uint64_t seed = time(NULL);
-    crand64_rng rng = crand64_make(seed);
+    crand64_rng rng = crand64_from(seed);
     crand64_normal_dist dist = {.mean=-12.0, .stddev=6.0};
 
     // Create histogram map

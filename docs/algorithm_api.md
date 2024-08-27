@@ -90,21 +90,21 @@ c_forrange (i, 30, 0, -5) printf(" %lld", i);
 ### crange: Integer range generator object
 A number sequence generator type, similar to [boost::irange](https://www.boost.org/doc/libs/release/libs/range/doc/html/range/reference/ranges/irange.html).
 ```c
-crange      crange_make(stop);              // will generate 0, 1, ..., stop-1
-crange      crange_make(start, stop);       // will generate start, start+1, ... stop-1
-crange      crange_make(start, stop, step); // will generate start, start+step, ... upto-not-including stop
+crange      crange_from(start);             // start, start+1,...
+crange      crange_from(start, stop);       // start, start+1, ... stop-1
+crange      crange_from(start, stop, step); // start, start+step, ... upto-not-including stop
                                             // step may be negative.
 crange_iter crange_begin(crange* self);
 void        crange_next(crange_iter* it);
 
-crange&     c_iota(start);                  // returns an l-value; will generate start, start+1, ...
-crange&     c_iota(start, stop);            // l-value, otherwise like crange_make(start, stop)
-crange&     c_iota(start, stop, step);      // l-value, otherwise like crange_make(start, stop, step)
+crange&     c_iota(start);                  // l-value; otherwise like crange_from(start)
+crange&     c_iota(start, stop);            // l-value, otherwise like crange_from(start, stop)
+crange&     c_iota(start, stop, step);      // l-value, otherwise like crange_from(start, stop, step)
 ```
  The **crange_value** type is *isize*. Variables *start*, *stop*, and *step* are of type *crange_value*. Note that **crange** does not have *_end()* and *_advance()* functions; e.g. will not compile when used with *c_filter_pairwise()*.
 ```c
 // 1. All primes less than 32: See below for c_filter() and is_prime()
-crange r1 = crange_make(3, 32, 2);
+crange r1 = crange_from(3, 32, 2);
 printf("2"); // first prime
 c_filter(crange, r1, true
     && is_prime(*value)
