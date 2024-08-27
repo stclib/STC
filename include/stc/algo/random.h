@@ -28,9 +28,9 @@
 
 // ===== crand64 ===================================
 
-typedef struct { uint64_t data[4]; } crand64_rng;
+typedef struct { uint64_t data[4]; } crand64;
 
-static inline void crand64_seed_r(crand64_rng* rng, uint64_t seed) {
+static inline void crand64_seed_r(crand64* rng, uint64_t seed) {
     uint64_t* s = rng->data;
     s[0] = seed*0x9e3779b97f4a7c15; s[0] ^= s[0] >> 30;
     s[1] = s[0]*0xbf58476d1ce4e5b9; s[1] ^= s[1] >> 27;
@@ -39,7 +39,7 @@ static inline void crand64_seed_r(crand64_rng* rng, uint64_t seed) {
 }
 
 // Minimum period length 2^64 per stream. 2^63 streams (odd numbers only)
-static inline uint64_t crand64_r(crand64_rng* rng, uint64_t stream) {
+static inline uint64_t crand64_uint_r(crand64* rng, uint64_t stream) {
     uint64_t* s = rng->data;
     const uint64_t result = (s[0] ^ (s[3] += stream)) + s[1];
     s[0] = s[1] ^ (s[1] >> 11);
@@ -48,22 +48,22 @@ static inline uint64_t crand64_r(crand64_rng* rng, uint64_t stream) {
     return result;
 }
 
-static inline double crand64_real_r(crand64_rng* rng, uint64_t stream)
-    { return (double)(crand64_r(rng, stream) >> 11) * 0x1.0p-53; }
+static inline double crand64_real_r(crand64* rng, uint64_t stream)
+    { return (double)(crand64_uint_r(rng, stream) >> 11) * 0x1.0p-53; }
 
-static inline crand64_rng* _stc64(void) {
-    static crand64_rng s = {{0x9e3779bb07979af0,0x6f682616bae3641a,0xe220a8397b1dcdaf,0x1}};
-    return &s;
+static inline crand64* _stc64(void) {
+    static crand64 rng = {{0x9e3779bb07979af0,0x6f682616bae3641a,0xe220a8397b1dcdaf,0x1}};
+    return &rng;
 }
 
 static inline void crand64_seed(uint64_t seed)
     { crand64_seed_r(_stc64(), seed); }
 
-static inline crand64_rng crand64_from(uint64_t seed)
-    { crand64_rng s; crand64_seed_r(&s, seed); return s; }
+static inline crand64 crand64_from(uint64_t seed)
+    { crand64 rng; crand64_seed_r(&rng, seed); return rng; }
 
-static inline uint64_t crand64(void)
-    { return crand64_r(_stc64(), 1); }
+static inline uint64_t crand64_uint(void)
+    { return crand64_uint_r(_stc64(), 1); }
 
 static inline double crand64_real(void)
     { return crand64_real_r(_stc64(), 1); }
@@ -83,12 +83,12 @@ crand64_uniform_from(int64_t low, int64_t high) {
 }
 
 static inline int64_t
-crand64_uniform_r(crand64_rng* rng, uint64_t stream, crand64_uniform_dist* d) {
+crand64_uniform_r(crand64* rng, uint64_t stream, crand64_uniform_dist* d) {
     uint64_t lo, hi;
     #ifdef c_umul128
-        do { c_umul128(crand64_r(rng, stream), d->range, &lo, &hi); } while (lo < d->threshold);
+        do { c_umul128(crand64_uint_r(rng, stream), d->range, &lo, &hi); } while (lo < d->threshold);
     #else
-        do { lo = crand64_r(rng, stream); hi = lo % d->range; } while (lo - hi > -d->range);
+        do { lo = crand64_uint_r(rng, stream); hi = lo % d->range; } while (lo - hi > -d->range);
     #endif
     return d->low + (int64_t)hi;
 }
@@ -105,7 +105,7 @@ typedef struct {
 } crand64_normal_dist;
 
 static inline double
-crand64_normal_r(crand64_rng* rng, uint64_t stream, crand64_normal_dist* d) {
+crand64_normal_r(crand64* rng, uint64_t stream, crand64_normal_dist* d) {
     double v1, v2, sq, rt;
     if (d->_has_next++ & 1)
         return d->_next*d->stddev + d->mean;
@@ -124,9 +124,9 @@ static inline double crand64_normal(crand64_normal_dist* d)
 
 // ===== crand32 ===================================
 
-typedef struct { uint32_t data[4]; } crand32_rng;
+typedef struct { uint32_t data[4]; } crand32;
 
-static inline void crand32_seed_r(crand32_rng* rng, uint32_t seed) {
+static inline void crand32_seed_r(crand32* rng, uint32_t seed) {
     uint32_t* s = rng->data;
     s[0] = seed*0x9e3779b9; s[0] ^= s[0] >> 16;
     s[1] = s[0]*0x21f0aaad; s[1] ^= s[1] >> 15;
@@ -135,7 +135,7 @@ static inline void crand32_seed_r(crand32_rng* rng, uint32_t seed) {
 }
 
 // Minimum period length 2^32 per stream. 2^31 streams (odd numbers only)
-static inline uint32_t crand32_r(crand32_rng* rng, uint32_t stream) {
+static inline uint32_t crand32_uint_r(crand32* rng, uint32_t stream) {
     uint32_t* s = rng->data;
     const uint32_t result = (s[0] ^ (s[3] += stream)) + s[1];
     s[0] = s[1] ^ (s[1] >> 9);
@@ -144,22 +144,22 @@ static inline uint32_t crand32_r(crand32_rng* rng, uint32_t stream) {
     return result;
 }
 
-static inline float crand32_real_r(crand32_rng* rng, uint32_t stream)
-    { return (float)(crand32_r(rng, stream) >> 9) * 0x1.0p-23f; }
+static inline float crand32_real_r(crand32* rng, uint32_t stream)
+    { return (float)(crand32_uint_r(rng, stream) >> 8) * 0x1.0p-24f; }
 
-static inline crand32_rng* _stc32(void) {
-    static crand32_rng s = {{0x9e37e78e,0x6eab1ba1,0x64625032,0x1}};
-    return &s;
+static inline crand32* _stc32(void) {
+    static crand32 rng = {{0x9e37e78e,0x6eab1ba1,0x64625032,0x1}};
+    return &rng;
 }
 
 static inline void crand32_seed(uint32_t seed)
     { crand32_seed_r(_stc32(), seed); }
 
-static inline crand32_rng crand32_from(uint32_t seed)
-    { crand32_rng s; crand32_seed_r(&s, seed); return s; }
+static inline crand32 crand32_from(uint32_t seed)
+    { crand32 rng; crand32_seed_r(&rng, seed); return rng; }
 
-static inline uint32_t crand32(void)
-    { return crand32_r(_stc32(), 1); }
+static inline uint32_t crand32_uint(void)
+    { return crand32_uint_r(_stc32(), 1); }
 
 static inline float crand32_real(void)
     { return crand32_real_r(_stc32(), 1); }
@@ -179,10 +179,10 @@ crand32_uniform_from(int32_t low, int32_t high) {
 }
 
 static inline int32_t
-crand32_uniform_r(crand32_rng* rng, uint32_t stream, crand32_uniform_dist* d) {
+crand32_uniform_r(crand32* rng, uint32_t stream, crand32_uniform_dist* d) {
     uint64_t r;
     do {
-        r = crand32_r(rng, stream) * (uint64_t)d->range;
+        r = crand32_uint_r(rng, stream) * (uint64_t)d->range;
     } while ((uint32_t)r < d->threshold);
     return d->low + (int32_t)(r >> 32);
 }
@@ -199,7 +199,7 @@ typedef struct {
 } crand32_normal_dist;
 
 static inline float
-crand32_normal_r(crand32_rng* rng, uint32_t stream, crand32_normal_dist* d) {
+crand32_normal_r(crand32* rng, uint32_t stream, crand32_normal_dist* d) {
     float v1, v2, sq, rt;
     if (d->_has_next++ & 1)
         return d->_next*d->stddev + d->mean;

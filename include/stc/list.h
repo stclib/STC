@@ -37,7 +37,7 @@
         List list = {0};
 
         for (int i = 0; i < 5000000; ++i) // five million
-            List_push_back(&list, crand64() & (1<<24) - 1;
+            List_push_back(&list, crand64_uint() & (1<<24) - 1;
 
         int n = 0;
         c_foreach (i, List, list)

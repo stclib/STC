@@ -51,7 +51,7 @@ KHASH_MAP_INIT_INT64(ii, IValue)
 
 
 #define SEED(s) crand64_seed(s)
-#define RAND(N) (crand64() & (((uint64_t)1 << N) - 1))
+#define RAND(N) (crand64_uint() & (((uint64_t)1 << N) - 1))
 
 #define HMAP_SETUP(X, Key, Value) hmap_##X map = hmap_##X##_init()
 #define HMAP_PUT(X, key, val)     hmap_##X##_insert_or_assign(&map, key, val).ref->second
@@ -230,7 +230,7 @@ KHASH_MAP_INIT_INT64(ii, IValue)
 void fisher_yates_shuffle(IKey a[], size_t n) {
     --n;
     for (size_t i = 0; i < n; i++) {
-        size_t j = i + (crand64() % (n - i)); // swap element with random later element
+        size_t j = i + (crand64_uint() % (n - i)); // swap element with random later element
         IKey t = a[i];
         a[i] = a[j];
         a[j] = t;

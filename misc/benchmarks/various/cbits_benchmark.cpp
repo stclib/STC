@@ -43,7 +43,7 @@ int main(int argc, char **argv)
 
     c_forrange (40 * N)
     {
-        uint64_t r = crand64();
+        uint64_t r = crand64_uint();
         bools[r & (N-1)] = r & 1<<29;
     }
 
@@ -71,7 +71,7 @@ int main(int argc, char **argv)
 
     c_forrange (40 * N)
     {
-        uint64_t r = crand64();
+        uint64_t r = crand64_uint();
         bits[r & (N-1)] = r & 1<<29;
     }
 
@@ -97,7 +97,7 @@ int main(int argc, char **argv)
 
     c_forrange (40 * N)
     {
-        uint64_t r = crand64();
+        uint64_t r = crand64_uint();
         cbits_set_value(&bits2, r & (N-1), r & 1<<29);
     }
 

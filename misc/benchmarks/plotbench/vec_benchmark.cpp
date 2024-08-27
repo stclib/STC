@@ -28,7 +28,7 @@ Sample test_std_vector() {
         s.test[INSERT].t1 = clock();
         container con;
         crand64_seed(seed);
-        c_forrange (N) con.push_back(crand64() & mask1);
+        c_forrange (N) con.push_back(crand64_uint() & mask1);
         s.test[INSERT].t2 = clock();
         s.test[INSERT].sum = con.size();
         s.test[ERASE].t1 = clock();
@@ -38,7 +38,7 @@ Sample test_std_vector() {
      }{
         container con;
         crand64_seed(seed);
-        c_forrange (N) con.push_back(crand64() & mask2);
+        c_forrange (N) con.push_back(crand64_uint() & mask2);
         s.test[FIND].t1 = clock();
         uint64_t sum = 0;
         c_forrange (R) c_forrange (i, N) sum += con[i];
@@ -67,7 +67,7 @@ Sample test_stc_vector() {
         s.test[INSERT].t1 = clock();
         vec_u64 con = {0};
         crand64_seed(seed);
-        c_forrange (N) vec_u64_push(&con, crand64() & mask1);
+        c_forrange (N) vec_u64_push(&con, crand64_uint() & mask1);
         s.test[INSERT].t2 = clock();
         s.test[INSERT].sum = vec_u64_size(&con);
         s.test[ERASE].t1 = clock();
@@ -78,7 +78,7 @@ Sample test_stc_vector() {
      }{
         crand64_seed(seed);
         vec_u64 con = {0};
-        c_forrange (N) vec_u64_push(&con, crand64() & mask2);
+        c_forrange (N) vec_u64_push(&con, crand64_uint() & mask2);
         s.test[FIND].t1 = clock();
         uint64_t sum = 0;
         c_forrange (R) c_forrange (i, N) sum += con.data[i];

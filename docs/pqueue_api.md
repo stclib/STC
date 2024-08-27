@@ -75,7 +75,7 @@ int main(void)
 
     // Push ten million random numbers to priority queue.
     c_forrange (N)
-        PriorityQ_push(&numbers, crand64() & ((1 << 21) - 1));
+        PriorityQ_push(&numbers, crand64_uint() & ((1 << 21) - 1));
 
     // Add some negative ones.
     int nums[] = {-231, -32, -873, -4, -343};

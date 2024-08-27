@@ -17,7 +17,7 @@ int main(int argc, char const *argv[])
     unsigned mask = (1 << 23) - 1;
     ivec v = {0};
     c_forrange (i, N)
-        ivec_push(&v, crand64() & mask);
+        ivec_push(&v, crand64_uint() & mask);
 
     ivec_sort(&v);
 
@@ -25,7 +25,7 @@ int main(int argc, char const *argv[])
     clock_t t = clock();
     //crand64_seed(1);
     c_forrange (i, N) {
-        uint64_t r = crand64() & mask;
+        uint64_t r = crand64_uint() & mask;
         #ifdef __cplusplus
           #define LABEL "std::binary_search"
           count += std::binary_search(v.data, v.data + ivec_size(&v), r);

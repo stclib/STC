@@ -15,19 +15,19 @@ typedef struct Point { int x, y; } Point;
 
 int main(void) {
     int n = 50000000;
-    crand64_rng rng = crand64_from(time(NULL));
+    crand64 rng = crand64_from(time(NULL));
 
     IntQ Q = {0};
 
     // Push 50'000'000 random numbers onto the queue.
     c_forrange (n)
-        IntQ_push(&Q, crand64_r(&rng, 1) & ((1<<24) - 1));
+        IntQ_push(&Q, crand64_uint_r(&rng, 1) & ((1<<24) - 1));
 
     // Push or pop on the queue 50 million times
     printf("befor: size %" c_ZI ", capacity %" c_ZI "\n", IntQ_size(&Q), IntQ_capacity(&Q));
 
     c_forrange (n) {
-        int r = crand64_r(&rng, 1) & ((1<<24) - 1);
+        int r = crand64_uint_r(&rng, 1) & ((1<<24) - 1);
         if (r & 3)
             IntQ_push(&Q, r);
         else

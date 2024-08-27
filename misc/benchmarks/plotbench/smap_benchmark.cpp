@@ -27,26 +27,26 @@ Sample test_std_map() {
         crand64_seed(seed);
         s.test[INSERT].t1 = clock();
         container con;
-        c_forrange (i, N/2) con.emplace(crand64() & mask1, i);
+        c_forrange (i, N/2) con.emplace(crand64_uint() & mask1, i);
         c_forrange (i, N/2) con.emplace(i, i);
         s.test[INSERT].t2 = clock();
         s.test[INSERT].sum = con.size();
         crand64_seed(seed);
         s.test[ERASE].t1 = clock();
-        c_forrange (N) con.erase(crand64() & mask1);
+        c_forrange (N) con.erase(crand64_uint() & mask1);
         s.test[ERASE].t2 = clock();
         s.test[ERASE].sum = con.size();
      }{
         container con;
         crand64_seed(seed);
-        c_forrange (i, N/2) con.emplace(crand64() & mask1, i);
+        c_forrange (i, N/2) con.emplace(crand64_uint() & mask1, i);
         c_forrange (i, N/2) con.emplace(i, i);
         crand64_seed(seed);
         s.test[FIND].t1 = clock();
         uint64_t sum = 0;
         container::iterator it;
         c_forrange (N)
-            if ((it = con.find(crand64() & mask1)) != con.end())
+            if ((it = con.find(crand64_uint() & mask1)) != con.end())
                 sum += it->second;
         s.test[FIND].t2 = clock();
         s.test[FIND].sum = sum;
@@ -73,27 +73,27 @@ Sample test_stc_map() {
         crand64_seed(seed);
         s.test[INSERT].t1 = clock();
         smap_u64 con = {0};
-        c_forrange (i, N/2) smap_u64_insert(&con, crand64() & mask1, i);
+        c_forrange (i, N/2) smap_u64_insert(&con, crand64_uint() & mask1, i);
         c_forrange (i, N/2) smap_u64_insert(&con, i, i);
         s.test[INSERT].t2 = clock();
         s.test[INSERT].sum = smap_u64_size(&con);
         crand64_seed(seed);
         s.test[ERASE].t1 = clock();
-        c_forrange (N) smap_u64_erase(&con, crand64() & mask1);
+        c_forrange (N) smap_u64_erase(&con, crand64_uint() & mask1);
         s.test[ERASE].t2 = clock();
         s.test[ERASE].sum = smap_u64_size(&con);
         smap_u64_drop(&con);
      }{
         smap_u64 con = {0};
         crand64_seed(seed);
-        c_forrange (i, N/2) smap_u64_insert(&con, crand64() & mask1, i);
+        c_forrange (i, N/2) smap_u64_insert(&con, crand64_uint() & mask1, i);
         c_forrange (i, N/2) smap_u64_insert(&con, i, i);
         crand64_seed(seed);
         s.test[FIND].t1 = clock();
         uint64_t sum = 0;
         const smap_u64_value* val;
         c_forrange (N)
-            if ((val = smap_u64_get(&con, crand64() & mask1)))
+            if ((val = smap_u64_get(&con, crand64_uint() & mask1)))
                 sum += val->second;
         s.test[FIND].t2 = clock();
         s.test[FIND].sum = sum;
