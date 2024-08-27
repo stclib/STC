@@ -26,7 +26,7 @@
     it also support both push_back() and push_front(), unlike std::forward_list:
 
     #include <stdio.h>
-    #include "stc/algo/random.h"
+    #include "stc/random.h"
 
     #define i_type List,long
     #define i_use_cmp // enable sorting, use default *x < *y comparison
@@ -44,7 +44,7 @@
             if (++n % 100000 == 0) printf("%8d: %10zu\n", n, *i.ref);
 
         // Sort them...
-        List_sort(&list); // algo/sort.h quicksort
+        List_sort(&list); // sort.h quicksort
 
         n = 0;
         puts("sorted");
@@ -386,7 +386,7 @@ _c_MEMB(_remove)(Self* self, _m_raw val) {
 
 #if defined _i_has_cmp
 #define _sort_lowhigh _sort_lowhigh_
-#include "algo/sort.h"
+#include "sort.h"
 #undef _sort_lowhigh
 
 STC_DEF bool _c_MEMB(_sort)(Self* self) {

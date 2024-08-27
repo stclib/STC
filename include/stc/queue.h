@@ -20,9 +20,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#include "priv/linkage.h"
 
 // Queue. Implemented as a ring buffer.
+#include "priv/linkage.h"
 
 #ifndef STC_QUEUE_H_INCLUDED
 #define STC_QUEUE_H_INCLUDED
@@ -37,10 +37,5 @@
 #endif
 #include "priv/template.h"
 #include "priv/queue_prv.h"
-
-/* -------------------------- IMPLEMENTATION ------------------------- */
-#if defined i_implement || defined i_static
-#include "priv/queue_prv.c"
-#endif // IMPLEMENTATION
 #include "priv/linkage2.h"
 #include "priv/template2.h"

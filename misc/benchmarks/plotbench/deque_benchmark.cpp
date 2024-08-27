@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <time.h>
 #define i_static
-#include "stc/crand.h"
+#include "stc/random.h"
 
 #ifdef __cplusplus
 #include <deque>
@@ -28,9 +28,9 @@ Sample test_std_deque() {
         s.test[INSERT].t1 = clock();
         container con;
         csrand(seed);
-        c_forrange (N/3) con.push_front(crand() & mask1);
-        c_forrange (N/3) {con.push_back(crand() & mask1); con.pop_front();}
-        c_forrange (N/3) con.push_back(crand() & mask1);
+        c_forrange (N/3) con.push_front(crand64_uint() & mask1);
+        c_forrange (N/3) {con.push_back(crand64_uint() & mask1); con.pop_front();}
+        c_forrange (N/3) con.push_back(crand64_uint() & mask1);
         s.test[INSERT].t2 = clock();
         s.test[INSERT].sum = con.size();
         s.test[ERASE].t1 = clock();
@@ -40,7 +40,7 @@ Sample test_std_deque() {
      }{
         container con;
         csrand(seed);
-        c_forrange (N) con.push_back(crand() & mask2);
+        c_forrange (N) con.push_back(crand64_uint() & mask2);
         s.test[FIND].t1 = clock();
         size_t sum = 0;
         c_forrange (R) c_forrange (i, N) sum += con[i];
@@ -70,9 +70,9 @@ Sample test_stc_deque() {
         container con = {0};
         //Deque_reserve(&con, N);
         csrand(seed);
-        c_forrange (N/3) Deque_push_front(&con, crand() & mask1);
-        c_forrange (N/3) {Deque_push_back(&con, crand() & mask1); Deque_pop_front(&con);}
-        c_forrange (N/3) Deque_push_back(&con, crand() & mask1);
+        c_forrange (N/3) Deque_push_front(&con, crand64_uint() & mask1);
+        c_forrange (N/3) {Deque_push_back(&con, crand64_uint() & mask1); Deque_pop_front(&con);}
+        c_forrange (N/3) Deque_push_back(&con, crand64_uint() & mask1);
         s.test[INSERT].t2 = clock();
         s.test[INSERT].sum = Deque_size(&con);
         s.test[ERASE].t1 = clock();
@@ -83,7 +83,7 @@ Sample test_stc_deque() {
      }{
         csrand(seed);
         container con = {0};
-        c_forrange (N) Deque_push_back(&con, crand() & mask2);
+        c_forrange (N) Deque_push_back(&con, crand64_uint() & mask2);
         s.test[FIND].t1 = clock();
         size_t sum = 0;
         c_forrange (R) c_forrange (i, N) sum += *Deque_at(&con, i);

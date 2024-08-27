@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "stc/algo/random.h"
+#include "stc/random.h"
 
 #define i_type queue_i, int
 #include "stc/queue.h"

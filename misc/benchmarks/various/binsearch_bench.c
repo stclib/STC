@@ -1,7 +1,7 @@
 #define i_type ivec,int
 #define i_use_cmp
 #include "stc/vec.h"
-#include "stc/algo/random.h"
+#include "stc/random.h"
 
 #include <stdio.h>
 #include <time.h>
@@ -9,7 +9,7 @@
 #include <algorithm>
 #endif
 
-// Use quicksort and binary_search from "algo/sort.h"
+// Use quicksort and binary_search from "sort.h"
 
 int main(int argc, char const *argv[])
 {

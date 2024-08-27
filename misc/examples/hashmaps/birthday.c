@@ -1,7 +1,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <time.h>
-#include "stc/algo/random.h"
+#include "stc/random.h"
 
 #define i_type hmap_ui, uint64_t, int
 #include "stc/hmap.h"

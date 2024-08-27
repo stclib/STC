@@ -61,7 +61,7 @@ i_key               pqueue_X_value_clone(i_key value);
 
 ## Example
 ```c
-#include "stc/algo/random.h"
+#include "stc/random.h"
 #include <stdio.h>
 
 #define i_type PriorityQ, int64_t

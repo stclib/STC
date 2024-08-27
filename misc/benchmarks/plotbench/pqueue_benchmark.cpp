@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <time.h>
-#include "stc/algo/random.h"
+#include "stc/random.h"
 
 #define i_type PrQue,float
 #define i_cmp -c_default_cmp

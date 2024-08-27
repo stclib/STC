@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <time.h>
-#include "stc/algo/random.h"
+#include "stc/random.h"
 
 #define MAX_LOAD_FACTOR 80
 

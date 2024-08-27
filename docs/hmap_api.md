@@ -34,11 +34,12 @@ See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/contain
 #define i_valclone <fn>       // REQUIRED IF i_valdrop defined
 #define i_valraw <t>          // convertion "raw" type - defaults to i_val
 #define i_valfrom <fn>        // convertion func i_valraw => i_val
-#define i_valtoraw <fn>          // convertion func i_val* => i_valraw
+#define i_valtoraw <fn>       // convertion func i_val* => i_valraw
 
 #include "stc/hmap.h"
 ```
-In the following, `X` is the value of `i_key` unless `i_type` is specified.
+- In the following, `X` is the value of `i_key` unless `i_type` is specified.
+- **emplace**-functions are only available when `i_keyraw`/`i_valraw` are implicitly or explicitly specified.
 ## Methods
 
 ```c
@@ -68,6 +69,7 @@ hmap_X_iter           hmap_X_find(const hmap_X* self, i_keyraw rkey);           
 hmap_X_result         hmap_X_insert(hmap_X* self, i_key key, i_val mapped);             // no change if key in map
 hmap_X_result         hmap_X_insert_or_assign(hmap_X* self, i_key key, i_val mapped);   // always update mapped
 hmap_X_result         hmap_X_push(hmap_X* self, hmap_X_value entry);                    // similar to insert
+hmap_X_result         hmap_X_put(hmap_X* self, i_keyraw rkey, i_valraw rmapped);        // like emplace_or_assign()
 
 hmap_X_result         hmap_X_emplace(hmap_X* self, i_keyraw rkey, i_valraw rmapped);    // no change if rkey in map
 hmap_X_result         hmap_X_emplace_or_assign(hmap_X* self, i_keyraw rkey, i_valraw rmapped); // always update mapped

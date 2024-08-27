@@ -24,7 +24,7 @@
 #define STC_RANDOM_H_INCLUDED
 
 #include <math.h>
-#include "stc/common.h"
+#include "common.h"
 
 // ===== crand64 ===================================
 

@@ -8,7 +8,7 @@
 #include "stc/cstr.h"   // string
 #define i_implement
 #include "stc/csview.h" // string_view
-#include "stc/algo/utility.h"
+#include "stc/utility.h"
 
 #define i_key_cstr
 #include "stc/vec.h"    // vec of cstr with const char* lookup

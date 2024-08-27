@@ -1,7 +1,7 @@
 // https://en.wikipedia.org/wiki/Dining_philosophers_problem
 #include <stdio.h>
 #include <time.h>
-#include "stc/algo/random.h"
+#include "stc/random.h"
 #include "stc/coroutine.h"
 
 // Define the number of philosophers and forks

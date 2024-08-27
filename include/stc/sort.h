@@ -20,17 +20,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-/* Generic Quicksort in C, performs as fast as c++ std::sort().
+/* Generic Quicksort in C, performs as fast as c++ std::sort(), and more robust.
 template params:
-#define i_key           - value type [required]
-#define i_less          - optional less function. default: *x < *y
-#define i_type name     - optional, define {{name}}_sort(), else {{i_key}}s_sort().
-#define i_type name,key - alternative way to define both i_type and i_key.
+#define i_key keytype   - [required] (or use i_type, see below)
+#define i_less(xp, yp)  - optional less function. default: *xp < *yp
+#define i_cmp(xp, yp)   - alternative 3-way comparison. c_default_cmp(xp, yp)
+#define i_type name     - optional, defines {name}_sort(), else {i_key}s_sort().
+#define i_type name,key - alternative one-liner to define both i_type and i_key.
 
 // ex1:
 #include <stdio.h>
 #define i_key int
-#include "stc/algo/sort.h"
+#include "stc/sort.h"
 
 int main(void) {
     int nums[] = {23, 321, 5434, 25, 245, 1, 654, 33, 543, 21};
@@ -51,7 +52,7 @@ int main(void) {
 // ex2: Test on a deque !!
 #include <stdio.h>
 #define i_type IDeq, int
-#define i_use_cmp
+#define i_use_cmp  // enable sorting (and equality) with defaults
 #include "stc/deque.h"
 
 int main(void) {
@@ -75,8 +76,8 @@ int main(void) {
 }
 */
 #ifndef _i_template
-  #include "../priv/linkage.h"
-  #include "../common.h"
+  #include "priv/linkage.h"
+  #include "common.h"
 
   #define _i_is_array
   #if defined i_type && !defined i_key
@@ -88,10 +89,11 @@ int main(void) {
     #define Self c_JOIN(i_key, s)
   #endif
 
-  typedef i_key Self, c_JOIN(Self, _value), c_JOIN(Self, _raw);
+  typedef i_key Self;
+  typedef Self c_JOIN(Self, _value), c_JOIN(Self, _raw);
   #define i_at(arr, idx) (&(arr)[idx])
   #define i_at_mut i_at
-  #include "../priv/template.h"
+  #include "priv/template.h"
 #elif defined _sort_lowhigh // from list.h
   #define i_at(self, idx) (&((_m_value *)(self)->last)[idx])
   #define i_at_mut i_at
@@ -209,8 +211,8 @@ _c_MEMB(_binary_search_range)(const Self* self, const _m_raw raw, isize start, i
 
 #ifdef _i_is_array
 #undef _i_is_array
-#include "../priv/linkage2.h"
-#include "../priv/template2.h"
+#include "priv/linkage2.h"
+#include "priv/template2.h"
 #endif
 #undef i_at
 #undef i_at_mut

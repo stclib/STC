@@ -1,4 +1,4 @@
-# STC [crand64](../include/stc/algo/random.h): Pseudo Random Number Generator
+# STC [crand64 / crand32](../include/stc/random.h): Pseudo Random Number Generator
 ![Random](pics/random.jpg)
 
 This features both a 64-bit and a 32-bit PRNG API. It can generate integers, reals, normal distributed,
@@ -9,7 +9,7 @@ The PRNG can generate 2^63 unique streams where each has theoretical minimum 2^6
 See [random](https://en.cppreference.com/w/cpp/header/random) for similar c++ functionality.
 
 ```c
-#include "stc/algo/random.h"
+#include "stc/random.h"
 ```
 
 ## Methods (64-bit)
@@ -62,7 +62,7 @@ int32_t              crand32_uniform_r(crand32* rng, uint32_t strm, crand32_unif
 ## Example
 ```c
 #include <time.h>
-#include "stc/algo/random.h"
+#include "stc/random.h"
 #define i_implement
 #include "stc/cstr.h"
 

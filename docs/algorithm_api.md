@@ -128,7 +128,7 @@ It enables a subset of functional programming like in other popular languages.
 
 - **Note 1**: The **_reverse** variants only works with *vec, deque, stack, queue* containers.
 - **Note 2**: There is also a `c_forfilter` loop variant of `c_filter`. It uses the filter namings
-`c_fflt_skip(it, numItems)`, etc. See [filter.h](../include/stc/algo/filter.h).
+`c_fflt_skip(it, numItems)`, etc. See [filter.h](../include/stc/filter.h).
 
 | Usage                                | Description                       |
 |:-------------------------------------|:----------------------------------|
@@ -321,7 +321,7 @@ and typically simpler to use. You may customize `i_type` and the comparison func
 There is a [benchmark/test file here](../misc/benchmarks/various/quicksort_bench.c).
 ```c
 #define i_key int                    // note: "container" type becomes `ints` (i_type can override).
-#include "stc/algo/sort.h"
+#include "stc/sort.h"
 #include <stdio.h>
 
 int main(void) {

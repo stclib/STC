@@ -3,8 +3,8 @@ mkdir -p $d/../stcsingle/c11 $d/../stcsingle/stc/algo
 python singleheader.py $d/include/c11/fmt.h   $d/../stcsingle/c11/fmt.h
 python singleheader.py $d/include/stc/algorithm.h $d/../stcsingle/stc/algorithm.h
 python singleheader.py $d/include/stc/coroutine.h $d/../stcsingle/stc/coroutine.h
-python singleheader.py $d/include/stc/algo/sort.h $d/../stcsingle/stc/algo/sort.h
-python singleheader.py $d/include/stc/algo/random.h $d/../stcsingle/stc/algo/random.h
+python singleheader.py $d/include/stc/sort.h $d/../stcsingle/stc/sort.h
+python singleheader.py $d/include/stc/random.h $d/../stcsingle/stc/random.h
 python singleheader.py $d/include/stc/arc.h    $d/../stcsingle/stc/arc.h
 python singleheader.py $d/include/stc/cbits.h   $d/../stcsingle/stc/cbits.h
 python singleheader.py $d/include/stc/box.h    $d/../stcsingle/stc/box.h

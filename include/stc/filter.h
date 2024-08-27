@@ -24,7 +24,7 @@
 #include <stdio.h>
 #define i_type Vec, int
 #include "stc/cstack.h"
-#include "stc/algorithm.h"
+#include "stc/filter.h"
 
 int main(void)
 {
@@ -45,7 +45,7 @@ int main(void)
 #ifndef STC_FILTER_H_INCLUDED
 #define STC_FILTER_H_INCLUDED
 
-#include "../common.h"
+#include "common.h"
 
 // ------- c_filter --------
 #define c_flt_take(n) _flt_take(&_base, n)

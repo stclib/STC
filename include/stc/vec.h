@@ -249,7 +249,7 @@ STC_INLINE bool _c_MEMB(_eq)(const Self* self, const Self* other) {
 #endif // _i_has_eq
 
 #if defined _i_has_cmp
-#include "algo/sort.h"
+#include "sort.h"
 #endif // _i_has_cmp
 
 /* -------------------------- IMPLEMENTATION ------------------------- */

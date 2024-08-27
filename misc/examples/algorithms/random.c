@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <time.h>
 #include "stc/common.h"
-#include "stc/algo/random.h"
+#include "stc/random.h"
 
 int main(void)
 {

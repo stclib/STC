@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <time.h>
 #define i_static
-#include "stc/crand.h"
+#include "stc/random.h"
 
 #ifdef __cplusplus
 #include <unordered_map>
@@ -27,26 +27,26 @@ Sample test_std_unordered_map() {
         csrand(seed);
         s.test[INSERT].t1 = clock();
         container con;
-        c_forrange (i, N/2) con.emplace(crand() & mask1, i);
+        c_forrange (i, N/2) con.emplace(crand64_uint() & mask1, i);
         c_forrange (i, N/2) con.emplace(i, i);
         s.test[INSERT].t2 = clock();
         s.test[INSERT].sum = con.size();
         csrand(seed);
         s.test[ERASE].t1 = clock();
-        c_forrange (N) con.erase(crand() & mask1);
+        c_forrange (N) con.erase(crand64_uint() & mask1);
         s.test[ERASE].t2 = clock();
         s.test[ERASE].sum = con.size();
      }{
         container con;
         csrand(seed);
-        c_forrange (i, N/2) con.emplace(crand() & mask1, i);
+        c_forrange (i, N/2) con.emplace(crand64_uint() & mask1, i);
         c_forrange (i, N/2) con.emplace(i, i);
         csrand(seed);
         s.test[FIND].t1 = clock();
         size_t sum = 0;
         container::iterator it;
         c_forrange (N)
-            if ((it = con.find(crand() & mask1)) != con.end())
+            if ((it = con.find(crand64_uint() & mask1)) != con.end())
                 sum += it->second;
         s.test[FIND].t2 = clock();
         s.test[FIND].sum = sum;
@@ -72,27 +72,27 @@ Sample test_stc_unordered_map() {
         csrand(seed);
         s.test[INSERT].t1 = clock();
         hmap_u64 con = {0};
-        c_forrange (i, N/2) hmap_u64_insert(&con, crand() & mask1, i);
+        c_forrange (i, N/2) hmap_u64_insert(&con, crand64_uint() & mask1, i);
         c_forrange (i, N/2) hmap_u64_insert(&con, i, i);
         s.test[INSERT].t2 = clock();
         s.test[INSERT].sum = hmap_u64_size(&con);
         csrand(seed);
         s.test[ERASE].t1 = clock();
-        c_forrange (N) hmap_u64_erase(&con, crand() & mask1);
+        c_forrange (N) hmap_u64_erase(&con, crand64_uint() & mask1);
         s.test[ERASE].t2 = clock();
         s.test[ERASE].sum = hmap_u64_size(&con);
         hmap_u64_drop(&con);
      }{
         hmap_u64 con = {0};
         csrand(seed);
-        c_forrange (i, N/2) hmap_u64_insert(&con, crand() & mask1, i);
+        c_forrange (i, N/2) hmap_u64_insert(&con, crand64_uint() & mask1, i);
         c_forrange (i, N/2) hmap_u64_insert(&con, i, i);
         csrand(seed);
         s.test[FIND].t1 = clock();
         size_t sum = 0;
         const hmap_u64_value* val;
         c_forrange (N)
-            if ((val = hmap_u64_get(&con, crand() & mask1)))
+            if ((val = hmap_u64_get(&con, crand64_uint() & mask1)))
                 sum += val->second;
         s.test[FIND].t2 = clock();
         s.test[FIND].sum = sum;

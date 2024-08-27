@@ -55,7 +55,7 @@ i_key*              stack_X_emplace(stack_X* self, i_keyraw raw);
 void                stack_X_pop(stack_X* self);                        // destroy last element
 stack_X_value       stack_X_pull(stack_X* self);                       // move out last element
 
-void                stack_X_sort(stack_X* self);                                    // quicksort from algo/sort.h
+void                stack_X_sort(stack_X* self);                                    // quicksort from sort.h
 isize               stack_X_lower_bound(const stack_X* self, const i_keyraw raw);   // return -1 if not found
 isize               stack_X_binary_search(const stack_X* self, const i_keyraw raw); // return -1 if not found
 

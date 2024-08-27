@@ -20,9 +20,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#include "priv/linkage.h"
-
 // Deque - double ended queue. Implemented as a ring buffer, extension of queue.
+
+#include "priv/linkage.h"
 
 #ifndef STC_DEQUE_H_INCLUDED
 #define STC_DEQUE_H_INCLUDED
@@ -130,13 +130,11 @@ _c_MEMB(_get_mut)(Self* self, _m_raw raw)
 #endif // _i_has_eq
 
 #if defined _i_has_cmp
-#include "algo/sort.h"
+#include "sort.h"
 #endif // _i_has_cmp
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined(i_implement) || defined(i_static)
-
-#include "priv/queue_prv.c"
 
 STC_DEF _m_value*
 _c_MEMB(_push_front)(Self* self, _m_value value) {

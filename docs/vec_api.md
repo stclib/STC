@@ -27,7 +27,8 @@ See the c++ class [std::vector](https://en.cppreference.com/w/cpp/container/vect
 
 #include "stc/vec.h"
 ```
-In the following, `X` is the value of `i_key` unless `i_type` is specified.
+- In the following, `X` is the value of `i_key` unless `i_type` is specified.
+- **emplace**-functions are only available when `i_keyraw` is implicitly or explicitly specified.
 
 ## Methods
 
@@ -57,7 +58,7 @@ vec_X_value*        vec_X_get_mut(vec_X* self, i_keyraw raw);                   
 vec_X_iter          vec_X_find(const vec_X* self, i_keyraw raw);
 vec_X_iter          vec_X_find_in(vec_X_iter i1, vec_X_iter i2, i_keyraw raw);  // return vec_X_end() if not found
 
-void                vec_X_sort(vec_X* self);                                    // quicksort from algo/sort.h
+void                vec_X_sort(vec_X* self);                                    // quicksort from sort.h
 isize               vec_X_lower_bound(const vec_X* self, const i_keyraw raw);   // return -1 if not found
 isize               vec_X_binary_search(const vec_X* self, const i_keyraw raw); // return -1 if not found
 

@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <time.h>
 #define i_static
-#include "stc/algo/random.h"
+#include "stc/random.h"
 
 #ifdef __cplusplus
 #include <vector>

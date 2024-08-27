@@ -35,7 +35,8 @@ See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) fo
 
 #include "stc/smap.h"
 ```
-In the following, `X` is the value of `i_key` unless `i_type` is specified.
+- In the following, `X` is the value of `i_key` unless `i_type` is specified.
+- **emplace**-functions are only available when `i_keyraw`/`i_valraw` are implicitly or explicitly specified.
 
 ## Methods
 
@@ -69,6 +70,7 @@ smap_X_value*        smap_X_back(const smap_X* self);
 smap_X_result        smap_X_insert(smap_X* self, i_key key, i_val mapped);                    // no change if key in map
 smap_X_result        smap_X_insert_or_assign(smap_X* self, i_key key, i_val mapped);          // always update mapped
 smap_X_result        smap_X_push(smap_X* self, smap_X_value entry);                           // similar to insert()
+smap_X_result        smap_X_put(smap_X* self, i_keyraw rkey, i_valraw rmapped);               // like emplace_or_assign()
 
 smap_X_result        smap_X_emplace(smap_X* self, i_keyraw rkey, i_valraw rmapped);           // no change if rkey in map
 smap_X_result        smap_X_emplace_or_assign(smap_X* self, i_keyraw rkey, i_valraw rmapped); // always update rmapped

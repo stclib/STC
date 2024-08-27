@@ -1,5 +1,5 @@
 #define i_static
-#include "stc/crand.h"
+#include "stc/random.h"
 #define i_static
 #include "stc/cstr.h"
 #include <cmath>
@@ -54,14 +54,14 @@ static void insert_and_erase_i32(picobench::state& s)
 
     picobench::scope scope(s);
     c_forrange (s.iterations())
-        map[crand()];
+        map[crand64_uint()];
     map.clear();
     csrand(seed);
     c_forrange (s.iterations())
-        map[crand()];
+        map[crand64_uint()];
     csrand(seed);
     c_forrange (s.iterations())
-        map.erase(crand());
+        map.erase(crand64_uint());
     s.set_result(map.size());
 }
 /*
@@ -72,14 +72,14 @@ static void insert_and_erase_hmap_i32(picobench::state& s)
 
     picobench::scope scope(s);
     c_forrange (s.iterations())
-        hmap_i32_insert(&map, crand(), 0);
+        hmap_i32_insert(&map, crand64_uint(), 0);
     hmap_i32_clear(&map);
     csrand(seed);
     c_forrange (s.iterations())
-        hmap_i32_insert(&map, crand(), 0);
+        hmap_i32_insert(&map, crand64_uint(), 0);
     csrand(seed);
     c_forrange (s.iterations())
-        hmap_i32_erase(&map, crand());
+        hmap_i32_erase(&map, crand64_uint());
     s.set_result(hmap_i32_size(&map));
     hmap_i32_drop(&map);
 }
@@ -91,14 +91,14 @@ static void insert_and_erase_hmap_u64(picobench::state& s)
 
     picobench::scope scope(s);
     c_forrange (s.iterations())
-        hmap_u64_insert(&map, crand(), 0);
+        hmap_u64_insert(&map, crand64_uint(), 0);
     hmap_u64_clear(&map);
     csrand(seed);
     c_forrange (s.iterations())
-        hmap_u64_insert(&map, crand(), 0);
+        hmap_u64_insert(&map, crand64_uint(), 0);
     csrand(seed);
     c_forrange (s.iterations())
-        hmap_u64_erase(&map, crand());
+        hmap_u64_erase(&map, crand64_uint());
     s.set_result(hmap_u64_size(&map));
     hmap_u64_drop(&map);
 }
@@ -124,7 +124,7 @@ static void insert_and_access_i32(picobench::state& s)
 
     picobench::scope scope(s);
     c_forrange (N1)
-        result += ++map[crand() & mask];
+        result += ++map[crand64_uint() & mask];
     s.set_result(result);
 }
 
@@ -137,7 +137,7 @@ static void insert_and_access_hmap_i32(picobench::state& s)
 
     picobench::scope scope(s);
     c_forrange (N1)
-        result += ++hmap_i32_insert(&map, crand() & mask, 0).ref->second;
+        result += ++hmap_i32_insert(&map, crand32_uint() & mask, 0).ref->second;
     s.set_result(result);
     hmap_i32_drop(&map);
 }
@@ -154,7 +154,7 @@ PICOBENCH_SUITE("Map3");
 
 static void randomize(char* str, size_t len) {
     for (size_t k=0; k < len; ++k) {
-        union {uint64_t i; char c[8];} r = {.i = crand()};
+        union {uint64_t i; char c[8];} r = {.i = crand64_uint()};
         for (unsigned i=0; i<8 && k<len; ++k, ++i)
             str[k] = (r.c[i] & 63) + 48;
     }
@@ -224,7 +224,7 @@ static void iterate_u64(picobench::state& s)
 
     // measure insert then iterate whole map
     c_forrange (n, s.iterations()) {
-        map[crand()] = n;
+        map[crand64_uint()] = n;
         if (!(n & K)) for (auto const& keyVal : map)
             result += keyVal.second;
     }
@@ -234,7 +234,7 @@ static void iterate_u64(picobench::state& s)
 
     // measure erase then iterate whole map
     c_forrange (n, s.iterations()) {
-        map.erase(crand());
+        map.erase(crand64_uint());
         if (!(n & K)) for (auto const& keyVal : map)
             result += keyVal.second;
     }
@@ -252,7 +252,7 @@ static void iterate_hmap_u64(picobench::state& s)
 
     // measure insert then iterate whole map
     c_forrange (n, s.iterations()) {
-        hmap_u64_insert_or_assign(&map, crand(), n);
+        hmap_u64_insert_or_assign(&map, crand64_uint(), n);
         if (!(n & K)) c_foreach (i, hmap_u64, map)
             result += i.ref->second;
     }
@@ -262,7 +262,7 @@ static void iterate_hmap_u64(picobench::state& s)
 
     // measure erase then iterate whole map
     c_forrange (n, s.iterations()) {
-        hmap_u64_erase(&map, crand());
+        hmap_u64_erase(&map, crand64_uint());
         if (!(n & K)) c_foreach (i, hmap_u64, map)
             result += i.ref->second;
     }

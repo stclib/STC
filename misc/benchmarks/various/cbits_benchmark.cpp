@@ -5,7 +5,7 @@
 
 enum{ N=1<<22 }; // 4.2 mill.
 #define i_static
-#include "stc/algo/random.h"
+#include "stc/random.h"
 #define i_type cbits, N
 #include "stc/cbits.h"
 

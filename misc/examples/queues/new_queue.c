@@ -1,4 +1,4 @@
-#include "stc/algo/random.h"
+#include "stc/random.h"
 #include "stc/types.h"
 #include <stdio.h>
 #include <time.h>

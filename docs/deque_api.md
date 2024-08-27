@@ -26,7 +26,8 @@ See the c++ class [std::deque](https://en.cppreference.com/w/cpp/container/deque
 
 #include "stc/deque.h"
 ```
-In the following, `X` is the value of `i_key` unless `i_type` is specified.
+- In the following, `X` is the value of `i_key` unless `i_type` is specified.
+- **emplace**-functions are only available when `i_keyraw` is implicitly or explicitly specified.
 
 ## Methods
 
@@ -52,7 +53,7 @@ deque_X_value*          deque_X_get_mut(deque_X* self, i_keyraw raw);           
 deque_X_iter            deque_X_find(const deque_X* self, i_keyraw raw);
 deque_X_iter            deque_X_find_in(deque_X_iter i1, deque_X_iter i2, i_keyraw raw);  // return vec_X_end() if not found
 
-void                    deque_X_sort(deque_X* self);                                    // quicksort from algo/sort.h
+void                    deque_X_sort(deque_X* self);                                    // quicksort from sort.h
 isize                   deque_X_lower_bound(const deque_X* self, const i_keyraw raw);   // return -1 if not found
 isize                   deque_X_binary_search(const deque_X* self, const i_keyraw raw); // return -1 if not found
 

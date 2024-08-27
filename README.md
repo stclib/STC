@@ -376,7 +376,7 @@ Note that the non-templated string types **cstr**, **csview** uses shared linkin
 **zsview** is fully inlined.
 
 Conveniently, `src\libstc.c` implements all the non-templated functions with shared linking for **cstr**,
-**csview**, **cregex**, **utf8**, and **crand**.
+**csview**, **cregex**, **utf8**, and **random**.
 
 Additionally, `#define i_import` works as `i_implement` for **cregex** or **cstr**, but it will also implement
 the dependent **utf8** functions (utf8 case conversions, etc.). Or you can simply link with libstc.
@@ -695,7 +695,7 @@ STC is generally very memory efficient. Memory usage for the different container
     - Renamed "stc/calgo.h" => `"stc/algorithm.h"`
     - Moved "stc/algo/coroutine.h" => `"stc/coroutine.h"`
         - Much improved with some new API and added features.
-    - Removed deprecated "stc/crandom.h". Use `"stc/crand.h"` with the new API.
+    - Removed deprecated "stc/crandom.h". Use `"stc/random.h"` with the new API.
         - Reverted names _unif and _norm back to `_uniform` and `_normal`.
     - Removed default comparison for **list**, **vec** and **deque**:
         - Define `i_use_cmp` to enable comparison for built-in i_key types (<, ==).
@@ -717,7 +717,7 @@ STC is generally very memory efficient. Memory usage for the different container
     - Headers, e.g. https://raw.githubusercontent.com/stclib/stcsingle/main/stc/vec.h
 - Much improved documentation
 - Added Coroutines + documentation
-- Added new crand.h API & header. Old crandom.h is deprecated.
+- Added new random.h API & header. Old crandom.h is deprecated.
 - Added `c_const_cast()` typesafe macro.
 - Removed RAII macros usage from examples
 - Renamed c_flt_count(i) => `c_flt_counter(i)`
@@ -735,7 +735,7 @@ Major changes:
 - Algorithms:
     - [crange](docs/algorithm_api.md#crange) - similar to [boost::irange](https://www.boost.org/doc/libs/release/libs/range/doc/html/range/reference/ranges/irange.html) integer range generator.
     - [c_forfilter](docs/algorithm_api.md#c_forfilter) - ranges-like view filtering.
-    - [quicksort](include/stc/algo/sort.h) - fast quicksort with [custom inline comparison](misc/benchmarks/various/quicksort_bench.c).
+    - [quicksort](include/stc/sort.h) - fast quicksort with [custom inline comparison](misc/benchmarks/various/quicksort_bench.c).
 - Renamed `c_ARGSV()` => `c_svarg()`: **csview** print arg. Note `c_sv()` is shorthand for *csview_from()*.
 - Support for [uppercase flow-control](include/stc/priv/altnames.h) macro names in common.h.
 - Some API changes in **cregex** and **cstr**.
@@ -781,5 +781,5 @@ Major changes:
 - Allows for `i_key*` template parameters instead of `i_val*` for all containers, not only for **hset** and **sset**.
 - Optimized *c_default_hash()*. Therefore *c_hash32()* and *c_hash64()* are removed (same speed).
 - Added *.._push()* and *.._emplace()* function to all containers to allow for more generic coding.
-- Renamed global PRNGs *stc64_random()* and *stc64_srandom()* to *crand()* and *csrand()*.
+- Renamed global PRNGs *stc64_random()* and *stc64_srandom()* to *crand64_uint()* and *csrand()*.
 - Added some examples and benchmarks for SSO and heterogenous lookup comparison with c++20 (string_bench_*.cpp).

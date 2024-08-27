@@ -1,7 +1,7 @@
 
 #include <stdio.h>
 #include <time.h>
-#include "stc/algo/random.h"
+#include "stc/random.h"
 
 #define i_type PQueue,int
 #define i_cmp -c_default_cmp  // min-heap (increasing values)

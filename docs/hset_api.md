@@ -22,7 +22,8 @@ A **hset** is an associative container that contains a set of unique objects of 
 
 #include "stc/hset.h"
 ```
-In the following, `X` is the value of `i_key` unless `i_type` is specified.
+- In the following, `X` is the value of `i_key` unless `i_type` is specified.
+- **emplace**-functions are only available when `i_keyraw` is implicitly or explicitly specified.
 
 ## Methods
 

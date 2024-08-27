@@ -2,7 +2,7 @@
 #include <iostream>
 #include <chrono>
 
-#include "stc/algo/random.h"
+#include "stc/random.h"
 #define i_static
 #include "stc/cstr.h"
 

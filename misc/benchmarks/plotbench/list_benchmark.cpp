@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <time.h>
 #define i_static
-#include "stc/crand.h"
+#include "stc/random.h"
 
 #ifdef __cplusplus
 #include <forward_list>
@@ -29,8 +29,8 @@ Sample test_std_forward_list() {
         s.test[INSERT].t1 = clock();
         container con;
         csrand(seed);
-        c_forrange (N/2) con.push_front(crand() & mask1);
-        c_forrange (N/2) con.push_front(crand() & mask1);
+        c_forrange (N/2) con.push_front(crand64_uint() & mask1);
+        c_forrange (N/2) con.push_front(crand64_uint() & mask1);
         s.test[INSERT].t2 = clock();
         s.test[INSERT].sum = 0;
         s.test[ERASE].t1 = clock();
@@ -40,7 +40,7 @@ Sample test_std_forward_list() {
      }{
         container con;
         csrand(seed);
-        c_forrange (N) con.push_front(crand() & mask2);
+        c_forrange (N) con.push_front(crand64_uint() & mask2);
         s.test[FIND].t1 = clock();
         size_t sum = 0;
         container::iterator it;
@@ -69,8 +69,8 @@ Sample test_stc_forward_list() {
         s.test[INSERT].t1 = clock();
         list_u64 con = {0};
         csrand(seed);
-        c_forrange (N/2) list_u64_push_front(&con, crand() & mask1);
-        c_forrange (N/2) list_u64_push_back(&con, crand() & mask1);
+        c_forrange (N/2) list_u64_push_front(&con, crand64_uint() & mask1);
+        c_forrange (N/2) list_u64_push_back(&con, crand64_uint() & mask1);
         s.test[INSERT].t2 = clock();
         s.test[INSERT].sum = 0;
         s.test[ERASE].t1 = clock();
@@ -81,7 +81,7 @@ Sample test_stc_forward_list() {
      }{
         csrand(seed);
         list_u64 con = {0};
-        c_forrange (N) list_u64_push_front(&con, crand() & mask2);
+        c_forrange (N) list_u64_push_front(&con, crand64_uint() & mask2);
         s.test[FIND].t1 = clock();
         size_t sum = 0;
         //clist iteration - skipping

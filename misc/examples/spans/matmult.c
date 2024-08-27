@@ -59,7 +59,7 @@ void recursive_matrix_product(Mat A, Mat B, OutMat C)
 
 #define i_type Values,double
 #include "stc/stack.h"
-#include "stc/algo/random.h"
+#include "stc/random.h"
 
 int main(void)
 {

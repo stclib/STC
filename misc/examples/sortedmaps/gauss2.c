@@ -3,7 +3,7 @@
 
 #define i_implement
 #include "stc/cstr.h"
-#include "stc/algo/random.h"
+#include "stc/random.h"
 
 // Declare int -> int sorted map.
 #define i_type SortedMap,int,int

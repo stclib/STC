@@ -128,32 +128,28 @@ _c_MEMB(_insert_entry_)(Self* self, _m_keyraw rkey) {
 #ifdef _i_is_map
     STC_API _m_result _c_MEMB(_insert_or_assign)(Self* self, _m_key key, _m_mapped mapped);
     #if !defined i_no_emplace
-        STC_API _m_result  _c_MEMB(_emplace_or_assign)(Self* self, _m_keyraw rkey, _m_rmapped rmapped);
+    STC_API _m_result _c_MEMB(_emplace_or_assign)(Self* self, _m_keyraw rkey, _m_rmapped rmapped);
     #endif
 
-    STC_INLINE const _m_mapped*
-    _c_MEMB(_at)(const Self* self, _m_keyraw rkey) {
+    STC_INLINE const _m_mapped* _c_MEMB(_at)(const Self* self, _m_keyraw rkey) {
         _m_result res = _c_MEMB(_bucket_lookup_)(self, &rkey);
         c_assert(res.ref);
         return &res.ref->second;
     }
 
-    STC_INLINE _m_mapped*
-    _c_MEMB(_at_mut)(Self* self, _m_keyraw rkey)
+    STC_INLINE _m_mapped* _c_MEMB(_at_mut)(Self* self, _m_keyraw rkey)
         { return (_m_mapped*)_c_MEMB(_at)(self, rkey); }
 #endif // _i_is_map
 
 #if !defined i_no_clone
-    STC_INLINE void
-    _c_MEMB(_copy)(Self *self, const Self* other) {
+    STC_INLINE void _c_MEMB(_copy)(Self *self, const Self* other) {
         if (self->table == other->table)
             return;
         _c_MEMB(_drop)(self);
         *self = _c_MEMB(_clone)(*other);
     }
 
-    STC_INLINE _m_value
-    _c_MEMB(_value_clone)(_m_value _val) {
+    STC_INLINE _m_value _c_MEMB(_value_clone)(_m_value _val) {
         *_i_keyref(&_val) = i_keyclone((*_i_keyref(&_val)));
         _i_MAP_ONLY( _val.second = i_valclone(_val.second); )
         return _val;
@@ -171,15 +167,14 @@ _c_MEMB(_insert_entry_)(Self* self, _m_keyraw rkey) {
         return _res;
     }
 
-#ifdef _i_is_map
-STC_INLINE _m_result
-_c_MEMB(_emplace_key)(Self* self, _m_keyraw rkey) {
-    _m_result _res = _c_MEMB(_insert_entry_)(self, rkey);
-    if (_res.inserted)
-        _res.ref->first = i_keyfrom(rkey);
-    return _res;
-}
-#endif // _i_is_map
+    #ifdef _i_is_map
+    STC_INLINE _m_result _c_MEMB(_emplace_key)(Self* self, _m_keyraw rkey) {
+        _m_result _res = _c_MEMB(_insert_entry_)(self, rkey);
+        if (_res.inserted)
+            _res.ref->first = i_keyfrom(rkey);
+        return _res;
+    }
+    #endif // _i_is_map
 #endif // !i_no_emplace
 
 STC_INLINE _m_raw _c_MEMB(_value_toraw)(const _m_value* val) {
@@ -211,17 +206,25 @@ STC_INLINE _m_value* _c_MEMB(_push)(Self* self, _m_value _val) {
     return _res.ref;
 }
 
+#ifdef _i_is_map
+STC_INLINE _m_result _c_MEMB(_put)(Self* self, _m_keyraw rkey, _m_rmapped rmapped) {
+    #ifdef i_no_emplace
+        return _c_MEMB(_insert_or_assign)(self, rkey, rmapped);
+    #else
+        return _c_MEMB(_emplace_or_assign)(self, rkey, rmapped);
+    #endif
+}
+#endif
+
 STC_INLINE void _c_MEMB(_put_n)(Self* self, const _m_raw* raw, isize n) {
     while (n--)
-#if defined _i_is_set && defined i_no_emplace
-        _c_MEMB(_insert)(self, *raw++);
-#elif defined _i_is_set
-        _c_MEMB(_emplace)(self, *raw++);
-#elif defined i_no_emplace
-        _c_MEMB(_insert_or_assign)(self, raw->first, raw->second), ++raw;
-#else
-        _c_MEMB(_emplace_or_assign)(self, raw->first, raw->second), ++raw;
-#endif
+        #if defined _i_is_set && defined i_no_emplace
+            _c_MEMB(_insert)(self, *raw++);
+        #elif defined _i_is_set
+            _c_MEMB(_emplace)(self, *raw++);
+        #else
+            _c_MEMB(_put)(self, raw->first, raw->second), ++raw;
+        #endif
 }
 
 STC_INLINE Self _c_MEMB(_from_n)(const _m_raw* raw, isize n)
