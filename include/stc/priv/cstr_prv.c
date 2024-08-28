@@ -27,12 +27,12 @@
 
 STC_DEF uint64_t cstr_hash(const cstr *self) {
     csview sv = cstr_sv(self);
-    return c_hash_n(sv.buf, sv.size);
+    return chash_n(sv.buf, sv.size);
 }
 
 STC_DEF isize cstr_find_sv(const cstr* self, csview search) {
     csview sv = cstr_sv(self);
-    char* res = c_strnstrn(sv.buf, sv.size, search.buf, search.size);
+    char* res = cstrnstrn(sv.buf, sv.size, search.buf, search.size);
     return res ? (res - sv.buf) : c_NPOS;
 }
 
@@ -165,7 +165,7 @@ STC_DEF cstr cstr_from_replace(csview in, csview search, csview repl, int32_t co
     isize from = 0; char* res;
     if (!count) count = INT32_MAX;
     if (search.size)
-        while (count-- && (res = c_strnstrn(in.buf + from, in.size - from, search.buf, search.size))) {
+        while (count-- && (res = cstrnstrn(in.buf + from, in.size - from, search.buf, search.size))) {
             const isize pos = (res - in.buf);
             cstr_append_n(&out, in.buf + from, pos - from);
             cstr_append_n(&out, repl.buf, repl.size);

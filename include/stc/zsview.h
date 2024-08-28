@@ -135,7 +135,7 @@ STC_INLINE bool zsview_eq(const zsview* x, const zsview* y)
     { return x->size == y->size && !c_memcmp(x->str, y->str, x->size); }
 
 STC_INLINE uint64_t zsview_hash(const zsview *self)
-    { return c_hash_n(self->str, self->size); }
+    { return chash_n(self->str, self->size); }
 
 #endif // STC_ZSVIEW_H_INCLUDED
 

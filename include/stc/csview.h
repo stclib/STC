@@ -169,12 +169,12 @@ STC_DEF csview_iter csview_advance(csview_iter it, isize u8pos) {
 }
 
 STC_DEF isize csview_find_sv(csview sv, csview search) {
-    char* res = c_strnstrn(sv.buf, sv.size, search.buf, search.size);
+    char* res = cstrnstrn(sv.buf, sv.size, search.buf, search.size);
     return res ? (res - sv.buf) : c_NPOS;
 }
 
 STC_DEF uint64_t csview_hash(const csview *self)
-    { return c_hash_n(self->buf, self->size); }
+    { return chash_n(self->buf, self->size); }
 
 STC_DEF csview csview_substr_ex(csview sv, isize pos, isize n) {
     if (pos < 0) {
@@ -201,7 +201,7 @@ STC_DEF csview csview_slice_ex(csview sv, isize p1, isize p2) {
 STC_DEF csview csview_token(csview sv, const char* sep, isize* start) {
     isize sep_size = c_strlen(sep);
     csview slice = {sv.buf + *start, sv.size - *start};
-    const char* res = c_strnstrn(slice.buf, slice.size, sep, sep_size);
+    const char* res = cstrnstrn(slice.buf, slice.size, sep, sep_size);
     csview tok = {slice.buf, res ? (res - slice.buf) : slice.size};
     *start += tok.size + sep_size;
     return tok;

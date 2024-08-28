@@ -118,8 +118,7 @@ typedef ptrdiff_t               isize;
 #define c_default_eq(x, y)      (*(x) == *(y))
 #define c_default_less(x, y)    (*(x) < *(y))
 #define c_default_cmp(x, y)     (c_default_less(y, x) - c_default_less(x, y))
-#define c_default_hash(p)       c_hash(p)
-#define c_hash(p)               c_hash_n(p, sizeof *(p))
+#define c_default_hash(p)       chash_n(p, sizeof *(p))
 
 #define c_default_clone(v)      (v)
 #define c_default_toraw(vp)     (*(vp))
@@ -134,13 +133,13 @@ typedef ptrdiff_t               isize;
 typedef const char* cstr_raw;
 #define cstr_raw_cmp(xp, yp) strcmp(*(xp), *(yp))
 #define cstr_raw_eq(xp, yp) (cstr_raw_cmp(xp, yp) == 0)
-#define cstr_raw_hash(p) c_hash_str(*(p))
+#define cstr_raw_hash(p) chash_str(*(p))
 #define cstr_raw_clone(s) (s)
 #define cstr_raw_drop(p) ((void)p)
 
 #define c_ROTL(x, k) (x << (k) | x >> (8*sizeof(x) - (k)))
 
-STC_INLINE uint64_t c_hash_n(const void* key, isize len) {
+STC_INLINE uint64_t chash_n(const void* key, isize len) {
     uint32_t u4; uint64_t u8;
     switch (len) {
         case 8: memcpy(&u8, key, 8); return u8*0xc6a4a7935bd1e99d;
@@ -158,15 +157,15 @@ STC_INLINE uint64_t c_hash_n(const void* key, isize len) {
     return h ^ c_ROTL(h, 26);
 }
 
-STC_INLINE uint64_t c_hash_str(const char *str)
-    { return c_hash_n(str, c_strlen(str)); }
+STC_INLINE uint64_t chash_str(const char *str)
+    { return chash_n(str, c_strlen(str)); }
 
-STC_INLINE uint64_t _c_hash_mix(uint64_t h[], int n) { // n > 0
+STC_INLINE uint64_t _chash_mix(uint64_t h[], int n) { // n > 0
     for (int i = 1; i < n; ++i) h[0] += h[0] ^ h[i]; // non-commutative!
     return h[0];
 }
 
-STC_INLINE char* c_strnstrn(const char *str, isize slen,
+STC_INLINE char* cstrnstrn(const char *str, isize slen,
                             const char *needle, isize nlen) {
     if (!nlen) return (char *)str;
     if (nlen > slen) return NULL;
@@ -179,7 +178,7 @@ STC_INLINE char* c_strnstrn(const char *str, isize slen,
     return NULL;
 }
 
-STC_INLINE isize c_next_pow2(isize n) {
+STC_INLINE isize cnextpow2(isize n) {
     n--;
     n |= n >> 1, n |= n >> 2;
     n |= n >> 4, n |= n >> 8;
@@ -240,8 +239,8 @@ STC_INLINE isize c_next_pow2(isize n) {
         for (struct {T* ref; int size, index;} \
              it = {.ref=(T[])__VA_ARGS__, .size=(int)(sizeof((T[])__VA_ARGS__)/sizeof(T))} \
              ; it.index < it.size; ++it.ref, ++it.index)
-    #define c_hash_mix(...) \
-        _c_hash_mix((uint64_t[]){__VA_ARGS__}, c_NUMARGS(__VA_ARGS__))
+    #define chash_mix(...) \
+        _chash_mix((uint64_t[]){__VA_ARGS__}, c_NUMARGS(__VA_ARGS__))
 #else
     #include <initializer_list>
     #include <array>
@@ -253,8 +252,8 @@ STC_INLINE isize c_next_pow2(isize n) {
         for (struct {std::initializer_list<T> _il; std::initializer_list<T>::iterator ref; size_t size, index;} \
              it = {._il=__VA_ARGS__, .ref=it._il.begin(), .size=it._il.size()} \
              ; it.index < it.size; ++it.ref, ++it.index)
-    #define c_hash_mix(...) \
-        _c_hash_mix(std::array<uint64_t, c_NUMARGS(__VA_ARGS__)>{__VA_ARGS__}.data(), c_NUMARGS(__VA_ARGS__))
+    #define chash_mix(...) \
+        _chash_mix(std::array<uint64_t, c_NUMARGS(__VA_ARGS__)>{__VA_ARGS__}.data(), c_NUMARGS(__VA_ARGS__))
 #endif
 
 #define c_with(...) c_MACRO_OVERLOAD(c_with, __VA_ARGS__)

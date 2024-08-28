@@ -453,7 +453,7 @@ _c_MEMB(_reserve)(Self* self, const isize _newcap) {
     if (_newcap != self->size && _newcap <= _oldbucks)
         return true;
     isize _newbucks = (isize)((float)_newcap / (i_max_load_factor)) + 4;
-    _newbucks = c_next_pow2(_newbucks);
+    _newbucks = cnextpow2(_newbucks);
 
     Self map = {
         _i_malloc(_m_value, _newbucks),

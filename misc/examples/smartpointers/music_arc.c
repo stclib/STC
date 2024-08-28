@@ -39,7 +39,7 @@ bool static inline SongView_cmp(const SongView* xw, const SongView* yw)
 #define SongView_eq(x, y) SongView_cmp(x, y)==0
 
 uint64_t static inline SongView_hash(const SongView* xw)
-    { return c_hash_mix(c_hash_str(xw->artist), c_hash_str(xw->title)); }
+    { return chash_mix(chash_str(xw->artist), chash_str(xw->title)); }
 
 
 // Define the shared pointer type SongArc and conversion functions to SongView:

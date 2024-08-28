@@ -71,11 +71,11 @@ TEST(algorithm, c_filter)
     EXPECT_EQ(42, sum);
 
     uint64_t hash = 0;
-    c_filter(IVec, vec, hash = c_hash_mix(hash, *value));
+    c_filter(IVec, vec, hash = chash_mix(hash, *value));
     EXPECT_EQ(658, hash);
 
     hash = 0;
-    c_filter_reverse(IVec, vec, hash = c_hash_mix(hash, *value));
+    c_filter_reverse(IVec, vec, hash = chash_mix(hash, *value));
     EXPECT_EQ(10897, hash);
 
     sum = 0;

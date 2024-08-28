@@ -170,7 +170,7 @@ STC_DEF bool
 _c_MEMB(_reserve)(Self* self, const isize n) {
     if (n <= self->capmask)
         return true;
-    isize oldpow2 = self->capmask + 1, newpow2 = c_next_pow2(n + 1);
+    isize oldpow2 = self->capmask + 1, newpow2 = cnextpow2(n + 1);
     _m_value* d = (_m_value *)i_realloc(self->cbuf, oldpow2*c_sizeof *d, newpow2*c_sizeof *d);
     if (!d)
         return false;

@@ -143,7 +143,7 @@ int         cstr_cmp(const cstr* s1, const cstr* s2);
 bool        cstr_eq(const cstr* s1, const cstr* s2);
 uint64_t    cstr_hash(const cstr* self);
 
-char*       c_strnstrn(const char* str, isize slen, const char* needle, isize nlen);
+char*       cstrnstrn(const char* str, isize slen, const char* needle, isize nlen);
 ```
 
 ## Types
