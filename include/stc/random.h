@@ -23,7 +23,6 @@
 #ifndef STC_RANDOM_H_INCLUDED
 #define STC_RANDOM_H_INCLUDED
 
-#include <math.h>
 #include "common.h"
 
 // ===== crand64 ===================================
@@ -96,32 +95,6 @@ crand64_uniform_r(crand64* rng, uint64_t stream, crand64_uniform_dist* d) {
 static inline int64_t crand64_uniform(crand64_uniform_dist* d)
     { return crand64_uniform_r(_stc64(), 1, d); }
 
-// --- crand64_normal ---
-
-typedef struct {
-    double mean, stddev;
-    double _next;
-    int _has_next;
-} crand64_normal_dist;
-
-static inline double
-crand64_normal_r(crand64* rng, uint64_t stream, crand64_normal_dist* d) {
-    double v1, v2, sq, rt;
-    if (d->_has_next++ & 1)
-        return d->_next*d->stddev + d->mean;
-    do {
-        v1 = 2*crand64_real_r(rng, stream) - 1;
-        v2 = 2*crand64_real_r(rng, stream) - 1;
-        sq = v1*v1 + v2*v2;
-    } while (sq >= 1 || sq == 0);
-    rt = sqrt(-2*log(sq)/sq);
-    d->_next = v2*rt;
-    return (v1*rt)*d->stddev + d->mean;
-}
-
-static inline double crand64_normal(crand64_normal_dist* d)
-    { return crand64_normal_r(_stc64(), 1, d); }
-
 // ===== crand32 ===================================
 
 typedef struct { uint32_t data[4]; } crand32;
@@ -190,7 +163,39 @@ crand32_uniform_r(crand32* rng, uint32_t stream, crand32_uniform_dist* d) {
 static inline int64_t crand32_uniform(crand32_uniform_dist* d)
     { return crand32_uniform_r(_stc32(), 1, d); }
 
-// --- crand32_normal ---
+#endif // STC_RANDOM_H_INCLUDED
+
+#if !defined STC_RANDOM_NORMAL && defined i_normal_dist
+#define STC_RANDOM_NORMAL
+#include <math.h>
+
+// === crand64_normal ===
+
+typedef struct {
+    double mean, stddev;
+    double _next;
+    int _has_next;
+} crand64_normal_dist;
+
+static inline double
+crand64_normal_r(crand64* rng, uint64_t stream, crand64_normal_dist* d) {
+    double v1, v2, sq, rt;
+    if (d->_has_next++ & 1)
+        return d->_next*d->stddev + d->mean;
+    do {
+        v1 = 2*crand64_real_r(rng, stream) - 1;
+        v2 = 2*crand64_real_r(rng, stream) - 1;
+        sq = v1*v1 + v2*v2;
+    } while (sq >= 1 || sq == 0);
+    rt = sqrt(-2*log(sq)/sq);
+    d->_next = v2*rt;
+    return (v1*rt)*d->stddev + d->mean;
+}
+
+static inline double crand64_normal(crand64_normal_dist* d)
+    { return crand64_normal_r(_stc64(), 1, d); }
+
+// === crand32_normal ===
 
 typedef struct {
     float mean, stddev;
@@ -217,4 +222,4 @@ static inline float
 crand32_normal(crand32_normal_dist* d)
     { return crand32_normal_r(_stc32(), 1, d); }
 
-#endif // STC_RANDOM_H_INCLUDED
+#endif // i_normal_dist

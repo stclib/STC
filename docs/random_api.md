@@ -9,6 +9,7 @@ The PRNG can generate 2^63 unique streams where each has theoretical minimum 2^6
 See [random](https://en.cppreference.com/w/cpp/header/random) for similar c++ functionality.
 
 ```c
+#define i_normal_dist // required only for the normal distribution functions
 #include "stc/random.h"
 ```
 
@@ -62,6 +63,7 @@ int32_t              crand32_uniform_r(crand32* rng, uint32_t strm, crand32_unif
 ## Example
 ```c
 #include <time.h>
+#define i_normal_dist
 #include "stc/random.h"
 #define i_implement
 #include "stc/cstr.h"

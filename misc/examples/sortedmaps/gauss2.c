@@ -3,6 +3,7 @@
 
 #define i_implement
 #include "stc/cstr.h"
+#define i_normal_dist // required for the normal distribution functions
 #include "stc/random.h"
 
 // Declare int -> int sorted map.
