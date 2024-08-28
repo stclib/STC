@@ -268,7 +268,7 @@ void fisher_yates_shuffle(IKey a[], size_t n) {
     M##_SETUP(X, IKey, IValue); \
     size_t sum = 0, _n = n; \
     SEED(seed); \
-    for (size_t i = 0; i < n; ++i) \
+    for (size_t i = 0; i < _n; ++i) \
         M##_GET_OR_INSERT(X, RAND(keybits), i); \
     size_t rep = 100000000ull/M##_SIZE(X); \
     clock_t difference, before = clock(); \
@@ -341,7 +341,7 @@ int main(int argc, char* argv[])
     unsigned n_mill = argc >= 2 ? atoi(argv[1]) : DEFAULT_N_MILL;
     unsigned keybits = argc >= 3 ? atoi(argv[2]) : DEFAULT_KEYBITS;
     unsigned n = n_mill * 1000000;
-    unsigned N1 = n, N2 = n, N3 = n, N4 = n, N5 = n;
+    unsigned N1 = n, /*N2 = n,*/ N3 = n, N4 = n, N5 = n;
     size_t seed = 123456; // time(NULL);
 
     printf("\nUnordered hash map shootout\n");

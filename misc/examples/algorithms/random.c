@@ -17,8 +17,8 @@ int main(void)
         sum += (int32_t)crand64_uint_r(&rng, 1);
     }
     t = clock() - t;
-    printf("full range\t\t: %f secs, %lld, avg: %f\n",
-           (double)t/CLOCKS_PER_SEC, N, (double)(sum/N));
+    printf("full range\t\t: %f secs, %d, avg: %f\n",
+           (double)t/CLOCKS_PER_SEC, (int)N, (double)(sum/N));
 
     sum = 0;
     rng = crand64_from(seed);
@@ -27,6 +27,6 @@ int main(void)
         sum += (int32_t)crand64_uint_r(&rng, 1) % (range + 1); // biased
     }
     t = clock() - t;
-    printf("biased 0-%lld  \t: %f secs, %lld, avg: %f\n",
-           range, (double)t/CLOCKS_PER_SEC, N, (double)(sum/N));
+    printf("biased 0-%d  \t: %f secs, %d, avg: %f\n",
+           (int)range, (double)t/CLOCKS_PER_SEC, (int)N, (double)(sum/N));
 }

@@ -24,24 +24,24 @@ Sample test_std_unordered_map() {
     typedef std::unordered_map<uint64_t, uint64_t> container;
     Sample s = {"std,unordered_map"};
     {
-        csrand(seed);
+        crand64_seed(seed);
         s.test[INSERT].t1 = clock();
         container con;
         c_forrange (i, N/2) con.emplace(crand64_uint() & mask1, i);
         c_forrange (i, N/2) con.emplace(i, i);
         s.test[INSERT].t2 = clock();
         s.test[INSERT].sum = con.size();
-        csrand(seed);
+        crand64_seed(seed);
         s.test[ERASE].t1 = clock();
         c_forrange (N) con.erase(crand64_uint() & mask1);
         s.test[ERASE].t2 = clock();
         s.test[ERASE].sum = con.size();
      }{
         container con;
-        csrand(seed);
+        crand64_seed(seed);
         c_forrange (i, N/2) con.emplace(crand64_uint() & mask1, i);
         c_forrange (i, N/2) con.emplace(i, i);
-        csrand(seed);
+        crand64_seed(seed);
         s.test[FIND].t1 = clock();
         size_t sum = 0;
         container::iterator it;
@@ -69,14 +69,14 @@ Sample test_std_unordered_map() { Sample s = {"std-unordered_map"}; return s;}
 Sample test_stc_unordered_map() {
     Sample s = {"STC,unordered_map"};
     {
-        csrand(seed);
+        crand64_seed(seed);
         s.test[INSERT].t1 = clock();
         hmap_u64 con = {0};
         c_forrange (i, N/2) hmap_u64_insert(&con, crand64_uint() & mask1, i);
         c_forrange (i, N/2) hmap_u64_insert(&con, i, i);
         s.test[INSERT].t2 = clock();
         s.test[INSERT].sum = hmap_u64_size(&con);
-        csrand(seed);
+        crand64_seed(seed);
         s.test[ERASE].t1 = clock();
         c_forrange (N) hmap_u64_erase(&con, crand64_uint() & mask1);
         s.test[ERASE].t2 = clock();
@@ -84,10 +84,10 @@ Sample test_stc_unordered_map() {
         hmap_u64_drop(&con);
      }{
         hmap_u64 con = {0};
-        csrand(seed);
+        crand64_seed(seed);
         c_forrange (i, N/2) hmap_u64_insert(&con, crand64_uint() & mask1, i);
         c_forrange (i, N/2) hmap_u64_insert(&con, i, i);
-        csrand(seed);
+        crand64_seed(seed);
         s.test[FIND].t1 = clock();
         size_t sum = 0;
         const hmap_u64_value* val;

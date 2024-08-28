@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <time.h>
 #include "stc/algorithm.h"
+#include "stc/random.h"
 
 #define i_type DList,double
 #define i_use_cmp

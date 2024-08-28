@@ -128,7 +128,7 @@ It enables a subset of functional programming like in other popular languages.
 
 - **Note 1**: The **_reverse** variants only works with *vec, deque, stack, queue* containers.
 - **Note 2**: There is also a `c_forfilter` loop variant of `c_filter`. It uses the filter namings
-`c_fflt_skip(it, numItems)`, etc. See [filter.h](../include/stc/filter.h).
+`c_fflt_skip(it, numItems)`, etc.
 
 | Usage                                | Description                       |
 |:-------------------------------------|:----------------------------------|

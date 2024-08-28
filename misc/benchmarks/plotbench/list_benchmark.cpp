@@ -28,7 +28,7 @@ Sample test_std_forward_list() {
     {
         s.test[INSERT].t1 = clock();
         container con;
-        csrand(seed);
+        crand64_seed(seed);
         c_forrange (N/2) con.push_front(crand64_uint() & mask1);
         c_forrange (N/2) con.push_front(crand64_uint() & mask1);
         s.test[INSERT].t2 = clock();
@@ -39,7 +39,7 @@ Sample test_std_forward_list() {
         s.test[ERASE].sum = 0;
      }{
         container con;
-        csrand(seed);
+        crand64_seed(seed);
         c_forrange (N) con.push_front(crand64_uint() & mask2);
         s.test[FIND].t1 = clock();
         size_t sum = 0;
@@ -68,7 +68,7 @@ Sample test_stc_forward_list() {
     {
         s.test[INSERT].t1 = clock();
         list_u64 con = {0};
-        csrand(seed);
+        crand64_seed(seed);
         c_forrange (N/2) list_u64_push_front(&con, crand64_uint() & mask1);
         c_forrange (N/2) list_u64_push_back(&con, crand64_uint() & mask1);
         s.test[INSERT].t2 = clock();
@@ -79,7 +79,7 @@ Sample test_stc_forward_list() {
         s.test[ERASE].sum = 0;
         list_u64_drop(&con);
      }{
-        csrand(seed);
+        crand64_seed(seed);
         list_u64 con = {0};
         c_forrange (N) list_u64_push_front(&con, crand64_uint() & mask2);
         s.test[FIND].t1 = clock();

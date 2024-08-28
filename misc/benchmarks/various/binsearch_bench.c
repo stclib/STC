@@ -36,6 +36,6 @@ int main(int argc, char const *argv[])
     }
     t = clock() - t;
     printf("elements: %d\n", (int)N);
-    printf("%s: found %lld %f\n", LABEL, count, (float)t/CLOCKS_PER_SEC);
+    printf("%s: found %d %f\n", LABEL, (int)count, (float)t/CLOCKS_PER_SEC);
     ivec_drop(&v);
 }

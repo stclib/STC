@@ -22,8 +22,7 @@
 */
 /*
 #include <stdio.h>
-#include "stc/filter.h"
-#include "stc/crange.h"
+#include "stc/algorithm.h"
 
 int main(void)
 {
@@ -45,7 +44,7 @@ int main(void)
 #ifndef STC_CRANGE_H_INCLUDED
 #define STC_CRANGE_H_INCLUDED
 
-#include "common.h"
+#include "../common.h"
 
 typedef isize crange_value;
 typedef struct { crange_value start, end, step, value; } crange;

@@ -27,7 +27,7 @@ Sample test_std_deque() {
     {
         s.test[INSERT].t1 = clock();
         container con;
-        csrand(seed);
+        crand64_seed(seed);
         c_forrange (N/3) con.push_front(crand64_uint() & mask1);
         c_forrange (N/3) {con.push_back(crand64_uint() & mask1); con.pop_front();}
         c_forrange (N/3) con.push_back(crand64_uint() & mask1);
@@ -39,7 +39,7 @@ Sample test_std_deque() {
         s.test[ERASE].sum = con.size();
      }{
         container con;
-        csrand(seed);
+        crand64_seed(seed);
         c_forrange (N) con.push_back(crand64_uint() & mask2);
         s.test[FIND].t1 = clock();
         size_t sum = 0;
@@ -69,7 +69,7 @@ Sample test_stc_deque() {
         s.test[INSERT].t1 = clock();
         container con = {0};
         //Deque_reserve(&con, N);
-        csrand(seed);
+        crand64_seed(seed);
         c_forrange (N/3) Deque_push_front(&con, crand64_uint() & mask1);
         c_forrange (N/3) {Deque_push_back(&con, crand64_uint() & mask1); Deque_pop_front(&con);}
         c_forrange (N/3) Deque_push_back(&con, crand64_uint() & mask1);
@@ -81,7 +81,7 @@ Sample test_stc_deque() {
         s.test[ERASE].sum = Deque_size(&con);
         Deque_drop(&con);
      }{
-        csrand(seed);
+        crand64_seed(seed);
         container con = {0};
         c_forrange (N) Deque_push_back(&con, crand64_uint() & mask2);
         s.test[FIND].t1 = clock();
@@ -111,7 +111,7 @@ int main(int argc, char* argv[])
         if (i > 0) c_forrange (j, N_TESTS) {
             if (secs(std_s[i].test[j]) < secs(std_s[0].test[j])) std_s[0].test[j] = std_s[i].test[j];
             if (secs(stc_s[i].test[j]) < secs(stc_s[0].test[j])) stc_s[0].test[j] = stc_s[i].test[j];
-            if (stc_s[i].test[j].sum != stc_s[0].test[j].sum) printf("Error in sum: test %lld, sample %lld\n", i, j);
+            if (stc_s[i].test[j].sum != stc_s[0].test[j].sum) printf("Error in sum: test %d, sample %d\n", (int)i, (int)j);
         }
     }
     const char* comp = argc > 1 ? argv[1] : "test";

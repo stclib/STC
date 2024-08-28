@@ -67,7 +67,7 @@ template <class MapInt>
 static void insert_i32(picobench::state& s)
 {
     MapInt map;
-    csrand(seed);
+    crand64_seed(seed);
     picobench::scope scope(s);
     c_forrange (n, s.iterations())
         map.emplace(crand32_uint() & 0xfffffff, n);
@@ -77,7 +77,7 @@ static void insert_i32(picobench::state& s)
 static void insert_smap_i32(picobench::state& s)
 {
     smap_i32 map = {0};
-    csrand(seed);
+    crand64_seed(seed);
     picobench::scope scope(s);
     c_forrange (n, s.iterations())
         smap_i32_insert(&map, crand32_uint() & 0xfffffff, n);
@@ -99,7 +99,7 @@ static void insert_and_erase_i32(picobench::state& s)
     size_t result = 0;
     uint64_t mask = (1ull << s.arg()) - 1;
     MapInt map;
-    csrand(seed);
+    crand64_seed(seed);
 
     picobench::scope scope(s);
     c_forrange (i, s.iterations())
@@ -107,11 +107,11 @@ static void insert_and_erase_i32(picobench::state& s)
     result = map.size();
 
     map.clear();
-    csrand(seed);
+    crand64_seed(seed);
     c_forrange (i, s.iterations())
         map[crand32_uint() & mask] = i;
 
-    csrand(seed);
+    crand64_seed(seed);
     c_forrange (s.iterations())
         map.erase(crand32_uint() & mask);
     s.set_result(result);
@@ -122,7 +122,7 @@ static void insert_and_erase_smap_i32(picobench::state& s)
     size_t result = 0;
     uint64_t mask = (1ull << s.arg()) - 1;
     smap_i32 map = {0};
-    csrand(seed);
+    crand64_seed(seed);
 
     picobench::scope scope(s);
     c_forrange (i, s.iterations())
@@ -130,11 +130,11 @@ static void insert_and_erase_smap_i32(picobench::state& s)
     result = smap_i32_size(&map);
 
     smap_i32_clear(&map);
-    csrand(seed);
+    crand64_seed(seed);
     c_forrange (i, s.iterations())
         smap_i32_insert_or_assign(&map, crand32_uint() & mask, i);
 
-    csrand(seed);
+    crand64_seed(seed);
     c_forrange (s.iterations())
         smap_i32_erase(&map, crand32_uint() & mask);
     s.set_result(result);
@@ -154,7 +154,7 @@ static void insert_and_access_i32(picobench::state& s)
     uint64_t mask = (1ull << s.arg()) - 1;
     size_t result = 0;
     MapInt map;
-    csrand(seed);
+    crand64_seed(seed);
 
     picobench::scope scope(s);
     c_forrange (s.iterations()) {
@@ -170,7 +170,7 @@ static void insert_and_access_smap_i32(picobench::state& s)
     uint64_t mask = (1ull << s.arg()) - 1;
     size_t result = 0;
     smap_i32 map = {0};
-    csrand(seed);
+    crand64_seed(seed);
 
     picobench::scope scope(s);
     c_forrange (s.iterations()) {
@@ -203,12 +203,12 @@ static void insert_and_access_str(picobench::state& s)
     MapStr map;
 
     picobench::scope scope(s);
-    csrand(seed);
+    crand64_seed(seed);
     c_forrange (s.iterations()) {
         randomize(&str[0], str.size());
         map.emplace(str, str);
     }
-    csrand(seed);
+    crand64_seed(seed);
     c_forrange (s.iterations()) {
         randomize(&str[0], str.size());
         result += map.erase(str);
@@ -224,12 +224,12 @@ static void insert_and_access_smap_cstr(picobench::state& s)
     smap_cstr map = {0};
 
     picobench::scope scope(s);
-    csrand(seed);
+    crand64_seed(seed);
     c_forrange (s.iterations()) {
         randomize(buf, s.arg());
         smap_cstr_emplace(&map, buf, buf);
     }
-    csrand(seed);
+    crand64_seed(seed);
     c_forrange (s.iterations()) {
         randomize(buf, s.arg());
         result += smap_cstr_erase(&map, buf);
@@ -258,7 +258,7 @@ static void iterate_u64(picobench::state& s)
     uint64_t K = (1ull << s.arg()) - 1;
 
     picobench::scope scope(s);
-    csrand(seed);
+    crand64_seed(seed);
     size_t result = 0;
 
     // measure insert then iterate whole map
@@ -269,7 +269,7 @@ static void iterate_u64(picobench::state& s)
     }
 
     // reset rng back to inital state
-    csrand(seed);
+    crand64_seed(seed);
 
     // measure erase then iterate whole map
     c_forrange (n, s.iterations()) {
@@ -286,7 +286,7 @@ static void iterate_smap_u64(picobench::state& s)
     uint64_t K = (1ull << s.arg()) - 1;
 
     picobench::scope scope(s);
-    csrand(seed);
+    crand64_seed(seed);
     size_t result = 0;
 
     // measure insert then iterate whole map
@@ -297,7 +297,7 @@ static void iterate_smap_u64(picobench::state& s)
     }
 
     // reset rng back to inital state
-    csrand(seed);
+    crand64_seed(seed);
 
     // measure erase then iterate whole map
     c_forrange (n, s.iterations()) {

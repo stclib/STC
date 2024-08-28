@@ -781,5 +781,5 @@ Major changes:
 - Allows for `i_key*` template parameters instead of `i_val*` for all containers, not only for **hset** and **sset**.
 - Optimized *c_default_hash()*. Therefore *c_hash32()* and *c_hash64()* are removed (same speed).
 - Added *.._push()* and *.._emplace()* function to all containers to allow for more generic coding.
-- Renamed global PRNGs *stc64_random()* and *stc64_srandom()* to *crand64_uint()* and *csrand()*.
+- Renamed global PRNGs *stc64_random()* and *stc64_srandom()* to *crand64_uint()* and *crand64_seed()*.
 - Added some examples and benchmarks for SSO and heterogenous lookup comparison with c++20 (string_bench_*.cpp).
