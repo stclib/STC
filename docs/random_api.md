@@ -19,15 +19,15 @@ See [random](https://en.cppreference.com/w/cpp/header/random) for similar c++ fu
 void                 crand64_seed(uint64_t seed);                        // set global crand64_uint() seed
 uint64_t             crand64_uint(void);                                 // global crand64_uint_r(rng)
 double               crand64_real(void);                                 // global crand64_real_r(rng)
-double               crand64_normal(crand64_normal_dist* d);             // global crand64_normal_r(rng, d)
-crand64_uniform_dist crand64_uniform_from(int64_t low, int64_t high);    // create a uniform distribution
+crand64_uniform_dist crand64_uniform_from(int64_t low, int64_t high);    // create an unbiased uniform distribution
 int64_t              crand64_uniform(crand64_uniform_dist* d);           // global crand64_uniform_r(rng, d)
+double               crand64_normal(crand64_normal_dist* d);             // global crand64_normal_r(rng, d)
 
 crand64              crand64_from(uint64_t seed);                        // create a crand64 state from a seed value
 uint64_t             crand64_uint_r(crand64* rng, uint64_t strm);        // reentrant; return rnd in [0, UINT64_MAX]
 double               crand64_real_r(crand64* rng, uint64_t strm);        // reentrant; return rnd in [0.0, 1.0)
-double               crand64_normal_r(crand64* rng, uint64_t strm, crand64_normal_dist* d);   // return normal distributed rnd's
 int64_t              crand64_uniform_r(crand64* rng, uint64_t strm, crand64_uniform_dist* d); // return rnd in [low, high]
+double               crand64_normal_r(crand64* rng, uint64_t strm, crand64_normal_dist* d);   // return normal distributed rnd's
 ```
 Note that `strm` must be an odd number.
 ## Types
@@ -35,29 +35,26 @@ Note that `strm` must be an odd number.
 | Name                   | Type definition                   | Used to represent...         |
 |:-----------------------|:----------------------------------|:-----------------------------|
 | `crand64`              | `struct {uint64_t data[3];}`      | The PRNG engine type         |
-| `crand64_normal_dist`  | `struct {double mean, stddev;}`   | Normal distribution struct     |
 | `crand64_uniform_dist` | `struct {...}`                    | Uniform int distribution struct |
+| `crand64_normal_dist`  | `struct {double mean, stddev;}`   | Normal distribution struct     |
 
 ## Methods (32-bit)
 ```c
 void                 crand32_seed(uint32_t seed);                        // set global crand32_uint() seed
 uint32_t             crand32_uint(void);                                 // global crand32_uint_r(rng)
 float                crand32_real(void);                                 // global crand32_real_r(rng)
-float                crand32_normal(crand64_normal_dist* d);             // global crand32_normal_r(rng, d)
-crand32_uniform_dist crand32_uniform_from(int32_t low, int32_t high);    // create a uniform distribution
+crand32_uniform_dist crand32_uniform_from(int32_t low, int32_t high);    // create an unbiased uniform distribution
 int32_t              crand32_uniform(crand64_uniform_dist* d);           // global crand32_uniform_r(rng, d)
 
 crand32              crand32_from(uint32_t seed);                        // create a crand32 state from a seed value
 uint32_t             crand32_uint_r(crand32* rng, uint32_t strm);        // reentrant; return rnd in [0, UINT32_MAX]
 float                crand32_real_r(crand32* rng, uint32_t strm);        // reentrant; return rnd in [0.0, 1.0)
-float                crand32_normal_r(crand32* rng, uint32_t strm, crand32_normal_dist* d);   // return normal distributed rnd's
 int32_t              crand32_uniform_r(crand32* rng, uint32_t strm, crand32_uniform_dist* d); // return rnd in [low, high]
 ```
 
 | Name                   | Type definition                   | Used to represent...         |
 |:-----------------------|:----------------------------------|:-----------------------------|
 | `crand32`              | `struct {uint32_t data[3];}`      | The PRNG engine type         |
-| `crand32_normal_dist`  | `struct {float mean, stddev;}`    | Normal distribution struct     |
 | `crand32_uniform_dist` | `struct {...}`                    | Uniform int distribution struct |
 
 ## Example

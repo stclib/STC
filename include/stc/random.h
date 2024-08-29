@@ -117,8 +117,8 @@ static inline uint32_t crand32_uint_r(crand32* rng, uint32_t stream) {
     return result;
 }
 
-static inline float crand32_real_r(crand32* rng, uint32_t stream)
-    { return (float)(crand32_uint_r(rng, stream) >> 8) * 0x1.0p-24f; }
+static inline double crand32_real_r(crand32* rng, uint32_t stream)
+    { return crand32_uint_r(rng, stream) * 0x1.0p-32; }
 
 static inline crand32* _stc32(void) {
     static crand32 rng = {{0x9e37e78e,0x6eab1ba1,0x64625032,0x1}};
@@ -134,7 +134,7 @@ static inline crand32 crand32_from(uint32_t seed)
 static inline uint32_t crand32_uint(void)
     { return crand32_uint_r(_stc32(), 1); }
 
-static inline float crand32_real(void)
+static inline double crand32_real(void)
     { return crand32_real_r(_stc32(), 1); }
 
 // --- crand32_uniform ---
@@ -194,32 +194,5 @@ crand64_normal_r(crand64* rng, uint64_t stream, crand64_normal_dist* d) {
 
 static inline double crand64_normal(crand64_normal_dist* d)
     { return crand64_normal_r(_stc64(), 1, d); }
-
-// === crand32_normal ===
-
-typedef struct {
-    float mean, stddev;
-    float _next;
-    int _has_next;
-} crand32_normal_dist;
-
-static inline float
-crand32_normal_r(crand32* rng, uint32_t stream, crand32_normal_dist* d) {
-    float v1, v2, sq, rt;
-    if (d->_has_next++ & 1)
-        return d->_next*d->stddev + d->mean;
-    do {
-        v1 = 2.0f*crand32_real_r(rng, stream) - 1.0f;
-        v2 = 2.0f*crand32_real_r(rng, stream) - 1.0f;
-        sq = v1*v1 + v2*v2;
-    } while (sq >= 1.0f || sq == 0.0f);
-    rt = sqrtf(-2.0f*logf(sq)/sq);
-    d->_next = v2*rt;
-    return (v1*rt)*d->stddev + d->mean;
-}
-
-static inline float
-crand32_normal(crand32_normal_dist* d)
-    { return crand32_normal_r(_stc32(), 1, d); }
 
 #endif // i_normal_dist
