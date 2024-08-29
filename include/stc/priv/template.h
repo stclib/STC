@@ -123,11 +123,9 @@
 #if defined i_key_cstr
   #define i_keyclass cstr
   #define i_cmpclass cstr_raw
-  #define i_use_cmp
 #elif defined i_key_arcbox
   #define i_keyclass i_key_arcbox
   #define i_cmpclass c_JOIN(i_key_arcbox, _raw)
-  #define i_use_cmp
 #endif
 
 // Check for i_keyclass and i_cmpclass, and fill in missing defs.
