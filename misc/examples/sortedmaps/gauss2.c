@@ -1,9 +1,8 @@
 #include <stdio.h>
 #include <time.h>
 
-#define i_implement
+#define STC_IMPLEMENT // also for the normal distribution functions
 #include "stc/cstr.h"
-#define i_normal_dist // required for the normal distribution functions
 #include "stc/random.h"
 
 // Declare int -> int sorted map.
