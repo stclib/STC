@@ -142,7 +142,7 @@ while (cregex_find(&re, input, match, CREG_NEXT) == CREG_OK)
     for (int k = 1; i <= cregex_captures(&re); ++k)
         printf("submatch %d: " c_svfmt "\n", k, c_svarg(match[k]));
 ```
-There are also a `c_formatch`/`c_formatch_sv` macro which simplifies this:
+There is also a `c_formatch` macro which simplifies this:
 ```c
 c_formatch (it, &re, input)
     for (int k = 1; i <= cregex_captures(&re); ++k)

@@ -78,17 +78,13 @@ typedef struct {
 
 typedef struct {
     const cregex* regex;
-    csview input;
+    const char* input;
     csview match[CREG_MAX_CAPTURES];
 } cregex_iter;
 
 #define c_formatch(it, re, string) \
-    for (cregex_iter it = {.regex=re, .input={.buf=string,.size=-1}, .match={{0}}}; \
-         cregex_find_4(it.regex, it.input.buf, it.match, CREG_NEXT) == CREG_OK && it.match[0].size > 0; )
-
-#define c_formatch_sv(it, re, strview) \
-    for (cregex_iter it = {.regex=re, .input=strview, .match={{0}}}; \
-         cregex_find_sv(it.regex, it.input, it.match, CREG_NEXT) == CREG_OK && it.match[0].size > 0; )
+    for (cregex_iter it = {.regex=re, .input=string, .match={{0}}}; \
+         cregex_find_4(it.regex, it.input, it.match, CREG_NEXT) == CREG_OK && it.match[0].size > 0; )
 
 STC_INLINE cregex cregex_init(void) {
     cregex re = {0};
