@@ -163,7 +163,7 @@ void cregex_drop(cregex* re);
 
 #endif // STC_CREGEX_H_INCLUDED
 
-#if defined i_implement || defined i_import
+#if defined STC_IMPLEMENT || defined i_implement || defined i_import
   #include "priv/linkage.h"
   #include "priv/cregex_prv.c"
   #if defined i_import

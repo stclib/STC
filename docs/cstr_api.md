@@ -28,9 +28,10 @@ cstr        cstr_lit(const char literal_only[]);                    // cstr from
 cstr        cstr_init(void);                                        // constructor; empty string
 cstr        cstr_from(const char* str);                             // constructor using strlen()
 cstr        cstr_from_n(const char* str, isize n);                  // constructor with n first bytes of str
+cstr        cstr_from_s(cstr s, isize pos, isize len);              // construct a substring
 cstr        cstr_from_fmt(const char* fmt, ...);                    // printf() formatting
 cstr        cstr_from_replace(csview sv, csview search, csview repl, int32_t count);
-cstr        cstr_from_zv(zsview zv);                                // construct cstr from zsview
+cstr        cstr_from_zv(zsview zv);                                // construct cstr from a null-terminated sview
 cstr        cstr_from_sv(csview sv);                                // construct cstr from csview
 cstr        cstr_with_capacity(isize cap);
 cstr        cstr_with_size(isize len, char fill);                   // repeat fill len times
@@ -130,6 +131,7 @@ cstr        cstr_toupper_sv(csview sv);                             // returns n
 void        cstr_uppercase(cstr* self);                             // transform cstr to uppercase utf8
 
 int         cstr_icmp(const cstr* s1, const cstr* s2);              // utf8 case-insensitive comparison
+bool        cstr_ieq(const cstr* s1, const cstr* s2);               // utf8 case-insensitive comparison
 bool        cstr_iequals(const cstr* self, const char* str);        //   "
 bool        cstr_istarts_with(const cstr* self, const char* str);   //   "
 bool        cstr_iends_with(const cstr* self, const char* str);     //   "

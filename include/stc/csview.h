@@ -66,12 +66,12 @@ STC_INLINE bool csview_contains(csview sv, const char* str)
 
 STC_INLINE bool csview_starts_with(csview sv, const char* str) {
     isize n = c_strlen(str);
-    return n > sv.size ? false : !c_memcmp(sv.buf, str, n);
+    return n <= sv.size && !c_memcmp(sv.buf, str, n);
 }
 
 STC_INLINE bool csview_ends_with(csview sv, const char* str) {
     isize n = c_strlen(str);
-    return n > sv.size ? false : !c_memcmp(sv.buf + sv.size - n, str, n);
+    return n <= sv.size && !c_memcmp(sv.buf + sv.size - n, str, n);
 }
 
 STC_INLINE csview csview_substr(csview sv, isize pos, isize n) {
@@ -138,17 +138,40 @@ STC_INLINE bool csview_u8_valid(csview sv) // requires linking with utf8 symbols
 
 /* ---- Container helper functions ---- */
 
+STC_DEF uint64_t csview_hash(const csview *self)
+    { return chash_n(self->buf, self->size); }
+
 STC_INLINE int csview_cmp(const csview* x, const csview* y) {
     isize n = x->size < y->size ? x->size : y->size;
     int c = c_memcmp(x->buf, y->buf, n);
     return c ? c : (int)(x->size - y->size);
 }
 
+STC_INLINE bool csview_eq(const csview* x, const csview* y)
+    { return x->size == y->size && !c_memcmp(x->buf, y->buf, x->size); }
+
 STC_INLINE int csview_icmp(const csview* x, const csview* y)
     { return utf8_icmp_sv(*x, *y); }
 
-STC_INLINE bool csview_eq(const csview* x, const csview* y)
-    { return x->size == y->size && !c_memcmp(x->buf, y->buf, x->size); }
+STC_INLINE bool csview_ieq(const csview* x, const csview* y)
+    { return x->size == y->size && !utf8_icmp_sv(*x, *y); }
+
+/* ---- case insensitive ---- */
+
+STC_INLINE bool csview_iequals(csview sv, const char* str) {
+    isize n = c_strlen(str);
+    return sv.size == n && !utf8_icmp_sv(sv, c_sv(str, n));
+}
+
+STC_INLINE bool csview_istarts_with(csview sv, const char* str) {
+    isize n = c_strlen(str);
+    return n <= sv.size && !utf8_icmp_sv(sv, c_sv(str, n));
+}
+
+STC_INLINE bool csview_iends_with(csview sv, const char* str) {
+    isize n = c_strlen(str);
+    return n <= sv.size && !utf8_icmp(sv.buf + sv.size - n, str);
+}
 
 #endif // STC_CSVIEW_H_INCLUDED
 
@@ -172,9 +195,6 @@ STC_DEF isize csview_find_sv(csview sv, csview search) {
     char* res = cstrnstrn(sv.buf, sv.size, search.buf, search.size);
     return res ? (res - sv.buf) : c_NPOS;
 }
-
-STC_DEF uint64_t csview_hash(const csview *self)
-    { return chash_n(self->buf, self->size); }
 
 STC_DEF csview csview_substr_ex(csview sv, isize pos, isize n) {
     if (pos < 0) {

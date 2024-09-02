@@ -172,20 +172,10 @@ STC_INLINE isize cstr_capacity(const cstr* self)
 STC_INLINE isize cstr_topos(const cstr* self, cstr_iter it)
     { return it.ref - cstr_str(self); }
 
-
-// requires linking with utf8 symbols, e.g. #define i_import before including cstr.h in one TU.
-
-extern cstr cstr_casefold_sv(csview sv);
-extern cstr cstr_tolower_sv(csview sv);
-extern cstr cstr_toupper_sv(csview sv);
-extern cstr cstr_tolower(const char* str);
-extern cstr cstr_toupper(const char* str);
-extern void cstr_lowercase(cstr* self);
-extern void cstr_uppercase(cstr* self);
-extern bool cstr_valid_utf8(const cstr* self);
-
-STC_INLINE cstr cstr_from_pos(cstr s, isize pos, isize len)
+STC_INLINE cstr cstr_from_s(cstr s, isize pos, isize len)
     { return cstr_from_n(cstr_str(&s) + pos, len); }
+
+// BEGIN utf8 functions
 
 STC_INLINE isize cstr_u8_size(const cstr* self)
     { return utf8_size(cstr_str(self)); }
@@ -233,28 +223,55 @@ STC_INLINE cstr_iter cstr_advance(cstr_iter it, isize u8pos) {
     return it;
 }
 
+// utf8 case conversion: requires `#define i_import` before including cstr.h in one TU.
 
-STC_INLINE int cstr_cmp(const cstr* s1, const cstr* s2)
-    { return strcmp(cstr_str(s1), cstr_str(s2)); }
+extern cstr cstr_casefold_sv(csview sv);
+extern cstr cstr_tolower_sv(csview sv);
+extern cstr cstr_toupper_sv(csview sv);
+extern cstr cstr_tolower(const char* str);
+extern cstr cstr_toupper(const char* str);
+extern void cstr_lowercase(cstr* self);
+extern void cstr_uppercase(cstr* self);
+extern bool cstr_valid_utf8(const cstr* self);
+
+STC_INLINE bool cstr_istarts_with(const cstr* self, const char* sub) {
+    csview sv = cstr_sv(self);
+    isize len = c_strlen(sub);
+    return len <= sv.size && !utf8_icmp_sv(sv, c_sv(sub, len));
+}
+
+STC_INLINE bool cstr_iends_with(const cstr* self, const char* sub) {
+    csview sv = cstr_sv(self);
+    isize n = c_strlen(sub);
+    return n <= sv.size && !utf8_icmp(sv.buf + sv.size - n, sub);
+}
 
 STC_INLINE int cstr_icmp(const cstr* s1, const cstr* s2)
     { return utf8_icmp(cstr_str(s1), cstr_str(s2)); }
+
+STC_INLINE bool cstr_ieq(const cstr* s1, const cstr* s2) {
+    csview x = cstr_sv(s1), y = cstr_sv(s2);
+    return x.size == y.size && !utf8_icmp_sv(x, y);
+}
+
+STC_INLINE bool cstr_iequals(const cstr* self, const char* str)
+    { return !utf8_icmp(cstr_str(self), str); }
+
+// END utf8
+
+STC_INLINE int cstr_cmp(const cstr* s1, const cstr* s2)
+    { return strcmp(cstr_str(s1), cstr_str(s2)); }
 
 STC_INLINE bool cstr_eq(const cstr* s1, const cstr* s2) {
     csview x = cstr_sv(s1), y = cstr_sv(s2);
     return x.size == y.size && !c_memcmp(x.buf, y.buf, x.size);
 }
 
-
 STC_INLINE bool cstr_equals(const cstr* self, const char* str)
     { return !strcmp(cstr_str(self), str); }
 
 STC_INLINE bool cstr_equals_sv(const cstr* self, csview sv)
     { return sv.size == cstr_size(self) && !c_memcmp(cstr_str(self), sv.buf, sv.size); }
-
-STC_INLINE bool cstr_iequals(const cstr* self, const char* str)
-    { return !utf8_icmp(cstr_str(self), str); }
-
 
 STC_INLINE isize cstr_find(const cstr* self, const char* search) {
     const char *str = cstr_str(self), *res = strstr((char*)str, search);
@@ -279,13 +296,6 @@ STC_INLINE bool cstr_starts_with(const cstr* self, const char* sub) {
     return !*sub;
 }
 
-STC_INLINE bool cstr_istarts_with(const cstr* self, const char* sub) {
-    csview sv = cstr_sv(self);
-    isize len = c_strlen(sub);
-    return len <= sv.size && !utf8_icmp_sv(sv, c_sv(sub, len));
-}
-
-
 STC_INLINE bool cstr_ends_with_sv(const cstr* self, csview sub) {
     csview sv = cstr_sv(self);
     if (sub.size > sv.size) return false;
@@ -294,13 +304,6 @@ STC_INLINE bool cstr_ends_with_sv(const cstr* self, csview sub) {
 
 STC_INLINE bool cstr_ends_with(const cstr* self, const char* sub)
     { return cstr_ends_with_sv(self, c_sv(sub, c_strlen(sub))); }
-
-STC_INLINE bool cstr_iends_with(const cstr* self, const char* sub) {
-    csview sv = cstr_sv(self);
-    isize n = c_strlen(sub);
-    return n <= sv.size && !utf8_icmp(sv.buf + sv.size - n, sub);
-}
-
 
 STC_INLINE char* cstr_assign(cstr* self, const char* str)
     { return cstr_assign_n(self, str, c_strlen(str)); }

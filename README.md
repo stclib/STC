@@ -50,7 +50,7 @@ Containers
 - [***cstr*** - string type (short string optimized)](docs/cstr_api.md)
 - [***csview*** - string view (non-zero terminated)](docs/csview_api.md)
 - [***zsview*** - zero-terminated string view](docs/zsview_api.md)
-- [***cspan*** - single and multidimensional span](docs/cspan_api.md)
+- [***cspan*** - single and multidimensional spans](docs/cspan_api.md)
 
 Algorithms
 ----------

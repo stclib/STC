@@ -60,12 +60,12 @@ STC_INLINE bool zsview_contains(zsview zs, const char* str)
 
 STC_INLINE bool zsview_starts_with(zsview zs, const char* str) {
     isize n = c_strlen(str);
-    return n > zs.size ? false : !c_memcmp(zs.str, str, n);
+    return n <= zs.size && !c_memcmp(zs.str, str, n);
 }
 
 STC_INLINE bool zsview_ends_with(zsview zs, const char* str) {
     isize n = c_strlen(str);
-    return n > zs.size ? false : !c_memcmp(zs.str + zs.size - n, str, n);
+    return n <= zs.size && !c_memcmp(zs.str + zs.size - n, str, n);
 }
 
 STC_INLINE zsview zsview_from_pos(zsview zs, isize pos) {
@@ -121,9 +121,10 @@ STC_INLINE zsview_iter zsview_advance(zsview_iter it, isize u8pos) {
     return it;
 }
 
-/* utf8 ignore case cmp: requires linking with utf8 symbols */
-STC_INLINE int zsview_icmp(const zsview* x, const zsview* y)
-    { return utf8_icmp_sv(c_sv_2(x->str, x->size), c_sv_2(y->str, y->size)); }
+/* ---- Container helper functions ---- */
+
+STC_INLINE uint64_t zsview_hash(const zsview *self)
+    { return chash_n(self->str, self->size); }
 
 STC_INLINE int zsview_cmp(const zsview* x, const zsview* y) {
     isize n = x->size < y->size ? x->size : y->size;
@@ -134,8 +135,24 @@ STC_INLINE int zsview_cmp(const zsview* x, const zsview* y) {
 STC_INLINE bool zsview_eq(const zsview* x, const zsview* y)
     { return x->size == y->size && !c_memcmp(x->str, y->str, x->size); }
 
-STC_INLINE uint64_t zsview_hash(const zsview *self)
-    { return chash_n(self->str, self->size); }
+STC_INLINE int zsview_icmp(const zsview* x, const zsview* y)
+    { return utf8_icmp(x->str, y->str); }
+
+STC_INLINE bool zsview_ieq(const zsview* x, const zsview* y)
+    { return x->size == y->size && !utf8_icmp(x->str, y->str); }
+
+/* ---- case insensitive ---- */
+
+STC_INLINE bool zsview_iequals(zsview zs, const char* str)
+    { return strlen(str) == zs.size && !utf8_icmp(sz.str, str); }
+
+STC_INLINE bool zsview_istarts_with(zsview zs, const char* str)
+    { return c_strlen(str) <= zs.size && !utf8_icmp(zs.str, str); }
+
+STC_INLINE bool zsview_iends_with(zsview zs, const char* str) {
+    isize n = c_strlen(str);
+    return n <= zs.size && !utf8_icmp(zs.str + zs.size - n, str);
+}
 
 #endif // STC_ZSVIEW_H_INCLUDED
 

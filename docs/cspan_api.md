@@ -4,7 +4,10 @@
 The **cspan** types are templated non-owning *single* and *multi-dimensional* views of an array.
 It supports both row-major and column-major layout efficiently, in a addition to slicing
 capabilities similar to [python's numpy arrays](https://numpy.org/doc/stable/user/basics.indexing.html).
-Note that each dimension is currently limited to int32_t sizes and 8 dimensions (can be extended).
+Note that **cspan** stores indices as int32_t. Multi-dimensional spans can have up to INT32_MAX elements
+in the RANK-1 inner dimensions in total, and INT32_MAX in the outer dimension. Currently limited to 8
+dimensions due to ergonomics and optimization of one-dimensional spans. More dimensions can be added with
+the *using_cspan_tuple(N)* macro.
 
 See also C++
 [std::span](https://en.cppreference.com/w/cpp/container/span) /
@@ -18,7 +21,7 @@ including each container. This works well mainly because cspan is non-owning.
 #include "stc/cspan.h"
 using_cspan(SpanType, ValueType);        // define a 1-d SpanType with ValueType elements.
 using_cspan(SpanTypeN, ValueType, RANK); // define multi-dimensional span with RANK.
-                                         // RANK is the literal number of dimensions
+                                         // RANK is the constant number of dimensions
 // Shorthands:
 using_cspan2(S, ValueType);              // define span types S, S2 with ranks 1, 2.
 using_cspan3(S, ValueType);              // define span types S, S2, S3 with ranks 1, 2, 3.
@@ -33,15 +36,15 @@ of arguments does not match the span rank, a compile error is issued. Runtime bo
 by default (define `STC_NDEBUG` or `NDEBUG` to disable).
 ```c
 SpanType        cspan_init(<TYPE> SpanType, {v1, v2, ...});         // make a 1-d cspan from value list
-SpanType        cspan_from_n(ValueType* ptr, isize n);           // make a 1-d cspan from a pointer and length
+SpanType        cspan_from_n(ValueType* ptr, isize n);              // make a 1-d cspan from a pointer and length
 SpanType        cspan_from_array(ValueType array[]);                // make a 1-d cspan from a C array
 SpanType        cspan_from(STCContainer* cnt);                      // make a 1-d cspan from a vec or stack
 
 int             cspan_rank(const SpanTypeN* self);                  // num dimensions; compile-time constant
 isize           cspan_size(const SpanTypeN* self);                  // return number of elements
-isize           cspan_index(const SpanTypeN* self, isize i, j..); // offset index at i, j,...
+isize           cspan_index(const SpanTypeN* self, isize i, j..);   // offset index at i, j,...
 
-ValueType*      cspan_at(const SpanTypeN* self, isize i, j..);  // num args is compile-time checked
+ValueType*      cspan_at(const SpanTypeN* self, isize i, j..);      // num args is compile-time checked
 ValueType*      cspan_front(const SpanTypeN* self);
 ValueType*      cspan_back(const SpanTypeN* self);
 
@@ -112,7 +115,7 @@ OutSpanM        cspan_slice(<TYPE> OutSpanM, const SpanTypeN* self, {x0,x1,xs}, 
 
 #define i_key int
 #include "stc/stack.h"
-
+#define i_implement
 #include "stc/cspan.h"
 using_cspan(intspan, int);
 
@@ -194,6 +197,7 @@ if __name__ == '__main__':
 [ [Run this code](https://godbolt.org/z/q5rT89Eze) ]
 ```c
 #include <stdio.h>
+#define i_implement
 #include "stc/cspan.h"
 
 using_cspan3(myspan, int); // define myspan, myspan2, myspan3.
@@ -235,6 +239,7 @@ Slicing cspan without and with reducing the rank:
 [ [Run this code](https://godbolt.org/z/EdGzxeM4b) ]
 ```c
 #include <stdio.h>
+#define i_implement
 #include "stc/cspan.h"
 
 using_cspan3(Span, int); // Shorthand to define Span, Span2, and Span3
@@ -251,16 +256,16 @@ int main(void)
 
     puts("Slice without reducing rank:");
     Span3 ss3 = cspan_slice(Span3, &span3, {c_ALL}, {3,4}, {c_ALL});
-    cspan_print(Span3, ss3);
+    cspan_print(Span3, ss3, "%d");
 
     puts("Slice with reducing rank:");
     Span2 ss2 = cspan_slice(Span2, &span3, {c_ALL}, {3}, {c_ALL});
-    cspan_print(Span2, ss2);
+    cspan_print(Span2, ss2, "%d");
 
     puts("Swapped:");
     Span3 swapped = span3;
     cspan_swap_axes(&swapped, 0, 1);
     cspan_swap_axes(&swapped, 1, 2);
-    cspan_print(Span3, swapped);
+    cspan_print(Span3, swapped, "%d");
 }
 ```

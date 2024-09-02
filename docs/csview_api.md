@@ -35,31 +35,33 @@ All csview definitions and prototypes are available by including a single header
 ## Methods
 
 ```c
-csview         c_sv(const char literal_only[]);                     // from string literal only
-csview         c_sv(const char* str, isize n);                   // from a const char* and length n
-csview         csview_from(const char* str);                        // from const char* str
-csview         csview_from_n(const char* str, isize n);          // alias for c_sv(str, n)
+csview          c_sv(const char literal_only[]);                     // from string literal only
+csview          c_sv(const char* str, isize n);                   // from a const char* and length n
+csview          csview_from(const char* str);                        // from const char* str
+csview          csview_from_n(const char* str, isize n);          // alias for c_sv(str, n)
 
-isize          csview_size(csview sv);
-bool           csview_is_empty(csview sv);
-void           csview_clear(csview* self);
+isize           csview_size(csview sv);
+bool            csview_is_empty(csview sv);
+void            csview_clear(csview* self);
 
-bool           csview_equals(csview sv, const char* str);
-isize          csview_equals_sv(csview sv, csview sv2);
-isize          csview_find(csview sv, const char* str);
-isize          csview_find_sv(csview sv, csview find);
-bool           csview_contains(csview sv, const char* str);
-bool           csview_starts_with(csview sv, const char* str);
-bool           csview_ends_with(csview sv, const char* str);
+bool            csview_equals(csview sv, const char* str);
+bool            csview_iequals(csview sv, const char* str);
+isize           csview_find(csview sv, const char* str);
+isize           csview_find_sv(csview sv, csview find);
+bool            csview_contains(csview sv, const char* str);
+bool            csview_starts_with(csview sv, const char* str);
+bool            csview_istarts_with(csview sv, const char* str);
+bool            csview_ends_with(csview sv, const char* str);
+bool            csview_iends_with(csview sv, const char* str);
 
-csview         csview_substr(csview sv, isize pos, isize n);
-csview         csview_slice(csview sv, isize pos1, isize pos2);
-csview         csview_last(csview sv, isize len);                      // substr of the last len bytes
-const char*    csview_at(csview sv, isize index);
+csview          csview_substr(csview sv, isize pos, isize n);
+csview          csview_slice(csview sv, isize pos1, isize pos2);
+csview          csview_last(csview sv, isize len);                      // substr of the last len bytes
+const char*     csview_at(csview sv, isize index);
 
-csview         csview_substr_ex(csview sv, isize pos, isize n);     // negative pos count from end
-csview         csview_slice_ex(csview sv, isize pos1, isize pos2);  // negative pos1, pos2 count from end
-csview         csview_token(csview sv, const char* sep, isize* start); // *start > sv.size after last token
+csview          csview_substr_ex(csview sv, isize pos, isize n);     // negative pos count from end
+csview          csview_slice_ex(csview sv, isize pos1, isize pos2);  // negative pos1, pos2 count from end
+csview          csview_token(csview sv, const char* sep, isize* start); // *start > sv.size after last token
 ```
 
 #### UTF8 methods
@@ -101,6 +103,7 @@ c_fortoken (i, ", ", "hello, one, two, three")
 int            csview_cmp(const csview* x, const csview* y);
 int            csview_icmp(const csview* x, const csview* y);
 bool           csview_eq(const csview* x, const csview* y);
+bool           csview_ieq(const csview* x, const csview* y);
 uint64_t       csview_hash(const csview* x);
 ```
 

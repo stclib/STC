@@ -64,7 +64,6 @@
   #pragma clang diagnostic warning "-Wextra"
   #pragma clang diagnostic warning "-Wpedantic"
   #pragma clang diagnostic warning "-Wconversion"
-  #pragma clang diagnostic warning "-Wdouble-promotion"
   #pragma clang diagnostic warning "-Wwrite-strings"
   // ignored
   #pragma clang diagnostic ignored "-Wmissing-field-initializers"
@@ -74,7 +73,6 @@
   #pragma GCC diagnostic warning "-Wextra"
   #pragma GCC diagnostic warning "-Wpedantic"
   #pragma GCC diagnostic warning "-Wconversion"
-  #pragma GCC diagnostic warning "-Wdouble-promotion"
   #pragma GCC diagnostic warning "-Wwrite-strings"
   // ignored
   #pragma GCC diagnostic ignored "-Wuninitialized"

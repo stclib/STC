@@ -2,6 +2,7 @@
 // C99:
 #include <stdio.h>
 #include <time.h>
+#define i_implement
 #include "stc/cspan.h"
 
 using_cspan(Mat, double, 2);

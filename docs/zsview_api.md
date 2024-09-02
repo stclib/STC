@@ -32,10 +32,13 @@ void            zsview_clear(zsview* self);
 
 csview          zsview_sv(zsview zv);                           // convert to csview type
 bool            zsview_equals(zsview zv, const char* str);
+bool            zsview_iequals(zsview zs, const char* str);
 isize           zsview_find(zsview zv, const char* str);
 bool            zsview_contains(zsview zv, const char* str);
 bool            zsview_starts_with(zsview zv, const char* str);
+bool            zsview_istarts_with(zsview zs, const char* str);
 bool            zsview_ends_with(zsview zv, const char* str);
+bool            zsview_iends_with(zsview zs, const char* str);
 
 zsview_iter     zsview_begin(const zsview* self);
 zsview_iter     zsview_end(const zsview* self);
@@ -53,9 +56,10 @@ bool            zsview_u8_valid(zsview zv);                     // requires link
 #### Helper methods for usage in containers
 ```c
 int             zsview_cmp(const zsview* x, const zsview* y);
-int             zsview_icmp(const zsview* x, const zsview* y);  // requires linking with utf8 symbols
 bool            zsview_eq(const zsview* x, const zsview* y);
 uint64_t        zsview_hash(const zsview* x);
+int             zsview_icmp(const zsview* s1, const zsview* s2);              // utf8 case-insensitive comparison
+bool            zsview_ieq(const zsview* s1, const zsview* s2);               // utf8 case-insensitive comparison
 ```
 
 #### UTF8 helper methods
