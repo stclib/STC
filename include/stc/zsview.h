@@ -126,11 +126,8 @@ STC_INLINE zsview_iter zsview_advance(zsview_iter it, isize u8pos) {
 STC_INLINE uint64_t zsview_hash(const zsview *self)
     { return chash_n(self->str, self->size); }
 
-STC_INLINE int zsview_cmp(const zsview* x, const zsview* y) {
-    isize n = x->size < y->size ? x->size : y->size;
-    int c = c_memcmp(x->str, y->str, n);
-    return c ? c : (int)(x->size - y->size);
-}
+STC_INLINE int zsview_cmp(const zsview* x, const zsview* y)
+    { return strcmp(x->str, y->str); }
 
 STC_INLINE bool zsview_eq(const zsview* x, const zsview* y)
     { return x->size == y->size && !c_memcmp(x->str, y->str, x->size); }

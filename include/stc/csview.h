@@ -144,7 +144,7 @@ STC_DEF uint64_t csview_hash(const csview *self)
 STC_INLINE int csview_cmp(const csview* x, const csview* y) {
     isize n = x->size < y->size ? x->size : y->size;
     int c = c_memcmp(x->buf, y->buf, n);
-    return c ? c : (int)(x->size - y->size);
+    return c ? c : c_default_cmp(x->size, y->size);
 }
 
 STC_INLINE bool csview_eq(const csview* x, const csview* y)
