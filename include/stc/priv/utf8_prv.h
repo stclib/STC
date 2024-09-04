@@ -23,8 +23,6 @@
 #ifndef STC_UTF8_PRV_H_INCLUDED
 #define STC_UTF8_PRV_H_INCLUDED
 
-#include <ctype.h>
-
 // The following functions assume valid utf8 strings:
 
 /* number of bytes in the utf8 codepoint from s */
@@ -68,27 +66,13 @@ STC_INLINE isize utf8_pos(const char* s, isize index)
 // To call them, either define i_import before including
 // one of cstr, csview, zsview, or link with src/libstc.o.
 
-enum {
-    U8G_Cc, U8G_Lt, U8G_Nd, U8G_Nl,
-    U8G_Pc, U8G_Pd, U8G_Pf, U8G_Pi,
-    U8G_Sc, U8G_Zl, U8G_Zp, U8G_Zs,
-    U8G_Arabic, U8G_Cyrillic,
-    U8G_Devanagari, U8G_Greek,
-    U8G_Han, U8G_Latin,
-    U8G_SIZE
-};
-
-extern bool     utf8_isgroup(int group, uint32_t c);
-extern bool     utf8_isalpha(uint32_t c);
+extern bool     utf8_valid_n(const char* s, isize nbytes);
+extern int      utf8_encode(char *out, uint32_t c);
+extern int      utf8_icompare(const csview s1, const csview s2);
+extern uint32_t utf8_peek_off(const char* s, int pos);
 extern uint32_t utf8_casefold(uint32_t c);
 extern uint32_t utf8_tolower(uint32_t c);
 extern uint32_t utf8_toupper(uint32_t c);
-extern bool     utf8_iscased(uint32_t c);
-extern bool     utf8_isword(uint32_t c);
-extern bool     utf8_valid_n(const char* s, isize nbytes);
-extern int      utf8_icompare(csview s1, csview s2);
-extern int      utf8_encode(char *out, uint32_t c);
-extern uint32_t utf8_peek_off(const char *s, int offset);
 
 STC_INLINE bool utf8_isupper(uint32_t c)
     { return utf8_tolower(c) != c; }
@@ -96,20 +80,6 @@ STC_INLINE bool utf8_isupper(uint32_t c)
 STC_INLINE bool utf8_islower(uint32_t c)
     { return utf8_toupper(c) != c; }
 
-STC_INLINE bool utf8_isalnum(uint32_t c) {
-    if (c < 128) return isalnum((int)c) != 0;
-    return utf8_isalpha(c) || utf8_isgroup(U8G_Nd, c);
-}
-
-STC_INLINE bool utf8_isblank(uint32_t c) {
-    if (c < 128) return (c == ' ') | (c == '\t');
-    return utf8_isgroup(U8G_Zs, c);
-}
-
-STC_INLINE bool utf8_isspace(uint32_t c) {
-    if (c < 128) return isspace((int)c) != 0;
-    return ((c == 8232) | (c == 8233)) || utf8_isgroup(U8G_Zs, c);
-}
 
 /* decode next utf8 codepoint. https://bjoern.hoehrmann.de/utf-8/decoder/dfa */
 typedef struct { uint32_t state, codep; } utf8_decode_t;

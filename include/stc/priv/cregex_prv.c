@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include <setjmp.h>
 #include "utf8_prv.h"
 #include "cstr_prv.h"
+#include "ucd_prv.c"
 
 typedef uint32_t _Rune; /* Utf8 code point */
 typedef int32_t _Token;

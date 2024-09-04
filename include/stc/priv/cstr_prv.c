@@ -227,8 +227,10 @@ STC_DEF isize cstr_printf(cstr* self, const char* fmt, ...) {
 #endif // STC_CSTR_PRV_C_INCLUDED
 
 /* ----------------------- UTF8 CASE CONVERSION ---------------------- */
-#if defined i_import && !defined STC_CSTR_UTF8_INCLUDED
+#if !defined STC_CSTR_UTF8_INCLUDED && (defined i_import || defined STC_UTF8_PRV_C_INCLUDED)
 #define STC_CSTR_UTF8_INCLUDED
+
+#include <ctype.h>
 
 static struct {
     int      (*conv_asc)(int);
