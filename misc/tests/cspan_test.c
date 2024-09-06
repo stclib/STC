@@ -1,4 +1,5 @@
 #include <stdio.h>
+#define i_implement
 #include "stc/cspan.h"
 #include "ctest.h"
 

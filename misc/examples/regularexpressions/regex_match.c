@@ -28,7 +28,8 @@ int main(void)
         printf("  %g\n", (double)*i.ref);
 
     // extracts the numbers only to a comma separated string.
-    cstr nums = cregex_replace_sv(&re, csview_from(str), " $0,", 0, NULL, CREG_STRIP);
+    cstr nums = cregex_replace_sv_with(&re, csview_from(str), " $0,",
+                                       INT32_MAX, NULL, CREG_STRIP);
     printf("\n%s\n", cstr_str(&nums));
 
     cstr_drop(&nums);

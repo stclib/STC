@@ -30,7 +30,8 @@ int main(void)
         printf("fixed: %s\n", cstr_str(&str));
 
         /* US date format, and add 10 years to dates: */
-        cstr_take(&str, cregex_replace_pattern(pattern, input, "$1/$3/$2", 0, add_10_years, CREG_DEFAULT));
+        cstr_take(&str, cregex_replace_pattern_with(pattern, input, "$1/$3/$2",
+                                                    INT32_MAX, add_10_years, CREG_DEFAULT));
         printf("us+10: %s\n", cstr_str(&str));
 
         /* Wrap first date inside []: */
@@ -47,7 +48,8 @@ int main(void)
         printf("euros: %s\n", cstr_str(&str));
 
         /* Strip out everything but the matches */
-        cstr_take(&str, cregex_replace_sv(&re, csview_from(input), "$3.$2.$1;", 0, NULL, CREG_STRIP));
+        cstr_take(&str, cregex_replace_sv_with(&re, csview_from(input), "$3.$2.$1;",
+                                               INT32_MAX, NULL, CREG_STRIP));
         printf("strip: %s\n", cstr_str(&str));
 
         /* Wrap all words in ${} */
