@@ -138,9 +138,6 @@ STC_INLINE bool csview_u8_valid(csview sv) // requires linking with utf8 symbols
 
 /* ---- Container helper functions ---- */
 
-STC_DEF uint64_t csview_hash(const csview *self)
-    { return chash_n(self->buf, self->size); }
-
 STC_INLINE int csview_cmp(const csview* x, const csview* y) {
     isize n = x->size < y->size ? x->size : y->size;
     int c = c_memcmp(x->buf, y->buf, n);
@@ -180,6 +177,9 @@ STC_INLINE bool csview_iends_with(csview sv, const char* str) {
 #if defined i_implement || defined i_static
 #ifndef STC_CSVIEW_C_INCLUDED
 #define STC_CSVIEW_C_INCLUDED
+
+STC_DEF uint64_t csview_hash(const csview *self)
+    { return chash_n(self->buf, self->size); }
 
 STC_DEF csview_iter csview_advance(csview_iter it, isize u8pos) {
     int inc = -1;
