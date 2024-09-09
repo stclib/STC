@@ -32,7 +32,6 @@
   #define c_no_hash       (1<<4)
   #define c_use_cmp       (1<<5)
   #define c_use_eq        (1<<6)
-  #define c_more          (1<<7)
 
   #define _c_MEMB(name) c_JOIN(Self, name)
   #define _c_DEFTYPES(macro, SELF, ...) c_EXPAND(macro(SELF, __VA_ARGS__))
@@ -113,9 +112,6 @@
 #endif
 #if c_option(c_no_clone) || defined _i_is_arc
   #define i_no_clone
-#endif
-#if c_option(c_more)
-  #define i_more
 #endif
 
 // Handle predefined element-types with lookup convertion types:

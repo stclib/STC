@@ -52,7 +52,7 @@ void demo2(void)
         && c_flt_skipwhile(*value != 11) // Skip initial numbers unequal 11
         && (*value % 2) != 0             // Collect odd numbers
         && (c_flt_map(*value * *value),  // Square each number
-            IVec_push(&vector, *value),  // Populate output IVec
+            IVec_push(&vector, (int)*value),  // Populate output IVec
             c_flt_take(5))               // Only take five numbers
     );
     c_foreach (i, IVec, vector)

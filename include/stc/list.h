@@ -87,6 +87,7 @@
 #endif
 #include "priv/template.h"
 
+#define _i_is_list
 #ifndef i_is_forward
   _c_DEFTYPES(_c_list_types, Self, i_key);
 #endif
@@ -385,9 +386,7 @@ _c_MEMB(_remove)(Self* self, _m_raw val) {
 #endif
 
 #if defined _i_has_cmp
-#define _sort_lowhigh _sort_lowhigh_
-#include "sort.h"
-#undef _sort_lowhigh
+#include "priv/sort_prv.h"
 
 STC_DEF bool _c_MEMB(_sort)(Self* self) {
     isize len = 0, cap = 0;
@@ -403,7 +402,7 @@ STC_DEF bool _c_MEMB(_sort)(Self* self) {
     }
     _m_node* keep = self->last;
     self->last = (_m_node *)arr;
-    _c_MEMB(_sort_lowhigh_)(self, 0, len - 1);
+    _c_MEMB(_sort_lowhigh)(self, 0, len - 1);
     self->last = keep;
     c_foreach (i, Self, *self)
         *i.ref = *p++;
@@ -414,3 +413,4 @@ STC_DEF bool _c_MEMB(_sort)(Self* self) {
 #endif // i_implement
 #include "priv/linkage2.h"
 #include "priv/template2.h"
+#undef _i_is_list

@@ -215,7 +215,7 @@ STC_INLINE void _c_MEMB(_adjust_end_)(Self* self, isize n)
     { self->size += n; }
 
 #if defined _i_has_cmp
-#include "sort.h"
+#include "priv/sort_prv.h"
 #endif // _i_has_cmp
 
 #if defined _i_has_eq

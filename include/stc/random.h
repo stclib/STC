@@ -192,11 +192,13 @@ crand64_normal_r(crand64* rng, uint64_t stream, crand64_normal_dist* d) {
     if (d->_has_next++ & 1)
         return d->_next*d->stddev + d->mean;
     do {
-        v1 = 2*crand64_real_r(rng, stream) - 1;
-        v2 = 2*crand64_real_r(rng, stream) - 1;
+        // range (-1.0, 1.0):
+        v1 = (double)((int64_t)crand64_uint_r(rng, stream) >> 11) * 0x1.0p-52;
+        v2 = (double)((int64_t)crand64_uint_r(rng, stream) >> 11) * 0x1.0p-52;
+
         sq = v1*v1 + v2*v2;
-    } while (sq >= 1 || sq == 0);
-    rt = sqrt(-2*log(sq)/sq);
+    } while (sq >= 1.0 || sq == 0.0);
+    rt = sqrt(-2.0 * log(sq) / sq);
     d->_next = v2*rt;
     return (v1*rt)*d->stddev + d->mean;
 }

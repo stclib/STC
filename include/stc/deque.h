@@ -130,7 +130,7 @@ _c_MEMB(_get_mut)(Self* self, _m_raw raw)
 #endif // _i_has_eq
 
 #if defined _i_has_cmp
-#include "sort.h"
+#include "priv/sort_prv.h"
 #endif // _i_has_cmp
 
 /* -------------------------- IMPLEMENTATION ------------------------- */

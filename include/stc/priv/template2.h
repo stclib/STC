@@ -20,9 +20,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifdef i_more
-#undef i_more
-#else
 #undef i_TYPE
 #undef i_type
 #undef i_class
@@ -31,7 +28,6 @@
 #undef i_capacity
 
 #undef i_key
-#undef i_keyraw
 #undef i_key_cstr
 #undef i_key_str    // [deprecated]
 #undef i_key_arc
@@ -40,17 +36,16 @@
 #undef i_keyclass
 #undef i_cmpclass   // define i_keyraw, and bind i_cmp, i_eq, i_hash "members"
 #undef i_keyclone
+#undef i_keydrop
+#undef i_keyraw
 #undef i_keyfrom
 #undef i_keytoraw
 #undef i_cmp
 #undef i_less
 #undef i_eq
 #undef i_hash
-#undef i_keydrop
 
 #undef i_val
-#undef i_val2       // i_val, i_valraw
-#undef i_valraw
 #undef i_val_cstr
 #undef i_val_str    // [deprecated]
 #undef i_val_arc
@@ -58,9 +53,10 @@
 #undef i_val_arcbox // [deprecated]
 #undef i_valclass
 #undef i_valclone
+#undef i_valdrop
+#undef i_valraw
 #undef i_valfrom
 #undef i_valtoraw
-#undef i_valdrop
 
 #undef i_use_cmp
 #undef i_use_eq
@@ -74,4 +70,3 @@
 #undef _i_prefix
 #undef _i_template
 #undef Self
-#endif
