@@ -160,7 +160,7 @@ It enables a subset of functional programming like in other popular languages.
 | `c_flt_src1, c_flt_src2`     | Pointer variables to current unmapped source values |
 | `value1, value2`             | Pointer variables to (possible mapped) values |
 
-[ [Run this example](https://godbolt.org/z/7dP5a1s4s) ]
+[ [Run this example](https://godbolt.org/z/7d6rbhba8) ]
 ```c
 #include <stdio.h>
 #define i_type Vec, int
@@ -339,7 +339,7 @@ Also deque/queue (with ring buffer) and linked lists may be sorted, e.g.:
 
 int main(void) {
     MyDeq deq = c_init(MyDeq, {5, 3, 5, 9, 7, 4, 7});
-    c_deferred (MyDeq_drop(&deq))
+    c_defer (MyDeq_drop(&deq))
     {
         c_foritems (i, int, {2, 4, 9, 3, 1, 2, 6, 4})
             MyDeq_push_front(&deq, *i.ref);
@@ -418,74 +418,15 @@ void        c_default_drop(Type* p);                    // does nothing
 ---
 ## RAII scope macros
 
-#### c_guard: GNUC ***defer*** mechanics for resource acquisition and release.
-| Usage               | Description |
-|:--------------------|:----------------------------------------------------------|
-| `c_guard {...}`     | Create a defer scope. Equal to `c_guard_max(32) {...}`. |
-| `c_guard_max(N) {...}` | Create a defer scope with max N defer statements. |
-| `c_defer({...});`   | Add code ... to be deferred to end of `c_guard`, or until a `c_return`/`c_break`|
-| `c_panic({...});`   | Executes all deferred statements added, then the code ... May contain normal `return` or exit(). |
-| `c_return(x);`      | Return `x` from current function after `c_defer` statements are executed. |
-| `c_break`           | Break `c_guard` after `c_defer` statements are executed. Breaks out from any local loop/switch too.|
-
-- *Note 1*: `c_guard` can only guard variables already defined, i.e.,
-do not define variables inside the `c_guard` scope which are referred
-to by `c_defer`/`c_panic`.
-- *Note 2*: `c_return(x)` uses **typeof**, which is standard in C23,
-but supported by virtually every C99 compiler, except MSVC prior to
-MSVC VS17.9. If **typeof** is not supported, use `c_return_typed(Type, x)`.
-
-*Note*: `c_guard` requires computed goto's GNUC extension.
-
-*Note*: Regular `return`, `break` and `continue` must not be used
-anywhere inside a defer scope (except inside a `c_panic` clause).
-Use `c_return` and `c_break` to exit clause, otherwise assertion fails.
-
-*Note*: Nested `c_guard`s are not supported, as `c_return` will only
-execute the innermost defers before returning.
-
-Use of **c_guard** for managing resource dependencies:
-```c
-int read_nums(void) {
-    c_guard {
-        FILE *f = fopen("nums.txt", "r");
-        if (NULL == f)
-            c_return (-1);
-
-        c_defer({ fclose(f); });
-
-        int size;
-        if (1 != fscanf(f, "%i", &size))
-            c_return (-2);
-
-        int *nums = malloc(size * sizeof(int));
-        if (NULL == nums)
-            c_return (-3);
-
-        c_defer({ free(nums); });
-
-        for (int i = 0; i < size; ++i) {
-            int num;
-            if (1 != fscanf(f, "%i", &num))
-                c_return (-4);
-            nums[i] = num;
-        }
-        // ... use nums array here
-        c_break; // will assert fail if forgotten.
-    }
-    return 0;
-}
-```
-
-There is also portable `c_deferred` and `c_with` macros with similar functionality.
-It does not support `c_defer`/`c_return`/`c_break`, but you may use `continue` to
-break out of the scope:
+#### c_with, c_defer: resource acquisition and release.
 | Usage                                 | Description                                            |
 |:--------------------------------------|:-------------------------------------------------------|
-| `c_deferred (deinit, ...) {}`         | Defers execution of `deinit`s to end of scope |
+| `c_defer (deinit, ...) {}`            | Defers execution of `deinit`s to end of scope          |
 | `c_with (init, deinit) {}`            | Declare and/or initialize a variable. Defers execution of `deinit` to end of scope |
 | `c_with (init, condition, deinit) {}` | Adds a predicate in order to exit early if init fails  |
 | `continue`                            | Break out of a `c_with` scope without resource leakage |
+*Note*: Regular `return`, `break` and `continue` must not be used
+anywhere inside a defer scope.
 
 ```c
 // declare and init a new scoped variable and specify the deinitialize call:

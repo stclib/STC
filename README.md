@@ -195,7 +195,7 @@ Note that `i_val*` template parameters can be used instead of `i_key*` for *non-
 
 Switching to a different container type, e.g. a sorted set (sset):
 
-[ [Run this code](https://godbolt.org/z/ehzns5Pd9) ]
+[ [Run this code](https://godbolt.org/z/cedobWETq) ]
 ```c
 #define i_type Floats,float
 #include "stc/sset.h" // Use a sorted set instead
@@ -226,7 +226,7 @@ If an element destructor `i_keydrop` is defined, `i_keyclone` function is requir
 
 Let's make a vector of vectors, which can be cloned. All of its element vectors will be destroyed when destroying the Vec2D.
 
-[ [Run this code](https://godbolt.org/z/vnMeG6qj9) ]
+[ [Run this code](https://godbolt.org/z/PW3vso45G) ]
 ```c
 #include <stdio.h>
 #include "stc/algorithm.h"
@@ -269,7 +269,7 @@ int main(void)
 ```
 This example uses four different container types:
 
-[ [Run this code](https://godbolt.org/z/oEhMbGn6E) ]
+[ [Run this code](https://godbolt.org/z/hPr5K4haG) ]
 ```c
 #include <stdio.h>
 
@@ -296,7 +296,7 @@ int main(void)
     vec_pnt vec = {0};
     list_int lst = {0};
     smap_int map = {0};
-    c_deferred( // Drop the containers at scope exit
+    c_defer( // Drop the containers at scope exit
         hset_int_drop(&set),
         vec_pnt_drop(&vec),
         list_int_drop(&lst),

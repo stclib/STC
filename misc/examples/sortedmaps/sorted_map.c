@@ -8,7 +8,7 @@
 int main(void)
 {
     smap_int gquiz1 = {0}, gquiz2 = {0};
-    c_deferred(
+    c_defer(
         smap_int_drop(&gquiz1),
         smap_int_drop(&gquiz2)
     ){

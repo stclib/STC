@@ -45,7 +45,7 @@ int main(void)
     PSPtr p = PSPtr_from(Person_make("Laura", "Palmer"));
     PSPtr q = PSPtr_from(Person_clone(*p.get)); // deep copy
     Persons vec = {0};
-    c_deferred(
+    c_defer(
         PSPtr_drop(&p),
         PSPtr_drop(&q),
         Persons_drop(&vec)

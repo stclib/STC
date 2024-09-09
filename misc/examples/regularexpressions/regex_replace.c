@@ -19,7 +19,7 @@ int main(void)
 
     cstr str = {0};
     cregex re = {0};
-    c_deferred(
+    c_defer(
         cregex_drop(&re),
         cstr_drop(&str)
     ){

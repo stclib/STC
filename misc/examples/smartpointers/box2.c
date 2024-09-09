@@ -53,7 +53,7 @@ int main(void) {
     // Create BoxBoxPoint from either a Point or a BoxPoint:
     BoxBoxPoint box_in_a_box = BoxBoxPoint_from(origin());
 
-    c_deferred(
+    c_defer(
         BoxBoxPoint_drop(&box_in_a_box),
         BoxPoint_drop(&boxed_point),
         BoxRect_drop(&boxed_rectangle)

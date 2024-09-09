@@ -36,7 +36,7 @@ void stc_test(void)
     int N = 10000000;
 
     PrQue pq = {0};
-    c_deferred(PrQue_drop(&pq))
+    c_defer(PrQue_drop(&pq))
     {
         crand64_seed(seed);
         clock_t start = clock();

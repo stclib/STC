@@ -262,7 +262,7 @@ STC_INLINE isize cnextpow2(isize n) {
 #define c_with_3(init, condition, deinit) \
     for (int _i = 1; _i; ) for (init; _i && (condition); _i = 0, deinit)
 
-#define c_deferred(...) \
+#define c_defer(...) \
     for (int _i = 1; _i; _i = 0, __VA_ARGS__)
 
 #define c_drop(C, ...) \

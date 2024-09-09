@@ -99,7 +99,7 @@ If an error occurs ```cregex_compile``` returns a negative error code stored in 
 
 ### Getting the first match and making text replacements
 
-[ [Run this code](https://godbolt.org/z/c8as3oxj7) ]
+[ [Run this code](https://godbolt.org/z/9EovPvK5K) ]
 ```c
 #define i_import // include dependent cstr, utf8 and cregex function definitions.
 #include "stc/cregex.h"

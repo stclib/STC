@@ -17,7 +17,7 @@ int main(void)
     hmap_cstr map = {0}, mclone = {0};
     vec_cstr keys = {0}, values = {0};
     list_cstr list = {0};
-    c_deferred(
+    c_defer(
         hmap_cstr_drop(&map),
         hmap_cstr_drop(&mclone),
         vec_cstr_drop(&keys),

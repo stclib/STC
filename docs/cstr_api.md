@@ -170,7 +170,7 @@ char*       cstrnstrn(const char* str, isize slen, const char* needle, isize nle
 
 int main(void) {
     cstr s0, s1, full_path;
-    c_deferred(
+    c_defer(
         cstr_drop(&s0), cstr_drop(&s1), cstr_drop(&full_path)
     ){
         s0 = cstr_lit("Initialization without using strlen().");

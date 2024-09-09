@@ -9,7 +9,7 @@ int main(void)
 {
     // declaring set for storing string data-type
     hset_cstr stringSet = {0};
-    c_deferred(
+    c_defer(
         hset_cstr_drop(&stringSet)
     ){
         // inserting various string, same string will be stored

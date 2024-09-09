@@ -83,7 +83,7 @@ yield or await from a (deeply) nested coroutine call using cco_task objects desc
 
 The first example is a generator of Pythagorian triples, and stops when diagonal size > max_c.
 
-[ [Run this code](https://godbolt.org/z/qrbP4fffr) ]
+[ [Run this code](https://godbolt.org/z/PccE7W67h) ]
 ```c
 #include "stc/coroutine.h"
 #include <stdio.h>
@@ -131,7 +131,7 @@ The next variant skips the triples which are upscaled version of smaller ones by
 the gcd() function. Note that the gcd1_triples struct contains the triples struct so that
 both functions have separate call frames:
 
-[ [Run this code](https://godbolt.org/z/c5GzGo1Px) ]
+[ [Run this code](https://godbolt.org/z/PccE7W67h) ]
 ```c
 int gcd(int a, int b) { // greatest common denominator
     while (b) {

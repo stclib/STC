@@ -80,7 +80,7 @@ astar(cstr* maze, int width)
     pqueue_pnt front = {0};
     smap_pstep from = {0};
     smap_pcost costs = {0};
-    c_deferred(
+    c_defer(
         pqueue_pnt_drop(&front),
         smap_pstep_drop(&from),
         smap_pcost_drop(&costs)

@@ -102,7 +102,7 @@ TEST(cregex, compile_match_class_simple)
     cregex re1 = cregex_from("\\s");
     cregex re2 = cregex_from("\\w");
     cregex re3 = cregex_from("\\D");
-    c_deferred(
+    c_defer(
         cregex_drop(&re1), cregex_drop(&re2), cregex_drop(&re3)
     ){
         EXPECT_EQ(re1.error, 0);
@@ -126,7 +126,7 @@ TEST(cregex, compile_match_class_simple)
 TEST(cregex, compile_match_or)
 {
     cregex re, re2;
-    c_deferred(
+    c_defer(
         cregex_drop(&re), cregex_drop(&re2)
     ){
         re = cregex_from("as|df");
@@ -254,7 +254,7 @@ TEST(cregex, replace)
     const char* input = "start date: 2015-12-31, end date: 2022-02-28";
     cstr str = {0};
     cregex re = {0};
-    c_deferred(
+    c_defer(
         cstr_drop(&str), cregex_drop(&re)
     ){
         // replace with a fixed string, extended all-in-one call:
