@@ -96,7 +96,7 @@ int main(void) {
   #include "priv/template.h"
 #endif
 
-#include "priv/sort.h"
+#include "priv/sort_prv.h"
 
 #ifdef _i_is_array
   #undef _i_is_array
