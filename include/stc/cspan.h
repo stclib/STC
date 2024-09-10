@@ -56,11 +56,11 @@ int demo2() {
     puts("");
 }
 */
-#ifndef STC_CSPAN_H_INCLUDED
-#define STC_CSPAN_H_INCLUDED
-
 #define i_header
 #include "priv/linkage.h"
+
+#ifndef STC_CSPAN_H_INCLUDED
+#define STC_CSPAN_H_INCLUDED
 #include "common.h"
 typedef int32_t cspan_istride, _istride;
 
@@ -385,5 +385,5 @@ STC_DEF isize _cspan_slice(_istride oshape[], _istride ostride[], int* orank,
     *orank = oi;
     return off;
 }
-#include "priv/linkage2.h"
 #endif // IMPLEMENT
+#include "priv/linkage2.h"

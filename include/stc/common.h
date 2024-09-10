@@ -196,7 +196,7 @@ STC_INLINE isize cnextpow2(isize n) {
 #define c_foreach_4(it, C, start, end) \
     _c_foreach(it, C, start, (end).ref, _)
 
-#define c_foreach_count(k, it, C, cnt) \
+#define c_foreach_index(k, it, C, cnt) \
     for (isize k = 0, _i=1; _i; _i=0) \
     for (C##_iter it = C##_begin(&cnt); it.ref; C##_next(&it), ++k)
 

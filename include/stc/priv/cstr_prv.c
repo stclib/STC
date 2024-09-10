@@ -189,7 +189,7 @@ STC_DEF void cstr_u8_erase(cstr* self, const isize bytepos, const isize u8len) {
     _cstr_set_size(self, r.size - len);
 }
 
-STC_DEF isize cstr_vfmt(cstr* self, isize start, const char* fmt, va_list args) {
+static isize cstr_vfmt(cstr* self, isize start, const char* fmt, va_list args) {
     va_list args2;
     va_copy(args2, args);
     const int n = vsnprintf(NULL, 0ULL, fmt, args);
