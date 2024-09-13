@@ -2,7 +2,7 @@
 
 #include <time.h>
 #include <stdio.h>
-#define i_static
+#define i_import
 #include "stc/cstr.h"
 #include "stc/coroutine.h"
 

@@ -1,4 +1,4 @@
-#define i_implement
+#define i_import
 #include "stc/cstr.h"
 
 #define i_type hmap_id   // Map of int => cstr

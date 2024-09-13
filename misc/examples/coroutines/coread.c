@@ -1,7 +1,8 @@
-#define i_implement
+#include <stdlib.h>
+#include <errno.h>
+#define i_import
 #include "stc/cstr.h"
 #include "stc/coroutine.h"
-#include <errno.h>
 
 // Read file line by line using coroutines:
 

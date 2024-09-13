@@ -187,7 +187,7 @@ int main(void)
 ### Example 3
 This example uses a smap with cstr as mapped value.
 ```c
-#define i_implement
+#define i_import
 #include "stc/cstr.h"
 
 #define i_type IDSMap

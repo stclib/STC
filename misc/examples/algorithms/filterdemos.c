@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #define i_import
 #include "stc/cstr.h"
 #define i_implement

@@ -23,8 +23,6 @@
 #ifndef STC_CSTR_PRV_C_INCLUDED
 #define STC_CSTR_PRV_C_INCLUDED
 
-#include <stdio.h>
-
 STC_DEF uint64_t cstr_hash(const cstr *self) {
     csview sv = cstr_sv(self);
     return chash_n(sv.buf, sv.size);
@@ -57,20 +55,6 @@ STC_DEF char* _cstr_init(cstr* self, const isize len, const isize cap) {
     }
     cstr_s_set_size(self, len);
     return self->sml.data;
-}
-
-STC_DEF void cstr_shrink_to_fit(cstr* self) {
-    cstr_buf r = cstr_buffer(self);
-    if (r.size == r.cap)
-        return;
-    if (r.size > cstr_s_cap) {
-        self->lon.data = (char *)i_realloc(self->lon.data, cstr_l_cap(self) + 1, r.size + 1);
-        cstr_l_set_cap(self, r.size);
-    } else if (r.cap > cstr_s_cap) {
-        c_memcpy(self->sml.data, r.data, r.size + 1);
-        cstr_s_set_size(self, r.size);
-        i_free(r.data, r.cap + 1);
-    }
 }
 
 STC_DEF char* cstr_reserve(cstr* self, const isize cap) {
@@ -140,26 +124,6 @@ STC_DEF char* cstr_append_uninit(cstr *self, isize len) {
     return r.data + r.size;
 }
 
-STC_DEF bool cstr_getdelim(cstr *self, const int delim, FILE *fp) {
-    int c = fgetc(fp);
-    if (c == EOF)
-        return false;
-    isize pos = 0;
-    cstr_buf r = cstr_buffer(self);
-    for (;;) {
-        if (c == delim || c == EOF) {
-            _cstr_set_size(self, pos);
-            return true;
-        }
-        if (pos == r.cap) {
-            _cstr_set_size(self, pos);
-            r.data = cstr_reserve(self, (r.cap = r.cap*3/2 + 16));
-        }
-        r.data[pos++] = (char) c;
-        c = fgetc(fp);
-    }
-}
-
 STC_DEF cstr cstr_from_replace(csview in, csview search, csview repl, int32_t count) {
     cstr out = cstr_init();
     isize from = 0; char* res;
@@ -187,6 +151,35 @@ STC_DEF void cstr_u8_erase(cstr* self, const isize bytepos, const isize u8len) {
     isize len = utf8_pos(r.data + bytepos, u8len);
     c_memmove(&r.data[bytepos], &r.data[bytepos + len], r.size - (bytepos + len));
     _cstr_set_size(self, r.size - len);
+}
+
+#endif // STC_CSTR_PRV_C_INCLUDED
+
+/* ----------------------- UTF8 CASE CONVERSION ---------------------- */
+#if !defined STC_CSTR_UTF8_INCLUDED && (defined i_import || defined STC_UTF8_PRV_C_INCLUDED)
+#define STC_CSTR_UTF8_INCLUDED
+
+#include <ctype.h>
+#include <stdarg.h>
+
+STC_DEF bool cstr_getdelim(cstr *self, const int delim, FILE *fp) {
+    int c = fgetc(fp);
+    if (c == EOF)
+        return false;
+    isize pos = 0;
+    cstr_buf r = cstr_buffer(self);
+    for (;;) {
+        if (c == delim || c == EOF) {
+            _cstr_set_size(self, pos);
+            return true;
+        }
+        if (pos == r.cap) {
+            _cstr_set_size(self, pos);
+            r.data = cstr_reserve(self, (r.cap = r.cap*3/2 + 16));
+        }
+        r.data[pos++] = (char) c;
+        c = fgetc(fp);
+    }
 }
 
 static isize cstr_vfmt(cstr* self, isize start, const char* fmt, va_list args) {
@@ -224,13 +217,25 @@ STC_DEF isize cstr_printf(cstr* self, const char* fmt, ...) {
     va_end(args);
     return n;
 }
-#endif // STC_CSTR_PRV_C_INCLUDED
 
-/* ----------------------- UTF8 CASE CONVERSION ---------------------- */
-#if !defined STC_CSTR_UTF8_INCLUDED && (defined i_import || defined STC_UTF8_PRV_C_INCLUDED)
-#define STC_CSTR_UTF8_INCLUDED
+STC_DEF void cstr_shrink_to_fit(cstr* self) {
+    cstr_buf r = cstr_buffer(self);
+    if (r.size == r.cap)
+        return;
+    if (r.size > cstr_s_cap) {
+        self->lon.data = (char *)i_realloc(self->lon.data, cstr_l_cap(self) + 1, r.size + 1);
+        cstr_l_set_cap(self, r.size);
+    } else if (r.cap > cstr_s_cap) {
+        c_memcpy(self->sml.data, r.data, r.size + 1);
+        cstr_s_set_size(self, r.size);
+        i_free(r.data, r.cap + 1);
+    }
+}
 
-#include <ctype.h>
+// utf8:
+
+STC_DEF bool cstr_u8_valid(const cstr* self)
+    { return utf8_valid(cstr_str(self)); }
 
 static struct {
     int      (*conv_asc)(int);
@@ -240,7 +245,7 @@ fn_tocase[] = {{tolower, utf8_casefold},
                {tolower, utf8_tolower},
                {toupper, utf8_toupper}};
 
-static cstr cstr_tocase(csview sv, int k) {
+STC_DEF cstr cstr_tocase_sv(csview sv, int k) {
     cstr out = {0};
     char *buf = cstr_reserve(&out, sv.size*3/2);
     const char *end = sv.buf + sv.size;
@@ -260,29 +265,5 @@ static cstr cstr_tocase(csview sv, int k) {
     cstr_shrink_to_fit(&out);
     return out;
 }
-
-cstr cstr_casefold_sv(csview sv)
-    { return cstr_tocase(sv, 0); }
-
-cstr cstr_tolower_sv(csview sv)
-    { return cstr_tocase(sv, 1); }
-
-cstr cstr_toupper_sv(csview sv)
-    { return cstr_tocase(sv, 2); }
-
-cstr cstr_tolower(const char* str)
-    { return cstr_tolower_sv(c_sv(str, c_strlen(str))); }
-
-cstr cstr_toupper(const char* str)
-    { return cstr_toupper_sv(c_sv(str, c_strlen(str))); }
-
-void cstr_lowercase(cstr* self)
-    { cstr_take(self, cstr_tolower_sv(cstr_sv(self))); }
-
-void cstr_uppercase(cstr* self)
-    { cstr_take(self, cstr_toupper_sv(cstr_sv(self))); }
-
-bool cstr_valid_utf8(const cstr* self)
-    { return utf8_valid(cstr_str(self)); }
 
 #endif // i_import STC_CSTR_UTF8_INCLUDED

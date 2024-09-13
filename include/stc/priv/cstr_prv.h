@@ -23,10 +23,8 @@
 #ifndef STC_CSTR_PRV_H_INCLUDED
 #define STC_CSTR_PRV_H_INCLUDED
 
+#include <stdio.h> /* FILE*, vsnprintf */
 #include <stdlib.h> /* malloc */
-#include <stdarg.h>
-#include <stdio.h> /* vsnprintf */
-
 /**************************** PRIVATE API **********************************/
 
 #if defined __GNUC__ && !defined __clang__
@@ -75,10 +73,11 @@ STC_API char*       cstr_append_n(cstr* self, const char* str, isize len);
 STC_API char*       cstr_append_uninit(cstr *self, isize len);
 STC_API bool        cstr_getdelim(cstr *self, int delim, FILE *fp);
 STC_API void        cstr_erase(cstr* self, isize pos, isize len);
-STC_API void        cstr_u8_erase(cstr* self, isize bytepos, isize u8len);
 STC_API isize       cstr_append_fmt(cstr* self, const char* fmt, ...);
 STC_API isize       cstr_printf(cstr* self, const char* fmt, ...);
 STC_API uint64_t    cstr_hash(const cstr *self);
+STC_API bool        cstr_u8_valid(const cstr* self);
+STC_API void        cstr_u8_erase(cstr* self, isize bytepos, isize u8len);
 
 STC_INLINE cstr_buf cstr_buffer(cstr* s) {
     return cstr_is_long(s) ? c_literal(cstr_buf){s->lon.data, cstr_l_size(s), cstr_l_cap(s)}
@@ -175,7 +174,7 @@ STC_INLINE isize cstr_topos(const cstr* self, cstr_iter it)
 STC_INLINE cstr cstr_from_s(cstr s, isize pos, isize len)
     { return cstr_from_n(cstr_str(&s) + pos, len); }
 
-// BEGIN utf8 functions
+// BEGIN utf8 functions =====
 
 STC_INLINE isize cstr_u8_size(const cstr* self)
     { return utf8_size(cstr_str(self)); }
@@ -224,15 +223,28 @@ STC_INLINE cstr_iter cstr_advance(cstr_iter it, isize u8pos) {
 }
 
 // utf8 case conversion: requires `#define i_import` before including cstr.h in one TU.
+STC_API cstr cstr_tocase_sv(csview sv, int k);
 
-extern cstr cstr_casefold_sv(csview sv);
-extern cstr cstr_tolower_sv(csview sv);
-extern cstr cstr_toupper_sv(csview sv);
-extern cstr cstr_tolower(const char* str);
-extern cstr cstr_toupper(const char* str);
-extern void cstr_lowercase(cstr* self);
-extern void cstr_uppercase(cstr* self);
-extern bool cstr_valid_utf8(const cstr* self);
+STC_INLINE cstr cstr_casefold_sv(csview sv)
+    { return cstr_tocase_sv(sv, 0); }
+
+STC_INLINE cstr cstr_tolower_sv(csview sv)
+    { return cstr_tocase_sv(sv, 1); }
+
+STC_INLINE cstr cstr_toupper_sv(csview sv)
+    { return cstr_tocase_sv(sv, 2); }
+
+STC_INLINE cstr cstr_tolower(const char* str)
+    { return cstr_tolower_sv(c_sv(str, c_strlen(str))); }
+
+STC_INLINE cstr cstr_toupper(const char* str)
+    { return cstr_toupper_sv(c_sv(str, c_strlen(str))); }
+
+STC_INLINE void cstr_lowercase(cstr* self)
+    { cstr_take(self, cstr_tolower_sv(cstr_sv(self))); }
+
+STC_INLINE void cstr_uppercase(cstr* self)
+    { cstr_take(self, cstr_toupper_sv(cstr_sv(self))); }
 
 STC_INLINE bool cstr_istarts_with(const cstr* self, const char* sub) {
     csview sv = cstr_sv(self);
@@ -257,7 +269,7 @@ STC_INLINE bool cstr_ieq(const cstr* s1, const cstr* s2) {
 STC_INLINE bool cstr_iequals(const cstr* self, const char* str)
     { return !utf8_icmp(cstr_str(self), str); }
 
-// END utf8
+// END utf8 =====
 
 STC_INLINE int cstr_cmp(const cstr* s1, const cstr* s2)
     { return strcmp(cstr_str(s1), cstr_str(s2)); }
