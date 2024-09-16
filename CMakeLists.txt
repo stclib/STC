@@ -1,25 +1,30 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.12)
 
-project(stc)
-add_library(stc INTERFACE)
-target_include_directories(stc INTERFACE include)
+project(stclib)
+add_library(stcinc INTERFACE)
+#target_include_directories(stcinc INTERFACE include)
+
+file(GLOB sources "src/*.c")
+add_library(stc STATIC ${sources})
 
 if (UNIX)
-	#find_package(Threads)
 	find_package(FLEX)
 	flex_target(checkscoped src/checkscoped.l ${CMAKE_CURRENT_BINARY_DIR}/lex.yy.c)
 	add_executable(checkscoped ${FLEX_checkscoped_OUTPUTS})
 endif()
 
+
+#[[
 include(CTest)
-if(BUILD_TESTING)
+
+if (BUILD_TESTING)
 	file(GLOB examples misc/examples/*.c)
-	foreach(file IN LISTS examples)
+	foreach (file IN LISTS examples)
 		get_filename_component(name "${file}" NAME_WE)
 		add_executable(${name} ${file})
 		#target_compile_options(${name} PRIVATE "-pthread")
 		target_compile_options(${name} PRIVATE "-DSTC_STATIC")
-		if(CMAKE_THREAD_LIBS_INIT)
+		if (CMAKE_THREAD_LIBS_INIT)
 			target_link_libraries(${name} PRIVATE "${CMAKE_THREAD_LIBS_INIT}")
 		endif()
 		target_link_libraries(${name} PRIVATE stc m)
@@ -31,9 +36,10 @@ if(BUILD_TESTING)
 	target_link_libraries(stctest PRIVATE stc m)
 	add_test(NAME stctest COMMAND stctest)
 
-	# foreach(name IN ITEMS deque list hmap smap vec)
+	# foreach (name IN ITEMS deque list hmap smap vec)
 	#	add_executable(${name} misc/benchmarks/plotbench/${name}_benchmark.cpp)
 	#	target_link_libraries(${name} PRIVATE stc m)
 	#	add_test(NAME ${name} COMMAND ${name})
 	# endforeach()
 endif()
+]]

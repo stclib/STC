@@ -3,29 +3,7 @@
 STC - Smart Template Containers
 ===============================
 
-### [Version 5.0 beta 5](#version-history)
-- New shorthand template parameter `i_TYPE` lets you define `i_type`, `i_key`, and `i_val` all in one line.
-- [**c_filter(C, cnt, filters)**](docs/algorithm_api.md#c_filter) added to `filter.h`: Enforces functional programming paradigm.
-- **Breaking changes**:
-- Changed coroutine "keyword" `cco_yield();` => **cco_yield;**
-- Renamed several function `stc_xxxxx()` => **c_xxxxx()** in `common.h` and `algo/*.h`.
-- Renamed all member functions `TYPE_empty()` => **TYPE_is_empty()**.
-- Swapped 2nd and 3rd argument in `c_fortoken()` to make it consistent with all other `c_for*()`, i.e, input object is third/last.
-- Renamed templated STC header files. The new default container names are based on the new file names:
-  - **vec.h** (from `cvec.h`)
-  - **deque.h** (from `cdeq.h`)
-  - **list.h** (from `clist.h`)
-  - **stack.h** (from `cstack.h`)
-  - **queue.h** (from `cqueue.h`)
-  - **pqueue.h** (from `cpque.h`)
-  - **hmap.h** (from `cmap.h`)
-  - **hset.h** (from `cset.h`)
-  - **smap.h** (from `csmap.h`)
-  - **sset.h** (from `csset.h`)
-  - **zsview.h** (from `czview.h`)
-  - **types.h** (from `forward.h`)
-- **Note**: Old headers are removed as of the STC V5.0 release.
----
+### Version 5.0 RC
 Description
 -----------
 STC is a *modern*, *typesafe*, *fast* and *compact* container and algorithms library for C99.
@@ -55,8 +33,8 @@ Containers
 Algorithms
 ----------
 - [***Ranged for-loops*** - c_foreach, c_foreach_kv, c_foritems](docs/algorithm_api.md#ranged-for-loops)
-- [***Range algorithms*** - c_forrange, crange, c_filter](docs/algorithm_api.md#range-algorithms)
-- [***Generic algorithms*** - c_init, c_find_if, c_erase_if, quicksort, lower_bound, ...](docs/algorithm_api.md#generic-algorithms)
+- [***Range algorithms*** - c_filter, c_forrange, crange](docs/algorithm_api.md#range-algorithms)
+- [***Generic algorithms*** - c_init, c_find_if, c_erase_if, sort, binary_search, lower_bound, ...](docs/algorithm_api.md#generic-algorithms)
 - [***Coroutines*** - ergonomic portable coroutines](docs/coroutine_api.md)
 - [***Regular expressions*** - Rob Pike's Plan 9 regexp modernized!](docs/cregex_api.md)
 - [***Random numbers*** - a very fast *PRNG* based on *SFC64*](docs/random_api.md)
@@ -97,27 +75,28 @@ List of contents
 - **Extendable containers** - STC provides a mechanism to wrap containers inside a struct with [custom data per instance](#per-container-instance-customization).
 
 ---
-## STC is unique!
+## Unique features of STC
 
 1. ***Centralized analysis of template parameters***. The analyser assigns values to all
-non-specified template parameters (based on the specified ones) using meta-programming, so
-that you don't have to! You may specify a set of "standard" template parameters for each
-container, but as a minimum *only one is required*: `i_key` (+ `i_val` for maps). In this
-case, STC assumes that the elements are of basic types. For non-trivial types, additional
-template parameters must be given.
-2. ***Alternative insert/lookup type***. You may specify an alternative type to use for
+non-specified template parameters using meta-programming. You may specify a set of "standard"
+template parameters for each container, but as a minimum *only one is required*: `i_type` or
+`i_key` (+ `i_val` for maps). In this case, STC assumes that the elements are of basic types.
+For non-trivial types, additional template parameters must be given.
+2. ***Alternative lookup and insert type***. Specify an alternative type to use for
 lookup in containers. E.g., containers with STC string elements (**cstr**) uses `const char*`
-as lookup type, so constructing a `cstr` (which may allocate memory) for the lookup
-*is not needed*. Hence, the alternative lookup key does not need to be destroyed after use,
-as it is normally a POD type. Finally, the key may be passed to an ***emplace***-function.
-So instead of calling e.g. `vec_cstr_push(&vec, cstr_from("Hello"))`, you may call
-`vec_cstr_emplace(&vec, "Hello")`, which is functionally identical, but more convenient.
+as lookup type. Therefore it is not needed to construct (or destroy) a `cstr` in order
+to lookup a **cstr** object. Also, one may pass a c-string literal to one of the
+***emplace***-functions to implicitly insert a cstr object, i.e. `vec_cstr_emplace(&vec, "Hello")`
+as an alternative to `vec_cstr_push(&vec, cstr_from("Hello"))`.
 3. ***Standardized container iterators***. All containers can be iterated in the same manner, and all use the
-same element access syntax. E.g.:
-    - `c_foreach (it, MyInts, myints) *it.ref += 42;` works for any container defined as
-    `MyInts` with `int` elements.
-    - `c_foreach (it, MyInts, it1, it2)  *it.ref += 42;` iterates from `it1` up to not including `it2`.
-
+same element access syntax. The following works for single-element type containers, e.g a linked list:
+```c
+#define i_type MyInts, int
+#include "stc/list.h"
+...
+MyInts ints = c_init(MyInts, {3, 5, 9, 7, 2});
+c_foreach (it, MyInts, ints) *it.ref += 42;
+```
 ---
 ## Performance
 
@@ -688,6 +667,29 @@ STC is generally very memory efficient. Memory usage for the different container
 
 ---
 # Version History
+
+- New shorthand template parameter `i_TYPE` lets you define `i_type`, `i_key`, and `i_val` all in one line.
+- [**c_filter(C, cnt, filters)**](docs/algorithm_api.md#c_filter) added to `filter.h`: Enforces functional programming paradigm.
+- **Breaking changes**:
+- Changed coroutine "keyword" `cco_yield();` => **cco_yield;**
+- Renamed several function `stc_xxxxx()` => **c_xxxxx()** in `common.h` and `algo/*.h`.
+- Renamed all member functions `TYPE_empty()` => **TYPE_is_empty()**.
+- Swapped 2nd and 3rd argument in `c_fortoken()` to make it consistent with all other `c_for*()`, i.e, input object is third/last.
+- Renamed templated STC header files. The new default container names are based on the new file names:
+  - **vec.h** (from `cvec.h`)
+  - **deque.h** (from `cdeq.h`)
+  - **list.h** (from `clist.h`)
+  - **stack.h** (from `cstack.h`)
+  - **queue.h** (from `cqueue.h`)
+  - **pqueue.h** (from `cpque.h`)
+  - **hmap.h** (from `cmap.h`)
+  - **hset.h** (from `cset.h`)
+  - **smap.h** (from `csmap.h`)
+  - **sset.h** (from `csset.h`)
+  - **zsview.h** (from `czview.h`)
+  - **types.h** (from `forward.h`)
+- **Note**: Old headers are removed as of the STC V5.0 release.
+---
 
 ## Version 4.3
 - Breaking changes:
