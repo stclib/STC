@@ -21,6 +21,7 @@
  * SOFTWARE.
  */
 
+// IWYU pragma: private
 #ifdef _i_is_list
   #define i_at(self, idx) (&((_m_value *)(self)->last)[idx])
   #define i_at_mut i_at

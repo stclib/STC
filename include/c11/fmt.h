@@ -67,7 +67,7 @@ int main(void) {
                                     fmt_time("%Y-%m-%d %X %Z", &t2, ts[1], 63));
 }
 */
-#include <stdio.h>
+#include <stdio.h> // IWYU pragma: keep
 #include <stddef.h>
 #include <assert.h>
 #include "../stc/common.h"

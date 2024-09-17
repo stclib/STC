@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+// IWYU pragma: private
 #undef i_TYPE
 #undef i_type
 #undef i_class

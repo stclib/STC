@@ -21,6 +21,7 @@
  * SOFTWARE.
  */
 
+// IWYU pragma: private
 #ifndef i_is_forward
 _c_DEFTYPES(_c_deque_types, Self, i_key);
 #endif
