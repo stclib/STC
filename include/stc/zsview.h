@@ -141,7 +141,7 @@ STC_INLINE bool zsview_ieq(const zsview* x, const zsview* y)
 /* ---- case insensitive ---- */
 
 STC_INLINE bool zsview_iequals(zsview zs, const char* str)
-    { return strlen(str) == zs.size && !utf8_icmp(sz.str, str); }
+    { return c_strlen(str) == zs.size && !utf8_icmp(zs.str, str); }
 
 STC_INLINE bool zsview_istarts_with(zsview zs, const char* str)
     { return c_strlen(str) <= zs.size && !utf8_icmp(zs.str, str); }

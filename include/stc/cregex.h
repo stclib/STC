@@ -87,23 +87,23 @@ typedef struct {
 
 #define c_formatch(it, re, string) \
     for (cregex_iter it = {.regex=re, .input=string, .match={{0}}}; \
-         cregex_find_with(it.regex, it.input, it.match, CREG_NEXT) == CREG_OK && it.match[0].size > 0; )
+         cregex_find_ex(it.regex, it.input, it.match, CREG_NEXT) == CREG_OK && it.match[0].size > 0; )
 
 
 /* compile a regex from a pattern. return CREG_OK, or negative error code on failure. */
-int cregex_compile_with(cregex *re, const char* pattern, int cflags);
+int cregex_compile_ex(cregex *re, const char* pattern, int cflags);
 
 STC_INLINE int cregex_compile(cregex* re, const char* pattern)
-    { return cregex_compile_with(re, pattern, CREG_DEFAULT); }
+    { return cregex_compile_ex(re, pattern, CREG_DEFAULT); }
 
 /* construct and return a regex from a pattern. return CREG_OK, or negative error code on failure. */
-STC_INLINE cregex cregex_with_flags(const char* pattern, int cflags) {
+STC_INLINE cregex cregex_from_ex(const char* pattern, int cflags) {
     cregex re = {0};
-    cregex_compile_with(&re, pattern, cflags);
+    cregex_compile_ex(&re, pattern, cflags);
     return re;
 }
 STC_INLINE cregex cregex_from(const char* pattern)
-    { return cregex_with_flags(pattern, CREG_DEFAULT); }
+    { return cregex_from_ex(pattern, CREG_DEFAULT); }
 
 
 /* number of capture groups in a regex pattern, excluding the full match capture (0) */
@@ -111,48 +111,48 @@ int cregex_captures(const cregex* re);
 
 
 /* return CREG_OK, CREG_NOMATCH or CREG_MATCHERROR. */
-int cregex_find_with(const cregex* re, const char* input, csview match[], int mflags);
+int cregex_find_ex(const cregex* re, const char* input, csview match[], int mflags);
 
 STC_INLINE int cregex_find_sv(const cregex* re, csview input, csview match[]) {
     if (match) match[0] = input;
-    return cregex_find_with(re, input.buf, match, CREG_STARTEND);
+    return cregex_find_ex(re, input.buf, match, CREG_STARTEND);
 }
 STC_INLINE int cregex_find(const cregex* re, const char* input, csview match[])
-    { return cregex_find_with(re, input, match, CREG_DEFAULT); }
+    { return cregex_find_ex(re, input, match, CREG_DEFAULT); }
 
 
-STC_INLINE bool cregex_is_match_with(const cregex* re, const char* input, int mflags)
-    { return cregex_find_with(re, input, NULL, mflags) == CREG_OK; }
+STC_INLINE bool cregex_is_match_ex(const cregex* re, const char* input, int mflags)
+    { return cregex_find_ex(re, input, NULL, mflags) == CREG_OK; }
 
 STC_INLINE bool cregex_is_match(const cregex* re, const char* input)
-    { return cregex_is_match_with(re, input, CREG_DEFAULT); }
+    { return cregex_is_match_ex(re, input, CREG_DEFAULT); }
 
 
 /* match + compile RE pattern */
-int cregex_find_pattern_with(const char* pattern, const char* input,
-                             csview match[], int cmflags);
+int cregex_find_pattern_ex(const char* pattern, const char* input,
+                           csview match[], int cmflags);
 
 STC_INLINE int cregex_find_pattern(const char* pattern, const char* input, csview match[])
-    { return cregex_find_pattern_with(pattern, input, match, CREG_DEFAULT); }
+    { return cregex_find_pattern_ex(pattern, input, match, CREG_DEFAULT); }
 
 
 /* replace csview input with replace using regular expression pattern */
-cstr cregex_replace_xform(const cregex* re, csview input, const char* replace, int count,
-                          bool(*transform)(int group, csview match, cstr* result), int rflags);
+cstr cregex_replace_ex(const cregex* re, csview input, const char* replace, int count,
+                       bool(*transform)(int group, csview match, cstr* result), int rflags);
 
 /* replace matches in input */
 STC_INLINE cstr cregex_replace(const cregex* re, const char* input, const char* replace) {
     csview sv = {input, c_strlen(input)};
-    return cregex_replace_xform(re, sv, replace, INT32_MAX, NULL, CREG_DEFAULT);
+    return cregex_replace_ex(re, sv, replace, INT32_MAX, NULL, CREG_DEFAULT);
 }
 
 /* replace + compile RE pattern, and extra arguments */
-cstr cregex_replace_pattern_xform(const char* pattern, csview input, const char* replace, int count,
-                                  bool(*transform)(int group, csview match, cstr* result), int crflags);
+cstr cregex_replace_pattern_ex(const char* pattern, csview input, const char* replace, int count,
+                               bool(*transform)(int group, csview match, cstr* result), int crflags);
 
 STC_INLINE cstr cregex_replace_pattern(const char* pattern, const char* input, const char* replace) {
     csview sv = c_sv(input, c_strlen(input));
-    return cregex_replace_pattern_xform(pattern, sv, replace, INT32_MAX, NULL, CREG_DEFAULT);
+    return cregex_replace_pattern_ex(pattern, sv, replace, INT32_MAX, NULL, CREG_DEFAULT);
 }
 
 /* destroy regex */

@@ -15,7 +15,7 @@ TEST(cregex, compile_match_char)
     EXPECT_EQ(re.error, 0);
 
     csview match;
-    EXPECT_EQ(cregex_find_with(&re, inp="äsdf", &match, CREG_FULLMATCH), CREG_OK);
+    EXPECT_EQ(cregex_find_ex(&re, inp="äsdf", &match, CREG_FULLMATCH), CREG_OK);
     EXPECT_EQ(M_START(match), 0);
     EXPECT_EQ(M_END(match), 5); // ä is two bytes wide
 
@@ -196,14 +196,14 @@ TEST(cregex, search_all)
         int res;
         EXPECT_EQ(re.error, CREG_OK);
         inp="ab,ab,ab";
-        res = cregex_find_with(&re, inp, &m, CREG_NEXT);
+        res = cregex_find_ex(&re, inp, &m, CREG_NEXT);
         EXPECT_EQ(M_START(m), 0);
-        res = cregex_find_with(&re, inp, &m, CREG_NEXT);
+        res = cregex_find_ex(&re, inp, &m, CREG_NEXT);
         EXPECT_EQ(res, CREG_OK);
         EXPECT_EQ(M_START(m), 3);
-        res = cregex_find_with(&re, inp, &m, CREG_NEXT);
+        res = cregex_find_ex(&re, inp, &m, CREG_NEXT);
         EXPECT_EQ(M_START(m), 6);
-        res = cregex_find_with(&re, inp, &m, CREG_NEXT);
+        res = cregex_find_ex(&re, inp, &m, CREG_NEXT);
         EXPECT_NE(res, CREG_OK);
     }
 }
@@ -262,12 +262,12 @@ TEST(cregex, replace)
         EXPECT_STREQ(cstr_str(&str), "start date: YYYY-MM-DD, end date: YYYY-MM-DD");
 
         // US date format, and add 10 years to dates:
-        cstr_take(&str, cregex_replace_pattern_xform(pattern, csview_from(input), "$1/$3/$2",
+        cstr_take(&str, cregex_replace_pattern_ex(pattern, csview_from(input), "$1/$3/$2",
                                                      INT32_MAX, add_10_years, CREG_DEFAULT));
         EXPECT_STREQ(cstr_str(&str), "start date: 2025/31/12, end date: 2032/28/02");
 
         // Wrap first date inside []:
-        cstr_take(&str, cregex_replace_pattern_xform(pattern, csview_from(input), "[$0]", 1, NULL, CREG_DEFAULT));
+        cstr_take(&str, cregex_replace_pattern_ex(pattern, csview_from(input), "[$0]", 1, NULL, CREG_DEFAULT));
         EXPECT_STREQ(cstr_str(&str), "start date: [2015-12-31], end date: 2022-02-28");
 
         // Wrap all words in ${}
@@ -283,8 +283,8 @@ TEST(cregex, replace)
         EXPECT_STREQ(cstr_str(&str), "start date: 31.12.2015, end date: 28.02.2022");
 
         // Strip out everything but the matches
-        cstr_take(&str, cregex_replace_xform(&re, csview_from(input), "$3.$2.$1;",
-                                             INT32_MAX, NULL, CREG_STRIP));
+        cstr_take(&str, cregex_replace_ex(&re, csview_from(input), "$3.$2.$1;",
+                                          INT32_MAX, NULL, CREG_STRIP));
         EXPECT_STREQ(cstr_str(&str), "31.12.2015;28.02.2022;");
     }
 }

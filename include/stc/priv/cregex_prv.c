@@ -1255,7 +1255,7 @@ _build_subst(const char* replace, int nmatch, const csview match[],
  */
 
 int
-cregex_compile_with(cregex *self, const char* pattern, int cflags) {
+cregex_compile_ex(cregex *self, const char* pattern, int cflags) {
     _Parser par;
     self->prog = _regcomp1(self->prog, &par, pattern, cflags);
     return self->error = par.error;
@@ -1267,7 +1267,7 @@ cregex_captures(const cregex* self) {
 }
 
 int
-cregex_find_with(const cregex* re, const char* input, csview match[], int mflags) {
+cregex_find_ex(const cregex* re, const char* input, csview match[], int mflags) {
     int res = _regexec(re->prog, input, cregex_captures(re) + 1, match, mflags);
     switch (res) {
         case 1: return CREG_OK;
@@ -1277,19 +1277,19 @@ cregex_find_with(const cregex* re, const char* input, csview match[], int mflags
 }
 
 int
-cregex_find_pattern_with(const char* pattern, const char* input,
-                         csview match[], int cmflags) {
+cregex_find_pattern_ex(const char* pattern, const char* input,
+                       csview match[], int cmflags) {
     cregex re = {0};
-    int res = cregex_compile_with(&re, pattern, cmflags);
+    int res = cregex_compile_ex(&re, pattern, cmflags);
     if (res != CREG_OK) return res;
-    res = cregex_find_with(&re, input, match, cmflags);
+    res = cregex_find_ex(&re, input, match, cmflags);
     cregex_drop(&re);
     return res;
 }
 
 cstr
-cregex_replace_xform(const cregex* re, csview input, const char* replace,
-                     int count, bool(*transform)(int, csview, cstr*), int rflags) {
+cregex_replace_ex(const cregex* re, csview input, const char* replace,
+                  int count, bool(*transform)(int, csview, cstr*), int rflags) {
     cstr out = {0};
     cstr subst = {0};
     csview match[CREG_MAX_CAPTURES];
@@ -1310,12 +1310,12 @@ cregex_replace_xform(const cregex* re, csview input, const char* replace,
 }
 
 cstr
-cregex_replace_pattern_xform(const char* pattern, csview input, const char* replace,
-                             int count, bool(*transform)(int, csview, cstr*), int crflags) {
+cregex_replace_pattern_ex(const char* pattern, csview input, const char* replace,
+                          int count, bool(*transform)(int, csview, cstr*), int crflags) {
     cregex re = {0};
-    if (cregex_compile_with(&re, pattern, crflags) != CREG_OK)
+    if (cregex_compile_ex(&re, pattern, crflags) != CREG_OK)
         assert(0);
-    cstr out = cregex_replace_xform(&re, input, replace, count, transform, crflags);
+    cstr out = cregex_replace_ex(&re, input, replace, count, transform, crflags);
     cregex_drop(&re);
     return out;
 }
