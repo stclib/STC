@@ -35,21 +35,23 @@ See [random](https://en.cppreference.com/w/cpp/header/random) for similar c++ fu
 ## Methods (64-bit)
 
 ```c
-void                 crand64_seed(uint64_t seed);                        // set global crand64_uint() seed
-uint64_t             crand64_uint(void);                                 // global crand64_uint_r(rng)
-double               crand64_real(void);                                 // global crand64_real_r(rng)
+void                 crand64_seed(uint64_t seed);                        // seed global rng64 state
+uint64_t             crand64_uint(void);                                 // global crand64_uint_r(rng64, 1)
+double               crand64_real(void);                                 // global crand64_real_r(rng64, 1)
 crand64_uniform_dist crand64_uniform_from(int64_t low, int64_t high);    // create an unbiased uniform distribution
-int64_t              crand64_uniform(crand64_uniform_dist* d);           // global crand64_uniform_r(rng, d)
-double               crand64_normal(crand64_normal_dist* d);             // global crand64_normal_r(rng, d)
-
-void                 crand64_shuffle_n(T array[], isize n);              // shuffle an array of elements
-void                 crand64_shuffle(Vec<T>* vec);                       // shuffle a vec.h/stack.h type
+int64_t              crand64_uniform(crand64_uniform_dist* d);           // global crand64_uniform_r(rng64, 1, d)
+double               crand64_normal(crand64_normal_dist* d);             // global crand64_normal_r(rng64, 1, d)
 
 crand64              crand64_from(uint64_t seed);                        // create a crand64 state from a seed value
 uint64_t             crand64_uint_r(crand64* rng, uint64_t strm);        // reentrant; return rnd in [0, UINT64_MAX]
 double               crand64_real_r(crand64* rng, uint64_t strm);        // reentrant; return rnd in [0.0, 1.0)
 int64_t              crand64_uniform_r(crand64* rng, uint64_t strm, crand64_uniform_dist* d); // return rnd in [low, high]
 double               crand64_normal_r(crand64* rng, uint64_t strm, crand64_normal_dist* d);   // return normal distributed rnd's
+
+// Generic algorithms:
+void                 c_shuffle_seed(size_t seed);                        // calls crand64_seed() or crand32_seed()
+void                 c_shuffle_n(T array[], isize n);                    // shuffle an array of elements
+void                 c_shuffle(Vec<T>* vec);                             // shuffle a vec.h/stack.h type
 ```
 Note that `strm` must be an odd number.
 ## Types
@@ -62,11 +64,11 @@ Note that `strm` must be an odd number.
 
 ## Methods (32-bit)
 ```c
-void                 crand32_seed(uint32_t seed);                        // set global crand32_uint() seed
-uint32_t             crand32_uint(void);                                 // global crand32_uint_r(rng)
-float                crand32_real(void);                                 // global crand32_real_r(rng)
+void                 crand32_seed(uint32_t seed);                        // seed global rng32 state
+uint32_t             crand32_uint(void);                                 // global crand32_uint_r(rng32, 1)
+float                crand32_real(void);                                 // global crand32_real_r(rng32, 1)
 crand32_uniform_dist crand32_uniform_from(int32_t low, int32_t high);    // create an unbiased uniform distribution
-int32_t              crand32_uniform(crand64_uniform_dist* d);           // global crand32_uniform_r(rng, d)
+int32_t              crand32_uniform(crand64_uniform_dist* d);           // global crand32_uniform_r(rng32, 1, d)
 
 crand32              crand32_from(uint32_t seed);                        // create a crand32 state from a seed value
 uint32_t             crand32_uint_r(crand32* rng, uint32_t strm);        // reentrant; return rnd in [0, UINT32_MAX]

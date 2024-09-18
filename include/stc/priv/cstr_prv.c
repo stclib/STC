@@ -20,21 +20,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef STC_CSTR_PRV_C_INCLUDED
-#define STC_CSTR_PRV_C_INCLUDED
+#ifndef STC_CSTR_CORE_INCLUDED
+#define STC_CSTR_CORE_INCLUDED
 
-STC_DEF uint64_t cstr_hash(const cstr *self) {
+uint64_t cstr_hash(const cstr *self) {
     csview sv = cstr_sv(self);
     return chash_n(sv.buf, sv.size);
 }
 
-STC_DEF isize cstr_find_sv(const cstr* self, csview search) {
+isize cstr_find_sv(const cstr* self, csview search) {
     csview sv = cstr_sv(self);
     char* res = cstrnstrn(sv.buf, sv.size, search.buf, search.size);
     return res ? (res - sv.buf) : c_NPOS;
 }
 
-STC_DEF char* _cstr_internal_move(cstr* self, const isize pos1, const isize pos2) {
+char* _cstr_internal_move(cstr* self, const isize pos1, const isize pos2) {
     cstr_buf r = cstr_buffer(self);
     if (pos1 != pos2) {
         const isize newlen = (r.size + pos2 - pos1);
@@ -46,7 +46,7 @@ STC_DEF char* _cstr_internal_move(cstr* self, const isize pos1, const isize pos2
     return r.data;
 }
 
-STC_DEF char* _cstr_init(cstr* self, const isize len, const isize cap) {
+char* _cstr_init(cstr* self, const isize len, const isize cap) {
     if (cap > cstr_s_cap) {
         self->lon.data = (char *)i_malloc(cap + 1);
         cstr_l_set_size(self, len);
@@ -57,7 +57,7 @@ STC_DEF char* _cstr_init(cstr* self, const isize len, const isize cap) {
     return self->sml.data;
 }
 
-STC_DEF char* cstr_reserve(cstr* self, const isize cap) {
+char* cstr_reserve(cstr* self, const isize cap) {
     if (cstr_is_long(self)) {
         if (cap > cstr_l_cap(self)) {
             self->lon.data = (char *)i_realloc(self->lon.data, cstr_l_cap(self) + 1, cap + 1);
@@ -79,7 +79,7 @@ STC_DEF char* cstr_reserve(cstr* self, const isize cap) {
     return self->sml.data;
 }
 
-STC_DEF char* cstr_resize(cstr* self, const isize size, const char value) {
+char* cstr_resize(cstr* self, const isize size, const char value) {
     cstr_buf r = cstr_buffer(self);
     if (size > r.size) {
         if (size > r.cap && !(r.data = cstr_reserve(self, size)))
@@ -90,20 +90,20 @@ STC_DEF char* cstr_resize(cstr* self, const isize size, const char value) {
     return r.data;
 }
 
-STC_DEF isize cstr_find_at(const cstr* self, const isize pos, const char* search) {
+isize cstr_find_at(const cstr* self, const isize pos, const char* search) {
     csview sv = cstr_sv(self);
     if (pos > sv.size) return c_NPOS;
     const char* res = strstr((char*)sv.buf + pos, search);
     return res ? (res - sv.buf) : c_NPOS;
 }
 
-STC_DEF char* cstr_assign_n(cstr* self, const char* str, const isize len) {
+char* cstr_assign_n(cstr* self, const char* str, const isize len) {
     char* d = cstr_reserve(self, len);
     if (d) { _cstr_set_size(self, len); c_memmove(d, str, len); }
     return d;
 }
 
-STC_DEF char* cstr_append_n(cstr* self, const char* str, const isize len) {
+char* cstr_append_n(cstr* self, const char* str, const isize len) {
     cstr_buf r = cstr_buffer(self);
     if (r.size + len > r.cap) {
         const size_t off = (size_t)(str - r.data);
@@ -116,15 +116,7 @@ STC_DEF char* cstr_append_n(cstr* self, const char* str, const isize len) {
     return r.data;
 }
 
-STC_DEF char* cstr_append_uninit(cstr *self, isize len) {
-    cstr_buf r = cstr_buffer(self);
-    if (r.size + len > r.cap && !(r.data = cstr_reserve(self, r.size*3/2 + len)))
-        return NULL;
-    _cstr_set_size(self, r.size + len);
-    return r.data + r.size;
-}
-
-STC_DEF cstr cstr_from_replace(csview in, csview search, csview repl, int32_t count) {
+cstr cstr_from_replace(csview in, csview search, csview repl, int32_t count) {
     cstr out = cstr_init();
     isize from = 0; char* res;
     if (!count) count = INT32_MAX;
@@ -139,30 +131,42 @@ STC_DEF cstr cstr_from_replace(csview in, csview search, csview repl, int32_t co
     return out;
 }
 
-STC_DEF void cstr_erase(cstr* self, const isize pos, isize len) {
+void cstr_erase(cstr* self, const isize pos, isize len) {
     cstr_buf r = cstr_buffer(self);
     if (len > r.size - pos) len = r.size - pos;
     c_memmove(&r.data[pos], &r.data[pos + len], r.size - (pos + len));
     _cstr_set_size(self, r.size - len);
 }
 
-STC_DEF void cstr_u8_erase(cstr* self, const isize bytepos, const isize u8len) {
+void cstr_shrink_to_fit(cstr* self) {
     cstr_buf r = cstr_buffer(self);
-    isize len = utf8_pos(r.data + bytepos, u8len);
-    c_memmove(&r.data[bytepos], &r.data[bytepos + len], r.size - (bytepos + len));
-    _cstr_set_size(self, r.size - len);
+    if (r.size == r.cap)
+        return;
+    if (r.size > cstr_s_cap) {
+        self->lon.data = (char *)i_realloc(self->lon.data, cstr_l_cap(self) + 1, r.size + 1);
+        cstr_l_set_cap(self, r.size);
+    } else if (r.cap > cstr_s_cap) {
+        c_memcpy(self->sml.data, r.data, r.size + 1);
+        cstr_s_set_size(self, r.size);
+        i_free(r.data, r.cap + 1);
+    }
 }
+#endif // STC_CSTR_CORE_INCLUDED
 
-#endif // STC_CSTR_PRV_C_INCLUDED
+#if !defined STC_CSTR_IO_INCLUDED && defined i_import
+#define STC_CSTR_IO_INCLUDED
 
-/* ----------------------- UTF8 CASE CONVERSION ---------------------- */
-#if !defined STC_CSTR_UTF8_INCLUDED && (defined i_import || defined STC_UTF8_PRV_C_INCLUDED)
-#define STC_CSTR_UTF8_INCLUDED
-
-#include <ctype.h>
 #include <stdarg.h>
 
-STC_DEF bool cstr_getdelim(cstr *self, const int delim, FILE *fp) {
+char* cstr_append_uninit(cstr *self, isize len) {
+    cstr_buf r = cstr_buffer(self);
+    if (r.size + len > r.cap && !(r.data = cstr_reserve(self, r.size*3/2 + len)))
+        return NULL;
+    _cstr_set_size(self, r.size + len);
+    return r.data + r.size;
+}
+
+bool cstr_getdelim(cstr *self, const int delim, FILE *fp) {
     int c = fgetc(fp);
     if (c == EOF)
         return false;
@@ -192,7 +196,7 @@ static isize cstr_vfmt(cstr* self, isize start, const char* fmt, va_list args) {
     return n;
 }
 
-STC_DEF cstr cstr_from_fmt(const char* fmt, ...) {
+cstr cstr_from_fmt(const char* fmt, ...) {
     cstr s = cstr_init();
     va_list args;
     va_start(args, fmt);
@@ -201,7 +205,7 @@ STC_DEF cstr cstr_from_fmt(const char* fmt, ...) {
     return s;
 }
 
-STC_DEF isize cstr_append_fmt(cstr* self, const char* fmt, ...) {
+isize cstr_append_fmt(cstr* self, const char* fmt, ...) {
     va_list args;
     va_start(args, fmt);
     const isize n = cstr_vfmt(self, cstr_size(self), fmt, args);
@@ -210,31 +214,29 @@ STC_DEF isize cstr_append_fmt(cstr* self, const char* fmt, ...) {
 }
 
 /* NB! self-data in args is UB */
-STC_DEF isize cstr_printf(cstr* self, const char* fmt, ...) {
+isize cstr_printf(cstr* self, const char* fmt, ...) {
     va_list args;
     va_start(args, fmt);
     const isize n = cstr_vfmt(self, 0, fmt, args);
     va_end(args);
     return n;
 }
+#endif // STC_CSTR_IO_INCLUDED
 
-STC_DEF void cstr_shrink_to_fit(cstr* self) {
+/* ----------------------- UTF8 CASE CONVERSION ---------------------- */
+#if !defined STC_CSTR_UTF8_INCLUDED && (defined i_import || defined STC_UTF8_PRV_C_INCLUDED)
+#define STC_CSTR_UTF8_INCLUDED
+
+#include <ctype.h>
+
+void cstr_u8_erase(cstr* self, const isize bytepos, const isize u8len) {
     cstr_buf r = cstr_buffer(self);
-    if (r.size == r.cap)
-        return;
-    if (r.size > cstr_s_cap) {
-        self->lon.data = (char *)i_realloc(self->lon.data, cstr_l_cap(self) + 1, r.size + 1);
-        cstr_l_set_cap(self, r.size);
-    } else if (r.cap > cstr_s_cap) {
-        c_memcpy(self->sml.data, r.data, r.size + 1);
-        cstr_s_set_size(self, r.size);
-        i_free(r.data, r.cap + 1);
-    }
+    isize len = utf8_pos(r.data + bytepos, u8len);
+    c_memmove(&r.data[bytepos], &r.data[bytepos + len], r.size - (bytepos + len));
+    _cstr_set_size(self, r.size - len);
 }
 
-// utf8:
-
-STC_DEF bool cstr_u8_valid(const cstr* self)
+bool cstr_u8_valid(const cstr* self)
     { return utf8_valid(cstr_str(self)); }
 
 static struct {
@@ -245,7 +247,7 @@ fn_tocase[] = {{tolower, utf8_casefold},
                {tolower, utf8_tolower},
                {toupper, utf8_toupper}};
 
-STC_DEF cstr cstr_tocase_sv(csview sv, int k) {
+cstr cstr_tocase_sv(csview sv, int k) {
     cstr out = {0};
     char *buf = cstr_reserve(&out, sv.size*3/2);
     const char *end = sv.buf + sv.size;
@@ -265,5 +267,4 @@ STC_DEF cstr cstr_tocase_sv(csview sv, int k) {
     cstr_shrink_to_fit(&out);
     return out;
 }
-
 #endif // i_import STC_CSTR_UTF8_INCLUDED
