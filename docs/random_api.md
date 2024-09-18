@@ -42,6 +42,9 @@ crand64_uniform_dist crand64_uniform_from(int64_t low, int64_t high);    // crea
 int64_t              crand64_uniform(crand64_uniform_dist* d);           // global crand64_uniform_r(rng, d)
 double               crand64_normal(crand64_normal_dist* d);             // global crand64_normal_r(rng, d)
 
+void                 crand64_shuffle_n(T array[], isize n);              // shuffle an array of elements
+void                 crand64_shuffle(Vec<T>* vec);                       // shuffle a vec.h/stack.h type
+
 crand64              crand64_from(uint64_t seed);                        // create a crand64 state from a seed value
 uint64_t             crand64_uint_r(crand64* rng, uint64_t strm);        // reentrant; return rnd in [0, UINT64_MAX]
 double               crand64_real_r(crand64* rng, uint64_t strm);        // reentrant; return rnd in [0.0, 1.0)

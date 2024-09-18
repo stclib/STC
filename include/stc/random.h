@@ -43,6 +43,19 @@ typedef struct {
 STC_API double crand64_normal(crand64_normal_dist* d);
 STC_API double crand64_normal_r(crand64* rng, uint64_t stream, crand64_normal_dist* d);
 
+#define crand64_shuffle_n(array, n) { \
+    __typeof__(0[array])* _arr = array; \
+    const isize _n = (n) - 1; \
+    for (isize _i = _n; _i > 0; --_i) { \
+        isize _j = (isize)(crand64_uint() % (_i + 1)); \
+        c_swap(_arr + _i, _arr + _j); \
+    } \
+}
+#define crand64_shuffle(vec) { \
+    __typeof__(vec) _vec = vec; \
+    crand64_shuffle_n(_vec->data, _vec->size); \
+}
+
 STC_INLINE void crand64_seed_r(crand64* rng, uint64_t seed) {
     uint64_t* s = rng->data;
     s[0] = seed*0x9e3779b97f4a7c15; s[0] ^= s[0] >> 30;
