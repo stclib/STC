@@ -45,8 +45,7 @@ STC_API double crand64_normal_r(crand64* rng, uint64_t stream, crand64_normal_di
 
 #define crand64_shuffle_n(array, n) { \
     __typeof__(0[array])* _arr = array; \
-    const isize _n = (n) - 1; \
-    for (isize _i = _n; _i > 0; --_i) { \
+    for (isize _i = (n) - 1; _i > 0; --_i) { \
         isize _j = (isize)(crand64_uint() % (_i + 1)); \
         c_swap(_arr + _i, _arr + _j); \
     } \
