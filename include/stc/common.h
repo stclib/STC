@@ -36,6 +36,18 @@
 #define c_ZI PRIiPTR
 #define c_ZU PRIuPTR
 
+typedef ptrdiff_t       isize;
+#ifndef STC_NO_INT_DEFS
+    typedef int8_t      int8;
+    typedef uint8_t     uint8;
+    typedef int16_t     int16;
+    typedef uint16_t    uint16;
+    typedef int32_t     int32;
+    typedef uint32_t    uint32;
+    typedef int64_t     int64;
+    typedef uint64_t    uint64;
+#endif
+
 #if defined __GNUC__ || defined __clang__
     #define STC_INLINE static inline __attribute((unused))
 #else
@@ -99,7 +111,6 @@
 } while (0)
 
 // use with gcc -Wconversion
-typedef ptrdiff_t               isize;
 #define c_sizeof                (isize)sizeof
 #define c_strlen(s)             (isize)strlen(s)
 #define c_strncmp(a, b, ilen)   strncmp(a, b, c_i2u_size(ilen))
