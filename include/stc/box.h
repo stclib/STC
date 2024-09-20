@@ -63,7 +63,6 @@ int main(void) {
 #include "common.h"
 #include "types.h"
 #include <stdlib.h>
-#include <string.h>
 
 #define cbox_null {0}
 #endif // STC_BOX_H_INCLUDED

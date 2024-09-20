@@ -50,8 +50,8 @@ double               crand64_normal_r(crand64* rng, uint64_t strm, crand64_norma
 
 // Generic algorithms:
 void                 c_shuffle_seed(size_t seed);                        // calls crand64_seed() or crand32_seed()
-void                 c_shuffle_n(T array[], isize n);                    // shuffle an array of elements
-void                 c_shuffle(Vec<T>* vec);                             // shuffle a vec.h/stack.h type
+void                 c_shuffle_array(TYPE T, T* array, isize n);         // shuffle an array of elements.
+void                 c_shuffle(TYPE CntType, CntType* cnt);              // shuffle a vec, stack or deque type.
 ```
 Note that `strm` must be an odd number.
 ## Types

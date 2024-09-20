@@ -32,7 +32,6 @@ THE SOFTWARE.
  */
 #include "common.h"
 #include "types.h" // csview, cstr types
-#include <string.h>
 
 enum {
     CREG_DEFAULT = 0,

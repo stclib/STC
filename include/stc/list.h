@@ -61,7 +61,6 @@
 #include "common.h"
 #include "types.h"
 #include <stdlib.h>
-#include <string.h>
 
 #define _c_list_complete_types(SELF, dummy) \
     struct SELF##_node { \

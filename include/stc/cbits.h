@@ -54,7 +54,6 @@ int main(void) {
 #define STC_CBITS_H_INCLUDED
 #include "common.h"
 #include <stdlib.h>
-#include <string.h>
 
 #if INTPTR_MAX == INT64_MAX
 #define _gnu_popc(x) __builtin_popcountll(x)

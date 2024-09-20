@@ -56,7 +56,6 @@ int main(void) {
 #include "common.h"
 #include "types.h"
 #include <stdlib.h>
-#include <string.h>
 #endif // STC_SMAP_H_INCLUDED
 
 #ifndef _i_prefix

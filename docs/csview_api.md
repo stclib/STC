@@ -15,9 +15,7 @@ usage.
 ```c
 csview sv = c_sv("Hello world");
 sv = csview_substr(sv, 0, 5);
-printf(c_svfmt "\n", sv.size, sv.buf);
-// or with the c_svarg() macro:
-printf(c_svfmt "\n", c_svarg(sv));
+printf(c_svfmt "\n", c_svarg(sv)); // "Hello"
 ```
 
 See the c++ class [std::basic_string_view](https://en.cppreference.com/w/cpp/string/basic_string_view)

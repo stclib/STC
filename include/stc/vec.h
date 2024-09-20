@@ -64,7 +64,6 @@ int main(void) {
 #include "common.h"
 #include "types.h"
 #include <stdlib.h>
-#include <string.h>
 
 #define _it2_ptr(it1, it2) (it1.ref && !it2.ref ? it1.end : it2.ref)
 #define _it_ptr(it) (it.ref ? it.ref : it.end)

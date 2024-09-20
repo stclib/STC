@@ -52,7 +52,6 @@ int main(void) {
 #include "common.h"
 #include "types.h"
 #include <stdlib.h>
-#include <string.h>
 #define _hashmask 0x3fU
 #define _distmask 0x3ffU
 struct hmap_meta { uint16_t hashx:6, dist:10; }; // dist: 0=empty, 1=PSL 0, 2=PSL 1, ...

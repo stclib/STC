@@ -29,7 +29,6 @@
 #include "common.h"
 #include "types.h"
 #include <stdlib.h>
-#include <string.h>
 #endif // STC_DEQUE_H_INCLUDED
 
 #ifndef _i_prefix

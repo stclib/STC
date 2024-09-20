@@ -51,16 +51,22 @@ STC_API double crand64_normal_r(crand64* rng, uint64_t stream, crand64_normal_di
 
 #define c_shuffle_seed(s) \
     c_JOIN(crandWS, _seed)(s)
-#define c_shuffle_n(array, n) { \
-    __typeof__(0[array])* _arr = array; \
+
+#define c_shuffle_array(ElemType, array, n) { \
+    typedef ElemType _elem_type; \
+    _elem_type* _arr = array; \
     for (isize _i = (n) - 1; _i > 0; --_i) { \
         isize _j = (isize)(c_JOIN(crandWS, _uint)() % (_i + 1)); \
         c_swap(_arr + _i, _arr + _j); \
     } \
 }
-#define c_shuffle(vec) { \
-    __typeof__(vec) _vec = vec; \
-    c_shuffle_n(_vec->data, _vec->size); \
+// Compiles with vec, stack, and deque container types:
+#define c_shuffle(CntType, self) { \
+    CntType* _self = self; \
+    for (isize _i = CntType##_size(_self) - 1; _i > 0; --_i) { \
+        isize _j = (isize)(c_JOIN(crandWS, _uint)() % (_i + 1)); \
+        c_swap(CntType##_at_mut(_self, _i), CntType##_at_mut(_self, _j)); \
+    } \
 }
 
 STC_INLINE void crand64_seed_r(crand64* rng, uint64_t seed) {
