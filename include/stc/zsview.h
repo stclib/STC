@@ -76,6 +76,14 @@ STC_INLINE zsview zsview_from_pos(zsview zs, isize pos) {
 STC_INLINE zsview zsview_last(zsview zs, isize count)
     { return zsview_from_pos(zs, zs.size - count); }
 
+STC_INLINE zsview zsview_trim(zsview zs, int side) {
+    if (side <= 0) // trim left
+        while (zs.size && *zs.str <= ' ') ++zs.str, --zs.size;
+    if (side >= 0) // trim right
+        while (zs.size && zs.str[zs.size - 1] <= ' ') --zs.size;
+    return zs;
+}
+
 /* utf8 */
 STC_INLINE isize zsview_u8_size(zsview zs)
     { return utf8_size(zs.str); }

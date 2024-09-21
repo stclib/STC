@@ -52,14 +52,15 @@ STC_API double crand64_normal_r(crand64* rng, uint64_t stream, crand64_normal_di
 #define c_shuffle_seed(s) \
     c_JOIN(crandWS, _seed)(s)
 
-#define c_shuffle_array(ElemType, array, n) do { \
-    typedef ElemType _elem_type; \
-    _elem_type* _arr = array; \
+#define c_shuffle_array(array, n) do { \
+    typedef struct { char d[sizeof 0[array]]; } _etype; \
+    _etype* _arr = (_etype *)(array); \
     for (isize _i = (n) - 1; _i > 0; --_i) { \
         isize _j = (isize)(c_JOIN(crandWS, _uint)() % (_i + 1)); \
         c_swap(_arr + _i, _arr + _j); \
     } \
 } while (0)
+
 // Compiles with vec, stack, and deque container types:
 #define c_shuffle(CntType, self) do { \
     CntType* _self = self; \

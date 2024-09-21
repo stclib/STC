@@ -86,6 +86,14 @@ STC_INLINE csview csview_slice(csview sv, isize p1, isize p2) {
     return sv;
 }
 
+STC_INLINE csview csview_trim(csview sv, int side) {
+    if (side <= 0) // trim left
+        while (sv.size && *sv.buf <= ' ') ++sv.buf, --sv.size;
+    if (side >= 0) // trim right
+        while (sv.size && sv.buf[sv.size - 1] <= ' ') --sv.size;
+    return sv;
+}
+
 STC_INLINE csview csview_last(csview sv, isize len)
     { return csview_substr(sv, sv.size - len, len); }
 
