@@ -34,9 +34,9 @@ All csview definitions and prototypes are available by including a single header
 
 ```c
 csview          c_sv(const char literal_only[]);                     // from string literal only
-csview          c_sv(const char* str, isize n);                   // from a const char* and length n
+csview          c_sv(const char* str, isize n);                      // from a const char* and length n
 csview          csview_from(const char* str);                        // from const char* str
-csview          csview_from_n(const char* str, isize n);          // alias for c_sv(str, n)
+csview          csview_from_n(const char* str, isize n);             // alias for c_sv(str, n)
 
 isize           csview_size(csview sv);
 bool            csview_is_empty(csview sv);
@@ -54,7 +54,8 @@ bool            csview_iends_with(csview sv, const char* str);
 
 csview          csview_substr(csview sv, isize pos, isize n);
 csview          csview_slice(csview sv, isize pos1, isize pos2);
-csview          csview_last(csview sv, isize len);                      // substr of the last len bytes
+csview          csview_trim(csview sv, int side);                    // trim ws; side -1:left, 1:right, 0:both
+csview          csview_last(csview sv, isize len);                   // substr of the trailing len bytes
 const char*     csview_at(csview sv, isize index);
 
 csview          csview_substr_ex(csview sv, isize pos, isize n);     // negative pos count from end
@@ -66,14 +67,14 @@ csview          csview_token(csview sv, const char* sep, isize* start); // *star
 ```c
 isize          csview_u8_size(csview sv);
 csview         csview_u8_substr(csview sv, isize bytepos, isize u8len);
-csview         csview_u8_last(csview sv, isize u8len);                 // substr of the last u8len
+csview         csview_u8_last(csview sv, isize u8len);                  // substr of the trailing u8len chrs.
 const char*    csview_u8_at(csview sv, isize u8idx);
-bool           csview_u8_valid(csview sv);                                // requires linking with utf8 symbols
+bool           csview_u8_valid(csview sv);                              // requires linking with utf8 symbols
 
 csview_iter    csview_begin(const csview* self);
 csview_iter    csview_end(const csview* self);
-void           csview_next(csview_iter* it);                              // next utf8 codepoint
-csview_iter    csview_advance(csview_iter it, isize u8pos);            // advance +/- codepoints
+void           csview_next(csview_iter* it);                            // next utf8 codepoint
+csview_iter    csview_advance(csview_iter it, isize u8pos);             // advance +/- codepoints
 ```
 
 #### cstr methods returning csview
