@@ -24,33 +24,28 @@
 #define STC_UTILITY_H_INCLUDED
 
 // --------------------------------
-// c_func, c_if_error
+// c_func, c_error
 // --------------------------------
-// c_func (check_file,(const char* fname), ->, FILE*, {const char* what;})
+// c_func (read_file,(const char* name), ->, vec_cstr, {int err_no;})
 // {
-//     check_file_ret f = {fopen(fname, "w")};
-//     c_if_error(check_file, &f, f.value == NULL, {"Failed to open file"})
-//         return f;
-//     // ...
-//     return f;
-// }
-//
-// c_func (compute_expr,(int a, int b, int c), ->, float, {int a, b, c, line;})
-// {
-//     compute_expr_ret e;
-//     c_if_error(compute_expr, &e, c == 0, {a, b, c, __LINE__})
-//         return e;
-//     e.value = (a - b)/c;
-//     return e;
+//     read_file_ret vec = {0};
+//     FILE* f;
+//     c_with (f = fopen(name, "r"), f != NULL, fclose(f))
+//         c_with (cstr line = {0}, cstr_drop(&line))
+//             while (cstr_getline(&line, f))
+//                 vec_cstr_push(&vec.value, cstr_clone(line));
+//     if (f == NULL) { vec.error = true; vec.ctx.err_no = errno; }
+//     //c_error(f == NULL, read_file, &vec, {errno});
+//     return vec;
 // }
 
 #define c_func(fn, args, rightarrow, Ret, ...) \
     typedef struct __VA_ARGS__ fn##_ctx; \
-    typedef struct { Ret value; int error; fn##_ctx ctx; } fn##_ret; \
+    typedef struct { Ret value; bool error; fn##_ctx ctx; } fn##_ret; \
     fn##_ret fn args
 
-#define c_if_error(fn, ret, failed, ...) \
-    if (((ret)->error = (failed)) && ((ret)->ctx = (fn##_ctx)__VA_ARGS__, 1))
+#define c_error(failed, fn, ret, ...) \
+    (((ret)->error = (failed)) && ((ret)->ctx = (fn##_ctx)__VA_ARGS__, 1))
 
 // --------------------------------
 // c_find_if, c_find_reverse_if
