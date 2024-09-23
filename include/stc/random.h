@@ -116,7 +116,7 @@ typedef struct {
 } crand64_uniform_dist;
 
 STC_INLINE crand64_uniform_dist
-crand64_uniform_from(int64_t low, int64_t high) {
+crand64_make_uniform(int64_t low, int64_t high) {
     crand64_uniform_dist d = {low, (uint64_t)(high - low + 1)};
     d.threshold = (uint64_t)(0 - d.range) % d.range;
     return d;
@@ -186,7 +186,7 @@ typedef struct {
 } crand32_uniform_dist;
 
 STC_INLINE crand32_uniform_dist
-crand32_uniform_from(int32_t low, int32_t high) {
+crand32_make_uniform(int32_t low, int32_t high) {
     crand32_uniform_dist d = {low, (uint32_t)(high - low + 1)};
     d.threshold = (uint32_t)(0 - d.range) % d.range;
     return d;

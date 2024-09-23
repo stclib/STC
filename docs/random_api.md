@@ -38,7 +38,7 @@ See [random](https://en.cppreference.com/w/cpp/header/random) for similar c++ fu
 void                 crand64_seed(uint64_t seed);                        // seed global rng64 state
 uint64_t             crand64_uint(void);                                 // global crand64_uint_r(rng64, 1)
 double               crand64_real(void);                                 // global crand64_real_r(rng64, 1)
-crand64_uniform_dist crand64_uniform_from(int64_t low, int64_t high);    // create an unbiased uniform distribution
+crand64_uniform_dist crand64_make_uniform(int64_t low, int64_t high);    // create an unbiased uniform distribution
 int64_t              crand64_uniform(crand64_uniform_dist* d);           // global crand64_uniform_r(rng64, 1, d)
 double               crand64_normal(crand64_normal_dist* d);             // global crand64_normal_r(rng64, 1, d)
 
@@ -67,7 +67,7 @@ Note that `strm` must be an odd number.
 void                 crand32_seed(uint32_t seed);                        // seed global rng32 state
 uint32_t             crand32_uint(void);                                 // global crand32_uint_r(rng32, 1)
 float                crand32_real(void);                                 // global crand32_real_r(rng32, 1)
-crand32_uniform_dist crand32_uniform_from(int32_t low, int32_t high);    // create an unbiased uniform distribution
+crand32_uniform_dist crand32_make_uniform(int32_t low, int32_t high);    // create an unbiased uniform distribution
 int32_t              crand32_uniform(crand64_uniform_dist* d);           // global crand32_uniform_r(rng32, 1, d)
 
 crand32              crand32_from(uint32_t seed);                        // create a crand32 state from a seed value

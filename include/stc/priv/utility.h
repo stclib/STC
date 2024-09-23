@@ -34,14 +34,14 @@
 //         c_with (cstr line = {0}, cstr_drop(&line))
 //             while (cstr_getline(&line, f))
 //                 vec_cstr_push(&vec.value, cstr_clone(line));
-//     if (f == NULL) { vec.error = true; vec.ctx.err_no = errno; }
+//     if (f == NULL) { vec.error = 1; vec.ctx.err_no = errno; }
 //     //c_error(f == NULL, read_file, &vec, {errno});
 //     return vec;
 // }
 
 #define c_func(fn, args, rightarrow, Ret, ...) \
     typedef struct __VA_ARGS__ fn##_ctx; \
-    typedef struct { Ret value; bool error; fn##_ctx ctx; } fn##_ret; \
+    typedef struct { Ret value; int error; fn##_ctx ctx; } fn##_ret; \
     fn##_ret fn args
 
 #define c_error(failed, fn, ret, ...) \

@@ -26,14 +26,14 @@
 
 int main(void)
 {
-    crange r1 = crange_from(80, 90);
+    crange r1 = crange_make(80, 90);
     c_foreach (i, crange, r1)
         printf(" %d", (int)*i.ref);
     puts("");
 
     // use a temporary crange object.
     int a = 100, b = INT32_MAX;
-    crange r2 = crange_from(a, b, 8);
+    crange r2 = crange_make(a, b, 8);
     c_filter(crange, r2
          , c_flt_skip(10)
         && (printf(" %zi", *value), c_flt_take(3))
@@ -50,17 +50,17 @@ typedef isize crange_value;
 typedef struct { crange_value start, end, step, value; } crange;
 typedef struct { crange_value *ref, end, step; } crange_iter;
 
-#define crange_from(...) c_MACRO_OVERLOAD(crange_from, __VA_ARGS__)
-#define crange_from_1(start) crange_from_3(start, INTPTR_MAX, 1)
-#define crange_from_2(start, stop) crange_from_3(start, stop, 1)
+STC_INLINE crange crange_make_3(crange_value start, crange_value stop, crange_value step)
+    { crange r = {start, stop - (step > 0), step}; return r; }
 
 #define c_iota(...) c_MACRO_OVERLOAD(c_iota, __VA_ARGS__)
 #define c_iota_1(start) c_iota_3(start, INTPTR_MAX, 1)
 #define c_iota_2(start, stop) c_iota_3(start, stop, 1)
-#define c_iota_3(start, stop, step) ((crange[]){crange_from_3(start, stop, step)})[0]
+#define c_iota_3(start, stop, step) ((crange[]){crange_make_3(start, stop, step)})[0]
 
-STC_INLINE crange crange_from_3(crange_value start, crange_value stop, crange_value step)
-    { crange r = {start, stop - (step > 0), step}; return r; }
+#define crange_make(...) c_MACRO_OVERLOAD(crange_make, __VA_ARGS__)
+#define crange_make_1(stop) crange_make_3(0, stop, 1) // NB! arg is stop
+#define crange_make_2(start, stop) crange_make_3(start, stop, 1)
 
 STC_INLINE crange_iter crange_begin(crange* self) {
     self->value = self->start;
