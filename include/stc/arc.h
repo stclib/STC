@@ -143,11 +143,12 @@ STC_INLINE Self _c_MEMB(_move)(Self* self) {
 STC_INLINE void _c_MEMB(_drop)(const Self* self) {
     if (self->use_count && _i_atomic_dec_and_test(self->use_count)) {
         i_keydrop(self->get);
-        if (!c_container_of(self->use_count, struct _arc_metadata, counter)->value_included) {
+        // assume counter is first member of structs _arc_metadata and _rep_:
+        if (((struct _arc_metadata *)self->use_count)->value_included) {
+            i_free(self->use_count, c_sizeof(struct _c_MEMB(_rep_))); // _make()
+        } else {                                                      
+            i_free(self->use_count, c_sizeof(struct _arc_metadata)); // _from_ptr()
             i_free(self->get, c_sizeof *self->get);
-            i_free((void *)self->use_count, c_sizeof *self->use_count);
-        } else { // allocated combined counter+value with _make()
-            i_free((void *)self->use_count, c_sizeof(struct _c_MEMB(_rep_)));
         }
     }
 }
