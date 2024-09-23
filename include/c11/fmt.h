@@ -175,7 +175,8 @@ FMT_API void       _fmt_sprint(fmt_stream*, const char* fmt, ...);
 #else
   #define _signed_char_hhd signed char: "hhd",
 #endif
-#ifdef __GNUC__
+
+#if defined(__GNUC__) || defined(__clang__) || defined(__INTEL_LLVM_COMPILER)
   #define FMT_UNUSED __attribute__((unused))
 #else
   #define FMT_UNUSED
