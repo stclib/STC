@@ -4,6 +4,8 @@
 #include "stc/stack.h"
 #include "stc/algorithm.h"
 
+#define i_implement
+
 #include "stc/cstr.h"
 #include "stc/cspan.h"
 using_cspan(ISpan, int);
