@@ -44,35 +44,38 @@ vec_X_iter          vec_X_copy_n(vec_X* self, isize idx, const i_key* arr, isize
 bool                vec_X_reserve(vec_X* self, isize cap);
 bool                vec_X_resize(vec_X* self, isize size, i_key null);
 void                vec_X_shrink_to_fit(vec_X* self);
-void                vec_X_drop(vec_X* self);                              // destructor
+void                vec_X_drop(vec_X* self);                                    // destructor
 
 bool                vec_X_is_empty(const vec_X* self);
 isize               vec_X_size(const vec_X* self);
 isize               vec_X_capacity(const vec_X* self);
 
-const vec_X_value*  vec_X_at(const vec_X* self, isize idx);
-vec_X_value*        vec_X_at_mut(vec_X* self, isize idx);                       // return mutable at idx
-const vec_X_value*  vec_X_get(const vec_X* self, i_keyraw raw);                 // return NULL if not found
-vec_X_value*        vec_X_get_mut(vec_X* self, i_keyraw raw);                   // find mutable value
-
 vec_X_iter          vec_X_find(const vec_X* self, i_keyraw raw);
 vec_X_iter          vec_X_find_in(vec_X_iter i1, vec_X_iter i2, i_keyraw raw);  // return vec_X_end() if not found
 
+const i_key*        vec_X_at(const vec_X* self, isize idx);
+const i_key*        vec_X_get(const vec_X* self, i_keyraw raw);                 // find raw, NULL not found
+const i_key*        vec_X_front(const vec_X* self);
+const i_key*        vec_X_back(const vec_X* self);
+
+i_key*              vec_X_at_mut(vec_X* self, isize idx);                       // return mutable at idx
+i_key*              vec_X_get_mut(vec_X* self, i_keyraw raw);                   // find mutable raw value
+i_key*              vec_X_front_mut(vec_X* self);
+i_key*              vec_X_back_mut(vec_X* self);
+
+// Requires either i_use_cmp, i_cmp or i_less defined:
 void                vec_X_sort(vec_X* self);                                    // quicksort from sort.h
 isize               vec_X_lower_bound(const vec_X* self, const i_keyraw raw);   // return -1 if not found
 isize               vec_X_binary_search(const vec_X* self, const i_keyraw raw); // return -1 if not found
 
-vec_X_value*        vec_X_front(const vec_X* self);
-vec_X_value*        vec_X_back(const vec_X* self);
-
-vec_X_value*        vec_X_push(vec_X* self, i_key value);
-vec_X_value*        vec_X_push_back(vec_X* self, i_key value);            // alias for push
-vec_X_value*        vec_X_emplace(vec_X* self, i_keyraw raw);
-vec_X_value*        vec_X_emplace_back(vec_X* self, i_keyraw raw);        // alias for emplace
+i_key*              vec_X_push(vec_X* self, i_key value);
+i_key*              vec_X_push_back(vec_X* self, i_key value);            // alias for push
+i_key*              vec_X_emplace(vec_X* self, i_keyraw raw);
+i_key*              vec_X_emplace_back(vec_X* self, i_keyraw raw);        // alias for emplace
 
 void                vec_X_pop(vec_X* self);                               // destroy last element
 void                vec_X_pop_back(vec_X* self);                          // alias for pop
-vec_X_value         vec_X_pull(vec_X* self);                              // move out last element
+i_key               vec_X_pull(vec_X* self);                              // move out last element
 
 vec_X_iter          vec_X_insert_n(vec_X* self, isize idx, const i_key arr[], isize n); // move values
 vec_X_iter          vec_X_insert_at(vec_X* self, vec_X_iter it, i_key value);  // move value

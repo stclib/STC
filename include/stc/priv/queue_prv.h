@@ -77,11 +77,15 @@ STC_INLINE bool         _c_MEMB(_is_empty)(const Self* self)
 STC_INLINE _m_raw       _c_MEMB(_value_toraw)(const _m_value* pval)
                             { return i_keytoraw(pval); }
 
-STC_INLINE _m_value*    _c_MEMB(_front)(const Self* self)
+STC_INLINE const _m_value* _c_MEMB(_front)(const Self* self)
+                            { return self->cbuf + self->start; }
+STC_INLINE _m_value*    _c_MEMB(_front_mut)(Self* self)
                             { return self->cbuf + self->start; }
 
-STC_INLINE _m_value*    _c_MEMB(_back)(const Self* self)
+STC_INLINE const _m_value* _c_MEMB(_back)(const Self* self)
                             { return self->cbuf + ((self->end - 1) & self->capmask); }
+STC_INLINE _m_value*    _c_MEMB(_back_mut)(Self* self)
+                            { return (_m_value*)_c_MEMB(_back)(self); }
 
 STC_INLINE void _c_MEMB(_pop)(Self* self) { // pop_front
     c_assert(!_c_MEMB(_is_empty)(self));

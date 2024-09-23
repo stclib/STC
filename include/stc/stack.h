@@ -119,14 +119,20 @@ STC_INLINE _m_value* _c_MEMB(_append_uninit)(Self *self, isize n) {
 STC_INLINE void _c_MEMB(_shrink_to_fit)(Self* self)
     { _c_MEMB(_reserve)(self, self->size); }
 
-STC_INLINE const _m_value* _c_MEMB(_top)(const Self* self)
+STC_INLINE const _m_value* _c_MEMB(_front)(const Self* self)
+    { return &self->data[0]; }
+STC_INLINE _m_value* _c_MEMB(_front_mut)(Self* self)
+    { return &self->data[0]; }
+
+STC_INLINE const _m_value* _c_MEMB(_back)(const Self* self)
+    { return &self->data[self->size - 1]; }
+STC_INLINE _m_value* _c_MEMB(_back_mut)(Self* self)
     { return &self->data[self->size - 1]; }
 
-STC_INLINE _m_value* _c_MEMB(_back)(const Self* self)
-    { return (_m_value*) &self->data[self->size - 1]; }
-
-STC_INLINE _m_value* _c_MEMB(_front)(const Self* self)
-    { return (_m_value*) &self->data[0]; }
+STC_INLINE const _m_value* _c_MEMB(_top)(const Self* self)
+    { return _c_MEMB(_back)(self); }
+STC_INLINE _m_value* _c_MEMB(_top_mut)(Self* self)
+    { return _c_MEMB(_back_mut)(self); }
 
 STC_INLINE _m_value* _c_MEMB(_push)(Self* self, _m_value val) {
     if (self->size == _c_MEMB(_capacity)(self))

@@ -136,9 +136,10 @@ STC_INLINE isize        _c_MEMB(_size)(const Self* self) { return self->size; }
 STC_INLINE isize        _c_MEMB(_capacity)(const Self* self) { return self->capacity; }
 STC_INLINE bool         _c_MEMB(_is_empty)(const Self* self) { return !self->size; }
 STC_INLINE _m_raw       _c_MEMB(_value_toraw)(const _m_value* val) { return i_keytoraw(val); }
-STC_INLINE _m_value*    _c_MEMB(_front)(const Self* self) { return self->data; }
-STC_INLINE _m_value*    _c_MEMB(_back)(const Self* self)
-                            { return self->data + self->size - 1; }
+STC_INLINE const _m_value*  _c_MEMB(_front)(const Self* self) { return self->data; }
+STC_INLINE _m_value*        _c_MEMB(_front_mut)(Self* self) { return self->data; }
+STC_INLINE const _m_value*  _c_MEMB(_back)(const Self* self) { return &self->data[self->size - 1]; }
+STC_INLINE _m_value*        _c_MEMB(_back_mut)(Self* self) { return &self->data[self->size - 1]; }
 
 STC_INLINE void         _c_MEMB(_pop)(Self* self)
                             { c_assert(self->size); _m_value* p = &self->data[--self->size]; i_keydrop(p); }

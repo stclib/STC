@@ -45,9 +45,15 @@ isize               stack_X_size(const stack_X* self);
 isize               stack_X_capacity(const stack_X* self);
 bool                stack_X_is_empty(const stack_X* self);
 
-i_key*              stack_X_top(const stack_X* self);
 const i_key*        stack_X_at(const stack_X* self, isize idx);
+const i_key*        stack_X_top(const stack_X* self);
+const i_key*        stack_X_front(const stack_X* self);
+const i_key*        stack_X_back(const stack_X* self);
+
 i_key*              stack_X_at_mut(stack_X* self, isize idx);
+i_key*              stack_X_top_mut(stack_X* self);
+i_key*              stack_X_front_mut(stack_X* self);
+i_key*              stack_X_back_mut(stack_X* self);
 
 i_key*              stack_X_push(stack_X* self, i_key value);
 i_key*              stack_X_emplace(stack_X* self, i_keyraw raw);
@@ -55,6 +61,7 @@ i_key*              stack_X_emplace(stack_X* self, i_keyraw raw);
 void                stack_X_pop(stack_X* self);                        // destroy last element
 stack_X_value       stack_X_pull(stack_X* self);                       // move out last element
 
+// Requires either i_use_cmp, i_cmp or i_less defined:
 void                stack_X_sort(stack_X* self);                                    // quicksort from sort.h
 isize               stack_X_lower_bound(const stack_X* self, const i_keyraw raw);   // return -1 if not found
 isize               stack_X_binary_search(const stack_X* self, const i_keyraw raw); // return -1 if not found

@@ -150,8 +150,10 @@ STC_INLINE _m_value*    _c_MEMB(_push)(Self* self, _m_value value)
                             { return _c_MEMB(_push_back)(self, value); }
 STC_INLINE void         _c_MEMB(_pop_front)(Self* self)
                             { c_assert(!_c_MEMB(_is_empty)(self)); _c_MEMB(_erase_after_node)(self, self->last); }
-STC_INLINE _m_value*    _c_MEMB(_front)(const Self* self) { return &self->last->next->value; }
-STC_INLINE _m_value*    _c_MEMB(_back)(const Self* self) { return &self->last->value; }
+STC_INLINE const _m_value* _c_MEMB(_front)(const Self* self) { return &self->last->next->value; }
+STC_INLINE _m_value*       _c_MEMB(_front_mut)(Self* self) { return &self->last->next->value; }
+STC_INLINE const _m_value* _c_MEMB(_back)(const Self* self) { return &self->last->value; }
+STC_INLINE _m_value*       _c_MEMB(_back_mut)(Self* self) { return &self->last->value; }
 STC_INLINE _m_raw       _c_MEMB(_value_toraw)(const _m_value* pval) { return i_keytoraw(pval); }
 STC_INLINE void         _c_MEMB(_value_drop)(_m_value* pval) { i_keydrop(pval); }
 
