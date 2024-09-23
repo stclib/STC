@@ -61,6 +61,11 @@ int main(void) {
 #include "types.h"
 #include <stdlib.h>
 
+#if defined __GNUC__ || defined __clang__ || defined _MSC_VER || defined i_no_atomic
+    typedef long catomic_long;
+#else // try with C11
+    typedef _Atomic(long) catomic_long;
+#endif
 #if defined _MSC_VER
     #include <intrin.h>
     #define c_atomic_inc(v) (void)_InterlockedIncrement(v)
@@ -68,13 +73,14 @@ int main(void) {
 #elif defined __GNUC__ || defined __clang__
     #define c_atomic_inc(v) (void)__atomic_add_fetch(v, 1, __ATOMIC_SEQ_CST)
     #define c_atomic_dec_and_test(v) !__atomic_sub_fetch(v, 1, __ATOMIC_SEQ_CST)
-#else
+#else // try with C11
     #include <stdatomic.h>
     #define c_atomic_inc(v) (void)atomic_fetch_add(v, 1)
     #define c_atomic_dec_and_test(v) (atomic_fetch_sub(v, 1) == 1)
 #endif
 
-#define carc_null {0}
+// @wmww, thanks for finding & fixing rare memleak with the metadata struct!
+struct _arc_metadata { catomic_long counter; bool value_included; };
 #endif // STC_ARC_H_INCLUDED
 
 #ifndef _i_prefix
@@ -97,7 +103,7 @@ typedef i_keyraw _m_raw;
 #ifndef i_is_forward
 _c_DEFTYPES(_c_arc_types, Self, i_key);
 #endif
-struct _c_MEMB(_rep_) { catomic_long counter; i_key value; };
+struct _c_MEMB(_rep_) { struct _arc_metadata metadata; i_key value; };
 
 STC_INLINE Self _c_MEMB(_init)(void)
     { return c_literal(Self){NULL, NULL}; }
@@ -105,9 +111,13 @@ STC_INLINE Self _c_MEMB(_init)(void)
 STC_INLINE long _c_MEMB(_use_count)(const Self* self)
     { return self->use_count ? *self->use_count : 0; }
 
-STC_INLINE Self _c_MEMB(_from_ptr)(_m_value* p) {
-    Self arc = {p};
-    *(arc.use_count = _i_malloc(catomic_long, 1)) = 1;
+STC_INLINE Self _c_MEMB(_from_ptr)(_m_value* ptr) {
+    Self arc = {ptr};
+    if (ptr) {
+        struct _arc_metadata* metadata = _i_malloc(struct _arc_metadata, 1);
+        metadata->value_included = false;
+        *(arc.use_count = &metadata->counter) = 1;
+    }    
     return arc;
 }
 
@@ -115,7 +125,8 @@ STC_INLINE Self _c_MEMB(_from_ptr)(_m_value* p) {
 STC_INLINE Self _c_MEMB(_make)(_m_value val) {
     Self arc;
     struct _c_MEMB(_rep_)* rep = _i_malloc(struct _c_MEMB(_rep_), 1);
-    *(arc.use_count = &rep->counter) = 1;
+    rep->metadata.value_included = true;
+    *(arc.use_count = &rep->metadata.counter) = 1;
     *(arc.get = &rep->value) = val;
     return arc;
 }
@@ -129,11 +140,10 @@ STC_INLINE Self _c_MEMB(_move)(Self* self) {
     return arc;
 }
 
-STC_INLINE void _c_MEMB(_drop)(const Self* cself) {
-    Self* self = (Self*)cself;
-    if (_i_atomic_dec_and_test(self->use_count)) {
+STC_INLINE void _c_MEMB(_drop)(const Self* self) {
+    if (self->use_count && _i_atomic_dec_and_test(self->use_count)) {
         i_keydrop(self->get);
-        if ((char *)self->get != (char *)self->use_count + offsetof(struct _c_MEMB(_rep_), value)) {
+        if (!c_container_of(self->use_count, struct _arc_metadata, counter)->value_included) {
             i_free(self->get, c_sizeof *self->get);
             i_free((void *)self->use_count, c_sizeof *self->use_count);
         } else { // allocated combined counter+value with _make()
@@ -142,9 +152,9 @@ STC_INLINE void _c_MEMB(_drop)(const Self* cself) {
     }
 }
 
-STC_INLINE void _c_MEMB(_reset_to)(Self* self, _m_value* p) {
+STC_INLINE void _c_MEMB(_reset_to)(Self* self, _m_value* ptr) {
     _c_MEMB(_drop)(self);
-    *self = _c_MEMB(_from_ptr)(p);
+    *self = _c_MEMB(_from_ptr)(ptr);
 }
 
 STC_INLINE Self _c_MEMB(_from)(_m_raw raw)
@@ -152,7 +162,7 @@ STC_INLINE Self _c_MEMB(_from)(_m_raw raw)
 
 // does not use i_keyclone, so OK to always define.
 STC_INLINE Self _c_MEMB(_clone)(Self arc) {
-    _i_atomic_inc(arc.use_count);
+    if (arc.use_count) _i_atomic_inc(arc.use_count);
     return arc;
 }
 
@@ -163,7 +173,7 @@ STC_INLINE void _c_MEMB(_take)(Self* self, Self unowned) {
 }
 // share ownership with arc
 STC_INLINE void _c_MEMB(_assign)(Self* self, Self arc) {
-    _i_atomic_inc(arc.use_count);
+    if (arc.use_count) _i_atomic_inc(arc.use_count);
     _c_MEMB(_drop)(self);
     *self = arc;
 }

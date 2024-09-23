@@ -98,10 +98,11 @@ STC_INLINE _m_raw _c_MEMB(_toraw)(const Self* self)
     { return i_keytoraw(self->get); }
 
 // destructor
-STC_INLINE void _c_MEMB(_drop)(const Self* cself) {
-    Self* self = (Self*)cself;
-    i_keydrop(self->get);
-    i_free(self->get, c_sizeof *self->get);
+STC_INLINE void _c_MEMB(_drop)(const Self* self) {
+    if (self->get) {
+        i_keydrop(self->get);
+        i_free(self->get, c_sizeof *self->get);
+    }
 }
 
 STC_INLINE Self _c_MEMB(_move)(Self* self) {
@@ -124,6 +125,7 @@ STC_INLINE Self _c_MEMB(_from)(_m_raw raw)
 
 #if !defined i_no_clone
     STC_INLINE Self _c_MEMB(_clone)(Self other) {
+        if (!other.get) return other;
         Self out = {_i_malloc(_m_value, 1)};
         *out.get = i_keyclone((*other.get));
         return out;
