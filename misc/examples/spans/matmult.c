@@ -8,19 +8,6 @@
 using_cspan(Mat, double, 2);
 using_cspan(Mat3, double, 3);
 typedef Mat OutMat;
-typedef struct { Mat m00, m01, m10, m11; } Partition;
-
-Partition partition(Mat A)
-{
-  int M = A.shape[0];
-  int N = A.shape[1];
-  return (Partition){
-    .m00 = cspan_slice(Mat, &A, {0, M/2}, {0, N/2}),
-    .m01 = cspan_slice(Mat, &A, {0, M/2}, {N/2, N}),
-    .m10 = cspan_slice(Mat, &A, {M/2, M}, {0, N/2}),
-    .m11 = cspan_slice(Mat, &A, {M/2, M}, {N/2, N}),
-  };
-}
 
 // Slow generic implementation
 void base_case_matrix_product(Mat A, Mat B, OutMat C)
@@ -34,6 +21,21 @@ void base_case_matrix_product(Mat A, Mat B, OutMat C)
       *cspan_at(&C, i,j) += C_ij;
     }
   }
+}
+
+
+typedef struct { Mat m00, m01, m10, m11; } Partition;
+
+Partition partition(Mat A)
+{
+  int M = A.shape[0];
+  int N = A.shape[1];
+  return (Partition){
+    .m00 = cspan_slice(Mat, &A, {0, M/2}, {0, N/2}),
+    .m01 = cspan_slice(Mat, &A, {0, M/2}, {N/2, N}),
+    .m10 = cspan_slice(Mat, &A, {M/2, M}, {0, N/2}),
+    .m11 = cspan_slice(Mat, &A, {M/2, M}, {N/2, N}),
+  };
 }
 
 void recursive_matrix_product(Mat A, Mat B, OutMat C)

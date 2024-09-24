@@ -117,7 +117,7 @@ STC_INLINE Self _c_MEMB(_from_ptr)(_m_value* ptr) {
         struct _arc_metadata* metadata = _i_malloc(struct _arc_metadata, 1);
         metadata->value_included = false;
         *(arc.use_count = &metadata->counter) = 1;
-    }    
+    }
     return arc;
 }
 
@@ -146,7 +146,7 @@ STC_INLINE void _c_MEMB(_drop)(const Self* self) {
         // assume counter is first member of structs _arc_metadata and _rep_:
         if (((struct _arc_metadata *)self->use_count)->value_included) {
             i_free(self->use_count, c_sizeof(struct _c_MEMB(_rep_))); // _make()
-        } else {                                                      
+        } else {
             i_free(self->use_count, c_sizeof(struct _arc_metadata)); // _from_ptr()
             i_free(self->get, c_sizeof *self->get);
         }
@@ -188,9 +188,6 @@ STC_INLINE void _c_MEMB(_assign)(Self* self, Self arc) {
         return i_cmp((&rawx), (&rawy));
     }
 #else
-    STC_INLINE int _c_MEMB(_raw_cmp)(const _m_raw* rx, const _m_raw* ry)
-        { return (rx > ry) - (rx < ry); }
-
     STC_INLINE int _c_MEMB(_cmp)(const Self* self, const Self* other) {
         const _m_value *x = self->get, *y = other->get;
         return (x > y) - (x < y);
@@ -206,9 +203,6 @@ STC_INLINE void _c_MEMB(_assign)(Self* self, Self arc) {
         return i_eq((&rawx), (&rawy));
     }
 #else
-    STC_INLINE bool _c_MEMB(_raw_eq)(const _m_raw* rx, const _m_raw* ry)
-        { return rx == ry; }
-
     STC_INLINE bool _c_MEMB(_eq)(const Self* self, const Self* other)
         { return self->get == other->get; }
 #endif
@@ -222,9 +216,6 @@ STC_INLINE void _c_MEMB(_assign)(Self* self, Self arc) {
         return i_hash((&raw));
     }
 #else
-    STC_INLINE uint64_t _c_MEMB(_raw_hash)(const _m_raw* rx)
-        { return c_default_hash(&rx); }
-
     STC_INLINE uint64_t _c_MEMB(_hash)(const Self* self)
         { return c_default_hash(&self->get); }
 #endif // i_no_hash

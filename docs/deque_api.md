@@ -120,7 +120,7 @@ int main(void) {
     puts("");
 
     c_foritems (i, int, {1, 4, 5, 22, 33, 2})
-        Deque_push_back(&q, *i.ref)
+        Deque_push_back(&q, *i.ref);
 
     c_foreach (i, Deque, q)
         printf(" %d", *i.ref);

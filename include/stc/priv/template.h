@@ -173,8 +173,8 @@
 
 #if !defined i_key
   #error "No i_key defined"
-#elif defined i_keyraw ^ defined i_keytoraw
-  #error "Both i_keyraw/i_valraw and i_keytoraw/i_valtoraw must be defined, if any"
+#elif defined i_keyraw && !defined i_keytoraw
+  #error "If i_keyraw/i_valraw is defined, i_keytoraw/i_valtoraw must be defined too"
 #elif !defined i_no_clone && (defined i_keyclone ^ defined i_keydrop)
   #error "Both i_keyclone/i_valclone and i_keydrop/i_valdrop must be defined, if any (unless i_no_clone defined)."
 #elif defined i_keyboxed || defined i_valboxed
@@ -218,6 +218,8 @@
 #endif
 #ifndef i_keyraw
   #define i_keyraw i_key
+#endif
+#ifndef i_keytoraw
   #define i_keytoraw c_default_toraw
 #endif
 #ifndef i_keyclone
@@ -257,8 +259,8 @@
 
 #ifndef i_val
   #error "i_val* must be defined for maps"
-#elif defined i_valraw ^ defined i_valtoraw
-  #error "Both i_valraw and i_valtoraw must be defined, if any"
+#elif defined i_valraw && !defined i_valtoraw
+  #error "If i_valraw is defined, i_valtoraw must be defined too"
 #elif !defined i_no_clone && (defined i_valclone ^ defined i_valdrop)
   #error "Both i_valclone and i_valdrop must be defined, if any"
 #endif
