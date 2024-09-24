@@ -274,6 +274,8 @@
 #endif
 #ifndef i_valraw
   #define i_valraw i_val
+#endif
+#ifndef i_valtoraw
   #define i_valtoraw c_default_toraw
 #endif
 #ifndef i_valclone

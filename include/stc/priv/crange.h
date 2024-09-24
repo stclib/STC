@@ -28,15 +28,13 @@ int main(void)
 {
     crange r1 = crange_make(80, 90);
     c_foreach (i, crange, r1)
-        printf(" %d", (int)*i.ref);
+        printf(" %d", *i.ref);
     puts("");
 
-    // use a temporary crange object.
-    int a = 100, b = INT32_MAX;
-    crange r2 = crange_make(a, b, 8);
-    c_filter(crange, r2
-         , c_flt_skip(10)
-        && (printf(" %zi", *value), c_flt_take(3))
+    c_filter(crange, c_iota(100, INT_MAX, 10), true
+        && c_flt_skip(25)
+        && c_flt_take(3)
+        && printf(" %d", *value)
     );
     puts("");
 }
@@ -46,17 +44,14 @@ int main(void)
 
 #include "../common.h"
 
+// crange: int range -----
+
 typedef isize crange_value;
 typedef struct { crange_value start, end, step, value; } crange;
 typedef struct { crange_value *ref, end, step; } crange_iter;
 
 STC_INLINE crange crange_make_3(crange_value start, crange_value stop, crange_value step)
     { crange r = {start, stop - (step > 0), step}; return r; }
-
-#define c_iota(...) c_MACRO_OVERLOAD(c_iota, __VA_ARGS__)
-#define c_iota_1(start) c_iota_3(start, INTPTR_MAX, 1)
-#define c_iota_2(start, stop) c_iota_3(start, stop, 1)
-#define c_iota_3(start, stop, step) ((crange[]){crange_make_3(start, stop, step)})[0]
 
 #define crange_make(...) c_MACRO_OVERLOAD(crange_make, __VA_ARGS__)
 #define crange_make_1(stop) crange_make_3(0, stop, 1) // NB! arg is stop
@@ -69,6 +64,39 @@ STC_INLINE crange_iter crange_begin(crange* self) {
 }
 
 STC_INLINE void crange_next(crange_iter* it) {
+    if ((it->step > 0) == ((*it->ref += it->step) > it->end))
+        it->ref = NULL;
+}
+
+
+// iota: c++-like std::iota, use in iterations on-the-fly -----
+// Note: c_iota() does not compile with c++, crange does.
+#define c_iota(...) c_MACRO_OVERLOAD(c_iota, __VA_ARGS__)
+#define c_iota_1(start) c_iota_3(start, INTPTR_MAX, 1) // NB! arg is start.
+#define c_iota_2(start, stop) c_iota_3(start, stop, 1)
+#define c_iota_3(start, stop, step) ((crange[]){crange_make_3(start, stop, step)})[0]
+
+
+// cirange: int range -----
+
+typedef int cirange_value;
+typedef struct { cirange_value start, end, step, value; } cirange;
+typedef struct { cirange_value *ref, end, step; } cirange_iter;
+
+STC_INLINE cirange cirange_make_3(cirange_value start, cirange_value stop, cirange_value step)
+    { cirange r = {start, stop - (step > 0), step}; return r; }
+
+#define cirange_make(...) c_MACRO_OVERLOAD(cirange_make, __VA_ARGS__)
+#define cirange_make_1(stop) cirange_make_3(0, stop, 1) // NB! arg is stop
+#define cirange_make_2(start, stop) cirange_make_3(start, stop, 1)
+
+STC_INLINE cirange_iter cirange_begin(cirange* self) {
+    self->value = self->start;
+    cirange_iter it = {&self->value, self->end, self->step};
+    return it;
+}
+
+STC_INLINE void cirange_next(cirange_iter* it) {
     if ((it->step > 0) == ((*it->ref += it->step) > it->end))
         it->ref = NULL;
 }

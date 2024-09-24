@@ -95,8 +95,12 @@ c_forrange (i, 30, 0, -5) printf(" %lld", i);
 // 30 25 20 15 10 5
 ```
 
-### crange: Integer range generator object
+### crange, cirange: Integer range generator object
 A number sequence generator type, similar to [boost::irange](https://www.boost.org/doc/libs/release/libs/range/doc/html/range/reference/ranges/irange.html).
+
+- `crange` uses `isize` (ptrdiff_t) as control variable
+- `cirange` is like crange, but uses `int` as control variable and it is slighly faster.
+
 ```c
 crange      crange_make(start);             // start, start+1,...
 crange      crange_make(start, stop);       // start, start+1, ... stop-1
@@ -104,6 +108,7 @@ crange      crange_make(start, stop, step); // start, start+step, ... upto-not-i
                                             // step may be negative.
 crange_iter crange_begin(crange* self);
 void        crange_next(crange_iter* it);
+
 
 crange&     c_iota(start);                  // l-value; otherwise like crange_make(start)
 crange&     c_iota(start, stop);            // l-value, otherwise like crange_make(start, stop)
