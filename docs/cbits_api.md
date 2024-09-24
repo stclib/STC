@@ -1,19 +1,23 @@
 # STC [cbits](../include/stc/cbits.h): Bitset
 ![Bitset](pics/bitset.jpg)
 
-A **cbits** represents either a fixed or a dynamically sized sequence of bits. It provides accesses to the value of individual bits via *cbits_test()* and provides the bitwise operators that one can apply to builtin integers. The number of bits in the set is specified at runtime via a parameter to the constructor *cbits_with_size()* or by *cbits_resize()*. A **cbits** bitset can be manipulated by standard logic operators and converted to and from strings.
+A **cbits** represents either a dynamically sized sequence of bits, or a compile-time fixed sized bitset. It provides accesses to the value of individual bits via *cbits_test()* (or *cbits_at()*) and provides the bitwise operators that one can apply to builtin integers. 
+
+For the dynamic The number of bits in the set is specified at runtime via a parameter to the constructor *cbits_with_size()* or by *cbits_resize()*. A **cbits** bitset can be manipulated by standard logic operators and converted to and from strings.
 
 See the c++ class [std::bitset](https://en.cppreference.com/w/cpp/utility/bitset) or
 [boost::dynamic_bitset](https://www.boost.org/doc/libs/release/libs/dynamic_bitset/dynamic_bitset.html)
 for a functional description.
 
 ## Header file
-
 All cbits definitions and prototypes are available by including a single header file.
 
 ```c
-#define i_len N        // if defined, the bitset will be fixed-size of N bits on the stack.
-#define i_type name    // optional, specifies the name of the bitset type. Default to cbits or cbitsN
+// if i_type is defined, the bitset will be fixed-size of N bits on the stack, and with the given type name.
+#define i_type MyBits, MY_MAX_BITS
+#include "stc/cbits.h"
+
+// otherwise, just include the header. The type name is cbits and it will be dynamically allocated.
 #include "stc/cbits.h"
 ```
 ## Methods
@@ -64,45 +68,44 @@ void        cbits_xor(cbits* self, const cbits* other);             // set of di
 
 ## Example
 ```c
-#define i_implement // force shared implementation of some cbits functionn.
 #include "stc/cbits.h"
 #include <stdio.h>
 #include <math.h>
 #include <time.h>
 
-cbits sieveOfEratosthenes(int64_t n)
+cbits sieveOfEratosthenes(int64 n)
 {
-    cbits bits = cbits_with_size(n>>1, true);
-    int64_t q = (int64_t) sqrt(n);
+    cbits bits = cbits_with_size(n/2, true);
+    int64 q = (int64)sqrt(n);
 
-    for (int64_t i = 3; i <= q; i += 2) {
-        for (int64_t j = i; j < n; j += 2) {
-            if (cbits_test(&bits, j>>1)) {
+    for (int64 i = 3; i <= q; i += 2) {
+        for (int64 j = i; j < n; j += 2) {
+            if (cbits_test(&bits, j/2)) {
                 i = j;
                 break;
             }
         }
-        for (int64_t j = i*i; j < n; j += i*2)
-            cbits_reset(&bits, j>>1);
+        for (int64 j = i*i; j < n; j += i*2)
+            cbits_reset(&bits, j/2);
     }
     return bits;
 }
 
 int main(void)
 {
-    int64_t n = 100000000;
+    int64 n = 100000000;
     printf("computing prime numbers up to %" c_ZI "\n", n);
 
     clock_t t1 = clock();
     cbits primes = sieveOfEratosthenes(n + 1);
-    int64_t nprimes = cbits_count(&primes);
-    clock_t t2 = clock();
+    int64 nprimes = cbits_count(&primes);
+    t1 = clock() - t1;
 
-    printf("number of primes: %" c_ZI ", time: %f\n", nprimes, (float)(t2 - t1)/CLOCKS_PER_SEC);
+    printf("number of primes: %" c_ZI ", time: %f\n", nprimes, (float)t1/CLOCKS_PER_SEC);
 
     printf(" 2");
-    for (int64_t i = 3; i < 1000; i += 2)
-       if (cbits_test(&primes, i>>1)) printf(" %" c_ZI, i);
+    for (int64 i = 3; i < 1000; i += 2)
+       if (cbits_test(&primes, i/2)) printf(" %" c_ZI, i);
     puts("");
 
     cbits_drop(&primes);

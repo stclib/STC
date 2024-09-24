@@ -66,8 +66,9 @@ c_foritems (i, const char*, {"Hello", "crazy", "world"})
 
 ## Integer range loops
 
-### c_forrange
-Abstraction for iterating sequence of integers. Like python's **for** *i* **in** *range()* loop.
+### c_forrange, c_forirange
+- Abstraction for iterating sequence of integers. Like python's **for** *i* **in** *range()* loop. It uses `isize` as control variable.
+- `c_forirange` takes an integer type as first argument as control variable, otherwise identical to `c_forrange`.
 
 | Usage                                | Python equivalent                    |
 |:-------------------------------------|:-------------------------------------|
@@ -75,6 +76,13 @@ Abstraction for iterating sequence of integers. Like python's **for** *i* **in**
 | `c_forrange (i, stop)`               | `for i in range(stop):`              |
 | `c_forrange (i, start, stop)`        | `for i in range(start, stop):`       |
 | `c_forrange (i, start, stop, step)`  | `for i in range(start, stop, step):` |
+
+| Usage                                        | Python equivalent                    |
+|:---------------------------------------------|:-------------------------------------|
+| `c_forirange (iType, stop)`                  | `for _ in range(stop):`              |
+| `c_forirange (iType, i, stop)`               | `for i in range(stop):`              |
+| `c_forirange (iType, i, start, stop)`        | `for i in range(start, stop):`       |
+| `c_forirange (iType, i, start, stop, step)`  | `for i in range(start, stop, step):` |
 
 ```c
 c_forrange (5) printf("x");

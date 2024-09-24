@@ -237,24 +237,22 @@ STC_INLINE isize cnextpow2(isize n) {
 #define c_forlist(...) 'c_forlist not_supported. Use c_foritems'   // [removed]
 #define c_forpair(...) 'c_forpair not_supported. Use c_foreach_kv' // [removed]
 
-// c_forrange: python-like indexed iteration
-#define c_forrange(...) c_MACRO_OVERLOAD(c_forrange, __VA_ARGS__)
-#define c_forrange_1(stop) c_forrange_3(_i, 0, stop)
-#define c_forrange_2(i, stop) c_forrange_3(i, 0, stop)
-#define c_forrange_3(i, start, stop) \
-    for (int i=start, _end=stop; i < _end; ++i)
-#define c_forrange_4(i, start, stop, step) \
-    for (int i=start, _inc=step, _end=(isize)(stop) - (_inc > 0) \
-         ; (_inc > 0) ^ (i > _end); i += _inc)
+// c_forirange / c_forrange: python-like int range iteration
 
-#define c_forlrange(...) c_MACRO_OVERLOAD(c_forlrange, __VA_ARGS__)
-#define c_forlrange_1(stop) c_forlrange_3(_i, 0, stop)
-#define c_forlrange_2(i, stop) c_forlrange_3(i, 0, stop)
-#define c_forlrange_3(i, start, stop) \
-    for (isize i=start, _end=stop; i < _end; ++i)
-#define c_forlrange_4(i, start, stop, step) \
-    for (isize i=start, _inc=step, _end=(isize)(stop) - (_inc > 0) \
-         ; (_inc > 0) ^ (i > _end); i += _inc)
+#define c_forirange(...) c_MACRO_OVERLOAD(c_forirange, __VA_ARGS__)
+#define c_forirange_2(iT, stop) c_forirange_4(iT, _i, 0, stop)
+#define c_forirange_3(iT, i, stop) c_forirange_4(iT, i, 0, stop)
+#define c_forirange_4(iT, i, start, stop) \
+    for (iT i=start, _end=stop; i < _end; ++i)
+#define c_forirange_5(iT, i, start, stop, step) \
+    for (iT i=start, _inc=step, _end=(stop) - (_inc > 0) \
+         ; (_inc > 0) == (i <= _end); i += _inc)
+
+#define c_forrange(...) c_MACRO_OVERLOAD(c_forrange, __VA_ARGS__)
+#define c_forrange_1(stop) c_forirange_4(isize, _i, 0, stop)
+#define c_forrange_2(i, stop) c_forirange_4(isize, i, 0, stop)
+#define c_forrange_3(i, start, stop) c_forirange_4(isize, i, start, stop)
+#define c_forrange_4(i, start, stop, step) c_forirange_5(isize, i, start, stop, step)
 
 #ifndef __cplusplus
     #define c_init(C, ...) \
