@@ -72,7 +72,7 @@ int main(void)
 #define _c_filter(C, start, rev, pred) do { \
     struct _flt_base _base = {0}; \
     C##_iter _it = start; \
-    C##_value *value = _it.ref, _mapped; \
+    C##_value *value = _it.ref, _mapped = {0}; \
     for ((void)_mapped ; !_base.done & (_it.ref != NULL) ; \
          C##rev##next(&_it), value = _it.ref, _base.sn_top=0, _base.sb_top=0) \
       (void)(pred); \

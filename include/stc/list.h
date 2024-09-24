@@ -392,6 +392,7 @@ _c_MEMB(_remove)(Self* self, _m_raw val) {
 STC_DEF bool _c_MEMB(_sort)(Self* self) {
     isize len = 0, cap = 0;
     _m_value *arr = NULL, *p = NULL;
+    _m_node* keep;
     c_foreach (i, Self, *self) {
         if (len == cap) {
             isize cap_n = cap + cap/2 + 8;
@@ -401,7 +402,7 @@ STC_DEF bool _c_MEMB(_sort)(Self* self) {
         }
         arr[len++] = *i.ref;
     }
-    _m_node* keep = self->last;
+    keep = self->last;
     self->last = (_m_node *)arr;
     _c_MEMB(_sort_lowhigh)(self, 0, len - 1);
     self->last = keep;

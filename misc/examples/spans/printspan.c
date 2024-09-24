@@ -8,7 +8,7 @@
 #define i_implement
 #include "stc/cspan.h"
 
-using_cspan(intspan, int);
+using_cspan(intspan, const int);
 
 
 void printMe(intspan container) {
