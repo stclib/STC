@@ -242,8 +242,17 @@ STC_INLINE isize cnextpow2(isize n) {
 #define c_forrange_1(stop) c_forrange_3(_i, 0, stop)
 #define c_forrange_2(i, stop) c_forrange_3(i, 0, stop)
 #define c_forrange_3(i, start, stop) \
-    for (isize i=start, _end=stop; i < _end; ++i)
+    for (int i=start, _end=stop; i < _end; ++i)
 #define c_forrange_4(i, start, stop, step) \
+    for (int i=start, _inc=step, _end=(isize)(stop) - (_inc > 0) \
+         ; (_inc > 0) ^ (i > _end); i += _inc)
+
+#define c_forlrange(...) c_MACRO_OVERLOAD(c_forlrange, __VA_ARGS__)
+#define c_forlrange_1(stop) c_forlrange_3(_i, 0, stop)
+#define c_forlrange_2(i, stop) c_forlrange_3(i, 0, stop)
+#define c_forlrange_3(i, start, stop) \
+    for (isize i=start, _end=stop; i < _end; ++i)
+#define c_forlrange_4(i, start, stop, step) \
     for (isize i=start, _inc=step, _end=(isize)(stop) - (_inc > 0) \
          ; (_inc > 0) ^ (i > _end); i += _inc)
 
