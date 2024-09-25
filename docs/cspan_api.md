@@ -60,8 +60,10 @@ ValueType*      cspan_back(const SpanTypeN* self);
                 //    Note that fmt must match the arguments passed via itemfn().
                 // Usage ex: cspan_print(Span2, ((Span2)cspan_transposed2(&sp2)), "%.3f");
                 //           cspan_print(Span2, cspan_slice(Span2, &sp3, {c_ALL}, {3}, {c_ALL}), "%.3f");
-void            cspan_print(<TYPE> SpanTypeN, SpanTypeN span, const char* fmt,
-                            FILE* fp = stdout, const char* brackets = "[]", itemfn = c_EXPAND);
+void            cspan_print(<TYPE> SpanTypeN, SpanTypeN span, const char* fmt, FILE* fp = stdout,
+                            const char* brackets = "[]", itemfn = c_EXPAND);
+                // Print matrix with complex numbers. num_decimals applies both to real and imag parts.
+void            cspan_print_complex(<TYPE> SpanTypeN, SpanTypeN span, int num_decimals, FILE* fp);
 
 SpanTypeN_iter  SpanType_begin(const SpanTypeN* self);
 SpanTypeN_iter  SpanType_end(const SpanTypeN* self);

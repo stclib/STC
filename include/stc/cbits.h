@@ -86,6 +86,19 @@ int main(void) {
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"     // gcc 11.4
 #endif
 
+#define cbits_print(...) c_MACRO_OVERLOAD(cbits_print, __VA_ARGS__)
+#define cbits_print_1(self) cbits_print_4(self, stdout, 0, -1)
+#define cbits_print_2(self, stream) cbits_print_4(self, stream, 0, -1)
+#define cbits_print_4(self, stream, start, end) cbits_print_5(cbits, self, stream, start, end)
+#define cbits_print_3(SetType, self, stream) cbits_print_5(SetType, self, stream, 0, -1)
+#define cbits_print_5(SetType, self, stream, start, end) do { \
+    const SetType* _cb_set = self; \
+    isize _cb_start = start, _cb_end = end; \
+    if (_cb_end == -1) _cb_end = SetType##_size(_cb_set); \
+    c_forrange_3 (_cb_i, _cb_start, _cb_end) \
+        fputc(SetType##_test(_cb_set, _cb_i) ? '1' : '0', stream); \
+} while (0)
+
 STC_INLINE isize _cbits_count(const uintptr_t* set, const isize sz) {
     const isize n = sz/_cbits_WB;
     isize count = 0;
@@ -142,7 +155,6 @@ STC_INLINE bool _cbits_disjoint(const uintptr_t* set, const uintptr_t* other, co
 typedef struct { uintptr_t *buffer; isize _size; } Self;
 #define _i_assert(x) c_assert(x)
 
-STC_INLINE cbits cbits_init(void) { return c_literal(cbits){0}; }
 STC_INLINE void cbits_drop(cbits* self) { i_free(self->buffer, _cbits_bytes(self->_size)); }
 STC_INLINE isize cbits_size(const cbits* self) { return self->_size; }
 
@@ -210,7 +222,6 @@ STC_INLINE cbits cbits_with_pattern(const isize size, const uintptr_t pattern) {
 
 typedef struct { uintptr_t buffer[(_i_length - 1)/_cbits_WB + 1]; } Self;
 
-STC_INLINE void     _i_MEMB(_init)(Self* self) { memset(self->buffer, 0, sizeof self->buffer); }
 STC_INLINE void     _i_MEMB(_drop)(Self* self) { (void)self; }
 STC_INLINE isize    _i_MEMB(_size)(const Self* self) { (void)self; return _i_length; }
 STC_INLINE Self     _i_MEMB(_move)(Self* self) { return *self; }
@@ -236,7 +247,7 @@ STC_INLINE Self _i_MEMB(_with_pattern)(const isize size, const uintptr_t pattern
 // COMMON:
 
 STC_INLINE void _i_MEMB(_set_all)(Self *self, const bool value)
-    { c_memset(self->buffer, value? ~0 : 0, _cbits_bytes(_i_MEMB(_size)(self))); }
+    { c_memset(self->buffer, -(int)value, _cbits_bytes(_i_MEMB(_size)(self))); }
 
 STC_INLINE void _i_MEMB(_set_pattern)(Self *self, const uintptr_t pattern) {
     isize n = _cbits_words(_i_MEMB(_size)(self));
@@ -247,7 +258,7 @@ STC_INLINE bool _i_MEMB(_test)(const Self* self, const isize i)
     { return (self->buffer[i/_cbits_WB] & _cbits_bit(i)) != 0; }
 
 STC_INLINE bool _i_MEMB(_at)(const Self* self, const isize i)
-    { return (self->buffer[i/_cbits_WB] & _cbits_bit(i)) != 0; }
+    { c_assert(c_uless(i, _i_MEMB(_size)(self))); return _i_MEMB(_test)(self, i); }
 
 STC_INLINE void _i_MEMB(_set)(Self *self, const isize i)
     { self->buffer[i/_cbits_WB] |= _cbits_bit(i); }

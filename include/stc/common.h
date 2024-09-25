@@ -208,7 +208,7 @@ STC_INLINE isize cnextpow2(isize n) {
     _c_foreach(it, C, start, (end).ref, _)
 
 #define c_foreach_index(k, it, C, cnt) \
-    for (isize k = 0, _i=1; _i; _i=0) \
+    for (isize k = 0, _c_i=1; _c_i; _c_i=0) \
     for (C##_iter it = C##_begin(&cnt); it.ref; C##_next(&it), ++k)
 
 #define c_foreach_reverse(...) c_MACRO_OVERLOAD(c_foreach_reverse, __VA_ARGS__)
@@ -223,8 +223,8 @@ STC_INLINE isize cnextpow2(isize n) {
 
 #define c_foreach_kv(...) c_MACRO_OVERLOAD(c_foreach_kv, __VA_ARGS__)
 #define _c_foreach_kv(key, val, C, start, endref) /* structured binding for maps */ \
-    for (const C##_key *key, **_k = &key; _k; ) \
-    for (C##_mapped *val; _k; _k = NULL) \
+    for (const C##_key *key, **_c_k = &key; _c_k; ) \
+    for (C##_mapped *val; _c_k; _c_k = NULL) \
     for (C##_iter _it = start, *_endref = c_safe_cast(C##_iter*, C##_value*, endref) ; \
          _it.ref != (C##_value*)_endref && (key = &_it.ref->first, val = &_it.ref->second); \
          C##_next(&_it))
@@ -240,16 +240,16 @@ STC_INLINE isize cnextpow2(isize n) {
 // c_forirange / c_forrange: python-like int range iteration
 
 #define c_forirange(...) c_MACRO_OVERLOAD(c_forirange, __VA_ARGS__)
-#define c_forirange_2(iT, stop) c_forirange_4(iT, _i, 0, stop)
-#define c_forirange_3(iT, i, stop) c_forirange_4(iT, i, 0, stop)
-#define c_forirange_4(iT, i, start, stop) \
-    for (iT i=start, _end=stop; i < _end; ++i)
-#define c_forirange_5(iT, i, start, stop, step) \
-    for (iT i=start, _inc=step, _end=(stop) - (_inc > 0) \
-         ; (_inc > 0) == (i <= _end); i += _inc)
+#define c_forirange_2(Ti, stop) c_forirange_4(Ti, _c_i, 0, stop)
+#define c_forirange_3(Ti, i, stop) c_forirange_4(Ti, i, 0, stop)
+#define c_forirange_4(Ti, i, start, stop) \
+    for (Ti i=start, _c_end=stop; i < _c_end; ++i)
+#define c_forirange_5(Ti, i, start, stop, step) \
+    for (Ti i=start, _c_inc=step, _c_end=(stop) - (_c_inc > 0) \
+         ; (_c_inc > 0) == (i <= _c_end); i += _c_inc)
 
 #define c_forrange(...) c_MACRO_OVERLOAD(c_forrange, __VA_ARGS__)
-#define c_forrange_1(stop) c_forirange_4(isize, _i, 0, stop)
+#define c_forrange_1(stop) c_forirange_4(isize, _c_i, 0, stop)
 #define c_forrange_2(i, stop) c_forirange_4(isize, i, 0, stop)
 #define c_forrange_3(i, start, stop) c_forirange_4(isize, i, start, stop)
 #define c_forrange_4(i, start, stop, step) c_forirange_5(isize, i, start, stop, step)
@@ -285,10 +285,10 @@ STC_INLINE isize cnextpow2(isize n) {
     for (int _i = 1; _i; ) for (init; _i && (condition); _i = 0, deinit)
 
 #define c_defer(...) \
-    for (int _i = 1; _i; _i = 0, __VA_ARGS__)
+    for (int _c_i = 1; _c_i; _c_i = 0, __VA_ARGS__)
 
 #define c_drop(C, ...) \
-    do { c_foritems (_i, C*, {__VA_ARGS__}) C##_drop(*_i.ref); } while(0)
+    do { c_foritems (_c_i, C*, {__VA_ARGS__}) C##_drop(*_c_i.ref); } while(0)
 
 #if defined(__SIZEOF_INT128__)
     #define c_umul128(a, b, lo, hi) \

@@ -17,13 +17,12 @@ All cbits definitions and prototypes are available by including a single header 
 #define i_type MyBits, MY_MAX_BITS
 #include "stc/cbits.h"
 
-// otherwise, just include the header. The type name is cbits and it will be dynamically allocated.
+// otherwise, just include the header. The type name is cbits, data will be dynamically allocated.
 #include "stc/cbits.h"
 ```
 ## Methods
 
 ```c
-cbits       cbits_init(void);
 cbits       cbits_from(const char* str);
 cbits       cbits_with_size(int64_t size, bool value);              // size must be <= N if N is defined
 cbits       cbits_with_pattern(int64_t size, uint64_t pattern);
@@ -31,7 +30,7 @@ cbits       cbits_clone(cbits other);
 
 void        cbits_clear(cbits* self);
 cbits*      cbits_copy(cbits* self, const cbits* other);
-void        cbits_resize(cbits* self, int64_t size, bool value);    // only if i_len is not defined
+void        cbits_resize(cbits* self, int64_t size, bool value);    // NB! only for dynamic bitsets!
 void        cbits_drop(cbits* self);
 
 cbits*      cbits_take(cbits* self, const cbits* other);            // give other to self
@@ -41,10 +40,16 @@ int64_t     cbits_size(const cbits* self);
 int64_t     cbits_count(const cbits* self);                         // count number of bits set
 
 bool        cbits_test(const cbits* self, int64_t i);
-bool        cbits_at(const cbits* self, int64_t i);                 // same as cbits_test()
+bool        cbits_at(const cbits* self, int64_t i);                 // cbits_test() with bounds check.
 bool        cbits_subset_of(const cbits* self, const cbits* other); // is set a subset of other?
 bool        cbits_disjoint(const cbits* self, const cbits* other);  // no common bits
 char*       cbits_to_str(const cbits* self, char* str, int64_t start, int64_t stop);
+
+void        cbits_print(const cbits* self);
+void        cbits_print(const cbits* self, FILE* fp);
+void        cbits_print(const cbits* self, FILE* fp, int64_t start, int64_t stop);
+void        cbits_print(TYPE Bits, const Bits* self, FILE* fp); // for fixed size bitsets
+void        cbits_print(TYPE Bits, const Bits* self, FILE* fp, int64_t start, int64_t stop);
 
 void        cbits_set(cbits* self, int64_t i);
 void        cbits_reset(cbits* self, int64_t i);

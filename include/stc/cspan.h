@@ -249,8 +249,8 @@ typedef enum {c_ROWMAJOR, c_COLMAJOR} cspan_layout;
     cspan_print_5(Span, span, fmt, fp, "[]")
 #define cspan_print_5(Span, span, fmt, fp, brackets) \
     cspan_print_6(Span, span, fmt, fp, brackets, c_EXPAND)
-#define cspan_print_complex(Span, span, prec) \
-    cspan_print_6(Span, span, "%." #prec "f%+." #prec "fi", stdout, "[]", cspan_CMPLX_FLD)
+#define cspan_print_complex(Span, span, prec, fp) \
+    cspan_print_6(Span, span, "%." #prec "f%+." #prec "fi", fp, "[]", cspan_CMPLX_FLD)
 #define cspan_CMPLX_FLD(x) creal(x), cimag(x)
 
 #define cspan_print_6(Span, span, fmt, fp, brackets, field) do { \
