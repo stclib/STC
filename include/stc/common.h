@@ -255,28 +255,28 @@ STC_INLINE isize cnextpow2(isize n) {
 #define c_forrange_4(i, start, stop, step) c_forrange_t_5(isize, i, start, stop, step)
 
 #ifndef __cplusplus
-    #define c_init(C, ...) \
-        C##_from_n((C##_raw[])__VA_ARGS__, c_sizeof((C##_raw[])__VA_ARGS__)/c_sizeof(C##_raw))
+    #define _c_ARRAY(T, ...) ((T[])__VA_ARGS__)
+
     #define c_foritems(it, T, ...) \
         for (struct {T* ref; int size, index;} \
              it = {.ref=(T[])__VA_ARGS__, .size=(int)(sizeof((T[])__VA_ARGS__)/sizeof(T))} \
              ; it.index < it.size; ++it.ref, ++it.index)
-    #define chash_mix(...) \
-        _chash_mix((uint64_t[]){__VA_ARGS__}, c_NUMARGS(__VA_ARGS__))
 #else
+    template<typename T, int N> struct _c_Array { T data[N]; };
+    #define _c_ARRAY(T, ...) (_c_Array<T, sizeof((T[])__VA_ARGS__)/sizeof(T)>{__VA_ARGS__}.data)
+
     #include <initializer_list>
-    #include <array>
-    template <class C, class T>
-    inline C _from_n(C (*func)(const T[], isize), std::initializer_list<T> il)
-        { return func(&*il.begin(), il.size()); }
-    #define c_init(C, ...) _from_n<C,C##_raw>(C##_from_n, __VA_ARGS__)
     #define c_foritems(it, T, ...) \
         for (struct {std::initializer_list<T> _il; std::initializer_list<T>::iterator ref; size_t size, index;} \
              it = {._il=__VA_ARGS__, .ref=it._il.begin(), .size=it._il.size()} \
              ; it.index < it.size; ++it.ref, ++it.index)
-    #define chash_mix(...) \
-        _chash_mix(std::array<uint64_t, c_NUMARGS(__VA_ARGS__)>{__VA_ARGS__}.data(), c_NUMARGS(__VA_ARGS__))
 #endif
+
+#define c_init(C, ...) \
+    C##_from_n(_c_ARRAY(C##_raw, __VA_ARGS__), c_sizeof((C##_raw[])__VA_ARGS__)/c_sizeof(C##_raw))
+
+#define chash_mix(...) \
+    _chash_mix(_c_ARRAY(uint64_t, {__VA_ARGS__}), c_NUMARGS(__VA_ARGS__))
 
 #define c_with(...) c_MACRO_OVERLOAD(c_with, __VA_ARGS__)
 #define c_with_2(init, deinit) \
