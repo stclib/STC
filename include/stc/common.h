@@ -237,22 +237,22 @@ STC_INLINE isize cnextpow2(isize n) {
 #define c_forlist(...) 'c_forlist not_supported. Use c_foritems'   // [removed]
 #define c_forpair(...) 'c_forpair not_supported. Use c_foreach_kv' // [removed]
 
-// c_forirange / c_forrange: python-like int range iteration
+// c_forrange_t / c_forrange: python-like int range iteration
 
-#define c_forirange(...) c_MACRO_OVERLOAD(c_forirange, __VA_ARGS__)
-#define c_forirange_2(Ti, stop) c_forirange_4(Ti, _c_i, 0, stop)
-#define c_forirange_3(Ti, i, stop) c_forirange_4(Ti, i, 0, stop)
-#define c_forirange_4(Ti, i, start, stop) \
-    for (Ti i=start, _c_end=stop; i < _c_end; ++i)
-#define c_forirange_5(Ti, i, start, stop, step) \
-    for (Ti i=start, _c_inc=step, _c_end=(stop) - (_c_inc > 0) \
+#define c_forrange_t(...) c_MACRO_OVERLOAD(c_forrange_t, __VA_ARGS__)
+#define c_forrange_t_2(T, stop) c_forrange_t_4(T, _c_i, 0, stop)
+#define c_forrange_t_3(T, i, stop) c_forrange_t_4(T, i, 0, stop)
+#define c_forrange_t_4(T, i, start, stop) \
+    for (T i=start, _c_end=stop; i < _c_end; ++i)
+#define c_forrange_t_5(T, i, start, stop, step) \
+    for (T i=start, _c_inc=step, _c_end=(stop) - (_c_inc > 0) \
          ; (_c_inc > 0) == (i <= _c_end); i += _c_inc)
 
 #define c_forrange(...) c_MACRO_OVERLOAD(c_forrange, __VA_ARGS__)
-#define c_forrange_1(stop) c_forirange_4(isize, _c_i, 0, stop)
-#define c_forrange_2(i, stop) c_forirange_4(isize, i, 0, stop)
-#define c_forrange_3(i, start, stop) c_forirange_4(isize, i, start, stop)
-#define c_forrange_4(i, start, stop, step) c_forirange_5(isize, i, start, stop, step)
+#define c_forrange_1(stop) c_forrange_t_4(isize, _c_i, 0, stop)
+#define c_forrange_2(i, stop) c_forrange_t_4(isize, i, 0, stop)
+#define c_forrange_3(i, start, stop) c_forrange_t_4(isize, i, start, stop)
+#define c_forrange_4(i, start, stop, step) c_forrange_t_5(isize, i, start, stop, step)
 
 #ifndef __cplusplus
     #define c_init(C, ...) \

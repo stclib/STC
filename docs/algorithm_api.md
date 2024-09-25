@@ -66,9 +66,9 @@ c_foritems (i, const char*, {"Hello", "crazy", "world"})
 
 ## Integer range loops
 
-### c_forrange, c_forirange
-- Abstraction for iterating sequence of integers. Like python's **for** *i* **in** *range()* loop. It uses `isize` as control variable.
-- `c_forirange` takes an integer type as first argument as control variable, otherwise identical to `c_forrange`.
+### c_forrange, c_forrange_t
+- `c_forrange`: abstraction for iterating sequence of integers. Like python's **for** *i* **in** *range()* loop. Uses `isize` as control variable.
+- `c_forrange_t`: takes a ***type*** as first argument for the control variable type, otherwise identical to `c_forrange`.
 
 | Usage                                | Python equivalent                    |
 |:-------------------------------------|:-------------------------------------|
@@ -77,12 +77,12 @@ c_foritems (i, const char*, {"Hello", "crazy", "world"})
 | `c_forrange (i, start, stop)`        | `for i in range(start, stop):`       |
 | `c_forrange (i, start, stop, step)`  | `for i in range(start, stop, step):` |
 
-| Usage                                        | Python equivalent                    |
-|:---------------------------------------------|:-------------------------------------|
-| `c_forirange (iType, stop)`                  | `for _ in range(stop):`              |
-| `c_forirange (iType, i, stop)`               | `for i in range(stop):`              |
-| `c_forirange (iType, i, start, stop)`        | `for i in range(start, stop):`       |
-| `c_forirange (iType, i, start, stop, step)`  | `for i in range(start, stop, step):` |
+| Usage                                          |
+|:-----------------------------------------------|
+| `c_forrange_t(IntType, stop)`                  |
+| `c_forrange_t(IntType, i, stop)`               |
+| `c_forrange_t(IntType, i, start, stop)`        |
+| `c_forrange_t(IntType, i, start, stop, step)`  |
 
 ```c
 c_forrange (5) printf("x");
@@ -95,11 +95,11 @@ c_forrange (i, 30, 0, -5) printf(" %lld", i);
 // 30 25 20 15 10 5
 ```
 
-### crange, cirange: Integer range generator object
+### crange, crange_int: Integer range generators
 A number sequence generator type, similar to [boost::irange](https://www.boost.org/doc/libs/release/libs/range/doc/html/range/reference/ranges/irange.html).
 
 - `crange` uses `isize` (ptrdiff_t) as control variable
-- `cirange` is like crange, but uses `int` as control variable and it is slighly faster.
+- `crange_int` is like ***crange***, but uses `int` as control variable and it is slighly faster.
 
 ```c
 crange      crange_make(start);             // start, start+1,...
