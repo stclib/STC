@@ -1,2 +1,2 @@
-#define i_implement
+#define STC_IMPLEMENT
 #include "../include/stc/cstr.h"

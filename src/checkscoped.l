@@ -1,13 +1,13 @@
-/* Check for illegal return/break/continue usage inside a STC-lib c_guard* block (RAII).
+/* Check for illegal return/break/continue usage inside a STC-lib c_defer/c_with block (RAII).
  * Copyright Tyge Løvset, (c) 2024.
  */
 %{
 #include <stdbool.h>
-enum { LOOP=1<<0, AUTO=1<<1 };
-enum { NORMAL, BRACES, BRACESDONE };
+enum Block { LOOP=1<<0, DEFER=1<<1 };
+enum State { NORMAL, BRACES, BRACESDONE };
 static int braces_lev = 0, block_lev = 0;
-static int state = NORMAL;
-static unsigned int block[64] = {0}, block_type = 0;
+static enum State state = NORMAL;
+static unsigned char block[64] = {0}, block_type = 0;
 const char* fname;
 int errors = 0, warnings = 0;
 %}
@@ -35,25 +35,28 @@ c_foreach_reverse |
 c_foreach_kv    |
 c_foreach       |
 c_forrange      |
+c_forirange     |
 c_fortoken_sv   |
 c_fortoken      |
-c_formatch_sv   |
 c_formatch      |
+c_forfilter_reverse_from |
+c_forfilter_reverse |
+c_forfilter_from |
 c_forfilter     |
 for             |
 while           |
 switch          { block_type |= LOOP; state = BRACES; }
 do              { block_type |= LOOP; state = BRACESDONE; }
 c_with          |
-c_defer         |
+c_defer         { block_type = DEFER; state = BRACES; }
 \(              { if (state == BRACES) ++braces_lev; }
 \)              { if (state == BRACES && --braces_lev == 0)
                     state = BRACESDONE;
                 }
 if              { if (state == BRACESDONE) {
-                    if (block_type == AUTO) {
-                      printf("%s:%d: warning: 'if' after c_guard* not enclosed in curly braces.\n"
-                             "    Make sure to enclose 'if - else' statement in { } after c_guard*.\n",
+                    if (block_type == DEFER) {
+                      printf("%s:%d: warning: 'if' after c_defer/c_with not enclosed in curly braces.\n"
+                             "    Make sure to enclose 'if - else' statement in { } after c_defer/c_with.\n",
                              fname, yylineno);
                       ++warnings;
                     }
@@ -68,21 +71,21 @@ if              { if (state == BRACESDONE) {
                 }
 \{              { if (state != BRACES) { block[++block_lev] = block_type; state = NORMAL; } }
 \}              { if (state != BRACES) block_type = block[--block_lev]; }
-return          { if (block_type == AUTO) {
-                    printf("%s:%d: error: 'return' used inside a c_guard*.\n"
-                           "    Use 'continue' to exit the current c_guard* before return.\n"
+return          { if (block_type == DEFER) {
+                    printf("%s:%d: error: 'return' used inside a c_defer/c_with scope.\n"
+                           "    Use 'continue' to exit the current c_defer/c_with before return.\n"
                            , fname, yylineno);
                     ++errors;
-                  } else if (block_type & AUTO) {
-                    printf("%s:%d: error: 'return' used in a loop inside a c_guard*.\n"
-                           "    Use 'break' to exit loop, then 'continue' to exit c_guard*.\n"
+                  } else if (block_type & DEFER) {
+                    printf("%s:%d: error: 'return' used in a loop inside a c_defer/c_with scope.\n"
+                           "    Use 'break' to exit loop, then 'continue' to exit c_defer/c_with.\n"
                            , fname, yylineno);
                     ++errors;
                   }
                 }
-break           { if (block_type == AUTO) {
-                    printf("%s:%d: error: 'break' used inside a c_guard*.\n"
-                           "    Use 'continue' to exit the current c_guard*.\n"
+break           { if (block_type == DEFER) {
+                    printf("%s:%d: error: 'break' used inside a c_defer/c_with scope.\n"
+                           "    Use 'continue' to exit the current c_defer/c_with.\n"
                            , fname, yylineno);
                     ++errors;
                   }
@@ -98,7 +101,8 @@ break           { if (block_type == AUTO) {
 int main(int argc, char **argv)
 {
     if (argc == 1 || strcmp(argv[1], "--help") == 0) {
-        printf("usage: %s [--help] {C-file... | -}\n", argv[0]);
+        printf("C-language source code checker for correct usage of STClib c_defer() / c_with().\n");
+        printf("Usage: %s {C-file... | -}\n", argv[0]);
         return 0;
     }
 
