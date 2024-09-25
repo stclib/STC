@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <time.h>
 #include "stc/random.h"
-
+#define NDEBUG
 #define MAX_LOAD_FACTOR 80
 
 #ifdef __cplusplus
@@ -35,7 +35,8 @@ KHASH_MAP_INIT_INT64(ii, IValue)
 // STC hmap template definition
 #define i_type hmap_ii,IKey,IValue
 #define i_max_load_factor MAX_LOAD_FACTOR / 100.0f
-#include "stc/hmap.h"
+//#include "stc/hmap.h"
+#include "external/hmap-old.h"
 
 #define i_type ivec,IKey
 #include "stc/stack.h"
@@ -51,7 +52,7 @@ KHASH_MAP_INIT_INT64(ii, IValue)
 
 
 #define SEED(s) crand64_seed(s)
-#define RAND(N) (crand64_uint() & (((uint64_t)1 << N) - 1))
+#define RAND(N) (crand64_uint() >> (64 - N))
 
 #define HMAP_SETUP(X, Key, Value) hmap_##X map = hmap_##X##_init()
 #define HMAP_PUT(X, key, val)     hmap_##X##_insert_or_assign(&map, key, val).ref->second
@@ -370,8 +371,8 @@ int main(int argc, char* argv[])
     printf("\nT3: Erase all elements by lookup, %u mill. inserts, key range [0, 2^%u)\n", n_mill, keybits);
     RUN_TEST(3)
 
-    printf("\nT4: Iterate map with %u mill inserts, repeatedly.\n", n_mill);
-    RUN_TEST(4)
+    //printf("\nT4: Iterate map with %u mill inserts, repeatedly.\n", n_mill);
+    //RUN_TEST(4)
 
     printf("\nT5: Lookup mix of random/existing keys in range [0, 2^%u). Num lookups adjusted for size.\n", keybits);
     RUN_TEST(5)
