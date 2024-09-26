@@ -77,26 +77,26 @@ STC_INLINE void crange_next(crange_iter* it) {
 #define c_iota_3(start, stop, step) ((crange[]){crange_make_3(start, stop, step)})[0]
 
 
-// crange_int -----
+// crange32 -----
 
-typedef int crange_int_value;
-typedef struct { crange_int_value start, end, step, value; } crange_int;
-typedef struct { crange_int_value *ref, end, step; } crange_int_iter;
+typedef int32_t crange32_value;
+typedef struct { crange32_value start, end, step, value; } crange32;
+typedef struct { crange32_value *ref, end, step; } crange32_iter;
 
-STC_INLINE crange_int crange_int_make_3(crange_int_value start, crange_int_value stop, crange_int_value step)
-    { crange_int r = {start, stop - (step > 0), step}; return r; }
+STC_INLINE crange32 crange32_make_3(crange32_value start, crange32_value stop, crange32_value step)
+    { crange32 r = {start, stop - (step > 0), step}; return r; }
 
-#define crange_int_make(...) c_MACRO_OVERLOAD(crange_int_make, __VA_ARGS__)
-#define crange_int_make_1(stop) crange_int_make_3(0, stop, 1) // NB! arg is stop
-#define crange_int_make_2(start, stop) crange_int_make_3(start, stop, 1)
+#define crange32_make(...) c_MACRO_OVERLOAD(crange32_make, __VA_ARGS__)
+#define crange32_make_1(stop) crange32_make_3(0, stop, 1) // NB! arg is stop
+#define crange32_make_2(start, stop) crange32_make_3(start, stop, 1)
 
-STC_INLINE crange_int_iter crange_int_begin(crange_int* self) {
+STC_INLINE crange32_iter crange32_begin(crange32* self) {
     self->value = self->start;
-    crange_int_iter it = {&self->value, self->end, self->step};
+    crange32_iter it = {&self->value, self->end, self->step};
     return it;
 }
 
-STC_INLINE void crange_int_next(crange_int_iter* it) {
+STC_INLINE void crange32_next(crange32_iter* it) {
     if ((it->step > 0) == ((*it->ref += it->step) > it->end))
         it->ref = NULL;
 }

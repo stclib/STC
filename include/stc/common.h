@@ -245,7 +245,6 @@ STC_INLINE isize cnextpow2(isize n) {
 // c_forrange_t / c_forrange: python-like int range iteration
 
 #define c_forrange_t(...) c_MACRO_OVERLOAD(c_forrange_t, __VA_ARGS__)
-#define c_forrange_t_2(T, stop) c_forrange_t_4(T, _c_i, 0, stop)
 #define c_forrange_t_3(T, i, stop) c_forrange_t_4(T, i, 0, stop)
 #define c_forrange_t_4(T, i, start, stop) \
     for (T i=start, _c_end=stop; i < _c_end; ++i)
@@ -280,9 +279,9 @@ STC_INLINE isize cnextpow2(isize n) {
 
 #define c_with(...) c_MACRO_OVERLOAD(c_with, __VA_ARGS__)
 #define c_with_2(init, deinit) \
-    for (int _i = 1; _i; ) for (init; _i; _i = 0, deinit) // thanks, tstanisl
+    for (int _c_i = 1; _c_i; ) for (init; _c_i; _c_i = 0, deinit) // thanks, tstanisl
 #define c_with_3(init, condition, deinit) \
-    for (int _i = 1; _i; ) for (init; _i && (condition); _i = 0, deinit)
+    for (int _c_i = 1; _c_i; ) for (init; _c_i && (condition); _c_i = 0, deinit)
 
 #define c_defer(...) \
     for (int _c_i = 1; _c_i; _c_i = 0, __VA_ARGS__)

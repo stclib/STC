@@ -79,7 +79,6 @@ c_foritems (i, const char*, {"Hello", "crazy", "world"})
 
 | Usage                                          |
 |:-----------------------------------------------|
-| `c_forrange_t(IntType, stop)`                  |
 | `c_forrange_t(IntType, i, stop)`               |
 | `c_forrange_t(IntType, i, start, stop)`        |
 | `c_forrange_t(IntType, i, start, stop, step)`  |
@@ -95,11 +94,11 @@ c_forrange (i, 30, 0, -5) printf(" %lld", i);
 // 30 25 20 15 10 5
 ```
 
-### crange, crange_int: Integer range generators
+### crange, crange32: Integer range generators
 A number sequence generator type, similar to [boost::irange](https://www.boost.org/doc/libs/release/libs/range/doc/html/range/reference/ranges/irange.html).
 
 - `crange` uses `isize` (ptrdiff_t) as control variable
-- `crange_int` is like ***crange***, but uses `int` as control variable and it is slighly faster.
+- `crange32` is like ***crange***, but uses `int32_t` as control variable, which may be faster.
 
 ```c
 crange      crange_make(start);             // start, start+1,...
