@@ -78,12 +78,17 @@ typedef ptrdiff_t       isize;
     #define _i_calloc(T, n)     ((T*)i_calloc(n, c_sizeof(T)))
     #define c_new(T, ...)       ((T*)memcpy(malloc(sizeof(T)), ((T[]){__VA_ARGS__}), sizeof(T)))
     #define c_literal(T)        (T)
+    #define c_make_array(T, ...) ((T[])__VA_ARGS__)
+    #define c_make_array2d(T, N, ...) ((T[][N])__VA_ARGS__)
 #else
     #include <new>
     #define _i_malloc(T, n)     static_cast<T*>(i_malloc((n)*c_sizeof(T)))
     #define _i_calloc(T, n)     static_cast<T*>(i_calloc(n, c_sizeof(T)))
     #define c_new(T, ...)       new (malloc(sizeof(T))) T(__VA_ARGS__)
     #define c_literal(T)        T
+    template<typename T, int M, int N> struct _c_Array { T data[M][N]; };
+    #define c_make_array(T, ...) (_c_Array<T, 1, sizeof((T[])__VA_ARGS__)/sizeof(T)>{{__VA_ARGS__}}.data[0])
+    #define c_make_array2d(T, N, ...) (_c_Array<T, sizeof((T[][N])__VA_ARGS__)/sizeof(T[N]), N>{__VA_ARGS__}.data)
 #endif
 #define c_new_n(T, n)           ((T*)malloc(sizeof(T)*c_i2u_size(n)))
 #define c_malloc(sz)            malloc(c_i2u_size(sz))
@@ -255,28 +260,26 @@ STC_INLINE isize cnextpow2(isize n) {
 #define c_forrange_4(i, start, stop, step) c_forrange_t_5(isize, i, start, stop, step)
 
 #ifndef __cplusplus
-    #define c_init(C, ...) \
-        C##_from_n((C##_raw[])__VA_ARGS__, c_sizeof((C##_raw[])__VA_ARGS__)/c_sizeof(C##_raw))
     #define c_foritems(it, T, ...) \
         for (struct {T* ref; int size, index;} \
              it = {.ref=(T[])__VA_ARGS__, .size=(int)(sizeof((T[])__VA_ARGS__)/sizeof(T))} \
              ; it.index < it.size; ++it.ref, ++it.index)
-    #define chash_mix(...) \
-        _chash_mix((uint64_t[]){__VA_ARGS__}, c_NUMARGS(__VA_ARGS__))
 #else
     #include <initializer_list>
-    #include <array>
     template <class C, class T>
     inline C _from_n(C (*func)(const T[], isize), std::initializer_list<T> il)
         { return func(&*il.begin(), il.size()); }
-    #define c_init(C, ...) _from_n<C,C##_raw>(C##_from_n, __VA_ARGS__)
     #define c_foritems(it, T, ...) \
         for (struct {std::initializer_list<T> _il; std::initializer_list<T>::iterator ref; size_t size, index;} \
              it = {._il=__VA_ARGS__, .ref=it._il.begin(), .size=it._il.size()} \
              ; it.index < it.size; ++it.ref, ++it.index)
-    #define chash_mix(...) \
-        _chash_mix(std::array<uint64_t, c_NUMARGS(__VA_ARGS__)>{__VA_ARGS__}.data(), c_NUMARGS(__VA_ARGS__))
 #endif
+
+#define c_init(C, ...) \
+    C##_from_n(c_make_array(C##_raw, __VA_ARGS__), c_sizeof((C##_raw[])__VA_ARGS__)/c_sizeof(C##_raw))
+
+#define chash_mix(...) \
+    _chash_mix(c_make_array(uint64_t, {__VA_ARGS__}), c_NUMARGS(__VA_ARGS__))
 
 #define c_with(...) c_MACRO_OVERLOAD(c_with, __VA_ARGS__)
 #define c_with_2(init, deinit) \

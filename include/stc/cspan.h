@@ -65,15 +65,6 @@ int demo2() {
 typedef int32_t cspan_istride, _istride;
 typedef isize _isize_triple[3];
 
-#ifndef __cplusplus
-    #define _c_MAKE_ARRAY(T, ...) ((T[])__VA_ARGS__)
-    #define _c_MAKE_ARRAY2D(T, N, ...) ((T[][N])__VA_ARGS__)
-#else
-    template<typename T, int M, int N> struct _c_Tuples { T data[M][N]; };
-    #define _c_MAKE_ARRAY(T, ...) (_c_Tuples<T, 1, sizeof((T[])__VA_ARGS__)/sizeof(T)>{{__VA_ARGS__}}.data[0])
-    #define _c_MAKE_ARRAY2D(T, N, ...) (_c_Tuples<T, sizeof((T[][N])__VA_ARGS__)/sizeof(T[N]), N>{__VA_ARGS__}.data)
-#endif
-
 #define using_cspan(...) c_MACRO_OVERLOAD(using_cspan, __VA_ARGS__)
 #define using_cspan_2(Self, T) \
     using_cspan_3(Self, T, 1); \
@@ -130,7 +121,7 @@ using_cspan_tuple(7); using_cspan_tuple(8);
 // cspan_init: static construction from initialization list
 //
 #define cspan_init(Span, ...) \
-    ((Span){.data=_c_MAKE_ARRAY(Span##_value, __VA_ARGS__), \
+    ((Span){.data=c_make_array(Span##_value, __VA_ARGS__), \
             .shape={sizeof((Span##_value[])__VA_ARGS__)/sizeof(Span##_value)}, \
             .stride=(cspan_tuple1){.d={1}}})
 
@@ -165,7 +156,7 @@ using_cspan_tuple(7); using_cspan_tuple(8);
 #define cspan_front(self) ((self)->data)
 #define cspan_back(self) ((self)->data + cspan_size(self) - 1)
 #define cspan_index(self, ...) \
-    _cspan_index((self)->shape, (self)->stride.d, _c_MAKE_ARRAY(isize, {__VA_ARGS__}), \
+    _cspan_index((self)->shape, (self)->stride.d, c_make_array(isize, {__VA_ARGS__}), \
                  cspan_rank(self) + c_static_assert(cspan_rank(self) == c_NUMARGS(__VA_ARGS__)))
 
 // Multi-dimensional span constructors
@@ -179,7 +170,7 @@ typedef enum {c_ROWMAJOR, c_COLMAJOR} cspan_layout;
     {.data=array, \
      .shape={__VA_ARGS__}, \
      .stride=*(c_JOIN(cspan_tuple,c_NUMARGS(__VA_ARGS__))*) \
-             _cspan_shape2stride(layout, _c_MAKE_ARRAY(_istride, {__VA_ARGS__}), c_NUMARGS(__VA_ARGS__))}
+             _cspan_shape2stride(layout, c_make_array(_istride, {__VA_ARGS__}), c_NUMARGS(__VA_ARGS__))}
 
 // Transpose and swap axes
 //
@@ -201,7 +192,7 @@ typedef enum {c_ROWMAJOR, c_COLMAJOR} cspan_layout;
 
 #define cspan_slice(OutSpan, self, ...) \
     OutSpan##_slice_((self)->data, (self)->shape, (self)->stride.d, \
-                     _c_MAKE_ARRAY2D(isize, 3, {__VA_ARGS__}), \
+                     c_make_array2d(isize, 3, {__VA_ARGS__}), \
                      cspan_rank(self) + c_static_assert(cspan_rank(self) == sizeof((isize[][3]){__VA_ARGS__})/sizeof(isize[3])))
 
 // submd#(): # <= 4 optimized. Reduce rank, like e.g. cspan_slice(Span2, &ms3, {x}, {c_ALL}, {c_ALL});
