@@ -29,7 +29,7 @@ int main(void)
     clock_t t = clock();
     cbits primes = sieveOfEratosthenes(n + 1);
 
-    int np = cbits_count(&primes);
+    int np = (int)cbits_count(&primes);
     t = clock() - t;
 
     printf("Number of primes: %d, time: %f\n\n", np, (double)t/CLOCKS_PER_SEC);

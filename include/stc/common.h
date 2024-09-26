@@ -266,9 +266,6 @@ STC_INLINE isize cnextpow2(isize n) {
              ; it.index < it.size; ++it.ref, ++it.index)
 #else
     #include <initializer_list>
-    template <class C, class T>
-    inline C _from_n(C (*func)(const T[], isize), std::initializer_list<T> il)
-        { return func(&*il.begin(), il.size()); }
     #define c_foritems(it, T, ...) \
         for (struct {std::initializer_list<T> _il; std::initializer_list<T>::iterator ref; size_t size, index;} \
              it = {._il=__VA_ARGS__, .ref=it._il.begin(), .size=it._il.size()} \
