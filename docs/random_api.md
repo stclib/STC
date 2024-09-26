@@ -48,10 +48,10 @@ double               crand64_real_r(crand64* rng, uint64_t strm);        // reen
 int64_t              crand64_uniform_r(crand64* rng, uint64_t strm, crand64_uniform_dist* d); // return rnd in [low, high]
 double               crand64_normal_r(crand64* rng, uint64_t strm, crand64_normal_dist* d);   // return normal distributed rnd's
 
-// Generic algorithms:
-void                 c_shuffle_seed(size_t seed);                        // calls crand64_seed() or crand32_seed()
-void                 c_shuffle_array(T* array, isize n);                 // shuffle an array of elements.
-void                 c_shuffle(TYPE CntType, CntType* cnt);              // shuffle a vec, stack or deque type.
+// Generic algorithms (uses 64 or 32 bit depending on machine word size):
+void                 crand_shuffle_seed(size_t seed);                    // calls crand64_seed() or crand32_seed()
+void                 crand_shuffle_array(T* array, isize n);             // shuffle an array of elements.
+void                 crand_shuffle(TYPE CntType, CntType* cnt);          // shuffle a vec, stack or deque type.
 ```
 Note that `strm` must be an odd number.
 ## Types
