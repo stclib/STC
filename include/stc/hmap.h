@@ -371,7 +371,7 @@ STC_DEF void _c_MEMB(_clear)(Self* self) {
 
 static _m_result
 _c_MEMB(_bucket_lookup_)(const Self* self, const _m_keyraw* rkeyptr) {
-    const uint64_t _hash = i_hash(rkeyptr);
+    const size_t _hash = i_hash(rkeyptr);
     const size_t _idxmask = (size_t)self->bucket_count - 1;
     _m_result _res = {.idx=_hash & _idxmask, .hashx=(uint8_t)((_hash >> 24) & _hashmask), .dist=1};
 

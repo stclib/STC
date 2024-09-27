@@ -144,7 +144,7 @@ Note that all methods with arguments `(..., const char* str, isize n)`, `n` must
 ```c
 int         cstr_cmp(const cstr* s1, const cstr* s2);
 bool        cstr_eq(const cstr* s1, const cstr* s2);
-uint64_t    cstr_hash(const cstr* self);
+size_t      cstr_hash(const cstr* self);
 
 char*       cstrnstrn(const char* str, isize slen, const char* needle, isize nlen);
 ```

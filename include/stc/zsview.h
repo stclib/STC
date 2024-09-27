@@ -123,7 +123,7 @@ STC_INLINE zsview_iter zsview_advance(zsview_iter it, isize u8pos) {
 
 /* ---- Container helper functions ---- */
 
-STC_INLINE uint64_t zsview_hash(const zsview *self)
+STC_INLINE size_t zsview_hash(const zsview *self)
     { return chash_n(self->str, self->size); }
 
 STC_INLINE int zsview_cmp(const zsview* x, const zsview* y)

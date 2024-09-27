@@ -103,7 +103,7 @@ int            csview_cmp(const csview* x, const csview* y);
 int            csview_icmp(const csview* x, const csview* y);
 bool           csview_eq(const csview* x, const csview* y);
 bool           csview_ieq(const csview* x, const csview* y);
-uint64_t       csview_hash(const csview* x);
+size_t         csview_hash(const csview* x);
 ```
 
 ## Types

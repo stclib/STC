@@ -38,10 +38,10 @@
 
 STC_API csview_iter csview_advance(csview_iter it, isize u8pos);
 STC_API isize       csview_find_sv(csview sv, csview search);
-STC_API uint64_t    csview_hash(const csview *self);
+STC_API size_t      csview_hash(const csview *self);
 STC_API csview      csview_slice_ex(csview sv, isize p1, isize p2);
 STC_API csview      csview_substr_ex(csview sv, isize pos, isize n);
-STC_API csview      csview_token(csview sv, const char* sep, isize* start);
+STC_API csview      csview_token(csview sv, const char* sep, isize* pos);
 
 STC_INLINE csview   csview_from(const char* str)
     { return c_literal(csview){str, c_strlen(str)}; }
@@ -186,7 +186,7 @@ STC_INLINE bool csview_iends_with(csview sv, const char* str) {
 #ifndef STC_CSVIEW_C_INCLUDED
 #define STC_CSVIEW_C_INCLUDED
 
-STC_DEF uint64_t csview_hash(const csview *self)
+STC_DEF size_t csview_hash(const csview *self)
     { return chash_n(self->buf, self->size); }
 
 STC_DEF csview_iter csview_advance(csview_iter it, isize u8pos) {
@@ -227,12 +227,12 @@ STC_DEF csview csview_slice_ex(csview sv, isize p1, isize p2) {
     return sv;
 }
 
-STC_DEF csview csview_token(csview sv, const char* sep, isize* start) {
+STC_DEF csview csview_token(csview sv, const char* sep, isize* pos) {
     isize sep_size = c_strlen(sep);
-    csview slice = {sv.buf + *start, sv.size - *start};
+    csview slice = {sv.buf + *pos, sv.size - *pos};
     const char* res = cstrnstrn(slice.buf, slice.size, sep, sep_size);
     csview tok = {slice.buf, res ? (res - slice.buf) : slice.size};
-    *start += tok.size + sep_size;
+    *pos += tok.size + sep_size;
     return tok;
 }
 #endif // STC_CSVIEW_C_INCLUDED

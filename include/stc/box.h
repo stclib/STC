@@ -175,15 +175,15 @@ STC_INLINE void _c_MEMB(_assign)(Self* self, Self* moved) {
 #endif
 
 #if !defined i_no_hash && defined _i_has_eq
-    STC_INLINE uint64_t _c_MEMB(_raw_hash)(const _m_raw* rx)
+    STC_INLINE size_t _c_MEMB(_raw_hash)(const _m_raw* rx)
         { return i_hash(rx); }
 
-    STC_INLINE uint64_t _c_MEMB(_hash)(const Self* self) {
+    STC_INLINE size_t _c_MEMB(_hash)(const Self* self) {
         _m_raw raw = i_keytoraw(self->get);
         return i_hash((&raw));
     }
 #else
-    STC_INLINE uint64_t _c_MEMB(_hash)(const Self* self)
+    STC_INLINE size_t _c_MEMB(_hash)(const Self* self)
         { return c_default_hash(&self->get); }
 #endif // i_no_hash
 

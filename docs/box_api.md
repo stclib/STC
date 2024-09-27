@@ -52,14 +52,14 @@ void        box_X_drop(box_X* self);                        // destruct the cont
 
 void        box_X_reset_to(box_X* self, i_key* p);          // assign new box from ptr. Takes ownership of p.
 
-uint64_t    box_X_hash(const box_X* x);                     // hash value
+size_t      box_X_hash(const box_X* x);                     // hash value
 int         box_X_cmp(const box_X* x, const box_X* y);      // compares pointer addresses if no `i_cmp` is specified.
                                                             // is defined. Otherwise uses 'i_cmp' or default cmp.
 bool        box_X_eq(const box_X* x, const box_X* y);       // box_X_cmp() == 0
 
 // functions on pointed to objects.
 
-uint64_t    box_X_value_hash(const i_key* x);
+size_t      box_X_value_hash(const i_key* x);
 int         box_X_value_cmp(const i_key* x, const i_key* y);
 bool        box_X_value_eq(const i_key* x, const i_key* y);
 ```

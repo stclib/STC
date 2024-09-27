@@ -9,13 +9,14 @@ struct fibonacci {
 };
 
 int fibonacci(struct fibonacci* g) {
+    unsigned long long tmp;
     cco_scope (g) {
         g->value = 0;
         g->b = 1;
         cco_yield;
 
         while (true) {
-            unsigned long long tmp = g->value;
+            tmp = g->value;
             g->value = g->b;
             g->b += tmp;
             cco_yield;

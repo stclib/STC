@@ -413,7 +413,7 @@ int* ip = c_const_cast(int*, cs);  // issues a warning!
 ```c
 typedef     const char* cstr_raw;
 int         cstr_raw_cmp(const cstr_raw* x, const cstr_raw* y);
-uint64_t    cstr_raw_hash(const cstr_raw* x);
+size_t      cstr_raw_hash(const cstr_raw* x);
 cstr_raw    cstr_raw_clone(cstr_raw sp);
 void        cstr_raw_drop(cstr_raw* x);
 ```
@@ -422,7 +422,7 @@ Default implementations
 int         c_default_cmp(const Type*, const Type*);    // <=>
 bool        c_default_less(const Type*, const Type*);   // <
 bool        c_default_eq(const Type*, const Type*);     // ==
-uint64_t    c_default_hash(const Type*);
+size_t      c_default_hash(const Type*);
 Type        c_default_clone(Type val);                  // return val
 Type        c_default_toraw(const Type* p);             // return *p
 void        c_default_drop(Type* p);                    // does nothing

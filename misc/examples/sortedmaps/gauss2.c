@@ -35,7 +35,7 @@ int main(void)
 
     // Print the gaussian bar chart
     c_foreach_kv (index, count, SortedMap, hist) {
-        int n = (int)round(2.5 * Scale * StdDev * (*count) / N);
+        int n = (int)round(2.5 * Scale * StdDev * (*count) / (isize)N);
         if (n > 0) {
             cstr_resize(&bar, n, '*');
             printf("%4d %s\n", *index, cstr_str(&bar));

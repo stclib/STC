@@ -51,7 +51,7 @@ struct fibonacci {
 
 int fibonacci(struct fibonacci* g) {
     assert(g->count < 94);
-
+    long long tmp;
     cco_scope(g) {
         if (g->value == 0)
             g->b = 1;
@@ -59,7 +59,7 @@ int fibonacci(struct fibonacci* g) {
             if (g->count-- == 0)
                 cco_return;
             // NB! locals lasts only until next yield/await!
-            long long tmp = g->value;
+            tmp = g->value;
             g->value = g->b;
             g->b += tmp;
             cco_yield_v(YIELD_FIB);
@@ -108,16 +108,16 @@ int main(void)
 
     puts("SEQUENCED");
     cco_run_coroutine(res = sequenced(&c)) {
-        if (res & YIELD_PRM) 
+        if (res & YIELD_PRM)
             printf("Prime=%lld\n", c.prm.value);
         if (res & YIELD_FIB)
             printf("Fibon=%lld\n", c.fib.value);
     }
-    
+
     c = (struct combined){.prm={.count=12}, .fib={.count=8}};
     puts("PARALLEL");
     cco_run_coroutine(res = parallel(&c)) {
-        if (res & YIELD_PRM) 
+        if (res & YIELD_PRM)
             printf("Prime=%lld\n", c.prm.value);
         if (res & YIELD_FIB)
             printf("Fibon=%lld\n", c.fib.value);

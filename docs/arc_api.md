@@ -61,14 +61,14 @@ long        arc_X_use_count(const arc_X* self);
 
 void        arc_X_reset_to(arc_X* self, i_key* p);          // assign new arc from ptr. Takes ownership of p.
 
-uint64_t    arc_X_hash(const arc_X* x);                     // hash value
+size_t      arc_X_hash(const arc_X* x);                     // hash value
 int         arc_X_cmp(const arc_X* x, const arc_X* y);      // compares pointer addresses if no `i_cmp` is specified.
                                                             // is defined. Otherwise uses 'i_cmp' or default cmp.
 bool        arc_X_eq(const arc_X* x, const arc_X* y);       // arc_X_cmp() == 0
 
 // functions on pointed to objects.
 
-uint64_t    arc_X_value_hash(const i_key* x);
+size_t      arc_X_value_hash(const i_key* x);
 int         arc_X_value_cmp(const i_key* x, const i_key* y);
 bool        arc_X_value_eq(const i_key* x, const i_key* y);
 ```

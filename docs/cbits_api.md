@@ -1,7 +1,7 @@
 # STC [cbits](../include/stc/cbits.h): Bitset
 ![Bitset](pics/bitset.jpg)
 
-A **cbits** represents either a dynamically sized sequence of bits, or a compile-time fixed sized bitset. It provides accesses to the value of individual bits via *cbits_test()* (or *cbits_at()*) and provides the bitwise operators that one can apply to builtin integers. 
+A **cbits** represents either a dynamically sized sequence of bits, or a compile-time fixed sized bitset. It provides accesses to the value of individual bits via *cbits_test()* (or *cbits_at()*) and provides the bitwise operators that one can apply to builtin integers.
 
 For the dynamic The number of bits in the set is specified at runtime via a parameter to the constructor *cbits_with_size()* or by *cbits_resize()*. A **cbits** bitset can be manipulated by standard logic operators and converted to and from strings.
 
@@ -25,7 +25,7 @@ All cbits definitions and prototypes are available by including a single header 
 ```c
 cbits       cbits_from(const char* str);
 cbits       cbits_with_size(int64_t size, bool value);              // size must be <= N if N is defined
-cbits       cbits_with_pattern(int64_t size, uint64_t pattern);
+cbits       cbits_with_pattern(int64_t size, size_t pattern);
 cbits       cbits_clone(cbits other);
 
 void        cbits_clear(cbits* self);
@@ -55,7 +55,7 @@ void        cbits_set(cbits* self, int64_t i);
 void        cbits_reset(cbits* self, int64_t i);
 void        cbits_set_value(cbits* self, int64_t i, bool value);
 void        cbits_set_all(cbits* self, bool value);
-void        cbits_set_pattern(cbits* self, uint64_t pattern);
+void        cbits_set_pattern(cbits* self, size_t pattern);
 void        cbits_flip_all(cbits* self);
 void        cbits_flip(cbits* self, int64_t i);
 

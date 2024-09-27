@@ -224,35 +224,34 @@ typedef const char* cstr_raw;
 // General functions
 
 // hashing
-#define c_ROTL(x, k) (x << (k) | x >> (8*sizeof(x) - (k)))
-
-STC_INLINE uint64_t chash_n(const void* key, isize len) {
-    uint32_t u4; uint64_t u8;
+STC_INLINE size_t chash_n(const void* key, isize len) {
+    union { size_t block; uint64_t b8; uint32_t b4; } u;
     switch (len) {
-        case 8: memcpy(&u8, key, 8); return u8*0xc6a4a7935bd1e99d;
-        case 4: memcpy(&u4, key, 4); return u4*0xc6a4a7935bd1e99d;
-        case 0: return 1;
+        case 8: memcpy(&u.b8, key, 8); return (size_t)(u.b8 * 0xc6a4a7935bd1e99d);
+        case 4: memcpy(&u.b4, key, 4); return u.b4 * (size_t)0xc6a4a7935bd1e99d;
+        case 0: return 87213627321u;
     }
-    const uint8_t *x = (const uint8_t*)key;
-    uint64_t h = (uint64_t)*x << 7, n = (uint64_t)len >> 3;
-    len &= 7;
-    while (n--) {
-        memcpy(&u8, x, 8), x += 8;
-        h = (h ^ u8)*0xc6a4a7935bd1e99d;
+    size_t hash = 87213627321u;
+    const uint8_t* msg = (const uint8_t*)key;
+    while (len >= c_sizeof(size_t)) {
+        memcpy(&u.block, msg, sizeof(size_t));
+        hash = (hash ^ u.block) * (size_t)0xc6a4a7935bd1e99d;
+        msg += c_sizeof(size_t);
+        len -= c_sizeof(size_t);
     }
-    while (len--) h = (h ^ *x++)*0x100000001b3;
-    return h ^ c_ROTL(h, 26);
+    while (len--) hash = (hash ^ *msg++)*0x100000001b3;
+    return hash ^ (hash >> 3);
 }
 
-STC_INLINE uint64_t chash_str(const char *str)
+STC_INLINE size_t chash_str(const char *str)
     { return chash_n(str, c_strlen(str)); }
 
-STC_INLINE uint64_t _chash_mix(uint64_t h[], int n) {
+STC_INLINE size_t _chash_mix(size_t h[], int n) {
     for (int i = 1; i < n; ++i) h[0] += h[0] ^ h[i];
     return h[0];
 }
 #define chash_mix(...) /* non-commutative hash combine! */ \
-    _chash_mix(c_make_array(uint64_t, {__VA_ARGS__}), c_NUMARGS(__VA_ARGS__))
+    _chash_mix(c_make_array(size_t, {__VA_ARGS__}), c_NUMARGS(__VA_ARGS__))
 
 // generic typesafe swap
 #define c_swap(xp, yp) do { \
