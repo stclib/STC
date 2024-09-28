@@ -42,6 +42,7 @@ int main(void)
     Vec_drop(&vec);
 }
 */
+// IWYU pragma: private, include "stc/algorithm.h"
 #ifndef STC_FILTER_H_INCLUDED
 #define STC_FILTER_H_INCLUDED
 

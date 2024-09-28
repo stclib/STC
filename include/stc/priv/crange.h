@@ -39,6 +39,7 @@ int main(void)
     puts("");
 }
 */
+// IWYU pragma: private, include "stc/algorithm.h"
 #ifndef STC_CRANGE_H_INCLUDED
 #define STC_CRANGE_H_INCLUDED
 

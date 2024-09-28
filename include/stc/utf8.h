@@ -25,9 +25,9 @@
 #ifndef STC_UTF8_H_INCLUDED
 #define STC_UTF8_H_INCLUDED
 
-#include "common.h"
+#include "common.h" // IWYU pragma: keep
 #include "types.h"
-#include "priv/utf8_prv.h"
+#include "priv/utf8_prv.h" // IWYU pragma: keep
 
 #endif // STC_UTF8_H_INCLUDED
 

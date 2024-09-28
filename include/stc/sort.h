@@ -93,7 +93,7 @@ int main(void) {
   typedef Self c_JOIN(Self, _value), c_JOIN(Self, _raw);
   #define i_at(arr, idx) (&(arr)[idx])
   #define i_at_mut i_at
-  #include "priv/template.h"
+  #include "priv/template.h" // IWYU pragma: keep
 #endif
 
 #include "priv/sort_prv.h"

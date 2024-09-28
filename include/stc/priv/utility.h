@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
 */
+// IWYU pragma: private, include "stc/algorithm.h"
 #ifndef STC_UTILITY_H_INCLUDED
 #define STC_UTILITY_H_INCLUDED
 
