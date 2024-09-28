@@ -546,7 +546,7 @@ int ctest_main(int argc, const char *argv[])
 
     uint32_t* magic_begin = &CTEST_IMPL_TNAME(suite, test).magic1;
     uint32_t* magic_end = &CTEST_IMPL_TNAME(suite, test).magic0, *m;
-    size_t num_ints = sizeof(struct ctest)/sizeof *m;
+    ptrdiff_t num_ints = sizeof(struct ctest)/sizeof *m;
 
 #if (defined __TINYC__ && defined __unix__)
     #define CTEST_IMPL_MAGIC_SEEK 10 /* search 4*(1+10) bytes outside ctest entry bounds */

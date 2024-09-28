@@ -28,10 +28,10 @@
 
 forward_vec(vec_i32, int);
 
-struct MyStruct {
+typedef struct MyStruct {
     vec_i32 int_vec;
     cstr name;
-} typedef MyStruct;
+} MyStruct;
 
 #define i_key float
 #include "stc/vec.h"

@@ -7,10 +7,10 @@
 #include "stc/cstr.h"
 #include "stc/algorithm.h"
 
-struct {
+typedef struct {
     cstr artist;
     cstr title;
-} typedef Song;
+} Song;
 
 // Make Song a "class" by defining _clone and _drop "members":
 Song Song_init(const char* artist, const char* title)
@@ -28,17 +28,17 @@ void Song_drop(Song* self) {
 }
 
 // Define a keyraw conversion type, SongView:
-struct {
+typedef struct {
     const char* artist;
     const char* title;
-} typedef SongView;
+} SongView;
 
-bool static inline SongView_cmp(const SongView* xw, const SongView* yw)
+inline static bool SongView_cmp(const SongView* xw, const SongView* yw)
     { int c = strcmp(xw->artist, yw->artist); return c ? c : strcmp(xw->title, yw->title); }
 
 #define SongView_eq(x, y) SongView_cmp(x, y)==0
 
-uint64_t static inline SongView_hash(const SongView* xw)
+inline static uint64_t SongView_hash(const SongView* xw)
     { return chash_mix(chash_str(xw->artist), chash_str(xw->title)); }
 
 
