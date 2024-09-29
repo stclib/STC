@@ -6,34 +6,51 @@ project(
   default_options: ['c_std=c11', 'warning_level=2', 'default_library=both']
 )
 
+stcversion = 5
 cc = meson.get_compiler('c')
 
 if cc.get_id() == 'gcc' or cc.get_id() == 'clang'
-  add_project_arguments('-Wno-missing-field-initializers', '-Wno-clobbered', language: 'c')
+  add_global_arguments('-Wno-missing-field-initializers', '-Wno-clobbered', language: 'c')
 elif cc.get_id() == 'msvc'
-  add_project_arguments('-D_CRT_SECURE_NO_WARNINGS', language: 'c')
+  add_global_arguments('-wd4996', language: 'c') # no "unsecure" funcs warnings
 endif
 
-m_dep = cc.find_library('m', required: false)
+libsrc = files(
+  'src/cregex.c',
+  'src/cspan.c',
+  'src/cstr_core.c',
+  'src/cstr_io.c',
+  'src/cstr_u8.c',
+  'src/csview.c',
+  'src/fmt.c',
+  'src/random.c',
+)
 
 inc = include_directories('include')
-stc_lib = library(
-  'stc',
-  files(
-    'src/cregex.c',
-    'src/cspan.c',
-    'src/cstr_core.c',
-    'src/cstr_io.c',
-    'src/cstr_u8.c',
-    'src/csview.c',
-    'src/fmt.c',
-    'src/random.c',
-  ),
-  dependencies: [m_dep],
-  soversion: 5,
-  include_directories: inc,
-  install: true,
-)
+
+if cc.get_id() == 'msvc'
+  # only static library for MSVC atm.
+  stc_lib = static_library(
+    'stc',
+    libsrc,
+    name_prefix: '',
+    name_suffix: 'lib',
+    include_directories: inc,
+    install: true,
+  )
+else
+  m_dep = cc.find_library('m', required: false)
+
+  # both static and dynamic libs
+  stc_lib = library(
+    'stc',
+    libsrc,
+    dependencies: [m_dep],
+    soversion: stcversion,
+    include_directories: inc,
+    install: true,
+  )
+endif
 
 install_headers(
   'include/stc/algorithm.h',

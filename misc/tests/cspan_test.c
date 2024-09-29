@@ -50,7 +50,7 @@ TEST(cspan, slice) {
 TEST(cspan, slice2) {
     c_with (Stack stack = {0}, Stack_drop(&stack))
     {
-        c_forrange (i, 10 * 20 * 30)
+        c_forrange_t (int, i, 10 * 20 * 30)
             Stack_push(&stack, i);
 
         Span3 ms3 = cspan_md(stack.data, 10, 20, 30);
@@ -89,7 +89,7 @@ TEST_SETUP(cspan_cube, fixt) {
     fixt->tiles = Tiles_init();
 
     Stack_reserve(&fixt->stack, N);
-    c_forrange (i, N)
+    c_forrange_t (int, i, N)
         Stack_push(&fixt->stack, i+1);
 
     Span3 ms3 = cspan_md(fixt->stack.data, CUBE, CUBE, CUBE);

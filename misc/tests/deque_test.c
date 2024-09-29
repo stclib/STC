@@ -11,7 +11,7 @@ TEST(deque, basics) {
 
     c_forrange (5)
         IDeq_pop_front(&d);
-    c_forrange (i, 2, 9)
+    c_forrange_t (int, i, 2, 9)
         IDeq_push_back(&d, i*10);
 
     IDeq res1 = c_init(IDeq, {6, 7, 8, 9, 10, 11, 12, 20, 30, 40, 50, 60, 70, 80});
