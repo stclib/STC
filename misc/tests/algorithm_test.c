@@ -61,7 +61,7 @@ TEST(algorithm, c_filter)
     #define f_is_even(v) ((v & 1) == 0)
     #define f_is_odd(v) ((v & 1) == 1)
 
-    int sum = 0;
+    isize sum = 0;
     c_filter(IVec, vec
          , c_flt_skipwhile(f_is_odd(*value))
         && c_flt_skip(1)

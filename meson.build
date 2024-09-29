@@ -3,10 +3,16 @@ project(
   'c',
   version: '5.0-dev',
   license: 'MIT',
-  default_options: ['c_std=c11', 'warning_level=2'],
+  default_options: ['c_std=c11', 'warning_level=2', 'default_library=both']
 )
 
 cc = meson.get_compiler('c')
+
+if cc.get_id() == 'gcc' or cc.get_id() == 'clang'
+  add_project_arguments('-Wno-missing-field-initializers', '-Wno-clobbered', language: 'c')
+elif cc.get_id() == 'msvc'
+  add_project_arguments('-D_CRT_SECURE_NO_WARNINGS', language: 'c')
+endif
 
 m_dep = cc.find_library('m', required: false)
 
