@@ -83,6 +83,21 @@ install_headers(
 )
 
 install_headers(
+  'include/stc/priv/crange.h',
+  'include/stc/priv/cstr_prv.h',
+  'include/stc/priv/filter.h',
+  'include/stc/priv/linkage.h',
+  'include/stc/priv/linkage2.h',
+  'include/stc/priv/queue_prv.h',
+  'include/stc/priv/sort_prv.h',
+  'include/stc/priv/template.h',
+  'include/stc/priv/template2.h',
+  'include/stc/priv/utf8_prv.h',
+  'include/stc/priv/utility.h',
+  subdir: 'stc/priv',
+)
+
+install_headers(
   'include/c11/fmt.h',
   subdir: 'c11',
 )
