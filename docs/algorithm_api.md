@@ -102,17 +102,17 @@ A number sequence generator type, similar to [boost::irange](https://www.boost.o
 - `crange32` is like *crange*, but uses `int32` as control variable, which may be faster.
 
 ```c
-crange      crange_make(start);             // start, start+1,...
+crange      crange_make(stop);              // 0, 1, ... stop-1
 crange      crange_make(start, stop);       // start, start+1, ... stop-1
-crange      crange_make(start, stop, step); // start, start+step, ... upto-not-including stop
+crange      crange_make(start, stop, step); // start, start+step, ... upto-not-including stop,
                                             // step may be negative.
 crange_iter crange_begin(crange* self);
 void        crange_next(crange_iter* it);
 
 
-crange&     c_iota(start);                  // l-value; otherwise like crange_make(start)
-crange&     c_iota(start, stop);            // l-value, otherwise like crange_make(start, stop)
-crange&     c_iota(start, stop, step);      // l-value, otherwise like crange_make(start, stop, step)
+crange&     c_iota(start);                  // l-value; NB! otherwise like crange_make(start, INTPTR_MAX)
+crange&     c_iota(start, stop);            // l-value; otherwise like crange_make(start, stop)
+crange&     c_iota(start, stop, step);      // l-value; otherwise like crange_make(start, stop, step)
 ```
  The **crange_value** type is *isize*. Variables *start*, *stop*, and *step* are of type *crange_value*. Note that **crange** does not have *_end()* and *_advance()* functions; e.g. will not compile when used with *c_filter_pairwise()*.
 ```c
@@ -227,9 +227,9 @@ c_drop(hset_cstr, &myset, &myset2);
 Find linearily in containers using a predicate. `value` is a pointer to each element in predicate.
 ***outiter_ptr*** must be defined prior to call.
 - `c_find_if(CntType, cnt, outiter_ptr, pred)`.
-- `c_find_if(CntType, cnt, OutCnt, outiter_ptr, pred)`
+- `c_find_if(CntType, startiter, enditer, outiter_ptr, pred)`
 - `c_find_reverse_if(CntType, cnt, outiter_ptr, pred)`
-- `c_find_reverse_if(CntType, cnt, OutCnt, outiter_ptr, pred)`
+- `c_find_reverse_if(CntType, startiter, enditer, outiter_ptr, pred)`
 
 ### c_copy, c_copy_reverse, c_copy_if, c_copy_reverse_if
 Copy linearily in containers using a predicate. `value` is a pointer to each element in predicate.
@@ -292,11 +292,11 @@ int main(void)
     c_foreach (i, List, list) printf(" %d", *i.ref);
     puts("");
 
-    // Search a sorted map for the first string containing "hello" from it1, and erase it:
+    // Search a sorted map from it1, for the first string containing "hello" and erase it:
     Map map = c_init(Map, { {"yes",1}, {"no",2}, {"say hello from me",3}, {"goodbye",4} });
     Map_iter res, it1 = Map_begin(&map);
 
-    c_find_from(Map, it1, &res, cstr_contains(&value->first, "hello"));
+    c_find_if(Map, it1, Map_end(&map), &res, cstr_contains(&value->first, "hello"));
     if (res.ref) Map_erase_at(&map, res);
 
     // Erase all strings containing "good" in the sorted map:
@@ -356,10 +356,13 @@ int main(void) {
         c_foritems (i, int, {2, 4, 9, 3, 1, 2, 6, 4})
             MyDeq_push_front(&deq, *i.ref);
 
+        c_foreach (i, MyDeq, deq) printf(" %d", *i.ref);
+        puts("");
+
         MyDeq_sort(&deq);
 
-        c_foreach (i, MyDeq, deq)
-            printf(" %d", *i.ref);
+        c_foreach (i, MyDeq, deq) printf(" %d", *i.ref);
+        puts("");
     }
 }
 ```

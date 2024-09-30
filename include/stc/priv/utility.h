@@ -49,6 +49,18 @@
     (((ret)->error = (failed)) && ((ret)->ctx = (fn##_ctx)__VA_ARGS__, 1))
 
 // --------------------------------
+// c_print_debug
+// --------------------------------
+// c_print_debug(Vec, vec, "%d", *value);
+// c_print_debug(Map, map, "{%d -> %d}", value->first, value->second);
+
+#define c_print_debug(C, cnt, fmt, ...) do { int _n = 0; \
+    c_foreach_3(_it, C, cnt) { \
+        const C##_value* value = _it.ref; \
+        printf(!_n++ ? #cnt ": [" fmt : ", " fmt, __VA_ARGS__); \
+    } puts("]"); } while (0)
+
+// --------------------------------
 // c_find_if, c_find_reverse_if
 // --------------------------------
 
