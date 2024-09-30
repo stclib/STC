@@ -11,7 +11,7 @@ static uint64_t seed = 12345;
 static void test_repeats(void)
 {
     enum {BITS = 46, BITS_TEST = BITS/2 + 2};
-    static const uint64_t N = 1ull << BITS_TEST;
+    static const isize N = (isize)(1ull << BITS_TEST);
     static const uint64_t mask = (1ull << BITS) - 1;
 
     printf("birthday paradox: value range: 2^%d, testing repeats of 2^%d values\n", BITS, BITS_TEST);
@@ -35,7 +35,7 @@ void test_distribution(void)
     enum {BITS = 26};
     printf("distribution test: 2^%d values\n", BITS);
     crand64 rng = crand64_from(seed);
-    const size_t N = 1ull << BITS ;
+    const isize N = (isize)(1ull << BITS);
 
     hmap_uu map = {0};
     c_forrange (N) {

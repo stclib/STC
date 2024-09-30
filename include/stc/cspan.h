@@ -192,7 +192,7 @@ typedef enum {c_ROWMAJOR, c_COLMAJOR} cspan_layout;
 
 #define cspan_slice(OutSpan, self, ...) \
     OutSpan##_slice_((self)->data, (self)->shape, (self)->stride.d, \
-                     c_make_array2d(isize, 3, {__VA_ARGS__}), \
+                     c_make_array2d(const isize, 3, {__VA_ARGS__}), \
                      cspan_rank(self) + c_static_assert(cspan_rank(self) == sizeof((isize[][3]){__VA_ARGS__})/sizeof(isize[3])))
 
 // submd#(): # <= 4 optimized. Reduce rank, like e.g. cspan_slice(Span2, &ms3, {x}, {c_ALL}, {c_ALL});

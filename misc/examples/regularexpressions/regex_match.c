@@ -25,7 +25,7 @@ int main(void)
         Fvec_push(&vec, (float)atof(i.match[0].buf));
 
     c_foreach (i, Fvec, vec)
-        printf("  %g\n", *i.ref);
+        printf("  %g\n", (double)*i.ref);
 
     // extracts the numbers only to a comma separated string.
     cstr nums = cregex_replace_ex(&re, csview_from(str), " $0,",

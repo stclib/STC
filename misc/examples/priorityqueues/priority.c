@@ -9,7 +9,7 @@
 
 int main(void) {
     int N = 10000000;
-    crand64 rng = crand64_from(time(NULL));
+    crand64 rng = crand64_from((uint64_t)time(NULL));
     PQueue heap = {0};
 
     // Push ten million random numbers to priority queue
