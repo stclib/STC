@@ -1,6 +1,5 @@
 // Advanced example: Hashmap with struct as key with rawtype,
 
-#define i_implement
 #include "stc/cstr.h"
 
 typedef struct Viking {

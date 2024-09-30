@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#define i_implement
 #include "stc/cspan.h"
 
 using_cspan3(DSpan, double);

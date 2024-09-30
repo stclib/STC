@@ -1,7 +1,5 @@
 #include <stdio.h>
-#define i_import // cstr + utf8 functions
 #include "stc/cregex.h"
-#define i_implement
 #include "stc/csview.h"
 
 int main(void)

@@ -7,7 +7,6 @@
 #define i_type vec_ii, smap_ii_value
 #include "stc/vec.h"
 
-#define i_implement
 #include "stc/cstr.h"
 
 #define i_type smap_istr // Map of int => cstr

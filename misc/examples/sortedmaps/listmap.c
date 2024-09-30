@@ -2,7 +2,6 @@
 // https://en.cppreference.com/w/cpp/container/multimap/insert
 
 // Multimap entries
-#define i_implement
 #include "stc/cstr.h"
 #define i_key_cstr
 #include "stc/list.h"

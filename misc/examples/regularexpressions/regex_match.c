@@ -1,6 +1,5 @@
-#define i_import
+#include "stc/cstr.h"
 #include "stc/cregex.h"
-#define i_implement
 #include "stc/csview.h"
 
 #define i_type Fvec, float

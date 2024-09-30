@@ -1,6 +1,10 @@
 tests = get_option('tests').enable_auto_if(root)
 
 if tests.enabled()
+  tests_deps = [
+    stc_dep,
+    cc.find_library('m', required: false),
+  ]
   foreach suite, filter : {
     'algorithm': [
       'cstr_append',
@@ -41,6 +45,7 @@ if tests.enabled()
       files(f'@suite@_test.c', 'main.c'),
       include_directories: inc,
       c_args: ['-D_GNU_SOURCE'],
+      dependencies: tests_deps,
       install: false,
     )
     foreach unit : filter

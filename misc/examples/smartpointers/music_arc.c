@@ -3,7 +3,6 @@
 
 // Advanced example.
 
-#define i_implement
 #include "stc/cstr.h"
 #include "stc/algorithm.h"
 

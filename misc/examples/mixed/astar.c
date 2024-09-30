@@ -4,7 +4,6 @@
 // This is a reimplementation of the CTL example to STC:
 //     https://github.com/glouw/ctl/blob/master/examples/astar.c
 //     https://www.redblobgames.com/pathfinding/a-star/introduction.html
-#define i_implement
 #include "stc/cstr.h"
 #include <stdio.h>
 

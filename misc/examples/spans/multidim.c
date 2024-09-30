@@ -2,7 +2,6 @@
 #include <stdio.h>
 #define i_key int
 #include "stc/stack.h"
-#define i_implement
 #include "stc/cspan.h"
 
 using_cspan3(ispan, int);

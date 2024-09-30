@@ -1,5 +1,4 @@
 #include <stdio.h>
-#define i_implement
 #include "stc/cstr.h"
 
 // hmap of cstr => long*

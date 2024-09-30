@@ -205,7 +205,6 @@ typedef const char* cstr_raw;
 #define c_forrange_4(i, start, stop, step) c_forrange_ex_5(isize, i, start, stop, step)
 
 #define c_forrange32(...) c_MACRO_OVERLOAD(c_forrange32, __VA_ARGS__)
-#define c_forrange32_1(stop) c_forrange_ex_4(int32_t, _c_i, 0, stop)
 #define c_forrange32_2(i, stop) c_forrange_ex_4(int32_t, i, 0, stop)
 #define c_forrange32_3(i, start, stop) c_forrange_ex_4(int32_t, i, start, stop)
 #define c_forrange32_4(i, start, stop, step) c_forrange_ex_5(int32_t, i, start, stop, step)

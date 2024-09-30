@@ -1,5 +1,4 @@
 #include <stdio.h>
-#define i_implement
 #include "stc/cspan.h"
 #include "ctest.h"
 
@@ -10,11 +9,11 @@ TEST(cspan, subdim) {
     int array[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
     Span3 m = cspan_md(array, 2, 2, 3);
 
-    for (int i = 0; i < m.shape[0]; ++i) {
+    c_forrange (i, m.shape[0]) {
         Span2 sub_i = cspan_submd3(&m, i);
-        for (int j = 0; j < m.shape[1]; ++j) {
+        c_forrange (j, m.shape[1]) {
             Span sub_i_j = cspan_submd2(&sub_i, j);
-            for (int k = 0; k < m.shape[2]; ++k) {
+            c_forrange (k, m.shape[2]) {
                ASSERT_EQ(*cspan_at(&sub_i_j, k), *cspan_at(&m, i, j, k));
             }
         }
@@ -26,8 +25,8 @@ TEST(cspan, slice) {
     Span2 m1 = cspan_md(array, 3, 4);
 
     int sum1 = 0;
-    for (int i = 0; i < m1.shape[0]; ++i) {
-        for (int j = 0; j < m1.shape[1]; ++j) {
+    c_forrange (i, m1.shape[0]) {
+        c_forrange (j, m1.shape[1]) {
             sum1 += *cspan_at(&m1, i, j);
         }
     }
@@ -35,8 +34,8 @@ TEST(cspan, slice) {
     Span2 m2 = cspan_slice(Span2, &m1, {c_ALL}, {2,4});
 
     int sum2 = 0;
-    for (int i = 0; i < m2.shape[0]; ++i) {
-        for (int j = 0; j < m2.shape[1]; ++j) {
+    c_forrange (i, m2.shape[0]) {
+        c_forrange (j, m2.shape[1]) {
             sum2 += *cspan_at(&m2, i, j);
         }
     }
@@ -57,9 +56,9 @@ TEST(cspan, slice2) {
         ms3 = cspan_slice(Span3, &ms3, {1,4}, {3,7}, {20,24});
 
         int sum = 0;
-        for (int i = 0; i < ms3.shape[0]; ++i) {
-            for (int j = 0; j < ms3.shape[1]; ++j) {
-                for (int k = 0; k < ms3.shape[2]; ++k) {
+        c_forrange (i, ms3.shape[0]) {
+            c_forrange (j, ms3.shape[1]) {
+                c_forrange (k, ms3.shape[2]) {
                     sum += *cspan_at(&ms3, i, j, k);
                 }
             }
@@ -94,9 +93,9 @@ TEST_SETUP(cspan_cube, fixt) {
 
     Span3 ms3 = cspan_md(fixt->stack.data, CUBE, CUBE, CUBE);
 
-    c_forrange32 (i, 0, ms3.shape[0], TSIZE) {
-        c_forrange32 (j, 0, ms3.shape[1], TSIZE) {
-            c_forrange32 (k, 0, ms3.shape[2], TSIZE) {
+    c_forrange (i, 0, ms3.shape[0], TSIZE) {
+        c_forrange (j, 0, ms3.shape[1], TSIZE) {
+            c_forrange (k, 0, ms3.shape[2], TSIZE) {
                 Span3 tile = cspan_slice(Span3, &ms3, {i, i + TSIZE}, {j, j + TSIZE}, {k, k + TSIZE});
                 Tiles_push(&fixt->tiles, tile);
             }
@@ -112,7 +111,7 @@ TEST_TEARDOWN(cspan_cube, fixt) {
 
 
 TEST_F(cspan_cube, slice3, fixt) {
-    int64_t n = Stack_size(&fixt->stack);
+    isize n = Stack_size(&fixt->stack);
     int64_t sum = 0;
 
     // iterate each 3d tile in sequence

@@ -1,7 +1,6 @@
 // https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2022/p2630r0.html
 // C99:
 #include <stdio.h>
-#define i_implement
 #include "stc/cspan.h"
 
 using_cspan3(span, double); // shorthand for defining span, span2, span3
