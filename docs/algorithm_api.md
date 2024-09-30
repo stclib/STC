@@ -248,7 +248,6 @@ Erase linearily in containers using a predicate. `value` is a pointer to each el
 - `c_eraseremove_if(CntType, cnt_ptr, pred)`. Use with **stack**, **vec**, **deque**, and **queue** only.
 ```c
 #include <stdio.h>
-#define i_static
 #include "stc/cstr.h"
 #include "stc/algorithm.h"
 
@@ -461,7 +460,6 @@ c_with (pthread_mutex_lock(&lock), pthread_mutex_unlock(&lock))
 **Example 2**: Load each line of a text file into a vector of strings:
 ```c
 #include <errno.h>
-#define i_implement
 #include "stc/cstr.h"
 
 #define i_key_cstr

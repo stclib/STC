@@ -78,7 +78,6 @@ hset_X_value        hset_X_value_clone(hset_X_value val);
 
 ## Example
 ```c
-#define i_implement
 #include "stc/cstr.h"
 #define i_type Strings
 #define i_key_cstr

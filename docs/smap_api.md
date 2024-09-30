@@ -105,7 +105,6 @@ void                 smap_X_value_drop(smap_X_value* pval);
 
 ## Examples
 ```c
-#define i_implement
 #include "stc/cstr.h"
 
 #define i_key_cstr // special macro for i_key = cstr
@@ -154,7 +153,6 @@ Translate a
 
 [ [Run this code](https://godbolt.org/z/3Kfrax43r) ]
 ```c
-#define i_implement
 #include "stc/cstr.h"
 #define i_type strmap
 #define i_key_cstr

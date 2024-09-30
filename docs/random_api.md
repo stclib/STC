@@ -28,7 +28,6 @@ it uses a fairly expensive output function (but trivially invertible, see ref) i
 See [random](https://en.cppreference.com/w/cpp/header/random) for similar c++ functionality.
 
 ```c
-#define i_implement // implement normal distribution functions
 #include "stc/random.h"
 ```
 
@@ -40,6 +39,7 @@ uint64_t             crand64_uint(void);                                 // glob
 double               crand64_real(void);                                 // global crand64_real_r(rng64, 1)
 crand64_uniform_dist crand64_make_uniform(int64_t low, int64_t high);    // create an unbiased uniform distribution
 int64_t              crand64_uniform(crand64_uniform_dist* d);           // global crand64_uniform_r(rng64, 1, d)
+                     // requires linking with stc lib.
 double               crand64_normal(crand64_normal_dist* d);             // global crand64_normal_r(rng64, 1, d)
 
 crand64              crand64_from(uint64_t seed);                        // create a crand64 state from a seed value

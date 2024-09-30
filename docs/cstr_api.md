@@ -18,7 +18,6 @@ for string capacity up to 22 bytes. `sizeof(cstr)` is 24. In comparison, C++
 All cstr definitions and prototypes are available by including a single header file.
 
 ```c
-#define i_implement   // define this to implement many functions as shared symbols!
 #include "stc/cstr.h"
 ```
 
@@ -166,7 +165,6 @@ char*       cstrnstrn(const char* str, isize slen, const char* needle, isize nle
 
 ## Example
 ```c
-#define i_implement
 #include "stc/cstr.h"
 
 int main(void) {

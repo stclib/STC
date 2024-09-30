@@ -88,7 +88,6 @@ bool        arc_X_value_eq(const i_key* x, const i_key* y);
 // Create two stacks with arcs to maps.
 // Demonstrate sharing and cloning of maps.
 // Show elements dropped.
-#define i_implement
 #include "stc/cstr.h"
 
 #define i_type Map

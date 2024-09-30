@@ -26,7 +26,6 @@ for a functional description.
 All csview definitions and prototypes are available by including a single header file.
 
 ```c
-#define i_implement
 #include "stc/cstr.h"
 #include "stc/csview.h" // after cstr.h: include extra cstr-csview functions
 ```
@@ -122,7 +121,6 @@ size_t         csview_hash(const csview* x);
 
 ## Example
 ```c
-#define i_implement
 #include "stc/cstr.h"
 #include "stc/csview.h"
 
@@ -188,7 +186,6 @@ void print_split(csview input, const char* sep)
         printf("[" c_svfmt "]\n", c_svarg(i.token));
     puts("");
 }
-#define i_implement
 #include "stc/cstr.h"
 #define i_key_cstr
 #include "stc/stack.h"

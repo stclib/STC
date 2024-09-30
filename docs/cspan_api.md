@@ -18,7 +18,6 @@ See also C++
 This is different from other containers where template parameters are defined prior to
 including each container. This works well mainly because cspan is non-owning.
 ```c
-#define i_implement
 #include "stc/cspan.h"
 using_cspan(SpanType, ValueType);        // define a 1-d SpanType with ValueType elements.
 using_cspan(SpanTypeN, ValueType, RANK); // define multi-dimensional span with RANK.
@@ -118,7 +117,6 @@ OutSpanM        cspan_slice(<TYPE> OutSpanM, const SpanTypeN* self, {x0,x1,xs}, 
 
 #define i_key int
 #include "stc/stack.h"
-#define i_implement
 #include "stc/cspan.h"
 using_cspan(intspan, int);
 
@@ -200,7 +198,6 @@ if __name__ == '__main__':
 [ [Run this code](https://godbolt.org/z/nKT7nrbYT) ]
 ```c
 #include <stdio.h>
-#define i_implement
 #include "stc/cspan.h"
 
 using_cspan3(myspan, int); // define myspan, myspan2, myspan3.
@@ -242,7 +239,6 @@ Slicing cspan without and with reducing the rank:
 [ [Run this code](https://godbolt.org/z/hcnETrzh4) ]
 ```c
 #include <stdio.h>
-#define i_implement
 #include "stc/cspan.h"
 
 using_cspan3(Span, int); // Shorthand to define Span, Span2, and Span3

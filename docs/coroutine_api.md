@@ -204,7 +204,6 @@ by awaiting a few seconds before producing a number, using a timer.
 // https://mariusbancila.ro/blog/2020/06/22/a-cpp20-coroutine-example/
 #include <time.h>
 #include <stdio.h>
-#define i_static
 #include "stc/cstr.h"
 #include "stc/coroutine.h"
 

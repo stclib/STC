@@ -345,21 +345,17 @@ After erasing the elements found:
 STC is primarily a "headers-only" library, so most headers can simply be included in your program. By default,
 all templated functions are static (many inlined). This is often optimal for both performance and compiled
 binary size. However, if container type instances, e.g. a `vec_int` is used used in several translation units,
-(e.g. more than 3-4 TUs), consider creating a separate header file for them and link it shared [as described here](#1-include-as-a-header-file). In this case, *one* (of the) c-file must implement the templated container, e.g.:
+(e.g. more than 3-4 TUs), consider creating a separate header file for them and link it shared 
+[as described here](#1-include-as-a-header-file). In this case, *one* (of the) c-file must implement the
+templated container, e.g.:
 ```c
 #define i_implement // define shared symbols
 #include "vec_int.h"
 ```
-Note that the non-templated string types **cstr**, **csview** uses shared linking by default (may use static linking by
-`#define i_static` before include). Most functions in **csview** are inlined though, and the zero-terminated string view,
-**zsview** is fully inlined.
-
-Conveniently, `src\libstc.c` implements all the non-templated functions with shared linking for **cstr**,
-**csview**, **cregex**, **utf8**, and **random**.
-
-Additionally, `#define i_import` works as `i_implement` for **cregex** or **cstr**, but it will also implement
-the dependent **utf8** functions (utf8 case conversions, etc.). Or you can simply link with libstc.
-
+Some of the non-templated types like **cstr**, **csview**, **cregex** and **cspan** are built as a library
+using the ***meson*** build tool. However, most functions in **csview** and **random** are inlined.
+The bitset **cbits**, the zero-terminated string view **zsview** and **algorthm** / **sort** are all fully
+inlined and need no linking with the stc-library.
 ---
 ## Specifying template parameters
 
@@ -367,16 +363,20 @@ Each templated type requires one `#include`, even if it's the same container bas
 The template parameters are given by a `#define i_xxxx` statement, where *xxxx* is the parameter name.
 The list of template parameters:
 
-- `i_TYPE` *ConType*, *KeyType*[, *ValType*] is a shorthand for defining `i_type`, `i_key` and `i_val` on one line.
+- `i_type` *ConType*, *KeyType*[, *ValType*] is a shorthand for defining `i_type`, `i_key` (and `i_val`)
+ individually, as described next.
 - `i_type` *ConType* - Custom container type name.
-- `i_key` *Type* - Element key type. **[required]**. Note: `i_val` *may* be used instead for non-maps (not recommended).
+- `i_key` *Type* - Element key type. **[required]**.
 - `i_val` *Type* - Element value type. **[required for]** hmap/smap as the mapped value type.
-- `i_cmp` *Func* - Three-way comparison of two *i_keyraw*\* - **[required for]** non-integral *i_keyraw* elements, but also see `i_use_cmp`.
-- `i_hash` *Func* - Hash function taking *i_keyraw*\* - defaults to *c_default_hash*. **[required for]** ***hmap/hset*** with non-POD *i_keyraw* elements.
+- `i_cmp` *Func* - Three-way comparison of two *i_keyraw*\* - **[required for]** non-integral *i_keyraw*
+- `i_less` *Func* - Comparison of two *i_keyraw*\* - an alternative to specifying `i_cmp`.
+- `i_hash` *Func* - Hash function taking *i_keyraw*\* - defaults to *c_default_hash*. **[required for]**
+***hmap/hset*** with non-POD *i_keyraw* elements.
 - `i_eq` *Func* - Equality comparison of two *i_keyraw*\* - defaults to *!i_cmp*. Companion with *i_hash*.
 
 Properties:
-- `i_opt` *Flags* - Boolean properties: may combine *c_no_clone*, *c_no_atomic*, *c_is_forward*, *c_static*, *c_header* with the *|* separator.
+- `i_opt` *Flags* - Boolean properties: may combine *c_no_clone*, *c_no_atomic*, *c_is_forward*, *c_static*,
+*c_header* with the *|* separator.
 
 Key:
 - `i_keydrop` *Func* - Destroy map/set key func - defaults to empty destructor.
@@ -411,18 +411,19 @@ NB: Do not use when defining arc/box types themselves.
 
 ## Specifying comparison parameters
 
-The table below shows the template parameters which must be defined to support element search and sort for various containers versus element types.
+The table below shows the template parameters which *must* be defined to support element search/lookup and sort for various container type instantiations.
 
-For the containers marked ***optional***, the features are disabled if the template parameter(s) are not defined. Note that the ***(integral type)*** columns also applies to "special" types, specified with `i_key_cstr`, `i_key_arc`, `i_key_box`, and `i_keyclass`, and not only true integral types like `int` or `float`.
+For the containers marked ***optional***, the features are disabled if the template parameter(s) are not defined. Note that the ***(integral type)*** columns also applies to "special" key-types, specified with `i_key_cstr`, `i_key_arc`/`i_key_box`, and `i_keyclass` (so not only for true integral types like `int` or `float`).
 
-| Container         | find (integral type) | sort (integral type) |\|| find (struct elem) | sort (struct elem) | optional |
+| Container         | search (integral type) | sort (integral type) |\|| search (struct elem) | sort (struct elem) | optional |
 |:------------------|:---------------------|:---------------------|:-|:-----------------|:-------------------|:---------|
-| stack, queue      | n/a                  | n/a                  || n/a                | n/a                | n/a      |
 | vec, deque, list  | `i_use_cmp`          | `i_use_cmp`          || `i_eq`             | `i_cmp` / `i_less` | yes      |
+| stack             | n/a                  | `i_use_cmp`          || n/a                | `i_cmp` / `i_less` | yes      |
 | box, arc          | `i_use_cmp`          | `i_use_cmp`          || `i_eq` + `i_hash`  | `i_cmp` / `i_less` | yes      |
 | hmap, hset        |                      | n/a                  || `i_eq` + `i_hash`  | n/a                | no       |
 | smap, sset        |                      |                      || `i_cmp` / `i_less` | `i_cmp` / `i_less` | no       |
 | pqueue            | n/a                  |                      || n/a                | `i_cmp` / `i_less` | no       |
+| queue             | n/a                  | n/a                  || n/a                | n/a                | n/a      |
 
 ---
 ## The *emplace* methods
