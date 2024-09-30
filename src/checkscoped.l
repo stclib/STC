@@ -35,7 +35,8 @@ c_foreach_reverse |
 c_foreach_kv    |
 c_foreach       |
 c_forrange      |
-c_forrange_t     |
+c_forrange32    |
+c_forrange_ex   |
 c_fortoken_sv   |
 c_fortoken      |
 c_formatch      |

@@ -50,7 +50,7 @@ TEST(cspan, slice) {
 TEST(cspan, slice2) {
     c_with (Stack stack = {0}, Stack_drop(&stack))
     {
-        c_forrange_t (int, i, 10 * 20 * 30)
+        c_forrange32 (i, 10 * 20 * 30)
             Stack_push(&stack, i);
 
         Span3 ms3 = cspan_md(stack.data, 10, 20, 30);
@@ -89,14 +89,14 @@ TEST_SETUP(cspan_cube, fixt) {
     fixt->tiles = Tiles_init();
 
     Stack_reserve(&fixt->stack, N);
-    c_forrange_t (int, i, N)
+    c_forrange32 (i, N)
         Stack_push(&fixt->stack, i+1);
 
     Span3 ms3 = cspan_md(fixt->stack.data, CUBE, CUBE, CUBE);
 
-    c_forrange (i, 0, ms3.shape[0], TSIZE) {
-        c_forrange (j, 0, ms3.shape[1], TSIZE) {
-            c_forrange (k, 0, ms3.shape[2], TSIZE) {
+    c_forrange32 (i, 0, ms3.shape[0], TSIZE) {
+        c_forrange32 (j, 0, ms3.shape[1], TSIZE) {
+            c_forrange32 (k, 0, ms3.shape[2], TSIZE) {
                 Span3 tile = cspan_slice(Span3, &ms3, {i, i + TSIZE}, {j, j + TSIZE}, {k, k + TSIZE});
                 Tiles_push(&fixt->tiles, tile);
             }

@@ -189,20 +189,26 @@ typedef const char* cstr_raw;
 #define c_forlist(...) c_foritems(_VA_ARGS__) // [deprecated]
 #define c_forpair(...) 'c_forpair not_supported. Use c_foreach_kv' // [removed]
 
-// c_forrange_t / c_forrange: python-like int range iteration
-#define c_forrange_t(...) c_MACRO_OVERLOAD(c_forrange_t, __VA_ARGS__)
-#define c_forrange_t_3(T, i, stop) c_forrange_t_4(T, i, 0, stop)
-#define c_forrange_t_4(T, i, start, stop) \
+// c_forrange, c_forrange32: python-like int range iteration
+#define c_forrange_ex(...) c_MACRO_OVERLOAD(c_forrange_ex, __VA_ARGS__)
+#define c_forrange_ex_3(T, i, stop) c_forrange_ex_4(T, i, 0, stop)
+#define c_forrange_ex_4(T, i, start, stop) \
     for (T i=start, _c_end=stop; i < _c_end; ++i)
-#define c_forrange_t_5(T, i, start, stop, step) \
+#define c_forrange_ex_5(T, i, start, stop, step) \
     for (T i=start, _c_inc=step, _c_end=(stop) - (_c_inc > 0) \
          ; (_c_inc > 0) == (i <= _c_end); i += _c_inc)
 
 #define c_forrange(...) c_MACRO_OVERLOAD(c_forrange, __VA_ARGS__)
-#define c_forrange_1(stop) c_forrange_t_4(isize, _c_i, 0, stop)
-#define c_forrange_2(i, stop) c_forrange_t_4(isize, i, 0, stop)
-#define c_forrange_3(i, start, stop) c_forrange_t_4(isize, i, start, stop)
-#define c_forrange_4(i, start, stop, step) c_forrange_t_5(isize, i, start, stop, step)
+#define c_forrange_1(stop) c_forrange_ex_4(isize, _c_i, 0, stop)
+#define c_forrange_2(i, stop) c_forrange_ex_4(isize, i, 0, stop)
+#define c_forrange_3(i, start, stop) c_forrange_ex_4(isize, i, start, stop)
+#define c_forrange_4(i, start, stop, step) c_forrange_ex_5(isize, i, start, stop, step)
+
+#define c_forrange32(...) c_MACRO_OVERLOAD(c_forrange32, __VA_ARGS__)
+#define c_forrange32_1(stop) c_forrange_ex_4(int32_t, _c_i, 0, stop)
+#define c_forrange32_2(i, stop) c_forrange_ex_4(int32_t, i, 0, stop)
+#define c_forrange32_3(i, start, stop) c_forrange_ex_4(int32_t, i, start, stop)
+#define c_forrange32_4(i, start, stop, step) c_forrange_ex_5(int32_t, i, start, stop, step)
 
 // init container with literal list, and drop multiple containers of same type
 #define c_init(C, ...) \
@@ -228,18 +234,18 @@ STC_INLINE size_t chash_n(const void* key, isize len) {
     union { size_t block; uint64_t b8; uint32_t b4; } u;
     switch (len) {
         case 8: memcpy(&u.b8, key, 8); return (size_t)(u.b8 * 0xc6a4a7935bd1e99d);
-        case 4: memcpy(&u.b4, key, 4); return u.b4 * (size_t)0xc6a4a7935bd1e99d;
-        case 0: return 87213627321u;
+        case 4: memcpy(&u.b4, key, 4); return u.b4 * (size_t)0xa2ffeb2f01000193;
+        case 0: return 0x811c9dc5;
     }
-    size_t hash = 87213627321u;
+    size_t hash = 0x811c9dc5;
     const uint8_t* msg = (const uint8_t*)key;
     while (len >= c_sizeof(size_t)) {
         memcpy(&u.block, msg, sizeof(size_t));
-        hash = (hash ^ u.block) * (size_t)0xc6a4a7935bd1e99d;
+        hash = (hash ^ u.block) * (size_t)0x89bb179901000193;
         msg += c_sizeof(size_t);
         len -= c_sizeof(size_t);
     }
-    while (len--) hash = (hash ^ *msg++)*0x100000001b3;
+    while (len--) hash = (hash ^ *msg++) * (size_t)0xb0340f4501000193;
     return hash ^ (hash >> 3);
 }
 
