@@ -3,14 +3,14 @@ project(
   'c',
   version: '5.0-dev',
   license: 'MIT',
-  default_options: ['c_std=c11', 'warning_level=2', 'default_library=both']
+  default_options: ['c_std=c11', 'warning_level=2', 'default_library=static']
 )
 
 stcversion = 5
 cc = meson.get_compiler('c')
 
 if cc.get_id() == 'gcc' or cc.get_id() == 'clang'
-  add_global_arguments('-Wno-missing-field-initializers', language: ['c', 'cpp'])
+  add_global_arguments('-Wno-missing-field-initializers', '-Wno-stringop-overflow', language: ['c', 'cpp'])
 elif cc.get_id() == 'msvc'
   add_global_arguments('-wd4996', language: ['c', 'cpp']) # no "unsecure" funcs warnings
 endif
@@ -41,7 +41,6 @@ if cc.get_id() == 'msvc'
 else
   m_dep = cc.find_library('m', required: false)
 
-  # both static and dynamic libs
   stc_lib = library(
     'stc',
     libsrc,

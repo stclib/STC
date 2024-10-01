@@ -107,14 +107,11 @@ STC_DEF void _c_MEMB(_sort_lowhigh)(Self* self, isize lo, isize hi) {
 STC_DEF isize // -1 = not found
 _c_MEMB(_lower_bound_range)(const Self* self, const _m_raw raw, isize start, isize end) {
     isize count = end - start, step = count/2;
-
+    // Uses Andrei Alexandrescu's skewed split, instead of 1/2 split.
     while (count > 0) {
-        isize it = start;
-        it += step;
-
-        const _m_raw rx = i_keytoraw(i_at(self, it));
+        const _m_raw rx = i_keytoraw(i_at(self, start + step));
         if (i_less((&rx), (&raw))) {
-            start = ++it;
+            start += step + 1;
             count -= step + 1;
             step = count*3/4;
         } else {

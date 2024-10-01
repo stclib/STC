@@ -1,4 +1,4 @@
-#define i_import
+#include <stdio.h>
 #include "stc/cregex.h"
 
 int main(void)

@@ -25,42 +25,6 @@
 #define STC_UTILITY_H_INCLUDED
 
 // --------------------------------
-// c_func, c_error
-// --------------------------------
-// c_func (read_file,(const char* name), ->, vec_cstr, {int err_no;})
-// {
-//     read_file_ret vec = {0};
-//     FILE* f;
-//     c_with (f = fopen(name, "r"), f != NULL, fclose(f))
-//         c_with (cstr line = {0}, cstr_drop(&line))
-//             while (cstr_getline(&line, f))
-//                 vec_cstr_push(&vec.value, cstr_clone(line));
-//     if (f == NULL) { vec.error = 1; vec.ctx.err_no = errno; }
-//     //c_error(f == NULL, read_file, &vec, {errno});
-//     return vec;
-// }
-
-#define c_func(fn, args, rightarrow, Ret, ...) \
-    typedef struct __VA_ARGS__ fn##_ctx; \
-    typedef struct { Ret value; int error; fn##_ctx ctx; } fn##_ret; \
-    fn##_ret fn args
-
-#define c_error(failed, fn, ret, ...) \
-    (((ret)->error = (failed)) && ((ret)->ctx = (fn##_ctx)__VA_ARGS__, 1))
-
-// --------------------------------
-// c_print_debug
-// --------------------------------
-// c_print_debug(Vec, vec, "%d", *value);
-// c_print_debug(Map, map, "{%d -> %d}", value->first, value->second);
-
-#define c_print_debug(C, cnt, fmt, ...) do { int _n = 0; \
-    c_foreach_3(_it, C, cnt) { \
-        const C##_value* value = _it.ref; \
-        printf(!_n++ ? #cnt ": [" fmt : ", " fmt, __VA_ARGS__); \
-    } puts("]"); } while (0)
-
-// --------------------------------
 // c_find_if, c_find_reverse_if
 // --------------------------------
 

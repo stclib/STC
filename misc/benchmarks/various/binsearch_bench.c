@@ -1,13 +1,13 @@
-#define i_type ivec,int
-#define i_use_cmp
-#include "stc/vec.h"
-#include "stc/random.h"
-
 #include <stdio.h>
 #include <time.h>
 #ifdef __cplusplus
 #include <algorithm>
 #endif
+
+#define i_type ivec, int
+#define i_use_cmp
+#include "stc/stack.h"
+#include "stc/random.h"
 
 // Use quicksort and binary_search from "sort.h"
 

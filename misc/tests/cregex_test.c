@@ -1,5 +1,5 @@
-#define i_import
 #include "stc/cregex.h"
+#include "stc/cstr.h"
 #include "stc/csview.h"
 #include "stc/algorithm.h"
 #include "ctest.h"

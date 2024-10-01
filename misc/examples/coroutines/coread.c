@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include <errno.h>
-#define i_import
 #include "stc/cstr.h"
 #include "stc/coroutine.h"
 

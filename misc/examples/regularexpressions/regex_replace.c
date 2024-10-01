@@ -1,5 +1,5 @@
-#define i_import
 #include "stc/cregex.h"
+#include "stc/cstr.h"
 #include "stc/csview.h"
 
 bool add_10_years(int i, csview match, cstr* out) {

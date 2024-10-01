@@ -1,4 +1,4 @@
-#define i_import
+#include "stc/cstr.h"
 #include "stc/cregex.h"
 
 int main(int argc, char* argv[])
