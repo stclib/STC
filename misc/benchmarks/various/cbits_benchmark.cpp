@@ -1,3 +1,4 @@
+#define NDEBUG
 #include <iostream>
 #include <bitset>
 #include <cstdlib> // rand
@@ -59,15 +60,15 @@ int main(int argc, char **argv)
 
     difference2 = get_time_in_ms() - current_time;
 
-    cout << "Bool:" << endl << "sum total = " << total << ", random access time = " << difference1
-                            << ", sequential access time = " << difference2 << endl << endl;
+    cout << "bool[]:" << endl << "sum total = " << total << ", random access time = " << difference1
+         << ", sequential access time = " << difference2 << endl << endl;
 
     one_sec_delay();
 
     total = 0;
     crand64_seed(seed);
     current_time = get_time_in_ms();
-    bitset<N> bits;
+    std::bitset<N> bits;
 
     c_forrange (40 * N)
     {
@@ -85,8 +86,8 @@ int main(int argc, char **argv)
 
     difference2 = get_time_in_ms() - current_time;
 
-    cout << "Bitset:" << endl << "sum total = " << total << ", random access time = " << difference1
-                              << ", sequential access time = " << difference2 << endl << endl;
+    cout << "std::bitset:" << endl << "sum total = " << total << ", random access time = " << difference1
+         << ", sequential access time = " << difference2 << endl << endl;
 
     one_sec_delay();
 
@@ -114,7 +115,7 @@ int main(int argc, char **argv)
     difference2 = get_time_in_ms() - current_time;
 
     cout << "cbits:" << endl << "sum total = " << total << ", random access time = " << difference1
-                              << ", sequential access time = " << difference2 << endl << endl;
+         << ", sequential access time = " << difference2 << endl << endl;
 
     //cin.get();
 

@@ -1,3 +1,4 @@
+#define NDEBUG
 #include <stdio.h>
 #include <time.h>
 #ifdef __cplusplus

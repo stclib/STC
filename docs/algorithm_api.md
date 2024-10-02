@@ -229,6 +229,34 @@ int main(void) {
 }
 ```
 
+### c_func
+- A convenient macro for defining functions mith multiple return values, e.g. error values.
+```c
+
+Vec get_data(const char* fname) {
+    return c_init(Vec, {1, 2, 3, 4, 5, 6});
+}
+
+c_func (get_data1,(const char* fname), ->, Vec) {
+    return c_init(Vec, {1, 2, 3, 4, 5, 6});
+}
+
+c_func (get_data2,(const char* fname), ->, struct {Vec v1, v2;}) {
+    return (get_data2_result){.v1=c_init(Vec, {1, 2, 3, 4, 5, 6}),
+                              .v2=c_init(Vec, {7, 8, 9, 10, 11})};
+}
+
+c_func (load_data,(const char* fname), ->, struct {Vec out; int err;}) {
+    FILE* fp = fopen(fname, "rb");
+    if (fp == 0)
+        return (load_data_result){.err=1};
+    load_data_result vec = {Vec_with_size(1024, '\0')};
+    fread(vec.out.data, sizeof(vec.out.data[0]), 1024, fp);
+    fclose(fp);
+    return vec;
+}
+```
+
 ### c_find_if, c_find_reverse_if
 Find linearily in containers using a predicate. `value` is a pointer to each element in predicate.
 ***outiter_ptr*** must be defined prior to call.

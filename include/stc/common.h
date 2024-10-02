@@ -219,6 +219,9 @@ typedef const char* cstr_raw;
 #define c_drop(C, ...) \
     do { c_foritems (_c_i, C*, {__VA_ARGS__}) C##_drop(*_c_i.ref); } while(0)
 
+#define c_func(name, args, RIGHTARROW, ...) \
+    typedef __VA_ARGS__ name##_result; name##_result name args
+
 // RAII scopes
 #define c_defer(...) \
     for (int _c_i = 1; _c_i; _c_i = 0, __VA_ARGS__)
