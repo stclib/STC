@@ -1,4 +1,3 @@
-#define STC_IMPLEMENT
 #include "stc/cstr.h"
 #include "stc/csview.h"
 

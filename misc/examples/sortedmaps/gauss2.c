@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <time.h>
+#include <math.h>
 
-#define STC_IMPLEMENT // also for the normal distribution functions
 #include "stc/cstr.h"
 #include "stc/random.h"
 
