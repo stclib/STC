@@ -147,9 +147,9 @@ typedef const char* cstr_raw;
 #define c_foreach_4(it, C, start, end) \
     _c_foreach(it, C, start, (end).ref, _)
 
-#define c_foreach_index(k, it, C, cnt) \
-    for (isize k = 0, _c_i=1; _c_i; _c_i=0) \
-    for (C##_iter it = C##_begin(&cnt); it.ref; C##_next(&it), ++k)
+#define c_foreach_n(it, C, cnt, n) \
+    for (isize it##_index=0, _c_n=n; _c_n; _c_n=0) \
+    for (C##_iter it = C##_begin(&cnt); it.ref && it##_index < _c_n; C##_next(&it), ++it##_index)
 
 #define c_foreach_reverse(...) c_MACRO_OVERLOAD(c_foreach_reverse, __VA_ARGS__)
 #define c_foreach_reverse_3(it, C, cnt) /* works for stack, vec, queue, deque */ \

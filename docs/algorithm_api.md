@@ -14,7 +14,7 @@
 | `c_foreach (it, ctype, it1, it2)`        | Iterate the range [it1, it2)              |
 | `c_foreach_reverse (it, ctype, container)`| Iteratate elements in reverse: *vec, deque, queue, stack* |
 | `c_foreach_reverse (it, ctype, it1, it2)`| Iteratate range [it1, it2) elements in reverse. |
-| `c_foreach_n (it, ctype, cnt, n)`        | Iterate up to n times using it.index and it.n |
+| `c_foreach_n (it, ctype, container, n)`| Iteratate `n` first elements. Index variable is `{it}_index`. |
 | `c_foreach_kv (key, val, ctype, container)` | Iterate with structured binding           |
 
 ```c
@@ -37,14 +37,14 @@ c_foreach (i, IMap, iter, IMap_end(&map))
     printf(" %d", i.ref->first);
 // 7 12 23
 
-// iterate with "structured binding":
-c_foreach_kv (id, count, IMap, map)
-    printf(" (%d %d)", *id, *count);
-
 // iterate first 3 with an index count enumeration
 c_foreach_n (i, IMap, map, 3)
-    printf(" %zd:(%d %d)", i.index, i.ref->first, i.ref->second);
+    printf(" %zd:(%d %d)", i_count, i.ref->first, i.ref->second);
 // 0:(3 2) 1:(5 4) 2:(7 3)
+
+// iterate maps with "structured binding":
+c_foreach_kv (id, count, IMap, map)
+    printf(" (%d %d)", *id, *count);
 ```
 
 ### c_foritems
@@ -95,8 +95,8 @@ c_forrange (i, 30, 0, -5) printf(" %lld", i);
 // 30 25 20 15 10 5
 ```
 
-### crange, crange32 - integer range generators
-A number sequence generator type, similar to [boost::irange](https://www.boost.org/doc/libs/release/libs/range/doc/html/range/reference/ranges/irange.html).
+### crange, crange32
+An integer sequence generator type, similar to [boost::irange](https://www.boost.org/doc/libs/release/libs/range/doc/html/range/reference/ranges/irange.html).
 
 - `crange` uses `isize` (ptrdiff_t) as control variable
 - `crange32` is like *crange*, but uses `int32` as control variable, which may be faster.
@@ -230,18 +230,17 @@ int main(void) {
 ```
 
 ### c_func
-- A convenient macro for defining functions mith multiple return values, e.g. error values.
+- A very convenient macro for defining functions mith multiple return values, e.g. added error values.
 ```c
-
-Vec get_data(const char* fname) {
+Vec get_data(void) {
     return c_init(Vec, {1, 2, 3, 4, 5, 6});
 }
 
-c_func (get_data1,(const char* fname), ->, Vec) {
+c_func (get_data1,(void), ->, Vec) {
     return c_init(Vec, {1, 2, 3, 4, 5, 6});
 }
 
-c_func (get_data2,(const char* fname), ->, struct {Vec v1, v2;}) {
+c_func (get_data2,(void), ->, struct {Vec v1, v2;}) {
     return (get_data2_result){.v1=c_init(Vec, {1, 2, 3, 4, 5, 6}),
                               .v2=c_init(Vec, {7, 8, 9, 10, 11})};
 }
@@ -250,6 +249,7 @@ c_func (load_data,(const char* fname), ->, struct {Vec out; int err;}) {
     FILE* fp = fopen(fname, "rb");
     if (fp == 0)
         return (load_data_result){.err=1};
+
     load_data_result vec = {Vec_with_size(1024, '\0')};
     fread(vec.out.data, sizeof(vec.out.data[0]), 1024, fp);
     fclose(fp);
