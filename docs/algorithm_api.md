@@ -95,7 +95,7 @@ c_forrange (i, 30, 0, -5) printf(" %lld", i);
 // 30 25 20 15 10 5
 ```
 
-### crange, crange32: Integer range generators
+### crange, crange32 - integer range generators
 A number sequence generator type, similar to [boost::irange](https://www.boost.org/doc/libs/release/libs/range/doc/html/range/reference/ranges/irange.html).
 
 - `crange` uses `isize` (ptrdiff_t) as control variable
@@ -114,7 +114,7 @@ crange&     c_iota(start);                  // l-value; NB! otherwise like crang
 crange&     c_iota(start, stop);            // l-value; otherwise like crange_make(start, stop)
 crange&     c_iota(start, stop, step);      // l-value; otherwise like crange_make(start, stop, step)
 ```
- The **crange_value** type is *isize*. Variables *start*, *stop*, and *step* are of type *crange_value*. Note that **crange** does not have *_end()* and *_advance()* functions; e.g. will not compile when used with *c_filter_pairwise()*.
+ The **crange_value** type is *isize*. Variables *start*, *stop*, and *step* are of type *crange_value*.
 ```c
 // 1. All primes less than 32: See below for c_filter() and is_prime()
 crange r1 = crange_make(3, 32, 2);
@@ -200,27 +200,33 @@ int main(void)
 ---
 ## Generic algorithms
 
-### c_init, c_drop
+### c_init, c_push, c_drop
 
-- **c_init** - construct any container from an initializer list:
-- **c_drop** - drop (destroy) multiple containers of the same type:
+- **c_init** - construct any container from an initializer list
+- **c_push** - push values onto any container from an initializer list
+- **c_drop** - drop (destroy) multiple containers of the same type
 ```c
-#define i_key_cstr // owned cstr string value type
-#include "stc/hset.h"
+#include <stdio.h>
+#define i_type Vec, int
+#include "stc/vec.h"
 
-#define i_key int
-#define i_val int
+#define i_type Map, int, int
 #include "stc/hmap.h"
-...
-// Initializes with const char*, internally converted to cstr!
-hset_cstr myset = c_init(hset_cstr, {"This", "is", "the", "story"});
 
-int x = 7, y = 8;
-hmap_int mymap = c_init(hmap_int, { {1, 2}, {3, 4}, {5, 6}, {x, y} });
-```
-Drop multiple containers of the same type:
-```c
-c_drop(hset_cstr, &myset, &myset2);
+int main(void) {
+    Vec vec = c_init(Vec, {1, 2, 3, 4, 5, 6});
+    Vec vec2 = c_init(Vec, {42, 43, 44, 45, 46});
+    Map map = c_init(Map, {{1, 2}, {3, 4}, {5, 6}});
+
+    c_push(Vec, &vec, {7, 8, 9, 10, 11, 12});
+    c_push(Map, &map, {{7, 8}, {9, 10}, {11, 12}});
+
+    c_foreach (i, Vec, vec) printf("%d ", *i.ref); puts("");
+    c_foreach_kv(k, v, Map, map) printf("%d:%d ", *k, *v); puts("");
+
+    c_drop(Vec, &vec, &vec2);
+    c_drop(Map, &map);
+}
 ```
 
 ### c_find_if, c_find_reverse_if
@@ -323,47 +329,38 @@ if (result)
     puts("At least one number is divisible by 7");
 ```
 
-### quicksort, binary_search, lower_bound - 2X faster qsort on arrays
+### sort, binary_search, lower_bound
 
-The **quicksort**, **quicksort_ij** algorithm is about twice as fast as *qsort()*,
-and typically simpler to use. You may customize `i_type` and the comparison function
-`i_cmp` or `i_less`. All containers with random access may be sorted, including regular C-arrays.
-- `void MyType_quicksort(MyType* cnt, isize n);`
+The **X_sort()**, **X_sort_lowhigh()** functions are about twice as fast as *qsort()*.
+Both **X_binary_seach()** and **X_lower_bound()** are typically faster than c++ *std::lower_bound()*.
+`i_type` may be customized the regular way, along with the comparison function `i_cmp` or `i_less`.
+All containers with random access may be sorted, including regular C-arrays.
 
 There is a [benchmark/test file here](../misc/benchmarks/various/quicksort_bench.c).
 ```c
-#define i_key int                    // note: "container" type becomes `ints` (i_type can override).
+#define i_key int // sort a regular c-array of ints
 #include "stc/sort.h"
 #include <stdio.h>
 
 int main(void) {
     int nums[] = {5, 3, 5, 9, 7, 4, 7, 2, 4, 9, 3, 1, 2, 6, 4};
-    ints_sort(nums, c_arraylen(nums)); // note: function name derived from i_key
+    ints_sort(nums, c_arraylen(nums)); // `ints` derived from the `i_key` name
     c_forrange (i, c_arraylen(arr)) printf(" %d", arr[i]);
 }
 ```
-Also deque/queue (with ring buffer) and linked lists may be sorted, e.g.:
+Also **vec**, **stack**, **list** (linked), and **deque** (ring buffer) may be sorted:
 ```c
-#define i_type MyDeq,int
-#define i_use_cmp // enable sorting
-#include "stc/deque.h" // deque
+#define i_type MyDeq, int
+#define i_use_cmp      // enable sorting
+#include "stc/deque.h" // can be swapped with any of the above
 #include <stdio.h>
 
 int main(void) {
     MyDeq deq = c_init(MyDeq, {5, 3, 5, 9, 7, 4, 7});
-    c_defer (MyDeq_drop(&deq))
-    {
-        c_foritems (i, int, {2, 4, 9, 3, 1, 2, 6, 4})
-            MyDeq_push_front(&deq, *i.ref);
 
-        c_foreach (i, MyDeq, deq) printf(" %d", *i.ref);
-        puts("");
-
-        MyDeq_sort(&deq);
-
-        c_foreach (i, MyDeq, deq) printf(" %d", *i.ref);
-        puts("");
-    }
+    MyDeq_sort(&deq);
+    c_foreach (i, MyDeq, deq) printf(" %d", *i.ref); puts("");
+    MyDeq_drop(&deq);
 }
 ```
 

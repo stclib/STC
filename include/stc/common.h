@@ -213,6 +213,9 @@ typedef const char* cstr_raw;
 #define c_init(C, ...) \
     C##_from_n(c_make_array(C##_raw, __VA_ARGS__), c_sizeof((C##_raw[])__VA_ARGS__)/c_sizeof(C##_raw))
 
+#define c_push(C, cnt, ...) \
+    C##_put_n(cnt, c_make_array(C##_raw, __VA_ARGS__), c_sizeof((C##_raw[])__VA_ARGS__)/c_sizeof(C##_raw))
+
 #define c_drop(C, ...) \
     do { c_foritems (_c_i, C*, {__VA_ARGS__}) C##_drop(*_c_i.ref); } while(0)
 

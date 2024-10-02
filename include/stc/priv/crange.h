@@ -70,6 +70,11 @@ STC_INLINE void crange_next(crange_iter* it) {
         it->ref = NULL;
 }
 
+STC_INLINE crange_iter crange_advance(crange_iter it, size_t n) {
+    if ((it.step > 0) == ((*it.ref += it.step*(isize)n) > it.end))
+        it.ref = NULL;
+    return it;
+}
 
 // iota: c++-like std::iota, use in iterations on-the-fly -----
 // Note: c_iota() does not compile with c++, crange does.
@@ -103,6 +108,11 @@ STC_INLINE void crange32_next(crange32_iter* it) {
         it->ref = NULL;
 }
 
-#include "linkage2.h"
+STC_INLINE crange32_iter crange32_advance(crange32_iter it, uint32_t n) {
+    if ((it.step > 0) == ((*it.ref += it.step*(int32_t)n) > it.end))
+        it.ref = NULL;
+    return it;
+}
 
+#include "linkage2.h"
 #endif // STC_CRANGE_H_INCLUDE
