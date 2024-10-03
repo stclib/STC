@@ -79,8 +79,8 @@ int main(void) {
     #define c_atomic_dec_and_test(v) (atomic_fetch_sub(v, 1) == 1)
 #endif
 
-// @wmww, thanks for finding & fixing rare memleak with the metadata struct!
-struct _arc_metadata { catomic_long counter; bool value_included; };
+// @wmww: Now fixed rare memleak by adding 4 bytes when allocating the counter alone.
+struct _arc_metadata { catomic_long counter; };
 #endif // STC_ARC_H_INCLUDED
 
 #ifndef _i_prefix
@@ -112,11 +112,12 @@ STC_INLINE long _c_MEMB(_use_count)(const Self* self)
     { return self->use_count ? *self->use_count : 0; }
 
 STC_INLINE Self _c_MEMB(_from_ptr)(_m_value* ptr) {
+    enum {OFFSET = offsetof(struct _c_MEMB(_rep_), value)};
     Self arc = {ptr};
     if (ptr) {
-        struct _arc_metadata* metadata = _i_malloc(struct _arc_metadata, 1);
-        metadata->value_included = false;
-        *(arc.use_count = &metadata->counter) = 1;
+        // Adds 4 dummy bytes to ensure that the if-test in _drop is safe.
+        struct _arc_metadata* meta = (struct _arc_metadata*)i_malloc(OFFSET + 4);
+        *(arc.use_count = &meta->counter) = 1;
     }
     return arc;
 }
@@ -125,7 +126,6 @@ STC_INLINE Self _c_MEMB(_from_ptr)(_m_value* ptr) {
 STC_INLINE Self _c_MEMB(_make)(_m_value val) {
     Self arc;
     struct _c_MEMB(_rep_)* rep = _i_malloc(struct _c_MEMB(_rep_), 1);
-    rep->metadata.value_included = true;
     *(arc.use_count = &rep->metadata.counter) = 1;
     *(arc.get = &rep->value) = val;
     return arc;
@@ -142,12 +142,13 @@ STC_INLINE Self _c_MEMB(_move)(Self* self) {
 
 STC_INLINE void _c_MEMB(_drop)(const Self* self) {
     if (self->use_count && _i_atomic_dec_and_test(self->use_count)) {
+        enum {OFFSET = offsetof(struct _c_MEMB(_rep_), value)};
         i_keydrop(self->get);
-        // assume counter is first member of structs _arc_metadata and _rep_:
-        if (((struct _arc_metadata *)self->use_count)->value_included) {
+
+        if ((char*)self->use_count + OFFSET == (char*)self->get) {
             i_free(self->use_count, c_sizeof(struct _c_MEMB(_rep_))); // _make()
         } else {
-            i_free(self->use_count, c_sizeof(struct _arc_metadata)); // _from_ptr()
+            i_free(self->use_count, OFFSET + 4); // _from_ptr()
             i_free(self->get, c_sizeof *self->get);
         }
     }
