@@ -231,7 +231,7 @@ isize cstr_printf(cstr* self, const char* fmt, ...) {
 
 void cstr_u8_erase(cstr* self, const isize bytepos, const isize u8len) {
     cstr_buf r = cstr_buffer(self);
-    isize len = utf8_pos(r.data + bytepos, u8len);
+    isize len = utf8_to_index(r.data + bytepos, u8len);
     c_memmove(&r.data[bytepos], &r.data[bytepos + len], r.size - (bytepos + len));
     _cstr_set_size(self, r.size - len);
 }

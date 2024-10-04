@@ -66,10 +66,10 @@ int utf8_encode(char *out, uint32_t c) {
     return 0;
 }
 
-uint32_t utf8_peek_off(const char* s, int pos) {
+uint32_t utf8_peek_from(const char* s, isize offset) {
     int inc = -1;
-    if (pos > 0) pos = -pos, inc = 1;
-    while (pos) pos += (*(s += inc) & 0xC0) != 0x80;
+    if (offset > 0) offset = -offset, inc = 1;
+    while (offset) offset += (*(s += inc) & 0xC0) != 0x80;
     return utf8_peek(s);
 }
 

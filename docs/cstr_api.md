@@ -5,13 +5,12 @@ A **cstr** object represent sequences of characters. It supports an interface si
 to that of a standard container of bytes, but adding features specifically designed to
 operate with strings of single-byte characters, terminated by the null character.
 
-**cstr** has basic support for *UTF8* encoded strings, and has a set of compact and
+**cstr** has support for *UTF8* encoded strings, and has a set of small and
 efficient functions for handling case-conversion, iteration and indexing into UTF8
-codepoints.
+codepoints (runes).
 
 **cstr** uses short strings optimization (sso), which eliminates heap memory allocation
-for string capacity up to 22 bytes. `sizeof(cstr)` is 24. In comparison, C++
-`sizeof(std::string)` is typically 32, but sso capacity is only 15 bytes.
+for string capacity up to 22 bytes.
 
 ## Header file
 
@@ -26,16 +25,16 @@ All cstr definitions and prototypes are available by including a single header f
 cstr        cstr_lit(const char literal_only[]);                    // cstr from literal; no strlen() call.
 cstr        cstr_init(void);                                        // constructor; empty string
 cstr        cstr_from(const char* str);                             // constructor using strlen()
-cstr        cstr_from_n(const char* str, isize n);                  // constructor with n first bytes of str
 cstr        cstr_from_s(cstr s, isize pos, isize len);              // construct a substring
 cstr        cstr_from_fmt(const char* fmt, ...);                    // printf() formatting
 cstr        cstr_from_replace(csview sv, csview search, csview repl, int32_t count);
 cstr        cstr_from_zv(zsview zv);                                // construct cstr from a null-terminated sview
 cstr        cstr_from_sv(csview sv);                                // construct cstr from csview
+cstr        cstr_with_n(const char* str, isize n);                  // constructor with first n bytes of str
 cstr        cstr_with_capacity(isize cap);
 cstr        cstr_with_size(isize len, char fill);                   // repeat fill len times
-cstr        cstr_clone(cstr s);
 
+cstr        cstr_clone(cstr s);
 cstr*       cstr_take(cstr* self, cstr s);                          // take ownership of s, i.e. don't drop s.
 cstr        cstr_move(cstr* self);                                  // move string to caller, leave self empty
 void        cstr_drop(cstr* self);                                  // destructor
@@ -48,7 +47,7 @@ cstr_buf    cstr_buffer(cstr* self);                                // to mutabl
 
 isize       cstr_size(const cstr* self);
 isize       cstr_capacity(const cstr* self);
-isize       cstr_topos(const cstr* self, cstr_iter it);             // get byte position at iter.
+isize       cstr_to_index(const cstr* self, cstr_iter it);          // get byte position at iter.
 bool        cstr_is_empty(const cstr* self);
 
 void        cstr_clear(cstr* self);
@@ -103,30 +102,26 @@ bool        cstr_getdelim(cstr *self, int delim, FILE *stream);     // does not 
 
 #### UTF8 methods
 ```c
-isize       cstr_u8_size(const cstr* self);                         // number of utf8 codepoints
-isize       cstr_u8_size_n(const cstr self, isize nbytes);          // utf8 size within n bytes
-isize       cstr_u8_topos(const cstr* self, isize u8idx);           // byte position at utf8 codepoint index
-const char* cstr_u8_at(const cstr* self, isize u8idx);              // char* position at utf8 codepoint index
-csview      cstr_u8_chr(const cstr* self, isize u8idx);             // get utf8 character as a csview
-void        cstr_u8_replace_at(cstr* self, isize bytepos, isize u8len, csview repl); // replace u8len utf8 chars
-void        cstr_u8_erase(cstr* self, isize bytepos, isize u8len);  // erase u8len codepoints from pos
+cstr        cstr_u8_from(const char* str, isize u8pos, isize u8len);// make cstr from an utf8 substring
+isize       cstr_u8_count(const cstr* self);                        // number of utf8 runes
+isize       cstr_u8_to_index(const cstr* self, isize i8pos);        // get byte index at rune position
+csview      cstr_u8_chr(const cstr* self, isize i8pos);             // get rune at rune position
+csview      cstr_u8_subview(const cstr* self, isize u8pos, isize u8len);
+void        cstr_u8_replace_at(cstr* self, isize bytepos, isize u8len, const char* repl);
+void        cstr_u8_erase(cstr* self, isize bytepos, isize u8len);  // erase u8len runes from bytepos
+bool        cstr_u8_valid(const cstr* self);                        // verify that str is valid utf8
 
 // iterate utf8 codepoints
 cstr_iter   cstr_begin(const cstr* self);
 cstr_iter   cstr_end(const cstr* self);
-void        cstr_next(cstr_iter* it);                               // next utf8 codepoint
-cstr_iter   cstr_advance(cstr_iter it, isize u8pos);                // advance +/- codepoints
-
-// requires linking with utf8 symbols:
-bool        cstr_u8_valid(const cstr* self);                        // check if str is valid utf8
+void        cstr_next(cstr_iter* it);                               // next rune
+cstr_iter   cstr_advance(cstr_iter it, isize u8pos);                // advance +/- runes
 
 cstr        cstr_casefold_sv(csview sv);                            // returns new casefolded utf8 cstr
 cstr        cstr_tolower_sv(csview sv);                             // returns new lowercase utf8 cstr
 cstr        cstr_toupper_sv(csview sv);                             // returns new uppercase utf8 cstr
-
 cstr        cstr_tolower(const char* str);                          // returns new lowercase utf8 cstr
 cstr        cstr_toupper(const char* str);                          // returns new uppercase utf8 cstr
-
 void        cstr_lowercase(cstr* self);                             // transform cstr to lowercase utf8
 void        cstr_uppercase(cstr* self);                             // transform cstr to uppercase utf8
 

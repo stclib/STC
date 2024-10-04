@@ -14,7 +14,7 @@ usage.
 - Because it is not zero-terminated, it must be printed the following way:
 ```c
 csview sv = c_sv("Hello world");
-sv = csview_substr(sv, 0, 5);
+sv = csview_subview(sv, 0, 5);
 printf(c_svfmt "\n", c_svarg(sv)); // "Hello"
 ```
 
@@ -35,7 +35,7 @@ All csview definitions and prototypes are available by including a single header
 csview          c_sv(const char literal_only[]);                     // from string literal only
 csview          c_sv(const char* str, isize n);                      // from a const char* and length n
 csview          csview_from(const char* str);                        // from const char* str
-csview          csview_from_n(const char* str, isize n);             // alias for c_sv(str, n)
+csview          csview_with_n(const char* str, isize n);             // alias for c_sv(str, n)
 
 isize           csview_size(csview sv);
 bool            csview_is_empty(csview sv);
@@ -51,24 +51,27 @@ bool            csview_istarts_with(csview sv, const char* str);
 bool            csview_ends_with(csview sv, const char* str);
 bool            csview_iends_with(csview sv, const char* str);
 
-csview          csview_substr(csview sv, isize pos, isize n);
+csview          csview_subview(csview sv, isize pos, isize n);
 csview          csview_slice(csview sv, isize pos1, isize pos2);
-csview          csview_trim(csview sv, int side);                    // trim ws; side -1:left, 1:right, 0:both
-csview          csview_last(csview sv, isize len);                   // substr of the trailing len bytes
+csview          csview_trim(csview sv);                              // trim whitespaces from left+right of view
+csview          csview_trim_left(csview sv);
+csview          csview_trim_right(csview sv);
+csview          csview_trailing(csview sv, isize len);               // substr of the trailing len bytes
 const char*     csview_at(csview sv, isize index);
 
-csview          csview_substr_ex(csview sv, isize pos, isize n);     // negative pos count from end
+csview          csview_subview_ex(csview sv, isize pos, isize n);    // negative pos count from end
 csview          csview_slice_ex(csview sv, isize pos1, isize pos2);  // negative pos1, pos2 count from end
 csview          csview_token(csview sv, const char* sep, isize* start); // *start > sv.size after last token
 ```
 
 #### UTF8 methods
 ```c
-isize          csview_u8_size(csview sv);
-csview         csview_u8_substr(csview sv, isize bytepos, isize u8len);
-csview         csview_u8_last(csview sv, isize u8len);                  // substr of the trailing u8len chrs.
-const char*    csview_u8_at(csview sv, isize u8idx);
-bool           csview_u8_valid(csview sv);                              // requires linking with utf8 symbols
+csview         csview_u8_with_n(const char* str, isize u8len);          // construct csview with u8len runes
+isize          csview_u8_count(csview sv);                              // number of utf8 runes
+csview         csview_u8_subview(csview sv, isize bytepos, isize u8len);// starts at bytepos, with u8len runes
+csview         csview_u8_trailing(csview sv, isize u8len);              // substr of the trailing u8len chrs.
+csview         csview_u8_chr(csview sv, isize i8pos);                   // get rune at rune position
+bool           csview_u8_valid(csview sv);                              // check utf8 validity of sv
 
 csview_iter    csview_begin(const csview* self);
 csview_iter    csview_end(const csview* self);
@@ -76,14 +79,6 @@ void           csview_next(csview_iter* it);                            // next 
 csview_iter    csview_advance(csview_iter it, isize u8pos);             // advance +/- codepoints
 ```
 
-#### cstr methods returning csview
-```c
-csview         cstr_slice(const cstr* self, isize pos1, isize pos2);
-csview         cstr_slice_ex(const cstr* self, isize pos1, isize pos2); // see csview_slice_ex()
-csview         cstr_substr(const cstr* self, isize pos, isize n);
-csview         cstr_substr_ex(const cstr* self, isize pos, isize n);    // see csview_substr_ex()
-csview         cstr_u8_substr(const cstr* self, isize bytepos, isize u8len);
-```
 #### Iterate tokens with *c_fortoken*
 
 Iterate tokens in an input string split by a separator string:
@@ -129,15 +124,15 @@ int main(void)
     cstr str1 = cstr_lit("We think in generalities, but we live in details.");
                                                         // (quoting Alfred N. Whitehead)
 
-    csview ss1 = cstr_substr_ex(&str1, 3, 5);           // "think"
+    csview ss1 = cstr_subview_ex(&str1, 3, 5);           // "think"
     isize pos = cstr_find(&str1, "live");            // position of "live" in str1
-    csview ss2 = cstr_substr_ex(&str1, pos, 4);         // get "live"
+    csview ss2 = cstr_subview_ex(&str1, pos, 4);         // get "live"
     csview ss3 = cstr_slice_ex(&str1, -8, -1);          // get "details"
     printf(c_svfmt " " c_svfmt " " c_svfmt "\n",
            c_svarg(ss1), c_svarg(ss2), c_svarg(ss3));
     cstr s1 = cstr_lit("Apples are red");
-    cstr s2 = cstr_from_sv(cstr_substr_ex(&s1, -3, 3)); // "red"
-    cstr s3 = cstr_from_sv(cstr_substr_ex(&s1, 0, 6));  // "Apples"
+    cstr s2 = cstr_from_sv(cstr_subview_ex(&s1, -3, 3)); // "red"
+    cstr s3 = cstr_from_sv(cstr_subview_ex(&s1, 0, 6));  // "Apples"
     printf("%s %s\n", cstr_str(&s2), cstr_str(&s3));
 
     c_drop(cstr, &str1, &s1, &s2, &s3);
@@ -158,7 +153,7 @@ int main(void)
 {
     cstr s1 = cstr_lit("hell😀 w😀rld");
 
-    cstr_u8_replace_at(&s1, cstr_find(&s1, "😀rld"), 1, c_sv("ø"));
+    cstr_u8_replace_at(&s1, cstr_find(&s1, "😀rld"), 1, "ø");
     printf("%s\n", cstr_str(&s1));
 
     c_foreach (i, cstr, s1)

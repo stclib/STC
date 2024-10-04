@@ -38,14 +38,14 @@ STC_INLINE int utf8_chr_size(const char *s) {
 }
 
 /* number of codepoints in the utf8 string s */
-STC_INLINE isize utf8_size(const char *s) {
+STC_INLINE isize utf8_count(const char *s) {
     isize size = 0;
     while (*s)
         size += (*++s & 0xC0) != 0x80;
     return size;
 }
 
-STC_INLINE isize utf8_size_n(const char *s, isize nbytes) {
+STC_INLINE isize utf8_count_n(const char *s, isize nbytes) {
     isize size = 0;
     while ((nbytes-- != 0) & (*s != 0)) {
         size += (*++s & 0xC0) != 0x80;
@@ -59,7 +59,7 @@ STC_INLINE const char* utf8_at(const char *s, isize index) {
     return s;
 }
 
-STC_INLINE isize utf8_pos(const char* s, isize index)
+STC_INLINE isize utf8_to_index(const char* s, isize index)
     { return (isize)(utf8_at(s, index) - s); }
 
 // ------------------------------------------------------
@@ -70,7 +70,7 @@ STC_INLINE isize utf8_pos(const char* s, isize index)
 extern bool     utf8_valid_n(const char* s, isize nbytes);
 extern int      utf8_encode(char *out, uint32_t c);
 extern int      utf8_icompare(const csview s1, const csview s2);
-extern uint32_t utf8_peek_off(const char* s, int pos);
+extern uint32_t utf8_peek_from(const char* s, isize offset);
 extern uint32_t utf8_casefold(uint32_t c);
 extern uint32_t utf8_tolower(uint32_t c);
 extern uint32_t utf8_toupper(uint32_t c);

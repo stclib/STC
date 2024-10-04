@@ -23,8 +23,8 @@ All zsview definitions and prototypes are available by including a single header
 ```c
 zsview          c_zv(const char literal_only[]);                // create from string literal only
 zsview          zsview_from(const char* str);                   // construct from const char*
-zsview          zsview_from_pos(zsview zv, isize pos);          // subview starting from pos to eos.
-zsview          zsview_last(zsview zv, isize count);            // subview of the last count bytes
+zsview          zsview_from_position(zsview zv, isize pos);     // subview starting from index pos
+zsview          zsview_trailing(zsview zv, isize len);          // subview of the traling n bytes
 
 isize           zsview_size(zsview zv);
 bool            zsview_is_empty(zsview zv);                     // check if size == 0
@@ -40,18 +40,17 @@ bool            zsview_istarts_with(zsview zs, const char* str);
 bool            zsview_ends_with(zsview zv, const char* str);
 bool            zsview_iends_with(zsview zs, const char* str);
 
+/* utf8 */
 zsview_iter     zsview_begin(const zsview* self);
 zsview_iter     zsview_end(const zsview* self);
-void            zsview_next(zsview_iter* it);                   // next utf8 codepoint
-zsview_iter     zsview_advance(zsview_iter it, isize u8pos);    // advance +/- codepoints
+void            zsview_next(zsview_iter* it);                   // next rune
+zsview_iter     zsview_advance(zsview_iter it, isize u8pos);    // advance +/- runes
 
-/* utf8 */
-const char*     zsview_u8_at(zsview zv, isize u8idx);
-zsview          zsview_u8_from_pos(zsview zv, isize u8idx);     // subview starting from u8idx
-zsview          zsview_u8_last(zsview zv, isize u8len);         // subview of the last u8len codepoints
-isize           zsview_u8_size(zsview zv);
-bool            zsview_u8_valid(zsview zv);                     // requires linking with utf8 symbols
-```
+zsview          zsview_u8_from_position(zsview zv, isize i8pos);// subview starting from rune i8pos
+zsview          zsview_u8_trailing(zsview zv, isize u8len);     // subview of the last u8len runes
+csview          zsview_u8_chr(zsview zv, isize i8pos);          // get rune at rune position
+isize           zsview_u8_count(zsview zv);                     // number of utf8 runes
+bool            zsview_u8_valid(zsview zv);                     // check utf8 validity of zv
 
 #### Helper methods for usage in containers
 ```c
@@ -65,11 +64,11 @@ bool            zsview_ieq(const zsview* x, const zsview* y);   // utf8 case-ins
 #### UTF8 helper methods
 ```c
                 // from utf8.h
-isize           utf8_size(const char *s);
-isize           utf8_size_n(const char *s, isize nbytes);       // number of UTF8 codepoints within n bytes
-const char*     utf8_at(const char *s, isize index);            // from UTF8 index to char* position
-isize           utf8_pos(const char* s, isize index);           // from UTF8 index to byte index position
-unsigned        utf8_chr_size(const char* s);                   // UTF8 character size: 1-4
+isize           utf8_count(const char *s);                      // number of utf8 runes in s
+isize           utf8_count_n(const char *s, isize nbytes);      // number of utf8 runes within n bytes
+const char*     utf8_at(const char *s, isize pos);              // from utf8 pos to char* 
+isize           utf8_to_index(const char* s, isize pos);        // from utf8 pos to byte index
+unsigned        utf8_chr_size(const char* s);                   // utf8 character size: 1-4
 
                 // requires linking with utf8 symbols
 bool            utf8_valid(const char* s);
@@ -77,7 +76,7 @@ bool            utf8_valid_n(const char* s, isize nbytes);
 uint32_t        utf8_decode(utf8_decode_t *d, uint8_t byte);    // decode next byte to utf8, return state.
 unsigned        utf8_encode(char *out, uint32_t codepoint);     // encode unicode cp into out buffer
 uint32_t        utf8_peek(const char* s);                       // codepoint value of character at s
-uint32_t        utf8_peek_off(const char* s, int offset);       // codepoint value at utf8 pos (may be negative)
+uint32_t        utf8_peek_from(const char* s, isize offset);    // codepoint value at utf8 offset (may be negative)
 int             utf8_icmp(const char* s1, const char* s2);      // case-insensitive comparison
 int             utf8_icompare(csview s1, csview s2);            // case-insensitive comparison
 

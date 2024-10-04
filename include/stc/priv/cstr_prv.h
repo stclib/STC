@@ -60,7 +60,7 @@ extern  char* _cstr_internal_move(cstr* self, isize pos1, isize pos2);
 /**************************** PUBLIC API **********************************/
 
 #define cstr_init() (c_literal(cstr){0})
-#define cstr_lit(literal) cstr_from_n(literal, c_litstrlen(literal))
+#define cstr_lit(literal) cstr_with_n(literal, c_litstrlen(literal))
 extern  cstr        cstr_from_replace(csview sv, csview search, csview repl, int32_t count);
 extern  cstr        cstr_from_fmt(const char* fmt, ...);
 
@@ -93,20 +93,20 @@ STC_INLINE csview cstr_sv(const cstr* s) {
                            : c_literal(csview){s->sml.data, cstr_s_size(s)};
 }
 
-STC_INLINE cstr cstr_from_n(const char* str, const isize len) {
+STC_INLINE cstr cstr_with_n(const char* str, const isize len) {
     cstr s;
     c_memcpy(_cstr_init(&s, len, len), str, len);
     return s;
 }
 
 STC_INLINE cstr cstr_from(const char* str)
-    { return cstr_from_n(str, c_strlen(str)); }
+    { return cstr_with_n(str, c_strlen(str)); }
 
 STC_INLINE cstr cstr_from_sv(csview sv)
-    { return cstr_from_n(sv.buf, sv.size); }
+    { return cstr_with_n(sv.buf, sv.size); }
 
 STC_INLINE cstr cstr_from_zv(zsview zv)
-    { return cstr_from_n(zv.str, zv.size); }
+    { return cstr_with_n(zv.str, zv.size); }
 
 STC_INLINE cstr cstr_with_size(const isize size, const char value) {
     cstr s;
@@ -135,7 +135,7 @@ STC_INLINE cstr cstr_move(cstr* self) {
 
 STC_INLINE cstr cstr_clone(cstr s) {
     csview sv = cstr_sv(&s);
-    return cstr_from_n(sv.buf, sv.size);
+    return cstr_with_n(sv.buf, sv.size);
 }
 
 STC_INLINE void cstr_drop(cstr* self) {
@@ -169,30 +169,33 @@ STC_INLINE isize cstr_size(const cstr* self)
 STC_INLINE isize cstr_capacity(const cstr* self)
     { return cstr_is_long(self) ? cstr_l_cap(self) : (isize)cstr_s_cap; }
 
-STC_INLINE isize cstr_topos(const cstr* self, cstr_iter it)
+STC_INLINE isize cstr_to_index(const cstr* self, cstr_iter it)
     { return it.ref - cstr_str(self); }
 
 STC_INLINE cstr cstr_from_s(cstr s, isize pos, isize len)
-    { return cstr_from_n(cstr_str(&s) + pos, len); }
+    { return cstr_with_n(cstr_str(&s) + pos, len); }
 
 // BEGIN utf8 functions =====
 
-STC_INLINE isize cstr_u8_size(const cstr* self)
-    { return utf8_size(cstr_str(self)); }
+STC_INLINE cstr cstr_u8_from(const char* str, isize u8pos, isize u8len)
+    { str = utf8_at(str, u8pos); return cstr_with_n(str, utf8_to_index(str, u8len)); }
 
-STC_INLINE isize cstr_u8_size_n(const cstr* self, isize nbytes)
-    { return utf8_size_n(cstr_str(self), nbytes); }
+STC_INLINE isize cstr_u8_count(const cstr* self)
+    { return utf8_count(cstr_str(self)); }
 
-STC_INLINE isize cstr_u8_topos(const cstr* self, isize u8idx)
-    { return utf8_pos(cstr_str(self), u8idx); }
+STC_INLINE isize cstr_u8_to_index(const cstr* self, isize i8pos)
+    { return utf8_to_index(cstr_str(self), i8pos); }
 
-STC_INLINE const char* cstr_u8_at(const cstr* self, isize u8idx)
-    { return utf8_at(cstr_str(self), u8idx); }
-
-STC_INLINE csview cstr_u8_chr(const cstr* self, isize u8idx) {
-    const char* str = cstr_str(self);
+STC_INLINE csview cstr_u8_subview(const cstr* self, isize u8pos, isize u8len) {
     csview sv;
-    sv.buf = utf8_at(str, u8idx);
+    sv.buf = utf8_at(cstr_str(self), u8pos);
+    sv.size = utf8_to_index(sv.buf, u8len);
+    return sv;
+}
+
+STC_INLINE csview cstr_u8_chr(const cstr* self, isize i8pos) {
+    csview sv;
+    sv.buf = utf8_at(cstr_str(self), i8pos);
     sv.size = utf8_chr_size(sv.buf);
     return sv;
 }
@@ -367,8 +370,9 @@ STC_INLINE void cstr_replace_at_sv(cstr* self, isize pos, isize len, const csvie
 STC_INLINE void cstr_replace_at(cstr* self, isize pos, isize len, const char* repl)
     { cstr_replace_at_sv(self, pos, len, c_sv(repl, c_strlen(repl))); }
 
-STC_INLINE void cstr_u8_replace_at(cstr* self, isize bytepos, isize u8len, csview repl)
-    { cstr_replace_at_sv(self, bytepos, utf8_pos(cstr_str(self) + bytepos, u8len), repl); }
+STC_INLINE void cstr_u8_replace_at(cstr* self, isize bytepos, isize u8len, const char* repl)
+    { cstr_replace_at_sv(self, bytepos, utf8_to_index(cstr_str(self) + bytepos, u8len),
+                                        c_sv(repl, c_strlen(repl))); }
 
 
 STC_INLINE void cstr_insert(cstr* self, isize pos, const char* str)

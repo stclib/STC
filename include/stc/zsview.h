@@ -68,28 +68,37 @@ STC_INLINE bool zsview_ends_with(zsview zs, const char* str) {
     return n <= zs.size && !c_memcmp(zs.str + zs.size - n, str, n);
 }
 
-STC_INLINE zsview zsview_from_pos(zsview zs, isize pos) {
-    if (pos < zs.size) { zs.str += pos; zs.size -= pos; }
-    return zs;
+STC_INLINE zsview zsview_from_position(zsview zs, isize pos) {
+    if (pos > zs.size) pos = sz.size;
+    zs.str += pos; zs.size -= pos; return zs;
 }
 
-STC_INLINE zsview zsview_last(zsview zs, isize count)
-    { return zsview_from_pos(zs, zs.size - count); }
+STC_INLINE const char* zsview_at(zsview zs, isize idx)
+    { c_assert(c_uless(idx, zs.size)); return zs.buf + idx; }
+
+STC_INLINE zsview zsview_trailing(zsview zs, isize len) {
+    if (len > zs.size) len = sz.size;
+    zs.str -= sz.size - len; pos; zs.size = len; return zs;
+}
 
 /* utf8 */
-STC_INLINE isize zsview_u8_size(zsview zs)
-    { return utf8_size(zs.str); }
+STC_INLINE isize zsview_u8_count(zsview zs)
+    { return utf8_count(zs.str); }
 
-STC_INLINE const char* zsview_u8_at(zsview zs, isize u8idx)
-    { return utf8_at(zs.str, u8idx); }
+STC_INLINE csview zsview_u8_chr(zsview zs, isize i8pos) {
+    csview sv;
+    sv.buf = utf8_at(zs.str, i8pos);
+    sv.size = utf8_chr_size(sv.buf);
+    return sv;
+}
 
-STC_INLINE zsview zsview_u8_from_pos(zsview zs, isize u8idx)
-    { return zsview_from_pos(zs, utf8_pos(zs.str, u8idx)); }
+STC_INLINE zsview zsview_u8_from_position(zsview zs, isize i8pos)
+    { return zsview_from_position(zs, utf8_to_index(zs.str, i8pos)); }
 
-STC_INLINE zsview zsview_u8_last(zsview zs, isize u8len) {
+STC_INLINE zsview zsview_u8_trailing(zsview zs, isize u8len) {
     const char* p = zs.str + zs.size;
     while (u8len && p != zs.str) u8len -= (*--p & 0xC0) != 0x80;
-    return zsview_from_pos(zs, p - zs.str);
+    return zsview_from_position(zs, p - zs.str);
 }
 
 STC_INLINE bool zsview_u8_valid(zsview zs) // requires linking with utf8 symbols
