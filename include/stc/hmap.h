@@ -226,7 +226,7 @@ STC_INLINE void _c_MEMB(_put_n)(Self* self, const _m_raw* raw, isize n) {
         #endif
 }
 
-STC_INLINE Self _c_MEMB(_with_n)(const _m_raw* raw, isize n)
+STC_INLINE Self _c_MEMB(_from_n)(const _m_raw* raw, isize n)
     { Self cx = {0}; _c_MEMB(_put_n)(&cx, raw, n); return cx; }
 
 STC_API _m_iter _c_MEMB(_begin)(const Self* self);
@@ -452,7 +452,7 @@ _c_MEMB(_reserve)(Self* self, const isize _newcap) {
     if (_newcap != self->size && _newcap <= _oldbucks)
         return true;
     isize _newbucks = (isize)((float)_newcap / (i_max_load_factor)) + 4;
-    _newbucks = cnextpow2(_newbucks);
+    _newbucks = c_next_pow2(_newbucks);
 
     Self map = {
         _i_malloc(_m_value, _newbucks),

@@ -25,12 +25,12 @@
 
 uint64_t cstr_hash(const cstr *self) {
     csview sv = cstr_sv(self);
-    return chash_n(sv.buf, sv.size);
+    return c_hash_n(sv.buf, sv.size);
 }
 
 isize cstr_find_sv(const cstr* self, csview search) {
     csview sv = cstr_sv(self);
-    char* res = cstrnstrn(sv.buf, sv.size, search.buf, search.size);
+    char* res = c_strnstrn(sv.buf, sv.size, search.buf, search.size);
     return res ? (res - sv.buf) : c_NPOS;
 }
 
@@ -121,7 +121,7 @@ cstr cstr_from_replace(csview in, csview search, csview repl, int32_t count) {
     isize from = 0; char* res;
     if (!count) count = INT32_MAX;
     if (search.size)
-        while (count-- && (res = cstrnstrn(in.buf + from, in.size - from, search.buf, search.size))) {
+        while (count-- && (res = c_strnstrn(in.buf + from, in.size - from, search.buf, search.size))) {
             const isize pos = (res - in.buf);
             cstr_append_n(&out, in.buf + from, pos - from);
             cstr_append_n(&out, repl.buf, repl.size);
@@ -232,7 +232,7 @@ isize cstr_printf(cstr* self, const char* fmt, ...) {
 void cstr_u8_erase(cstr* self, const isize u8pos, const isize u8len) {
     csview r = cstr_sv(self);
     csview span = utf8_span(r.buf, u8pos, u8len);
-    c_memmove((void *)span.buf, span.buf + span.size, span.size);
+    c_memmove((void *)&span.buf[0], &span.buf[span.size], r.size - span.size - (span.buf - r.buf));
     _cstr_set_size(self, r.size - span.size);
 }
 

@@ -73,7 +73,7 @@ STC_INLINE zsview zsview_from_position(zsview zs, isize pos) {
     zs.str += pos; zs.size -= pos; return zs;
 }
 
-STC_INLINE zsview zsview_trailing(zsview zs, isize len) {
+STC_INLINE zsview zsview_right(zsview zs, isize len) {
     if (len > zs.size) len = zs.size;
     zs.str += zs.size - len; zs.size = len; return zs;
 }
@@ -86,11 +86,16 @@ STC_INLINE const char* zsview_at(zsview zs, isize idx)
 STC_INLINE zsview zsview_u8_from_position(zsview zs, isize i8pos)
     { return zsview_from_position(zs, utf8_to_index(zs.str, i8pos)); }
 
-STC_INLINE zsview zsview_u8_trailing(zsview zs, isize u8len) {
-    const char* p = zs.str + zs.size;
-    while (u8len && p != zs.str) u8len -= (*--p & 0xC0) != 0x80;
-    zs.size = p - zs.str, zs.str = p; return zs;
+STC_INLINE zsview zsview_u8_right(zsview zs, isize u8len) {
+    const char* p = &zs.str[zs.size];
+    while (u8len && p != zs.str)
+        u8len -= (*--p & 0xC0) != 0x80;
+    zs.size -= p - zs.str, zs.str = p;
+    return zs;
 }
+
+STC_INLINE csview zsview_u8_subview(zsview zs, isize u8pos, isize u8len)
+    { return utf8_span(zs.str, u8pos, u8len); }
 
 STC_INLINE csview zsview_u8_chr(zsview zs, isize i8pos) {
     csview sv;
@@ -99,7 +104,7 @@ STC_INLINE csview zsview_u8_chr(zsview zs, isize i8pos) {
     return sv;
 }
 
-STC_INLINE isize zsview_u8_count(zsview zs)
+STC_INLINE isize zsview_u8_size(zsview zs)
     { return utf8_count(zs.str); }
 
 STC_INLINE bool zsview_u8_valid(zsview zs) // requires linking with utf8 symbols
@@ -131,7 +136,7 @@ STC_INLINE zsview_iter zsview_advance(zsview_iter it, isize u8pos) {
 /* ---- Container helper functions ---- */
 
 STC_INLINE size_t zsview_hash(const zsview *self)
-    { return chash_n(self->str, self->size); }
+    { return c_hash_n(self->str, self->size); }
 
 STC_INLINE int zsview_cmp(const zsview* x, const zsview* y)
     { return strcmp(x->str, y->str); }

@@ -66,7 +66,7 @@ int utf8_encode(char *out, uint32_t c) {
     return 0;
 }
 
-uint32_t utf8_peek_from(const char* s, isize offset)
+uint32_t utf8_peek_at(const char* s, isize offset)
     { return utf8_peek(utf8_offset(s, offset)); }
 
 bool utf8_valid_n(const char* s, isize nbytes) {

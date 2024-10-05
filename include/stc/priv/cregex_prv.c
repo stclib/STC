@@ -1090,7 +1090,7 @@ _regexec1(const _Reprog *progp,  /* program to run */
                 case TOK_NWBOUND:
                     ok = true; /* fall through */
                 case TOK_WBOUND:
-                    if (ok ^ (s == bol || s == j->eol || (utf8_isword(utf8_peek_from(s, -1))
+                    if (ok ^ (s == bol || s == j->eol || (utf8_isword(utf8_peek_at(s, -1))
                                                         ^ utf8_isword(utf8_peek(s)))))
                         continue;
                     break;

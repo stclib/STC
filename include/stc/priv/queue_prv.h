@@ -44,7 +44,7 @@ STC_INLINE Self         _c_MEMB(_init)(void)
 STC_INLINE void         _c_MEMB(_put_n)(Self* self, const _m_raw* raw, isize n)
                             { while (n--) _c_MEMB(_push)(self, i_keyfrom((*raw))), ++raw; }
 
-STC_INLINE Self         _c_MEMB(_with_n)(const _m_raw* raw, isize n)
+STC_INLINE Self         _c_MEMB(_from_n)(const _m_raw* raw, isize n)
                             { Self cx = {0}; _c_MEMB(_put_n)(&cx, raw, n); return cx; }
 
 STC_INLINE void         _c_MEMB(_value_drop)(_m_value* val) { i_keydrop(val); }
@@ -175,7 +175,7 @@ STC_DEF bool
 _c_MEMB(_reserve)(Self* self, const isize n) {
     if (n <= self->capmask)
         return true;
-    isize oldpow2 = self->capmask + 1, newpow2 = cnextpow2(n + 1);
+    isize oldpow2 = self->capmask + 1, newpow2 = c_next_pow2(n + 1);
     _m_value* d = (_m_value *)i_realloc(self->cbuf, oldpow2*c_sizeof *d, newpow2*c_sizeof *d);
     if (!d)
         return false;

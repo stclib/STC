@@ -32,7 +32,7 @@ static inline bool RawVik_eq(const RawVik* rx, const RawVik* ry) {
 }
 
 static inline uint64_t RawVik_hash(const RawVik* rp) {
-    return chash_mix(chash_str(rp->name), chash_str(rp->country));
+    return c_hash_mix(c_hash_str(rp->name), c_hash_str(rp->country));
 }
 
 static inline Viking Viking_from(RawVik raw) { // note: parameter is by value

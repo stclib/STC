@@ -85,7 +85,7 @@ STC_INLINE csview utf8_span(const char *s, isize u8pos, isize u8len) {
 extern bool     utf8_valid_n(const char* s, isize nbytes);
 extern int      utf8_encode(char *out, uint32_t c);
 extern int      utf8_icompare(const csview s1, const csview s2);
-extern uint32_t utf8_peek_from(const char* s, isize u8offset);
+extern uint32_t utf8_peek_at(const char* s, isize u8offset);
 extern uint32_t utf8_casefold(uint32_t c);
 extern uint32_t utf8_tolower(uint32_t c);
 extern uint32_t utf8_toupper(uint32_t c);

@@ -45,7 +45,7 @@ STC_API csview      csview_token(csview sv, const char* sep, isize* pos);
 
 STC_INLINE csview   csview_from(const char* str)
     { return c_literal(csview){str, c_strlen(str)}; }
-STC_INLINE csview   csview_with_n(const char* str, isize n)
+STC_INLINE csview   csview_from_n(const char* str, isize n)
     { return c_literal(csview){str, n}; }
 
 STC_INLINE void     csview_clear(csview* self) { *self = csview_init(); }
@@ -95,7 +95,7 @@ STC_INLINE csview csview_trim_right(csview sv)
 STC_INLINE csview csview_trim(csview sv)
     { return csview_trim_right(csview_trim_left(sv)); }
 
-STC_INLINE csview csview_trailing(csview sv, isize len)
+STC_INLINE csview csview_right(csview sv, isize len)
     { return csview_subview(sv, sv.size - len, len); }
 
 STC_INLINE const char* csview_at(csview sv, isize idx)
@@ -116,26 +116,28 @@ STC_INLINE void csview_next(csview_iter* it) {
 }
 
 /* utf8 */
-STC_INLINE csview csview_u8_with_n(const char* str, isize u8pos, isize u8len)
+STC_INLINE csview csview_u8_from(const char* str, isize u8pos, isize u8len)
     { return utf8_span(str, u8pos, u8len); }
-
-STC_INLINE isize csview_u8_count(csview sv)
-    { return utf8_count_n(sv.buf, sv.size); }
-
-STC_INLINE csview csview_u8_chr(csview sv, isize i8pos) {
-    sv.buf = utf8_at(sv.buf, i8pos);
-    sv.size = utf8_chr_size(sv.buf);
-    return sv;
-}
 
 STC_INLINE csview csview_u8_subview(csview sv, isize u8pos, isize u8len)
     { return utf8_span(sv.buf, u8pos, u8len); }
 
-STC_INLINE csview csview_u8_trailing(csview sv, isize u8len) {
-    const char* p = sv.buf + sv.size;
-    while (u8len && p != sv.buf) u8len -= (*--p & 0xC0) != 0x80;
-    sv.size = p - sv.buf, sv.buf = p; return sv;
+STC_INLINE csview csview_u8_right(csview sv, isize u8len) {
+    const char* p = &sv.buf[sv.size];
+    while (u8len && p != sv.buf)
+        u8len -= (*--p & 0xC0) != 0x80;
+    sv.size -= p - sv.buf, sv.buf = p;
+    return sv;
 }
+
+STC_INLINE csview csview_u8_chr(csview sv, isize u8pos) {
+    sv.buf = utf8_at(sv.buf, u8pos);
+    sv.size = utf8_chr_size(sv.buf);
+    return sv;
+}
+
+STC_INLINE isize csview_u8_size(csview sv)
+    { return utf8_count_n(sv.buf, sv.size); }
 
 STC_INLINE bool csview_u8_valid(csview sv) // requires linking with utf8 symbols
     { return utf8_valid_n(sv.buf, sv.size); }
@@ -191,7 +193,7 @@ STC_INLINE bool csview_iends_with(csview sv, const char* str) {
 #define STC_CSVIEW_C_INCLUDED
 
 STC_DEF size_t csview_hash(const csview *self)
-    { return chash_n(self->buf, self->size); }
+    { return c_hash_n(self->buf, self->size); }
 
 STC_DEF csview_iter csview_advance(csview_iter it, isize u8pos) {
     int inc = 1;
@@ -204,7 +206,7 @@ STC_DEF csview_iter csview_advance(csview_iter it, isize u8pos) {
 }
 
 STC_DEF isize csview_find_sv(csview sv, csview search) {
-    char* res = cstrnstrn(sv.buf, sv.size, search.buf, search.size);
+    char* res = c_strnstrn(sv.buf, sv.size, search.buf, search.size);
     return res ? (res - sv.buf) : c_NPOS;
 }
 
@@ -233,7 +235,7 @@ STC_DEF csview csview_slice_ex(csview sv, isize p1, isize p2) {
 STC_DEF csview csview_token(csview sv, const char* sep, isize* pos) {
     isize sep_size = c_strlen(sep);
     csview slice = {sv.buf + *pos, sv.size - *pos};
-    const char* res = cstrnstrn(slice.buf, slice.size, sep, sep_size);
+    const char* res = c_strnstrn(slice.buf, slice.size, sep, sep_size);
     csview tok = {slice.buf, res ? (res - slice.buf) : slice.size};
     *pos += tok.size + sep_size;
     return tok;

@@ -30,7 +30,7 @@ cstr        cstr_from_fmt(const char* fmt, ...);                    // printf() 
 cstr        cstr_from_replace(csview sv, csview search, csview repl, int32_t count);
 cstr        cstr_from_zv(zsview zv);                                // construct cstr from a null-terminated sview
 cstr        cstr_from_sv(csview sv);                                // construct cstr from csview
-cstr        cstr_with_n(const char* str, isize n);                  // constructor with first n bytes of str
+cstr        cstr_from_n(const char* str, isize n);                  // constructor with first n bytes of str
 cstr        cstr_with_capacity(isize cap);
 cstr        cstr_with_size(isize len, char fill);                   // repeat fill len times
 
@@ -43,6 +43,7 @@ const char* cstr_str(const cstr* self);                             // to const 
 zsview      cstr_zv(const cstr* self);                              // to zsview
 csview      cstr_sv(const cstr* self);                              // to csview
 csview      cstr_subview(const cstr* self, isize pos, isize len);   // create a subview
+zsview      cstr_right(cstr* self, isize len);                      // subview of the trailing len bytes
 char*       cstr_data(cstr* self);                                  // to mutable char*
 cstr_buf    cstr_buffer(cstr* self);                                // to mutable buffer (with capacity)
 
@@ -104,10 +105,11 @@ bool        cstr_getdelim(cstr *self, int delim, FILE *stream);     // does not 
 #### UTF8 methods
 ```c
 cstr        cstr_u8_from(const char* str, isize u8pos, isize u8len);// make cstr from an utf8 substring
-isize       cstr_u8_count(const cstr* self);                        // number of utf8 runes
+isize       cstr_u8_size(const cstr* self);                         // number of utf8 runes
 isize       cstr_u8_to_index(const cstr* self, isize i8pos);        // get byte index at rune position
 csview      cstr_u8_chr(const cstr* self, isize i8pos);             // get rune at rune position
 csview      cstr_u8_subview(const cstr* self, isize u8pos, isize u8len);
+zsview      cstr_u8_right(cstr* self, isize u8len);                 // subview of the trailing len runes
 void        cstr_u8_insert(cstr* self, isize u8pos, const char* ins);
 void        cstr_u8_replace(cstr* self, isize u8pos, isize u8len, const char* repl);
 void        cstr_u8_erase(cstr* self, isize u8pos, isize u8len);    // erase u8len runes from u8pos
@@ -142,7 +144,7 @@ int         cstr_cmp(const cstr* s1, const cstr* s2);
 bool        cstr_eq(const cstr* s1, const cstr* s2);
 size_t      cstr_hash(const cstr* self);
 
-char*       cstrnstrn(const char* str, isize slen, const char* needle, isize nlen);
+char*       c_strnstrn(const char* str, isize slen, const char* needle, isize nlen);
 ```
 
 ## Types

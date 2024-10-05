@@ -774,7 +774,7 @@ Major changes:
     - `CNT_capacity(const CNT *self)`
     - `CNT_is_empty(const CNT *self)`
 - Now both **stack** and **cbits** can be used with template `i_capacity` parameter: `#define i_capacity <NUM>`. They then use fixed sized arrays, and no heap allocated memory.
-- Renamed *cstr_rename_n()* => *cstr_rename_with_n()* as it could be confused with replacing n instances instead of n bytes.
+- Renamed *cstr_rename_n()* => *cstr_rename_from_n()* as it could be confused with replacing n instances instead of n bytes.
 - Fixed bug in `smap.h`: begin() on empty map was not fully initialized.
 
 ## Changes version 3.6

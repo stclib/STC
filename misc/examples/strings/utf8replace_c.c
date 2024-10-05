@@ -1,16 +1,24 @@
 #include "stc/cstr.h"
+#include "stc/zsview.h"
 
 int main(void)
 {
     cstr hello = cstr_lit("hell😀 w😀rld");
-    printf("%s\n", cstr_str(&hello));
+    printf("%s, %d:%d\n", cstr_str(&hello), (int)cstr_u8_size(&hello), (int)cstr_size(&hello));
+
+    zsview sub5 = cstr_u8_right(&hello, 5);
+    printf("%s, %d:%d\n", sub5.str, (int)zsview_u8_size(sub5), (int)sub5.size);
 
     /* replace second smiley at utf8 codepoint pos 7 */
-    cstr_u8_replace_at(&hello,
-                        cstr_u8_to_index(&hello, 7),
-                        1,
-                        "🐨");
-    printf("%s\n", cstr_str(&hello));
+
+    cstr_u8_insert(&hello, 8, "🐨");
+    printf("%s, %d:%d\n", cstr_str(&hello), (int)cstr_u8_size(&hello), (int)cstr_size(&hello));
+
+    cstr_u8_erase(&hello, 7, 1);
+    printf("%s, %d:%d\n", cstr_str(&hello), (int)cstr_u8_size(&hello), (int)cstr_size(&hello));
+
+    cstr_u8_replace(&hello, 9, 1, "😀");
+    printf("%s, %d:%d\n", cstr_str(&hello), (int)cstr_u8_size(&hello), (int)cstr_size(&hello));
 
     c_foreach (c, cstr, hello)
         printf(c_svfmt ",", c_svarg(c.chr));

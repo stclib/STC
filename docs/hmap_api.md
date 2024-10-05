@@ -89,13 +89,13 @@ hmap_X_raw            hmap_X_value_toraw(hmap_X_value* pval);
 ```
 Free helper functions:
 ```c
-size_t                chash_n(const void *data, isize n);                   // generic hash function of n bytes
-size_t                chash_str(const char *str);                           // string hash function, uses strlen()
-size_t                chash_mix(size_t h1, size_t h2, ...);                 // mix/combine computed hashes
-isize                 cnextpow2(isize k);                                   // get next power of 2 >= k
+size_t                c_hash_n(const void *data, isize n);                  // generic hash function of n bytes
+size_t                c_hash_str(const char *str);                          // string hash function, uses strlen()
+size_t                c_hash_mix(size_t h1, size_t h2, ...);                // mix/combine computed hashes
+isize                 c_next_pow2(isize k);                                 // get next power of 2 >= k
 
 // hash/equal template default functions:
-size_t                c_default_hash(const T *obj);                         // alias for chash_n(obj, sizeof *obj)
+size_t                c_default_hash(const T *obj);                         // alias for c_hash_n(obj, sizeof *obj)
 bool                  c_default_eq(const i_keyraw* a, const i_keyraw* b);   // *a == *b
 bool                  c_memcmp_eq(const i_keyraw* a, const i_keyraw* b);    // !memcmp(a, b, sizeof *a)
 ```
@@ -370,7 +370,7 @@ static inline bool RawVik_eq(const RawVik* rx, const RawVik* ry) {
 }
 
 static inline size_t RawVik_hash(const RawVik* rv) {
-    return chash_mix(chash_str(rv->name), chash_str(rv->country));
+    return c_hash_mix(c_hash_str(rv->name), c_hash_str(rv->country));
 }
 
 static inline Viking Viking_from(RawVik raw) { // note: parameter is by value

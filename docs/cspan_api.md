@@ -36,7 +36,7 @@ of arguments does not match the span rank, a compile error is issued. Runtime bo
 by default (define `STC_NDEBUG` or `NDEBUG` to disable).
 ```c
 SpanType        cspan_init(<TYPE> SpanType, {v1, v2, ...});         // make a 1-d cspan from value list
-SpanType        cspan_with_n(ValueType* ptr, isize n);              // make a 1-d cspan from a pointer and length
+SpanType        cspan_from_n(ValueType* ptr, isize n);              // make a 1-d cspan from a pointer and length
 SpanType        cspan_from_array(ValueType array[]);                // make a 1-d cspan from a C array
 SpanType        cspan_from(STCContainer* cnt);                      // make a 1-d cspan from a vec or stack
 

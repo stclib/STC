@@ -24,7 +24,7 @@ All zsview definitions and prototypes are available by including a single header
 zsview          c_zv(const char literal_only[]);                // create from string literal only
 zsview          zsview_from(const char* str);                   // construct from const char*
 zsview          zsview_from_position(zsview zv, isize pos);     // subview starting from index pos
-zsview          zsview_trailing(zsview zv, isize len);          // subview of the traling n bytes
+zsview          zsview_right(zsview zv, isize len);             // subview of the trailing n bytes
 
 isize           zsview_size(zsview zv);
 bool            zsview_is_empty(zsview zv);                     // check if size == 0
@@ -47,9 +47,10 @@ void            zsview_next(zsview_iter* it);                   // next rune
 zsview_iter     zsview_advance(zsview_iter it, isize u8pos);    // advance +/- runes
 
 zsview          zsview_u8_from_position(zsview zv, isize i8pos);// subview starting from rune i8pos
-zsview          zsview_u8_trailing(zsview zv, isize u8len);     // subview of the last u8len runes
+zsview          zsview_u8_right(zsview zv, isize u8len);        // subview of the last u8len runes
+csview          zsview_u8_subview(zsview zs, isize u8pos, isize u8len);
 csview          zsview_u8_chr(zsview zv, isize i8pos);          // get rune at rune position
-isize           zsview_u8_count(zsview zv);                     // number of utf8 runes
+isize           zsview_u8_size(zsview zv);                      // number of utf8 runes
 bool            zsview_u8_valid(zsview zv);                     // check utf8 validity of zv
 
 #### Helper methods for usage in containers

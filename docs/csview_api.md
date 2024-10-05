@@ -32,10 +32,10 @@ All csview definitions and prototypes are available by including a single header
 ## Methods
 
 ```c
-csview          c_sv(const char literal_only[]);                     // from string literal only
-csview          c_sv(const char* str, isize n);                      // from a const char* and length n
-csview          csview_from(const char* str);                        // from const char* str
-csview          csview_with_n(const char* str, isize n);             // alias for c_sv(str, n)
+csview          c_sv(const char literal_only[]);                        // from string literal only
+csview          c_sv(const char* str, isize n);                         // from a const char* and length n
+csview          csview_from(const char* str);                           // from const char* str
+csview          csview_from_n(const char* str, isize n);                // alias for c_sv(str, n)
 
 isize           csview_size(csview sv);
 bool            csview_is_empty(csview sv);
@@ -53,24 +53,24 @@ bool            csview_iends_with(csview sv, const char* str);
 
 csview          csview_subview(csview sv, isize pos, isize n);
 csview          csview_slice(csview sv, isize pos1, isize pos2);
-csview          csview_trim(csview sv);                              // trim whitespaces from left+right of view
+csview          csview_trim(csview sv);                                 // trim whitespaces from left+right of view
 csview          csview_trim_left(csview sv);
 csview          csview_trim_right(csview sv);
-csview          csview_trailing(csview sv, isize len);               // substr of the trailing len bytes
+csview          csview_right(csview sv, isize len);                     // substr of the trailing len bytes
 const char*     csview_at(csview sv, isize index);
 
-csview          csview_subview_ex(csview sv, isize pos, isize n);    // negative pos count from end
-csview          csview_slice_ex(csview sv, isize pos1, isize pos2);  // negative pos1, pos2 count from end
+csview          csview_subview_ex(csview sv, isize pos, isize n);       // negative pos count from end
+csview          csview_slice_ex(csview sv, isize pos1, isize pos2);     // negative pos1, pos2 count from end
 csview          csview_token(csview sv, const char* sep, isize* start); // *start > sv.size after last token
 ```
 
 #### UTF8 methods
 ```c
-csview         csview_u8_with_n(const char* str, isize u8pos, isize u8len); // construct csview with u8len runes
+csview         csview_u8_from(const char* str, isize u8pos, isize u8len); // construct csview with u8len runes
 csview         csview_u8_subview(csview sv, isize u8pos, isize u8len);  // utf8 subview
-csview         csview_u8_trailing(csview sv, isize u8len);              // substr of the trailing u8len chrs.
+csview         csview_u8_right(csview sv, isize u8len);                 // substr of the trailing u8len runes.
 csview         csview_u8_chr(csview sv, isize i8pos);                   // get rune at rune position
-isize          csview_u8_count(csview sv);                              // number of utf8 runes
+isize          csview_u8_size(csview sv);                               // number of utf8 runes
 bool           csview_u8_valid(csview sv);                              // check utf8 validity of sv
 
 csview_iter    csview_begin(const csview* self);

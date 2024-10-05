@@ -70,11 +70,11 @@ TEST(algorithm, c_filter)
     EXPECT_EQ(42, sum);
 
     uint64_t hash = 0;
-    c_filter(IVec, vec, hash = chash_mix(hash, (uint64_t)*value));
+    c_filter(IVec, vec, hash = c_hash_mix(hash, (uint64_t)*value));
     EXPECT_EQ(658, (isize)hash);
 
     hash = 0;
-    c_filter_reverse(IVec, vec, hash = chash_mix(hash, (uint64_t)*value));
+    c_filter_reverse(IVec, vec, hash = c_hash_mix(hash, (uint64_t)*value));
     EXPECT_EQ(10897, (isize)hash);
 
     sum = 0;
@@ -91,4 +91,3 @@ TEST(algorithm, c_filter)
 
     IVec_drop(&vec);
 }
-

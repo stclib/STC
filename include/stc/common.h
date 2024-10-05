@@ -126,7 +126,7 @@ typedef ptrdiff_t       isize;
 #define c_default_eq(x, y)      (*(x) == *(y))
 #define c_default_less(x, y)    (*(x) < *(y))
 #define c_default_cmp(x, y)     (c_default_less(y, x) - c_default_less(x, y))
-#define c_default_hash(p)       chash_n(p, sizeof *(p))
+#define c_default_hash(p)       c_hash_n(p, sizeof *(p))
 #define c_default_clone(v)      (v)
 #define c_default_toraw(vp)     (*(vp))
 #define c_default_drop(vp)      ((void) (vp))
@@ -135,7 +135,7 @@ typedef ptrdiff_t       isize;
 typedef const char* cstr_raw;
 #define cstr_raw_cmp(xp, yp) strcmp(*(xp), *(yp))
 #define cstr_raw_eq(xp, yp) (cstr_raw_cmp(xp, yp) == 0)
-#define cstr_raw_hash(p) chash_str(*(p))
+#define cstr_raw_hash(p) c_hash_str(*(p))
 #define cstr_raw_clone(s) (s)
 #define cstr_raw_drop(p) ((void)p)
 
@@ -211,7 +211,7 @@ typedef const char* cstr_raw;
 
 // init container with literal list, and drop multiple containers of same type
 #define c_init(C, ...) \
-    C##_with_n(c_make_array(C##_raw, __VA_ARGS__), c_sizeof((C##_raw[])__VA_ARGS__)/c_sizeof(C##_raw))
+    C##_from_n(c_make_array(C##_raw, __VA_ARGS__), c_sizeof((C##_raw[])__VA_ARGS__)/c_sizeof(C##_raw))
 
 #define c_push(C, cnt, ...) \
     C##_put_n(cnt, c_make_array(C##_raw, __VA_ARGS__), c_sizeof((C##_raw[])__VA_ARGS__)/c_sizeof(C##_raw))
@@ -235,7 +235,7 @@ typedef const char* cstr_raw;
 // General functions
 
 // hashing
-STC_INLINE size_t chash_n(const void* key, isize len) {
+STC_INLINE size_t c_hash_n(const void* key, isize len) {
     union { size_t block; uint64_t b8; uint32_t b4; } u;
     switch (len) {
         case 8: memcpy(&u.b8, key, 8); return (size_t)(u.b8 * 0xc6a4a7935bd1e99d);
@@ -254,14 +254,14 @@ STC_INLINE size_t chash_n(const void* key, isize len) {
     return hash ^ (hash >> 3);
 }
 
-STC_INLINE size_t chash_str(const char *str)
-    { return chash_n(str, c_strlen(str)); }
+STC_INLINE size_t c_hash_str(const char *str)
+    { return c_hash_n(str, c_strlen(str)); }
 
 STC_INLINE size_t _chash_mix(size_t h[], int n) {
     for (int i = 1; i < n; ++i) h[0] += h[0] ^ h[i];
     return h[0];
 }
-#define chash_mix(...) /* non-commutative hash combine! */ \
+#define c_hash_mix(...) /* non-commutative hash combine! */ \
     _chash_mix(c_make_array(size_t, {__VA_ARGS__}), c_NUMARGS(__VA_ARGS__))
 
 // generic typesafe swap
@@ -275,7 +275,7 @@ STC_INLINE size_t _chash_mix(size_t h[], int n) {
 } while (0)
 
 // get next power of two
-STC_INLINE isize cnextpow2(isize n) {
+STC_INLINE isize c_next_pow2(isize n) {
     n--;
     n |= n >> 1, n |= n >> 2;
     n |= n >> 4, n |= n >> 8;
@@ -287,7 +287,7 @@ STC_INLINE isize cnextpow2(isize n) {
 }
 
 // substring in substring?
-STC_INLINE char* cstrnstrn(const char *str, isize slen,
+STC_INLINE char* c_strnstrn(const char *str, isize slen,
                            const char *needle, isize nlen) {
     if (!nlen) return (char *)str;
     if (nlen > slen) return NULL;
