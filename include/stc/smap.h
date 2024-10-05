@@ -178,7 +178,7 @@ STC_API _m_result _c_MEMB(_insert_entry_)(Self* self, _m_keyraw rkey);
         return res;
     }
     #endif
-    
+
     STC_INLINE const _m_mapped* _c_MEMB(_at)(const Self* self, _m_keyraw rkey)
         { _m_iter it; return &_c_MEMB(_find_it)(self, rkey, &it)->second; }
 

@@ -69,21 +69,28 @@ STC_INLINE bool zsview_ends_with(zsview zs, const char* str) {
 }
 
 STC_INLINE zsview zsview_from_position(zsview zs, isize pos) {
-    if (pos > zs.size) pos = sz.size;
+    if (pos > zs.size) pos = zs.size;
     zs.str += pos; zs.size -= pos; return zs;
 }
 
-STC_INLINE const char* zsview_at(zsview zs, isize idx)
-    { c_assert(c_uless(idx, zs.size)); return zs.buf + idx; }
-
 STC_INLINE zsview zsview_trailing(zsview zs, isize len) {
-    if (len > zs.size) len = sz.size;
-    zs.str -= sz.size - len; pos; zs.size = len; return zs;
+    if (len > zs.size) len = zs.size;
+    zs.str += zs.size - len; zs.size = len; return zs;
 }
 
+STC_INLINE const char* zsview_at(zsview zs, isize idx)
+    { c_assert(c_uless(idx, zs.size)); return zs.str + idx; }
+
 /* utf8 */
-STC_INLINE isize zsview_u8_count(zsview zs)
-    { return utf8_count(zs.str); }
+
+STC_INLINE zsview zsview_u8_from_position(zsview zs, isize i8pos)
+    { return zsview_from_position(zs, utf8_to_index(zs.str, i8pos)); }
+
+STC_INLINE zsview zsview_u8_trailing(zsview zs, isize u8len) {
+    const char* p = zs.str + zs.size;
+    while (u8len && p != zs.str) u8len -= (*--p & 0xC0) != 0x80;
+    zs.size = p - zs.str, zs.str = p; return zs;
+}
 
 STC_INLINE csview zsview_u8_chr(zsview zs, isize i8pos) {
     csview sv;
@@ -92,19 +99,14 @@ STC_INLINE csview zsview_u8_chr(zsview zs, isize i8pos) {
     return sv;
 }
 
-STC_INLINE zsview zsview_u8_from_position(zsview zs, isize i8pos)
-    { return zsview_from_position(zs, utf8_to_index(zs.str, i8pos)); }
-
-STC_INLINE zsview zsview_u8_trailing(zsview zs, isize u8len) {
-    const char* p = zs.str + zs.size;
-    while (u8len && p != zs.str) u8len -= (*--p & 0xC0) != 0x80;
-    return zsview_from_position(zs, p - zs.str);
-}
+STC_INLINE isize zsview_u8_count(zsview zs)
+    { return utf8_count(zs.str); }
 
 STC_INLINE bool zsview_u8_valid(zsview zs) // requires linking with utf8 symbols
     { return utf8_valid_n(zs.str, zs.size); }
 
 /* utf8 iterator */
+
 STC_INLINE zsview_iter zsview_begin(const zsview* self) {
     return c_literal(zsview_iter){.chr = {self->str, utf8_chr_size(self->str)}};
 }
@@ -120,11 +122,7 @@ STC_INLINE void zsview_next(zsview_iter* it) {
 }
 
 STC_INLINE zsview_iter zsview_advance(zsview_iter it, isize u8pos) {
-    int inc = -1;
-    if (u8pos > 0)
-        u8pos = -u8pos, inc = 1;
-    while (u8pos && *it.ref)
-        u8pos += (*(it.ref += inc) & 0xC0) != 0x80;
+    it.ref = c_const_cast(char *, utf8_offset(it.ref, u8pos));
     it.chr.size = utf8_chr_size(it.ref);
     if (!*it.ref) it.ref = NULL;
     return it;

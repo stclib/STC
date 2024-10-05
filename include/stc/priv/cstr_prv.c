@@ -229,11 +229,11 @@ isize cstr_printf(cstr* self, const char* fmt, ...) {
 
 #include <ctype.h>
 
-void cstr_u8_erase(cstr* self, const isize bytepos, const isize u8len) {
-    cstr_buf r = cstr_buffer(self);
-    isize len = utf8_to_index(r.data + bytepos, u8len);
-    c_memmove(&r.data[bytepos], &r.data[bytepos + len], r.size - (bytepos + len));
-    _cstr_set_size(self, r.size - len);
+void cstr_u8_erase(cstr* self, const isize u8pos, const isize u8len) {
+    csview r = cstr_sv(self);
+    csview span = utf8_span(r.buf, u8pos, u8len);
+    c_memmove((void *)span.buf, span.buf + span.size, span.size);
+    _cstr_set_size(self, r.size - span.size);
 }
 
 bool cstr_u8_valid(const cstr* self)

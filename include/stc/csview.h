@@ -116,8 +116,8 @@ STC_INLINE void csview_next(csview_iter* it) {
 }
 
 /* utf8 */
-STC_INLINE csview csview_u8_with_n(const char* str, isize u8len)
-    { return (csview){str, utf8_to_index(str, u8len)}; }
+STC_INLINE csview csview_u8_with_n(const char* str, isize u8pos, isize u8len)
+    { return utf8_span(str, u8pos, u8len); }
 
 STC_INLINE isize csview_u8_count(csview sv)
     { return utf8_count_n(sv.buf, sv.size); }
@@ -128,16 +128,13 @@ STC_INLINE csview csview_u8_chr(csview sv, isize i8pos) {
     return sv;
 }
 
-STC_INLINE csview csview_u8_subview(csview sv, isize bytepos, isize u8len) {
-    sv.buf += bytepos;
-    sv.size = utf8_to_index(sv.buf, u8len);
-    return sv;
-}
+STC_INLINE csview csview_u8_subview(csview sv, isize u8pos, isize u8len)
+    { return utf8_span(sv.buf, u8pos, u8len); }
 
 STC_INLINE csview csview_u8_trailing(csview sv, isize u8len) {
     const char* p = sv.buf + sv.size;
     while (u8len && p != sv.buf) u8len -= (*--p & 0xC0) != 0x80;
-    return csview_subview(sv, p - sv.buf, sv.size);
+    sv.size = p - sv.buf, sv.buf = p; return sv;
 }
 
 STC_INLINE bool csview_u8_valid(csview sv) // requires linking with utf8 symbols
@@ -197,11 +194,10 @@ STC_DEF size_t csview_hash(const csview *self)
     { return chash_n(self->buf, self->size); }
 
 STC_DEF csview_iter csview_advance(csview_iter it, isize u8pos) {
-    int inc = -1;
-    if (u8pos > 0)
-        u8pos = -u8pos, inc = 1;
+    int inc = 1;
+    if (u8pos < 0) u8pos = -u8pos, inc = -1;
     while (u8pos && it.ref != it.u8.end)
-        u8pos += (*(it.ref += inc) & 0xC0) != 0x80;
+        u8pos -= (*(it.ref += inc) & 0xC0) != 0x80;
     it.chr.size = utf8_chr_size(it.ref);
     if (it.ref == it.u8.end) it.ref = NULL;
     return it;

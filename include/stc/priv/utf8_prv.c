@@ -66,12 +66,8 @@ int utf8_encode(char *out, uint32_t c) {
     return 0;
 }
 
-uint32_t utf8_peek_from(const char* s, isize offset) {
-    int inc = -1;
-    if (offset > 0) offset = -offset, inc = 1;
-    while (offset) offset += (*(s += inc) & 0xC0) != 0x80;
-    return utf8_peek(s);
-}
+uint32_t utf8_peek_from(const char* s, isize offset)
+    { return utf8_peek(utf8_offset(s, offset)); }
 
 bool utf8_valid_n(const char* s, isize nbytes) {
     utf8_decode_t d = {.state=0};

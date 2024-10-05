@@ -66,11 +66,11 @@ csview          csview_token(csview sv, const char* sep, isize* start); // *star
 
 #### UTF8 methods
 ```c
-csview         csview_u8_with_n(const char* str, isize u8len);          // construct csview with u8len runes
-isize          csview_u8_count(csview sv);                              // number of utf8 runes
-csview         csview_u8_subview(csview sv, isize bytepos, isize u8len);// starts at bytepos, with u8len runes
+csview         csview_u8_with_n(const char* str, isize u8pos, isize u8len); // construct csview with u8len runes
+csview         csview_u8_subview(csview sv, isize u8pos, isize u8len);  // utf8 subview
 csview         csview_u8_trailing(csview sv, isize u8len);              // substr of the trailing u8len chrs.
 csview         csview_u8_chr(csview sv, isize i8pos);                   // get rune at rune position
+isize          csview_u8_count(csview sv);                              // number of utf8 runes
 bool           csview_u8_valid(csview sv);                              // check utf8 validity of sv
 
 csview_iter    csview_begin(const csview* self);
@@ -153,7 +153,7 @@ int main(void)
 {
     cstr s1 = cstr_lit("hell😀 w😀rld");
 
-    cstr_u8_replace_at(&s1, cstr_find(&s1, "😀rld"), 1, "ø");
+    cstr_u8_replace(&s1, 7, 1, "ø");
     printf("%s\n", cstr_str(&s1));
 
     c_foreach (i, cstr, s1)

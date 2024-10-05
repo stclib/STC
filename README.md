@@ -345,7 +345,7 @@ After erasing the elements found:
 STC is primarily a "headers-only" library, so most headers can simply be included in your program. By default,
 all templated functions are static (many inlined). This is often optimal for both performance and compiled
 binary size. However, if container type instances, e.g. a `vec_int` is used used in several translation units,
-(e.g. more than 3-4 TUs), consider creating a separate header file for them and link it shared 
+(e.g. more than 3-4 TUs), consider creating a separate header file for them and link it shared
 [as described here](#1-include-as-a-header-file). In this case, *one* (of the) c-file must implement the
 templated container, e.g.:
 ```c

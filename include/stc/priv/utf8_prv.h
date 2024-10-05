@@ -53,14 +53,29 @@ STC_INLINE isize utf8_count_n(const char *s, isize nbytes) {
     return size;
 }
 
-STC_INLINE const char* utf8_at(const char *s, isize index) {
-    while ((index > 0) & (*s != 0))
-        index -= (*++s & 0xC0) != 0x80;
+STC_INLINE const char* utf8_at(const char *s, isize u8pos) {
+    while ((u8pos > 0) & (*s != 0))
+        u8pos -= (*++s & 0xC0) != 0x80;
     return s;
 }
 
-STC_INLINE isize utf8_to_index(const char* s, isize index)
-    { return (isize)(utf8_at(s, index) - s); }
+STC_INLINE const char* utf8_offset(const char* s, isize u8pos) {
+    int inc = 1;
+    if (u8pos < 0) u8pos = -u8pos, inc = -1;
+    while (u8pos && *s)
+        u8pos -= (*(s += inc) & 0xC0) != 0x80;
+    return s;
+}
+
+STC_INLINE isize utf8_to_index(const char* s, isize u8pos)
+    { return utf8_at(s, u8pos) - s; }
+
+STC_INLINE csview utf8_span(const char *s, isize u8pos, isize u8len) {
+    csview span;
+    span.buf = utf8_at(s, u8pos);
+    span.size = utf8_to_index(span.buf, u8len);
+    return span;
+}
 
 // ------------------------------------------------------
 // The following requires linking with utf8 symbols.
@@ -70,7 +85,7 @@ STC_INLINE isize utf8_to_index(const char* s, isize index)
 extern bool     utf8_valid_n(const char* s, isize nbytes);
 extern int      utf8_encode(char *out, uint32_t c);
 extern int      utf8_icompare(const csview s1, const csview s2);
-extern uint32_t utf8_peek_from(const char* s, isize offset);
+extern uint32_t utf8_peek_from(const char* s, isize u8offset);
 extern uint32_t utf8_casefold(uint32_t c);
 extern uint32_t utf8_tolower(uint32_t c);
 extern uint32_t utf8_toupper(uint32_t c);

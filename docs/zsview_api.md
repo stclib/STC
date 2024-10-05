@@ -61,40 +61,6 @@ int             zsview_icmp(const zsview* x, const zsview* y);  // utf8 case-ins
 bool            zsview_ieq(const zsview* x, const zsview* y);   // utf8 case-insensitive comparison
 ```
 
-#### UTF8 helper methods
-```c
-                // from utf8.h
-isize           utf8_count(const char *s);                      // number of utf8 runes in s
-isize           utf8_count_n(const char *s, isize nbytes);      // number of utf8 runes within n bytes
-const char*     utf8_at(const char *s, isize pos);              // from utf8 pos to char* 
-isize           utf8_to_index(const char* s, isize pos);        // from utf8 pos to byte index
-unsigned        utf8_chr_size(const char* s);                   // utf8 character size: 1-4
-
-                // requires linking with utf8 symbols
-bool            utf8_valid(const char* s);
-bool            utf8_valid_n(const char* s, isize nbytes);
-uint32_t        utf8_decode(utf8_decode_t *d, uint8_t byte);    // decode next byte to utf8, return state.
-unsigned        utf8_encode(char *out, uint32_t codepoint);     // encode unicode cp into out buffer
-uint32_t        utf8_peek(const char* s);                       // codepoint value of character at s
-uint32_t        utf8_peek_from(const char* s, isize offset);    // codepoint value at utf8 offset (may be negative)
-int             utf8_icmp(const char* s1, const char* s2);      // case-insensitive comparison
-int             utf8_icompare(csview s1, csview s2);            // case-insensitive comparison
-
-uint32_t        utf8_casefold(uint32_t c);                      // fold to a non-unique lowercase char.
-uint32_t        utf8_tolower(uint32_t c);
-uint32_t        utf8_toupper(uint32_t c);
-
-bool            utf8_isalpha(uint32_t c);
-bool            utf8_isalnum(uint32_t c);
-bool            utf8_isword(uint32_t c);
-bool            utf8_iscased(uint32_t c);
-bool            utf8_isblank(uint32_t c);
-bool            utf8_isspace(uint32_t c);
-bool            utf8_isupper(uint32_t c);
-bool            utf8_islower(uint32_t c);
-bool            utf8_isgroup(int group, uint32_t c);
-```
-
 ## Types
 
 | Type name      | Type definition                              | Used to represent...     |

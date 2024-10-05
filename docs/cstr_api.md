@@ -40,8 +40,9 @@ cstr        cstr_move(cstr* self);                                  // move stri
 void        cstr_drop(cstr* self);                                  // destructor
 
 const char* cstr_str(const cstr* self);                             // to const char*
-csview      cstr_sv(const cstr* self);                              // to csview
 zsview      cstr_zv(const cstr* self);                              // to zsview
+csview      cstr_sv(const cstr* self);                              // to csview
+csview      cstr_subview(const cstr* self, isize pos, isize len);   // create a subview
 char*       cstr_data(cstr* self);                                  // to mutable char*
 cstr_buf    cstr_buffer(cstr* self);                                // to mutable buffer (with capacity)
 
@@ -77,7 +78,7 @@ void        cstr_insert_sv(cstr* self, isize pos, csview ins);
 void        cstr_erase(cstr* self, isize pos, isize len);           // erase len bytes from pos
 
 void        cstr_replace(cstr* self, const char* search, const char* repl);
-void        cstr_replace_count(cstr* self, const char* search, const char* repl, int32_t count);
+void        cstr_replace_count(cstr* self, const char* search, const char* repl, int32_t count); // replace count instances
 cstr        cstr_replace_sv(csview in, csview search, csview repl, int32_t count);
 void        cstr_replace_at(cstr* self, isize pos, isize len, const char* repl); // replace at a pos
 void        cstr_replace_at_sv(cstr* self, isize pos, isize len, const csview repl);
@@ -107,8 +108,9 @@ isize       cstr_u8_count(const cstr* self);                        // number of
 isize       cstr_u8_to_index(const cstr* self, isize i8pos);        // get byte index at rune position
 csview      cstr_u8_chr(const cstr* self, isize i8pos);             // get rune at rune position
 csview      cstr_u8_subview(const cstr* self, isize u8pos, isize u8len);
-void        cstr_u8_replace_at(cstr* self, isize bytepos, isize u8len, const char* repl);
-void        cstr_u8_erase(cstr* self, isize bytepos, isize u8len);  // erase u8len runes from bytepos
+void        cstr_u8_insert(cstr* self, isize u8pos, const char* ins);
+void        cstr_u8_replace(cstr* self, isize u8pos, isize u8len, const char* repl);
+void        cstr_u8_erase(cstr* self, isize u8pos, isize u8len);    // erase u8len runes from u8pos
 bool        cstr_u8_valid(const cstr* self);                        // verify that str is valid utf8
 
 // iterate utf8 codepoints
