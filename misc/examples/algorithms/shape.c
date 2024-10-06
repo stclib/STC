@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "stc/common.h"
-#include "stc/priv/linkage.h"
 
 #define DYN_CAST(T, s) \
     (&T##_api == (s)->api ? (T*)(s) : (T*)0)

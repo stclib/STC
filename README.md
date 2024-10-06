@@ -1,7 +1,9 @@
 ![STC](docs/pics/containers.jpg)
 
-STC - Smart Template Containers
-===============================
+---
+---
+
+# STC - Smart Template Containers
 
 ### Version 5.0 RC
 Description
@@ -40,25 +42,11 @@ Algorithms
 - [***Random numbers*** - a very fast *PRNG* based on *SFC64*](docs/random_api.md)
 - [***Command line argument parser*** - similar to *getopt()*](docs/coption_api.md)
 
----
-List of contents
------------------
-- [Highlights](#highlights)
-- [STC is unique!](#stc-is-unique)
-- [Performance](#performance)
-- [Naming conventions](#naming-conventions)
-- [Usage](#usage)
-- [Installation](#installation)
-- [Specifying template parameters](#specifying-template-parameters)
-- [Specifying comparison parameters](#specifying-comparison-parameters)
-- [The *emplace* methods](#the-emplace-methods)
-- [The *erase* methods](#the-erase-methods)
-- [User-defined container type name](#user-defined-container-type-name)
-- [Forward declarations](#forward-declarations)
-- [Per container-instance customization](#per-container-instance-customization)
-- [Memory efficiency](#memory-efficiency)
+## Contents
 
----
+<details>
+<summary>Highlights</summary>
+
 ## Highlights
 
 - **Minimal boilerplate code** - Specify only the required template parameters, and leave the rest as defaults.
@@ -74,7 +62,10 @@ List of contents
 - **Forward declaration** - Templated containers may be [forward declared](#forward-declarations) without including the full API/implementation.
 - **Extendable containers** - STC provides a mechanism to wrap containers inside a struct with [custom data per instance](#per-container-instance-customization).
 
----
+</details>
+<details>
+<summary>Unique features of STC</summary>
+
 ## Unique features of STC
 
 1. ***Centralized analysis of template parameters***. The analyser assigns values to all
@@ -97,7 +88,10 @@ same element access syntax. The following works for single-element type containe
 MyInts ints = c_init(MyInts, {3, 5, 9, 7, 2});
 c_foreach (it, MyInts, ints) *it.ref += 42;
 ```
----
+</details>
+<details>
+<summary>Performance</summary>
+
 ## Performance
 
 STC is a fast and memory efficient library, and code compiles fast:
@@ -112,38 +106,45 @@ Benchmark notes:
 - access: no entryfor *forward_list*, *deque*, and *vector* because these c++ containers does not have native *find()*.
 - **deque**: *insert*: n/3 push_front(), n/3 push_back()+pop_front(), n/3 push_back().
 - **map and unordered map**: *insert*: n/2 random numbers, n/2 sequential numbers. *erase*: n/2 keys in the map, n/2 random keys.
+</details>
+<details>
+<summary>Naming rules</summary>
 
----
-## Naming conventions
+## Naming rules
 
-- Non-templated container names are prefixed by `c`, e.g. `cstr`, `cbits`, `cregex`.
-- Public STC macros and "keywords" are prefixed by `c_`, e.g. `c_foreach`, `c_init`.
-- Template parameter macros are prefixed by `i_`, e.g. `i_key`, `i_type`.
-- All owning containers can be initialized with `{0}` (also `cstr`), i.e. no heap allocation initially.
-- Common types for a container type Cont:
+- Naming conventions
+    - Non-templated container names are prefixed by `c`, e.g. `cstr`, `cbits`, `cregex`.
+    - Public STC macros and "keywords" are prefixed by `c_`, e.g. `c_foreach`, `c_init`.
+    - Template parameter macros are prefixed by `i_`, e.g. `i_key`, `i_type`.
+    - All owning containers can be initialized with `{0}` (also `cstr`), i.e. no heap allocation initially.
+
+- Common types for any container type Cont:
     - Cont
     - Cont_value
     - Cont_raw
     - Cont_iter
 
-- Functions that are available for most all containers:
+- Functions available for most all containers:
     - Cont_init()
-    - Cont_reserve(&con, capacity)
-    - Cont_drop(&con)
-    - Cont_is_empty(&con)
-    - Cont_size(&con)
-    - Cont_clone(con)
-    - Cont_push(&con, value)
-    - Cont_emplace(&con, rawval)
-    - Cont_erase_at(&con, iter)
-    - Cont_front(&con)
-    - Cont_back(&con)
-    - Cont_begin(&con)
-    - Cont_end(&con)
-    - Cont_next(&iter)
-    - Cont_advance(iter, n)
+    - Cont_from_n(rawvals[], n)
+    - Cont_reserve(Cont*, capacity)
+    - Cont_clone(Cont)
+    - Cont_drop(Cont*)
+    - Cont_size(Cont*)
+    - Cont_is_empty(Cont*)
+    - Cont_push(Cont*, value)
+    - Cont_put_n(Cont*, rawvals[], n)
+    - Cont_erase_at(Cont*, Cont_iter)
+    - Cont_front(Cont*)
+    - Cont_back(Cont*)
+    - Cont_begin(Cont*)
+    - Cont_end(Cont*)
+    - Cont_next(Cont_iter*)
+    - Cont_advance(Cont_iter, n)
+</details>
+<details>
+<summary>Usage</summary>
 
----
 ## Usage
 STC containers have similar functionality to the C++ STL standard containers. All containers except for a few,
 like **cstr** and **cbits** are generic/templated. No type casting is used, so containers are type-safe like
@@ -339,7 +340,10 @@ After erasing the elements found:
  lst: 10 30 40 50
  map: [10: 1] [30: 3] [40: 4] [50: 5]
 ```
----
+</details>
+<details>
+<summary>Installation</summary>
+
 ## Installation
 
 STC is primarily a "headers-only" library, so most headers can simply be included in your program. By default,
@@ -356,7 +360,10 @@ Some of the non-templated types like **cstr**, **csview**, **cregex** and **cspa
 using the ***meson*** build tool. However, most functions in **csview** and **random** are inlined.
 The bitset **cbits**, the zero-terminated string view **zsview** and **algorthm** / **sort** are all fully
 inlined and need no linking with the stc-library.
----
+</details>
+<details>
+<summary>Specifying template parameters</summary>
+
 ## Specifying template parameters
 
 Each templated type requires one `#include`, even if it's the same container base type, as described earlier.
@@ -424,8 +431,10 @@ For the containers marked ***optional***, the features are disabled if the templ
 | smap, sset        |                      |                      || `i_cmp` / `i_less` | `i_cmp` / `i_less` | no       |
 | pqueue            | n/a                  |                      || n/a                | `i_cmp` / `i_less` | no       |
 | queue             | n/a                  | n/a                  || n/a                | n/a                | n/a      |
+</details>
+<details>
+<summary>The <b>emplace</b> methods</summary>
 
----
 ## The *emplace* methods
 
 STC, like c++ STL, has two sets of methods for adding elements to containers. One set begins
@@ -497,8 +506,10 @@ it = hmap_cstr_find(&map, "Hello");
 ```
 Apart from strings, maps and sets are normally used with trivial value types. However, the
 last example on the **hmap** page demonstrates how to specify a map with non-trivial keys.
+</details>
+<details>
+<summary>The <b>erase</b> methods</summary>
 
----
 ## The *erase* methods
 
 | Name                      | Description                  | Container                                |
@@ -508,8 +519,10 @@ last example on the **hmap** page demonstrates how to specify a map with non-tri
 | erase_range()             | iterator based               | smap, sset, vec, deque, list             |
 | erase_n()                 | index based                  | vec, deque, cstr                         |
 | remove()                  | remove all matching values   | list                                     |
+</details>
+<details>
+<summary>User-defined container type name</summary>
 
----
 ## User-defined container type name
 
 Define `i_type` and/or `i_key`:
@@ -523,8 +536,10 @@ MyVec vec = {0};
 MyVec_push(&vec, 42);
 ...
 ```
+</details>
+<details>
+<summary>Forward declarations</summary>
 
----
 ## Forward declarations
 
 There are two ways to pre-declare templated containers in header files:
@@ -602,7 +617,10 @@ Define and use the "private" container in the c-file:
 #include "stc/vec.h"        // Implements PointVec with static linking by default
 ...
 ```
----
+</details>
+<details>
+<summary>Per container-instance customization</summary>
+
 ## Per container-instance customization
 Sometimes it is useful to extend a container type to store extra data, e.g. a comparison
 or allocator function pointer or a context which the function pointers can use. Most
@@ -652,7 +670,10 @@ void maptest()
     IMap_drop(&map);
 }
 ```
----
+</details>
+<details>
+<summary>Memory efficiency</summary>
+
 ## Memory efficiency
 
 STC is generally very memory efficient. Memory usage for the different containers:
@@ -665,9 +686,12 @@ STC is generally very memory efficient. Memory usage for the different container
 - **smap/sset**: Type size: 1 pointer. *smap* manages its own ***array of tree-nodes*** for allocation efficiency. Each node uses two 32-bit ints for child nodes, and one byte for `level`, but has ***no parent node***.
 - **arc**: Type size: 1 pointer, 1 long for the reference counter + memory for the shared element.
 - **box**: Type size: 1 pointer + memory for the pointed-to element.
+</details>
 
----
-# Version History
+<details>
+<summary>Version history</summary>
+
+## Version history
 
 - New shorthand template parameter `i_TYPE` lets you define `i_type`, `i_key`, and `i_val` all in one line.
 - [**c_filter(C, cnt, filters)**](docs/algorithm_api.md#c_filter) added to `filter.h`: Enforces functional programming paradigm.
@@ -755,34 +779,7 @@ Major changes:
 - Updated **cstr**, now always takes self as pointer, like all containers except csview.
 - Updated **vec**, **deque**, changed `*_range*` function names.
 
-## Changes version 3.8
-- Overhauled some **cstr** and **csview** API:
-    - Changed cstr_replace*() => `cstr_replace_at*(self, pos, len, repl)`: Replace at specific position.
-    - Changed `cstr_replace_all() cstr_replace*(self, search, repl, count)`: Replace count occurences.
-    - Renamed `cstr_find_from()` => `cstr_find_at()`
-    - Renamed `cstr_*_u8()` => `cstr_u8_*()`
-    - Renamed `csview_*_u8()` => `csview_u8_*()`
-    - Added cstr_u8_slice() and csview_u8_slice().
-    - Removed `csview_from_s()`: Use `cstr_sv(s)` instead.
-    - Added back file coption.h
-    - Simplified **cbits** usage: all inlined.
-    - Updated docs.
+</details>
 
-## Changes version 3.7
-- NB! Changed self argument from value to const pointer on containers (does not apply to **cstr**):
-    - `CNT_size(const CNT *self)`
-    - `CNT_capacity(const CNT *self)`
-    - `CNT_is_empty(const CNT *self)`
-- Now both **stack** and **cbits** can be used with template `i_capacity` parameter: `#define i_capacity <NUM>`. They then use fixed sized arrays, and no heap allocated memory.
-- Renamed *cstr_rename_n()* => *cstr_rename_from_n()* as it could be confused with replacing n instances instead of n bytes.
-- Fixed bug in `smap.h`: begin() on empty map was not fully initialized.
-
-## Changes version 3.6
-- Swapped to new **cstr** (*short string optimized*, aka SSO). Note that `cstr_str(&s)` must be used, `s.str` is no longer usable.
-- Removed *redundant* size argument to `i_hash` template parameter and `c_default_hash`. Please update your code.
-- Added general `i_keyclone/i_valclone` template parameter: containers of smart pointers (**arc**, **box**) now correctly cloned.
-- Allows for `i_key*` template parameters instead of `i_val*` for all containers, not only for **hset** and **sset**.
-- Optimized *c_default_hash()*. Therefore *c_hash32()* and *c_hash64()* are removed (same speed).
-- Added *.._push()* and *.._emplace()* function to all containers to allow for more generic coding.
-- Renamed global PRNGs *stc64_random()* and *stc64_srandom()* to *crand64_uint()* and *crand64_seed()*.
-- Added some examples and benchmarks for SSO and heterogenous lookup comparison with c++20 (string_bench_*.cpp).
+---
+---

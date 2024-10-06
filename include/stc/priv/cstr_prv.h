@@ -34,7 +34,7 @@
   #pragma GCC diagnostic ignored "-Warray-bounds"
 #endif
 
-enum  { cstr_s_last = sizeof(cstr_buf) - 1,
+enum  { cstr_s_last = sizeof(cstr_view) - 1,
         cstr_s_cap = cstr_s_last - 1 };
 #define cstr_s_size(s)          ((isize)(s)->sml.data[cstr_s_last])
 #define cstr_s_set_size(s, len) ((s)->sml.data[len] = 0, (s)->sml.data[cstr_s_last] = (char)(len))
@@ -80,9 +80,9 @@ extern  size_t      cstr_hash(const cstr *self);
 extern  bool        cstr_u8_valid(const cstr* self);
 extern  void        cstr_u8_erase(cstr* self, isize u8pos, isize u8len);
 
-STC_INLINE cstr_buf cstr_buffer(cstr* s) {
-    return cstr_is_long(s) ? c_literal(cstr_buf){s->lon.data, cstr_l_size(s), cstr_l_cap(s)}
-                           : c_literal(cstr_buf){s->sml.data, cstr_s_size(s), cstr_s_cap};
+STC_INLINE cstr_view cstr_getview(cstr* s) {
+    return cstr_is_long(s) ? c_literal(cstr_view){s->lon.data, cstr_l_size(s), cstr_l_cap(s)}
+                           : c_literal(cstr_view){s->sml.data, cstr_s_size(s), cstr_s_cap};
 }
 STC_INLINE zsview cstr_zv(const cstr* s) {
     return cstr_is_long(s) ? c_literal(zsview){s->lon.data, cstr_l_size(s)}

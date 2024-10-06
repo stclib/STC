@@ -35,7 +35,7 @@ isize cstr_find_sv(const cstr* self, csview search) {
 }
 
 char* _cstr_internal_move(cstr* self, const isize pos1, const isize pos2) {
-    cstr_buf r = cstr_buffer(self);
+    cstr_view r = cstr_getview(self);
     if (pos1 != pos2) {
         const isize newlen = (r.size + pos2 - pos1);
         if (newlen > r.cap)
@@ -80,7 +80,7 @@ char* cstr_reserve(cstr* self, const isize cap) {
 }
 
 char* cstr_resize(cstr* self, const isize size, const char value) {
-    cstr_buf r = cstr_buffer(self);
+    cstr_view r = cstr_getview(self);
     if (size > r.size) {
         if (size > r.cap && !(r.data = cstr_reserve(self, size)))
             return NULL;
@@ -104,7 +104,7 @@ char* cstr_assign_n(cstr* self, const char* str, const isize len) {
 }
 
 char* cstr_append_n(cstr* self, const char* str, const isize len) {
-    cstr_buf r = cstr_buffer(self);
+    cstr_view r = cstr_getview(self);
     if (r.size + len > r.cap) {
         const size_t off = (size_t)(str - r.data);
         r.data = cstr_reserve(self, r.size*3/2 + len);
@@ -132,14 +132,14 @@ cstr cstr_from_replace(csview in, csview search, csview repl, int32_t count) {
 }
 
 void cstr_erase(cstr* self, const isize pos, isize len) {
-    cstr_buf r = cstr_buffer(self);
+    cstr_view r = cstr_getview(self);
     if (len > r.size - pos) len = r.size - pos;
     c_memmove(&r.data[pos], &r.data[pos + len], r.size - (pos + len));
     _cstr_set_size(self, r.size - len);
 }
 
 void cstr_shrink_to_fit(cstr* self) {
-    cstr_buf r = cstr_buffer(self);
+    cstr_view r = cstr_getview(self);
     if (r.size == r.cap)
         return;
     if (r.size > cstr_s_cap) {
@@ -159,7 +159,7 @@ void cstr_shrink_to_fit(cstr* self) {
 #include <stdarg.h>
 
 char* cstr_append_uninit(cstr *self, isize len) {
-    cstr_buf r = cstr_buffer(self);
+    cstr_view r = cstr_getview(self);
     if (r.size + len > r.cap && !(r.data = cstr_reserve(self, r.size*3/2 + len)))
         return NULL;
     _cstr_set_size(self, r.size + len);
@@ -171,7 +171,7 @@ bool cstr_getdelim(cstr *self, const int delim, FILE *fp) {
     if (c == EOF)
         return false;
     isize pos = 0;
-    cstr_buf r = cstr_buffer(self);
+    cstr_view r = cstr_getview(self);
     for (;;) {
         if (c == delim || c == EOF) {
             _cstr_set_size(self, pos);

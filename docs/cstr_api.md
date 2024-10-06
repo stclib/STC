@@ -23,34 +23,35 @@ All cstr definitions and prototypes are available by including a single header f
 ## Methods
 ```c
 cstr        cstr_lit(const char literal_only[]);                    // cstr from literal; no strlen() call.
-cstr        cstr_init(void);                                        // constructor; empty string
-cstr        cstr_from(const char* str);                             // constructor using strlen()
+cstr        cstr_init(void);                                        // make an empty string
+cstr        cstr_from(const char* str);                             // construct from a zero-terminated c-string.
+cstr        cstr_from_n(const char* str, isize n);                  // construct from first n bytes of str
 cstr        cstr_from_s(cstr s, isize pos, isize len);              // construct a substring
 cstr        cstr_from_fmt(const char* fmt, ...);                    // printf() formatting
 cstr        cstr_from_replace(csview sv, csview search, csview repl, int32_t count);
-cstr        cstr_from_zv(zsview zv);                                // construct cstr from a null-terminated sview
-cstr        cstr_from_sv(csview sv);                                // construct cstr from csview
-cstr        cstr_from_n(const char* str, isize n);                  // constructor with first n bytes of str
-cstr        cstr_with_capacity(isize cap);
-cstr        cstr_with_size(isize len, char fill);                   // repeat fill len times
+cstr        cstr_from_sv(csview sv);                                // construct from a string view
+cstr        cstr_from_zv(zsview zv);                                // construct from a zero-terminated zsview
+cstr        cstr_with_capacity(isize cap);                          // make empty string with pre-allocated capacity.
+cstr        cstr_with_size(isize len, char fill);                   // make string with fill characters
 
 cstr        cstr_clone(cstr s);
 cstr*       cstr_take(cstr* self, cstr s);                          // take ownership of s, i.e. don't drop s.
 cstr        cstr_move(cstr* self);                                  // move string to caller, leave self empty
 void        cstr_drop(cstr* self);                                  // destructor
 
+zsview      cstr_zv(const cstr* self);                              // to zero-terminated string view
+csview      cstr_sv(const cstr* self);                              // to csview string view
+zsview      cstr_right(cstr* self, isize len);                      // zsview subview of the trailing len bytes
+csview      cstr_subview(const cstr* self, isize pos, isize len);   // csview subview from pos and length len
+
 const char* cstr_str(const cstr* self);                             // to const char*
-zsview      cstr_zv(const cstr* self);                              // to zsview
-csview      cstr_sv(const cstr* self);                              // to csview
-csview      cstr_subview(const cstr* self, isize pos, isize len);   // create a subview
-zsview      cstr_right(cstr* self, isize len);                      // subview of the trailing len bytes
 char*       cstr_data(cstr* self);                                  // to mutable char*
-cstr_buf    cstr_buffer(cstr* self);                                // to mutable buffer (with capacity)
+cstr_view    cstr_getview(cstr* self);                                // to mutable buffer struct (with capacity)
 
 isize       cstr_size(const cstr* self);
 isize       cstr_capacity(const cstr* self);
 isize       cstr_to_index(const cstr* self, cstr_iter it);          // get byte position at iter.
-bool        cstr_is_empty(const cstr* self);
+bool        cstr_is_empty(const cstr* self);                        // test from empty string
 
 void        cstr_clear(cstr* self);
 char*       cstr_reserve(cstr* self, isize capacity);               // return pointer to buffer
@@ -60,7 +61,7 @@ void        cstr_shrink_to_fit(cstr* self);
 char*       cstr_assign(cstr* self, const char* str);
 char*       cstr_assign_n(cstr* self, const char* str, isize n);    // assign n first bytes of str
 char*       cstr_assign_sv(cstr* self, csview sv);
-char*       cstr_copy(cstr* self, cstr s);                          // copy-assign a cstr
+char*       cstr_copy(cstr* self, cstr s);                          // assign a clone of s
 int         cstr_printf(cstr* self, const char* fmt, ...);          // source and target must not overlap.
 
 char*       cstr_append(cstr* self, const char* str);
@@ -154,7 +155,7 @@ char*       c_strnstrn(const char* str, isize slen, const char* needle, isize nl
 | `cstr`          | `struct { ... }`                             | The string type      |
 | `cstr_value`    | `char`                                       | String element type  |
 | `cstr_iter`     | `union { cstr_value *ref; csview chr; }`     | String iterator      |
-| `cstr_buf`      | `struct { char *data; isize size, cap; }` | String buffer type   |
+| `cstr_view`      | `struct { char *data; isize size, cap; }` | String buffer type   |
 
 ## Constants and macros
 
