@@ -119,8 +119,15 @@ STC_INLINE void csview_next(csview_iter* it) {
 STC_INLINE csview csview_u8_from(const char* str, isize u8pos, isize u8len)
     { return utf8_span(str, u8pos, u8len); }
 
-STC_INLINE csview csview_u8_subview(csview sv, isize u8pos, isize u8len)
-    { return utf8_span(sv.buf, u8pos, u8len); }
+STC_INLINE csview csview_u8_subview(csview sv, isize u8pos, isize u8len) {
+    const char* s, *end = &sv.buf[sv.size];
+    while ((u8pos > 0) & (sv.buf != end))
+        u8pos -= (*++sv.buf & 0xC0) != 0x80;
+    s = sv.buf;
+    while ((u8len > 0) & (s != end))
+        u8len -= (*++s & 0xC0) != 0x80;
+    sv.size = s - sv.buf; return sv;
+}
 
 STC_INLINE csview csview_u8_right(csview sv, isize u8len) {
     const char* p = &sv.buf[sv.size];
@@ -131,8 +138,10 @@ STC_INLINE csview csview_u8_right(csview sv, isize u8len) {
 }
 
 STC_INLINE csview csview_u8_chr(csview sv, isize u8pos) {
-    sv.buf = utf8_at(sv.buf, u8pos);
-    sv.size = utf8_chr_size(sv.buf);
+    const char *end = &sv.buf[sv.size];
+    while ((u8pos > 0) & (sv.buf != end))
+        u8pos -= (*++sv.buf & 0xC0) != 0x80;
+    sv.size = sv.buf != end ? utf8_chr_size(sv.buf) : 0;
     return sv;
 }
 
