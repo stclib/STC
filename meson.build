@@ -10,9 +10,9 @@ stcversion = 5
 cc = meson.get_compiler('c')
 
 if cc.get_id() == 'gcc' or cc.get_id() == 'clang'
-  add_global_arguments('-Wno-missing-field-initializers', '-Wno-stringop-overflow', language: ['c', 'cpp'])
+  add_project_arguments('-Wno-missing-field-initializers', '-Wno-stringop-overflow', language: ['c', 'cpp'])
 elif cc.get_id() == 'msvc'
-  add_global_arguments('-wd4996', language: ['c', 'cpp']) # no "unsecure" funcs warnings
+  add_project_arguments('-wd4996', language: ['c', 'cpp']) # no "unsecure" funcs warnings
 endif
 
 libsrc = files(
