@@ -122,6 +122,19 @@ crand64_make_uniform(int64_t low, int64_t high) {
     return d;
 }
 
+// 128-bit multiplication
+#if defined(__SIZEOF_INT128__)
+    #define c_umul128(a, b, lo, hi) \
+        do { __uint128_t _z = (__uint128_t)(a)*(b); \
+             *(lo) = (uint64_t)_z, *(hi) = (uint64_t)(_z >> 64U); } while(0)
+#elif defined(_MSC_VER) && defined(_WIN64)
+    #include <intrin.h>
+    #define c_umul128(a, b, lo, hi) ((void)(*(lo) = _umul128(a, b, hi)))
+#elif defined(__x86_64__)
+    #define c_umul128(a, b, lo, hi) \
+        asm("mulq %3" : "=a"(*(lo)), "=d"(*(hi)) : "a"(a), "rm"(b))
+#endif
+
 STC_INLINE int64_t
 crand64_uniform_r(crand64* rng, uint64_t stream, crand64_uniform_dist* d) {
     uint64_t lo, hi;

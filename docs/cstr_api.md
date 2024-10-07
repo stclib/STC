@@ -46,7 +46,7 @@ csview      cstr_subview(const cstr* self, isize pos, isize len);   // csview su
 
 const char* cstr_str(const cstr* self);                             // to const char*
 char*       cstr_data(cstr* self);                                  // to mutable char*
-cstr_view    cstr_getview(cstr* self);                                // to mutable buffer struct (with capacity)
+cstr_view   cstr_getview(cstr* self);                               // to mutable buffer struct (with capacity)
 
 isize       cstr_size(const cstr* self);
 isize       cstr_capacity(const cstr* self);
@@ -116,8 +116,11 @@ void        cstr_u8_replace(cstr* self, isize u8pos, isize u8len, const char* re
 void        cstr_u8_erase(cstr* self, isize u8pos, isize u8len);    // erase u8len runes from u8pos
 bool        cstr_u8_valid(const cstr* self);                        // verify that str is valid utf8
 
-// iterate utf8 codepoints
-cstr_iter   cstr_begin(const cstr* self);
+bool        cstr_iequals(const cstr* self, const char* str);        // utf8 case-insensitive comparison
+bool        cstr_istarts_with(const cstr* self, const char* str);   // utf8 case-insensitive
+bool        cstr_iends_with(const cstr* self, const char* str);     // utf8 case-insensitive
+
+cstr_iter   cstr_begin(const cstr* self);                           // iterate utf8 codepoints (runes)
 cstr_iter   cstr_end(const cstr* self);
 void        cstr_next(cstr_iter* it);                               // next rune
 cstr_iter   cstr_advance(cstr_iter it, isize u8pos);                // advance +/- runes
@@ -129,21 +132,17 @@ cstr        cstr_tolower(const char* str);                          // returns n
 cstr        cstr_toupper(const char* str);                          // returns new uppercase utf8 cstr
 void        cstr_lowercase(cstr* self);                             // transform cstr to lowercase utf8
 void        cstr_uppercase(cstr* self);                             // transform cstr to uppercase utf8
-
-int         cstr_icmp(const cstr* s1, const cstr* s2);              // utf8 case-insensitive comparison
-bool        cstr_ieq(const cstr* s1, const cstr* s2);               // utf8 case-insensitive comparison
-bool        cstr_iequals(const cstr* self, const char* str);        //   "
-bool        cstr_istarts_with(const cstr* self, const char* str);   //   "
-bool        cstr_iends_with(const cstr* self, const char* str);     //   "
 ```
 
 Note that all methods with arguments `(..., const char* str, isize n)`, `n` must be within the range of `str` length.
 
 #### Helper methods:
 ```c
+size_t      cstr_hash(const cstr* self);
 int         cstr_cmp(const cstr* s1, const cstr* s2);
 bool        cstr_eq(const cstr* s1, const cstr* s2);
-size_t      cstr_hash(const cstr* self);
+int         cstr_icmp(const cstr* s1, const cstr* s2);              // utf8 case-insensitive comparison
+bool        cstr_ieq(const cstr* s1, const cstr* s2);               // utf8 case-insensitive comparison
 
 char*       c_strnstrn(const char* str, isize slen, const char* needle, isize nlen);
 ```
