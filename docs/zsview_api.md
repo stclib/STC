@@ -21,51 +21,51 @@ All zsview definitions and prototypes are available by including a single header
 
 ## Methods
 ```c
-zsview      c_zv(const char literal_only[]);                    // create from string literal only
-zsview      zsview_from(const char* str);                       // construct from const char*
-zsview      zsview_from_position(zsview zv, isize pos);         // subview starting from index pos
+zsview          c_zv(const char literal_only[]);                    // create from string literal only
+zsview          zsview_from(const char* str);                       // construct from const char*
+zsview          zsview_from_position(zsview zv, isize pos);         // subview starting from index pos
 
-isize       zsview_size(zsview zv);
-bool        zsview_is_empty(zsview zv);                         // check if size == 0
-void        zsview_clear(zsview* self);
+isize           zsview_size(zsview zv);
+bool            zsview_is_empty(zsview zv);                         // check if size == 0
+void            zsview_clear(zsview* self);
 
-csview      zsview_sv(zsview zv);                               // convert to csview type
-csview      zsview_subview(zsview zv, isize pos, isize len);    // convert to csview type
-zsview      zsview_right(zsview zv, isize len);                 // subview of the trailing n bytes
+csview          zsview_sv(zsview zv);                               // convert to csview type
+csview          zsview_subview(zsview zv, isize pos, isize len);    // convert to csview type
+zsview          zsview_right(zsview zv, isize len);                 // subview of the trailing n bytes
 
-bool        zsview_equals(zsview zv, const char* str);
-isize       zsview_find(zsview zv, const char* str);
-bool        zsview_contains(zsview zv, const char* str);
-bool        zsview_starts_with(zsview zv, const char* str);
-bool        zsview_ends_with(zsview zv, const char* str);
+bool            zsview_equals(zsview zv, const char* str);
+isize           zsview_find(zsview zv, const char* str);
+bool            zsview_contains(zsview zv, const char* str);
+bool            zsview_starts_with(zsview zv, const char* str);
+bool            zsview_ends_with(zsview zv, const char* str);
 ```
 
 #### UTF8 methods
 ```c
-zsview      zsview_u8_from_position(zsview zv, isize u8pos);    // subview starting from rune u8pos
-isize       zsview_u8_size(zsview zv);                          // number of utf8 runes
-csview      zsview_u8_chr(zsview zv, isize u8pos);              // get rune at rune position
-csview      zsview_u8_subview(zsview zs, isize u8pos, isize u8len);
-zsview      zsview_u8_right(zsview zv, isize u8len);            // subview of the last u8len runes
-bool        zsview_u8_valid(zsview zv);                         // check utf8 validity of zv
+zsview          zsview_u8_from_position(zsview zv, isize u8pos);    // subview starting from rune u8pos
+isize           zsview_u8_size(zsview zv);                          // number of utf8 runes
+csview          zsview_u8_chr(zsview zv, isize u8pos);              // get rune at rune position
+csview          zsview_u8_subview(zsview zs, isize u8pos, isize u8len);
+zsview          zsview_u8_right(zsview zv, isize u8len);            // subview of the last u8len runes
+bool            zsview_u8_valid(zsview zv);                         // check utf8 validity of zv
 
-bool        zsview_iequals(zsview zs, const char* str);         // utf8 case-insensitive comparison
-bool        zsview_istarts_with(zsview zs, const char* str);    // utf8 case-insensitive
-bool        zsview_iends_with(zsview zs, const char* str);      // utf8 case-insensitive
+bool            zsview_iequals(zsview zs, const char* str);         // utf8 case-insensitive comparison
+bool            zsview_istarts_with(zsview zs, const char* str);    // utf8 case-insensitive
+bool            zsview_iends_with(zsview zs, const char* str);      // utf8 case-insensitive
 
-zsview_iter zsview_begin(const zsview* self);                   // utf8 iteration
-zsview_iter zsview_end(const zsview* self);
-void        zsview_next(zsview_iter* it);                       // next rune
-zsview_iter zsview_advance(zsview_iter it, isize u8pos);        // advance +/- runes
+zsview_iter     zsview_begin(const zsview* self);                   // utf8 iteration
+zsview_iter     zsview_end(const zsview* self);
+void            zsview_next(zsview_iter* it);                       // next rune
+zsview_iter     zsview_advance(zsview_iter it, isize u8pos);        // advance +/- runes
 ```
 
 #### Helper methods for usage in containers
 ```c
-uint64_t    zsview_hash(const zsview* x);
-int         zsview_cmp(const zsview* x, const zsview* y);
-bool        zsview_eq(const zsview* x, const zsview* y);
-int         zsview_icmp(const zsview* s1, const zsview* s2);    // utf8 case-insensitive comparison
-bool        zsview_ieq(const zsview* s1, const zsview* s2);     // "
+uint64_t        zsview_hash(const zsview* x);
+int             zsview_cmp(const zsview* x, const zsview* y);
+bool            zsview_eq(const zsview* x, const zsview* y);
+int             zsview_icmp(const zsview* s1, const zsview* s2);    // utf8 case-insensitive comparison
+bool            zsview_ieq(const zsview* s1, const zsview* s2);     // "
 ```
 
 ## Types

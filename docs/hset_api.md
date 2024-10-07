@@ -28,40 +28,40 @@ A **hset** is an associative container that contains a set of unique objects of 
 ## Methods
 
 ```c
-hset_X              hset_X_init(void);
-hset_X              hset_X_with_capacity(isize cap);
-hset_X              hset_X_clone(hset_x set);
+hset_X          hset_X_init(void);
+hset_X          hset_X_with_capacity(isize cap);
+hset_X          hset_X_clone(hset_x set);
 
-void                hset_X_clear(hset_X* self);
-void                hset_X_copy(hset_X* self, const hset_X* other);
-float               hset_X_max_load_factor(const hset_X* self);              // default: 0.85
-bool                hset_X_reserve(hset_X* self, isize size);
-void                hset_X_shrink_to_fit(hset_X* self);
-void                hset_X_drop(hset_X* self);                               // destructor
+void            hset_X_clear(hset_X* self);
+void            hset_X_copy(hset_X* self, const hset_X* other);
+float           hset_X_max_load_factor(const hset_X* self);              // default: 0.85
+bool            hset_X_reserve(hset_X* self, isize size);
+void            hset_X_shrink_to_fit(hset_X* self);
+void            hset_X_drop(hset_X* self);                               // destructor
 
-bool                hset_X_is_empty(const hset_X* self);
-isize               hset_X_size(const hset_X* self);                         // num. of allocated buckets
-isize               hset_X_capacity(const hset_X* self);                     // buckets * max_load_factor
-isize               hset_X_bucket_count(const hset_X* self);
+bool            hset_X_is_empty(const hset_X* self);
+isize           hset_X_size(const hset_X* self);                         // num. of allocated buckets
+isize           hset_X_capacity(const hset_X* self);                     // buckets * max_load_factor
+isize           hset_X_bucket_count(const hset_X* self);
 
-bool                hset_X_contains(const hset_X* self, i_keyraw rkey);
-const hset_X_value* hset_X_get(const hset_X* self, i_keyraw rkey);          // return NULL if not found
-hset_X_value*       hset_X_get_mut(hset_X* self, i_keyraw rkey);            // mutable get
-hset_X_iter         hset_X_find(const hset_X* self, i_keyraw rkey);
+bool            hset_X_contains(const hset_X* self, i_keyraw rkey);
+const X_value*  hset_X_get(const hset_X* self, i_keyraw rkey);           // return NULL if not found
+X_value*        hset_X_get_mut(hset_X* self, i_keyraw rkey);             // mutable get
+hset_X_iter     hset_X_find(const hset_X* self, i_keyraw rkey);
 
-hset_X_result       hset_X_insert(hset_X* self, i_key key);
-hset_X_result       hset_X_push(hset_X* self, i_key key);                    // alias for insert.
-hset_X_result       hset_X_emplace(hset_X* self, i_keyraw rkey);
+hset_X_result   hset_X_insert(hset_X* self, i_key key);
+hset_X_result   hset_X_push(hset_X* self, i_key key);                    // alias for insert.
+hset_X_result   hset_X_emplace(hset_X* self, i_keyraw rkey);
 
-int                 hset_X_erase(hset_X* self, i_keyraw rkey);               // return 0 or 1
-hset_X_iter         hset_X_erase_at(hset_X* self, hset_X_iter it);           // return iter after it
-void                hset_X_erase_entry(hset_X* self, hset_X_value* entry);
+int             hset_X_erase(hset_X* self, i_keyraw rkey);               // return 0 or 1
+hset_X_iter     hset_X_erase_at(hset_X* self, hset_X_iter it);           // return iter after it
+void            hset_X_erase_entry(hset_X* self, hset_X_value* entry);
 
-hset_X_iter         hset_X_begin(const hset_X* self);
-hset_X_iter         hset_X_end(const hset_X* self);
-void                hset_X_next(hset_X_iter* it);
+hset_X_iter     hset_X_begin(const hset_X* self);
+hset_X_iter     hset_X_end(const hset_X* self);
+void            hset_X_next(hset_X_iter* it);
 
-hset_X_value        hset_X_value_clone(hset_X_value val);
+hset_X_value    hset_X_value_clone(hset_X_value val);
 ```
 
 ## Types

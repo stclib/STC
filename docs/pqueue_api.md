@@ -26,30 +26,30 @@ In the following, `X` is the value of `i_key` unless `i_type` is specified.
 ## Methods
 
 ```c
-pqueue_X            pqueue_X_init(void);                    // create empty pri-queue.
-pqueue_X            pqueue_X_with_capacity(isize cap);
-pqueue_X            pqueue_X_with_size(isize size, i_key null);
-pqueue_X            pqueue_X_clone(pqueue_X pq);
+pqueue_X        pqueue_X_init(void);                            // create empty pri-queue.
+pqueue_X        pqueue_X_with_capacity(isize cap);
+pqueue_X        pqueue_X_with_size(isize size, i_key null);
+pqueue_X        pqueue_X_clone(pqueue_X pq);
 
-void                pqueue_X_clear(pqueue_X* self);
-bool                pqueue_X_reserve(pqueue_X* self, isize n);
-void                pqueue_X_shrink_to_fit(pqueue_X* self);
-void                pqueue_X_copy(pqueue_X* self, const pqueue_X* other);
-void                pqueue_X_drop(pqueue_X* self);        // destructor
+void            pqueue_X_clear(pqueue_X* self);
+bool            pqueue_X_reserve(pqueue_X* self, isize n);
+void            pqueue_X_shrink_to_fit(pqueue_X* self);
+void            pqueue_X_copy(pqueue_X* self, const pqueue_X* other);
+void            pqueue_X_drop(pqueue_X* self);                  // destructor
 
-isize               pqueue_X_size(const pqueue_X* self);
-bool                pqueue_X_is_empty(const pqueue_X* self);
-const i_key*        pqueue_X_top(const pqueue_X* self);
+isize           pqueue_X_size(const pqueue_X* self);
+bool            pqueue_X_is_empty(const pqueue_X* self);
+const i_key*    pqueue_X_top(const pqueue_X* self);
 
-void                pqueue_X_make_heap(pqueue_X* self);  // heapify the vector.
-void                pqueue_X_push(pqueue_X* self, i_key value);
-void                pqueue_X_emplace(pqueue_X* self, i_keyraw raw); // converts from raw
+void            pqueue_X_make_heap(pqueue_X* self);             // heapify the vector.
+void            pqueue_X_push(pqueue_X* self, i_key value);
+void            pqueue_X_emplace(pqueue_X* self, i_keyraw raw); // converts from raw
 
-void                pqueue_X_pop(pqueue_X* self);
-i_key               pqueue_X_pull(const pqueue_X* self);
-void                pqueue_X_erase_at(pqueue_X* self, isize idx);
+void            pqueue_X_pop(pqueue_X* self);
+i_key           pqueue_X_pull(const pqueue_X* self);
+void            pqueue_X_erase_at(pqueue_X* self, isize idx);
 
-i_key               pqueue_X_value_clone(i_key value);
+i_key           pqueue_X_value_clone(i_key value);
 ```
 
 ## Types

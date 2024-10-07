@@ -29,51 +29,51 @@ In the following, `X` is the value of `i_key` unless `i_type` is specified.
 ## Methods
 
 ```c
-stack_X             stack_X_init(void);
-stack_X             stack_X_with_capacity(isize cap);
-stack_X             stack_X_with_size(isize size, i_key fill);
-stack_X             stack_X_clone(stack_X st);
+stack_X         stack_X_init(void);
+stack_X         stack_X_with_capacity(isize cap);
+stack_X         stack_X_with_size(isize size, i_key fill);
+stack_X         stack_X_clone(stack_X st);
 
-void                stack_X_clear(stack_X* self);
-bool                stack_X_reserve(stack_X* self, isize n);
-void                stack_X_shrink_to_fit(stack_X* self);
-i_key*              stack_X_append_uninit(stack_X* self, isize n);
-void                stack_X_copy(stack_X* self, const stack_X* other);
-void                stack_X_drop(stack_X* self);                       // destructor
+void            stack_X_clear(stack_X* self);
+bool            stack_X_reserve(stack_X* self, isize n);
+void            stack_X_shrink_to_fit(stack_X* self);
+i_key*          stack_X_append_uninit(stack_X* self, isize n);
+void            stack_X_copy(stack_X* self, const stack_X* other);
+void            stack_X_drop(stack_X* self);                                    // destructor
 
-isize               stack_X_size(const stack_X* self);
-isize               stack_X_capacity(const stack_X* self);
-bool                stack_X_is_empty(const stack_X* self);
+isize           stack_X_size(const stack_X* self);
+isize           stack_X_capacity(const stack_X* self);
+bool            stack_X_is_empty(const stack_X* self);
 
-const i_key*        stack_X_at(const stack_X* self, isize idx);
-const i_key*        stack_X_top(const stack_X* self);
-const i_key*        stack_X_front(const stack_X* self);
-const i_key*        stack_X_back(const stack_X* self);
+const i_key*    stack_X_at(const stack_X* self, isize idx);
+const i_key*    stack_X_top(const stack_X* self);
+const i_key*    stack_X_front(const stack_X* self);
+const i_key*    stack_X_back(const stack_X* self);
 
-i_key*              stack_X_at_mut(stack_X* self, isize idx);
-i_key*              stack_X_top_mut(stack_X* self);
-i_key*              stack_X_front_mut(stack_X* self);
-i_key*              stack_X_back_mut(stack_X* self);
+i_key*          stack_X_at_mut(stack_X* self, isize idx);
+i_key*          stack_X_top_mut(stack_X* self);
+i_key*          stack_X_front_mut(stack_X* self);
+i_key*          stack_X_back_mut(stack_X* self);
 
-i_key*              stack_X_push(stack_X* self, i_key value);
-i_key*              stack_X_emplace(stack_X* self, i_keyraw raw);
+i_key*          stack_X_push(stack_X* self, i_key value);
+i_key*          stack_X_emplace(stack_X* self, i_keyraw raw);
 
-void                stack_X_pop(stack_X* self);                        // destroy last element
-stack_X_value       stack_X_pull(stack_X* self);                       // move out last element
+void            stack_X_pop(stack_X* self);                                     // destroy last element
+i_key           stack_X_pull(stack_X* self);                                    // move out last element
 
 // Requires either i_use_cmp, i_cmp or i_less defined:
-void                stack_X_sort(stack_X* self);                                    // quicksort from sort.h
-isize               stack_X_lower_bound(const stack_X* self, const i_keyraw raw);   // return -1 if not found
-isize               stack_X_binary_search(const stack_X* self, const i_keyraw raw); // return -1 if not found
+void            stack_X_sort(stack_X* self);                                    // quicksort from sort.h
+isize           stack_X_lower_bound(const stack_X* self, const i_keyraw raw);   // return -1 if not found
+isize           stack_X_binary_search(const stack_X* self, const i_keyraw raw); // return -1 if not found
 
-stack_X_iter        stack_X_begin(const stack_X* self);
-stack_X_iter        stack_X_end(const stack_X* self);
-void                stack_X_next(stack_X_iter* it);
+stack_X_iter    stack_X_begin(const stack_X* self);
+stack_X_iter    stack_X_end(const stack_X* self);
+void            stack_X_next(stack_X_iter* it);
 
-bool                stack_X_eq(const stack_X* c1, const stack_X* c2); // require i_eq/i_cmp/i_less.
-i_key               stack_X_value_clone(i_key value);
-i_keyraw            stack_X_value_toraw(const vec_X_value* pval);
-void                stack_X_value_drop(vec_X_value* pval);
+bool            stack_X_eq(const stack_X* c1, const stack_X* c2); // require i_eq/i_cmp/i_less.
+i_key           stack_X_value_clone(i_key value);
+i_keyraw        stack_X_value_toraw(const vec_X_value* pval);
+void            stack_X_value_drop(vec_X_value* pval);
 ```
 
 ## Types

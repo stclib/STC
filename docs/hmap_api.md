@@ -43,61 +43,61 @@ See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/contain
 ## Methods
 
 ```c
-hmap_X                hmap_X_init(void);
-hmap_X                hmap_X_with_capacity(isize cap);
-hmap_X                hmap_X_clone(hmap_x map);
+hmap_X          hmap_X_init(void);
+hmap_X          hmap_X_with_capacity(isize cap);
+hmap_X          hmap_X_clone(hmap_x map);
 
-void                  hmap_X_clear(hmap_X* self);
-void                  hmap_X_copy(hmap_X* self, const hmap_X* other);
-float                 hmap_X_max_load_factor(const hmap_X* self);                       // default: 0.85f
-bool                  hmap_X_reserve(hmap_X* self, isize size);
-void                  hmap_X_shrink_to_fit(hmap_X* self);
-void                  hmap_X_drop(hmap_X* self);                                        // destructor
+void            hmap_X_clear(hmap_X* self);
+void            hmap_X_copy(hmap_X* self, const hmap_X* other);
+float           hmap_X_max_load_factor(const hmap_X* self);                       // default: 0.85f
+bool            hmap_X_reserve(hmap_X* self, isize size);
+void            hmap_X_shrink_to_fit(hmap_X* self);
+void            hmap_X_drop(hmap_X* self);                                        // destructor
 
-bool                  hmap_X_is_empty(const hmap_X* self );
-isize                 hmap_X_size(const hmap_X* self);
-isize                 hmap_X_capacity(const hmap_X* self);                              // buckets * max_load_factor
-isize                 hmap_X_bucket_count(const hmap_X* self);                          // num. of allocated buckets
+bool            hmap_X_is_empty(const hmap_X* self );
+isize           hmap_X_size(const hmap_X* self);
+isize           hmap_X_capacity(const hmap_X* self);                              // buckets * max_load_factor
+isize           hmap_X_bucket_count(const hmap_X* self);                          // num. of allocated buckets
 
-const hmap_X_mapped*  hmap_X_at(const hmap_X* self, i_keyraw rkey);                     // rkey must be in map
-hmap_X_mapped*        hmap_X_at_mut(hmap_X* self, i_keyraw rkey);                       // mutable at
-const hmap_X_value*   hmap_X_get(const hmap_X* self, i_keyraw rkey);                    // const get
-hmap_X_value*         hmap_X_get_mut(hmap_X* self, i_keyraw rkey);                      // mutable get
-bool                  hmap_X_contains(const hmap_X* self, i_keyraw rkey);
-hmap_X_iter           hmap_X_find(const hmap_X* self, i_keyraw rkey);                   // find element
+const i_val*    hmap_X_at(const hmap_X* self, i_keyraw rkey);                     // rkey must be in map
+i_val*          hmap_X_at_mut(hmap_X* self, i_keyraw rkey);                       // mutable at
+const X_value*  hmap_X_get(const hmap_X* self, i_keyraw rkey);                    // const get
+X_value*        hmap_X_get_mut(hmap_X* self, i_keyraw rkey);                      // mutable get
+bool            hmap_X_contains(const hmap_X* self, i_keyraw rkey);
+hmap_X_iter     hmap_X_find(const hmap_X* self, i_keyraw rkey);                   // find element
 
-hmap_X_result         hmap_X_insert(hmap_X* self, i_key key, i_val mapped);             // no change if key in map
-hmap_X_result         hmap_X_insert_or_assign(hmap_X* self, i_key key, i_val mapped);   // always update mapped
-hmap_X_result         hmap_X_push(hmap_X* self, hmap_X_value entry);                    // similar to insert
-hmap_X_result         hmap_X_put(hmap_X* self, i_keyraw rkey, i_valraw rmapped);        // like emplace_or_assign()
+hmap_X_result   hmap_X_insert(hmap_X* self, i_key key, i_val mapped);             // no change if key in map
+hmap_X_result   hmap_X_insert_or_assign(hmap_X* self, i_key key, i_val mapped);   // always update mapped
+hmap_X_result   hmap_X_push(hmap_X* self, hmap_X_value entry);                    // similar to insert
+hmap_X_result   hmap_X_put(hmap_X* self, i_keyraw rkey, i_valraw rmapped);        // like emplace_or_assign()
 
-hmap_X_result         hmap_X_emplace(hmap_X* self, i_keyraw rkey, i_valraw rmapped);    // no change if rkey in map
-hmap_X_result         hmap_X_emplace_or_assign(hmap_X* self, i_keyraw rkey, i_valraw rmapped); // always update mapped
-hmap_X_result         hmap_X_emplace_key(hmap_X* self, i_keyraw rkey);                  // see example 1.
+hmap_X_result   hmap_X_emplace(hmap_X* self, i_keyraw rkey, i_valraw rmapped);    // no change if rkey in map
+hmap_X_result   hmap_X_emplace_or_assign(hmap_X* self, i_keyraw rkey, i_valraw rmapped); // always update mapped
+hmap_X_result   hmap_X_emplace_key(hmap_X* self, i_keyraw rkey);                  // see example 1.
 
-int                   hmap_X_erase(hmap_X* self, i_keyraw rkey);                        // return 0 or 1
-hmap_X_iter           hmap_X_erase_at(hmap_X* self, hmap_X_iter it);                    // return iter after it
-void                  hmap_X_erase_entry(hmap_X* self, hmap_X_value* entry);
+int             hmap_X_erase(hmap_X* self, i_keyraw rkey);                        // return 0 or 1
+hmap_X_iter     hmap_X_erase_at(hmap_X* self, hmap_X_iter it);                    // return iter after it
+void            hmap_X_erase_entry(hmap_X* self, hmap_X_value* entry);
 
-hmap_X_iter           hmap_X_begin(const hmap_X* self);
-hmap_X_iter           hmap_X_end(const hmap_X* self);
-void                  hmap_X_next(hmap_X_iter* it);
-hmap_X_iter           hmap_X_advance(hmap_X_iter it, hmap_X_ssize n);
+hmap_X_iter     hmap_X_begin(const hmap_X* self);
+hmap_X_iter     hmap_X_end(const hmap_X* self);
+void            hmap_X_next(hmap_X_iter* it);
+hmap_X_iter     hmap_X_advance(hmap_X_iter it, hmap_X_ssize n);
 
-hmap_X_value          hmap_X_value_clone(hmap_X_value val);
-hmap_X_raw            hmap_X_value_toraw(hmap_X_value* pval);
+hmap_X_value    hmap_X_value_clone(hmap_X_value val);
+hmap_X_raw      hmap_X_value_toraw(hmap_X_value* pval);
 ```
 Free helper functions:
 ```c
-size_t                c_hash_n(const void *data, isize n);                  // generic hash function of n bytes
-size_t                c_hash_str(const char *str);                          // string hash function, uses strlen()
-size_t                c_hash_mix(size_t h1, size_t h2, ...);                // mix/combine computed hashes
-isize                 c_next_pow2(isize k);                                 // get next power of 2 >= k
+size_t          c_hash_n(const void *data, isize n);                  // generic hash function of n bytes
+size_t          c_hash_str(const char *str);                          // string hash function, uses strlen()
+size_t          c_hash_mix(size_t h1, size_t h2, ...);                // mix/combine computed hashes
+isize           c_next_pow2(isize k);                                 // get next power of 2 >= k
 
 // hash/equal template default functions:
-size_t                c_default_hash(const T *obj);                         // alias for c_hash_n(obj, sizeof *obj)
-bool                  c_default_eq(const i_keyraw* a, const i_keyraw* b);   // *a == *b
-bool                  c_memcmp_eq(const i_keyraw* a, const i_keyraw* b);    // !memcmp(a, b, sizeof *a)
+size_t          c_default_hash(const T *obj);                         // alias for c_hash_n(obj, sizeof *obj)
+bool            c_default_eq(const i_keyraw* a, const i_keyraw* b);   // *a == *b
+bool            c_memcmp_eq(const i_keyraw* a, const i_keyraw* b);    // !memcmp(a, b, sizeof *a)
 ```
 
 ## Types

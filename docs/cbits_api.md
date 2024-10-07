@@ -23,45 +23,45 @@ All cbits definitions and prototypes are available by including a single header 
 ## Methods
 
 ```c
-cbits       cbits_from(const char* str);
-cbits       cbits_with_size(int64_t size, bool value);              // size must be <= N if N is defined
-cbits       cbits_with_pattern(int64_t size, size_t pattern);
-cbits       cbits_clone(cbits other);
+cbits           cbits_from(const char* str);
+cbits           cbits_with_size(int64_t size, bool value);              // size must be <= N if N is defined
+cbits           cbits_with_pattern(int64_t size, size_t pattern);
+cbits           cbits_clone(cbits other);
 
-void        cbits_clear(cbits* self);
-cbits*      cbits_copy(cbits* self, const cbits* other);
-void        cbits_resize(cbits* self, int64_t size, bool value);    // NB! only for dynamic bitsets!
-void        cbits_drop(cbits* self);
+void            cbits_clear(cbits* self);
+cbits*          cbits_copy(cbits* self, const cbits* other);
+void            cbits_resize(cbits* self, int64_t size, bool value);    // NB! only for dynamic bitsets!
+void            cbits_drop(cbits* self);
 
-cbits*      cbits_take(cbits* self, const cbits* other);            // give other to self
-cbits       cbits_move(cbits* self);                                // transfer self to caller
+cbits*          cbits_take(cbits* self, const cbits* other);            // give other to self
+cbits           cbits_move(cbits* self);                                // transfer self to caller
 
-int64_t     cbits_size(const cbits* self);
-int64_t     cbits_count(const cbits* self);                         // count number of bits set
+int64_t         cbits_size(const cbits* self);
+int64_t         cbits_count(const cbits* self);                         // count number of bits set
 
-bool        cbits_test(const cbits* self, int64_t i);
-bool        cbits_at(const cbits* self, int64_t i);                 // cbits_test() with bounds check.
-bool        cbits_subset_of(const cbits* self, const cbits* other); // is set a subset of other?
-bool        cbits_disjoint(const cbits* self, const cbits* other);  // no common bits
-char*       cbits_to_str(const cbits* self, char* str, int64_t start, int64_t stop);
+bool            cbits_test(const cbits* self, int64_t i);
+bool            cbits_at(const cbits* self, int64_t i);                 // cbits_test() with bounds check.
+bool            cbits_subset_of(const cbits* self, const cbits* other); // is set a subset of other?
+bool            cbits_disjoint(const cbits* self, const cbits* other);  // no common bits
+char*           cbits_to_str(const cbits* self, char* str, int64_t start, int64_t stop);
 
-void        cbits_print(const cbits* self);
-void        cbits_print(const cbits* self, FILE* fp);
-void        cbits_print(const cbits* self, FILE* fp, int64_t start, int64_t stop);
-void        cbits_print(TYPE Bits, const Bits* self, FILE* fp); // for fixed size bitsets
-void        cbits_print(TYPE Bits, const Bits* self, FILE* fp, int64_t start, int64_t stop);
+void            cbits_print(const cbits* self);
+void            cbits_print(const cbits* self, FILE* fp);
+void            cbits_print(const cbits* self, FILE* fp, int64_t start, int64_t stop);
+void            cbits_print(TYPE Bits, const Bits* self, FILE* fp);     // for fixed size bitsets
+void            cbits_print(TYPE Bits, const Bits* self, FILE* fp, int64_t start, int64_t stop);
 
-void        cbits_set(cbits* self, int64_t i);
-void        cbits_reset(cbits* self, int64_t i);
-void        cbits_set_value(cbits* self, int64_t i, bool value);
-void        cbits_set_all(cbits* self, bool value);
-void        cbits_set_pattern(cbits* self, size_t pattern);
-void        cbits_flip_all(cbits* self);
-void        cbits_flip(cbits* self, int64_t i);
+void            cbits_set(cbits* self, int64_t i);
+void            cbits_reset(cbits* self, int64_t i);
+void            cbits_set_value(cbits* self, int64_t i, bool value);
+void            cbits_set_all(cbits* self, bool value);
+void            cbits_set_pattern(cbits* self, size_t pattern);
+void            cbits_flip_all(cbits* self);
+void            cbits_flip(cbits* self, int64_t i);
 
-void        cbits_intersect(cbits* self, const cbits* other);
-void        cbits_union(cbits* self, const cbits* other);
-void        cbits_xor(cbits* self, const cbits* other);             // set of disjoint bits
+void            cbits_intersect(cbits* self, const cbits* other);
+void            cbits_union(cbits* self, const cbits* other);
+void            cbits_xor(cbits* self, const cbits* other);             // set of disjoint bits
 ```
 
 ## Types

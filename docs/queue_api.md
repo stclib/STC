@@ -25,37 +25,37 @@ In the following, `X` is the value of `i_key` unless `i_type` is specified.
 ## Methods
 
 ```c
-queue_X             queue_X_init(void);
-queue_X             queue_X_with_capacity(isize size);
-queue_X             queue_X_clone(queue_X q);
+queue_X         queue_X_init(void);
+queue_X         queue_X_with_capacity(isize size);
+queue_X         queue_X_clone(queue_X q);
 
-void                queue_X_clear(queue_X* self);
-void                queue_X_copy(queue_X* self, const queue_X* other);
-bool                queue_X_reserve(queue_X* self, isize cap);
-void                queue_X_shrink_to_fit(queue_X* self);
-void                queue_X_drop(queue_X* self);       // destructor
+void            queue_X_clear(queue_X* self);
+void            queue_X_copy(queue_X* self, const queue_X* other);
+bool            queue_X_reserve(queue_X* self, isize cap);
+void            queue_X_shrink_to_fit(queue_X* self);
+void            queue_X_drop(queue_X* self);       // destructor
 
-isize               queue_X_size(const queue_X* self);
-isize               queue_X_capacity(const queue_X* self);
-bool                queue_X_is_empty(const queue_X* self);
+isize           queue_X_size(const queue_X* self);
+isize           queue_X_capacity(const queue_X* self);
+bool            queue_X_is_empty(const queue_X* self);
 
-queue_X_value*      queue_X_front(const queue_X* self);
-queue_X_value*      queue_X_back(const queue_X* self);
+i_key*          queue_X_front(const queue_X* self);
+i_key*          queue_X_back(const queue_X* self);
 
-queue_X_value*      queue_X_push(queue_X* self, i_key value);
-queue_X_value*      queue_X_emplace(queue_X* self, i_keyraw raw);
-void                queue_X_pop(queue_X* self);
-queue_X_value       queue_X_pull(queue_X* self);                       // move out last element
+i_key*          queue_X_push(queue_X* self, i_key value);
+i_key*          queue_X_emplace(queue_X* self, i_keyraw raw);
+void            queue_X_pop(queue_X* self);
+i_key           queue_X_pull(queue_X* self);                       // move out last element
 
-queue_X_iter        queue_X_begin(const queue_X* self);
-queue_X_iter        queue_X_end(const queue_X* self);
-void                queue_X_next(queue_X_iter* it);
-queue_X_iter        queue_X_advance(queue_X_iter it, isize n);
+queue_X_iter    queue_X_begin(const queue_X* self);
+queue_X_iter    queue_X_end(const queue_X* self);
+void            queue_X_next(queue_X_iter* it);
+queue_X_iter    queue_X_advance(queue_X_iter it, isize n);
 
-bool                queue_X_eq(const queue_X* c1, const queue_X* c2); //  require i_eq/i_cmp/i_less.
-i_key               queue_X_value_clone(i_key value);
-queue_X_raw         queue_X_value_toraw(const queue_X_value* pval);
-void                queue_X_value_drop(queue_X_value* pval);
+bool            queue_X_eq(const queue_X* c1, const queue_X* c2); //  require i_eq/i_cmp/i_less.
+i_key           queue_X_value_clone(i_key value);
+queue_X_raw     queue_X_value_toraw(const i_key* pval);
+void            queue_X_value_drop(i_key* pval);
 ```
 
 ## Types

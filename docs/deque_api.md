@@ -32,70 +32,70 @@ See the c++ class [std::deque](https://en.cppreference.com/w/cpp/container/deque
 ## Methods
 
 ```c
-deque_X                 deque_X_init(void);
-deque_X                 deque_X_with_capacity(isize size);
-deque_X                 deque_X_clone(deque_X deque);
+deque_X         deque_X_init(void);
+deque_X         deque_X_with_capacity(isize size);
+deque_X         deque_X_clone(deque_X deque);
 
-void                    deque_X_clear(deque_X* self);
-void                    deque_X_copy(deque_X* self, const deque_X* other);
-bool                    deque_X_reserve(deque_X* self, isize cap);
-void                    deque_X_shrink_to_fit(deque_X* self);
-void                    deque_X_drop(deque_X* self);                                     // destructor
+void            deque_X_clear(deque_X* self);
+void            deque_X_copy(deque_X* self, const deque_X* other);
+bool            deque_X_reserve(deque_X* self, isize cap);
+void            deque_X_shrink_to_fit(deque_X* self);
+void            deque_X_drop(deque_X* self);                                     // destructor
 
-bool                    deque_X_is_empty(const deque_X* self);
-isize                   deque_X_size(const deque_X* self);
-isize                   deque_X_capacity(const deque_X* self);
+bool            deque_X_is_empty(const deque_X* self);
+isize           deque_X_size(const deque_X* self);
+isize           deque_X_capacity(const deque_X* self);
 
-deque_X_iter            deque_X_find(const deque_X* self, i_keyraw raw);
-deque_X_iter            deque_X_find_in(deque_X_iter i1, deque_X_iter i2, i_keyraw raw);  // return vec_X_end() if not found
+deque_X_iter    deque_X_find(const deque_X* self, i_keyraw raw);
+deque_X_iter    deque_X_find_in(deque_X_iter i1, deque_X_iter i2, i_keyraw raw); // return vec_X_end() if not found
 
-const i_key*            deque_X_at(const deque_X* self, isize idx);
-const i_key*            deque_X_get(const deque_X* self, i_keyraw raw);                 // return NULL if not found
-const i_key*            deque_X_front(const deque_X* self);
-const i_key*            deque_X_back(const deque_X* self);
+const i_key*    deque_X_at(const deque_X* self, isize idx);
+const i_key*    deque_X_get(const deque_X* self, i_keyraw raw);                  // return NULL if not found
+const i_key*    deque_X_front(const deque_X* self);
+const i_key*    deque_X_back(const deque_X* self);
 
-i_key*                  deque_X_at_mut(deque_X* self, isize idx);
-i_key*                  deque_X_get_mut(deque_X* self, i_keyraw raw);                   // mutable get
-i_key*                  deque_X_front_mut(deque_X* self);
-i_key*                  deque_X_back_mut(deque_X* self);
+i_key*          deque_X_at_mut(deque_X* self, isize idx);
+i_key*          deque_X_get_mut(deque_X* self, i_keyraw raw);                   // mutable get
+i_key*          deque_X_front_mut(deque_X* self);
+i_key*          deque_X_back_mut(deque_X* self);
 
 // Requires either i_use_cmp, i_cmp or i_less defined:
-void                    deque_X_sort(deque_X* self);                                    // quicksort from sort.h
-isize                   deque_X_lower_bound(const deque_X* self, const i_keyraw raw);   // return -1 if not found
-isize                   deque_X_binary_search(const deque_X* self, const i_keyraw raw); // return -1 if not found
+void            deque_X_sort(deque_X* self);                                     // quicksort from sort.h
+isize           deque_X_lower_bound(const deque_X* self, const i_keyraw raw);    // return -1 if not found
+isize           deque_X_binary_search(const deque_X* self, const i_keyraw raw);  // return -1 if not found
 
-i_key*                  deque_X_push_front(deque_X* self, i_key value);
-i_key*                  deque_X_emplace_front(deque_X* self, i_keyraw raw);
-void                    deque_X_pop_front(deque_X* self);
-i_key                   deque_X_pull_front(deque_X* self);                              // move out front element
+i_key*          deque_X_push_front(deque_X* self, i_key value);
+i_key*          deque_X_emplace_front(deque_X* self, i_keyraw raw);
+void            deque_X_pop_front(deque_X* self);
+i_key           deque_X_pull_front(deque_X* self);                               // move out front element
 
-i_key*                  deque_X_push_back(deque_X* self, i_key value);
-i_key*                  deque_X_push(deque_X* self, i_key value);                       // alias for push_back()
-i_key*                  deque_X_emplace_back(deque_X* self, i_keyraw raw);
-i_key*                  deque_X_emplace(deque_X* self, i_keyraw raw);                   // alias for emplace_back()
-void                    deque_X_pop_back(deque_X* self);                                // remove and destroy back()
-i_key                   deque_X_pull_back(deque_X* self);                               // move out last element
+i_key*          deque_X_push_back(deque_X* self, i_key value);
+i_key*          deque_X_push(deque_X* self, i_key value);                        // alias for push_back()
+i_key*          deque_X_emplace_back(deque_X* self, i_keyraw raw);
+i_key*          deque_X_emplace(deque_X* self, i_keyraw raw);                    // alias for emplace_back()
+void            deque_X_pop_back(deque_X* self);                                 // remove and destroy back()
+i_key           deque_X_pull_back(deque_X* self);                                // move out last element
 
-deque_X_iter            deque_X_insert_n(deque_X* self, isize idx, const i_key[] arr, isize n);  // move values
-deque_X_iter            deque_X_insert_at(deque_X* self, deque_X_iter it, i_key value); // move value
-deque_X_iter            deque_X_insert_uninit(deque_X* self, isize idx, isize n);       // uninitialized data
+deque_X_iter    deque_X_insert_n(deque_X* self, isize idx, const i_key[] arr, isize n);  // move values
+deque_X_iter    deque_X_insert_at(deque_X* self, deque_X_iter it, i_key value);  // move value
+deque_X_iter    deque_X_insert_uninit(deque_X* self, isize idx, isize n);        // uninitialized data
                         // copy values:
-deque_X_iter            deque_X_emplace_n(deque_X* self, isize idx, const i_keyraw[] arr, isize n);
-deque_X_iter            deque_X_emplace_at(deque_X* self, deque_X_iter it, i_keyraw raw);
+deque_X_iter    deque_X_emplace_n(deque_X* self, isize idx, const i_keyraw[] arr, isize n);
+deque_X_iter    deque_X_emplace_at(deque_X* self, deque_X_iter it, i_keyraw raw);
 
-void                    deque_X_erase_n(deque_X* self, isize idx, isize n);
-deque_X_iter            deque_X_erase_at(deque_X* self, deque_X_iter it);
-deque_X_iter            deque_X_erase_range(deque_X* self, deque_X_iter it1, deque_X_iter it2);
+void            deque_X_erase_n(deque_X* self, isize idx, isize n);
+deque_X_iter    deque_X_erase_at(deque_X* self, deque_X_iter it);
+deque_X_iter    deque_X_erase_range(deque_X* self, deque_X_iter it1, deque_X_iter it2);
 
-deque_X_iter            deque_X_begin(const deque_X* self);
-deque_X_iter            deque_X_end(const deque_X* self);
-void                    deque_X_next(deque_X_iter* it);
-deque_X_iter            deque_X_advance(deque_X_iter it, isize n);
+deque_X_iter    deque_X_begin(const deque_X* self);
+deque_X_iter    deque_X_end(const deque_X* self);
+void            deque_X_next(deque_X_iter* it);
+deque_X_iter    deque_X_advance(deque_X_iter it, isize n);
 
-bool                    deque_X_eq(const deque_X* c1, const deque_X* c2); // require i_eq/i_cmp/i_less.
-i_key                   deque_X_value_clone(i_key val);
-deque_X_raw             deque_X_value_toraw(const i_key* pval);
-void                    deque_X_value_drop(i_key* pval);
+bool            deque_X_eq(const deque_X* c1, const deque_X* c2); // require i_eq/i_cmp/i_less.
+i_key           deque_X_value_clone(i_key val);
+deque_X_raw     deque_X_value_toraw(const i_key* pval);
+void            deque_X_value_drop(i_key* pval);
 ```
 ## Types
 

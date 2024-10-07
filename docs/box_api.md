@@ -39,29 +39,29 @@ compare the pointer addresses when used. Additionally, `c_no_clone` or `i_is_fwd
 
 ## Methods
 ```c
-box_X       box_X_init();                                   // return an empty box
-box_X       box_X_from(i_keyraw raw);                       // create a box from raw type. Avail if i_keyraw user defined.
-box_X       box_X_from_ptr(i_key* ptr);                     // create a box from a pointer. Takes ownership of ptr.
-box_X       box_X_make(i_key val);                          // create a box from unowned val object.
+box_X           box_X_init();                                   // return an empty box
+box_X           box_X_from(i_keyraw raw);                       // create a box from raw type. Avail if i_keyraw user defined.
+box_X           box_X_from_ptr(i_key* ptr);                     // create a box from a pointer. Takes ownership of ptr.
+box_X           box_X_make(i_key val);                          // create a box from unowned val object.
 
-box_X       box_X_clone(box_X other);                       // return deep copied clone
-box_X       box_X_move(box_X* self);                        // transfer ownership to receiving box returned. self becomes NULL.
-void        box_X_take(box_X* self, box_X unowned);         // take ownership of unowned box object.
-void        box_X_assign(box_X* self, box_X* moved);        // transfer ownership from moved to self; moved becomes NULL.
-void        box_X_drop(box_X* self);                        // destruct the contained object and free its heap memory.
+box_X           box_X_clone(box_X other);                       // return deep copied clone
+box_X           box_X_move(box_X* self);                        // transfer ownership to receiving box returned. self becomes NULL.
+void            box_X_take(box_X* self, box_X unowned);         // take ownership of unowned box object.
+void            box_X_assign(box_X* self, box_X* moved);        // transfer ownership from moved to self; moved becomes NULL.
+void            box_X_drop(box_X* self);                        // destruct the contained object and free its heap memory.
 
-void        box_X_reset_to(box_X* self, i_key* p);          // assign new box from ptr. Takes ownership of p.
+void            box_X_reset_to(box_X* self, i_key* p);          // assign new box from ptr. Takes ownership of p.
 
-size_t      box_X_hash(const box_X* x);                     // hash value
-int         box_X_cmp(const box_X* x, const box_X* y);      // compares pointer addresses if no `i_cmp` is specified.
-                                                            // is defined. Otherwise uses 'i_cmp' or default cmp.
-bool        box_X_eq(const box_X* x, const box_X* y);       // box_X_cmp() == 0
+size_t          box_X_hash(const box_X* x);                     // hash value
+int             box_X_cmp(const box_X* x, const box_X* y);      // compares pointer addresses if no `i_cmp` is specified
+                                                                // is defined. Otherwise uses 'i_cmp' or default cmp.
+bool            box_X_eq(const box_X* x, const box_X* y);       // box_X_cmp() == 0
 
 // functions on pointed to objects.
 
-size_t      box_X_value_hash(const i_key* x);
-int         box_X_value_cmp(const i_key* x, const i_key* y);
-bool        box_X_value_eq(const i_key* x, const i_key* y);
+size_t          box_X_value_hash(const i_key* x);
+int             box_X_value_cmp(const i_key* x, const i_key* y);
+bool            box_X_value_eq(const i_key* x, const i_key* y);
 ```
 
 ## Types and constants

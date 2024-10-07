@@ -46,31 +46,31 @@ In the following, `X` is the value of `i_key` unless `i_type` is specified.
 
 ## Methods
 ```c
-arc_X       arc_X_init();                                   // empty shared pointer
-arc_X       arc_X_from(i_keyraw raw);                       // create an arc from raw type (available if i_keyraw defined by user).
-arc_X       arc_X_from_ptr(i_key* p);                       // create an arc from raw pointer. Takes ownership of p.
-arc_X       arc_X_make(i_key key);                          // create an arc from constructed key object. Faster than from_ptr().
+arc_X           arc_X_init();                                   // empty shared pointer
+arc_X           arc_X_from(i_keyraw raw);                       // create an arc from raw type (available if i_keyraw defined by user).
+arc_X           arc_X_from_ptr(i_key* p);                       // create an arc from raw pointer. Takes ownership of p.
+arc_X           arc_X_make(i_key key);                          // create an arc from constructed key object. Faster than from_ptr().
 
-arc_X       arc_X_clone(arc_X other);                       // return other with increased use count
-arc_X       arc_X_move(arc_X* self);                        // transfer ownership to receiver; self becomes NULL
-void        arc_X_take(arc_X* self, arc_X unowned);         // take ownership of unowned.
-void        arc_X_assign(arc_X* self, arc_X other);         // shared assign (increases use count)
+arc_X           arc_X_clone(arc_X other);                       // return other with increased use count
+arc_X           arc_X_move(arc_X* self);                        // transfer ownership to receiver; self becomes NULL
+void            arc_X_take(arc_X* self, arc_X unowned);         // take ownership of unowned.
+void            arc_X_assign(arc_X* self, arc_X other);         // shared assign (increases use count)
 
-void        arc_X_drop(arc_X* self);                        // destruct (decrease use count, free at 0)
-long        arc_X_use_count(const arc_X* self);
+void            arc_X_drop(arc_X* self);                        // destruct (decrease use count, free at 0)
+long            arc_X_use_count(const arc_X* self);
 
-void        arc_X_reset_to(arc_X* self, i_key* p);          // assign new arc from ptr. Takes ownership of p.
+void            arc_X_reset_to(arc_X* self, i_key* p);          // assign new arc from ptr. Takes ownership of p.
 
-size_t      arc_X_hash(const arc_X* x);                     // hash value
-int         arc_X_cmp(const arc_X* x, const arc_X* y);      // compares pointer addresses if no `i_cmp` is specified.
-                                                            // is defined. Otherwise uses 'i_cmp' or default cmp.
-bool        arc_X_eq(const arc_X* x, const arc_X* y);       // arc_X_cmp() == 0
+size_t          arc_X_hash(const arc_X* x);                     // hash value
+int             arc_X_cmp(const arc_X* x, const arc_X* y);      // compares pointer addresses if no `i_cmp` is specified
+                                                                // is defined. Otherwise uses 'i_cmp' or default cmp.
+bool            arc_X_eq(const arc_X* x, const arc_X* y);       // arc_X_cmp() == 0
 
 // functions on pointed to objects.
 
-size_t      arc_X_value_hash(const i_key* x);
-int         arc_X_value_cmp(const i_key* x, const i_key* y);
-bool        arc_X_value_eq(const i_key* x, const i_key* y);
+size_t          arc_X_value_hash(const i_key* x);
+int             arc_X_value_cmp(const i_key* x, const i_key* y);
+bool            arc_X_value_eq(const i_key* x, const i_key* y);
 ```
 
 ## Types and constants

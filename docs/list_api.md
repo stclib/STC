@@ -42,69 +42,69 @@ See the c++ class [std::list](https://en.cppreference.com/w/cpp/container/list) 
 ## Methods
 
 ```c
-list_X              list_X_init(void);
-list_X              list_X_clone(list_X list);
+list_X          list_X_init(void);
+list_X          list_X_clone(list_X list);
 
-void                list_X_clear(list_X* self);
-void                list_X_copy(list_X* self, const list_X* other);
-void                list_X_drop(list_X* self);                                        // destructor
+void            list_X_clear(list_X* self);
+void            list_X_copy(list_X* self, const list_X* other);
+void            list_X_drop(list_X* self);                                        // destructor
 
-bool                list_X_is_empty(const list_X* list);
-isize               list_X_count(const list_X* list);                                 // size() in O(n) time
+bool            list_X_is_empty(const list_X* list);
+isize           list_X_count(const list_X* list);                                 // size() in O(n) time
 
-list_X_iter         list_X_find(const list_X* self, i_keyraw raw);
-list_X_iter         list_X_find_in(list_X_iter it1, list_X_iter it2, i_keyraw raw);
+list_X_iter     list_X_find(const list_X* self, i_keyraw raw);
+list_X_iter     list_X_find_in(list_X_iter it1, list_X_iter it2, i_keyraw raw);
 
-const i_key*        list_X_get(const list_X* self, i_keyraw raw);
-const i_key*        list_X_back(const list_X* self);
-const i_key*        list_X_front(const list_X* self);
+const i_key*    list_X_get(const list_X* self, i_keyraw raw);
+const i_key*    list_X_back(const list_X* self);
+const i_key*    list_X_front(const list_X* self);
 
-i_key*              list_X_get_mut(list_X* self, i_keyraw raw);
-i_key*              list_X_back_mut(list_X* self);
-i_key*              list_X_front_mut(list_X* self);
+i_key*          list_X_get_mut(list_X* self, i_keyraw raw);
+i_key*          list_X_back_mut(list_X* self);
+i_key*          list_X_front_mut(list_X* self);
 
-void                list_X_push_back(list_X* self, i_key value);                      // note: no pop_back()
-void                list_X_push_front(list_X* self, i_key value);
-void                list_X_push(list_X* self, i_key value);                           // alias for push_back()
+void            list_X_push_back(list_X* self, i_key value);                      // note: no pop_back()
+void            list_X_push_front(list_X* self, i_key value);
+void            list_X_push(list_X* self, i_key value);                           // alias for push_back()
 
-void                list_X_emplace_back(list_X* self, i_keyraw raw);
-void                list_X_emplace_front(list_X* self, i_keyraw raw);
-void                list_X_emplace(list_X* self, i_keyraw raw);                       // alias for emplace_back()
+void            list_X_emplace_back(list_X* self, i_keyraw raw);
+void            list_X_emplace_front(list_X* self, i_keyraw raw);
+void            list_X_emplace(list_X* self, i_keyraw raw);                       // alias for emplace_back()
 
-list_X_iter         list_X_insert_at(list_X* self, list_X_iter it, i_key value);      // return iter to new elem
-list_X_iter         list_X_emplace_at(list_X* self, list_X_iter it, i_keyraw raw);
+list_X_iter     list_X_insert_at(list_X* self, list_X_iter it, i_key value);      // return iter to new elem
+list_X_iter     list_X_emplace_at(list_X* self, list_X_iter it, i_keyraw raw);
 
-void                list_X_pop_front(list_X* self);
-list_X_iter         list_X_erase_at(list_X* self, list_X_iter it);                    // return iter after it
-list_X_iter         list_X_erase_range(list_X* self, list_X_iter it1, list_X_iter it2);
-isize               list_X_remove(list_X* self, i_keyraw raw);                        // removes all matches
+void            list_X_pop_front(list_X* self);
+list_X_iter     list_X_erase_at(list_X* self, list_X_iter it);                    // return iter after it
+list_X_iter     list_X_erase_range(list_X* self, list_X_iter it1, list_X_iter it2);
+isize           list_X_remove(list_X* self, i_keyraw raw);                        // removes all matches
 
-list_X              list_X_split_off(list_X* self, list_X_iter i1, list_X_iter i2);   // split off [i1, i2)
-list_X_iter         list_X_splice(list_X* self, list_X_iter it, list_X* other);       // return updated valid it
-list_X_iter         list_X_splice_range(list_X* self, list_X_iter it,                 // return updated valid it
-                                        list_X* other, list_X_iter it1, list_X_iter it2);
+list_X          list_X_split_off(list_X* self, list_X_iter i1, list_X_iter i2);   // split off [i1, i2)
+list_X_iter     list_X_splice(list_X* self, list_X_iter it, list_X* other);       // return updated valid it
+list_X_iter     list_X_splice_range(list_X* self, list_X_iter it,                 // return updated valid it
+                                    list_X* other, list_X_iter it1, list_X_iter it2);
 
-void                list_X_reverse(list_X* self);
-void                list_X_sort(list_X* self);
-void                list_X_sort_with(list_X* self, int(*cmp)(const i_key*, const i_key*));
+void            list_X_reverse(list_X* self);
+void            list_X_sort(list_X* self);
+void            list_X_sort_with(list_X* self, int(*cmp)(const i_key*, const i_key*));
 
 // Node API
-list_X_node*        list_X_get_node(i_key* val);                               // get enclosing node
-i_key*              list_X_push_back_node(list_X* self, list_X_node* node);
-i_key*              list_X_insert_after_node(list_X* self, list_X_node* ref, list_X_node* node);
-list_X_node*        list_X_unlink_after_node(list_X* self, list_X_node* ref);         // return unlinked node
-list_X_node*        list_X_unlink_front_node(list_X* self);                           // return unlinked node
-void                list_X_erase_after_node(list_X* self, list_X_node* node);
+list_X_node*    list_X_get_node(i_key* val);                                      // get enclosing node
+i_key*          list_X_push_back_node(list_X* self, list_X_node* node);
+i_key*          list_X_insert_after_node(list_X* self, list_X_node* ref, list_X_node* node);
+list_X_node*    list_X_unlink_after_node(list_X* self, list_X_node* ref);         // return unlinked node
+list_X_node*    list_X_unlink_front_node(list_X* self);                           // return unlinked node
+void            list_X_erase_after_node(list_X* self, list_X_node* node);
 
-list_X_iter         list_X_begin(const list_X* self);
-list_X_iter         list_X_end(const list_X* self);
-void                list_X_next(list_X_iter* it);
-list_X_iter         list_X_advance(list_X_iter it, size_t n);                        // return n elements ahead.
+list_X_iter     list_X_begin(const list_X* self);
+list_X_iter     list_X_end(const list_X* self);
+void            list_X_next(list_X_iter* it);
+list_X_iter     list_X_advance(list_X_iter it, size_t n);                        // return n elements ahead.
 
-bool                list_X_eq(const list_X* c1, const list_X* c2);                   // equality test
-i_key               list_X_value_clone(i_key val);
-list_X_raw          list_X_value_toraw(const i_key* pval);
-void                list_X_value_drop(i_key* pval);
+bool            list_X_eq(const list_X* c1, const list_X* c2);                   // equality test
+i_key           list_X_value_clone(i_key val);
+list_X_raw      list_X_value_toraw(const i_key* pval);
+void            list_X_value_drop(i_key* pval);
 ```
 
 ## Types
