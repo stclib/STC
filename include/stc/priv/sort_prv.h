@@ -39,11 +39,11 @@ STC_API isize _c_MEMB(_binary_search_range)(const Self* self, const _m_raw raw, 
 static inline void _c_MEMB(_sort)(Self* arr, isize n)
     { _c_MEMB(_sort_lowhigh)(arr, 0, n - 1); }
 
-static inline isize // -1 = not found
+static inline isize // c_NPOS = not found
 _c_MEMB(_lower_bound)(const Self* arr, const _m_raw raw, isize n)
     { return _c_MEMB(_lower_bound_range)(arr, raw, 0, n); }
 
-static inline isize // -1 = not found
+static inline isize // c_NPOS = not found
 _c_MEMB(_binary_search)(const Self* arr, const _m_raw raw, isize n)
     { return _c_MEMB(_binary_search_range)(arr, raw, 0, n); }
 
@@ -54,11 +54,11 @@ STC_API isize _c_MEMB(_binary_search_range)(const Self* self, const _m_raw raw, 
 static inline void _c_MEMB(_sort)(Self* self)
     { _c_MEMB(_sort_lowhigh)(self, 0, _c_MEMB(_size)(self) - 1); }
 
-static inline isize // -1 = not found
+static inline isize // c_NPOS = not found
 _c_MEMB(_lower_bound)(const Self* self, const _m_raw raw)
     { return _c_MEMB(_lower_bound_range)(self, raw, 0, _c_MEMB(_size)(self)); }
 
-static inline isize // -1 = not found
+static inline isize // c_NPOS = not found
 _c_MEMB(_binary_search)(const Self* self, const _m_raw raw)
     { return _c_MEMB(_binary_search_range)(self, raw, 0, _c_MEMB(_size)(self)); }
 #endif
@@ -104,7 +104,7 @@ STC_DEF void _c_MEMB(_sort_lowhigh)(Self* self, isize lo, isize hi) {
 }
 
 #ifndef _i_is_list
-STC_DEF isize // -1 = not found
+STC_DEF isize // c_NPOS = not found
 _c_MEMB(_lower_bound_range)(const Self* self, const _m_raw raw, isize start, isize end) {
     isize count = end - start, step = count/2;
     while (count > 0) {
@@ -118,15 +118,15 @@ _c_MEMB(_lower_bound_range)(const Self* self, const _m_raw raw, isize start, isi
             step = count/8;
         }
     }
-    return start == end ? -1 : start;
+    return start == end ? c_NPOS : start;
 }
 
-STC_DEF isize // -1 = not found
+STC_DEF isize // c_NPOS = not found
 _c_MEMB(_binary_search_range)(const Self* self, const _m_raw raw, isize start, isize end) {
     isize res = _c_MEMB(_lower_bound_range)(self, raw, start, end);
-    if (res != -1) {
+    if (res != c_NPOS) {
         const _m_raw rx = i_keytoraw(i_at(self, res));
-        if (i_less((&raw), (&rx))) res = -1;
+        if (i_less((&raw), (&rx))) res = c_NPOS;
     }
     return res;
 }

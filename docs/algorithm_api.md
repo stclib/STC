@@ -359,12 +359,31 @@ if (result)
 
 ### sort, binary_search, lower_bound
 
-The **X_sort()**, **X_sort_lowhigh()** functions are about twice as fast as *qsort()*.
-Both **X_binary_seach()** and **X_lower_bound()** are typically faster than c++ *std::lower_bound()*.
-`i_type` may be customized the regular way, along with the comparison function `i_cmp` or `i_less`.
-All containers with random access may be sorted, including regular C-arrays.
+- `X` refers to the template name specified by `i_type` or `i_key`.
+- The functions are available with **stack**, **vec** and **deque** when either `i_use_cmp`, `i_cmp` or `i_less` is defined.
+- *X_sort()* works on linked lists too, but not *X_lower_bound()* and *X_binary_search()*.
+```c
+// when sort is "enabled" for containers:
+void    X_sort(X* self);
+isize   X_lower_bound(const X* self, i_key key);
+isize   X_binary_search(const X* self, i_key key);
 
-There is a [benchmark/test file here](../misc/benchmarks/various/quicksort_bench.c).
+// ... or "stc/sort.h" on c-arrays:
+void    X_sort(const X array[], isize len);
+isize   X_lower_bound(const X array[], i_key key, isize len);
+isize   X_binary_search(const X array[], i_key key, isize len);
+
+// work on sub-spans:
+void    X_sort_lowhigh(X* self, isize low, isize high);
+isize   X_lower_bound_range(const X* self, i_key key, isize start, isize end);
+isize   X_binary_search_range(const X* self, i_key key, isize start, isize end);
+```
+##### Performance
+The *X_sort()*, *X_sort_lowhigh()* functions are about twice as fast as *qsort()*.
+Both *X_binary_seach()* and *X_lower_bound()* are typically faster than c++ *std::lower_bound()*.
+`i_type` may be customized the regular way, along with the comparison function `i_cmp` or `i_less`.
+All containers with random access may be sorted, including regular C-arrays. There is a [benchmark/test file here](../misc/benchmarks/various/quicksort_bench.c).
+##### Usage examples
 ```c
 #define i_key int // sort a regular c-array of ints
 #include "stc/sort.h"
@@ -376,7 +395,7 @@ int main(void) {
     c_forrange (i, c_arraylen(arr)) printf(" %d", arr[i]);
 }
 ```
-Also **vec**, **stack**, **list** (linked), and **deque** (ring buffer) may be sorted:
+
 ```c
 #define i_type MyDeq, int
 #define i_use_cmp      // enable sorting
