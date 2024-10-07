@@ -346,20 +346,30 @@ After erasing the elements found:
 
 ## Installation
 
-STC is primarily a "headers-only" library, so most headers can simply be included in your program. By default,
-all templated functions are static (many inlined). This is often optimal for both performance and compiled
-binary size. However, if container type instances, e.g. a `vec_int` is used used in several translation units,
-(e.g. more than 3-4 TUs), consider creating a separate header file for them and link it shared
-[as described here](#1-include-as-a-header-file). In this case, *one* (of the) c-file must implement the
-templated container, e.g.:
+STC is mixed *"headers-only"* / traditional library, i.e the templated container headers (and the *sort*/*lower_bound*
+algorithms) can simply be included - they have no library dependencies. By default, all templated functions are
+static (many inlined). This is often optimal for both performance and compiled binary size. However, for frequently
+used container type instances (more than 2-3 TUs), consider creating a separate header file for them, e.g.:
 ```c
-#define i_implement // define shared symbols
-#include "vec_int.h"
+// intvec.h
+#ifndef INTVEC_H_
+#define INTVEC_H_
+#define i_header // header definitions only
+#define i_type intvec, int
+#include "stc/vec.h"
+#endif
 ```
-Some of the non-templated types like **cstr**, **csview**, **cregex** and **cspan** are built as a library
-using the ***meson*** build tool. However, most functions in **csview** and **random** are inlined.
-The bitset **cbits**, the zero-terminated string view **zsview** and **algorthm** / **sort** are all fully
-inlined and need no linking with the stc-library.
+So anyone may use the shared vec-type. Implement the shared functions in one C file (if several containers are shared,
+you may define STC_IMPLEMENT on top of the file once instead).
+```c
+// shared.c
+#define i_implement // implement the shared intvec.
+#include "intvec.h"
+```
+The non-templated types  **cstr**, **csview**, **cregex**, **cspan** and **random**, are built as a library (libstc),
+and is using the ***meson*** build system. However, the most common functions in **csview** and **random** are inlined.
+The bitset **cbits**, the zero-terminated string view **zsview** and **algorthm** are all fully inlined and need no
+linking with the stc-library.
 </details>
 <details>
 <summary>Specifying template parameters</summary>

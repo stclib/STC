@@ -78,7 +78,6 @@ bool            zsview_ieq(const zsview* s1, const zsview* s2);     // "
 
 ## Example: UTF8 iteration and case conversion
 ```c
-#define i_import
 #include "stc/cstr.h"
 #include "stc/zsview.h"
 

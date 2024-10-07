@@ -101,7 +101,6 @@ If an error occurs ```cregex_compile``` returns a negative error code stored in 
 
 [ [Run this code](https://godbolt.org/z/9EovPvK5K) ]
 ```c
-#define i_import // include dependent cstr, utf8 and cregex function definitions.
 #include "stc/cregex.h"
 
 int main(void) {
@@ -150,10 +149,6 @@ c_formatch (it, &re, input)
     for (int k = 1; i <= cregex_captures(&re); ++k)
         printf("submatch %d: " c_svfmt "\n", k, c_svarg(it.match[k]));
 ```
-
-## Using cregex in a project
-
-The easiest is to `#define i_import` before `#include "stc/cregex.h"`. Make sure to do that in one translation unit only.
 
 ## Regex Cheatsheet
 

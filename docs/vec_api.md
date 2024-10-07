@@ -152,7 +152,6 @@ sorted: 5 7 8 13 16 25
 ```
 ### Example 2
 ```c
-#define i_import
 #include "stc/cstr.h"
 
 #define i_key_cstr

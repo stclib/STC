@@ -147,7 +147,6 @@ red Apples
 
 ### Example 2: UTF8 handling
 ```c
-#define i_import // include dependent cstr, utf8 and cregex function definitions.
 #include "stc/cstr.h"
 
 int main(void)

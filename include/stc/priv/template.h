@@ -83,7 +83,7 @@
     #define Self i_type
     #define i_key i_cmpclass
     #define i_keytoraw c_default_toraw
-  #elif defined _i_is_map
+  #elif defined _i_is_map && !defined i_val
     #define Self c_SELECT(_c_SEL31, i_type)
     #define i_key c_SELECT(_c_SEL32, i_type)
     #define i_val c_SELECT(_c_SEL33, i_type)
