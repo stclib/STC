@@ -68,8 +68,8 @@ typedef isize _isize_triple[3];
 #define using_cspan(...) c_MACRO_OVERLOAD(using_cspan, __VA_ARGS__)
 #define using_cspan_2(Self, T) \
     using_cspan_3(Self, T, 1); \
-    STC_INLINE Self Self##_from_n(Self##_value* values, isize n) { \
-        return (Self)cspan_from_n(values, n); \
+    STC_INLINE Self Self##_with_n(Self##_value* values, isize n) { \
+        return (Self)cspan_with_n(values, n); \
     } \
     struct stc_nostruct
 
@@ -127,16 +127,16 @@ using_cspan_tuple(7); using_cspan_tuple(8);
 
 // cspan_from* a pointer+size, c-array, or a cvec/cstack container
 //
-#define cspan_from_n(ptr, n) \
+#define cspan_with_n(ptr, n) \
     {.data=(ptr), \
      .shape={(_istride)(n)}, \
      .stride=(cspan_tuple1){.d={1}}}
 
 #define cspan_from_array(array) \
-    cspan_from_n(array, c_arraylen(array))
+    cspan_with_n(array, c_arraylen(array))
 
 #define cspan_from(container) \
-    cspan_from_n((container)->data, (container)->size)
+    cspan_with_n((container)->data, (container)->size)
 
 // cspan_subspan on 1d spans
 //

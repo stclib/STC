@@ -25,12 +25,12 @@ All cstr definitions and prototypes are available by including a single header f
 cstr        cstr_lit(const char literal_only[]);                    // cstr from literal; no strlen() call.
 cstr        cstr_init(void);                                        // make an empty string
 cstr        cstr_from(const char* str);                             // construct from a zero-terminated c-string.
-cstr        cstr_from_n(const char* str, isize n);                  // construct from first n bytes of str
 cstr        cstr_from_s(cstr s, isize pos, isize len);              // construct a substring
 cstr        cstr_from_fmt(const char* fmt, ...);                    // printf() formatting
 cstr        cstr_from_replace(csview sv, csview search, csview repl, int32_t count);
 cstr        cstr_from_sv(csview sv);                                // construct from a string view
 cstr        cstr_from_zv(zsview zv);                                // construct from a zero-terminated zsview
+cstr        cstr_with_n(const char* str, isize n);                  // construct from first n bytes of str
 cstr        cstr_with_capacity(isize cap);                          // make empty string with pre-allocated capacity.
 cstr        cstr_with_size(isize len, char fill);                   // make string with fill characters
 

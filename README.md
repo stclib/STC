@@ -126,7 +126,7 @@ Benchmark notes:
 
 - Functions available for most all containers:
     - Cont_init()
-    - Cont_from_n(rawvals[], n)
+    - Cont_with_n(rawvals[], n)
     - Cont_reserve(Cont*, capacity)
     - Cont_clone(Cont)
     - Cont_drop(Cont*)
