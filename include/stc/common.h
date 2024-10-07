@@ -236,7 +236,7 @@ typedef const char* cstr_raw;
 
 // hashing
 STC_INLINE size_t c_hash_n(const void* key, isize len) {
-    union { size_t block; uint64_t b8; uint32_t b4; } u;
+    union { size_t block; uint64_t b8; uint32_t b4; } u = {0};
     switch (len) {
         case 8: memcpy(&u.b8, key, 8); return (size_t)(u.b8 * 0xc6a4a7935bd1e99d);
         case 4: memcpy(&u.b4, key, 4); return u.b4 * (size_t)0xa2ffeb2f01000193;
@@ -250,7 +250,8 @@ STC_INLINE size_t c_hash_n(const void* key, isize len) {
         msg += c_sizeof(size_t);
         len -= c_sizeof(size_t);
     }
-    while (len--) hash = (hash ^ *msg++) * (size_t)0xb0340f4501000193;
+    c_memcpy(&u.block, msg, len);
+    hash = (hash ^ u.block) * (size_t)0xb0340f4501000193;
     return hash ^ (hash >> 3);
 }
 
@@ -288,7 +289,7 @@ STC_INLINE isize c_next_pow2(isize n) {
 
 // substring in substring?
 STC_INLINE char* c_strnstrn(const char *str, isize slen,
-                           const char *needle, isize nlen) {
+                            const char *needle, isize nlen) {
     if (!nlen) return (char *)str;
     if (nlen > slen) return NULL;
     slen -= nlen;

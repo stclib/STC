@@ -176,11 +176,14 @@ STC_INLINE cstr cstr_from_s(cstr s, isize pos, isize len)
     { return cstr_from_n(cstr_str(&s) + pos, len); }
 
 STC_INLINE csview cstr_subview(const cstr* self, isize pos, isize len) {
-    csview sv = cstr_sv(self); c_assert(pos + len < sv.size);
+    csview sv = cstr_sv(self);
+    c_assert(((size_t)pos <= (size_t)sv.size) & (len >= 0));
+    if (pos + len > sv.size) len = sv.size - pos;
     return (csview){sv.buf + pos, len};
 }
 
 STC_INLINE zsview cstr_right(const cstr* self, isize len) {
+    c_assert(len >= 0);
     csview sv = cstr_sv(self);
     if (len > sv.size) len = sv.size;
     return (zsview){&sv.buf[sv.size - len], len};
@@ -194,8 +197,8 @@ STC_INLINE cstr cstr_u8_from(const char* str, isize u8pos, isize u8len)
 STC_INLINE isize cstr_u8_size(const cstr* self)
     { return utf8_count(cstr_str(self)); }
 
-STC_INLINE isize cstr_u8_to_index(const cstr* self, isize i8pos)
-    { return utf8_to_index(cstr_str(self), i8pos); }
+STC_INLINE isize cstr_u8_to_index(const cstr* self, isize u8pos)
+    { return utf8_to_index(cstr_str(self), u8pos); }
 
 STC_INLINE zsview cstr_u8_right(const cstr* self, isize u8len) {
     csview sv = cstr_sv(self);
@@ -208,9 +211,9 @@ STC_INLINE zsview cstr_u8_right(const cstr* self, isize u8len) {
 STC_INLINE csview cstr_u8_subview(const cstr* self, isize u8pos, isize u8len)
     { return utf8_span(cstr_str(self), u8pos, u8len); }
 
-STC_INLINE csview cstr_u8_chr(const cstr* self, isize i8pos) {
+STC_INLINE csview cstr_u8_chr(const cstr* self, isize u8pos) {
     csview sv;
-    sv.buf = utf8_at(cstr_str(self), i8pos);
+    sv.buf = utf8_at(cstr_str(self), u8pos);
     sv.size = utf8_chr_size(sv.buf);
     return sv;
 }

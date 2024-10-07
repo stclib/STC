@@ -69,7 +69,7 @@ csview          csview_token(csview sv, const char* sep, isize* start); // *star
 csview         csview_u8_from(const char* str, isize u8pos, isize u8len); // construct csview with u8len runes
 csview         csview_u8_subview(csview sv, isize u8pos, isize u8len);  // utf8 subview
 csview         csview_u8_right(csview sv, isize u8len);                 // substr of the trailing u8len runes.
-csview         csview_u8_chr(csview sv, isize i8pos);                   // get rune at rune position
+csview         csview_u8_chr(csview sv, isize u8pos);                   // get rune at rune position
 isize          csview_u8_size(csview sv);                               // number of utf8 runes
 bool           csview_u8_valid(csview sv);                              // check utf8 validity of sv
 

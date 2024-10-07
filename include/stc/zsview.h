@@ -73,9 +73,17 @@ STC_INLINE zsview zsview_from_position(zsview zs, isize pos) {
     zs.str += pos; zs.size -= pos; return zs;
 }
 
+STC_INLINE csview zsview_subview(const zsview zs, isize pos, isize len) {
+    c_assert(((size_t)pos <= (size_t)zs.size) & (len >= 0));
+    if (pos + len > zs.size) len = zs.size - pos;
+    return (csview){zs.str + pos, len};
+}
+
 STC_INLINE zsview zsview_right(zsview zs, isize len) {
+    c_assert(len >= 0);
     if (len > zs.size) len = zs.size;
-    zs.str += zs.size - len; zs.size = len; return zs;
+    zs.str += zs.size - len; zs.size = len;
+    return zs;
 }
 
 STC_INLINE const char* zsview_at(zsview zs, isize idx)
@@ -83,8 +91,8 @@ STC_INLINE const char* zsview_at(zsview zs, isize idx)
 
 /* utf8 */
 
-STC_INLINE zsview zsview_u8_from_position(zsview zs, isize i8pos)
-    { return zsview_from_position(zs, utf8_to_index(zs.str, i8pos)); }
+STC_INLINE zsview zsview_u8_from_position(zsview zs, isize u8pos)
+    { return zsview_from_position(zs, utf8_to_index(zs.str, u8pos)); }
 
 STC_INLINE zsview zsview_u8_right(zsview zs, isize u8len) {
     const char* p = &zs.str[zs.size];
@@ -97,9 +105,9 @@ STC_INLINE zsview zsview_u8_right(zsview zs, isize u8len) {
 STC_INLINE csview zsview_u8_subview(zsview zs, isize u8pos, isize u8len)
     { return utf8_span(zs.str, u8pos, u8len); }
 
-STC_INLINE csview zsview_u8_chr(zsview zs, isize i8pos) {
+STC_INLINE csview zsview_u8_chr(zsview zs, isize u8pos) {
     csview sv;
-    sv.buf = utf8_at(zs.str, i8pos);
+    sv.buf = utf8_at(zs.str, u8pos);
     sv.size = utf8_chr_size(sv.buf);
     return sv;
 }

@@ -46,10 +46,10 @@ zsview_iter     zsview_end(const zsview* self);
 void            zsview_next(zsview_iter* it);                   // next rune
 zsview_iter     zsview_advance(zsview_iter it, isize u8pos);    // advance +/- runes
 
-zsview          zsview_u8_from_position(zsview zv, isize i8pos);// subview starting from rune i8pos
+zsview          zsview_u8_from_position(zsview zv, isize u8pos);// subview starting from rune u8pos
 zsview          zsview_u8_right(zsview zv, isize u8len);        // subview of the last u8len runes
 csview          zsview_u8_subview(zsview zs, isize u8pos, isize u8len);
-csview          zsview_u8_chr(zsview zv, isize i8pos);          // get rune at rune position
+csview          zsview_u8_chr(zsview zv, isize u8pos);          // get rune at rune position
 isize           zsview_u8_size(zsview zv);                      // number of utf8 runes
 bool            zsview_u8_valid(zsview zv);                     // check utf8 validity of zv
 

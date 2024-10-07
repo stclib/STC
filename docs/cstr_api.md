@@ -107,8 +107,8 @@ bool        cstr_getdelim(cstr *self, int delim, FILE *stream);     // does not 
 ```c
 cstr        cstr_u8_from(const char* str, isize u8pos, isize u8len);// make cstr from an utf8 substring
 isize       cstr_u8_size(const cstr* self);                         // number of utf8 runes
-isize       cstr_u8_to_index(const cstr* self, isize i8pos);        // get byte index at rune position
-csview      cstr_u8_chr(const cstr* self, isize i8pos);             // get rune at rune position
+isize       cstr_u8_to_index(const cstr* self, isize u8pos);        // get byte index at rune position
+csview      cstr_u8_chr(const cstr* self, isize u8pos);             // get rune at rune position
 csview      cstr_u8_subview(const cstr* self, isize u8pos, isize u8len);
 zsview      cstr_u8_right(cstr* self, isize u8len);                 // subview of the trailing len runes
 void        cstr_u8_insert(cstr* self, isize u8pos, const char* ins);

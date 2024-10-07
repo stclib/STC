@@ -74,9 +74,10 @@ STC_INLINE bool csview_ends_with(csview sv, const char* str) {
     return n <= sv.size && !c_memcmp(sv.buf + sv.size - n, str, n);
 }
 
-STC_INLINE csview csview_subview(csview sv, isize pos, isize n) {
-    if (pos + n > sv.size) n = sv.size - pos;
-    sv.buf += pos, sv.size = n;
+STC_INLINE csview csview_subview(csview sv, isize pos, isize len) {
+    c_assert(((size_t)pos <= (size_t)sv.size) & (len >= 0));
+    if (pos + len > sv.size) len = sv.size - pos;
+    sv.buf += pos, sv.size = len;
     return sv;
 }
 
@@ -141,7 +142,8 @@ STC_INLINE csview csview_u8_chr(csview sv, isize u8pos) {
     const char *end = &sv.buf[sv.size];
     while ((u8pos > 0) & (sv.buf != end))
         u8pos -= (*++sv.buf & 0xC0) != 0x80;
-    sv.size = sv.buf != end ? utf8_chr_size(sv.buf) : 0;
+    c_assert(sv.buf != end);
+    sv.size = utf8_chr_size(sv.buf);
     return sv;
 }
 
