@@ -15,7 +15,7 @@ See similar c++ class [std::unique_ptr](https://en.cppreference.com/w/cpp/memory
 ## Header file and declaration
 
 ```c
-#define i_type <ct>,<kt> // shorthand to define i_type,i_key
+#define i_type <ct>,<kt> // shorthand to define i_type, i_key
 #define i_type <t>       // box container type name (default: box_{i_key})
 #define i_key <t>        // element type: REQUIRED. Note: i_val* may be specified instead of i_key*.
 #define i_key_box <t>    // Use instead of i_key when key itself is a box-type.
@@ -81,7 +81,7 @@ void int_drop(int* x) {
     printf("\n drop %d", *x);
 }
 
-#define i_type IBox,int
+#define i_type IBox, int
 #define i_keydrop int_drop  // just to display elements destroyed
 #define i_keyclone(x) x     // must be specified when i_keydrop is defined.
 #define i_use_cmp           // enable usage of default comparison == and < operators

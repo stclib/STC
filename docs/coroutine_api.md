@@ -83,7 +83,7 @@ yield or await from a (deeply) nested coroutine call using cco_task objects desc
 
 The first example is a generator of Pythagorian triples, and stops when diagonal size > max_c.
 
-[ [Run this code](https://godbolt.org/z/PccE7W67h) ]
+[ [Run this code](https://godbolt.org/z/Ge4b56Yqv) ]
 ```c
 #include "stc/coroutine.h"
 #include <stdio.h>

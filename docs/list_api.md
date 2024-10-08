@@ -22,7 +22,7 @@ See the c++ class [std::list](https://en.cppreference.com/w/cpp/container/list) 
 ## Header file and declaration
 
 ```c
-#define i_type <ct>,<kt> // shorthand to define i_type,i_key
+#define i_type <ct>,<kt> // shorthand to define i_type, i_key
 #define i_type <t>       // list container type name (default: list_{i_key})
 #define i_key <t>        // element type: REQUIRED. Note: i_val* may be specified instead of i_key*.
 #define i_cmp <fn>       // three-way compare two i_keyraw*
@@ -121,7 +121,7 @@ void            list_X_value_drop(i_key* pval);
 
 Interleave *push_front()* / *push_back()* then *sort()*:
 ```c
-#define i_type DList,double
+#define i_type DList, double
 #include "stc/list.h"
 
 #include <stdio.h>
@@ -157,7 +157,7 @@ sorted:  1 2 3 4 5 6 7 8 9 10 20 30 40 50 60 70 80 90
 Use of *erase_at()* and *erase_range()*:
 ```c
 // erasing from list
-#define i_type IList,int
+#define i_type IList, int
 #include "stc/list.h"
 #include <stdio.h>
 
@@ -190,7 +190,7 @@ mylist contains: 10 30
 
 Splice `[30, 40]` from *L2* into *L1* before `3`:
 ```c
-#define i_type IList,int
+#define i_type IList, int
 #include "stc/list.h"
 #include <stdio.h>
 

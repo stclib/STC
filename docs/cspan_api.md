@@ -195,7 +195,7 @@ if __name__ == '__main__':
 ```
 ... in C with STC cspan:
 
-[ [Run this code](https://godbolt.org/z/nKT7nrbYT) ]
+[ [Run this code](https://godbolt.org/z/1azav89o4) ]
 ```c
 #include <stdio.h>
 #include "stc/cspan.h"
@@ -220,7 +220,7 @@ int main(void) {
     myspan2 a = cspan_submd3(&ss3, 1);
     myspan2 b = cspan_transposed2(&a);
 
-    cspan_print(myspan3, ss3); // C11. Add "%d" argument for C99 comp.
+    cspan_print(myspan3, ss3, "%d");
     puts("");
     print_myspan2((myspan2)cspan_submd3(&ms3, 1));
     print_myspan2(a);

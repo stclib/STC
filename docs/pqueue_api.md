@@ -8,7 +8,7 @@ See the c++ class [std::priority_queue](https://en.cppreference.com/w/cpp/contai
 ## Header file and declaration
 
 ```c
-#define i_type <ct>,<kt> // shorthand to define i_type,i_key
+#define i_type <ct>,<kt> // shorthand to define i_type, i_key
 #define i_type <t>       // pqueue container type name (default: pqueue_{i_key})
 #define i_key <t>        // element type: REQUIRED. Defines pqueue_X_value
 #define i_less <fn>      // compare two i_key* : REQUIRED IF i_key/i_keyraw is a non-integral type

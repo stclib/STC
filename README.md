@@ -1,11 +1,9 @@
 ![STC](docs/pics/containers.jpg)
-
----
 ---
 
 # STC - Smart Template Containers
 
-### Version 5.0 RC
+### Version 5.0 RC2
 Description
 -----------
 STC is a *modern*, *typesafe*, *fast* and *compact* container and algorithms library for C99.
@@ -34,9 +32,7 @@ Containers
 
 Algorithms
 ----------
-- [***Ranged for-loops*** - c_foreach, c_foreach_kv, c_foritems](docs/algorithm_api.md#ranged-for-loops)
-- [***Range algorithms*** - c_filter, c_forrange, crange](docs/algorithm_api.md#range-algorithms)
-- [***Generic algorithms*** - c_init, c_find_if, c_erase_if, sort, binary_search, lower_bound, ...](docs/algorithm_api.md#generic-algorithms)
+- [***Generic algorithms***](docs/algorithm_api.md#stc-algorithms)
 - [***Coroutines*** - ergonomic portable coroutines](docs/coroutine_api.md)
 - [***Regular expressions*** - Rob Pike's Plan 9 regexp modernized!](docs/cregex_api.md)
 - [***Random numbers*** - a very fast *PRNG* based on *SFC64*](docs/random_api.md)
@@ -177,7 +173,7 @@ Switching to a different container type, e.g. a sorted set (sset):
 
 [ [Run this code](https://godbolt.org/z/cedobWETq) ]
 ```c
-#define i_type Floats,float
+#define i_type Floats, float
 #include "stc/sset.h" // Use a sorted set instead
 #include <stdio.h>
 
@@ -211,7 +207,7 @@ Let's make a vector of vectors, which can be cloned. All of its element vectors 
 #include <stdio.h>
 #include "stc/algorithm.h"
 
-#define i_type Vec,float
+#define i_type Vec, float
 #define i_use_cmp        // enable default ==, < and hash operations
 #include "stc/vec.h"
 
@@ -253,7 +249,7 @@ This example uses four different container types:
 ```c
 #include <stdio.h>
 
-#define i_type hset_int,int
+#define i_type hset_int, int
 #include "stc/hset.h"   // unordered/hash set (assume i_key is basic type, uses `==` operator)
 
 struct Point { float x, y; };
@@ -262,11 +258,11 @@ struct Point { float x, y; };
 #define i_eq(a, b) (a->x == b->x && a->y == b->y)
 #include "stc/vec.h"    // vector of struct Point
 
-#define i_type list_int,int
+#define i_type list_int, int
 #define i_use_cmp       // enable sort/search. Use native `<` and `==` operators
 #include "stc/list.h"   // singly linked list
 
-#define i_type smap_int,int,int
+#define i_type smap_int, int, int
 #include "stc/smap.h"  // sorted map int => int
 
 int main(void)
@@ -537,7 +533,7 @@ last example on the **hmap** page demonstrates how to specify a map with non-tri
 
 Define `i_type` and/or `i_key`:
 ```c
-// #define i_type MyVec,int // shorthand
+// #define i_type MyVec, int // shorthand
 #define i_type MyVec
 #define i_key int
 #include "stc/vec.h"
@@ -568,7 +564,7 @@ Create a dedicated header for the container type instance:
 // Do not to include user defined headers here if they use templated containers themselves
 
 // NB! struct Point must be complete at this point!
-#define i_type PointVec,struct Point
+#define i_type PointVec, struct Point
 #define i_header    // Do not implement, only expose API
 #include "stc/vec.h"
 
@@ -664,7 +660,7 @@ allocated size of the given pointer, unlike standard `realloc` and `free`.
 ```
 Usage is straight forward:
 ```c
-#define i_type IMap,int,int
+#define i_type IMap, int, int
 #include "stcpgs.h"
 #include "stc/smap.h"
 
@@ -791,5 +787,4 @@ Major changes:
 
 </details>
 
----
 ---

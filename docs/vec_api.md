@@ -12,7 +12,7 @@ See the c++ class [std::vector](https://en.cppreference.com/w/cpp/container/vect
 ## Header file and declaration
 
 ```c
-#define i_type <ct>,<kt> // shorthand to define i_type,i_key
+#define i_type <ct>,<kt> // shorthand to define i_type, i_key
 #define i_type <t>       // container type name (default: vec_{i_key})
 #define i_key <t>        // element type: REQUIRED. Defines vec_X_value
 #define i_keydrop <fn>   // destroy value func - defaults to empty destruct
@@ -63,10 +63,10 @@ i_key*          vec_X_get_mut(vec_X* self, i_keyraw raw);                   // f
 i_key*          vec_X_front_mut(vec_X* self);
 i_key*          vec_X_back_mut(vec_X* self);
 
-// Requires either i_use_cmp, i_cmp or i_less defined:
+                // Requires either i_use_cmp, i_cmp or i_less defined:
 void            vec_X_sort(vec_X* self);                                    // quicksort from sort.h
-isize           vec_X_lower_bound(const vec_X* self, const i_keyraw raw);   // return -1 if not found
-isize           vec_X_binary_search(const vec_X* self, const i_keyraw raw); // return -1 if not found
+isize           vec_X_lower_bound(const vec_X* self, const i_keyraw raw);   // return c_NPOS if not found
+isize           vec_X_binary_search(const vec_X* self, const i_keyraw raw); // return c_NPOS if not found
 
 i_key*          vec_X_push(vec_X* self, i_key value);
 i_key*          vec_X_push_back(vec_X* self, i_key value);                  // alias for push

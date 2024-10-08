@@ -2,19 +2,20 @@
 ![Random](pics/random.jpg)
 
 This features an excellent 32- and 64-bit Pseudo Random Number Geneator (PRNG).
+See [random](https://en.cppreference.com/w/cpp/header/random) for similar c++ functionality.
+
+Several programming languages uses xoshiro256\*\* as the default PRNG. Let's compare crand64 against it.
 
 ### Comparison of crand64 with [xoshiro256\*\*](https://prng.di.unimi.it/)
-Several programming languages uses xoshiro256\*\* as the default PRNG, let's compare.
-
-- **crand64** is based on the highly rated **SFC64**, which along with **xoshiro256\*\*** both have excellent results from currently
-available random test-suites. **SFC64** has minimum period length of 2^64.
+- **crand64** is based on **SFC64**, which along with **xoshiro256\*\*** both have excellent results
+from currently available random test-suites. **SFC64** has fairly short minimum period length of 2^64.
 - **crand64** uses a modified output function that incorporate a "stream" parameter value. This makes it suitable for mass-parallel deployment.
 - **crand64** can generate 2^63 unique streams, where each has 2^64 minimum period length. This is adequate even for large-scale
 experiments using random numbers.
-- **xoshiro256\*\*** has the full 2^256 period length. This is overkill, but it also has several disadvantages:
+- **xoshiro256\*\*** has the full 2^256 period length. This is overkill, but it also has disadvantages:
     - Requires *jump-functions*, which the user must call in order to split up the output ranges before parallel execution.
     - Generator may end up in "zeroland" or "oneland" states (nearly all bits 0s or 1s for multiple outputs in a row), and will
-generate bad quality output. See [A Quick Look at Xoshiro256\*\*](https://www.pcg-random.org/posts/a-quick-look-at-xoshiro256.html).
+generate low quality output. See [A Quick Look at Xoshiro256\*\*](https://www.pcg-random.org/posts/a-quick-look-at-xoshiro256.html).
     - Trivial predictablity: previous outputs along with all future ones can trivially be computed from four output samples.
 - **crand64** does not need jump-functions. Instead, one can simply pass an odd unique id/number to each stream/thread as argument.
 - **crand64** is 10-20% faster than **xoshiro256\*\***. Unlike **xoshiro**, it does not require (fast hardware) multiplication support.
@@ -22,11 +23,10 @@ generate bad quality output. See [A Quick Look at Xoshiro256\*\*](https://www.pc
 - **crand64**'s output function result is fed back into the state, resulting in a chaotic random state.
 It combines XOR, SHIFT ***and*** ADD state modifying bit-operations to ensure excellent bit-mixing.
 - **xoshiro256\*\***'s output is not fed back into its state, instead every bit-state possible is visited in sequence, using a rule-based
-iterator with XOR and SHIFT bit-operations only. To compensate for the regularity in the state change between each generated number,
-it uses a fairly expensive output function (but trivially invertible, see ref) involving two multiplications.
+iterator with XOR and SHIFT bit-operations only. To compensate for the regularity in the state change between generated numbers,
+it uses a fairly expensive output function (but trivially invertible, see ref link) involving two multiplications.
 
-See [random](https://en.cppreference.com/w/cpp/header/random) for similar c++ functionality.
-
+## Header file
 ```c
 #include "stc/random.h"
 ```
@@ -34,6 +34,7 @@ See [random](https://en.cppreference.com/w/cpp/header/random) for similar c++ fu
 ## Methods (64-bit)
 
 ```c
+                // Use global state
 void            crand64_seed(uint64_t seed);                        // seed global rng64 state
 uint64_t        crand64_uint(void);                                 // global crand64_uint_r(rng64, 1)
 double          crand64_real(void);                                 // global crand64_real_r(rng64, 1)
@@ -42,14 +43,17 @@ crand64_uniform_dist
 int64_t         crand64_uniform(crand64_uniform_dist* d);           // global crand64_uniform_r(rng64, 1, d)
                 // requires linking with stc lib.
 double          crand64_normal(crand64_normal_dist* d);             // global crand64_normal_r(rng64, 1, d)
-
+```
+```c
+                // Use local state
 crand64         crand64_from(uint64_t seed);                        // create a crand64 state from a seed value
 uint64_t        crand64_uint_r(crand64* rng, uint64_t strm);        // reentrant; return rnd in [0, UINT64_MAX]
 double          crand64_real_r(crand64* rng, uint64_t strm);        // reentrant; return rnd in [0.0, 1.0)
 int64_t         crand64_uniform_r(crand64* rng, uint64_t strm, crand64_uniform_dist* d); // return rnd in [low, high]
 double          crand64_normal_r(crand64* rng, uint64_t strm, crand64_normal_dist* d);   // return normal distributed rnd's
-
-                // Generic algorithms (uses 64 or 32 bit depending on machine word size):
+```
+```c
+                // Generic algorithms (uses 64 or 32 bit depending on word size):
 void            c_shuffle_seed(size_t seed);                        // calls crand64_seed() or crand32_seed()
 void            c_shuffle_array(T* array, isize n);                 // shuffle an array of elements.
 void            c_shuffle(TYPE CntType, CntType* cnt);              // shuffle a vec, stack or deque type.
@@ -90,7 +94,7 @@ int32_t              crand32_uniform_r(crand32* rng, uint32_t strm, crand32_unif
 #include "stc/cstr.h"
 
 // Declare int => int sorted map.
-#define i_type SortedMap,int,long
+#define i_type SortedMap, int, long
 #include "stc/smap.h"
 
 int main(void)

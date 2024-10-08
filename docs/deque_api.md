@@ -10,7 +10,7 @@ See the c++ class [std::deque](https://en.cppreference.com/w/cpp/container/deque
 ## Header file and declaration
 
 ```c
-#define i_type <ct>,<kt> // shorthand to define i_type,i_key
+#define i_type <ct>,<kt> // shorthand to define i_type, i_key
 #define i_type <t>       // deque container type name (default: deque_{i_key})
 #define i_key <t>        // element type: REQUIRED. Defines deque_X_value
 
@@ -59,10 +59,10 @@ i_key*          deque_X_get_mut(deque_X* self, i_keyraw raw);                   
 i_key*          deque_X_front_mut(deque_X* self);
 i_key*          deque_X_back_mut(deque_X* self);
 
-// Requires either i_use_cmp, i_cmp or i_less defined:
+                // Requires either i_use_cmp, i_cmp or i_less defined:
 void            deque_X_sort(deque_X* self);                                     // quicksort from sort.h
-isize           deque_X_lower_bound(const deque_X* self, const i_keyraw raw);    // return -1 if not found
-isize           deque_X_binary_search(const deque_X* self, const i_keyraw raw);  // return -1 if not found
+isize           deque_X_lower_bound(const deque_X* self, const i_keyraw raw);    // return c_NPOS if not found
+isize           deque_X_binary_search(const deque_X* self, const i_keyraw raw);  // return c_NPOS if not found
 
 i_key*          deque_X_push_front(deque_X* self, i_key value);
 i_key*          deque_X_emplace_front(deque_X* self, i_keyraw raw);
@@ -79,7 +79,7 @@ i_key           deque_X_pull_back(deque_X* self);                               
 deque_X_iter    deque_X_insert_n(deque_X* self, isize idx, const i_key[] arr, isize n);  // move values
 deque_X_iter    deque_X_insert_at(deque_X* self, deque_X_iter it, i_key value);  // move value
 deque_X_iter    deque_X_insert_uninit(deque_X* self, isize idx, isize n);        // uninitialized data
-                        // copy values:
+
 deque_X_iter    deque_X_emplace_n(deque_X* self, isize idx, const i_keyraw[] arr, isize n);
 deque_X_iter    deque_X_emplace_at(deque_X* self, deque_X_iter it, i_keyraw raw);
 
@@ -108,7 +108,7 @@ void            deque_X_value_drop(i_key* pval);
 
 ## Examples
 ```c
-#define i_type Deque,int32_t
+#define i_type Deque, int32_t
 #include "stc/deque.h"
 #include <stdio.h>
 

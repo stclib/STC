@@ -1,7 +1,11 @@
 # STC Algorithms
 
-"No raw loops" - Sean Parent
+STC contains many generic algorithms and flow control abstactions.
+
 ## Ranged for-loops
+<details>
+<summary><b>c_foreach</b> - Container / range iteration</summary>
+"No raw loops" - Sean Parent
 
 ### c_foreach, c_foreach_reverse, c_foreach_n, c_foreach_kv
 ```c
@@ -18,7 +22,7 @@
 | `c_foreach_kv (key, val, ctype, container)` | Iterate with structured binding           |
 
 ```c
-#define i_type IMap,int,int
+#define i_type IMap, int, int
 #include "stc/smap.h"
 // ...
 IMap map = c_init(IMap, { {23,1}, {3,2}, {7,3}, {5,4}, {12,5} });
@@ -46,6 +50,9 @@ c_foreach_n (i, IMap, map, 3)
 c_foreach_kv (id, count, IMap, map)
     printf(" (%d %d)", *id, *count);
 ```
+</details>
+<details>
+<summary><b>c_foritems</b> - Literal list iteration</summary>
 
 ### c_foritems
 Iterate compound literal array elements. In addition to `i.ref`, you can access `i.index` and `i.size`.
@@ -62,9 +69,12 @@ c_foritems (i, hmap_ii_value, { {4, 5}, {6, 7} })
 c_foritems (i, const char*, {"Hello", "crazy", "world"})
     stack_cstr_emplace(&stk, *i.ref);
 ```
----
+</details>
 
 ## Integer range loops
+
+<details>
+<summary><b>c_forrange</b> - For-loop abstraction</summary>
 
 ### c_forrange, c_forrange32, c_forrange_ex
 - `c_forrange`: abstraction for iterating sequence of integers. Like python's **for** *i* **in** *range()* loop. Uses `isize` (*ptrdiff_t*) as control variable.
@@ -94,8 +104,11 @@ c_forrange (i, -3, 3) printf(" %lld", i);
 c_forrange (i, 30, 0, -5) printf(" %lld", i);
 // 30 25 20 15 10 5
 ```
+</details>
+<details>
+<summary><b>c_range, c_iota</b> - Integer range objects</summary>
 
-### crange, crange32
+### crange, crange32, c_iota
 An integer sequence generator type, similar to [boost::irange](https://www.boost.org/doc/libs/release/libs/range/doc/html/range/reference/ranges/irange.html).
 
 - `crange` uses `isize` (ptrdiff_t) as control variable
@@ -134,6 +147,10 @@ c_filter(crange, c_iota(3), true
 );
 // 2 3 5 7 11 13 17 19 23 29 31
 ```
+
+</details>
+<details>
+<summary><b>c_filter</b> - Range filtering</summary>
 
 ### c_filter, c_filter_zip, c_filter_pairwise, c_forfilter
 Functional programming with chained `&&` filtering. `value` is the pointer to current value.
@@ -196,9 +213,11 @@ int main(void)
     Vec_drop(&vec);
 }
 ```
+</details>
 
----
 ## Generic algorithms
+<details>
+<summary>Generic container operations</summary>
 
 ### c_init, c_push, c_drop
 
@@ -228,9 +247,12 @@ int main(void) {
     c_drop(Map, &map);
 }
 ```
+</details>
+<details>
+<summary><b>c_func</b> - Function with on-the-fly defined return type</summary>
 
 ### c_func
-- A very convenient macro for defining functions mith multiple return values, e.g. added error values.
+A convenient macro for defining functions mith one or multiple return values, e.g. for errors.
 ```c
 Vec get_data(void) {
     return c_init(Vec, {1, 2, 3, 4, 5, 6});
@@ -256,6 +278,9 @@ c_func (load_data,(const char* fname), ->, struct {Vec out; int err;}) {
     return vec;
 }
 ```
+</details>
+<details>
+<summary><b>c_find, c_copy, c_erase</b> - Container operations with custom predicate</summary>
 
 ### c_find_if, c_find_reverse_if
 Find linearily in containers using a predicate. `value` is a pointer to each element in predicate.
@@ -285,11 +310,11 @@ Erase linearily in containers using a predicate. `value` is a pointer to each el
 #include "stc/cstr.h"
 #include "stc/algorithm.h"
 
-#define i_type Vec,int
+#define i_type Vec, int
 #define i_use_cmp
 #include "stc/vec.h"
 
-#define i_type List,int
+#define i_type List, int
 #define i_use_cmp
 #include "stc/list.h"
 
@@ -342,6 +367,9 @@ int main(void)
     Map_drop(&map);
 }
 ```
+</details>
+<details>
+<summary><b>c_all_of, c_any_of, c_none_of</b> - Generic container operations</summary>
 
 ### c_all_of, c_any_of, c_none_of
 Test a container/range using a predicate. ***result*** is output and must be declared prior to call.
@@ -356,33 +384,38 @@ c_any_of(vec_int, vec, &result, DivisibleBy(7));
 if (result)
     puts("At least one number is divisible by 7");
 ```
+</details>
+<details>
+<summary><b>sort, lower_bound, binary_search</b> - Faster quicksort and binary search</summary>
 
-### sort, binary_search, lower_bound
+### sort, lower_bound, binary_search
 
 - `X` refers to the template name specified by `i_type` or `i_key`.
-- The functions are available with **stack**, **vec** and **deque** when either `i_use_cmp`, `i_cmp` or `i_less` is defined.
-- *X_sort()* works on linked lists too, but not *X_lower_bound()* and *X_binary_search()*.
+- All containers with random access may be sorted, including regular C-arrays, i.e. **stack**, **vec**
+and **deque** when either `i_use_cmp`, `i_cmp` or `i_less` is defined.
+- Linked **list** may also be sorted, i.e. only *X_sort()* is available.
 ```c
-// when sort is "enabled" for containers:
-void    X_sort(X* self);
-isize   X_lower_bound(const X* self, i_key key);
-isize   X_binary_search(const X* self, i_key key);
+                // Sort c-arrays by defining i_type and include "stc/sort.h":
+void            X_sort(const X array[], isize len);
+isize           X_lower_bound(const X array[], i_key key, isize len);
+isize           X_binary_search(const X array[], i_key key, isize len);
 
-// ... or "stc/sort.h" on c-arrays:
-void    X_sort(const X array[], isize len);
-isize   X_lower_bound(const X array[], i_key key, isize len);
-isize   X_binary_search(const X array[], i_key key, isize len);
+                // or random access containers when `i_less`, `i_cmp` is defined:
+void            X_sort(X* self);
+isize           X_lower_bound(const X* self, i_key key);
+isize           X_binary_search(const X* self, i_key key);
 
-// work on sub-spans:
-void    X_sort_lowhigh(X* self, isize low, isize high);
-isize   X_lower_bound_range(const X* self, i_key key, isize start, isize end);
-isize   X_binary_search_range(const X* self, i_key key, isize start, isize end);
+                // functions for sub ranges:
+void            X_sort_lowhigh(X* self, isize low, isize high);
+isize           X_lower_bound_range(const X* self, i_key key, isize start, isize end);
+isize           X_binary_search_range(const X* self, i_key key, isize start, isize end);
 ```
+`i_type` may be customized in the normal way, along with comparison function `i_cmp` or `i_less`.
+
 ##### Performance
-The *X_sort()*, *X_sort_lowhigh()* functions are about twice as fast as *qsort()*.
-Both *X_binary_seach()* and *X_lower_bound()* are typically faster than c++ *std::lower_bound()*.
-`i_type` may be customized the regular way, along with the comparison function `i_cmp` or `i_less`.
-All containers with random access may be sorted, including regular C-arrays. There is a [benchmark/test file here](../misc/benchmarks/various/quicksort_bench.c).
+The *X_sort()*, *X_sort_lowhigh()* functions are about twice as fast as *qsort()* and comparable in
+speed with *std::sort()**. Both *X_binary_seach()* and *X_lower_bound()* are about 30% faster than
+c++ *std::lower_bound()*. There is a [benchmark/test file here](../misc/benchmarks/various/quicksort_bench.c).
 ##### Usage examples
 ```c
 #define i_key int // sort a regular c-array of ints
@@ -411,6 +444,10 @@ int main(void) {
 }
 ```
 
+</details>
+<details>
+<summary><b>c_new, c_delete, c_malloc</b> - Allocation helpers</summary>
+
 ### c_new, c_delete
 
 - `c_new(Type, val)` - Allocate *and init* a new object on the heap
@@ -433,6 +470,10 @@ default unless `i_malloc`, `i_calloc`, `i_realloc`, and `i_free` are defined. Se
 - `void* c_realloc(void* old_p, isize old_sz, isize new_sz)`
 - `void c_free(void* p, isize sz)`
 
+</details>
+<details>
+<summary>Miscellaneous macros</summary>
+
 ### c_arraylen
 Return number of elements in an array. array must not be a pointer!
 ```c
@@ -453,31 +494,37 @@ int* ip = c_const_cast(int*, cs);  // issues a warning!
 // Type safe casting:
 #define tofloat(d) c_safe_cast(float, double, d)
 ```
-
+</details>
+<!--
+<details>
+<summary>Predefined template parameter functions</summary>
 ### Predefined template parameter functions
 
 **cstr_raw** - Non-owning `const char*` "class" element type: `#define i_keyclass cstr_raw`
 ```c
-typedef     const char* cstr_raw;
-int         cstr_raw_cmp(const cstr_raw* x, const cstr_raw* y);
-size_t      cstr_raw_hash(const cstr_raw* x);
-cstr_raw    cstr_raw_clone(cstr_raw sp);
-void        cstr_raw_drop(cstr_raw* x);
+typedef         const char* cstr_raw;
+int             cstr_raw_cmp(const cstr_raw* x, const cstr_raw* y);
+size_t          cstr_raw_hash(const cstr_raw* x);
+cstr_raw        cstr_raw_clone(cstr_raw sp);
+void            cstr_raw_drop(cstr_raw* x);
 ```
 Default implementations
 ```c
-int         c_default_cmp(const Type*, const Type*);    // <=>
-bool        c_default_less(const Type*, const Type*);   // <
-bool        c_default_eq(const Type*, const Type*);     // ==
-size_t      c_default_hash(const Type*);
-Type        c_default_clone(Type val);                  // return val
-Type        c_default_toraw(const Type* p);             // return *p
-void        c_default_drop(Type* p);                    // does nothing
+int             c_default_cmp(const Type*, const Type*);    // <=>
+bool            c_default_less(const Type*, const Type*);   // <
+bool            c_default_eq(const Type*, const Type*);     // ==
+size_t          c_default_hash(const Type*);
+Type            c_default_clone(Type val);                  // return val
+Type            c_default_toraw(const Type* p);             // return *p
+void            c_default_drop(Type* p);                    // does nothing
 ```
----
-## RAII scope macros
+</details>
+-->
+<details>
+<summary><b>c_defer, c_with</b> - RAII macros</summary>
 
-#### c_with, c_defer: resource acquisition and release.
+### c_defer, c_with
+
 | Usage                                 | Description                                            |
 |:--------------------------------------|:-------------------------------------------------------|
 | `c_defer (deinit, ...) {}`            | Defers execution of `deinit`s to end of scope          |
@@ -530,3 +577,6 @@ int main(void)
             printf("| %s\n", cstr_str(i.ref));
 }
 ```
+</details>
+
+---

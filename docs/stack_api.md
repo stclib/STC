@@ -8,7 +8,7 @@ See the c++ class [std::stack](https://en.cppreference.com/w/cpp/container/stack
 ## Header file and declaration
 
 ```c
-#define i_type <ct>,<kt> // shorthand to define i_type,i_key
+#define i_type <ct>,<kt> // shorthand to define i_type, i_key
 #define i_type <t>       // container type name (default: stack_{i_key})
 #define i_key <t>        // element type: REQUIRED. Defines stack_X_value
 #define i_keydrop <fn>   // destroy value func - defaults to empty destruct
@@ -63,8 +63,8 @@ i_key           stack_X_pull(stack_X* self);                                    
 
 // Requires either i_use_cmp, i_cmp or i_less defined:
 void            stack_X_sort(stack_X* self);                                    // quicksort from sort.h
-isize           stack_X_lower_bound(const stack_X* self, const i_keyraw raw);   // return -1 if not found
-isize           stack_X_binary_search(const stack_X* self, const i_keyraw raw); // return -1 if not found
+isize           stack_X_lower_bound(const stack_X* self, const i_keyraw raw);   // return c_NPOS if not found
+isize           stack_X_binary_search(const stack_X* self, const i_keyraw raw); // return c_NPOS if not found
 
 stack_X_iter    stack_X_begin(const stack_X* self);
 stack_X_iter    stack_X_end(const stack_X* self);
@@ -87,7 +87,7 @@ void            stack_X_value_drop(vec_X_value* pval);
 
 ## Example
 ```c
-#define i_type IStack,int
+#define i_type IStack, int
 #include "stc/stack.h"
 
 #include <stdio.h>

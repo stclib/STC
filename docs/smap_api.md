@@ -15,7 +15,7 @@ See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) fo
 ## Header file and declaration
 
 ```c
-#define i_type <ct>,<kt>,<vt> // shorthand to define i_type,i_key,i_val
+#define i_type <ct>,<kt>,<vt> // shorthand to define i_type, i_key, i_val
 #define i_type <t>            // container type name (default: smap_{i_key})
 #define i_key <t>             // key type: REQUIRED.
 #define i_val <t>             // mapped value type: REQUIRED.
