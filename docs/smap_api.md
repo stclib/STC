@@ -194,7 +194,7 @@ This example uses a smap with cstr as mapped value.
 int main(void)
 {
     uint32_t col = 0xcc7744ff;
-    IDSMap idnames = c_init(IDSMap, { {100, "Red"}, {110, "Blue"} });
+    IDSMap idnames = c_init(IDSMap, {{100, "Red"}, {110, "Blue"}});
 
     // Assign/overwrite an existing mapped value with a const char*
     IDSMap_emplace_or_assign(&idnames, 110, "White");

@@ -25,7 +25,7 @@ STC contains many generic algorithms and flow control abstactions.
 #define i_type IMap, int, int
 #include "stc/smap.h"
 // ...
-IMap map = c_init(IMap, { {23,1}, {3,2}, {7,3}, {5,4}, {12,5} });
+IMap map = c_init(IMap, {{23,1}, {3,2}, {7,3}, {5,4}, {12,5}});
 
 c_foreach (i, IMap, map)
     printf(" %d", i.ref->first);
@@ -43,10 +43,10 @@ c_foreach (i, IMap, iter, IMap_end(&map))
 
 // iterate first 3 with an index count enumeration
 c_foreach_n (i, IMap, map, 3)
-    printf(" %zd:(%d %d)", i_count, i.ref->first, i.ref->second);
+    printf(" %zd:(%d %d)", i_index, i.ref->first, i.ref->second);
 // 0:(3 2) 1:(5 4) 2:(7 3)
 
-// iterate maps with "structured binding":
+// iterate a map using "structured binding" of the key and val pair:
 c_foreach_kv (id, count, IMap, map)
     printf(" (%d %d)", *id, *count);
 ```
@@ -62,7 +62,7 @@ c_foritems (i, int, {4, 5, 6, 7})
     list_i_push_back(&lst, *i.ref);
 
 // insert in existing map
-c_foritems (i, hmap_ii_value, { {4, 5}, {6, 7} })
+c_foritems (i, hmap_ii_value, {{4, 5}, {6, 7}})
     hmap_ii_insert(&map, i.ref->first, i.ref->second);
 
 // string literals pushed to a stack of cstr elements:
@@ -216,48 +216,17 @@ int main(void)
 </details>
 
 ## Generic algorithms
-<details>
-<summary>Generic container operations</summary>
 
-### c_init, c_push, c_drop
-
-- **c_init** - construct any container from an initializer list
-- **c_push** - push values onto any container from an initializer list
-- **c_drop** - drop (destroy) multiple containers of the same type
-```c
-#include <stdio.h>
-#define i_type Vec, int
-#include "stc/vec.h"
-
-#define i_type Map, int, int
-#include "stc/hmap.h"
-
-int main(void) {
-    Vec vec = c_init(Vec, {1, 2, 3, 4, 5, 6});
-    Vec vec2 = c_init(Vec, {42, 43, 44, 45, 46});
-    Map map = c_init(Map, {{1, 2}, {3, 4}, {5, 6}});
-
-    c_push(Vec, &vec, {7, 8, 9, 10, 11, 12});
-    c_push(Map, &map, {{7, 8}, {9, 10}, {11, 12}});
-
-    c_foreach (i, Vec, vec) printf("%d ", *i.ref); puts("");
-    c_foreach_kv(k, v, Map, map) printf("%d:%d ", *k, *v); puts("");
-
-    c_drop(Vec, &vec, &vec2);
-    c_drop(Map, &map);
-}
-```
-</details>
 <details>
 <summary><b>c_func</b> - Function with on-the-fly defined return type</summary>
 
 ### c_func
-A convenient macro for defining functions mith one or multiple return values, e.g. for errors.
+A convenient macro for defining functions with one or multiple return values, e.g. for errors.
 ```c
 Vec get_data(void) {
     return c_init(Vec, {1, 2, 3, 4, 5, 6});
 }
-
+// same as get_data():
 c_func (get_data1,(void), ->, Vec) {
     return c_init(Vec, {1, 2, 3, 4, 5, 6});
 }
@@ -276,6 +245,54 @@ c_func (load_data,(const char* fname), ->, struct {Vec out; int err;}) {
     fread(vec.out.data, sizeof(vec.out.data[0]), 1024, fp);
     fclose(fp);
     return vec;
+}
+```
+</details>
+<details>
+<summary><b>c_init, c_push, c_drop</b> - Generic container operations</summary>
+
+### c_init, c_push, c_drop
+
+- **c_init** - construct any container from an initializer list
+- **c_push** - push values onto any container from an initializer list
+- **c_drop** - drop (destroy) multiple containers of the same type
+
+[ [Run this code](https://godbolt.org/z/Gr1Y4MvMb) ]
+```c
+#include <stdio.h>
+#define i_type Vec, int
+#include "stc/vec.h"
+
+#define i_type Map, int, int
+#include "stc/hmap.h"
+
+c_func (split_map,(Map m), ->, struct {Vec keys, vals;}) {
+    split_map_result res = {0};
+    c_foreach_kv (k, v, Map, m) {
+        Vec_push(&res.keys, *k);
+        Vec_push(&res.vals, *v);
+    }
+    return res;
+}
+
+int main(void) {
+    Vec vec = c_init(Vec, {1, 2, 3, 4, 5, 6});
+    Map map = c_init(Map, {{1, 2}, {3, 4}, {5, 6}});
+
+    c_push(Vec, &vec, {7, 8, 9, 10, 11, 12});
+    c_push(Map, &map, {{7, 8}, {9, 10}, {11, 12}});
+
+    c_foreach (i, Vec, vec) printf("%d ", *i.ref);
+    puts("");
+    c_foreach_kv(k, v, Map, map) printf("{%d %d} ", *k, *v);
+    puts("");
+
+    split_map_result res = split_map(map);
+    c_foreach (i, Vec, res.vals) printf("%d ", *i.ref);
+    puts("");
+
+    c_drop(Vec, &vec, &res.keys, &res.vals);
+    c_drop(Map, &map);
 }
 ```
 </details>
@@ -352,7 +369,7 @@ int main(void)
     puts("");
 
     // Search a sorted map from it1, for the first string containing "hello" and erase it:
-    Map map = c_init(Map, { {"yes",1}, {"no",2}, {"say hello from me",3}, {"goodbye",4} });
+    Map map = c_init(Map, {{"yes",1}, {"no",2}, {"say hello from me",3}, {"goodbye",4}});
     Map_iter res, it1 = Map_begin(&map);
 
     c_find_if(Map, it1, Map_end(&map), &res, cstr_contains(&value->first, "hello"));
@@ -369,7 +386,7 @@ int main(void)
 ```
 </details>
 <details>
-<summary><b>c_all_of, c_any_of, c_none_of</b> - Generic container operations</summary>
+<summary><b>c_all_of, c_any_of, c_none_of</b> - Boolean container operations</summary>
 
 ### c_all_of, c_any_of, c_none_of
 Test a container/range using a predicate. ***result*** is output and must be declared prior to call.
