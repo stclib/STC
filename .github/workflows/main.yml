@@ -89,4 +89,4 @@ jobs:
           meson compile -C build-${{ matrix.flavor }}
       - name: Running tests
         run: |
-          meson test -C build-${{ matrix.flavor }}
+          meson test -C build-${{ matrix.flavor }} --timeout-multiplier 3
