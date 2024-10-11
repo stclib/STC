@@ -21,6 +21,8 @@ jobs:
           - name: sanitize
             args: >-
               "-Db_sanitize=address,undefined"
+          - name: sanitize+asanonly # For Visual Studio
+            args: -Db_sanitize=address
           - name: clang+sanitize
             args: >-
               "-Db_sanitize=address,undefined"
@@ -39,12 +41,24 @@ jobs:
           - ubuntu-22.04
 
         exclude:
+          # clang-cl
           - platform: ubuntu-22.04
             mode:
               name: clang-cl+sanitize
           - platform: macos-latest
             mode:
               name: clang-cl+sanitize
+          # msvc
+          - platform: ubuntu-22.04
+            mode:
+              name: sanitize+asanonly
+          - platform: macos-latest
+            mode:
+              name: sanitize+asanonly
+          - platform: windows-2022
+            mode:
+              name: sanitize
+          # default is clang
           - platform: macos-latest
             mode:
               name: clang+sanitize
