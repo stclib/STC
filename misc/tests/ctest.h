@@ -92,7 +92,11 @@ struct ctest {
 #define CTEST_IMPL_TEARDOWN_TPNAME(sname, tname) CTEST_IMPL_NAME(sname##_##tname##_teardown_ptr)
 
 #ifdef __APPLE__
+#ifdef __arm64__
+#define CTEST_IMPL_SECTION __attribute__ ((used, section ("__DATA, .ctest"), aligned(8)))
+#else
 #define CTEST_IMPL_SECTION __attribute__ ((used, section ("__DATA, .ctest"), aligned(1)))
+#endif
 #elif !defined _MSC_VER
 #define CTEST_IMPL_SECTION __attribute__ ((used, section (".ctest"), aligned(1)))
 #else
