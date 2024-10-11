@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  meson-build-and-tests:
+    runs-on: ${{ matrix.platform }}
+    name: >-
+      Meson build + tests (${{ matrix.platform }}, ${{ matrix.mode.name }} ${{ matrix.flavor }})
+    strategy:
+      fail-fast: false
+      matrix:
+        flavor:
+          - debug
+          - release
+        mode:
+          - { name: default, args: -Dtests=enabled }
+          - name: sanitize
+            args: >-
+              "-Db_sanitize=address,undefined"
+        platform:
+          - macos-latest
+          - windows-2022
+          - ubuntu-22.04
+
+    steps:
+      - name: Setup meson
+        run: |
+          pipx install meson ninja
+      - name: Checkout
+        uses: actions/checkout@v4
+        with: { submodules: recursive }
+      - name: Activate MSVC and Configure
+        if: ${{ matrix.platform == 'windows-2022' }}
+        run: |
+          meson setup build-${{ matrix.flavor }} --buildtype=${{ matrix.flavor }} ${{ matrix.mode.args }} --vsenv
+      - name: Configuring
+        if: ${{ matrix.platform != 'windows-2022' }}
+        run: |
+          meson setup build-${{ matrix.flavor }} --buildtype=${{ matrix.flavor }} ${{ matrix.mode.args }}
+      - name: Building
+        run: |
+          meson compile -C build-${{ matrix.flavor }}
+      - name: Running tests
+        run: |
+          meson test -C build-${{ matrix.flavor }}
