@@ -16,14 +16,38 @@ jobs:
           - debug
           - release
         mode:
-          - { name: default, args: -Dtests=enabled }
+          - name: default
+            args: -Dtests=enabled
           - name: sanitize
             args: >-
               "-Db_sanitize=address,undefined"
+          - name: clang+sanitize
+            args: >-
+              "-Db_sanitize=address,undefined"
+            extra_envs:
+              CC: clang
+              CXX: clang++
+          - name: clang-cl+sanitize
+            args: >-
+              "-Db_sanitize=address,undefined"
+            extra_envs:
+              CC: clang-cl
+              CXX: clang-cl
         platform:
           - macos-latest
           - windows-2022
           - ubuntu-22.04
+
+        exclude:
+          - platform: ubuntu-22.04
+            mode:
+              name: clang-cl+sanitize
+          - platform: macos-latest
+            mode:
+              name: clang-cl+sanitize
+          - platform: macos-latest
+            mode:
+              name: clang+sanitize
 
     steps:
       - name: Setup meson
@@ -31,7 +55,6 @@ jobs:
           pipx install meson ninja
       - name: Checkout
         uses: actions/checkout@v4
-        with: { submodules: recursive }
       - name: Activate MSVC and Configure
         if: ${{ matrix.platform == 'windows-2022' }}
         run: |
