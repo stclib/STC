@@ -18,11 +18,13 @@ jobs:
         mode:
           - name: default
             args: -Dtests=enabled
+            extra_envs: {}
           - name: sanitize
             args: >-
               "-Db_sanitize=address,undefined"
           - name: sanitize+asanonly # For Visual Studio
             args: -Db_sanitize=address
+            extra_envs: {}
           - name: clang+sanitize
             args: >-
               "-Db_sanitize=address,undefined"
@@ -71,10 +73,12 @@ jobs:
         uses: actions/checkout@v4
       - name: Activate MSVC and Configure
         if: ${{ matrix.platform == 'windows-2022' }}
+        env: ${{ matrix.mode.extra_envs }}
         run: |
           meson setup build-${{ matrix.flavor }} --buildtype=${{ matrix.flavor }} ${{ matrix.mode.args }} --vsenv
       - name: Configuring
         if: ${{ matrix.platform != 'windows-2022' }}
+        env: ${{ matrix.mode.extra_envs }}
         run: |
           meson setup build-${{ matrix.flavor }} --buildtype=${{ matrix.flavor }} ${{ matrix.mode.args }}
       - name: Building
