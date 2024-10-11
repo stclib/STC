@@ -37,6 +37,16 @@ jobs:
             extra_envs:
               CC: clang-cl
               CXX: clang-cl
+          - name: clang+msan
+            args: -Db_sanitize=memory
+            extra_envs:
+              CC: clang
+              CXX: clang++
+          - name: clang-cl+msan
+            args: -Db_sanitize=memory
+            extra_envs:
+              CC: clang-cl
+              CXX: clang-cl
         platform:
           - macos-latest
           - windows-2022
@@ -53,6 +63,15 @@ jobs:
           - platform: windows-2022
             mode:
               name: clang+sanitize
+          - platform: ubuntu-22.04
+            mode:
+              name: clang-cl+msan
+          - platform: macos-latest
+            mode:
+              name: clang-cl+msan
+          - platform: windows-2022
+            mode:
+              name: clang+msan
           # msvc
           - platform: ubuntu-22.04
             mode:
@@ -67,6 +86,10 @@ jobs:
           - platform: macos-latest
             mode:
               name: clang+sanitize
+          # msan unsupported
+          - platform: macos-latest
+            mode:
+              name: clang+msan
 
     steps:
       - name: Setup meson
