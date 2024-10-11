@@ -7,8 +7,7 @@ on:
 jobs:
   meson-build-and-tests:
     runs-on: ${{ matrix.platform }}
-    name: >-
-      Meson build + tests (${{ matrix.platform }}, ${{ matrix.mode.name }} ${{ matrix.flavor }})
+    name: ${{ matrix.platform }}, ${{ matrix.mode.name }} ${{ matrix.flavor }}
     strategy:
       fail-fast: false
       matrix:
