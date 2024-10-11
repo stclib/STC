@@ -24,7 +24,8 @@ jobs:
             extra_envs: {}
           - name: sanitize+asanonly # For Visual Studio
             args: -Db_sanitize=address
-            extra_envs: {}
+            extra_envs:
+              ASAN_OPTIONS: report_globals=2
           - name: clang+sanitize
             args: >-
               "-Db_sanitize=address,undefined"
