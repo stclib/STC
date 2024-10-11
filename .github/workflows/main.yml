@@ -25,7 +25,7 @@ jobs:
           - name: sanitize+asanonly # For Visual Studio
             args: -Db_sanitize=address
             extra_envs:
-              ASAN_OPTIONS: report_globals=2
+              ASAN_OPTIONS: report_globals=0:halt_on_error=1:abort_on_error=1:print_summary=1
           - name: clang+sanitize
             args: >-
               "-Db_sanitize=address,undefined"
@@ -112,6 +112,7 @@ jobs:
         run: |
           meson compile -C build-${{ matrix.flavor }}
       - name: Running tests
+        env: ${{ matrix.mode.extra_envs }}
         run: |
           meson test -C build-${{ matrix.flavor }} --timeout-multiplier 5
       - uses: actions/upload-artifact@v4
