@@ -154,11 +154,16 @@ enum {
     UTF_zp = UTF_GRP+2*U8G_Zp, UTF_ZP, /* utf8 separator paragraph */
     UTF_zs = UTF_GRP+2*U8G_Zs, UTF_ZS, /* utf8 separator space */
     UTF_arabic = UTF_GRP+2*U8G_Arabic, UTF_ARABIC,
+    UTF_bengali = UTF_GRP+2*U8G_Bengali, UTF_BENGALI,
     UTF_cyrillic = UTF_GRP+2*U8G_Cyrillic, UTF_CYRILLIC,
     UTF_devanagari = UTF_GRP+2*U8G_Devanagari, UTF_DEVANAGARI,
+    UTF_georgian = UTF_GRP+2*U8G_Georgian, UTF_GEORGIAN,
     UTF_greek = UTF_GRP+2*U8G_Greek, UTF_GREEK,
     UTF_han = UTF_GRP+2*U8G_Han, UTF_HAN,
+    UTF_hiragana = UTF_GRP+2*U8G_Hiragana, UTF_HIRAGANA,
+    UTF_katakana = UTF_GRP+2*U8G_Katakana, UTF_KATAKANA,
     UTF_latin = UTF_GRP+2*U8G_Latin, UTF_LATIN,
+    UTF_thai = UTF_GRP+2*U8G_Thai, UTF_THAI,
     TOK_ANY     = 0x8200000,    /* Any character except newline, . */
     TOK_ANYNL   ,               /* Any character including newline, . */
     TOK_NOP     ,               /* No operation, internal use only */
@@ -666,9 +671,17 @@ _lexutfclass(_Parser *par, _Rune *rp)
         {"{Pf}", 4, UTF_pf}, {"{Pi}", 4, UTF_pi},
         {"{Zl}", 4, UTF_zl}, {"{Zp}", 4, UTF_zp},
         {"{Zs}", 4, UTF_zs}, {"{Sc}", 4, UTF_sc},
-        {"{Arabic}", 8, UTF_arabic}, {"{Cyrillic}", 10, UTF_cyrillic},
-        {"{Devanagari}", 10, UTF_devanagari}, {"{Greek}", 7, UTF_greek},
-        {"{Han}", 5, UTF_han}, {"{Latin}", 7, UTF_latin},
+        {"{Arabic}", 8, UTF_arabic},
+        {"{Bengali}", 9, UTF_bengali},
+        {"{Cyrillic}", 10, UTF_cyrillic},
+        {"{Devanagari}", 12, UTF_devanagari},
+        {"{Georgian}", 10, UTF_georgian},
+        {"{Greek}", 7, UTF_greek},
+        {"{Han}", 5, UTF_han},
+        {"{Hiragana}", 10, UTF_hiragana},
+        {"{Katakana}", 10, UTF_katakana},
+        {"{Latin}", 7, UTF_latin},
+        {"{Thai}", 6, UTF_thai},
     };
     unsigned inv = (*rp == 'P');
     for (unsigned i = 0; i < (sizeof cls/sizeof *cls); ++i) {
@@ -961,11 +974,16 @@ _runematch(_Rune s, _Rune r)
     case UTF_zp: case UTF_ZP:
     case UTF_zs: case UTF_ZS:
     case UTF_arabic: case UTF_ARABIC:
+    case UTF_bengali: case UTF_BENGALI:
     case UTF_cyrillic: case UTF_CYRILLIC:
     case UTF_devanagari: case UTF_DEVANAGARI:
+    case UTF_georgian: case UTF_GEORGIAN:
     case UTF_greek: case UTF_GREEK:
     case UTF_han: case UTF_HAN:
+    case UTF_hiragana: case UTF_HIRAGANA:
+    case UTF_katakana: case UTF_KATAKANA:
     case UTF_latin: case UTF_LATIN:
+    case UTF_thai: case UTF_THAI:
         n = (int)s - UTF_GRP;
         inv = n & 1;
         return inv ^ (int)utf8_isgroup(n / 2, r);

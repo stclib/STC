@@ -201,11 +201,16 @@ c_formatch (it, &re, input)
 | \p{Word} | Match UTF8 word character: (Alnum Pc) | * |
 | \p{XDigit} | Match hex number | * |
 | \p{Arabic} | Unicode script | * |
+| \p{Bengali} | Unicode script | * |
 | \p{Cyrillic} | Unicode script | * |
 | \p{Devanagari} | Unicode script | * |
+| \p{Georgian} | Unicode script | * |
 | \p{Greek} | Unicode script | * |
 | \p{Han} | Unicode script | * |
+| \p{Hiragani} | Unicode script | * |
+| \p{Katakani} | Unicode script | * |
 | \p{Latin} | Unicode script | * |
+| \p{Thai} | Unicode script | * |
 | \P{***Class***} | Do not match the classes described above | * |
 | [:alnum:] [:alpha:] [:ascii:] | Match ASCII character class. NB: only to be used inside [] brackets | * |
 | [:blank:] [:cntrl:] [:digit:] | " | * |

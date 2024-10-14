@@ -36,7 +36,8 @@ enum {
     U8G_Sc, U8G_Zl, U8G_Zp, U8G_Zs,
     U8G_Arabic, U8G_Bengali, U8G_Cyrillic,
     U8G_Devanagari, U8G_Georgian, U8G_Greek,
-    U8G_Han, U8G_Latin, U8G_Thai,
+    U8G_Han, U8G_Hiragana, U8G_Katakana,
+    U8G_Latin, U8G_Thai,
     U8G_SIZE
 };
 
@@ -44,7 +45,8 @@ static bool utf8_isgroup(int group, uint32_t c);
 
 static bool utf8_isalpha(uint32_t c) {
     static int16_t groups[] = {U8G_Latin, U8G_Nl, U8G_Cyrillic, U8G_Han, U8G_Devanagari,
-                               U8G_Greek, U8G_Arabic, U8G_Bengali, U8G_Thai, U8G_Georgian};
+                               U8G_Arabic, U8G_Bengali, U8G_Hiragana, U8G_Katakana,
+                               U8G_Thai, U8G_Greek, U8G_Georgian};
     if (c < 128) return isalpha((int)c) != 0;
     for (int j=0; j < (int)(sizeof groups/sizeof groups[0]); ++j)
         if (utf8_isgroup(groups[j], c))
@@ -372,6 +374,21 @@ static const URange16 Han_range16[] = {
     { 64112, 64217 },
 };
 
+static const URange16 Hiragana_range16[] = {
+	{ 12353, 12438 },
+	{ 12445, 12447 },
+};
+
+static const URange16 Katakana_range16[] = {
+	{ 12449, 12538 },
+	{ 12541, 12543 },
+	{ 12784, 12799 },
+	{ 13008, 13054 },
+	{ 13056, 13143 },
+	{ 65382, 65391 },
+	{ 65393, 65437 },
+};
+
 static const URange16 Latin_range16[] = {
     { 65, 90 },
     { 97, 122 },
@@ -446,6 +463,8 @@ static const UGroup _utf8_unicode_groups[U8G_SIZE] = {
     _e_arg(U8G_Georgian, UNI_ENTRY(Georgian)),
     _e_arg(U8G_Greek, UNI_ENTRY(Greek)),
     _e_arg(U8G_Han, UNI_ENTRY(Han)),
+    _e_arg(U8G_Hiragana, UNI_ENTRY(Hiragana)),
+    _e_arg(U8G_Katakana, UNI_ENTRY(Katakana)),
     _e_arg(U8G_Latin, UNI_ENTRY(Latin)),
     _e_arg(U8G_Thai, UNI_ENTRY(Thai)),
 };
