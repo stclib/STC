@@ -118,19 +118,19 @@ using_cspan_tuple(3); using_cspan_tuple(4);
 using_cspan_tuple(5); using_cspan_tuple(6);
 using_cspan_tuple(7); using_cspan_tuple(8);
 
-// cspan_init: static construction from initialization list
-//
+// cspan_init: create static/global 1d-span from an initializer list
+// For non-static spans, use c_init(Span, ...) as it is consistent with initing other containers.
 #define cspan_init(Span, ...) \
-    ((Span){.data=c_make_array(Span##_value, __VA_ARGS__), \
-            .shape={sizeof((Span##_value[])__VA_ARGS__)/sizeof(Span##_value)}, \
-            .stride=(cspan_tuple1){.d={1}}})
+    (c_literal(Span){.data=c_make_array(Span##_value, __VA_ARGS__), \
+                     .shape={sizeof((Span##_value[])__VA_ARGS__)/sizeof(Span##_value)}, \
+                     .stride=(cspan_tuple1){.d={1}}})
 
 // cspan_from* a pointer+size, c-array, or a cvec/cstack container
 //
 #define cspan_with_n(ptr, n) \
     {.data=(ptr), \
      .shape={(_istride)(n)}, \
-     .stride=(cspan_tuple1){.d={1}}}
+     .stride=c_literal(cspan_tuple1){.d={1}}}
 
 #define cspan_from_array(array) \
     cspan_with_n(array, c_arraylen(array))

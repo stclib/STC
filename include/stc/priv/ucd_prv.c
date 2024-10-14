@@ -34,17 +34,17 @@ enum {
     U8G_Cc, U8G_Lt, U8G_Nd, U8G_Nl,
     U8G_Pc, U8G_Pd, U8G_Pf, U8G_Pi,
     U8G_Sc, U8G_Zl, U8G_Zp, U8G_Zs,
-    U8G_Arabic, U8G_Cyrillic,
-    U8G_Devanagari, U8G_Greek,
-    U8G_Han, U8G_Latin,
+    U8G_Arabic, U8G_Bengali, U8G_Cyrillic,
+    U8G_Devanagari, U8G_Georgian, U8G_Greek,
+    U8G_Han, U8G_Latin, U8G_Thai,
     U8G_SIZE
 };
 
 static bool utf8_isgroup(int group, uint32_t c);
 
 static bool utf8_isalpha(uint32_t c) {
-    static int16_t groups[] = {U8G_Latin, U8G_Nl, U8G_Greek, U8G_Cyrillic,
-                               U8G_Han, U8G_Devanagari, U8G_Arabic};
+    static int16_t groups[] = {U8G_Latin, U8G_Nl, U8G_Cyrillic, U8G_Han, U8G_Devanagari,
+                               U8G_Greek, U8G_Arabic, U8G_Bengali, U8G_Thai, U8G_Georgian};
     if (c < 128) return isalpha((int)c) != 0;
     for (int j=0; j < (int)(sizeof groups/sizeof groups[0]); ++j)
         if (utf8_isgroup(groups[j], c))
@@ -58,15 +58,15 @@ static bool utf8_iscased(uint32_t c) {
            utf8_isgroup(U8G_Lt, c);
 }
 
+static bool utf8_isalnum(uint32_t c) {
+    if (c < 128) return isalnum((int)c) != 0;
+    return utf8_isalpha(c) || utf8_isgroup(U8G_Nd, c);
+}
+
 static bool utf8_isword(uint32_t c) {
     if (c < 128) return (isalnum((int)c) != 0) | (c == '_');
     return utf8_isalpha(c) || utf8_isgroup(U8G_Nd, c) ||
            utf8_isgroup(U8G_Pc, c);
-}
-
-static bool utf8_isalnum(uint32_t c) {
-    if (c < 128) return isalnum((int)c) != 0;
-    return utf8_isalpha(c) || utf8_isgroup(U8G_Nd, c);
 }
 
 static bool utf8_isblank(uint32_t c) {
@@ -274,6 +274,23 @@ static const URange16 Arabic_range16[] = {
     { 65142, 65276 },
 };
 
+static const URange16 Bengali_range16[] = {
+    { 2432, 2435 },
+    { 2437, 2444 },
+    { 2447, 2448 },
+    { 2451, 2472 },
+    { 2474, 2480 },
+    { 2482, 2482 },
+    { 2486, 2489 },
+    { 2492, 2500 },
+    { 2503, 2504 },
+    { 2507, 2510 },
+    { 2519, 2519 },
+    { 2524, 2525 },
+    { 2527, 2531 },
+    { 2534, 2558 },
+};
+
 static const URange16 Cyrillic_range16[] = {
     { 1024, 1156 },
     { 1159, 1327 },
@@ -290,6 +307,19 @@ static const URange16 Devanagari_range16[] = {
     { 2389, 2403 },
     { 2406, 2431 },
     { 43232, 43263 },
+};
+
+static const URange16 Georgian_range16[] = {
+    { 4256, 4293 },
+    { 4295, 4295 },
+    { 4301, 4301 },
+    { 4304, 4346 },
+    { 4348, 4351 },
+    { 7312, 7354 },
+    { 7357, 7359 },
+    { 11520, 11557 },
+    { 11559, 11559 },
+    { 11565, 11565 },
 };
 
 static const URange16 Greek_range16[] = {
@@ -379,6 +409,11 @@ static const URange16 Latin_range16[] = {
     { 65345, 65370 },
 };
 
+static const URange16 Thai_range16[] = {
+    { 3585, 3642 },
+    { 3648, 3675 },
+};
+
 #ifdef __cplusplus
     #define _e_arg(k, v) v
 #else
@@ -405,11 +440,14 @@ static const UGroup _utf8_unicode_groups[U8G_SIZE] = {
     _e_arg(U8G_Zp, UNI_ENTRY(Zp)),
     _e_arg(U8G_Zs, UNI_ENTRY(Zs)),
     _e_arg(U8G_Arabic, UNI_ENTRY(Arabic)),
+    _e_arg(U8G_Bengali, UNI_ENTRY(Bengali)),
     _e_arg(U8G_Cyrillic, UNI_ENTRY(Cyrillic)),
     _e_arg(U8G_Devanagari, UNI_ENTRY(Devanagari)),
+    _e_arg(U8G_Georgian, UNI_ENTRY(Georgian)),
     _e_arg(U8G_Greek, UNI_ENTRY(Greek)),
     _e_arg(U8G_Han, UNI_ENTRY(Han)),
     _e_arg(U8G_Latin, UNI_ENTRY(Latin)),
+    _e_arg(U8G_Thai, UNI_ENTRY(Thai)),
 };
 
 static bool utf8_isgroup(int group, uint32_t c) {
