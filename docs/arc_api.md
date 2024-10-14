@@ -95,8 +95,8 @@ bool            arc_X_value_eq(const i_key* x, const i_key* y);
 #include "stc/cstr.h"
 
 #define i_type Map
-#define i_key_cstr   // i_key: cstr, i_keydrop: cstr_drop, etc..
-#define i_val int  // year
+#define i_keypro cstr // cstr "pro": cstr_clone cstr_drop, cstr_cmp, cstr_from, cstr_toraw, ....
+#define i_val int     // year
 // override cstr_drop(p) by defining i_keydrop:
 #define i_keydrop(p) (printf("  drop name: %s\n", cstr_str(p)), cstr_drop(p))
 #include "stc/smap.h"

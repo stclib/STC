@@ -343,7 +343,7 @@ Erase linearily in containers using a predicate. `value` is a pointer to each el
 #include "stc/list.h"
 
 #define i_type Map
-#define i_key_cstr
+#define i_keypro cstr
 #define i_val int
 #include "stc/smap.h"
 
@@ -580,7 +580,7 @@ c_with (pthread_mutex_lock(&lock), pthread_mutex_unlock(&lock))
 #include <errno.h>
 #include "stc/cstr.h"
 
-#define i_key_cstr
+#define i_keypro cstr
 #include "stc/vec.h"
 
 // receiver should check errno variable

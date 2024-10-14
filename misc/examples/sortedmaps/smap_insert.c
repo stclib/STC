@@ -11,7 +11,7 @@
 
 #define i_type smap_istr // Map of int => cstr
 #define i_key int
-#define i_val_cstr
+#define i_valpro cstr
 #include "stc/smap.h"
 
 void print_ii(smap_ii map) {

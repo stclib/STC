@@ -29,11 +29,12 @@
 #undef i_capacity
 
 #undef i_key
-#undef i_keystr
-#undef i_key_cstr   // alt.
-#undef i_keyarc
-#undef i_keybox
-#undef i_key_arcbox // alt.
+#undef i_keypro
+#undef i_keystr     // [deprecated]
+#undef i_key_cstr   // [deprecated]
+#undef i_keyarc     // [deprecated]
+#undef i_keybox     // [deprecated]
+#undef i_key_arcbox // [deprecated]
 #undef i_keyclass
 #undef i_cmpclass   // define i_keyraw, and bind i_cmp, i_eq, i_hash "members"
 #undef i_keyclone
@@ -47,11 +48,12 @@
 #undef i_hash
 
 #undef i_val
-#undef i_valstr
-#undef i_val_cstr   // alt.
-#undef i_valarc
-#undef i_valbox
-#undef i_val_arcbox // alt.
+#undef i_valpro
+#undef i_valstr     // [deprecated]
+#undef i_val_cstr   // [deprecated]
+#undef i_valarc     // [deprecated]
+#undef i_valbox     // [deprecated]
+#undef i_val_arcbox // [deprecated]
 #undef i_valclass
 #undef i_valclone
 #undef i_valdrop

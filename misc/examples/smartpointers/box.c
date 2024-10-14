@@ -32,7 +32,7 @@ void Person_drop(Person* p) {
 #include "stc/box.h"
 
 #define i_type Persons
-#define i_keybox PBox        // i_keybox informs that PBox is a box type.
+#define i_keypro PBox        // i_keypro informs that PBox is a box type.
 #include "stc/sset.h"
 
 int main(void)

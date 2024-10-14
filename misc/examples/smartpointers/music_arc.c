@@ -50,7 +50,7 @@ inline static uint64_t SongView_hash(const SongView* xw)
 
 // Create a set of SongArc
 #define i_type SongSet
-#define i_keyarc SongArc // use i_keyarc when key is an arc type, instead of i_key
+#define i_keypro SongArc // use i_keypro when key is an arc type, instead of i_key
 #include "stc/hset.h"
 
 void example3(void)

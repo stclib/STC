@@ -23,13 +23,13 @@ int point_cmp(const Point* a, const Point* b) {
 
 // cstr => cstr map
 #define i_type SMap
-#define i_key_cstr
-#define i_val_cstr
+#define i_keypro cstr
+#define i_valpro cstr
 #include "stc/smap.h"
 
 // cstr set
 #define i_type SSet
-#define i_key_cstr
+#define i_keypro cstr
 #include "stc/sset.h"
 
 

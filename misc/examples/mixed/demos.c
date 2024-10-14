@@ -50,7 +50,7 @@ void vectordemo1(void)
     vec_ll_drop(&bignums);
 }
 
-#define i_key_cstr
+#define i_keypro cstr
 #define i_use_cmp
 #include "stc/vec.h"
 
@@ -130,7 +130,7 @@ void mapdemo1(void)
 }
 
 #define i_type hmap_si
-#define i_key_cstr
+#define i_keypro cstr
 #define i_val int
 #include "stc/hmap.h"
 
@@ -152,8 +152,8 @@ void mapdemo2(void)
     hmap_si_drop(&nums);
 }
 
-#define i_key_cstr
-#define i_val_cstr
+#define i_keypro cstr
+#define i_valpro cstr
 #include "stc/hmap.h"
 
 void mapdemo3(void)

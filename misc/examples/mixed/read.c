@@ -1,6 +1,6 @@
 #include "stc/cstr.h"
 
-#define i_key_cstr
+#define i_keypro cstr
 #include "stc/vec.h"
 #include <errno.h>
 

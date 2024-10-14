@@ -81,7 +81,7 @@ hset_X_value    hset_X_value_clone(hset_X_value val);
 ```c
 #include "stc/cstr.h"
 #define i_type Strings
-#define i_key_cstr
+#define i_keypro cstr
 #include "stc/hset.h"
 
 int main(void)

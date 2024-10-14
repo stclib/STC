@@ -2,11 +2,11 @@
 
 #define i_type hmap_id   // Map of int => cstr
 #define i_key int
-#define i_val_cstr
+#define i_valpro cstr
 #include "stc/hmap.h"
 
 #define i_type hmap_nat  // Map of cstr => int
-#define i_key_cstr
+#define i_keypro cstr
 #define i_val int
 #include "stc/hmap.h"
 

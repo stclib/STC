@@ -22,11 +22,11 @@
 // Program to emulates the phone book.
 #include "stc/cstr.h"
 
-#define i_key_cstr
-#define i_val_cstr
+#define i_keypro cstr
+#define i_valpro cstr
 #include "stc/hmap.h"
 
-#define i_key_cstr
+#define i_keypro cstr
 #include "stc/hset.h"
 
 void print_phone_book(hmap_cstr phone_book)

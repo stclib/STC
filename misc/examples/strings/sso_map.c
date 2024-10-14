@@ -1,6 +1,6 @@
 #include "stc/cstr.h"
-#define i_key_cstr
-#define i_val_cstr
+#define i_keypro cstr
+#define i_valpro cstr
 #include "stc/hmap.h"
 
 int main(void)

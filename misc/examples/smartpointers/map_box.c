@@ -7,8 +7,8 @@
 
 // hmap of cstr => IBox
 #define i_type Boxmap
-#define i_key_cstr
-#define i_valbox IBox // i_valbox: use properties from IBox automatically
+#define i_keypro cstr
+#define i_valpro IBox // i_valpro: use properties from IBox automatically
 #include "stc/hmap.h"
 
 

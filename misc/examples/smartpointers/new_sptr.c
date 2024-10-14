@@ -17,11 +17,11 @@ uint64_t Person_hash(const Person* p);
 #include "stc/arc.h"
 
 #define i_type IPStack
-#define i_keyarc IPtr
+#define i_keypro IPtr
 #include "stc/stack.h"
 
 #define i_type PASet
-#define i_keyarc PersonArc
+#define i_keypro PersonArc
 #include "stc/hset.h"
 
 

@@ -158,7 +158,7 @@ sorted: 5 7 8 13 16 25
 ```c
 #include "stc/cstr.h"
 
-#define i_key_cstr
+#define i_keypro cstr
 #include "stc/vec.h"
 
 int main(void) {

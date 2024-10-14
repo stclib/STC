@@ -19,7 +19,7 @@
 #include "stc/hmap.h"
 
 #define i_type MapMap
-#define i_key_cstr
+#define i_keypro cstr
 #define i_valclass ListMap
 #include "stc/hmap.h"
 

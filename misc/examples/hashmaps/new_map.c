@@ -22,12 +22,12 @@ typedef struct Point { int x, y; } Point;
 #include "stc/hmap.h"
 
 // cstr => cstr map
-#define i_key_cstr
-#define i_val_cstr
+#define i_keypro cstr
+#define i_valpro cstr
 #include "stc/hmap.h"
 
 // string set
-#define i_key_cstr
+#define i_keypro cstr
 #include "stc/hset.h"
 
 

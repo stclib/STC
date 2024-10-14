@@ -2,7 +2,7 @@
 // and demonstrate sharing and cloning of maps.
 #include "stc/cstr.h"
 #define i_type Map
-#define i_key_cstr // strings
+#define i_keypro cstr // strings
 #define i_val int
 #define i_keydrop(p) (printf("drop name: %s\n", cstr_str(p)), cstr_drop(p))
 #include "stc/smap.h"
@@ -15,11 +15,11 @@
 #include "stc/arc.h"
 
 #define i_type Vec
-#define i_keyarc Arc // define i_keyarc for arc keys, not i_key
+#define i_keypro Arc // define i_keypro for arc keys, not i_key
 #include "stc/vec.h"
 
 #define i_type List
-#define i_keyarc Arc // as above
+#define i_keypro Arc // as above
 #include "stc/list.h"
 
 int main(void)

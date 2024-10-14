@@ -1,7 +1,7 @@
 // https://doc.rust-lang.org/rust-by-example/std/hash.html
 #include "stc/cstr.h"
-#define i_key_cstr
-#define i_val_cstr
+#define i_keypro cstr
+#define i_valpro cstr
 #include <stdio.h>
 #include "stc/hmap.h"
 

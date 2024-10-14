@@ -110,8 +110,8 @@ void            smap_X_value_drop(i_key* pval);
 ```c
 #include "stc/cstr.h"
 
-#define i_key_cstr // special macro for i_key = cstr
-#define i_val_cstr // ditto
+#define i_keypro cstr // special macro for i_key = cstr
+#define i_valpro cstr // ditto
 #include "stc/smap.h"
 
 int main(void)
@@ -158,8 +158,8 @@ Translate a
 ```c
 #include "stc/cstr.h"
 #define i_type strmap
-#define i_key_cstr // key = cstr class
-#define i_val_cstr
+#define i_keypro cstr // key = cstr class
+#define i_valpro cstr
 #include "stc/smap.h"
 
 static void print_node(const strmap_value* node) {

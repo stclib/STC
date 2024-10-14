@@ -368,11 +368,11 @@ linking with the stc-library.
 <details>
 <summary>Specifying template parameters</summary>
 
-## Specifying template parameters
+## Defining template parameters
 
-Each templated type requires one `#include`, even if it's the same container base type, as described earlier.
-The template parameters are given by a `#define i_xxxx` statement, where *xxxx* is the parameter name.
-The list of template parameters:
+Only `i_key` is strictly required to be specified. The template parameters are given by a `#define i_xxxx`
+statement. Each templated type instantiation requires a consecutive `#include`, even if the same container
+base type was included earlier. The possible template parameters are:
 
 - `i_type` *ContType*, *KeyType*[, *ValType*] is a shorthand for defining `i_type`, `i_key` (and `i_val`)
  individually, as described next.
@@ -381,44 +381,32 @@ The list of template parameters:
 - `i_val` *Type* - Element value type. **[required for]** hmap/smap as the mapped value type.
 - `i_cmp` *Func* - Three-way comparison of two *i_keyraw*\* - **[required for]** non-integral *i_keyraw*
 - `i_less` *Func* - Comparison of two *i_keyraw*\* - an alternative to specifying `i_cmp`.
+- `i_eq` *Func* - Equality comparison of two *i_keyraw*\* - defaults to *!i_cmp*. Companion with *i_hash*.
 - `i_hash` *Func* - Hash function taking *i_keyraw*\* - defaults to *c_default_hash*. **[required for]**
 ***hmap/hset*** with non-POD *i_keyraw* elements.
-- `i_eq` *Func* - Equality comparison of two *i_keyraw*\* - defaults to *!i_cmp*. Companion with *i_hash*.
-
-Properties:
-- `i_opt` *Flags* - Boolean properties: may combine *c_no_clone*, *c_no_atomic*, *c_is_forward*, *c_static*,
-*c_header* with the *|* separator.
 
 Key (element / lookup type):
 - `i_keydrop` *Func* - Destroy key - defaults to empty destructor.
 - `i_keyclone` *Func* - **[required if]** *i_keydrop* is defined (exception for **arc**, as it shares).
-- `i_keyraw` *Type* - Lookup and emplace "raw" type, defaults to *i_key*.
-- `i_keyfrom` *Func* - Convertion func from *i_keyraw* to *i_key*.
-- `i_keytoraw` *Func*  - Convertion func to *i_keyraw* from *i_key*. **[required if]** *i_keyraw* is defined
+- Advanced, convertion between an alternative input type:
+    - `i_keyraw` *Type* - Lookup and emplace "raw" type, defaults to *i_key*.
+    - `i_keyfrom` *Func* - Convertion func from *i_keyraw* to *i_key*.
+    - `i_keytoraw` *Func*  - Convertion func to *i_keyraw* from *i_key*. **[required if]** *i_keyraw* is defined
 
-Val (hmap/smap mapped value only):
-- `i_valdrop` *Func* - Destroy mapped value - defaults to empty destruct.
-- `i_valclone` *Func* - **[required if]** *i_valdrop* is defined.
-- `i_valraw` *Type*  - Emplace "raw" type, defaults to *i_val*.
-- `i_valfrom` *Func* - Convertion from *i_valraw* to *i_val*.
-- `i_valtoraw` *Func* - Convertion to *i_valraw* from *i_val*.
+Val (hmap/smap mapped value only): These are analogue to the Key parameters: `i_valxxxx`.
 
-Convenient meta-template parameters to use in place of `i_key` / `i_val`.
-- `i_keyclass` *Type* - Defines ***i_key*** and binds standard named functions: *Type_clone()*, *Type_drop()*,
-*Type_cmp()*, *Type_eq()*, *Type_hash()* to the respective template parameters. It is still required to
-define ***i_use_cmp*** to enable searching/sorting on sequences (stack, vec, deque, list).
-Also, if ***i_keyraw*** is defined, it binds ***i_keytoraw*** to *Type_toraw()* and ***i_keyfrom*** to *Type_from()*.
-Only functions required by the container type needs to be defined. i.e.:
-    - *Type_hash()* and *Type_eq()* are required by **hmap**, **hset**.
-    - *Type_cmp()* required by **smap**, **sset**, **pqueue**.
-- `i_class` *ContType*, *KeyType* - Define both ***i_type*** = *ContType* and ***i_keyclass*** = *KeyType*.
-This should be used for "*container of containers*" or container of element type which have both *_clone()* and *_drop()* functions.
-- `i_key_cstr` - Defines ***i_keyclass*** = *cstr*, ***i_keyraw*** = *const char*\*, along with
-***i_keyfrom***, ***i_keytoraw***, ***i_cmp***, ***i_eq***, and ***i_hash*** template parameters.
-- `i_keystr` - Alias for ***i_key_cstr***.
-- `i_keyarc` / `i_keybox` *Type* - Use when element *Type* is a smart pointer **arc** or **box**.
-Defines ***i_keyclass*** = *Type*, and ***i_keyraw*** = *Type\**. Not normally used when defining arc/box types themselves.
-- `i_valclass`, `i_val_cstr`, `i_valarc`, `i_valbox` - Similar rules as for **key**, but comparison functions are not relevant for these.
+Convenience meta-template parameters to use in place of `i_key` / `i_val` and `i_type`.
+- `i_class` *ContType*, *KeyType* - Define both ***i_type*** = *ContType* and ***i_keyclass*** = *KeyType* (see next).
+This should be used to define "*container of containers*" or container of element type which have both *_clone()* and *_drop()* functions.
+- `i_keyclass` *Type* - Defines ***i_key*** and binds standard named functions: *Type_clone()* and *Type_drop()*  to the respective template parameters.
+- `i_cmpclass` *RawType* - Defines ***i_keyraw*** and binds *Type_from()*, *Type_toraw()*, *RawType_cmp()*, *RawType_eq()*, *RawType_hash()* to the respective template parameters. It is still required to define ***i_use_cmp*** to enable searching/sorting on sequence types (stack, vec, deque, list).
+- `i_keypro` *Type* - This must be used for "pro" types, i.e. library types like **cstr**, **box** and **arc**.
+It combines the `i_keyclass` and `i_cmpclass` features.
+- `i_valclass`, `i_valpro` - Similar rules as for **key**, but comparison functions are not relevant for these.
+
+Properties:
+- `i_opt` *Flags* - Boolean properties: may combine *c_no_clone*, *c_no_atomic*, *c_is_forward*, *c_static*,
+*c_header* with the *|* separator.
 
 **Notes**:
 - You can define `i_no_clone` or `i_opt c_no_clone | c_... | ...` to disable *clone* functionality.
@@ -429,7 +417,7 @@ Defines ***i_keyclass*** = *Type*, and ***i_keyraw*** = *Type\**. Not normally u
 
 The table below shows the template parameters which *must* be defined to support element search/lookup and sort for various container type instantiations.
 
-For the containers marked ***optional***, the features are disabled if the template parameter(s) are not defined. Note that the ***(integral type)*** columns also applies to "special" key-types, specified with `i_key_cstr`, `i_keyarc`/`i_keybox`, and `i_keyclass` (so not only for true integral types like `int` or `float`).
+For the containers marked ***optional***, the features are disabled if the template parameter(s) are not defined. Note that the ***(integral type)*** columns also applies to "special" key-types, specified with `i_keyclass` (so not only for true integral types like `int` or `float`).
 
 | Container         | search (integral type) | sort (integral type) |\|| search (struct elem) | sort (struct elem) | optional |
 |:------------------|:---------------------|:---------------------|:-|:-----------------|:-------------------|:---------|
@@ -473,7 +461,7 @@ and non-emplace methods:
 #define i_implement     // define in ONE file to implement longer functions in cstr
 #include "stc/cstr.h"
 
-#define i_key_cstr       // special macro to enable container of cstr
+#define i_keypro cstr  // use i_keypro for "pro" types like cstr
 #include "stc/vec.h"   // vector of string (cstr)
 ...
 vec_cstr vec = {0};
