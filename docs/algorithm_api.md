@@ -232,8 +232,10 @@ c_func (get_data1,(void), ->, Vec) {
 }
 
 c_func (get_data2,(void), ->, struct {Vec v1, v2;}) {
-    return (get_data2_result){.v1=c_init(Vec, {1, 2, 3, 4, 5, 6}),
-                              .v2=c_init(Vec, {7, 8, 9, 10, 11})};
+    return (get_data2_result){
+        .v1=c_init(Vec, {1, 2, 3, 4, 5, 6}),
+        .v2=c_init(Vec, {7, 8, 9, 10, 11})
+    };
 }
 
 c_func (load_data,(const char* fname), ->, struct {Vec out; int err;}) {
@@ -266,9 +268,9 @@ c_func (load_data,(const char* fname), ->, struct {Vec out; int err;}) {
 #define i_type Map, int, int
 #include "stc/hmap.h"
 
-c_func (split_map,(Map m), ->, struct {Vec keys, vals;}) {
+c_func (split_map,(Map map), ->, struct {Vec keys, vals;}) {
     split_map_result res = {0};
-    c_foreach_kv (k, v, Map, m) {
+    c_foreach_kv (k, v, Map, map) {
         Vec_push(&res.keys, *k);
         Vec_push(&res.vals, *v);
     }
@@ -282,13 +284,18 @@ int main(void) {
     c_push(Vec, &vec, {7, 8, 9, 10, 11, 12});
     c_push(Map, &map, {{7, 8}, {9, 10}, {11, 12}});
 
-    c_foreach (i, Vec, vec) printf("%d ", *i.ref);
+    c_foreach (i, Vec, vec)
+        printf("%d ", *i.ref);
     puts("");
-    c_foreach_kv(k, v, Map, map) printf("{%d %d} ", *k, *v);
+
+    c_foreach_kv(k, v, Map, map)
+        printf("[%d %d] ", *k, *v);
     puts("");
 
     split_map_result res = split_map(map);
-    c_foreach (i, Vec, res.vals) printf("%d ", *i.ref);
+
+    c_foreach (i, Vec, res.vals)
+        printf("%d ", *i.ref);
     puts("");
 
     c_drop(Vec, &vec, &res.keys, &res.vals);

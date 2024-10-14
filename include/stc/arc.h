@@ -183,42 +183,16 @@ STC_INLINE void _c_MEMB(_assign)(Self* self, Self arc) {
 #if defined _i_has_cmp
     STC_INLINE int _c_MEMB(_raw_cmp)(const _m_raw* rx, const _m_raw* ry)
         { return i_cmp(rx, ry); }
-
-    STC_INLINE int _c_MEMB(_cmp)(const Self* self, const Self* other) {
-        _m_raw rawx = i_keytoraw(self->get), rawy = i_keytoraw(other->get);
-        return i_cmp((&rawx), (&rawy));
-    }
-#else
-    STC_INLINE int _c_MEMB(_cmp)(const Self* self, const Self* other) {
-        const _m_value *x = self->get, *y = other->get;
-        return (x > y) - (x < y);
-    }
 #endif
 
 #if defined _i_has_eq
     STC_INLINE bool _c_MEMB(_raw_eq)(const _m_raw* rx, const _m_raw* ry)
         { return i_eq(rx, ry); }
-
-    STC_INLINE bool _c_MEMB(_eq)(const Self* self, const Self* other) {
-        _m_raw rawx = i_keytoraw(self->get), rawy = i_keytoraw(other->get);
-        return i_eq((&rawx), (&rawy));
-    }
-#else
-    STC_INLINE bool _c_MEMB(_eq)(const Self* self, const Self* other)
-        { return self->get == other->get; }
 #endif
 
 #if !defined i_no_hash && defined _i_has_eq
     STC_INLINE size_t _c_MEMB(_raw_hash)(const _m_raw* rx)
         { return i_hash(rx); }
-
-    STC_INLINE size_t _c_MEMB(_hash)(const Self* self) {
-        _m_raw raw = i_keytoraw(self->get);
-        return i_hash((&raw));
-    }
-#else
-    STC_INLINE size_t _c_MEMB(_hash)(const Self* self)
-        { return c_default_hash(&self->get); }
 #endif // i_no_hash
 
 #undef i_no_atomic
