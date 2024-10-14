@@ -47,22 +47,20 @@
   #define _m_node _c_MEMB(_node)
 #endif
 
-#if defined i_key_arc
-  #define i_key_arcbox i_key_arc
-#elif defined i_key_box
-  #define i_key_arcbox i_key_box
-#elif defined i_key_str // [deprecated]
+#if defined i_keyarc   // Alternative to i_key_arcbox
+  #define i_key_arcbox i_keyarc
+#elif defined i_keybox // Same
+  #define i_key_arcbox i_keybox
+#elif defined i_keystr // Alternative to i_key_cstr
   #define i_key_cstr
-  #define i_tag str
 #endif
 
-#if defined i_val_arc
-  #define i_val_arcbox i_val_arc
-#elif defined i_val_box
-  #define i_val_arcbox i_val_box
-#elif defined i_val_str // [deprecated]
+#if defined i_valarc   // Alternative to i_val arcbox
+  #define i_val_arcbox i_valarc
+#elif defined i_valbox // Same
+  #define i_val_arcbox i_valbox
+#elif defined i_valstr // Alternative to i_val_cstr
   #define i_val_cstr
-  #define i_tag str
 #endif
 
 #ifdef i_TYPE // [deprecated]
@@ -178,9 +176,6 @@
   #error "If i_keyraw/i_valraw is defined, i_keytoraw/i_valtoraw must be defined too"
 #elif !defined i_no_clone && (defined i_keyclone ^ defined i_keydrop)
   #error "Both i_keyclone/i_valclone and i_keydrop/i_valdrop must be defined, if any (unless i_no_clone defined)."
-#elif defined i_keyboxed || defined i_valboxed
-  #error "i_keyboxed / i_valboxed not supported. " \
-         "Use: i_key_box/i_key_arc ; i_val_box/i_val_arc."
 #elif defined i_from || defined i_drop
   #error "i_from / i_drop not supported. Use i_keyfrom/i_keydrop ; i_valfrom/i_valdrop"
 #elif defined i_keyto || defined i_valto

@@ -15,11 +15,11 @@
 #include "stc/arc.h"
 
 #define i_type Vec
-#define i_key_arc Arc // use i_key_arc for arc key
+#define i_keyarc Arc // define i_keyarc for arc keys, not i_key
 #include "stc/vec.h"
 
 #define i_type List
-#define i_key_arc Arc // as above
+#define i_keyarc Arc // as above
 #include "stc/list.h"
 
 int main(void)

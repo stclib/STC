@@ -7,9 +7,10 @@ A **hset** is an associative container that contains a set of unique objects of 
 ## Header file and declaration
 
 ```c
-#define i_type <ct>,<kt> // shorthand to define i_type, i_key
+#define i_type <ct>,<kt> // shorthand for defining i_type, i_key
 #define i_type <t>       // container type name (default: hset_{i_key})
 #define i_key <t>        // element type: REQUIRED. Defines hset_X_value
+
 #define i_hash <fn>      // hash func i_keyraw*: REQUIRED IF i_keyraw is non-pod type
 #define i_eq <fn>        // equality comparison two i_keyraw*: REQUIRED IF i_keyraw is a
                          // non-integral type. Three-way i_cmp may be specified instead.
@@ -22,8 +23,8 @@ A **hset** is an associative container that contains a set of unique objects of 
 
 #include "stc/hset.h"
 ```
-- In the following, `X` is the value of `i_key` unless `i_type` is specified.
-- **emplace**-functions are only available when `i_keyraw` is implicitly or explicitly specified.
+- In the following, `X` is the value of `i_key` unless `i_type` is defined.
+- **emplace**-functions are only available when `i_keyraw` is implicitly or explicitly defined.
 
 ## Methods
 

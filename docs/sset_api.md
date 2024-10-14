@@ -8,10 +8,14 @@ See the c++ class [std::set](https://en.cppreference.com/w/cpp/container/set) fo
 ## Header file and declaration
 
 ```c
-#define i_type <ct>,<kt> // shorthand to define i_type, i_key
+#define i_type <ct>,<kt> // shorthand for defining i_type, i_key
 #define i_type <t>       // container type name (default: sset_{i_key})
 #define i_key <t>        // element type: REQUIRED. Defines sset_X_value
+
 #define i_cmp <fn>       // three-way compare two i_keyraw* : REQUIRED IF i_keyraw is a non-integral type
+#define i_less <fn>      // less comparison. Alternative to i_cmp
+#define i_eq <fn>        // equality comparison. Implicitly defined with i_cmp, but not i_less.
+
 #define i_keydrop <fn>   // destroy key func - defaults to empty destruct
 #define i_keyclone <fn>  // REQUIRED IF i_keydrop defined
 
@@ -21,8 +25,8 @@ See the c++ class [std::set](https://en.cppreference.com/w/cpp/container/set) fo
 
 #include "stc/sset.h"
 ```
-- In the following, `X` is the value of `i_key` unless `i_type` is specified.
-- **emplace**-functions are only available when `i_keyraw` is implicitly or explicitly specified.
+- In the following, `X` is the value of `i_key` unless `i_type` is defined.
+- **emplace**-functions are only available when `i_keyraw` is implicitly or explicitly defined.
 
 ## Methods
 

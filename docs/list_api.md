@@ -22,22 +22,26 @@ See the c++ class [std::list](https://en.cppreference.com/w/cpp/container/list) 
 ## Header file and declaration
 
 ```c
-#define i_type <ct>,<kt> // shorthand to define i_type, i_key
+#define i_type <ct>,<kt> // shorthand for defining i_type, i_key
 #define i_type <t>       // list container type name (default: list_{i_key})
 #define i_key <t>        // element type: REQUIRED. Note: i_val* may be specified instead of i_key*.
-#define i_cmp <fn>       // three-way compare two i_keyraw*
-#define i_use_cmp        // may be defined instead of i_cmp when i_key is an integral/native-type.
+
 #define i_keydrop <fn>   // destroy value func - defaults to empty destruct
 #define i_keyclone <fn>  // REQUIRED IF i_keydrop defined
+
+#define i_use_cmp        // may be defined instead of i_cmp when i_key is an integral/native-type.
+#define i_cmp <fn>       // three-way compare two i_keyraw*
+#define i_less <fn>      // less comparison. Alternative to i_cmp
+#define i_eq <fn>        // equality comparison. Implicitly defined with i_cmp, but not i_less.
 
 #define i_keyraw <t>     // convertion "raw" type (default: {i_key})
 #define i_keytoraw <fn>  // convertion func i_key* => i_keyraw
 #define i_keyfrom <fn>   // convertion func i_keyraw => i_key
 #include "stc/list.h"
 ```
-
-- In the following, `X` is the value of `i_key` unless `i_type` is specified.
-- **emplace**-functions are only available when `i_keyraw` is implicitly or explicitly specified.
+- Defining either `i_use_cmp`, `i_less` or `i_cmp` will enable sorting
+- **emplace**-functions are only available when `i_keyraw` is implicitly or explicitly defined.
+- In the following, `X` is the value of `i_key` unless `i_type` is defined.
 
 ## Methods
 

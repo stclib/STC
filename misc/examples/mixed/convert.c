@@ -1,7 +1,7 @@
 #include "stc/cstr.h"
 #include "stc/algorithm.h"
 
-#define i_key_cstr
+#define i_key_cstr // key = cstr
 #define i_val_cstr
 #include "stc/hmap.h"
 

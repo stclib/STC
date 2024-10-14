@@ -15,11 +15,14 @@ See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) fo
 ## Header file and declaration
 
 ```c
-#define i_type <ct>,<kt>,<vt> // shorthand to define i_type, i_key, i_val
+#define i_type <ct>,<kt>,<vt> // shorthand for defining i_type, i_key, i_val
 #define i_type <t>            // container type name (default: smap_{i_key})
 #define i_key <t>             // key type: REQUIRED.
 #define i_val <t>             // mapped value type: REQUIRED.
+
 #define i_cmp <fn>            // three-way compare two i_keyraw* : REQUIRED IF i_keyraw is a non-integral type
+#define i_less <fn>           // less comparison. Alternative to i_cmp
+#define i_eq <fn>             // equality comparison. Implicitly defined with i_cmp, but not i_less.
 
 #define i_keydrop <fn>        // destroy key func - defaults to empty destruct
 #define i_keyclone <fn>       // REQUIRED IF i_valdrop defined
@@ -35,8 +38,8 @@ See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) fo
 
 #include "stc/smap.h"
 ```
-- In the following, `X` is the value of `i_key` unless `i_type` is specified.
-- **emplace**-functions are only available when `i_keyraw`/`i_valraw` are implicitly or explicitly specified.
+- In the following, `X` is the value of `i_key` unless `i_type` is defined.
+- **emplace**-functions are only available when `i_keyraw`/`i_valraw` are implicitly or explicitly defined.
 
 ## Methods
 
@@ -155,7 +158,7 @@ Translate a
 ```c
 #include "stc/cstr.h"
 #define i_type strmap
-#define i_key_cstr
+#define i_key_cstr // key = cstr class
 #define i_val_cstr
 #include "stc/smap.h"
 

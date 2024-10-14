@@ -6,7 +6,7 @@ and `i_keydrop` macros specified. Use *box_X_clone(p)* to make a deep copy, whic
 `i_keyclone` macro if defined. Note that a box set to NULL is consider uninitialized, and
 cannot be e.g. cloned or dropped.
 
-When declaring a container of **box** values, define `i_key_box` with the
+When declaring a container of **box** values, define `i_keybox` with the
 box type instead of defining `i_key`. This will auto-set `i_keydrop`, `i_keyclone`, and `i_cmp` using
 functions defined by the specified **box**.
 
@@ -15,25 +15,29 @@ See similar c++ class [std::unique_ptr](https://en.cppreference.com/w/cpp/memory
 ## Header file and declaration
 
 ```c
-#define i_type <ct>,<kt> // shorthand to define i_type, i_key
+#define i_type <ct>,<kt> // shorthand for defining i_type, i_key
 #define i_type <t>       // box container type name (default: box_{i_key})
 #define i_key <t>        // element type: REQUIRED. Note: i_val* may be specified instead of i_key*.
-#define i_key_box <t>    // Use instead of i_key when key itself is a box-type.
-#define i_keyclass <t>   // Use instead of i_key when functions {i_key}_clone,
-                         //   {i_key}_drop and {i_keyraw}_cmp exist.
-#define i_cmp <fn>       // three-way compareison. REQUIRED IF i_key is a non-integral type
-                         // Note that containers of arcs will "inherit" i_cmp
-                         // when using arc in containers with i_val_arc MyArc - ie. the i_type.
+#define i_keyclass <t>   // Use instead of i_key when functions {i_key}_clone and {i_key}_drop exists.
+
 #define i_use_cmp        // may be defined instead of i_cmp when i_key is an integral/native-type.
+#define i_cmp <fn>       // three-way element comparison. If not specified, pointer comparison is used.
+                         // Note that containers of arcs will derive i_cmp from the i_key type
+                         // when using arc in containers specified with i_keyarc <arc-type>.
+#define i_less <fn>      // less comparison. Alternative to i_cmp
+#define i_eq <fn>        // equality comparison. Implicitly defined with i_cmp, but not i_less.
+
 #define i_keydrop <fn>   // destroy element func - defaults to empty destruct
 #define i_keyclone <fn>  // REQUIRED if i_keydrop is defined, unless 'i_opt c_no_clone' is defined.
 
-#define i_keyraw <t>     // convertion type (lookup): default to {i_key}
+#define i_keyraw <t>     // convertion type (lookup): defaults to {i_key}
 #define i_keytoraw <fn>  // convertion func i_key* => i_keyraw: REQUIRED IF i_keyraw defined.
 #define i_keyfrom <fn>   // from-raw func.
 #include "stc/box.h"
 ```
-In the following, `X` is the value of `i_key` unless `i_type` is specified.
+When defining a container with **box** elements, specify `#define i_keybox <box-type>` instead of `i_key`.
+
+In the following, `X` is the value of `i_key` unless `i_type` is defined.
 Unless `c_use_cmp` is defined, comparison between i_key's is not needed/available. Will then
 compare the pointer addresses when used. Additionally, `c_no_clone` or `i_is_fwd` may be defined.
 
@@ -88,11 +92,11 @@ void int_drop(int* x) {
 #include "stc/box.h"
 
 #define i_type ISet
-#define i_key_box IBox      // NB: use i_key_box instead of i_key
+#define i_keybox IBox       // NB: use i_keybox instead of i_key
 #include "stc/sset.h"       // ISet : std::set<std::unique_ptr<int>>
 
 #define i_type IVec
-#define i_key_box IBox      // NB: use i_key_box instead of i_key
+#define i_keybox IBox       // NB: use i_keybox instead of i_key
 #include "stc/vec.h"        // IVec : std::vector<std::unique_ptr<int>>
 
 int main(void)

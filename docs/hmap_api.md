@@ -17,10 +17,11 @@ See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/contain
 ## Header file and declaration
 
 ```c
-#define i_type <ct>,<kt>,<vt> // shorthand to define i_type, i_key, i_val
+#define i_type <ct>,<kt>,<vt> // shorthand for defining i_type, i_key, i_val
 #define i_type <t>            // container type name (default: hmap_{i_key})
 #define i_key <t>             // key type: REQUIRED.
 #define i_val <t>             // mapped value type: REQUIRED.
+
 #define i_hash <fn>           // hash func i_keyraw*: REQUIRED IF i_keyraw is non-pod type
 #define i_eq <fn>             // equality comparison two i_keyraw*: REQUIRED IF i_keyraw is a
                               // non-integral type. Three-way i_cmp may be specified instead.
@@ -38,8 +39,8 @@ See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/contain
 
 #include "stc/hmap.h"
 ```
-- In the following, `X` is the value of `i_key` unless `i_type` is specified.
-- **emplace**-functions are only available when `i_keyraw`/`i_valraw` are implicitly or explicitly specified.
+- In the following, `X` is the value of `i_key` unless `i_type` is defined.
+- **emplace**-functions are only available when `i_keyraw`/`i_valraw` are implicitly or explicitly defined.
 ## Methods
 
 ```c
@@ -167,7 +168,7 @@ This example uses a hmap with cstr as mapped value.
 ```c
 #include "stc/cstr.h"
 #define i_type IDMap, int // key=int
-#define i_val_cstr        // val=cstr
+#define i_val_cstr          // val=cstr
 #include "stc/hmap.h"
 
 int main(void)

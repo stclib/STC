@@ -8,10 +8,14 @@ See the c++ class [std::priority_queue](https://en.cppreference.com/w/cpp/contai
 ## Header file and declaration
 
 ```c
-#define i_type <ct>,<kt> // shorthand to define i_type, i_key
+#define i_type <ct>,<kt> // shorthand for defining i_type, i_key
 #define i_type <t>       // pqueue container type name (default: pqueue_{i_key})
 #define i_key <t>        // element type: REQUIRED. Defines pqueue_X_value
-#define i_less <fn>      // compare two i_key* : REQUIRED IF i_key/i_keyraw is a non-integral type
+
+#define i_use_cmp        // may be defined instead of i_cmp when i_key is an integral/native-type.
+#define i_less <fn>      // less comparison. REQUIRED for non-integral types.
+#define i_cmp <fn>       // three-way compare two i_keyraw*. Alternative to i_less.
+
 #define i_keydrop <fn>   // destroy value func - defaults to empty destruct
 #define i_keyclone <fn>  // REQUIRED IF i_keydrop defined
 
@@ -21,7 +25,7 @@ See the c++ class [std::priority_queue](https://en.cppreference.com/w/cpp/contai
 
 #include "stc/pqueue.h"
 ```
-In the following, `X` is the value of `i_key` unless `i_type` is specified.
+In the following, `X` is the value of `i_key` unless `i_type` is defined.
 
 ## Methods
 

@@ -14,35 +14,39 @@ All **arc** functions can be called by multiple threads on different instances o
 additional synchronization even if these instances are copies and share ownership of the same object.
 **arc** uses thread-safe atomic reference counting, through the *arc_X_clone()* and *arc_X_drop()* methods.
 
-When declaring a container with shared pointers, define `i_key_arc` with the arc type, see example.
+When declaring a container with shared pointers, define `i_keyarc` with the arc type, see example.
 
 See similar c++ class [std::shared_ptr](https://en.cppreference.com/w/cpp/memory/shared_ptr) for a functional reference, or Rust [std::sync::Arc](https://doc.rust-lang.org/std/sync/struct.Arc.html) / [std::rc::Rc](https://doc.rust-lang.org/std/rc/struct.Rc.html).
 
 ## Header file and declaration
 
 ```c
-#define i_type <ct>,<kt>   // shorthand to define i_type, i_key
-#define i_type <t>         // arc container type name (default: arc_{i_key})
-#define i_key <t>          // element type: REQUIRED. Defines arc_X_value
-#define i_keyclass <t>     // Use instead of i_key when functions {i_key}_clone,
-                           //   {i_key}_drop and {i_keyraw}_cmp exist.
-#define i_key_arc <t>      // Use instead of i_key when key itself is an arc-type.
-#define i_key_box <t>      // Use instead of i_key when key  is a box-type.
-#define i_cmp <fn>         // three-way compareison. REQUIRED IF i_key is a non-integral type
-                           // Note that containers of arcs will "inherit" i_cmp
-                           // when using arc in containers with i_val_arc MyArc - ie. the i_type.
-#define i_use_cmp          // may be defined instead of i_cmp when i_key is an integral/native-type.
-#define i_keydrop <fn>     // destroy element func - defaults to empty destruct
-#define i_keyclone <fn>    // REQUIRED if i_keydrop is defined, unless 'i_opt c_no_clone' is defined.
+#define i_type <ct>,<kt> // shorthand for defining i_type, i_key
+#define i_type <t>       // arc container type name
+#define i_key <t>        // element type: REQUIRED.
+#define i_keyclass <t>   // Use instead of i_key when functions {i_key}_clone and {i_key}_drop exists.
 
-#define i_keyraw <t>       // convertion type (lookup): default to {i_key}
-#define i_keytoraw <fn>    // convertion func i_key* => i_keyraw: REQUIRED IF i_keyraw defined.
-#define i_keyfrom <fn>     // from-raw func.
+#define i_use_cmp        // may be defined instead of i_cmp when i_key is an integral/native-type.
+#define i_cmp <fn>       // three-way element comparison. If not specified, pointer comparison is used.
+                         // Note that containers of arcs will derive i_cmp from the i_key type
+                         // when using arc in containers specified with i_keyarc <arc-type>.
+#define i_less <fn>      // less comparison. Alternative to i_cmp
+#define i_eq <fn>        // equality comparison. Implicitly defined with i_cmp, but not i_less.
 
-#define i_opt c_no_atomic  // Non-atomic reference counting, like Rust Rc.
+#define i_keydrop <fn>   // destroy element func - defaults to empty destruct
+#define i_keyclone <fn>  // REQUIRED if i_keydrop is defined, unless 'i_opt c_no_clone' is defined.
+
+#define i_keyraw <t>     // convertion type (lookup): defaults to {i_key}
+#define i_keytoraw <fn>  // convertion func i_key* => i_keyraw: REQUIRED IF i_keyraw defined.
+#define i_keyfrom <fn>   // from-raw func.
+
+#define i_no_atomic      // Non-atomic reference counting, like Rust Rc.
+#define i_opt c_no_atomic // Same as above, but can combine other options on one line with |.
 #include "stc/arc.h"
 ```
-In the following, `X` is the value of `i_key` unless `i_type` is specified.
+When defining a container with **arc** elements, specify `#define i_keyarc <arc-type>` instead of `i_key`.
+
+In the following, `X` is the value of `i_key` unless `i_type` is defined.
 
 ## Methods
 ```c
@@ -91,8 +95,8 @@ bool            arc_X_value_eq(const i_key* x, const i_key* y);
 #include "stc/cstr.h"
 
 #define i_type Map
-#define i_key_cstr // i_key: cstr, i_keydrop: cstr_drop, etc..
-#define i_val int // year
+#define i_key_cstr   // i_key: cstr, i_keydrop: cstr_drop, etc..
+#define i_val int  // year
 // override cstr_drop(p) by defining i_keydrop:
 #define i_keydrop(p) (printf("  drop name: %s\n", cstr_str(p)), cstr_drop(p))
 #include "stc/smap.h"
@@ -103,7 +107,7 @@ bool            arc_X_value_eq(const i_key* x, const i_key* y);
 #include "stc/arc.h"
 
 #define i_type Stack
-#define i_key_arc Arc // Note: use i_key_arc for arc key types
+#define i_keyarc Arc // Note: use i_keyarc for arc key types
 #include "stc/stack.h"
 
 int main(void)

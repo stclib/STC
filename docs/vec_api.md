@@ -12,14 +12,17 @@ See the c++ class [std::vector](https://en.cppreference.com/w/cpp/container/vect
 ## Header file and declaration
 
 ```c
-#define i_type <ct>,<kt> // shorthand to define i_type, i_key
+#define i_type <ct>,<kt> // shorthand for defining i_type, i_key
 #define i_type <t>       // container type name (default: vec_{i_key})
 #define i_key <t>        // element type: REQUIRED. Defines vec_X_value
+
 #define i_keydrop <fn>   // destroy value func - defaults to empty destruct
 #define i_keyclone <fn>  // REQUIRED IF i_keydrop defined
 
 #define i_use_cmp        // enable sorting, binary_search and lower_bound
 #define i_cmp <fn>       // three-way compare two i_keyraw*
+#define i_less <fn>      // less comparison. Alternative to i_cmp
+#define i_eq <fn>        // equality comparison. Implicitly defined with i_cmp, but not i_less.
 
 #define i_keyraw <t>     // convertion "raw" type - defaults to i_key
 #define i_keyfrom <fn>   // convertion func i_keyraw => i_key
@@ -27,8 +30,9 @@ See the c++ class [std::vector](https://en.cppreference.com/w/cpp/container/vect
 
 #include "stc/vec.h"
 ```
-- In the following, `X` is the value of `i_key` unless `i_type` is specified.
-- **emplace**-functions are only available when `i_keyraw` is implicitly or explicitly specified.
+- Defining either `i_use_cmp`, `i_less` or `i_cmp` will enable sorting, binary_search and lower_bound
+- **emplace**-functions are only available when `i_keyraw` is implicitly or explicitly defined.
+- In the following, `X` is the value of `i_key` unless `i_type` is defined.
 
 ## Methods
 
