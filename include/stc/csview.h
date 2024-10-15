@@ -43,7 +43,7 @@ STC_API csview      csview_slice_ex(csview sv, isize p1, isize p2);
 STC_API csview      csview_subview_ex(csview sv, isize pos, isize n);
 STC_API csview      csview_token(csview sv, const char* sep, isize* pos);
 STC_API csview      csview_u8_subview(csview sv, isize u8pos, isize u8len);
-STC_API csview      csview_u8_right(csview sv, isize u8len);
+STC_API csview      csview_u8_tail(csview sv, isize u8len);
 STC_API csview      csview_u8_chr(csview sv, isize u8pos);
 
 STC_INLINE csview   csview_from(const char* str)
@@ -90,16 +90,16 @@ STC_INLINE csview csview_slice(csview sv, isize p1, isize p2) {
     return sv;
 }
 
-STC_INLINE csview csview_trim_left(csview sv)
+STC_INLINE csview csview_trim_start(csview sv)
     { while (sv.size && *sv.buf <= ' ') ++sv.buf, --sv.size; return sv; }
 
-STC_INLINE csview csview_trim_right(csview sv)
+STC_INLINE csview csview_trim_end(csview sv)
     { while (sv.size && sv.buf[sv.size - 1] <= ' ') --sv.size; return sv; }
 
 STC_INLINE csview csview_trim(csview sv)
-    { return csview_trim_right(csview_trim_left(sv)); }
+    { return csview_trim_end(csview_trim_start(sv)); }
 
-STC_INLINE csview csview_right(csview sv, isize len)
+STC_INLINE csview csview_tail(csview sv, isize len)
     { return csview_subview(sv, sv.size - len, len); }
 
 STC_INLINE const char* csview_at(csview sv, isize idx)
@@ -238,7 +238,7 @@ STC_DEF csview csview_u8_subview(csview sv, isize u8pos, isize u8len) {
     sv.size = s - sv.buf; return sv;
 }
 
-STC_DEF csview csview_u8_right(csview sv, isize u8len) {
+STC_DEF csview csview_u8_tail(csview sv, isize u8len) {
     const char* p = &sv.buf[sv.size];
     while (u8len && p != sv.buf)
         u8len -= (*--p & 0xC0) != 0x80;

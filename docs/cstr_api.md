@@ -41,7 +41,7 @@ void            cstr_drop(cstr* self);                                  // destr
 
 zsview          cstr_zv(const cstr* self);                              // to zero-terminated string view
 csview          cstr_sv(const cstr* self);                              // to csview string view
-zsview          cstr_right(cstr* self, isize len);                      // zsview subview of the trailing len bytes
+zsview          cstr_tail(cstr* self, isize len);                       // zsview subview of the trailing len bytes
 csview          cstr_subview(const cstr* self, isize pos, isize len);   // csview subview from pos and length len
 
 const char*     cstr_str(const cstr* self);                             // to const char*
@@ -110,7 +110,7 @@ isize           cstr_u8_size(const cstr* self);                         // numbe
 isize           cstr_u8_to_index(const cstr* self, isize u8pos);        // get byte index at rune position
 csview          cstr_u8_chr(const cstr* self, isize u8pos);             // get rune at rune position
 csview          cstr_u8_subview(const cstr* self, isize u8pos, isize u8len);
-zsview          cstr_u8_right(cstr* self, isize u8len);                 // subview of the trailing len runes
+zsview          cstr_u8_tail(cstr* self, isize u8len);                  // subview of the trailing len runes
 void            cstr_u8_insert(cstr* self, isize u8pos, const char* ins);
 void            cstr_u8_replace(cstr* self, isize u8pos, isize u8len, const char* repl);
 void            cstr_u8_erase(cstr* self, isize u8pos, isize u8len);    // erase u8len runes from u8pos

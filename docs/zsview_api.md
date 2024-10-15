@@ -31,7 +31,7 @@ void            zsview_clear(zsview* self);
 
 csview          zsview_sv(zsview zv);                               // convert to csview type
 csview          zsview_subview(zsview zv, isize pos, isize len);    // convert to csview type
-zsview          zsview_right(zsview zv, isize len);                 // subview of the trailing n bytes
+zsview          zsview_tail(zsview zv, isize len);                  // subview of the trailing n bytes
 
 bool            zsview_equals(zsview zv, const char* str);
 isize           zsview_find(zsview zv, const char* str);
@@ -46,7 +46,7 @@ zsview          zsview_u8_from_position(zsview zv, isize u8pos);    // subview s
 isize           zsview_u8_size(zsview zv);                          // number of utf8 runes
 csview          zsview_u8_chr(zsview zv, isize u8pos);              // get rune at rune position
 csview          zsview_u8_subview(zsview zs, isize u8pos, isize u8len);
-zsview          zsview_u8_right(zsview zv, isize u8len);            // subview of the last u8len runes
+zsview          zsview_u8_tail(zsview zv, isize u8len);             // subview of the last u8len runes
 bool            zsview_u8_valid(zsview zv);                         // check utf8 validity of zv
 
 bool            zsview_iequals(zsview zs, const char* str);         // utf8 case-insensitive comparison
