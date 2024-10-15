@@ -191,7 +191,7 @@ This example uses a smap with cstr as mapped value.
 #include "stc/cstr.h"
 
 #define i_type IDSMap, int
-#define i_val_cstr
+#define i_valpro cstr
 #include "stc/smap.h"
 
 int main(void)

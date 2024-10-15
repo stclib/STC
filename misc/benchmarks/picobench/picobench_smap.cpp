@@ -23,8 +23,8 @@ using omap_str = std::map<std::string, std::string>;
 #define i_type smap_u64, uint64_t, uint64_t
 #include "stc/smap.h"
 
-#define i_key_cstr
-#define i_val_cstr
+#define i_keypro cstr
+#define i_valpro cstr
 #include "stc/smap.h"
 
 PICOBENCH_SUITE("Map1");

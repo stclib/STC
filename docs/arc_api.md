@@ -14,7 +14,7 @@ All **arc** functions can be called by multiple threads on different instances o
 additional synchronization even if these instances are copies and share ownership of the same object.
 **arc** uses thread-safe atomic reference counting, through the *arc_X_clone()* and *arc_X_drop()* methods.
 
-When declaring a container with shared pointers, define `i_keyarc` with the arc type, see example.
+When declaring a container with shared pointers, define `i_keypro` with the arc type, see example.
 
 See similar c++ class [std::shared_ptr](https://en.cppreference.com/w/cpp/memory/shared_ptr) for a functional reference, or Rust [std::sync::Arc](https://doc.rust-lang.org/std/sync/struct.Arc.html) / [std::rc::Rc](https://doc.rust-lang.org/std/rc/struct.Rc.html).
 
@@ -29,7 +29,7 @@ See similar c++ class [std::shared_ptr](https://en.cppreference.com/w/cpp/memory
 #define i_use_cmp        // may be defined instead of i_cmp when i_key is an integral/native-type.
 #define i_cmp <fn>       // three-way element comparison. If not specified, pointer comparison is used.
                          // Note that containers of arcs will derive i_cmp from the i_key type
-                         // when using arc in containers specified with i_keyarc <arc-type>.
+                         // when using arc in containers specified with i_keypro <arc-type>.
 #define i_less <fn>      // less comparison. Alternative to i_cmp
 #define i_eq <fn>        // equality comparison. Implicitly defined with i_cmp, but not i_less.
 
@@ -44,7 +44,7 @@ See similar c++ class [std::shared_ptr](https://en.cppreference.com/w/cpp/memory
 #define i_opt c_no_atomic // Same as above, but can combine other options on one line with |.
 #include "stc/arc.h"
 ```
-When defining a container with **arc** elements, specify `#define i_keyarc <arc-type>` instead of `i_key`.
+When defining a container with **arc** elements, specify `#define i_keypro <arc-type>` instead of `i_key`.
 
 In the following, `X` is the value of `i_key` unless `i_type` is defined.
 
@@ -107,7 +107,7 @@ bool            arc_X_value_eq(const i_key* x, const i_key* y);
 #include "stc/arc.h"
 
 #define i_type Stack
-#define i_keyarc Arc // Note: use i_keyarc for arc key types
+#define i_keypro Arc // Note: use i_keypro for arc key types
 #include "stc/stack.h"
 
 int main(void)

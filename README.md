@@ -394,24 +394,25 @@ Key (element / lookup type):
     - `i_keytoraw` *Func*  - Convertion func to *i_keyraw* from *i_key*. **[required if]** *i_keyraw* is defined
 
 Val (mapped value type - for maps):
-- These are analogue to the Key parameters ***i_valdrop***, ***i_valclone***, etc.
+- These are analogues to the Key parameters, i.e. `i_valdrop`, `i_valclone`, etc.
 
-The following are meta-template parameters to be used in place of ***i_key*** / ***i_val*** and ***i_type***. These
-parameters makes types into "classes" in the sense that they bind associated functions to the primary
-template parameters described above.
-- Key meta-parameters:
+The following are meta-template parameters to be used in place of ***i_key*** / ***i_val*** and ***i_type***.
+These parameters makes types into "classes" in the sense that they bind associated function names to the primary
+template parameters described above. NB! this is a fairly complex/detailed description.
+- Key-meta parameters:
     - `i_class` *ContType*, *KeyType* - Define both ***i_type*** = *ContType* and ***i_keyclass*** = *KeyType*
     (see next). This should be used to define "*container of containers*" or container of element type which
     have both *_clone()* and *_drop()* functions.
-    - `i_keyclass` *KeyType* - Defines ***i_key*** and binds standard named functions *Type_clone()* and *Type_drop()*
-    to their associated template parameters. If ***i_keyraw*** is also defined, *Type_from()* and *Type_toraw()* are
-    also bound to associated parameters.
-    - `i_cmpclass` *KeyRawType* - Defines ***i_keyraw*** and binds *RawType_cmp()*, *RawType_eq()*, *RawType_hash()* to
-    their associated template parameters. It is still required to define ***i_use_cmp*** to enable searching/sorting on sequence types (stack, vec, deque, list). This parameter is rarely used alone, rather as part the ***i_keypro*** parameter, next.
+    - `i_cmpclass` *RawType* - Defines ***i_keyraw*** and binds *RawType_cmp()*, *RawType_eq()*, *RawType_hash()* to
+    their associated template key parameters. It is still required to define ***i_use_cmp*** to enable searching/sorting
+    on sequence types (stack, vec, deque, list). ***i_cmpclass*** will be defined by ***i_keyclass*** and ***i_keypro*** parameters (described next) and rarely used alone.
+    - `i_keyclass` *KeyType* - Defines ***i_key*** and binds standard named functions *KeyType_clone()* and
+    *KeyType_drop()* to their associated template parameters. ***i_cmpclass*** is either defaulted to ***i_keyclass***
+    itself or set to ***i_keyraw*** if defined. In the latter case *KeyType_from()* and *KeyType_toraw()* are also bound.
     - `i_keypro` *KeyType* - This is used for "pro" types, i.e. library types like **cstr**, **box** and **arc**.
-    It combines all the ***i_keyclass*** and ***i_cmpclass*** features and assumes there exists a *KeyType_raw* type
-    for the ***i_cmpclass*** parameter.
-- Val (mapped) meta-parameters:
+    It combines all the ***i_keyclass*** and ***i_cmpclass*** type features. It sets ***i_cmpclass*** to *KeyType_raw*,
+    which is what differentiates it from the ***i_keyclass*** template parameter.
+- Val-meta (mapped) parameters:
     - `i_valclass` *MappedType* - Analogous to the ***i_keyclass*** parameter.
     - `i_valpro` *MappedType* - Defines ***i_keyraw*** and combines the ***i_valclass*** features (comparison functions
     are not relevant for the mapped type).
@@ -478,10 +479,9 @@ Strings are the most commonly used non-trivial data type. STC containers have pr
 definitions for cstr container elements, so they are fail-safe to use both with the **emplace**
 and non-emplace methods:
 ```c
-#define i_implement     // define in ONE file to implement longer functions in cstr
 #include "stc/cstr.h"
 
-#define i_keypro cstr  // use i_keypro for "pro" types like cstr
+#define i_keypro cstr  // use i_keypro for "pro" types like cstr, arc, box
 #include "stc/vec.h"   // vector of string (cstr)
 ...
 vec_cstr vec = {0};
@@ -744,7 +744,6 @@ STC is generally very memory efficient. Memory usage for the different container
     - Removed default comparison for **list**, **vec** and **deque**:
         - Define `i_use_cmp` to enable comparison for built-in i_key types (<, ==).
         - Use of `i_keyclass` still expects comparison functions to be defined.
-        - Use of `i_keyarc/i_keybox` compares stored pointers instead of pointed to values if comparison not defined.
     - Renamed input enum flags for ***cregex***-functions.
 - **cspan**: Added **column-major** order (fortran) multidimensional spans and transposed views (changed representation of strides).
 - All new faster and smaller **queue** and **deque** implementations, using a circular buffer.

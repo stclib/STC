@@ -38,8 +38,8 @@ DEFMAP(map_str, <std::string, std::string>);
 #define i_max_load_factor float(MaxLoadFactor100) / 100.0f
 #include "stc/hmap.h"
 
-#define i_key_cstr
-#define i_val_cstr
+#define i_keypro cstr
+#define i_valpro cstr
 #define i_max_load_factor float(MaxLoadFactor100) / 100.0f
 #include "stc/hmap.h"
 

@@ -76,10 +76,10 @@ c_foritems (i, const char*, {"Hello", "crazy", "world"})
 <details>
 <summary><b>c_forrange</b> - For-loop abstraction</summary>
 
-### c_forrange, c_forrange32, c_forrange_ex
+### c_forrange, c_forrange32, c_forrange_t
 - `c_forrange`: abstraction for iterating sequence of integers. Like python's **for** *i* **in** *range()* loop. Uses `isize` (*ptrdiff_t*) as control variable.
 - `c_forrange32` is like *c_forrange*, but uses `int32` as control variable.
-- `c_forrange_ex` is like *c_forrange*, but takes an additional ***type*** as first argument for the control variable.
+- `c_forrange_t` is like *c_forrange*, but takes an additional ***type*** as first argument for the control variable.
 
 | Usage                                | Python equivalent                    |
 |:-------------------------------------|:-------------------------------------|
@@ -90,9 +90,9 @@ c_foritems (i, const char*, {"Hello", "crazy", "world"})
 
 | Usage                                          |
 |:-----------------------------------------------|
-| `c_forrange_ex(IntType, i, stop)`               |
-| `c_forrange_ex(IntType, i, start, stop)`        |
-| `c_forrange_ex(IntType, i, start, stop, step)`  |
+| `c_forrange_t(IntType, i, stop)`               |
+| `c_forrange_t(IntType, i, start, stop)`        |
+| `c_forrange_t(IntType, i, start, stop, step)`  |
 
 ```c
 c_forrange (5) printf("x");

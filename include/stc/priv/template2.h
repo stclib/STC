@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 // IWYU pragma: private
-#undef i_TYPE
+#undef i_TYPE       // [deprecated]
 #undef i_type
 #undef i_class
 #undef i_tag
@@ -30,13 +30,11 @@
 
 #undef i_key
 #undef i_keypro
-#undef i_keystr     // [deprecated]
+#undef i_key_str    // [deprecated]
 #undef i_key_cstr   // [deprecated]
-#undef i_keyarc     // [deprecated]
-#undef i_keybox     // [deprecated]
 #undef i_key_arcbox // [deprecated]
 #undef i_keyclass
-#undef i_cmpclass   // define i_keyraw, and bind i_cmp, i_eq, i_hash "members"
+#undef i_cmpclass   // define i_keyraw, and bind i_cmp, i_eq, i_hash "class members"
 #undef i_keyclone
 #undef i_keydrop
 #undef i_keyraw
@@ -49,10 +47,8 @@
 
 #undef i_val
 #undef i_valpro
-#undef i_valstr     // [deprecated]
+#undef i_val_str    // [deprecated]
 #undef i_val_cstr   // [deprecated]
-#undef i_valarc     // [deprecated]
-#undef i_valbox     // [deprecated]
 #undef i_val_arcbox // [deprecated]
 #undef i_valclass
 #undef i_valclone

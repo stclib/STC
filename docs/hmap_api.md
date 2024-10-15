@@ -167,8 +167,8 @@ The HEX of color BLACK is:[#000000]
 This example uses a hmap with cstr as mapped value.
 ```c
 #include "stc/cstr.h"
-#define i_type IDMap, int // key=int
-#define i_val_cstr          // val=cstr
+#define i_type IDMap, int // key = int
+#define i_valpro cstr     // val = cstr
 #include "stc/hmap.h"
 
 int main(void)

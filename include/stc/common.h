@@ -190,24 +190,24 @@ typedef const char* cstr_raw;
 #define c_forpair(...) 'c_forpair not_supported. Use c_foreach_kv' // [removed]
 
 // c_forrange, c_forrange32: python-like int range iteration
-#define c_forrange_ex(...) c_MACRO_OVERLOAD(c_forrange_ex, __VA_ARGS__)
-#define c_forrange_ex_3(T, i, stop) c_forrange_ex_4(T, i, 0, stop)
-#define c_forrange_ex_4(T, i, start, stop) \
+#define c_forrange_t(...) c_MACRO_OVERLOAD(c_forrange_t, __VA_ARGS__)
+#define c_forrange_t_3(T, i, stop) c_forrange_t_4(T, i, 0, stop)
+#define c_forrange_t_4(T, i, start, stop) \
     for (T i=start, _c_end=stop; i < _c_end; ++i)
-#define c_forrange_ex_5(T, i, start, stop, step) \
+#define c_forrange_t_5(T, i, start, stop, step) \
     for (T i=start, _c_inc=step, _c_end=(stop) - (_c_inc > 0) \
          ; (_c_inc > 0) == (i <= _c_end); i += _c_inc)
 
 #define c_forrange(...) c_MACRO_OVERLOAD(c_forrange, __VA_ARGS__)
-#define c_forrange_1(stop) c_forrange_ex_4(isize, _c_i, 0, stop)
-#define c_forrange_2(i, stop) c_forrange_ex_4(isize, i, 0, stop)
-#define c_forrange_3(i, start, stop) c_forrange_ex_4(isize, i, start, stop)
-#define c_forrange_4(i, start, stop, step) c_forrange_ex_5(isize, i, start, stop, step)
+#define c_forrange_1(stop) c_forrange_t_4(isize, _c_i, 0, stop)
+#define c_forrange_2(i, stop) c_forrange_t_4(isize, i, 0, stop)
+#define c_forrange_3(i, start, stop) c_forrange_t_4(isize, i, start, stop)
+#define c_forrange_4(i, start, stop, step) c_forrange_t_5(isize, i, start, stop, step)
 
 #define c_forrange32(...) c_MACRO_OVERLOAD(c_forrange32, __VA_ARGS__)
-#define c_forrange32_2(i, stop) c_forrange_ex_4(int32_t, i, 0, stop)
-#define c_forrange32_3(i, start, stop) c_forrange_ex_4(int32_t, i, start, stop)
-#define c_forrange32_4(i, start, stop, step) c_forrange_ex_5(int32_t, i, start, stop, step)
+#define c_forrange32_2(i, stop) c_forrange_t_4(int32_t, i, 0, stop)
+#define c_forrange32_3(i, start, stop) c_forrange_t_4(int32_t, i, start, stop)
+#define c_forrange32_4(i, start, stop, step) c_forrange_t_5(int32_t, i, start, stop, step)
 
 // init container with literal list, and drop multiple containers of same type
 #define c_init(C, ...) \

@@ -47,23 +47,23 @@
   #define _m_node _c_MEMB(_node)
 #endif
 
-#if defined i_keyarc // [deprecated]
-  #define i_keypro i_keyarc
-#elif defined i_keybox // [deprecated]
-  #define i_keypro i_keybox
-#elif defined i_keystr // [deprecated]
-  #define i_key_cstr
+#if defined i_key_arcbox // [deprecated]
+  #define i_keypro i_key_arcbox
+#elif defined i_key_cstr // [deprecated]
+  #define i_keypro cstr
+#elif defined i_key_str  // [deprecated]
+  #define i_keypro cstr
+  #define i_tag str
 #endif
-
-#if defined i_valarc // [deprecated]
-  #define i_valpro i_valarc
-#elif defined i_valbox  // [deprecated]
-  #define i_valpro i_valbox
-#elif defined i_valstr  // [deprecated]
-  #define i_val_cstr
+#if defined i_val_arcbox // [deprecated]
+  #define i_valpro i_val_arcbox
+#elif defined i_val_cstr // [deprecated]
+  #define i_valpro cstr
+#elif defined i_val_str  // [deprecated]
+  #define i_valpro cstr
+  #define i_tag str
 #endif
-
-#ifdef i_TYPE // [deprecated]
+#ifdef i_TYPE            // [deprecated]
   #define i_type i_TYPE
 #endif
 
@@ -75,8 +75,7 @@
 #ifdef i_class
   #define Self c_SELECT(_c_SEL21, i_class)
   #define i_keyclass c_SELECT(_c_SEL22, i_class)
-#elif defined i_type && !(defined i_key || defined i_keyclass || \
-                          defined i_keypro || defined i_key_cstr)
+#elif defined i_type && !(defined i_key || defined i_keyclass || defined i_keypro)
   #if defined i_cmpclass
     #define Self i_type
     #define i_key i_cmpclass
@@ -118,9 +117,6 @@
 #if defined i_keypro
   #define i_keyclass i_keypro
   #define i_cmpclass c_JOIN(i_keypro, _raw)
-#elif defined i_key_cstr
-  #define i_keyclass cstr
-  #define i_cmpclass cstr_raw
 #endif
 
 // Check for i_keyclass and i_cmpclass, and fill in missing defs.
@@ -230,9 +226,6 @@
 #if defined i_valpro
   #define i_valclass i_valpro
   #define i_valraw c_JOIN(i_valpro, _raw)
-#elif defined i_val_cstr
-  #define i_valclass cstr
-  #define i_valraw cstr_raw
 #endif
 
 #ifdef i_valclass

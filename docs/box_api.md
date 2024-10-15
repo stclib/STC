@@ -6,7 +6,7 @@ and `i_keydrop` macros specified. Use *box_X_clone(p)* to make a deep copy, whic
 `i_keyclone` macro if defined. Note that a box set to NULL is consider uninitialized, and
 cannot be e.g. cloned or dropped.
 
-When declaring a container of **box** values, define `i_keybox` with the
+When declaring a container of **box** values, define `i_keypro` with the
 box type instead of defining `i_key`. This will auto-set `i_keydrop`, `i_keyclone`, and `i_cmp` using
 functions defined by the specified **box**.
 
@@ -23,7 +23,7 @@ See similar c++ class [std::unique_ptr](https://en.cppreference.com/w/cpp/memory
 #define i_use_cmp        // may be defined instead of i_cmp when i_key is an integral/native-type.
 #define i_cmp <fn>       // three-way element comparison. If not specified, pointer comparison is used.
                          // Note that containers of arcs will derive i_cmp from the i_key type
-                         // when using arc in containers specified with i_keyarc <arc-type>.
+                         // when using arc in containers specified with i_keypro <arc-type>.
 #define i_less <fn>      // less comparison. Alternative to i_cmp
 #define i_eq <fn>        // equality comparison. Implicitly defined with i_cmp, but not i_less.
 
@@ -35,7 +35,7 @@ See similar c++ class [std::unique_ptr](https://en.cppreference.com/w/cpp/memory
 #define i_keyfrom <fn>   // from-raw func.
 #include "stc/box.h"
 ```
-When defining a container with **box** elements, specify `#define i_keybox <box-type>` instead of `i_key`.
+When defining a container with **box** elements, specify `#define i_keypro <box-type>` instead of `i_key`.
 
 In the following, `X` is the value of `i_key` unless `i_type` is defined.
 Unless `c_use_cmp` is defined, comparison between i_key's is not needed/available. Will then
@@ -92,11 +92,11 @@ void int_drop(int* x) {
 #include "stc/box.h"
 
 #define i_type ISet
-#define i_keybox IBox       // NB: use i_keybox instead of i_key
+#define i_keypro IBox       // NB: use i_keypro instead of i_key
 #include "stc/sset.h"       // ISet : std::set<std::unique_ptr<int>>
 
 #define i_type IVec
-#define i_keybox IBox       // NB: use i_keybox instead of i_key
+#define i_keypro IBox       // NB: use i_keypro instead of i_key
 #include "stc/vec.h"        // IVec : std::vector<std::unique_ptr<int>>
 
 int main(void)
