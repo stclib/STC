@@ -366,21 +366,21 @@ The bitset **cbits**, the zero-terminated string view **zsview** and **algorthm*
 linking with the stc-library.
 </details>
 <details>
-<summary>Specifying template parameters</summary>
+<summary>Defining template parameters</summary>
 
 ## Defining template parameters
 
-Only `i_key` is strictly required to be specified. The template parameters are given by a `#define i_xxxx`
-statement. Each templated type instantiation requires a consecutive `#include`, even if the same container
-base type was included earlier. The possible template parameters are:
+The container template parameters are specified with a `#define i_xxxx` statement. Only `i_key` is
+strictly required. Each templated type instantiation requires an `#include` statement, even if the
+same container base type was included earlier. Possible template parameters are:
 
-- `i_type` *ContType*, *KeyType*[, *ValType*] is a shorthand for defining `i_type`, `i_key` (and `i_val`)
+- `i_type` *ContType*, *KeyType*[, *ValType*] is a shorthand for defining ***i_type***, ***i_key*** (and ***i_val***)
  individually, as described next.
 - `i_type` *ContType* - Custom container type name.
-- `i_key` *Type* - Element key type. **[required]**.
-- `i_val` *Type* - Element value type. **[required for]** hmap/smap as the mapped value type.
-- `i_cmp` *Func* - Three-way comparison of two *i_keyraw*\* - **[required for]** non-integral *i_keyraw*
-- `i_less` *Func* - Comparison of two *i_keyraw*\* - an alternative to specifying `i_cmp`.
+- `i_key` *KeyType* - Element type. **[required]**.
+- `i_val` *MappedType* - Element type. **[required for]** hmap and smap containers.
+- `i_cmp` *Func* - Three-way comparison of two *i_keyraw*\*
+- `i_less` *Func* - Comparison of two *i_keyraw*\* - an alternative to specifying ***i_cmp***.
 - `i_eq` *Func* - Equality comparison of two *i_keyraw*\* - defaults to *!i_cmp*. Companion with *i_hash*.
 - `i_hash` *Func* - Hash function taking *i_keyraw*\* - defaults to *c_default_hash*. **[required for]**
 ***hmap/hset*** with non-POD *i_keyraw* elements.
@@ -393,16 +393,28 @@ Key (element / lookup type):
     - `i_keyfrom` *Func* - Convertion func from *i_keyraw* to *i_key*.
     - `i_keytoraw` *Func*  - Convertion func to *i_keyraw* from *i_key*. **[required if]** *i_keyraw* is defined
 
-Val (hmap/smap mapped value only): These are analogue to the Key parameters: `i_valxxxx`.
+Val (mapped value type - for maps):
+- These are analogue to the Key parameters ***i_valdrop***, ***i_valclone***, etc.
 
-Convenience meta-template parameters to use in place of `i_key` / `i_val` and `i_type`.
-- `i_class` *ContType*, *KeyType* - Define both ***i_type*** = *ContType* and ***i_keyclass*** = *KeyType* (see next).
-This should be used to define "*container of containers*" or container of element type which have both *_clone()* and *_drop()* functions.
-- `i_keyclass` *Type* - Defines ***i_key*** and binds standard named functions: *Type_clone()* and *Type_drop()*  to the respective template parameters.
-- `i_cmpclass` *RawType* - Defines ***i_keyraw*** and binds *Type_from()*, *Type_toraw()*, *RawType_cmp()*, *RawType_eq()*, *RawType_hash()* to the respective template parameters. It is still required to define ***i_use_cmp*** to enable searching/sorting on sequence types (stack, vec, deque, list).
-- `i_keypro` *Type* - This must be used for "pro" types, i.e. library types like **cstr**, **box** and **arc**.
-It combines the `i_keyclass` and `i_cmpclass` features.
-- `i_valclass`, `i_valpro` - Similar rules as for **key**, but comparison functions are not relevant for these.
+The following are meta-template parameters to be used in place of ***i_key*** / ***i_val*** and ***i_type***. These
+parameters makes types into "classes" in the sense that they bind associated functions to the primary
+template parameters described above.
+- Key meta-parameters:
+    - `i_class` *ContType*, *KeyType* - Define both ***i_type*** = *ContType* and ***i_keyclass*** = *KeyType*
+    (see next). This should be used to define "*container of containers*" or container of element type which
+    have both *_clone()* and *_drop()* functions.
+    - `i_keyclass` *KeyType* - Defines ***i_key*** and binds standard named functions *Type_clone()* and *Type_drop()*
+    to their associated template parameters. If ***i_keyraw*** is also defined, *Type_from()* and *Type_toraw()* are
+    also bound to associated parameters.
+    - `i_cmpclass` *KeyRawType* - Defines ***i_keyraw*** and binds *RawType_cmp()*, *RawType_eq()*, *RawType_hash()* to
+    their associated template parameters. It is still required to define ***i_use_cmp*** to enable searching/sorting on sequence types (stack, vec, deque, list). This parameter is rarely used alone, rather as part the ***i_keypro*** parameter, next.
+    - `i_keypro` *KeyType* - This is used for "pro" types, i.e. library types like **cstr**, **box** and **arc**.
+    It combines all the ***i_keyclass*** and ***i_cmpclass*** features and assumes there exists a *KeyType_raw* type
+    for the ***i_cmpclass*** parameter.
+- Val (mapped) meta-parameters:
+    - `i_valclass` *MappedType* - Analogous to the ***i_keyclass*** parameter.
+    - `i_valpro` *MappedType* - Defines ***i_keyraw*** and combines the ***i_valclass*** features (comparison functions
+    are not relevant for the mapped type).
 
 Properties:
 - `i_opt` *Flags* - Boolean properties: may combine *c_no_clone*, *c_no_atomic*, *c_is_forward*, *c_static*,
@@ -410,8 +422,15 @@ Properties:
 
 **Notes**:
 - You can define `i_no_clone` or `i_opt c_no_clone | c_... | ...` to disable *clone* functionality.
-- If `i_keyraw` and `i_keyfrom` are defined, the *emplace*-functions are enabled. The ***cmp***, ***less***,
-***eq***, and ***hash*** functions takes parameter types *i_keyraw*\*, not *i_key*\*.
+- If ***i_keyraw*** and ***i_keyfrom*** are defined, the *emplace*-functions are enabled. The *_cmp()*, *_less()*,
+*_eq()*, and *_hash()* functions takes pointers to parameter type ***i_keyraw***.
+- Specify `i_has_cmp` instead of the comparison parameters to enable searching / sorting for integral
+***i_keyraw*** types, or when comparison functions are implicitly bound via meta-template parameters.
+
+
+</details>
+<details>
+<summary>Specifying comparison parameters</summary>
 
 ## Specifying comparison parameters
 
@@ -428,6 +447,7 @@ For the containers marked ***optional***, the features are disabled if the templ
 | smap, sset        |                      |                      || `i_cmp` / `i_less` | `i_cmp` / `i_less` | no       |
 | pqueue            | n/a                  |                      || n/a                | `i_cmp` / `i_less` | no       |
 | queue             | n/a                  | n/a                  || n/a                | n/a                | n/a      |
+
 </details>
 <details>
 <summary>The <b>emplace</b> methods</summary>
