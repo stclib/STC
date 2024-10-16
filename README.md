@@ -396,19 +396,25 @@ Key (element / lookup type):
 Val (mapped value type - for maps):
 - These are analogues to the Key parameters, i.e. `i_valdrop`, `i_valclone`, etc.
 
-The following meta-template parameters are to be used in place of ***i_key***, ***i_val*** and ***i_type***.
-These parameters makes types into "classes" in the sense that they bind associated function names to primary
+The following meta-template parameters can be used in place of ***i_key***, ***i_val*** and ***i_type***.
+These parameters make types into "classes" in the sense that they bind associated function names to primary
 template parameters described above. This reduces boiler-plate code, clutter, and simplifies the management
-of non-trivial container elements.
+of non-trivial container elements. Note that many basic template parameters will defined when defining the
+following parameters, but the user may override them when needed. E.g. defining the template parameters directly
+as function macros instead of referring to C function names.
 - Key-meta parameters:
-    - `i_keyclass` *KeyType* - Defines ***i_key*** and binds standard named functions *KeyType_clone()* and
-    *KeyType_drop()* to their associated template parameters. If either ***i_keyraw*** or ***i_rawclass*** (see below)
-    are defined, *KeyType_from()* and *KeyType_toraw()* are name-bound to ***i_keyfrom***, ***i_keytoraw*** as well.
     - `i_rawclass` *RawType* - Defines ***i_keyraw*** and binds *RawType_cmp()*, *RawType_eq()*, *RawType_hash()* to
     their associated template key parameters. It is still required to define ***i_use_cmp*** to enable searching/sorting
-    on sequence types (stack, vec, deque, list). Useful alone for containers of views (e.g. csview).
-    - `i_keypro` *KeyType* - This is used for "pro" types, i.e. library types like **cstr**, **box** and **arc**.
-    It combines all the ***i_keyclass*** and ***i_rawclass*** features. Defining ***i_keypro*** is identical to defining
+    on sequence types (stack, vec, deque, list). Useful for containers of views (like csview).
+        - If neither ***i_key*** nor ***i_keyclass*** are defined, ***i_key*** will be defined as *RawType*.
+    - `i_keyclass` *KeyType* - Defines ***i_key*** and binds standard named functions *KeyType_clone()* and
+    *KeyType_drop()* to ***i_keyclone*** and ***i_keydrop***.
+        - Use with container of containers, or in general when the element type has *_clone()* and *_drop()* "member" functions.
+        - If ***i_rawclass*** is defined, *KeyType_from()* and *KeyType_toraw()* will be name-bound to ***i_keyfrom*** and ***i_keytoraw***.
+        - Otherwise, ***i_rawclass*** will be defined as *KeyType*
+        - In both cases ***i_rawclass*** is defined, so also the comparison functions will be name-bound to template parameters.
+    - `i_keypro` *KeyType* - Use with "pro" types, i.e. library types like **cstr**, **box** and **arc**.
+    It combines all the ***i_keyclass*** and ***i_rawclass*** features. Defining ***i_keypro*** is like defining
         - ***i_keyclass*** *KeyType*
         - ***i_rawclass*** *KeyType*_***raw***.
 - Val-meta (mapped) parameters:
