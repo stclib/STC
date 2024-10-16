@@ -26,6 +26,7 @@
 
 #include <stdio.h> /* FILE*, vsnprintf */
 #include <stdlib.h> /* malloc */
+#include <stddef.h> /* size_t */
 /**************************** PRIVATE API **********************************/
 
 #if defined __GNUC__ && !defined __clang__
@@ -76,7 +77,7 @@ extern  bool        cstr_getdelim(cstr *self, int delim, FILE *fp);
 extern  void        cstr_erase(cstr* self, isize pos, isize len);
 extern  isize       cstr_append_fmt(cstr* self, const char* fmt, ...);
 extern  isize       cstr_printf(cstr* self, const char* fmt, ...);
-extern  uint64_t    cstr_hash(const cstr *self);
+extern  size_t      cstr_hash(const cstr *self);
 extern  bool        cstr_u8_valid(const cstr* self);
 extern  void        cstr_u8_erase(cstr* self, isize u8pos, isize u8len);
 

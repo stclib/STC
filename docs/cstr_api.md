@@ -138,7 +138,7 @@ Note that all methods with arguments `(..., const char* str, isize n)`, `n` must
 
 #### Helper methods:
 ```c
-uint64_t        cstr_hash(const cstr* self);
+size_t          cstr_hash(const cstr* self);
 int             cstr_cmp(const cstr* s1, const cstr* s2);
 bool            cstr_eq(const cstr* s1, const cstr* s2);
 int             cstr_icmp(const cstr* s1, const cstr* s2);              // utf8 case-insensitive comparison
