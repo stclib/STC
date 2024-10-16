@@ -50,10 +50,10 @@ bool            csview_ends_with(csview sv, const char* str);
 
 csview          csview_subview(csview sv, isize pos, isize len);
 csview          csview_slice(csview sv, isize pos1, isize pos2);
-csview          csview_right(csview sv, isize len);                     // substr of the trailing len bytes
-csview          csview_trim(csview sv);                                 // trim whitespaces from left+right of view
-csview          csview_trim_left(csview sv);
-csview          csview_trim_right(csview sv);
+csview          csview_tail(csview sv, isize len);                      // subview of the trailing len bytes
+csview          csview_trim(csview sv);                                 // trim whitespace and ctrl-chars on both ends
+csview          csview_trim_start(csview sv);                           // trim from start of view
+csview          csview_trim_end(csview sv);                             // trim from end of view
 const char*     csview_at(csview sv, isize index);
 
 csview          csview_subview_ex(csview sv, isize pos, isize len);     // negative pos count from end
@@ -67,7 +67,7 @@ csview          csview_u8_from(const char* str, isize u8pos, isize u8len); // co
 isize           csview_u8_size(csview sv);                              // number of utf8 runes
 csview          csview_u8_chr(csview sv, isize u8pos);                  // get rune at rune position
 csview          csview_u8_subview(csview sv, isize u8pos, isize u8len); // utf8 subview
-csview          csview_u8_right(csview sv, isize u8len);                // substr of the trailing u8len runes.
+csview          csview_u8_tail(csview sv, isize u8len);                 // subview of the trailing u8len runes.
 bool            csview_u8_valid(csview sv);                             // check utf8 validity of sv
 
 bool            csview_iequals(csview sv, const char* str);             // utf8 case-insensitive comparison

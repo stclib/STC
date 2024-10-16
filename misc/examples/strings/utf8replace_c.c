@@ -6,7 +6,7 @@ int main(void)
     cstr hello = cstr_lit("hell😀 w😀rld");
     printf("%s, %d:%d\n", cstr_str(&hello), (int)cstr_u8_size(&hello), (int)cstr_size(&hello));
 
-    zsview sub5 = cstr_u8_right(&hello, 5);
+    zsview sub5 = cstr_u8_tail(&hello, 5);
     printf("%s, %d:%d\n", sub5.str, (int)zsview_u8_size(sub5), (int)sub5.size);
 
     /* replace second smiley at utf8 codepoint pos 7 */

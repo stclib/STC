@@ -182,7 +182,7 @@ STC_INLINE csview cstr_subview(const cstr* self, isize pos, isize len) {
     return (csview){sv.buf + pos, len};
 }
 
-STC_INLINE zsview cstr_right(const cstr* self, isize len) {
+STC_INLINE zsview cstr_tail(const cstr* self, isize len) {
     c_assert(len >= 0);
     csview sv = cstr_sv(self);
     if (len > sv.size) len = sv.size;
@@ -200,7 +200,7 @@ STC_INLINE isize cstr_u8_size(const cstr* self)
 STC_INLINE isize cstr_u8_to_index(const cstr* self, isize u8pos)
     { return utf8_to_index(cstr_str(self), u8pos); }
 
-STC_INLINE zsview cstr_u8_right(const cstr* self, isize u8len) {
+STC_INLINE zsview cstr_u8_tail(const cstr* self, isize u8len) {
     csview sv = cstr_sv(self);
     const char* p = &sv.buf[sv.size];
     while (u8len && p != sv.buf)

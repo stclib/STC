@@ -79,7 +79,7 @@ STC_INLINE csview zsview_subview(const zsview zs, isize pos, isize len) {
     return (csview){zs.str + pos, len};
 }
 
-STC_INLINE zsview zsview_right(zsview zs, isize len) {
+STC_INLINE zsview zsview_tail(zsview zs, isize len) {
     c_assert(len >= 0);
     if (len > zs.size) len = zs.size;
     zs.str += zs.size - len; zs.size = len;
@@ -94,7 +94,7 @@ STC_INLINE const char* zsview_at(zsview zs, isize idx)
 STC_INLINE zsview zsview_u8_from_position(zsview zs, isize u8pos)
     { return zsview_from_position(zs, utf8_to_index(zs.str, u8pos)); }
 
-STC_INLINE zsview zsview_u8_right(zsview zs, isize u8len) {
+STC_INLINE zsview zsview_u8_tail(zsview zs, isize u8len) {
     const char* p = &zs.str[zs.size];
     while (u8len && p != zs.str)
         u8len -= (*--p & 0xC0) != 0x80;
