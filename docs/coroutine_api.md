@@ -83,12 +83,11 @@ yield or await from a (deeply) nested coroutine call using cco_task objects desc
 
 The first example is a generator of Pythagorian triples, and stops when diagonal size > max_c.
 
-[ [Run this code](https://godbolt.org/z/Ge4b56Yqv) ]
+[ [Run this code](https://godbolt.org/z/cP1dWKvM3) ]
 ```c
-#include "stc/coroutine.h"
-#include <stdio.h>
-#include <stdio.h>
 // https://quuxplusone.github.io/blog/2019/03/06/pythagorean-triples/
+#include <stdio.h>
+#include "stc/coroutine.h"
 
 struct triples {
     int max_c;     // input: max c.
@@ -97,7 +96,7 @@ struct triples {
 };
 
 int triples(struct triples* i) {
-    cco_scope(i) {  // the coroutine scope!
+    cco_scope (i) {  // the coroutine scope!
         for (i->c = 5;; ++i->c) {
             for (i->a = 1; i->a < i->c; ++i->a) {
                 for (i->b = i->a + 1; i->b < i->c; ++i->b) {
@@ -131,7 +130,7 @@ The next variant skips the triples which are upscaled version of smaller ones by
 the gcd() function. Note that the gcd1_triples struct contains the triples struct so that
 both functions have separate call frames:
 
-[ [Run this code](https://godbolt.org/z/PccE7W67h) ]
+[ [Run this code](https://godbolt.org/z/14a1YM9fd) ]
 ```c
 int gcd(int a, int b) { // greatest common denominator
     while (b) {
@@ -150,7 +149,7 @@ struct gcd1_triples {
 
 int gcd1_triples(struct gcd1_triples* i)
 {
-    cco_scope(i) {
+    cco_scope (i) {
         cco_reset(&i->tri);
         i->tri.max_c = i->max_c;
 

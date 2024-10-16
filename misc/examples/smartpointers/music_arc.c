@@ -42,8 +42,9 @@ inline static uint64_t SongView_hash(const SongView* xw)
 
 
 // Define the shared pointer type SongArc and conversion functions to SongView:
-#define i_class SongArc, Song // binds Song_clone(), Song_drop()
-#define i_cmpclass SongView   // Element view type
+#define i_type SongArc
+#define i_keyclass Song      // binds Song_clone(), Song_drop()
+#define i_rawclass SongView  // Element view type
 #define i_keytoraw(x) ((SongView){.artist=cstr_str(&x->artist), .title=cstr_str(&x->title)})
 #define i_keyfrom(sw) ((Song){.artist=cstr_from(sw.artist), .title=cstr_from(sw.title)})
 #include "stc/arc.h"

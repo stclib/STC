@@ -67,18 +67,15 @@
   #define i_type i_TYPE
 #endif
 
-#if defined i_cmpclass
+#if defined i_rawclass
   #define i_use_cmp
   #define i_use_eq
 #endif
 
-#ifdef i_class
-  #define Self c_SELECT(_c_SEL21, i_class)
-  #define i_keyclass c_SELECT(_c_SEL22, i_class)
-#elif defined i_type && !(defined i_key || defined i_keyclass || defined i_keypro)
-  #if defined i_cmpclass
+#if defined i_type && !(defined i_key || defined i_keyclass || defined i_keypro)
+  #if defined i_rawclass
     #define Self i_type
-    #define i_key i_cmpclass
+    #define i_key i_rawclass
     #define i_keytoraw c_default_toraw
   #elif defined _i_is_map && !defined i_val
     #define Self c_SELECT(_c_SEL31, i_type)
@@ -116,14 +113,14 @@
 // cstr_from(const char*) and arc_T_from(T) / box_T_from(T)
 #if defined i_keypro
   #define i_keyclass i_keypro
-  #define i_cmpclass c_JOIN(i_keypro, _raw)
+  #define i_rawclass c_JOIN(i_keypro, _raw)
 #endif
 
-// Check for i_keyclass and i_cmpclass, and fill in missing defs.
-#if defined i_cmpclass
-  #define i_keyraw i_cmpclass
+// Check for keyclass and rawclass, and fill in missing defs.
+#if defined i_rawclass
+  #define i_keyraw i_rawclass
 #elif defined i_keyclass && !defined i_keyraw
-  #define i_cmpclass i_key
+  #define i_rawclass i_key
 #endif
 
 // Bind to i_key "class members": _clone, _drop, _from and _toraw (when conditions are met).
@@ -154,15 +151,15 @@
 #endif
 
 // Bind to i_keyraw "class members": _cmp, _eq and _hash (when conditions are met).
-#if defined i_cmpclass // => i_keyraw
+#if defined i_rawclass // => i_keyraw
   #if !(defined i_cmp || defined i_less) && (defined i_use_cmp || defined _i_sorted || defined _i_is_pqueue)
-    #define i_cmp c_JOIN(i_cmpclass, _cmp)
+    #define i_cmp c_JOIN(i_rawclass, _cmp)
   #endif
   #if !defined i_eq && (defined i_use_eq || defined i_hash || defined _i_is_hash)
-    #define i_eq c_JOIN(i_cmpclass, _eq)
+    #define i_eq c_JOIN(i_rawclass, _eq)
   #endif
   #if !(defined i_hash || defined i_no_hash)
-    #define i_hash c_JOIN(i_cmpclass, _hash)
+    #define i_hash c_JOIN(i_rawclass, _hash)
   #endif
 #endif
 

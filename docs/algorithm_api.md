@@ -190,7 +190,7 @@ It enables a subset of functional programming like in other popular languages.
 | `c_flt_src1, c_flt_src2`     | Pointer variables to current unmapped source values |
 | `value1, value2`             | Pointer variables to (possible mapped) values |
 
-[ [Run this example](https://godbolt.org/z/7d6rbhba8) ]
+[ [Run this example](https://godbolt.org/z/MhW7xz5sn) ]
 ```c
 #include <stdio.h>
 #define i_type Vec, int
@@ -201,8 +201,8 @@ int main(void)
 {
     Vec vec = c_init(Vec, {1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 9, 10, 11, 12, 5});
 
-    c_filter(Vec, vec
-         , c_flt_skipwhile(*value < 3)  // skip leading values < 3
+    c_filter(Vec, vec, true
+        && c_flt_skipwhile(*value < 3)  // skip leading values < 3
         && (*value & 1) == 1            // then use odd values only
         && c_flt_map(*value * 2)        // multiply by 2
         && c_flt_takewhile(*value < 20) // stop if mapped *value >= 20
@@ -259,7 +259,7 @@ c_func (load_data,(const char* fname), ->, struct {Vec out; int err;}) {
 - **c_push** - push values onto any container from an initializer list
 - **c_drop** - drop (destroy) multiple containers of the same type
 
-[ [Run this code](https://godbolt.org/z/Gr1Y4MvMb) ]
+[ [Run this code](https://godbolt.org/z/K9Y5EMGxM) ]
 ```c
 #include <stdio.h>
 #define i_type Vec, int
@@ -269,12 +269,12 @@ c_func (load_data,(const char* fname), ->, struct {Vec out; int err;}) {
 #include "stc/hmap.h"
 
 c_func (split_map,(Map map), ->, struct {Vec keys, vals;}) {
-    split_map_result res = {0};
+    split_map_result out = {0};
     c_foreach_kv (k, v, Map, map) {
-        Vec_push(&res.keys, *k);
-        Vec_push(&res.vals, *v);
+        Vec_push(&out.keys, *k);
+        Vec_push(&out.vals, *v);
     }
-    return res;
+    return out;
 }
 
 int main(void) {

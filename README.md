@@ -210,7 +210,7 @@ Let's make a vector of vectors, which can be cloned. All of its element vectors 
 #include "stc/vec.h"
 
 #define i_type Vec2D
-#define i_keyclass Vec  // Use i_keyclass when key type has "members" _clone() and _drop().
+#define i_keyclass Vec   // Use i_keyclass when key type has "members" _clone() and _drop().
 #define i_use_eq         // vec does not have _cmp(), but it has _eq()
 #include "stc/vec.h"
 
@@ -243,7 +243,7 @@ int main(void)
 ```
 This example uses four different container types:
 
-[ [Run this code](https://godbolt.org/z/hPr5K4haG) ]
+[ [Run this code](https://godbolt.org/z/n1z16bdTr) ]
 ```c
 #include <stdio.h>
 
@@ -396,22 +396,21 @@ Key (element / lookup type):
 Val (mapped value type - for maps):
 - These are analogues to the Key parameters, i.e. `i_valdrop`, `i_valclone`, etc.
 
-The following are meta-template parameters to be used in place of ***i_key*** / ***i_val*** and ***i_type***.
-These parameters makes types into "classes" in the sense that they bind associated function names to the primary
-template parameters described above. NB! this is a fairly complex/detailed description.
+The following meta-template parameters are to be used in place of ***i_key***, ***i_val*** and ***i_type***.
+These parameters makes types into "classes" in the sense that they bind associated function names to primary
+template parameters described above. This reduces boiler-plate code, clutter, and simplifies the management
+of non-trivial container elements.
 - Key-meta parameters:
-    - `i_class` *ContType*, *KeyType* - Define both ***i_type*** = *ContType* and ***i_keyclass*** = *KeyType*
-    (see next). This should be used to define "*container of containers*" or container of element type which
-    have both *_clone()* and *_drop()* functions.
-    - `i_cmpclass` *RawType* - Defines ***i_keyraw*** and binds *RawType_cmp()*, *RawType_eq()*, *RawType_hash()* to
-    their associated template key parameters. It is still required to define ***i_use_cmp*** to enable searching/sorting
-    on sequence types (stack, vec, deque, list). ***i_cmpclass*** will be defined by ***i_keyclass*** and ***i_keypro*** parameters (described next) and rarely used alone.
     - `i_keyclass` *KeyType* - Defines ***i_key*** and binds standard named functions *KeyType_clone()* and
-    *KeyType_drop()* to their associated template parameters. ***i_cmpclass*** is either defaulted to ***i_keyclass***
-    itself or set to ***i_keyraw*** if defined. In the latter case *KeyType_from()* and *KeyType_toraw()* are also bound.
+    *KeyType_drop()* to their associated template parameters. If either ***i_keyraw*** or ***i_rawclass*** (see below)
+    are defined, *KeyType_from()* and *KeyType_toraw()* are name-bound to ***i_keyfrom***, ***i_keytoraw*** as well.
+    - `i_rawclass` *RawType* - Defines ***i_keyraw*** and binds *RawType_cmp()*, *RawType_eq()*, *RawType_hash()* to
+    their associated template key parameters. It is still required to define ***i_use_cmp*** to enable searching/sorting
+    on sequence types (stack, vec, deque, list). Useful alone for containers of views (e.g. csview).
     - `i_keypro` *KeyType* - This is used for "pro" types, i.e. library types like **cstr**, **box** and **arc**.
-    It combines all the ***i_keyclass*** and ***i_cmpclass*** type features. It sets ***i_cmpclass*** to *KeyType_raw*,
-    which is what differentiates it from the ***i_keyclass*** template parameter.
+    It combines all the ***i_keyclass*** and ***i_rawclass*** features. Defining ***i_keypro*** is identical to defining
+        - ***i_keyclass*** *KeyType*
+        - ***i_rawclass*** *KeyType*_***raw***.
 - Val-meta (mapped) parameters:
     - `i_valclass` *MappedType* - Analogous to the ***i_keyclass*** parameter.
     - `i_valpro` *MappedType* - Defines ***i_keyraw*** and combines the ***i_valclass*** features (comparison functions

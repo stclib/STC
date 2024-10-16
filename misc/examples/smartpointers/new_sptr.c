@@ -7,8 +7,9 @@ void Person_drop(Person* p);
 int Person_cmp(const Person* a, const Person* b);
 uint64_t Person_hash(const Person* p);
 
-#define i_class PersonArc, Person   // "class" binds _clone(), _drop()
-#define i_use_cmp                   // binds _cmp(), _hash()
+#define i_type PersonArc 
+#define i_keyclass Person // "class" binds _clone(), _drop()
+#define i_use_cmp         // binds _cmp(), _hash()
 #include "stc/arc.h"
 
 #define i_type IPtr,int
