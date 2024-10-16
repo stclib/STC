@@ -29,7 +29,6 @@
 #include "common.h"
 #include "types.h"
 #include <stdlib.h>
-#include <stdio.h>
 #endif // STC_STACK_H_INCLUDED
 
 #ifndef _i_prefix
