@@ -10,7 +10,10 @@ See the c++ class [std::set](https://en.cppreference.com/w/cpp/container/set) fo
 ```c
 #define i_type <ct>,<kt> // shorthand for defining i_type, i_key
 #define i_type <t>       // container type name (default: sset_{i_key})
-#define i_key <t>        // element type: REQUIRED. Defines sset_X_value
+// One of the following:
+#define i_key <t>        // key type
+#define i_keyclass <t>   // key type, and bind <t>_clone() and <t>_drop() function names
+#define i_keypro <t>     // key "pro" type, use for cstr, arc, box types
 
 #define i_cmp <fn>       // three-way compare two i_keyraw* : REQUIRED IF i_keyraw is a non-integral type
 #define i_less <fn>      // less comparison. Alternative to i_cmp

@@ -14,7 +14,10 @@ See the c++ class [std::vector](https://en.cppreference.com/w/cpp/container/vect
 ```c
 #define i_type <ct>,<kt> // shorthand for defining i_type, i_key
 #define i_type <t>       // container type name (default: vec_{i_key})
-#define i_key <t>        // element type: REQUIRED. Defines vec_X_value
+// One of the following:
+#define i_key <t>        // key type
+#define i_keyclass <t>   // key type, and bind <t>_clone() and <t>_drop() function names
+#define i_keypro <t>     // key "pro" type, use for cstr, arc, box types
 
 #define i_keydrop <fn>   // destroy value func - defaults to empty destruct
 #define i_keyclone <fn>  // REQUIRED IF i_keydrop defined

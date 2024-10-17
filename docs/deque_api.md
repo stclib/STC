@@ -12,7 +12,10 @@ See the c++ class [std::deque](https://en.cppreference.com/w/cpp/container/deque
 ```c
 #define i_type <ct>,<kt> // shorthand for defining i_type, i_key
 #define i_type <t>       // deque container type name (default: deque_{i_key})
-#define i_key <t>        // element type: REQUIRED. Defines deque_X_value
+// One of the following:
+#define i_key <t>        // key type
+#define i_keyclass <t>   // key type, and bind <t>_clone() and <t>_drop() function names
+#define i_keypro <t>     // key "pro" type, use for cstr, arc, box types
 
 #define i_keydrop <fn>   // destroy value func - defaults to empty destruct
 #define i_keyclone <fn>  // REQUIRED IF i_keydrop is defined

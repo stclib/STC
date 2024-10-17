@@ -17,8 +17,15 @@ See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) fo
 ```c
 #define i_type <ct>,<kt>,<vt> // shorthand for defining i_type, i_key, i_val
 #define i_type <t>            // container type name (default: smap_{i_key})
-#define i_key <t>             // key type: REQUIRED.
-#define i_val <t>             // mapped value type: REQUIRED.
+// One of the following:
+#define i_key <t>             // key type
+#define i_keyclass <t>        // key type, and bind <t>_clone() and <t>_drop() function names
+#define i_keypro <t>          // key "pro" type, use for cstr, arc, box types
+
+// One of the following:
+#define i_val <t>             // mapped value type
+#define i_valclass <t>        // mapped type, and bind <t>_clone() and <t>_drop() function names
+#define i_valpro <t>          // mapped "pro" type, use for cstr, arc, box types
 
 #define i_cmp <fn>            // three-way compare two i_keyraw* : REQUIRED IF i_keyraw is a non-integral type
 #define i_less <fn>           // less comparison. Alternative to i_cmp
@@ -27,6 +34,7 @@ See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) fo
 #define i_keydrop <fn>        // destroy key func - defaults to empty destruct
 #define i_keyclone <fn>       // REQUIRED IF i_valdrop defined
 #define i_keyraw <t>          // convertion "raw" type - defaults to i_key
+#define i_rawclass <t>        // alt. convertion "raw" type. binds <t>_cmp(),  <t>_eq(),  <t>_hash()
 #define i_keyfrom <fn>        // convertion func i_keyraw => i_key
 #define i_keytoraw <fn>       // convertion func i_key* => i_keyraw
 

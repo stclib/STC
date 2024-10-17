@@ -23,8 +23,10 @@ See similar c++ class [std::shared_ptr](https://en.cppreference.com/w/cpp/memory
 ```c
 #define i_type <ct>,<kt> // shorthand for defining i_type, i_key
 #define i_type <t>       // arc container type name
-#define i_key <t>        // element type: REQUIRED.
-#define i_keyclass <t>   // Use instead of i_key when functions {i_key}_clone and {i_key}_drop exists.
+// One of the following:
+#define i_key <t>        // key type
+#define i_keyclass <t>   // key type, and bind <t>_clone() and <t>_drop() function names
+#define i_keypro <t>     // key "pro" type, use for cstr, arc, box types
 
 #define i_use_cmp        // may be defined instead of i_cmp when i_key is an integral/native-type.
 #define i_cmp <fn>       // three-way element comparison. If not specified, pointer comparison is used.

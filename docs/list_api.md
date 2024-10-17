@@ -24,7 +24,10 @@ See the c++ class [std::list](https://en.cppreference.com/w/cpp/container/list) 
 ```c
 #define i_type <ct>,<kt> // shorthand for defining i_type, i_key
 #define i_type <t>       // list container type name (default: list_{i_key})
-#define i_key <t>        // element type: REQUIRED. Note: i_val* may be specified instead of i_key*.
+// One of the following:
+#define i_key <t>        // key type
+#define i_keyclass <t>   // key type, and bind <t>_clone() and <t>_drop() function names
+#define i_keypro <t>     // key "pro" type, use for cstr, arc, box types
 
 #define i_keydrop <fn>   // destroy value func - defaults to empty destruct
 #define i_keyclone <fn>  // REQUIRED IF i_keydrop defined

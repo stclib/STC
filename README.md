@@ -3,17 +3,20 @@
 
 # STC - Smart Template Containers
 
-### Version 5.0 RC3
-Description
------------
-STC is a *modern*, *typesafe*, *fast* and *compact* container and algorithms library for C99.
-The API naming is similar to C++ STL, but it takes inspiration from Rust and Python as well.
-The library handles everything from trivial to highly complex data using *templates*.
+### Version 5.0 RC4
+
+STC is a *modern*, *typesafe*, *fast* and *compact* general purpose container and algorithms
+library for C99. This library aims to transforms C into a high level language through a consistent,
+intuitive API. It has a number of generic templated container types and algorithms,
+many found in languages like C++, Rust, Zig and Odin, but with the advantage of having
+C's fast, low level features and multiple compilers readily available on every platform.
+What sets STC apart from similar libraries is its broad functionality, its general speed and
+ergonomic way to specify typesafe, fully memory managed containers, also with complex element types.
 
 Containers
 ----------
-- [***arc*** - (atomic) reference counted smart pointer`](docs/arc_api.md)
-- [***box*** - heap allocated element wrapped in a smart pointer`](docs/box_api.md)
+- [***arc*** - (atomic) reference counted shared pointer`](docs/arc_api.md)
+- [***box*** - heap allocated unique pointer`](docs/box_api.md)
 - [***cbits*** - dynamic bitset](docs/cbits_api.md)
 - [***list*** - forward linked list](docs/list_api.md)
 - [***stack*** - stack type](docs/stack_api.md)
@@ -28,7 +31,7 @@ Containers
 - [***cstr*** - string type (short string optimized)](docs/cstr_api.md)
 - [***csview*** - string view (non-zero terminated)](docs/csview_api.md)
 - [***zsview*** - zero-terminated string view](docs/zsview_api.md)
-- [***cspan*** - single and multidimensional spans](docs/cspan_api.md)
+- [***cspan*** - single and multidimensional span (view)](docs/cspan_api.md)
 
 Algorithms
 ----------
@@ -396,8 +399,8 @@ Key (element / lookup type):
 Val (mapped value type - for maps):
 - These are analogues to the Key parameters, i.e. `i_valdrop`, `i_valclone`, etc.
 
-The following meta-template parameters can be used in place of ***i_key***, ***i_val*** and ***i_type***.
-These parameters make types into "classes" in the sense that they bind associated function names to primary
+The following meta-template parameters can be specified instead of ***i_key***, ***i_val***, and ***i_keyraw***.
+These parameters make types into "classes" in the sense that they bind associated function names to the primary
 template parameters described above. This reduces boiler-plate code, clutter, and simplifies the management
 of non-trivial container elements. Note that many basic template parameters will defined when defining the
 following parameters, but the user may override them when needed. E.g. defining the template parameters directly

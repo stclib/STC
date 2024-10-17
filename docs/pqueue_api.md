@@ -10,7 +10,10 @@ See the c++ class [std::priority_queue](https://en.cppreference.com/w/cpp/contai
 ```c
 #define i_type <ct>,<kt> // shorthand for defining i_type, i_key
 #define i_type <t>       // pqueue container type name (default: pqueue_{i_key})
-#define i_key <t>        // element type: REQUIRED. Defines pqueue_X_value
+// One of the following:
+#define i_key <t>        // key type
+#define i_keyclass <t>   // key type, and bind <t>_clone() and <t>_drop() function names
+#define i_keypro <t>     // key "pro" type, use for cstr, arc, box types
 
 #define i_use_cmp        // may be defined instead of i_cmp when i_key is an integral/native-type.
 #define i_less <fn>      // less comparison. REQUIRED for non-integral types.

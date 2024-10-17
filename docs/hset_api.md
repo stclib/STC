@@ -9,7 +9,10 @@ A **hset** is an associative container that contains a set of unique objects of 
 ```c
 #define i_type <ct>,<kt> // shorthand for defining i_type, i_key
 #define i_type <t>       // container type name (default: hset_{i_key})
-#define i_key <t>        // element type: REQUIRED. Defines hset_X_value
+// One of the following:
+#define i_key <t>        // key type
+#define i_keyclass <t>   // key type, and bind <t>_clone() and <t>_drop() function names
+#define i_keypro <t>     // key "pro" type, use for cstr, arc, box types
 
 #define i_hash <fn>      // hash func i_keyraw*: REQUIRED IF i_keyraw is non-pod type
 #define i_eq <fn>        // equality comparison two i_keyraw*: REQUIRED IF i_keyraw is a
