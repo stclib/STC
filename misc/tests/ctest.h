@@ -92,15 +92,20 @@ struct ctest {
 #define CTEST_IMPL_TEARDOWN_TPNAME(sname, tname) CTEST_IMPL_NAME(sname##_##tname##_teardown_ptr)
 
 #ifdef __APPLE__
+#ifdef __arm64__
+#define CTEST_IMPL_SECTION __attribute__ ((used, section ("__DATA, .ctest"), aligned(8)))
+#else
 #define CTEST_IMPL_SECTION __attribute__ ((used, section ("__DATA, .ctest"), aligned(1)))
+#endif
 #elif !defined _MSC_VER
 #define CTEST_IMPL_SECTION __attribute__ ((used, section (".ctest"), aligned(1)))
 #else
-#define CTEST_IMPL_SECTION
+#pragma section(".ctest", read)
+#define CTEST_IMPL_SECTION __declspec(allocate(".ctest")) __declspec(align(1))
 #endif
 
 #define CTEST_IMPL_STRUCT(sname, tname, tskip, tdata, tsetup, tteardown) \
-    static struct ctest CTEST_IMPL_TNAME(sname, tname) CTEST_IMPL_SECTION = { \
+    static CTEST_IMPL_SECTION struct ctest CTEST_IMPL_TNAME(sname, tname) = { \
         0xBADCAFE0, 0, \
         #sname, \
         #tname, \

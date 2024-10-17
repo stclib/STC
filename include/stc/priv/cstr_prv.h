@@ -26,6 +26,7 @@
 
 #include <stdio.h> /* FILE*, vsnprintf */
 #include <stdlib.h> /* malloc */
+#include <stddef.h> /* size_t */
 /**************************** PRIVATE API **********************************/
 
 #if defined __GNUC__ && !defined __clang__

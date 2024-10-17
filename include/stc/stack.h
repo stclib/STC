@@ -68,6 +68,7 @@ STC_INLINE Self _c_MEMB(_with_size)(isize size, _m_value null) {
 #endif // i_capacity
 
 STC_INLINE void _c_MEMB(_clear)(Self* self) {
+    if (self->size == 0) return;
     _m_value *p = self->data + self->size;
     while (p-- != self->data) { i_keydrop(p); }
     self->size = 0;

@@ -23,7 +23,7 @@
 #ifndef STC_CSTR_CORE_INCLUDED
 #define STC_CSTR_CORE_INCLUDED
 
-uint64_t cstr_hash(const cstr *self) {
+size_t cstr_hash(const cstr *self) {
     csview sv = cstr_sv(self);
     return c_hash_n(sv.buf, sv.size);
 }
