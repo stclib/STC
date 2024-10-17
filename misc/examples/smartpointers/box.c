@@ -7,7 +7,7 @@ Person Person_make(const char* name, const char* last) {
     return c_literal(Person){.name = cstr_from(name), .last = cstr_from(last)};
 }
 
-uint64_t Person_hash(const Person* a) {
+size_t Person_hash(const Person* a) {
     return cstr_hash(&a->name) ^ cstr_hash(&a->last);
 }
 

@@ -37,7 +37,7 @@ inline static bool SongView_cmp(const SongView* xw, const SongView* yw)
 
 #define SongView_eq(x, y) SongView_cmp(x, y)==0
 
-inline static uint64_t SongView_hash(const SongView* xw)
+inline static size_t SongView_hash(const SongView* xw)
     { return c_hash_mix(c_hash_str(xw->artist), c_hash_str(xw->title)); }
 
 

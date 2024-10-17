@@ -285,7 +285,7 @@ static inline int Viking_cmp(const Viking* a, const Viking* b) {
     return c ? c : cstr_cmp(&a->country, &b->country);
 }
 
-static inline uint32_t Viking_hash(const Viking* a) {
+static inline size_t Viking_hash(const Viking* a) {
     return cstr_hash(&a->name) ^ cstr_hash(&a->country);
 }
 

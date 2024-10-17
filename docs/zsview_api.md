@@ -61,7 +61,7 @@ zsview_iter     zsview_advance(zsview_iter it, isize u8pos);        // advance +
 
 #### Helper methods for usage in containers
 ```c
-uint64_t        zsview_hash(const zsview* x);
+size_t          zsview_hash(const zsview* x);
 int             zsview_cmp(const zsview* x, const zsview* y);
 bool            zsview_eq(const zsview* x, const zsview* y);
 int             zsview_icmp(const zsview* s1, const zsview* s2);    // utf8 case-insensitive comparison

@@ -5,7 +5,7 @@ Person Person_make(const char* name, const char* last);
 Person Person_clone(Person p);
 void Person_drop(Person* p);
 int Person_cmp(const Person* a, const Person* b);
-uint64_t Person_hash(const Person* p);
+size_t Person_hash(const Person* p);
 
 #define i_type PersonArc 
 #define i_keyclass Person // "class" binds _clone(), _drop()
@@ -35,7 +35,7 @@ int Person_cmp(const Person* a, const Person* b) {
     return cstr_cmp(&a->name, &b->name);
 }
 
-uint64_t Person_hash(const Person* p) {
+size_t Person_hash(const Person* p) {
     return cstr_hash(&p->name);
 }
 

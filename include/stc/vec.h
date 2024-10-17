@@ -257,12 +257,10 @@ STC_INLINE bool _c_MEMB(_eq)(const Self* self, const Self* other) {
 
 STC_DEF void
 _c_MEMB(_clear)(Self* self) {
-    if (self->capacity) {
-        for (_m_value *p = self->data, *q = p + self->size; p != q; ) {
-            --q; i_keydrop(q);
-        }
-        self->size = 0;
-    }
+    if (self->size == 0) return;
+    _m_value *p = self->data + self->size;
+    while (p-- != self->data) { i_keydrop(p); }
+    self->size = 0;
 }
 
 STC_DEF void

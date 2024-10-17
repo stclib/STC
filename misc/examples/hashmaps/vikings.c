@@ -31,7 +31,7 @@ static inline bool RawVik_eq(const RawVik* rx, const RawVik* ry) {
            strcmp(rx->country, ry->country) == 0;
 }
 
-static inline uint64_t RawVik_hash(const RawVik* rp) {
+static inline size_t RawVik_hash(const RawVik* rp) {
     return c_hash_mix(c_hash_str(rp->name), c_hash_str(rp->country));
 }
 
