@@ -5,13 +5,10 @@
 
 ### Version 5.0 RC4
 
-STC is a *modern*, *typesafe*, *fast* and *compact* general purpose container and algorithms
-library for C99. This library aims to transforms C into a high level language through a consistent,
-intuitive API. It has a number of generic templated container types and algorithms,
-many found in languages like C++, Rust, Zig and Odin, but with the advantage of having
-C's fast, low level features and multiple compilers readily available on every platform.
-What sets STC apart from similar libraries is its broad functionality, its general speed and
-ergonomic way to specify typesafe, fully memory managed containers, also with complex element types.
+STC is a *modern*, *typesafe* and *fast* general purpose container and algorithms library
+for C99. This library aims to elevate C-programming to be even more fun, highly productive,
+less error-prone by encouraging broad usage of fundamental abstractions for loops, type-safe
+generic datatypes and algorithms.
 
 Containers
 ----------
@@ -51,11 +48,11 @@ Algorithms
 - **Minimal boilerplate code** - Specify only the required template parameters, and leave the rest as defaults.
 - **Fully type safe** - Because of templating, it avoids error-prone casting of container types and elements back and forth from the containers.
 - **High performance** - Unordered maps and sets, queues and deques are significantly faster than the C++ STL containers, the remaining are similar or close to STL in speed (See graph below).
-- **Fully memory managed** - Containers destructs keys/values via default or user supplied drop function. They may be cloned if element types are clonable. Also, smart pointers are supported and can be stored in containers. See [***arc***](docs/arc_api.md) and [***box***](docs/box_api.md).
-- **Uniform, easy-to-learn API** - Just include the headers and you are good. The API and functionality resembles c++ STL and is fully listed in the docs. Intuitive method/type names and uniform usage across the various containers.
+- **Fully memory managed** - Containers destructs keys/values via default or user supplied drop function. They may be cloned if element types are clonable. Smart pointers (shared and unique) works seamlessly when stored in containers. See [***arc***](docs/arc_api.md) and [***box***](docs/box_api.md).
+- **Uniform, easy-to-learn API** - For the generic containers and algorithms, simply include the headers. The API and functionality resembles c++ STL or Rust and is fully listed in the docs. Uniform usage across the various containers.
 - **No signed/unsigned mixing** - Unsigned sizes and indices mixed with signed for comparison and calculation is asking for trouble. STC only uses signed numbers in the API for this reason.
-- **Small footprint** - Small source code and generated executables. The executable from the example below using *four different* container types is only ***19 Kb in size*** compiled with gcc -O3 -s on Linux.
-- **Dual mode compilation** - By default it is a simple header-only library with inline and static methods only, but you can easily switch to create a traditional library with shared symbols, without changing existing source files. See the [installation section](#installation).
+- **Small footprint** - Small source code and generated executables.
+- **Dual mode compilation** - By default it is a header-only library with inline and static methods, but you can easily switch to create a shared library without changing existing source files. Non-generic types, like (utf8) strings are compiled with external linking. one See the [installation section](#installation).
 - **No callback functions** - All passed template argument functions/macros are directly called from the implementation, no slow callbacks which requires storage.
 - **Compiles with C++ and C99** - C code can be compiled with C++ (container element types must be POD).
 - **Forward declaration** - Templated containers may be [forward declared](#forward-declarations) without including the full API/implementation.
@@ -147,7 +144,7 @@ Benchmark notes:
 ## Usage
 STC containers have similar functionality to the C++ STL standard containers. All containers except for a few,
 like **cstr** and **cbits** are generic/templated. No type casting is used, so containers are type-safe like
-templated types in C++. However, to specify template parameters with STC, you define them as macros prior to
+templated types in C++. To specify template parameters with STC, you define them as macros prior to
 including the container, e.g.
 ```c
 #define i_type Floats, float // Container type (name, element type)
