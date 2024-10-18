@@ -168,7 +168,7 @@ int main(void)
 }
 ```
 Switching to a different container type, e.g. a sorted set (sset):
-
+<!-- https://raw.githubusercontent.com/stclib/stcsingle/main/ -->
 [ [Run this code](https://godbolt.org/z/cedobWETq) ]
 ```c
 #define i_type Floats, float

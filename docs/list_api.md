@@ -127,8 +127,11 @@ void            list_X_value_drop(i_key* pval);
 ## Example
 
 Interleave *push_front()* / *push_back()* then *sort()*:
+
+[ [Run this code](https://godbolt.org/z/dqWqfWrMd) ]
 ```c
 #define i_type DList, double
+#define i_use_cmp
 #include "stc/list.h"
 
 #include <stdio.h>
@@ -154,32 +157,28 @@ int main(void) {
     DList_drop(&list);
 }
 ```
-Output:
-```
-initial:  9 7 5 3 1 10 20 30 40 50 60 70 80 90 2 4 6 8
-sorted:  1 2 3 4 5 6 7 8 9 10 20 30 40 50 60 70 80 90
-```
-### Example 2
 
+### Example 2
 Use of *erase_at()* and *erase_range()*:
+
+[ [Run this code](https://godbolt.org/z/G6qPv4nrh) ]
 ```c
-// erasing from list
+#include <stdio.h>
 #define i_type IList, int
 #include "stc/list.h"
-#include <stdio.h>
 
 int main(void)
 {
     IList L = c_init(IList, {10, 20, 30, 40, 50});
-                                                // 10 20 30 40 50
+                                            // 10 20 30 40 50
     IList_iter it = IList_begin(&L);        // ^
     IList_next(&it);
-    it = IList_erase_at(&L, it);              // 10 30 40 50
-                                                //    ^
+    it = IList_erase_at(&L, it);            // 10 30 40 50
+                                            //    ^
     IList_iter end = IList_end(&L);         //
     IList_next(&it);
-    it = IList_erase_range(&L, it, end);      // 10 30
-                                                //       ^
+    it = IList_erase_range(&L, it, end);    // 10 30
+                                            //       ^
     printf("mylist contains:");
     c_foreach (x, IList, L)
         printf(" %d", *x.ref);

@@ -113,6 +113,8 @@ void            deque_X_value_drop(i_key* pval);
 | `deque_X_iter`    | `struct { deque_X_value* ref; }`   | The iterator type      |
 
 ## Examples
+
+[ [Run this code](https://godbolt.org/z/6ojqqMzrz) ]
 ```c
 #define i_type Deque, int32_t
 #include "stc/deque.h"

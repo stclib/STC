@@ -67,11 +67,13 @@ i_key           pqueue_X_value_clone(i_key value);
 | `pqueue_X_value`  | `i_key`                              | The pqueue element type  |
 
 ## Example
-```c
-#include "stc/random.h"
-#include <stdio.h>
 
-#define i_type PriorityQ, int64_t
+[ [Run this code](https://godbolt.org/z/cMhWYc9cb) ]
+```c
+#include <stdio.h>
+#include "stc/random.h"
+
+#define i_type PriorityQ, int32
 #define i_cmp -c_default_cmp // min-heap
 #include "stc/pqueue.h"
 
@@ -81,23 +83,22 @@ int main(void)
     PriorityQ numbers = {0};
 
     // Push ten million random numbers to priority queue.
-    c_forrange (N)
-        PriorityQ_push(&numbers, crand64_uint() & ((1 << 21) - 1));
+    c_forrange (N/2)
+        PriorityQ_push(&numbers, (int32)(crand32_uint() >> 6));
 
     // Add some negative ones.
-    int nums[] = {-231, -32, -873, -4, -343};
+    int32 nums[] = {-231, -32, -873, -4, -343};
     c_forrange (i, c_arraylen(nums))
         PriorityQ_push(&numbers, nums[i]);
 
+    c_forrange (N/2)
+        PriorityQ_push(&numbers, (int32)(crand32_uint() >> 6));
+
     // Extract and display the fifty smallest.
     c_forrange (50) {
-        printf("%" PRId64 " ", *PriorityQ_top(&numbers));
+        printf("%d ", *PriorityQ_top(&numbers));
         PriorityQ_pop(&numbers);
     }
     PriorityQ_drop(&numbers);
 }
-```
-Output:
-```
- -873 -343 -231 -32 -4 3 5 6 18 23 31 54 68 87 99 105 107 125 128 147 150 155 167 178 181 188 213 216 272 284 287 302 306 311 313 326 329 331 344 348 363 367 374 385 396 399 401 407 412 477
 ```
