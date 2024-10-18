@@ -80,6 +80,8 @@ bool            box_X_value_eq(const i_key* x, const i_key* y);
 
 ## Example
 Create a vec and a set with owned pointers to int elements, using box.
+
+[ [Run this code](https://godbolt.org/z/YTcfT5fMr) ]
 ```c
 #include <stdio.h>
 
@@ -93,13 +95,16 @@ void int_drop(int* x) {
 #define i_use_cmp           // enable usage of default comparison == and < operators
 #include "stc/box.h"
 
+// ISet : std::set<std::unique_ptr<int>>
 #define i_type ISet
 #define i_keypro IBox       // NB: use i_keypro instead of i_key
-#include "stc/sset.h"       // ISet : std::set<std::unique_ptr<int>>
+#include "stc/sset.h"
 
+// IVec : std::vector<std::unique_ptr<int>>
 #define i_type IVec
 #define i_keypro IBox       // NB: use i_keypro instead of i_key
-#include "stc/vec.h"        // IVec : std::vector<std::unique_ptr<int>>
+#include "stc/vec.h"
+
 
 int main(void)
 {
@@ -111,14 +116,14 @@ int main(void)
         printf(" %d", *i.ref->get);
 
     // add odd numbers from vec to set
-    c_foreach (i, IVec, vec)
-        if (*i.ref->get & 1)
+    c_foreach (i, IVec, vec) {
+        if (*i.ref->get & 1) {
             ISet_insert(&set, IBox_clone(*i.ref));
-
+        }
+    }
     // pop the two last elements in vec
     IVec_pop(&vec);
     IVec_pop(&vec);
-
     printf("\nvec:");
     c_foreach (i, IVec, vec)
         printf(" %d", *i.ref->get);
@@ -127,19 +132,7 @@ int main(void)
     c_foreach (i, ISet, set)
         printf(" %d", *i.ref->get);
 
-    IVec_drop(&vec),
-    ISet_drop(&set)
+    IVec_drop(&vec);
+    ISet_drop(&set);
 }
-```
-Output:
-```
-vec: 2021 2012 2022 2015
- drop 2015
- drop 2022
-vec: 2021 2012
-set: 2015 2021
- drop 2021
- drop 2015
- drop 2012
- drop 2021
 ```

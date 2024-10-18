@@ -90,6 +90,7 @@ bool            arc_X_value_eq(const i_key* x, const i_key* y);
 
 ## Example
 
+[ [Run this code](https://godbolt.org/z/bjrf47qbv) ]
 ```c
 // Create two stacks with arcs to maps.
 // Demonstrate sharing and cloning of maps.
@@ -97,16 +98,14 @@ bool            arc_X_value_eq(const i_key* x, const i_key* y);
 #include "stc/cstr.h"
 
 #define i_type Map
-#define i_keypro cstr // cstr "pro": cstr_clone cstr_drop, cstr_cmp, cstr_from, cstr_toraw, ....
-#define i_val int     // year
-// override cstr_drop(p) by defining i_keydrop:
+#define i_keypro cstr  // cstr is a "pro" type:
+#define i_val int      // year
 #define i_keydrop(p) (printf("  drop name: %s\n", cstr_str(p)), cstr_drop(p))
 #include "stc/smap.h"
 
-#define i_type Arc // (atomic) ref. counted pointer
-#define i_key Map
-#define i_keydrop(p) (printf("drop Arc:\n"), Map_drop(p))
-#include "stc/arc.h"
+#define i_type Arc     // (atomic) ref. counted pointer
+#define i_keyclass Map // bind _clone & _drop
+#include "stc/arc.h"   // try to switch to box.h!
 
 #define i_type Stack
 #define i_keypro Arc // Note: use i_keypro for arc key types
@@ -118,81 +117,29 @@ int main(void)
     Map *map;
 
     // POPULATE s1 with shared pointers to Map:
-    map = Stack_push(&s1, Arc_make(Map_init()))->get; // push empty map to s1.
-    Map_emplace(map, "Joey", 1990);
-    Map_emplace(map, "Mary", 1995);
-    Map_emplace(map, "Joanna", 1992);
+    map = Stack_push(&s1, Arc_from(Map_init()))->get; // push empty map to s1.
+    c_push(Map, map, {{"Joey", 1990}, {"Mary", 1995},
+                      {"Mary", 1996}, {"Joanna", 1992}});
 
-    map = Stack_push(&s1, Arc_make(Map_init()))->get;
-    Map_emplace(map, "Rosanna", 2001);
-    Map_emplace(map, "Brad", 1999);
-    Map_emplace(map, "Jack", 1980);
+    map = Stack_emplace(&s1, Map_init())->get; // emplace will make the Arc
+    c_push(Map, map, {{"Rosanna", 2001}, {"Brad", 1999}, {"Jack", 1980}});
 
     // POPULATE s2:
-    map = Stack_push(&s2, Arc_make(Map_init()))->get;
-    Map_emplace(map, "Steve", 1979);
-    Map_emplace(map, "Rick", 1974);
-    Map_emplace(map, "Tracy", 2003);
+    map = Stack_emplace(&s2, Map_init())->get;
+    c_push(Map, map, {{"Steve", 1979}, {"Rick", 1974}, {"Tracy", 2003}});
 
-    // Share two Maps from s1 with s2 by cloning(=sharing) the arcs:
-    Stack_push(&s2, Arc_clone(s1.data[0]));
+
+    // Share Arc 1 from s1 with s2 by cloning(=sharing):
     Stack_push(&s2, Arc_clone(s1.data[1]));
 
-    // Deep-copy (does not share) a Map from s1 to s2.
-    // s2 will contain two shared and two unshared maps.
-    map = Stack_push(&s2, Arc_from(Map_clone(*s1.data[1].get)))->get;
-
-    // Add one more element to the cloned map:
-    Map_emplace_or_assign(map, "Cloned", 2022);
-
-    // Add one more element to the shared map:
-    Map_emplace_or_assign(s1.data[1].get, "Shared", 2022);
-
-    puts("S1");
-    c_foreach (i, Stack, s1) {
-        c_foreach_kv (name, year, Map, *i.ref->get)
-            printf("  %s:%d", cstr_str(name), *year);
-        puts("");
-    }
-
-    puts("S2");
+    puts("S2 is now");
     c_foreach (i, Stack, s2) {
-        c_foreach_kv (name, year, Map, *i.ref->get)
-            printf("  %s:%d", cstr_str(name), *year);
+        Map m = Stack_value_toraw(i.ref);
+        c_foreach_kv (name, year, Map, m)
+            printf("  %s:%d\n", cstr_str(name), *year);
         puts("");
     }
-    puts("");
 
     c_drop(Stack, &s1, &s2);
 }
-```
-Output:
-```
-S1
-  Joanna:1992  Joey:1990  Mary:1995
-  Brad:1999  Jack:1980  Rosanna:2001  Shared:2022
-S2
-  Rick:1974  Steve:1979  Tracy:2003
-  Joanna:1992  Joey:1990  Mary:1995
-  Brad:1999  Jack:1980  Rosanna:2001  Shared:2022
-  Brad:1999  Cloned:2022  Jack:1980  Rosanna:2001
-
-drop Arc:
-  drop name: Rick
-  drop name: Tracy
-  drop name: Steve
-drop Arc:
-  drop name: Cloned
-  drop name: Brad
-  drop name: Rosanna
-  drop name: Jack
-drop Arc:
-  drop name: Brad
-  drop name: Shared
-  drop name: Rosanna
-  drop name: Jack
-drop Arc:
-  drop name: Joanna
-  drop name: Mary
-  drop name: Joey
 ```

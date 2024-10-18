@@ -125,6 +125,7 @@ bool            c_memcmp_eq(const i_keyraw* a, const i_keyraw* b);    // !memcmp
 
 ## Examples
 
+[ [Run this code](https://godbolt.org/z/5v3nT4ser) ]
 ```c
 #include "stc/cstr.h"
 
@@ -162,56 +163,38 @@ int main(void)
     hmap_cstr_drop(&umap);
 }
 ```
-Output:
-```
-Key:[RED] Value:[#FF0000]
-Key:[GREEN] Value:[#00FF00]
-Key:[BLUE] Value:[#0000FF]
-The HEX of color RED is:[#FF0000]
-The HEX of color BLACK is:[#000000]
-```
 
 ### Example 2
-This example uses a hmap with cstr as mapped value.
+Demonstrate hmap with mapped POD type Vec3i: hmap<int, Vec3i>:
+
+[ [Run this code](https://godbolt.org/z/1bbdv6qnx) ]
 ```c
-#include "stc/cstr.h"
-#define i_type IDMap, int // key = int
-#define i_valpro cstr     // val = cstr
+#include <stdio.h>
+typedef struct { int x, y, z; } Vec3i;
+
+#define i_type hmap_iv, int, Vec3i
 #include "stc/hmap.h"
 
 int main(void)
 {
-    uint32_t col = 0xcc7744ff;
+    hmap_iv vecs = {0};
 
-    IDMap idnames = {0};
+    hmap_iv_insert(&vecs, 1, (Vec3i){100,   0,   0});
+    hmap_iv_insert(&vecs, 2, (Vec3i){  0, 100,   0});
+    hmap_iv_insert(&vecs, 3, (Vec3i){  0,   0, 100});
+    hmap_iv_insert(&vecs, 4, (Vec3i){100, 100, 100});
 
-    c_foritems (i, IDMap_raw, {{100, "Red"}, {110, "Blue"}})
-        IDMap_emplace(&idnames, i.ref->first, i.ref->second);
+    c_foreach_kv (num, v3, hmap_iv, vecs)
+        printf("%d: { %3d, %3d, %3d }\n", *num, v3->x, v3->y, v3->z);
 
-    // replace existing mapped value:
-    IDMap_emplace_or_assign(&idnames, 110, "White");
-
-    // insert a new constructed mapped string into map:
-    IDMap_insert_or_assign(&idnames, 120, cstr_from_fmt("#%08x", col));
-
-    // emplace/insert does nothing if key already exist:
-    IDMap_emplace(&idnames, 100, "Green");
-
-    c_foreach (i, IDMap, idnames)
-        printf("%d: %s\n", i.ref->first, cstr_str(&i.ref->second));
-
-    IDMap_drop(&idnames);
+    hmap_iv_drop(&vecs);
 }
-```
-Output:
-```c
-100: Red
-110: White
-120: #cc7744ff
 ```
 
 ### Example 3
-Demonstrate hmap with plain-old-data key type Vec3i and int as mapped type: hmap<Vec3i, int>.
+Inverse: Demonstrate hmap with plain-old-data key type Vec3i and int as mapped type: hmap<Vec3i, int>.
+
+[ [Run this code](https://godbolt.org/z/x1vn36joc) ]
 ```c
 #include <stdio.h>
 typedef struct { int x, y, z; } Vec3i;
@@ -236,61 +219,25 @@ int main(void)
     hmap_vi_drop(&vecs);
 }
 ```
-Output:
+
+### Example 4: Advanced
+Key type is struct. Based on https://doc.rust-lang.org/std/collections/struct.HashMap.html
+
+[ [Run this code](https://godbolt.org/z/jhTv4x1e4) ]
 ```c
-{ 100,   0,   0 }: 1
-{   0,   0, 100 }: 3
-{ 100, 100, 100 }: 4
-{   0, 100,   0 }: 2
-```
-
-### Example 4
-Inverse: demonstrate hmap with mapped POD type Vec3i: hmap<int, Vec3i>:
-```c
-#include <stdio.h>
-typedef struct { int x, y, z; } Vec3i;
-
-#define i_type hmap_iv, int, Vec3i
-#include "stc/hmap.h"
-
-int main(void)
-{
-    hmap_iv vecs = {0}
-
-    hmap_iv_insert(&vecs, 1, (Vec3i){100,   0,   0});
-    hmap_iv_insert(&vecs, 2, (Vec3i){  0, 100,   0});
-    hmap_iv_insert(&vecs, 3, (Vec3i){  0,   0, 100});
-    hmap_iv_insert(&vecs, 4, (Vec3i){100, 100, 100});
-
-    c_foreach_kv (num, v3, hmap_iv, vecs)
-        printf("%d: { %3d, %3d, %3d }\n", *num, v3->x, v3->y, v3->z);
-
-    hmap_iv_drop(&vecs);
-}
-```
-Output:
-```c
-4: { 100, 100, 100 }
-3: {   0,   0, 100 }
-2: {   0, 100,   0 }
-1: { 100,   0,   0 }
-```
-
-### Example 5: Advanced
-Key type is struct.
-```c
-#include "stc/cstr.h"
+#include <stc/cstr.h>
 
 typedef struct {
     cstr name;
     cstr country;
 } Viking;
 
-#define Viking_init() ((Viking){.name={0}, .country={0}})
+static inline Viking Viking_make(cstr_raw name, cstr_raw country) {
+    return (Viking){.name = cstr_from(name), .country = cstr_from(country)};
+}
 
-static inline int Viking_cmp(const Viking* a, const Viking* b) {
-    int c = cstr_cmp(&a->name, &b->name);
-    return c ? c : cstr_cmp(&a->country, &b->country);
+static inline bool Viking_eq(const Viking* a, const Viking* b) {
+    return cstr_eq(&a->name, &b->name) && cstr_eq(&a->country, &b->country);
 }
 
 static inline size_t Viking_hash(const Viking* a) {
@@ -303,49 +250,44 @@ static inline Viking Viking_clone(Viking v) {
     return v;
 }
 
-static inline void Viking_drop(Viking* vk) {
-    cstr_drop(&vk->name);
-    cstr_drop(&vk->country);
+static inline void Viking_drop(Viking* vp) {
+    cstr_drop(&vp->name);
+    cstr_drop(&vp->country);
 }
 
 #define i_type Vikings
 #define i_keyclass Viking
 #define i_val int
-#include "stc/hmap.h"
+#include <stc/hmap.h>
 
 int main(void)
 {
     // Use a HashMap to store the vikings' health points.
-    Vikings vikings = {0};
+    Vikings vikings = c_init(Vikings, {
+        {Viking_make("Einar", "Norway"), 25},
+        {Viking_make("Olaf", "Denmark"), 24},
+        {Viking_make("Harald", "Iceland"), 12},
+    });
 
-    Vikings_insert(&vikings, (Viking){cstr_lit("Einar"), cstr_lit("Norway")}, 25);
-    Vikings_insert(&vikings, (Viking){cstr_lit("Olaf"), cstr_lit("Denmark")}, 24);
-    Vikings_insert(&vikings, (Viking){cstr_lit("Harald"), cstr_lit("Iceland")}, 12);
-    Vikings_insert(&vikings, (Viking){cstr_lit("Einar"), cstr_lit("Denmark")}, 21);
-
-    Viking lookup = (Viking){cstr_lit("Einar"), cstr_lit("Norway")};
-    printf("Lookup: Einar of Norway has %d hp\n\n", *Vikings_at(&vikings, lookup));
+    Viking lookup = Viking_make("Olaf", "Denmark");
+    printf("Lookup: Olaf of Denmark has %d hp\n\n", *Vikings_at(&vikings, lookup));
     Viking_drop(&lookup);
 
     // Print the status of the vikings.
-    c_foreach_kv (vik, hp, Vikings, vikings) {
-        printf("%s of %s has %d hp\n", cstr_str(&vik->name), cstr_str(&vik->country), *hp);
+    c_foreach_kv (viking, health, Vikings, vikings) {
+        printf("%s of %s has %d hp\n", cstr_str(&viking->name),
+                                       cstr_str(&viking->country), *health);
     }
     Vikings_drop(&vikings);
 }
 ```
-Output:
-```
-Olaf of Denmark has 24 hp
-Einar of Denmark has 21 hp
-Einar of Norway has 25 hp
-Harald of Iceland has 12 hp
-```
 
-### Example 6: More advanced
-In example 5 we needed to construct a lookup key which allocated strings, and then had to free it after.
-In this example we use rawtype feature to make it even simpler to use. Note that we must use the emplace() methods
-to add "raw" type entries (otherwise compile error).
+### Example 5: More advanced
+In example 4 we needed to construct a lookup key which may allocate strings, and then had to free it after.
+In this example we use keyraw feature to make it simpler to use and avoids the creation of a Viking object
+entirely when doing lookup.
+
+[ [Run this code](https://godbolt.org/z/qe86Kxs8W) ]
 ```c
 #include "stc/cstr.h"
 
@@ -354,62 +296,64 @@ typedef struct Viking {
     cstr country;
 } Viking;
 
+Viking Viking_make(cstr_raw name, cstr_raw country) {
+    return (Viking){.name = cstr_from(name), .country = cstr_from(country)};
+}
+
 void Viking_drop(Viking* vk) {
     cstr_drop(&vk->name);
     cstr_drop(&vk->country);
 }
 
-Viking Viking_clone(Viking vk) {
-    vk.name = cstr_clone(vk.name);
-    vk.country = cstr_clone(vk.country);
-    return vk;
+Viking Viking_clone(Viking v) {
+    v.name = cstr_clone(v.name);
+    v.country = cstr_clone(v.country);
+    return v;
 }
 
-// Define RawVik, a Viking lookup struct with eq, hash and convertion functions between them:
-
-typedef struct RawVik {
+// Define VikRaw, a Viking lookup struct with eq, hash and convertion functions between them:
+typedef struct VikRaw {
     const char* name;
     const char* country;
-} RawVik;
+} VikRaw;
 
-static inline bool RawVik_eq(const RawVik* rx, const RawVik* ry) {
+bool VikRaw_eq(const VikRaw* rx, const VikRaw* ry) {
     return strcmp(rx->name, ry->name)==0 && strcmp(rx->country, ry->country)==0;
 }
 
-static inline size_t RawVik_hash(const RawVik* rv) {
+size_t VikRaw_hash(const VikRaw* rv) {
     return c_hash_mix(c_hash_str(rv->name), c_hash_str(rv->country));
 }
 
-static inline Viking Viking_from(RawVik raw) { // note: parameter is by value
+Viking Viking_from(VikRaw raw) { // note: parameter is by value
     Viking v = {cstr_from(raw.name), cstr_from(raw.country)}; return v;
 }
 
-static inline RawVik Viking_toraw(const Viking* vp) {
-    RawVik rv = {cstr_str(&vp->name), cstr_str(&vp->country)}; return rv;
+VikRaw Viking_toraw(const Viking* vp) {
+    VikRaw rv = {cstr_str(&vp->name), cstr_str(&vp->country)}; return rv;
 }
 
 // With this in place, we define the Viking => int hash map type:
 #define i_type     Vikings
-#define i_keyclass Viking  // key "class": binds Viking_drop, Viking_clone,
-                           //                    Viking_from, Viking_toraw
-#define i_rawclass RawVik  // lookup "class": binds RawVik_cmp, RawVik_eq, RawVik_hash
-#define i_val       int    // mapped type
+#define i_keyclass Viking  // key "class": binds Viking_drop, Viking_clone, Viking_from, Viking_toraw
+#define i_rawclass VikRaw  // lookup "class": binds VikRaw_cmp, VikRaw_eq, VikRaw_hash
+#define i_val      int     // mapped health
 #include "stc/hmap.h"
 
 int main(void)
 {
-    Vikings vikings = {0};
-    Vikings_emplace(&vikings, (RawVik){"Einar", "Norway"}, 20);
-    Vikings_emplace(&vikings, (RawVik){"Olaf", "Denmark"}, 24);
-    Vikings_emplace(&vikings, (RawVik){"Harald", "Iceland"}, 12);
-    Vikings_emplace(&vikings, (RawVik){"Björn", "Sweden"}, 10);
+    Vikings vikings = c_init(Vikings, {
+        {(VikRaw){"Einar", "Norway"}, 25},
+        {(VikRaw){"Olaf", "Denmark"}, 24},
+        {(VikRaw){"Harald", "Iceland"}, 12},
+    });
 
-    // Lookup is using RawVik, not Viking:
-    Vikings_value* v = Vikings_get_mut(&vikings, (RawVik){"Einar", "Norway"});
-    v->second += 3; // add 3 hp points to Einar
+    // Now lookup is using VikRaw, not Viking:
+    printf("Lookup: Olaf of Denmark has %d hp\n\n", *Vikings_at(&vikings, (VikRaw){"Olaf", "Denmark"}));
 
-    c_foreach_kv (vk, hp, Vikings, vikings) {
-        printf("%s of %s has %d hp\n", cstr_str(&vk->name), cstr_str(&vk->country), *hp);
+    c_foreach_kv (viking, health, Vikings, vikings) {
+        printf("%s of %s has %d hp\n", cstr_str(&viking->name),
+                                       cstr_str(&viking->country), *health);
     }
     Vikings_drop(&vikings);
 }
