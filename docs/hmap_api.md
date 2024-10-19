@@ -82,7 +82,6 @@ hmap_X_result   hmap_X_put(hmap_X* self, i_keyraw rkey, i_valraw rmapped);      
 
 hmap_X_result   hmap_X_emplace(hmap_X* self, i_keyraw rkey, i_valraw rmapped);    // no change if rkey in map
 hmap_X_result   hmap_X_emplace_or_assign(hmap_X* self, i_keyraw rkey, i_valraw rmapped); // always update mapped
-hmap_X_result   hmap_X_emplace_key(hmap_X* self, i_keyraw rkey);                  // see example 1.
 
 int             hmap_X_erase(hmap_X* self, i_keyraw rkey);                        // return 0 or 1
 hmap_X_iter     hmap_X_erase_at(hmap_X* self, hmap_X_iter it);                    // return iter after it
@@ -150,11 +149,6 @@ int main(void)
     // Add two new entries to the unordered map
     hmap_cstr_emplace(&umap, "BLACK", "#000000");
     hmap_cstr_emplace(&umap, "WHITE", "#FFFFFF");
-
-    // Insert only if "CYAN" is not in the map: create mapped value when needed only.
-    hmap_cstr_result res = hmap_cstr_emplace_key(&umap, "CYAN");
-    if (res.inserted)
-        res.ref->second = cstr_lit("#00FFFF"); // must assign second if key was inserted.
 
     // Output values by key
     printf("The HEX of color RED is:[%s]\n", cstr_str(hmap_cstr_at(&umap, "RED")));

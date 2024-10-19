@@ -87,84 +87,43 @@ int32_t              crand32_uniform_r(crand32* rng, uint32_t strm, crand32_unif
 | `crand32_uniform_dist` | `struct {...}`                    | Uniform int distribution struct |
 
 ## Example
-```c
-#include <time.h>
-#define STC_IMPLEMENT
-#include "stc/random.h"
-#include "stc/cstr.h"
 
-// Declare int => int sorted map.
+[ [Run this code](https://godbolt.org/z/sWa3ea1cr) ]
+```c
+#include <stdio.h>
+#include <time.h>
+#include <math.h>
+#include "stc/random.h"
+
 #define i_type SortedMap, int, long
-#include "stc/smap.h"
+#include "stc/smap.h" // sorted map.
 
 int main(void)
 {
-    enum {N = 10000000};
+    enum {N = 5000000};
     printf("Demo of gaussian / normal distribution of %d random samples\n", N);
 
     // Setup a reentrant random number engine with normal distribution.
-    uint64_t seed = time(NULL);
-    crand64 rng = crand64_from(seed);
-    crand64_normal_dist dist = {.mean=-12.0, .stddev=6.0};
+    crand64_seed((uint64_t)time(NULL));
+    crand64_normal_dist dist = {.mean=-12.0, .stddev=4.0};
 
     // Create histogram map
     SortedMap mhist = {0};
     c_forrange (N) {
-        int index = (int)round(crand64_normal_r(&rng, 1, &dist));
+        int index = (int)round(crand64_normal(&dist));
         SortedMap_insert(&mhist, index, 0).ref->second += 1;
     }
 
     // Print the gaussian bar chart
-    cstr bar = {0};
-    const double scale = 74;
+    const double scale = 50;
     c_foreach (i, SortedMap, mhist) {
-        int n = (int)(i.ref->second * dist.stddev * scale * 2.5 / N);
+        int n = (int)((double)i.ref->second * dist.stddev * scale * 2.5 / N);
         if (n > 0) {
-            cstr_resize(&bar, n, '*');
-            printf("%4d %s\n", i.ref->first, cstr_str(&bar));
+            printf("%4d ", i.ref->first);
+            c_forrange(n) printf("*");
+            puts("");
         }
     }
-    // Cleanup
-    cstr_drop(&bar);
     SortedMap_drop(&mhist);
 }
-```
-Output:
-```
-Demo of gaussian / normal distribution of 10000000 random samples
- -29 *
- -28 **
- -27 ***
- -26 ****
- -25 *******
- -24 *********
- -23 *************
- -22 ******************
- -21 ***********************
- -20 ******************************
- -19 *************************************
- -18 ********************************************
- -17 ****************************************************
- -16 ***********************************************************
- -15 *****************************************************************
- -14 *********************************************************************
- -13 ************************************************************************
- -12 *************************************************************************
- -11 ************************************************************************
- -10 *********************************************************************
-  -9 *****************************************************************
-  -8 ***********************************************************
-  -7 ****************************************************
-  -6 ********************************************
-  -5 *************************************
-  -4 ******************************
-  -3 ***********************
-  -2 ******************
-  -1 *************
-   0 *********
-   1 *******
-   2 ****
-   3 ***
-   4 **
-   5 *
 ```

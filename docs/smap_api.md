@@ -85,7 +85,6 @@ smap_X_result   smap_X_put(smap_X* self, i_keyraw rkey, i_valraw rmapped);      
 
 smap_X_result   smap_X_emplace(smap_X* self, i_keyraw rkey, i_valraw rmapped);           // no change if rkey in map
 smap_X_result   smap_X_emplace_or_assign(smap_X* self, i_keyraw rkey, i_valraw rmapped); // always update rmapped
-smap_X_result   smap_X_emplace_key(smap_X* self, i_keyraw rkey);    // if key not in map, mapped is left unassigned
 
 int             smap_X_erase(smap_X* self, i_keyraw rkey);
 smap_X_iter     smap_X_erase_at(smap_X* self, smap_X_iter it);                           // returns iter after it

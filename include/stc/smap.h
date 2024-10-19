@@ -170,13 +170,6 @@ STC_API _m_result _c_MEMB(_insert_entry_)(Self* self, _m_keyraw rkey);
     STC_API _m_result _c_MEMB(_insert_or_assign)(Self* self, _m_key key, _m_mapped mapped);
     #ifndef i_no_emplace
     STC_API _m_result _c_MEMB(_emplace_or_assign)(Self* self, _m_keyraw rkey, _m_rmapped rmapped);
-
-    STC_INLINE _m_result _c_MEMB(_emplace_key)(Self* self, _m_keyraw rkey) {
-        _m_result res = _c_MEMB(_insert_entry_)(self, rkey);
-        if (res.inserted)
-            res.ref->first = i_keyfrom(rkey);
-        return res;
-    }
     #endif
 
     STC_INLINE const _m_mapped* _c_MEMB(_at)(const Self* self, _m_keyraw rkey)

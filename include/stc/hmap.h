@@ -165,15 +165,6 @@ _c_MEMB(_insert_entry_)(Self* self, _m_keyraw rkey) {
         }
         return _res;
     }
-
-    #ifdef _i_is_map
-    STC_INLINE _m_result _c_MEMB(_emplace_key)(Self* self, _m_keyraw rkey) {
-        _m_result _res = _c_MEMB(_insert_entry_)(self, rkey);
-        if (_res.inserted)
-            _res.ref->first = i_keyfrom(rkey);
-        return _res;
-    }
-    #endif // _i_is_map
 #endif // !i_no_emplace
 
 STC_INLINE _m_raw _c_MEMB(_value_toraw)(const _m_value* val) {
