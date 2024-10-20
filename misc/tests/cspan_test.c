@@ -72,6 +72,32 @@ TEST(cspan, slice2) {
     }
 }
 
+TEST(cspan, equality) {
+    Span base = c_init(Span, {
+        3, 1, 2, 3, 1,
+        2, 4, 5, 6, 2,
+        1, 7, 8, 9, 3,
+        1, 3, 1, 2, 3,
+        2, 2, 4, 5, 6,
+        3, 1, 7, 8, 9,
+    });
+    Span2 base2 = cspan_md(base.data, 6, 5);
+
+    Span test = c_init(Span, {
+        1, 2, 3,
+        4, 5, 6,
+        7, 8, 9,
+    });
+    Span2 test2 = cspan_md(test.data, 3, 3);
+
+    //puts(""); cspan_print(Span2, cspan_slice(Span2, &base2, {0, 3}, {1, 4}), "%d");
+
+    EXPECT_TRUE(Span2_equals(test2, cspan_slice(Span2, &base2, {0, 3}, {1, 4})));
+
+    EXPECT_TRUE(Span2_equals(cspan_slice(Span2, &base2, {0, 3}, {0, 4}),
+                             cspan_slice(Span2, &base2, {3, 6}, {1, 5})));
+}
+
 
 #define i_type Tiles,Span3
 #include "stc/stack.h"
