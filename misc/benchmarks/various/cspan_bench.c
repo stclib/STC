@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <time.h>
 
-using_cspan3(MD, double);
+using_cspan(MD3, double, 3);
 
 // define the dimensions of a 3d-array
 enum {
