@@ -111,6 +111,8 @@ typedef isize _isize_triple[3];
         it->ref += _cspan_next##RANK(it->pos, it->_s->shape, it->_s->stride.d, RANK, &done); \
         if (done) it->ref = NULL; \
     } \
+    STC_INLINE Self Self##_transpose(Self sp) \
+        { _cspan_transpose(sp.shape, sp.stride.d, cspan_rank(&sp)); return sp; } \
     struct stc_nostruct
 
 #define using_cspan_4(Self, T, RANK, i_eq) \
@@ -191,12 +193,6 @@ typedef enum {c_ROWMAJOR, c_COLMAJOR} cspan_layout;
              _cspan_shape2stride(layout, c_make_array(_istride, {__VA_ARGS__}), c_NUMARGS(__VA_ARGS__))}
 
 // Transpose and swap axes
-//
-#define cspan_transposed2(self) \
-    {.data=(self)->data + c_static_assert(cspan_rank(self) == 2), \
-     .shape={(self)->shape[1], (self)->shape[0]}, \
-     .stride=(cspan_tuple2){.d={(self)->stride.d[1], (self)->stride.d[0]}}}
-
 #define cspan_transpose(self) \
     _cspan_transpose((self)->shape, (self)->stride.d, cspan_rank(self))
 

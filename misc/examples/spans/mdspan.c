@@ -2,7 +2,8 @@
 #include <stdlib.h>
 #include "stc/cspan.h"
 
-using_cspan3(DSpan, double);
+using_cspan(DSpan2, double, 2);
+using_cspan(DSpan3, double, 3);
 
 int main(void) {
     const int nx=3, ny=4, nz=5;
