@@ -228,7 +228,7 @@ FMT_DEF void _fmt_sprint(fmt_stream* ss, const char* fmt, ...) {
         ss->cap = ss->len + ss->cap/2;
         ss->data = (char*)realloc(ss->data, (size_t)ss->cap + 1U);
     }
-    vsprintf(ss->data + pos, fmt, args2);
+    vsnprintf(ss->data + pos, (size_t)n, fmt, args2);
     done2: va_end(args2);
     done1: va_end(args);
 }
