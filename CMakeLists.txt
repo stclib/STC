@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.12)
-
 project(stclib)
+#[===[
 add_library(stcinc INTERFACE)
 #target_include_directories(stcinc INTERFACE include)
 
@@ -42,3 +42,4 @@ if (BUILD_TESTING)
 	# endforeach()
 endif()
 
+]===]
