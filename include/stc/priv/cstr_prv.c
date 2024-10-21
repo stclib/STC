@@ -190,7 +190,7 @@ static isize cstr_vfmt(cstr* self, isize start, const char* fmt, va_list args) {
     va_list args2;
     va_copy(args2, args);
     const int n = vsnprintf(NULL, 0ULL, fmt, args);
-    vsnprintf(cstr_reserve(self, start + n) + start, (size_t)n, fmt, args2);
+    vsnprintf(cstr_reserve(self, start + n) + start, (size_t)n+1, fmt, args2);
     va_end(args2);
     _cstr_set_size(self, start + n);
     return n;

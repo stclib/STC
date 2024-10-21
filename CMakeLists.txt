@@ -14,7 +14,6 @@ if (UNIX)
 endif()
 
 
-#[[
 include(CTest)
 
 if (BUILD_TESTING)
@@ -22,7 +21,6 @@ if (BUILD_TESTING)
 	foreach (file IN LISTS examples)
 		get_filename_component(name "${file}" NAME_WE)
 		add_executable(${name} ${file})
-		#target_compile_options(${name} PRIVATE "-pthread")
 		target_compile_options(${name} PRIVATE "-DSTC_STATIC")
 		if (CMAKE_THREAD_LIBS_INIT)
 			target_link_libraries(${name} PRIVATE "${CMAKE_THREAD_LIBS_INIT}")
@@ -42,4 +40,4 @@ if (BUILD_TESTING)
 	#	add_test(NAME ${name} COMMAND ${name})
 	# endforeach()
 endif()
-]]
+
