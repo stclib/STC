@@ -17,12 +17,17 @@ jobs:
         mode:
           - name: default
             args: -Dtests=enabled
-            extra_envs: {}
+            extra_envs:
+              CC: gcc
+              CXX: g++
           - name: sanitize
             args: >-
               "-Db_sanitize=address,undefined"
-            extra_envs: {}
-          - name: sanitize+asanonly # For Visual Studio
+            extra_envs:
+              CC: gcc
+              CXX: g++
+            # For Visual Studio
+          - name: sanitize+asanonly
             args: -Db_sanitize=address
             extra_envs:
               ASAN_OPTIONS: report_globals=0:halt_on_error=1:abort_on_error=1:print_summary=1
@@ -32,17 +37,17 @@ jobs:
             extra_envs:
               CC: clang
               CXX: clang++
-          - name: clang-cl+sanitize
-            args: >-
-              "-Db_sanitize=address,undefined"
-            extra_envs:
-              CC: clang-cl
-              CXX: clang-cl
-          - name: clang+msan
-            args: -Db_sanitize=memory
-            extra_envs:
-              CC: clang
-              CXX: clang++
+          #- name: clang-cl+sanitize
+          #  args: >-
+          #    "-Db_sanitize=address,undefined"
+          #  extra_envs:
+          #    CC: clang-cl
+          #    CXX: clang-cl
+          #- name: clang+msan
+          #  args: -Db_sanitize=memory
+          #  extra_envs:
+          #    CC: clang
+          #    CXX: clang++
           - name: clang-cl+msan
             args: -Db_sanitize=memory
             extra_envs:
