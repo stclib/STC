@@ -4,27 +4,29 @@
 This features an excellent 32- and 64-bit Pseudo Random Number Geneator (PRNG).
 See [random](https://en.cppreference.com/w/cpp/header/random) for similar c++ functionality.
 
-Several programming languages uses xoshiro256\*\* as the default PRNG. Let's compare crand64 against it.
+Several programming languages uses xoshiro256\*\* as the default PRNG. Let's compare.
 
 ### Comparison of crand64 with [xoshiro256\*\*](https://prng.di.unimi.it/)
 - **crand64** is based on **SFC64**, which along with **xoshiro256\*\*** both have excellent results
-from currently available random test-suites. **SFC64** has fairly short minimum period length of 2^64.
-- **crand64** uses a modified output function that incorporate a "stream" parameter value. This makes it suitable for mass-parallel deployment.
-- **crand64** can generate 2^63 unique streams, where each has 2^64 minimum period length. This is adequate even for large-scale
-experiments using random numbers.
-- **xoshiro256\*\*** has the full 2^256 period length. This is overkill, but it also has disadvantages:
+from currently available random test-suites. **SFC64** has a minimum period length of 2^64.
+- **crand64** uses a modified output function that incorporate a "stream" parameter value.
+  It can generate 2^63 unique streams, where each has 2^64 minimum period lengths. This is
+  adequate even for large-scale experiments using random numbers.
+- **xoshiro256\*\*** has the full 2^256 period length. This however has some disadvantages:
+    - Trivially predictable and invertible: previous outputs along with all future ones can trivially be computed from four
+      output samples.
     - Requires *jump-functions*, which the user must call in order to split up the output ranges before parallel execution.
-    - Generator may end up in "zeroland" or "oneland" states (nearly all bits 0s or 1s for multiple outputs in a row), and will
-generate low quality output. See [A Quick Look at Xoshiro256\*\*](https://www.pcg-random.org/posts/a-quick-look-at-xoshiro256.html).
-    - Trivial predictablity: previous outputs along with all future ones can trivially be computed from four output samples.
-- **crand64** does not need jump-functions. Instead, one can simply pass an odd unique id/number to each stream/thread as argument.
-- **crand64** is 10-20% faster than **xoshiro256\*\***. Unlike **xoshiro**, it does not require (fast hardware) multiplication support.
-- **crand64** has 256 bits state, 192 of them are "chaotic". 64 bits are used to ensure long minimum period lengths.
-- **crand64**'s output function result is fed back into the state, resulting in a chaotic random state.
-It combines XOR, SHIFT ***and*** ADD state modifying bit-operations to ensure excellent bit-mixing.
-- **xoshiro256\*\***'s output is not fed back into its state, instead every bit-state possible is visited in sequence, using a rule-based
-iterator with XOR and SHIFT bit-operations only. To compensate for the regularity in the state change between generated numbers,
-it uses a fairly expensive output function (but trivially invertible, see ref link) involving two multiplications.
+    - Overkill: Even to create "as few as" 2^64 random numbers in one thread at 1ns per number takes 584 years. 
+    - The generator may end up in "zeroland" or "oneland" states (nearly all bits 0s or 1s for multiple outputs in a row), and will
+      generate low quality output. See [A Quick Look at Xoshiro256\*\*](https://www.pcg-random.org/posts/a-quick-look-at-xoshiro256.html).
+- **crand64** does not need jump-functions. Instead one can simply pass a unique odd id/number to each stream/thread as argument.
+- **crand64** is 10-20% faster than **xoshiro256\*\***. Unlike **xoshiro**, it does not rely on fast hardware multiplication support.
+- **crand64** has a 256 bits state, 192 bits are "chaotic". 64 bits are used to ensure a long minimum period length. The output
+  function result is fed back into the state, resulting in the partially chaotic random state. It also combines XOR, SHIFT ***and ADD***
+  state modifying bit-operations to ensure excellent state randomness.
+- **xoshiro256\*\***'s output is not fed back into its state, instead every possible bit-state is iterated over by applying XOR and
+SHIFT bit-operations exclusively. Like with Mersenne Twister, the extreme period length has a cost: Because of the highly regulated
+state changes, a relative expensive output function with two multiplications is needed to achieve high quality output.
 
 ## Header file
 ```c
