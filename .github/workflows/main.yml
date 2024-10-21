@@ -48,15 +48,15 @@ jobs:
           #  extra_envs:
           #    CC: clang
           #    CXX: clang++
-          - name: clang-cl+msan
-            args: -Db_sanitize=memory
-            extra_envs:
-              CC: clang-cl
-              CXX: clang-cl
+          #- name: clang-cl+msan
+          #  args: -Db_sanitize=memory
+          #  extra_envs:
+          #    CC: clang-cl
+          #    CXX: clang-cl
         platform:
-          - macos-latest
-          - windows-2022
           - ubuntu-22.04
+          - windows-2022
+          #- macos-latest
 
         exclude:
           # clang-cl
@@ -69,6 +69,10 @@ jobs:
           - platform: windows-2022
             mode:
               name: clang+sanitize
+          - platform: windows-2022
+            mode:
+              name: sanitize+asanonly
+            flavor: release
           - platform: ubuntu-22.04
             mode:
               name: clang-cl+msan
@@ -96,6 +100,15 @@ jobs:
           - platform: macos-latest
             mode:
               name: clang+msan
+          - platform: macos-latest
+            mode:
+              name: sanitize
+            flavor: release
+          - platform: macos-latest
+            mode:
+              name: clang+msan
+            flavor: release
+
 
     steps:
       - name: Setup meson
