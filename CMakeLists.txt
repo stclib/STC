@@ -31,6 +31,7 @@ if (BUILD_TESTING)
 
 	file(GLOB test_files misc/tests/*_test.c)
 	add_executable(stctest ${test_files} misc/tests/main.c)
+	target_include_directories(stctest PRIVATE "include")
 	target_link_libraries(stctest PRIVATE stc m)
 	add_test(NAME stctest COMMAND stctest)
 
