@@ -5,10 +5,11 @@
 #include "stc/cstr.h"
 #include "stc/coroutine.h"
 
-cco_task_struct (next_value,
+cco_task_struct (next_value) {
+    next_value_state cco;
     int val;
     cco_timer tm;
-);
+};
 
 int next_value(struct next_value* co, cco_runtime* rt)
 {
@@ -33,16 +34,17 @@ void print_time(void)
 
 // PRODUCER
 
-cco_task_struct (produce_items,
+cco_task_struct (produce_items) {
+    produce_items_state cco;
     struct next_value next;
     cstr text;
-);
+};
 
 int produce_items(struct produce_items* p, cco_runtime* rt)
 {
     cco_scope (p) {
         p->text = cstr_init();
-        p->next.cco_func = next_value;
+        p->next.cco.func = next_value;
         while (true)
         {
             // await for next CCO_YIELD (or CCO_DONE) in next_value
@@ -62,15 +64,16 @@ int produce_items(struct produce_items* p, cco_runtime* rt)
 
 // CONSUMER
 
-cco_task_struct (consume_items,
-    int n, i;
+cco_task_struct (consume_items) {
+    consume_items_state cco;
     struct produce_items produce;
-);
+    int n, i;
+};
 
 int consume_items(struct consume_items* c, cco_runtime* rt)
 {
    cco_scope (c) {
-        c->produce.cco_func = produce_items;
+        c->produce.cco.func = produce_items;
 
         for (c->i = 1; c->i <= c->n; ++c->i)
         {
@@ -91,7 +94,7 @@ int consume_items(struct consume_items* c, cco_runtime* rt)
 int main(void)
 {
     struct consume_items consume = {
-        .cco_func = consume_items,
+        .cco = {consume_items},
         .n = 3,
     };
     cco_run_task(&consume);

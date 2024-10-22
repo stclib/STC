@@ -5,12 +5,13 @@
 #include "stc/cstr.h"
 #include "stc/coroutine.h"
 
-cco_task_struct(file_read,
+cco_task_struct (file_read) {
+    file_read_state cco;
     const char* path;
     cstr line;
     FILE* fp;
     cco_timer tm;
-);
+};
 
 
 int file_read(struct file_read* co, cco_runtime* rt)
@@ -38,17 +39,18 @@ int file_read(struct file_read* co, cco_runtime* rt)
 }
 
 
-cco_task_struct(count_line,
+cco_task_struct (count_line) {
+    count_line_state cco;
     cstr path;
     struct file_read reader;
     int lineCount;
-);
+};
 
 
 int count_line(struct count_line* co, cco_runtime* rt)
 {
     cco_scope (co) {
-        co->reader.cco_func = file_read;
+        co->reader.cco.func = file_read;
         co->reader.path = cstr_str(&co->path);
 
         while (true) {
@@ -71,7 +73,7 @@ int main(void)
 {
     // Creates a new task
     struct count_line countTask = {
-        .cco_func = count_line,
+        .cco = {count_line},
         .path = cstr_from(__FILE__),
     };
 

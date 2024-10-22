@@ -14,7 +14,7 @@ bool is_prime(long long i) {
 struct prime {
     int count;
     long long value;
-    int cco_state;
+    cco_state cco;
 };
 
 enum { YIELD_PRM = 1<<0, YIELD_FIB = 1<<1};
@@ -46,7 +46,7 @@ int prime(struct prime* g) {
 struct fibonacci {
     int count;
     long long value, b;
-    int cco_state;
+    cco_state cco;
 };
 
 int fibonacci(struct fibonacci* g) {
@@ -75,7 +75,7 @@ int fibonacci(struct fibonacci* g) {
 struct combined {
     struct prime prm;
     struct fibonacci fib;
-    int cco_state;
+    cco_state cco;
 };
 
 int sequenced(struct combined* g) {

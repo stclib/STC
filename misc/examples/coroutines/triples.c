@@ -21,7 +21,7 @@ void triples_vanilla(int max_c) {
 struct triples {
     int max_c;
     int a, b, c;
-    int cco_state;
+    cco_state cco;
 };
 
 int triples_coro(struct triples* t) {

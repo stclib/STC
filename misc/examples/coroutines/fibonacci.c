@@ -5,7 +5,7 @@
 
 struct fibonacci {
     unsigned long long value, b;
-    int cco_state;
+    cco_state cco;
 };
 
 int fibonacci(struct fibonacci* g) {

@@ -7,7 +7,7 @@
 struct GenValue {
     IVec *v;
     IVec_iter it;
-    int cco_state;
+    cco_state cco;
 };
 
 static long get_value(struct GenValue* g)
@@ -21,9 +21,9 @@ static long get_value(struct GenValue* g)
 
 struct Generator {
     struct GenValue x, y;
-    int cco_state;
     bool xact, yact;
     long value;
+    cco_state cco;
 };
 
 int interleaved(struct Generator* g)

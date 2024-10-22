@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include "stc/coroutine.h"
 
-#define i_type Tasks, struct cco_task*
+#define i_type Tasks, cco_task*
 #define i_keydrop(x) { puts("free task"); free(*x); }
 #define i_no_clone
 #include "stc/queue.h"
@@ -54,8 +54,8 @@ static int taskB(struct cco_task* task, cco_runtime* rt) {
 
 void Use(void) {
     Scheduler sched = {.tasks = c_init(Tasks, {
-        c_new(struct cco_task, {.cco_func=taskA}),
-        c_new(struct cco_task, {.cco_func=taskB}),
+        c_new(struct cco_task, {.cco={taskA}}),
+        c_new(struct cco_task, {.cco={taskB}}),
     })};
 
     Scheduler_run(&sched);

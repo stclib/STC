@@ -27,9 +27,9 @@
 #include "stc/coroutine.h"
 
 struct iterpair {
+    cco_state cco; // required member
     int max_x, max_y;
     int x, y;
-    int cco_state; // required member
 };
 
 int iterpair(struct iterpair* I) {
@@ -69,13 +69,17 @@ typedef enum {
     CCO_YIELD = 1<<30,
 } cco_result;
 
-#define cco_initial(co) ((co)->cco_state == CCO_STATE_INIT)
-#define cco_suspended(co) ((co)->cco_state > CCO_STATE_INIT)
-#define cco_done(co) ((co)->cco_state == CCO_STATE_DONE)
-#define cco_active(co) ((co)->cco_state != CCO_STATE_DONE)
+typedef struct {
+    int state;
+} cco_state;
+
+#define cco_initial(co) ((co)->cco.state == CCO_STATE_INIT)
+#define cco_suspended(co) ((co)->cco.state > CCO_STATE_INIT)
+#define cco_done(co) ((co)->cco.state == CCO_STATE_DONE)
+#define cco_active(co) ((co)->cco.state != CCO_STATE_DONE)
 
 #define cco_scope(co) \
-    for (int* _state = &(co)->cco_state; *_state != CCO_STATE_DONE; *_state = CCO_STATE_DONE) \
+    for (int* _state = &(co)->cco.state; *_state != CCO_STATE_DONE; *_state = CCO_STATE_DONE) \
         _resume: switch (*_state) case CCO_STATE_INIT: // thanks, @liigo!
 #define cco_routine cco_scope // [deprecated]
 
@@ -126,10 +130,10 @@ typedef enum {
     } while (0)
 
 #define cco_stop(co) \
-    ((co)->cco_state = (co)->cco_state >= CCO_STATE_INIT ? CCO_STATE_FINAL : CCO_STATE_DONE)
+    ((co)->cco.state = (co)->cco.state >= CCO_STATE_INIT ? CCO_STATE_FINAL : CCO_STATE_DONE)
 
 #define cco_reset(co) \
-    (void)((co)->cco_state = 0)
+    (void)((co)->cco.state = 0)
 
 
 /* ============ ADVANCED, OPTIONAL ============= */
@@ -150,18 +154,23 @@ typedef enum {
 	printf("%d ", *i.ref);
  */
 
-#define cco_iter_struct(Gen, ...) \
+#define cco_iter_struct(Gen) \
     typedef Gen Gen##_value; \
-    typedef struct Gen##_iter { \
-        Gen##_value* ref; \
-        int cco_state; \
-        __VA_ARGS__ \
-    } Gen##_iter
+    typedef struct Gen##_iter Gen##_iter; \
+    struct Gen##_iter
+
+#define cco_default_begin(Gen) \
+Gen##_iter Gen##_begin(Gen* g) { \
+    Gen##_iter it = {.ref = g}; \
+    Gen##_next(&it); \
+    return it; \
+} struct Gen##_iter
+
 
 /* Using c_filter with generators:
  */
-#define cco_flt_take(n) (c_flt_take(n), _base.done ? _it.cco_state = CCO_STATE_FINAL : 1)
-#define cco_flt_takewhile(pred) (c_flt_takewhile(pred), _base.done ? _it.cco_state = CCO_STATE_FINAL : 1)
+#define cco_flt_take(n) (c_flt_take(n), _base.done ? _it.cco.state = CCO_STATE_FINAL : 1)
+#define cco_flt_takewhile(pred) (c_flt_takewhile(pred), _base.done ? _it.cco.state = CCO_STATE_FINAL : 1)
 
 
 /*
@@ -170,14 +179,16 @@ typedef enum {
 
 struct cco_runtime;
 
-#define cco_task_struct(Task, ...) \
-    struct Task { \
-        int (*cco_func)(struct Task*, struct cco_runtime*); \
-        int cco_state, cco_expect; \
-        __VA_ARGS__ \
-    }
+#define cco_task_struct(Task) \
+    struct Task; \
+    typedef struct { \
+        int (*func)(struct Task*, struct cco_runtime*); \
+        int state, expect; \
+    } Task##_state; \
+    struct Task
 
-typedef cco_task_struct(cco_task, /**/) cco_task; /* Define base Task struct type */
+cco_task_struct(cco_task) { cco_task_state cco; }; /* Define base Task struct type */
+typedef struct cco_task cco_task;
 
 typedef struct cco_runtime {
     int result, top;
@@ -185,16 +196,16 @@ typedef struct cco_runtime {
 } cco_runtime;
 
 #define cco_cast_task(task) \
-    ((struct cco_task *)(task) + 0*sizeof((task)->cco_func(task, (cco_runtime*)0) + ((int*)0 == &(task)->cco_state)))
+    ((struct cco_task *)(task) + 0*sizeof((task)->cco.func(task, (cco_runtime*)0) + ((int*)0 == &(task)->cco.state)))
 
 #define cco_resume_task(task, rt) \
-    (task)->cco_func(task, rt)
+    (task)->cco.func(task, rt)
 
 #define cco_await_task(...) c_MACRO_OVERLOAD(cco_await_task, __VA_ARGS__)
 #define cco_await_task_2(task, rt) cco_await_task_3(task, rt, CCO_DONE)
 #define cco_await_task_3(task, rt, awaitbits) \
     do { \
-        ((rt)->stack[++(rt)->top] = cco_cast_task(task))->cco_expect = (awaitbits); \
+        ((rt)->stack[++(rt)->top] = cco_cast_task(task))->cco.expect = (awaitbits); \
         cco_yield_v(CCO_AWAIT); \
     } while (0)
 
@@ -203,7 +214,7 @@ typedef struct cco_runtime {
 #define cco_run_task_3(task, rt, STACKDEPTH) \
     for (struct { int result, top; struct cco_task* stack[STACKDEPTH]; } rt = {.stack={cco_cast_task(task)}}; \
          (((rt.result = cco_resume_task(rt.stack[rt.top], (cco_runtime*)&rt)) & \
-           ~rt.stack[rt.top]->cco_expect) || --rt.top >= 0); )
+           ~rt.stack[rt.top]->cco.expect) || --rt.top >= 0); )
 
 /*
  * Iterate containers with already defined iterator (prefer to use in coroutines only):

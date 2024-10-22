@@ -9,11 +9,13 @@ typedef struct {
     int a, b, c;
 } Triple;
 
-// Create an iterable generator over Triple with count items.
+// Create an iterable generator on an existing Triple type with count items.
 // Requires coroutine Triple_next() and function Triple_begin() to be defined.
-cco_iter_struct(Triple,
+cco_iter_struct (Triple) {
+    Triple_value* ref; // required by iterator
     int count;
-);
+    cco_state cco;     // required by coroutine
+};
 
 int Triple_next(Triple_iter* it) {
     Triple* g = it->ref; // note: before cco_scope

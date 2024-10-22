@@ -73,8 +73,8 @@ cancelled (not resumed until they are done).
 
 A coroutine function may have almost any signature, but the implementation adds support for
 coroutines which returns an int, indicating CCO_DONE, CCO_AWAIT, or CCO_YIELD. It should also
-take a struct pointer as parameter which must contains the member `int cco_state`. The struct should
-normally store all *local* variables to be used within the coroutine, along with *input* and *output* data
+take a struct pointer as parameter which must contains the member `cco_state cco;`. The struct should
+store all *local* variables to be used within the coroutine, along with *input* and *output* data
 for the coroutine.
 
 Note that this implementation is not limited to support a certain set of coroutine types,
@@ -83,7 +83,7 @@ yield or await from a (deeply) nested coroutine call using cco_task objects desc
 
 The first example is a generator of Pythagorian triples, and stops when diagonal size > max_c.
 
-[ [Run this code](https://godbolt.org/z/cP1dWKvM3) ]
+[ [Run this code](https://godbolt.org/z/r7h3K3e5j) ]
 ```c
 // https://quuxplusone.github.io/blog/2019/03/06/pythagorean-triples/
 #include <stdio.h>
@@ -92,7 +92,7 @@ The first example is a generator of Pythagorian triples, and stops when diagonal
 struct triples {
     int max_c;     // input: max c.
     int a, b, c;   // output
-    int cco_state; // required member
+    cco_state cco; // required member
 };
 
 int triples(struct triples* i) {
@@ -130,7 +130,7 @@ The next variant skips the triples which are upscaled version of smaller ones by
 the gcd() function. Note that the gcd1_triples struct contains the triples struct so that
 both functions have separate call frames:
 
-[ [Run this code](https://godbolt.org/z/14a1YM9fd) ]
+[ [Run this code](https://godbolt.org/z/afPsf5xsn) ]
 ```c
 int gcd(int a, int b) { // greatest common denominator
     while (b) {
@@ -143,8 +143,8 @@ int gcd(int a, int b) { // greatest common denominator
 
 struct gcd1_triples {
     int max_n, max_c, count; // input: max_n, max_c limit #triples to be generated.
-    struct triples tri;    // triples call frame
-    int cco_state;
+    struct triples tri;      // triples call frame
+    cco_state cco;           // required
 };
 
 int gcd1_triples(struct gcd1_triples* i)
@@ -206,10 +206,11 @@ by awaiting a few seconds before producing a number, using a timer.
 #include "stc/cstr.h"
 #include "stc/coroutine.h"
 
-cco_task_struct (next_value,
+cco_task_struct (next_value) {
+    next_value_state cco;
     int val;
     cco_timer tm;
-);
+};
 
 int next_value(struct next_value* co, cco_runtime* rt)
 {
@@ -232,16 +233,17 @@ void print_time()
 }
 
 // PRODUCER
-cco_task_struct (produce_items,
+cco_task_struct (produce_items) {
+    produce_items_state cco;
     struct next_value next;
     cstr text;
-);
+};
 
 int produce_items(struct produce_items* p, cco_runtime* rt)
 {
     cco_scope (p) {
         p->text = cstr_init();
-        p->next.cco_func = next_value;
+        p->next.cco.func = next_value;
         while (true)
         {
             // await for CCO_YIELD (or CCO_DONE)
@@ -259,15 +261,16 @@ int produce_items(struct produce_items* p, cco_runtime* rt)
 }
 
 // CONSUMER
-cco_task_struct (consume_items,
+cco_task_struct (consume_items) {
+    consume_items_state cco;
     int n, i;
     struct produce_items produce;
-);
+};
 
 int consume_items(struct consume_items* c, cco_runtime* rt)
 {
    cco_scope (c) {
-        c->produce.cco_func = produce_items;
+        c->produce.cco.func = produce_items;
 
         for (c->i = 1; c->i <= c->n; ++c->i)
         {
@@ -287,8 +290,8 @@ int consume_items(struct consume_items* c, cco_runtime* rt)
 int main(void)
 {
     struct consume_items consume = {
+        .cco = {consume_items},
         .n = 5,
-        .cco_func = consume_items,
     };
     cco_run_task(&consume);
 }

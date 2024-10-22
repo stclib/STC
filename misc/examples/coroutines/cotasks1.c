@@ -7,8 +7,8 @@
 
 struct next_value {
     int val;
-    int cco_state;
     cco_timer tm;
+    cco_state cco;
 };
 
 int next_value(struct next_value* co)
@@ -36,7 +36,7 @@ void print_time(void)
 struct produce_items {
     struct next_value next;
     cstr text;
-    int cco_state;
+    cco_state cco;
 };
 
 int produce_items(struct produce_items* p)
@@ -62,7 +62,7 @@ int produce_items(struct produce_items* p)
 
 struct consume_items {
     int n, i;
-    int cco_state;
+    cco_state cco;
 };
 
 int consume_items(struct consume_items* c, struct produce_items* p)

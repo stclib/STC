@@ -15,14 +15,14 @@ struct Philosopher {
     cco_timer tm;
     cco_semaphore* left_fork;
     cco_semaphore* right_fork;
-    int cco_state; // required
+    cco_state cco; // required
 };
 
 struct Dining {
     // Define semaphores for the forks
     cco_semaphore forks[num_forks];
     struct Philosopher ph[num_philosophers];
-    int cco_state; // required
+    cco_state cco; // required
 };
 
 

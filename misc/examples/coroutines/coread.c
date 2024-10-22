@@ -7,9 +7,9 @@
 
 struct file_read {
     const char* filename;
-    int cco_state;
     FILE* fp;
     cstr line;
+    cco_state cco;
 };
 
 int file_read(struct file_read* g)
@@ -31,7 +31,7 @@ int file_read(struct file_read* g)
 
 int main(void)
 {
-    struct file_read g = {__FILE__};
+    struct file_read g = {.filename=__FILE__};
     int n = 0;
     cco_run_coroutine(file_read(&g))
     {
