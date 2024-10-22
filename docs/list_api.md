@@ -38,6 +38,7 @@ See the c++ class [std::list](https://en.cppreference.com/w/cpp/container/list) 
 #define i_eq <fn>        // equality comparison. Implicitly defined with i_cmp, but not i_less.
 
 #define i_keyraw <t>     // convertion "raw" type (default: {i_key})
+#define i_rawclass <t>   // convertion "raw class". binds <t>_cmp(),  <t>_eq(),  <t>_hash()
 #define i_keytoraw <fn>  // convertion func i_key* => i_keyraw
 #define i_keyfrom <fn>   // convertion func i_keyraw => i_key
 #include "stc/list.h"
