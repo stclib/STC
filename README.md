@@ -404,9 +404,9 @@ following parameters, but the user may override them when needed. E.g. defining 
 as function macros instead of referring to C function names.
 - Key-meta parameters:
     - `i_rawclass` *RawType* - Defines ***i_keyraw*** and binds *RawType_cmp()*, *RawType_eq()*, *RawType_hash()* to
-    their associated template key parameters. It is still required to define ***i_use_cmp*** to enable searching/sorting
-    on sequence types (stack, vec, deque, list). Useful for containers of views (like csview).
+    their associated template key parameters.
         - If neither ***i_key*** nor ***i_keyclass*** are defined, ***i_key*** will be defined as *RawType*.
+        - Useful for containers of views (like csview).
     - `i_keyclass` *KeyType* - Defines ***i_key*** and binds standard named functions *KeyType_clone()* and
     *KeyType_drop()* to ***i_keyclone*** and ***i_keydrop***.
         - Use with container of containers, or in general when the element type has *_clone()* and *_drop()* "member" functions.
