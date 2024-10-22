@@ -69,6 +69,7 @@ int main(void) {
 #ifndef _i_prefix
   #define _i_prefix box_
 #endif
+#define _i_is_box
 #include "priv/template.h"
 typedef i_keyraw _m_raw;
 
@@ -159,6 +160,6 @@ STC_INLINE void _c_MEMB(_assign)(Self* self, Self* moved) {
     STC_INLINE size_t _c_MEMB(_raw_hash)(const _m_raw* rx)
         { return i_hash(rx); }
 #endif // i_no_hash
-
+#undef _i_is_box
 #include "priv/linkage2.h"
 #include "priv/template2.h"

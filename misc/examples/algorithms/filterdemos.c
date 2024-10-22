@@ -75,6 +75,7 @@ fn main() {
 */
 #define i_type SVec
 #define i_rawclass csview // set both key+keyraw = csview. Bind comparison functions.
+#define i_use_cmp
 #include "stc/vec.h"
 
 void demo3(void)

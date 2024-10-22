@@ -84,8 +84,10 @@
 #endif
 
 #if defined i_rawclass
-  #define i_use_cmp
-  #define i_use_eq
+  #if defined _i_is_arc || defined _i_is_box
+    #define i_use_cmp
+    #define i_use_eq
+  #endif
   #if !(defined i_key || defined i_keyclass)
     #define i_key i_rawclass
     #define i_keytoraw c_default_toraw
