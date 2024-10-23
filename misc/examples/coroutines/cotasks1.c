@@ -51,7 +51,7 @@ int produce_items(struct produce_items* p)
             printf("produced %s\n", cstr_str(&p->text));
             cco_yield;
         }
-        cco_final:
+        cco_cleanup:
             cstr_drop(&p->text);
             puts("done produce");
     }
@@ -75,7 +75,7 @@ int consume_items(struct consume_items* c, struct produce_items* p)
             print_time();
             printf("consumed %s\n", cstr_str(&p->text));
         }
-        cco_final:
+        cco_cleanup:
         puts("done consume");
     }
     return 0;

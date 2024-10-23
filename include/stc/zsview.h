@@ -42,7 +42,7 @@ STC_INLINE zsview   zsview_from(const char* str)
 STC_INLINE void     zsview_clear(zsview* self) { *self = c_zv(""); }
 STC_INLINE csview   zsview_sv(zsview zs) { return c_sv_2(zs.str, zs.size); }
 
-STC_INLINE isize zsview_size(zsview zs) { return zs.size; }
+STC_INLINE isize    zsview_size(zsview zs) { return zs.size; }
 STC_INLINE bool     zsview_is_empty(zsview zs) { return zs.size == 0; }
 
 STC_INLINE bool zsview_equals(zsview zs, const char* str) {

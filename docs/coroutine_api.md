@@ -16,7 +16,7 @@ NB! ***cco_yield\*()*** / ***cco_await\*()*** may not be called from within a `s
 |           |  Function / operator                 | Description                             |
 |:----------|:-------------------------------------|:----------------------------------------|
 |`cco_result` | `CCO_DONE`, `CCO_AWAIT`, `CCO_YIELD` | Default set of return values from coroutines |
-|           | `cco_final:`                         | Label for cleanup position in coroutine |
+|           | `cco_cleanup:`                       | Label for cleanup position in coroutine |
 | `bool`    | `cco_done(co)`                       | Is coroutine done?                      |
 |           | `cco_scope(co) {}`                   | The coroutine scope                     |
 |           | `cco_yield;`                         | Yield/suspend execution (return CCO_YIELD)|
@@ -105,13 +105,13 @@ int triples(struct triples* i) {
                         (int64_t)i->c * i->c)
                     {
                         if (i->c > i->max_c)
-                            cco_return; // "jump" to cco_final if defined, else exit scope.
+                            cco_return; // "jump" to cco_cleanup if defined, else exit scope.
                         cco_yield;
                     }
                 }
             }
         }
-        cco_final:
+        cco_cleanup:
         puts("done");
     }
     return 0; // CCO_DONE
@@ -164,7 +164,7 @@ int gcd1_triples(struct gcd1_triples* i)
             else
                 cco_yield;
         }
-        cco_final:
+        cco_cleanup:
         cco_stop(&i->tri); // to cleanup state if still active
         triples(&i->tri);  // do cleanup (or no-op if done)
     }
@@ -207,7 +207,7 @@ by awaiting a few seconds before producing a number, using a timer.
 #include "stc/coroutine.h"
 
 cco_task_struct (next_value) {
-    next_value_state cco;
+    next_value_state cco; // must be first member!
     int val;
     cco_timer tm;
 };
@@ -253,7 +253,7 @@ int produce_items(struct produce_items* p, cco_runtime* rt)
             printf("produced %s\n", cstr_str(&p->text));
             cco_yield;
         }
-        cco_final:
+        cco_cleanup:
         cstr_drop(&p->text);
         puts("done produce");
     }
@@ -279,7 +279,7 @@ int consume_items(struct consume_items* c, cco_runtime* rt)
             print_time();
             printf("consumed %s\n", cstr_str(&c->produce.text));
         }
-        cco_final:
+        cco_cleanup:
         cco_stop(&c->produce);
         cco_resume_task(&c->produce, rt);
         puts("done consume");
