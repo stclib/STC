@@ -177,7 +177,7 @@ _c_MEMB(_reserve)(Self* self, const isize n) {
         return true;
     isize oldpow2 = self->capmask + 1, newpow2 = c_next_pow2(n + 1);
     _m_value* d = (_m_value *)i_realloc(self->cbuf, oldpow2*c_sizeof *d, newpow2*c_sizeof *d);
-    if (!d)
+    if (d == NULL)
         return false;
     isize head = oldpow2 - self->start;
     if (self->start <= self->end)
@@ -213,7 +213,7 @@ _c_MEMB(_shrink_to_fit)(Self *self) {
     if (sz > self->capmask/2)
         return;
     Self out = _c_MEMB(_with_capacity)(sz);
-    if (!out.cbuf)
+    if (out.cbuf == NULL)
         return;
     c_foreach (i, Self, *self)
         out.cbuf[j++] = *i.ref;

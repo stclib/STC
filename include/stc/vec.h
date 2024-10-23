@@ -193,22 +193,25 @@ STC_INLINE _m_value* _c_MEMB(_at_mut)(Self* self, const isize idx) {
     c_assert(idx < self->size); return self->data + idx;
 }
 
+// iteration
 
 STC_INLINE _m_iter _c_MEMB(_begin)(const Self* self) {
-    isize n = self->size;
-    return c_literal(_m_iter){n ? self->data : NULL, self->data + n};
+    _m_iter it = {(_m_value*)self->data, (_m_value*)self->data};
+    if (it.ref != NULL) it.end += self->size;
+    return it;
 }
 
 STC_INLINE _m_iter _c_MEMB(_rbegin)(const Self* self) {
-    isize n = self->size;
-    return c_literal(_m_iter){n ? self->data + n - 1 : NULL, self->data - 1};
+    _m_iter it = {(_m_value*)self->data, (_m_value*)self->data};
+    if (it.ref != NULL) { it.ref += self->size - 1; it.end -= 1; }
+    return it;
 }
 
 STC_INLINE _m_iter _c_MEMB(_end)(const Self* self)
-    { (void)self; return c_literal(_m_iter){0}; }
+    { (void)self; _m_iter it = {0}; return it; }
 
 STC_INLINE _m_iter _c_MEMB(_rend)(const Self* self)
-    { (void)self; return c_literal(_m_iter){0}; }
+    { (void)self; _m_iter it = {0}; return it; }
 
 STC_INLINE void _c_MEMB(_next)(_m_iter* it)
     { if (++it->ref == it->end) it->ref = NULL; }
@@ -277,7 +280,7 @@ _c_MEMB(_reserve)(Self* self, const isize cap) {
     if (cap > self->capacity || (cap && cap == self->size)) {
         _m_value* d = (_m_value*)i_realloc(self->data, self->capacity*c_sizeof *d,
                                            cap*c_sizeof *d);
-        if (!d)
+        if (d == NULL)
             return false;
         self->data = d;
         self->capacity = cap;

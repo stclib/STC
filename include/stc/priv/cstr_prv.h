@@ -223,22 +223,22 @@ STC_INLINE csview cstr_u8_chr(const cstr* self, isize u8pos) {
 
 STC_INLINE cstr_iter cstr_begin(const cstr* self) {
     csview sv = cstr_sv(self);
-    if (!sv.size) return c_literal(cstr_iter){.ref = NULL};
-    return c_literal(cstr_iter){.chr = {sv.buf, utf8_chr_size(sv.buf)}};
+    cstr_iter it = {.chr = {sv.buf, utf8_chr_size(sv.buf)}};
+    return it;
 }
 STC_INLINE cstr_iter cstr_end(const cstr* self) {
-    (void)self; return c_literal(cstr_iter){NULL};
+    (void)self; cstr_iter it = {0}; return it;
 }
 STC_INLINE void cstr_next(cstr_iter* it) {
     it->ref += it->chr.size;
     it->chr.size = utf8_chr_size(it->ref);
-    if (!*it->ref) it->ref = NULL;
+    if (*it->ref == '\0') it->ref = NULL;
 }
 
 STC_INLINE cstr_iter cstr_advance(cstr_iter it, isize u8pos) {
     it.ref = c_const_cast(char *, utf8_offset(it.ref, u8pos));
     it.chr.size = utf8_chr_size(it.ref);
-    if (!*it.ref) it.ref = NULL;
+    if (*it.ref == '\0') it.ref = NULL;
     return it;
 }
 

@@ -121,23 +121,23 @@ STC_INLINE bool zsview_u8_valid(zsview zs) // requires linking with utf8 symbols
 /* utf8 iterator */
 
 STC_INLINE zsview_iter zsview_begin(const zsview* self) {
-    return c_literal(zsview_iter){.chr = {self->str, utf8_chr_size(self->str)}};
+    zsview_iter it = {.chr = {self->str, utf8_chr_size(self->str)}}; return it;
 }
 
 STC_INLINE zsview_iter zsview_end(const zsview* self) {
-    (void)self; return c_literal(zsview_iter){.ref = NULL};
+    (void)self; zsview_iter it = {0}; return it;
 }
 
 STC_INLINE void zsview_next(zsview_iter* it) {
     it->ref += it->chr.size;
     it->chr.size = utf8_chr_size(it->ref);
-    if (!*it->ref) it->ref = NULL;
+    if (*it->ref == '\0') it->ref = NULL;
 }
 
 STC_INLINE zsview_iter zsview_advance(zsview_iter it, isize u8pos) {
     it.ref = c_const_cast(char *, utf8_offset(it.ref, u8pos));
     it.chr.size = utf8_chr_size(it.ref);
-    if (!*it.ref) it.ref = NULL;
+    if (*it.ref == '\0') it.ref = NULL;
     return it;
 }
 

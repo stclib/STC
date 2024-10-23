@@ -642,7 +642,7 @@ _lexasciiclass(_Parser *par, _Rune *rp) /* assume *rp == '[' and *par->exprp == 
     };
     int inv = par->exprp[1] == '^', off = 1 + inv;
     for (unsigned i = 0; i < (sizeof cls/sizeof *cls); ++i)
-        if (!strncmp(par->exprp + off, cls[i].c, (size_t)cls[i].n)) {
+        if (strncmp(par->exprp + off, cls[i].c, (size_t)cls[i].n) == 0) {
             *rp = (_Rune)cls[i].r;
             par->exprp += off + cls[i].n;
             break;
@@ -685,7 +685,7 @@ _lexutfclass(_Parser *par, _Rune *rp)
     };
     unsigned inv = (*rp == 'P');
     for (unsigned i = 0; i < (sizeof cls/sizeof *cls); ++i) {
-        if (!strncmp(par->exprp, cls[i].c, (size_t)cls[i].n)) {
+        if (strncmp(par->exprp, cls[i].c, (size_t)cls[i].n) == 0) {
             if (par->rune_type == TOK_IRUNE && (cls[i].r == UTF_ll || cls[i].r == UTF_lu))
                 *rp = (_Rune)(UTF_lc + inv);
             else
@@ -868,7 +868,7 @@ _regcomp1(_Reprog *pp, _Parser *par, const char *s, int cflags)
     isize instcap = 5 + 6*c_strlen(s);
     isize new_allocsize = c_sizeof(_Reprog) + instcap*c_sizeof(_Reinst);
     pp = (_Reprog *)i_realloc(pp, pp ? pp->allocsize : 0, new_allocsize);
-    if (! pp) {
+    if (pp == NULL) {
         par->error = CREG_OUTOFMEMORY;
         return NULL;
     }

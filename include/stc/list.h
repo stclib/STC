@@ -160,7 +160,7 @@ STC_INLINE void         _c_MEMB(_value_drop)(_m_value* pval) { i_keydrop(pval); 
 STC_INLINE isize
 _c_MEMB(_count)(const Self* self) {
     isize n = 1; const _m_node *node = self->last;
-    if (!node) return 0;
+    if (node == NULL) return 0;
     while ((node = node->next) != self->last) ++n;
     return n;
 }
@@ -250,7 +250,7 @@ _c_MEMB(_push_back)(Self* self, _m_value value) {
 STC_DEF _m_value*
 _c_MEMB(_push_front)(Self* self, _m_value value) {
     _c_list_insert_entry_after(self->last, value);
-    if (!self->last)
+    if (self->last == NULL)
         self->last = entry;
     return &entry->value;
 }
@@ -265,7 +265,7 @@ _c_MEMB(_push_back_node)(Self* self, _m_node* node) {
 STC_DEF _m_value*
 _c_MEMB(_insert_after_node)(Self* self, _m_node* ref, _m_node* node) {
     _c_list_insert_after_node(ref, node);
-    if (!self->last)
+    if (self->last == NULL)
         self->last = node;
     return &node->value;
 }
@@ -274,7 +274,7 @@ STC_DEF _m_iter
 _c_MEMB(_insert_at)(Self* self, _m_iter it, _m_value value) {
     _m_node* node = it.ref ? it.prev : self->last;
     _c_list_insert_entry_after(node, value);
-    if (!self->last || !it.ref) {
+    if (self->last == NULL || it.ref == NULL) {
         it.prev = self->last ? self->last : entry;
         self->last = entry;
     }
@@ -295,7 +295,7 @@ _c_MEMB(_erase_range)(Self* self, _m_iter it1, _m_iter it2) {
     _m_node *end = it2.ref ? _clist_tonode(it2.ref) : self->last->next;
     if (it1.ref != it2.ref) do {
         _c_MEMB(_erase_after_node)(self, it1.prev);
-        if (!self->last) break;
+        if (self->last == NULL) break;
     } while (it1.prev->next != end);
     return it2;
 }
@@ -330,14 +330,14 @@ _c_MEMB(_reverse)(Self* self) {
 
 STC_DEF _m_iter
 _c_MEMB(_splice)(Self* self, _m_iter it, Self* other) {
-    if (!self->last)
+    if (self->last == NULL)
         self->last = other->last;
     else if (other->last) {
         _m_node *p = it.ref ? it.prev : self->last, *next = p->next;
         it.prev = other->last;
         p->next = it.prev->next;
         it.prev->next = next;
-        if (!it.ref) self->last = it.prev;
+        if (it.ref == NULL) self->last = it.prev;
     }
     other->last = NULL;
     return it;
@@ -378,7 +378,7 @@ _c_MEMB(_remove)(Self* self, _m_raw val) {
         _m_raw r = i_keytoraw((&node->value));
         if (i_eq((&r), (&val))) {
             _c_MEMB(_erase_after_node)(self, prev), ++n;
-            if (!self->last) break;
+            if (self->last == NULL) break;
         } else
             prev = node;
     } while (node != self->last);
@@ -396,7 +396,7 @@ STC_DEF bool _c_MEMB(_sort)(Self* self) {
     c_foreach (i, Self, *self) {
         if (len == cap) {
             isize cap_n = cap + cap/2 + 8;
-            if (!(p = (_m_value *)i_realloc(arr, cap*c_sizeof *p, cap_n*c_sizeof *p)))
+            if ((p = (_m_value *)i_realloc(arr, cap*c_sizeof *p, cap_n*c_sizeof *p)) == NULL)
                 goto done;
             arr = p, cap = cap_n;
         }

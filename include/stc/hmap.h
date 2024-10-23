@@ -238,7 +238,7 @@ STC_INLINE _m_iter _c_MEMB(_advance)(_m_iter it, size_t n) {
 STC_INLINE _m_iter
 _c_MEMB(_find)(const Self* self, _m_keyraw rkey) {
     _m_value* ref;
-    if (self->size && (ref = _c_MEMB(_bucket_lookup_)(self, &rkey).ref))
+    if (self->size != 0 && (ref = _c_MEMB(_bucket_lookup_)(self, &rkey).ref) != NULL)
         return c_literal(_m_iter){ref,
                                   &self->table[self->bucket_count],
                                   &self->meta[ref - self->table]};
@@ -257,7 +257,7 @@ _c_MEMB(_get_mut)(Self* self, _m_keyraw rkey)
 STC_INLINE int
 _c_MEMB(_erase)(Self* self, _m_keyraw rkey) {
     _m_value* ref;
-    if (self->size && (ref = _c_MEMB(_bucket_lookup_)(self, &rkey).ref))
+    if (self->size != 0 && (ref = _c_MEMB(_bucket_lookup_)(self, &rkey).ref) != NULL)
         { _c_MEMB(_erase_entry)(self, ref); return 1; }
     return 0;
 }
@@ -284,10 +284,11 @@ _c_MEMB(_eq)(const Self* self, const Self* other) {
 #if defined(i_implement) || defined(i_static)
 
 STC_DEF _m_iter _c_MEMB(_begin)(const Self* self) {
-    _m_iter it = {self->table, self->table+self->bucket_count, self->meta};
-    if (it._mref)
-        while (it._mref->dist == 0)
-            ++it.ref, ++it._mref;
+    _m_iter it = {self->table, self->table, self->meta};
+    if (it.ref == NULL) return it;
+    it._end += self->bucket_count;
+    while (it._mref->dist == 0)
+        ++it.ref, ++it._mref;
     if (it.ref == it._end) it.ref = NULL;
     return it;
 }
@@ -351,7 +352,7 @@ STC_DEF void _c_MEMB(_clear)(Self* self) {
         if (_res.inserted)
             _res.ref->first = i_keyfrom(rkey);
         else {
-            if (!_res.ref) return _res;
+            if (_res.ref == NULL) return _res;
             i_valdrop((&_res.ref->second));
         }
         _res.ref->second = i_valfrom(rmapped);
@@ -416,19 +417,19 @@ _c_MEMB(_bucket_insert_)(const Self* self, const _m_keyraw* rkeyptr) {
 #if !defined i_no_clone
     STC_DEF Self
     _c_MEMB(_clone)(Self map) {
-        if (map.bucket_count) {
+        if (map.bucket_count != 0) {
             _m_value *d = _i_malloc(_m_value, map.bucket_count);
             const isize _mbytes = (map.bucket_count + 1)*c_sizeof *map.meta;
             struct hmap_meta *m = (struct hmap_meta *)i_malloc(_mbytes);
-            if (d && m) {
+            if (d != NULL && m != NULL) {
                 c_memcpy(m, map.meta, _mbytes);
                 _m_value *_dst = d, *_end = map.table + map.bucket_count;
                 for (; map.table != _end; ++map.table, ++map.meta, ++_dst)
                     if (map.meta->dist)
                         *_dst = _c_MEMB(_value_clone)(*map.table);
             } else {
-                if (d) i_free(d, map.bucket_count*c_sizeof *d);
-                if (m) i_free(m, _mbytes);
+                if (d != NULL) i_free(d, map.bucket_count*c_sizeof *d);
+                if (m != NULL) i_free(m, _mbytes);
                 d = 0, m = 0, map.bucket_count = 0;
             }
             map.table = d, map.meta = m;
@@ -457,7 +458,7 @@ _c_MEMB(_reserve)(Self* self, const isize _newcap) {
         const _m_value* d = self->table;
         const struct hmap_meta* m = self->meta;
 
-        for (isize i = 0; i < _oldbucks; ++i, ++d) if ((m++)->dist) {
+        for (isize i = 0; i < _oldbucks; ++i, ++d) if ((m++)->dist != 0) {
             _m_keyraw r = i_keytoraw(_i_keyref(d));
             _m_result _res = _c_MEMB(_bucket_insert_)(&map, &r);
             *_res.ref = *d; // move

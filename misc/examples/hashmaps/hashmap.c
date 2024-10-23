@@ -6,10 +6,10 @@
 #include "stc/hmap.h"
 
 const char* call(const char* number) {
-    if (!strcmp(number, "798-1364"))
+    if (strcmp(number, "798-1364") == 0)
         return "We're sorry, the call cannot be completed as dialed."
                " Please hang up and try again.";
-    else if (!strcmp(number, "645-7689"))
+    else if (strcmp(number, "645-7689") == 0)
         return "Hello, this is Mr. Awesome's Pizza. My name is Fred."
                " What can I get for you today?";
     else

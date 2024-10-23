@@ -290,7 +290,7 @@ STC_INLINE isize c_next_pow2(isize n) {
 // substring in substring?
 STC_INLINE char* c_strnstrn(const char *str, isize slen,
                             const char *needle, isize nlen) {
-    if (!nlen) return (char *)str;
+    if (nlen == 0) return (char *)str;
     if (nlen > slen) return NULL;
     slen -= nlen;
     do {

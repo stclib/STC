@@ -107,11 +107,12 @@ STC_INLINE const char* csview_at(csview sv, isize idx)
 
 /* utf8 iterator */
 STC_INLINE csview_iter csview_begin(const csview* self) {
-    return c_literal(csview_iter){.u8 = {{self->buf, utf8_chr_size(self->buf)},
-                                          self->buf + self->size}};
+    csview_iter it = {.u8 = {{self->buf, utf8_chr_size(self->buf)},
+                             self->buf + self->size}};
+    return it;
 }
 STC_INLINE csview_iter csview_end(const csview* self) {
-    return c_literal(csview_iter){.u8 = {{0}, self->buf + self->size}};
+    (void)self; csview_iter it = {0}; return it;
 }
 STC_INLINE void csview_next(csview_iter* it) {
     it->ref += it->chr.size;

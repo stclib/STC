@@ -16,7 +16,7 @@ int file_read(struct file_read* g)
 {
     cco_scope(g) {
         g->fp = fopen(g->filename, "r");
-        if (!g->fp) cco_return;
+        if (g->fp == NULL) cco_return;
         g->line = (cstr){0};
 
         cco_await( !cstr_getline(&g->line, g->fp) );

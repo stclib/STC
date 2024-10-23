@@ -282,7 +282,7 @@ _c_MEMB(_reserve)(Self* self, const isize cap) {
         return false;
     _m_node* nodes = (_m_node*)i_realloc(self->nodes, (self->capacity + 1)*c_sizeof(_m_node),
                                                       (cap + 1)*c_sizeof(_m_node));
-    if (!nodes)
+    if (nodes == NULL)
         return false;
     nodes[0] = c_literal(_m_node){0};
     self->nodes = nodes;
@@ -311,7 +311,7 @@ _c_MEMB(_back)(const Self* self) {
 static int32_t
 _c_MEMB(_new_node_)(Self* self, int level) {
     int32_t tn;
-    if (self->disp) {
+    if (self->disp != 0) {
         tn = self->disp;
         self->disp = self->nodes[tn].link[1];
     } else {
@@ -345,7 +345,7 @@ _c_MEMB(_new_node_)(Self* self, int level) {
         if (_res.inserted)
             _res.ref->first = i_keyfrom(rkey);
         else {
-            if (!_res.ref) return _res;
+            if (_res.ref == NULL) return _res;
             i_valdrop((&_res.ref->second));
         }
         _res.ref->second = i_valfrom(rmapped);
@@ -375,7 +375,7 @@ STC_DEF _m_iter
 _c_MEMB(_lower_bound)(const Self* self, _m_keyraw rkey) {
     _m_iter it;
     _c_MEMB(_find_it)(self, rkey, &it);
-    if (!it.ref && it._top) {
+    if (it.ref == NULL && it._top != 0) {
         int32_t tn = it._st[--it._top];
         it._tn = it._d[tn].link[1];
         it.ref = &it._d[tn].value;
@@ -385,7 +385,7 @@ _c_MEMB(_lower_bound)(const Self* self, _m_keyraw rkey) {
 
 STC_DEF int32_t
 _c_MEMB(_skew_)(_m_node *d, int32_t tn) {
-    if (tn && d[d[tn].link[0]].level == d[tn].level) {
+    if (tn != 0 && d[d[tn].link[0]].level == d[tn].level) {
         int32_t tmp = d[tn].link[0];
         d[tn].link[0] = d[tmp].link[1];
         d[tmp].link[1] = tn;
@@ -414,7 +414,7 @@ _c_MEMB(_insert_entry_i_)(Self* self, int32_t tn, const _m_keyraw* rkey, _m_resu
     while (tx) {
         up[top++] = tx;
         const _m_keyraw _raw = i_keytoraw(_i_keyref(&d[tx].value));
-        if (!(c = i_cmp((&_raw), rkey)))
+        if ((c = i_cmp((&_raw), rkey)) == 0)
             { _res->ref = &d[tx].value; return tn; }
         dir = (c < 0);
         tx = d[tx].link[dir];
@@ -428,7 +428,7 @@ _c_MEMB(_insert_entry_i_)(Self* self, int32_t tn, const _m_keyraw* rkey, _m_resu
         return tx;
     d[up[top - 1]].link[dir] = tx;
     while (top--) {
-        if (top)
+        if (top != 0)
             dir = (d[up[top - 1]].link[1] == up[top]);
         up[top] = _c_MEMB(_skew_)(d, up[top]);
         up[top] = _c_MEMB(_split_)(d, up[top]);
@@ -457,8 +457,8 @@ _c_MEMB(_erase_r_)(Self *self, int32_t tn, const _m_keyraw* rkey, int *erased) {
     if (c != 0)
         d[tn].link[c < 0] = _c_MEMB(_erase_r_)(self, d[tn].link[c < 0], rkey, erased);
     else {
-        if (!(*erased)++)
-            _c_MEMB(_value_drop)(&d[tn].value);
+        if ((*erased)++ == 0)
+            _c_MEMB(_value_drop)(&d[tn].value); // drop first time, not second.
         if (d[tn].link[0] && d[tn].link[1]) {
             tx = d[tn].link[0];
             while (d[tx].link[1])
@@ -491,7 +491,7 @@ STC_DEF int
 _c_MEMB(_erase)(Self* self, _m_keyraw rkey) {
     int erased = 0;
     int32_t root = _c_MEMB(_erase_r_)(self, self->root, &rkey, &erased);
-    if (!erased)
+    if (erased == 0)
         return 0;
     self->root = root;
     --self->size;
@@ -502,7 +502,7 @@ STC_DEF _m_iter
 _c_MEMB(_erase_at)(Self* self, _m_iter it) {
     _m_keyraw raw = i_keytoraw(_i_keyref(it.ref));
     _c_MEMB(_next)(&it);
-    if (it.ref) {
+    if (it.ref != NULL) {
         _m_keyraw nxt = i_keytoraw(_i_keyref(it.ref));
         _c_MEMB(_erase)(self, raw);
         _c_MEMB(_find_it)(self, nxt, &it);
@@ -513,8 +513,8 @@ _c_MEMB(_erase_at)(Self* self, _m_iter it) {
 
 STC_DEF _m_iter
 _c_MEMB(_erase_range)(Self* self, _m_iter it1, _m_iter it2) {
-    if (!it2.ref) {
-        while (it1.ref)
+    if (it2.ref == NULL) {
+        while (it1.ref != NULL)
             it1 = _c_MEMB(_erase_at)(self, it1);
         return it1;
     }
@@ -568,7 +568,7 @@ _c_MEMB(_emplace)(Self* self, _m_keyraw rkey _i_MAP_ONLY(, _m_rmapped rmapped)) 
 
 static void
 _c_MEMB(_drop_r_)(_m_node* d, int32_t tn) {
-    if (tn) {
+    if (tn != 0) {
         _c_MEMB(_drop_r_)(d, d[tn].link[0]);
         _c_MEMB(_drop_r_)(d, d[tn].link[1]);
         _c_MEMB(_value_drop)(&d[tn].value);
@@ -578,7 +578,7 @@ _c_MEMB(_drop_r_)(_m_node* d, int32_t tn) {
 STC_DEF void
 _c_MEMB(_drop)(const Self* cself) {
     Self* self = (Self*)cself;
-    if (self->capacity) {
+    if (self->capacity != 0) {
         _c_MEMB(_drop_r_)(self->nodes, self->root);
         i_free(self->nodes, (self->capacity + 1)*c_sizeof(_m_node));
     }

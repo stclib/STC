@@ -127,7 +127,7 @@ STC_INLINE char* _cbits_to_str(const uintptr_t* set, const isize sz,
     for (isize i = 0; i < n; ++i) \
         if ((set[i] OPR other[i]) != VAL) \
             return false; \
-    if (!(sz & (_cbits_WB - 1))) \
+    if ((sz & (_cbits_WB - 1)) == 0) \
         return true; \
     const uintptr_t i = (uintptr_t)n, m = _cbits_bit(sz) - 1; \
     return ((set[i] OPR other[i]) & m) == (VAL & m)

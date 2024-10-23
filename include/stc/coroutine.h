@@ -65,8 +65,8 @@ enum {
 };
 typedef enum {
     CCO_DONE = 0,
-    CCO_AWAIT = 1<<29,
-    CCO_YIELD = 1<<30,
+    CCO_YIELD = 1<<29,
+    CCO_AWAIT = 1<<30,
 } cco_result;
 
 typedef struct {
@@ -97,12 +97,12 @@ typedef struct {
         return value; \
     } while (0)
 
-#define cco_await(promise) cco_await_and_return(promise, CCO_AWAIT)
-#define cco_await_and_return(promise, ret) \
+#define cco_await(until) cco_await_with_return(until, CCO_AWAIT)
+#define cco_await_with_return(until, ret) \
     do { \
         *_state = __LINE__; \
         /* fall through */ \
-        case __LINE__: if (!(promise)) {return ret; goto _resume;} \
+        case __LINE__: if (!(until)) {return ret; goto _resume;} \
     } while (0)
 
 /* cco_await_coroutine(): assumes coroutine returns a cco_result value (int) */
@@ -232,10 +232,10 @@ typedef struct cco_runtime {
 
 typedef struct { ptrdiff_t count; } cco_semaphore;
 
-#define cco_await_semaphore(sem) cco_await_semaphore_and_return(sem, CCO_AWAIT)
-#define cco_await_semaphore_and_return(sem, ret) \
+#define cco_await_semaphore(sem) cco_await_semaphore_with_return(sem, CCO_AWAIT)
+#define cco_await_semaphore_with_return(sem, ret) \
     do { \
-        cco_await_and_return((sem)->count > 0, ret); \
+        cco_await_with_return((sem)->count > 0, ret); \
         --(sem)->count; \
     } while (0)
 
@@ -290,12 +290,12 @@ typedef struct { ptrdiff_t count; } cco_semaphore;
 
 typedef struct { double interval, start; } cco_timer;
 
-#define cco_await_timer(tm, sec) cco_await_timer_and_return(tm, sec, CCO_AWAIT)
+#define cco_await_timer(tm, sec) cco_await_timer_with_return(tm, sec, CCO_AWAIT)
 #define cco_await_timer_v(...) c_MACRO_OVERLOAD(cco_await_timer_v, __VA_ARGS__)
-#define cco_await_timer_and_return(tm, sec, ret) \
+#define cco_await_timer_with_return(tm, sec, ret) \
     do { \
         cco_timer_start(tm, sec); \
-        cco_await_and_return(cco_timer_expired(tm), ret); \
+        cco_await_with_return(cco_timer_expired(tm), ret); \
     } while (0)
 
 static inline void cco_timer_start(cco_timer* tm, double sec) {

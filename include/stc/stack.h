@@ -169,7 +169,7 @@ STC_INLINE _m_value* _c_MEMB(_emplace)(Self* self, _m_raw raw)
 #if !defined i_no_clone
 STC_INLINE Self _c_MEMB(_clone)(Self s) {
     Self tmp = {_i_malloc(_m_value, s.size), s.size, s.size};
-    if (!tmp.data) tmp.capacity = 0;
+    if (tmp.data == NULL) tmp.capacity = 0;
     else for (isize i = 0; i < s.size; ++s.data)
         tmp.data[i++] = i_keyclone((*s.data));
     s.data = tmp.data;
@@ -190,21 +190,25 @@ STC_INLINE i_keyraw _c_MEMB(_value_toraw)(const _m_value* val)
     { return i_keytoraw(val); }
 #endif // !i_no_clone
 
+// iteration
+
 STC_INLINE _m_iter _c_MEMB(_begin)(const Self* self) {
-    isize n = self->size; _m_value* d = (_m_value*)self->data;
-    return c_literal(_m_iter){n ? d : NULL, d + n};
+    _m_iter it = {(_m_value*)self->data, (_m_value*)self->data};
+    if (it.ref != NULL) it.end += self->size;
+    return it;
 }
 
 STC_INLINE _m_iter _c_MEMB(_rbegin)(const Self* self) {
-    isize n = self->size; _m_value* d = (_m_value*)self->data;
-    return c_literal(_m_iter){n ? d + n - 1 : NULL, d - 1};
+    _m_iter it = {(_m_value*)self->data, (_m_value*)self->data};
+    if (it.ref != NULL) { it.ref += self->size - 1; it.end -= 1; }
+    return it;
 }
 
 STC_INLINE _m_iter _c_MEMB(_end)(const Self* self)
-    { (void)self; return c_literal(_m_iter){0}; }
+    { (void)self; _m_iter it = {0}; return it; }
 
 STC_INLINE _m_iter _c_MEMB(_rend)(const Self* self)
-    { (void)self; return c_literal(_m_iter){0}; }
+    { (void)self; _m_iter it = {0}; return it; }
 
 STC_INLINE void _c_MEMB(_next)(_m_iter* it)
     { if (++it->ref == it->end) it->ref = NULL; }

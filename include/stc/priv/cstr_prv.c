@@ -82,7 +82,7 @@ char* cstr_reserve(cstr* self, const isize cap) {
 char* cstr_resize(cstr* self, const isize size, const char value) {
     cstr_view r = cstr_getview(self);
     if (size > r.size) {
-        if (size > r.cap && !(r.data = cstr_reserve(self, size)))
+        if (size > r.cap && (r.data = cstr_reserve(self, size)) == NULL)
             return NULL;
         c_memset(r.data + r.size, value, size - r.size);
     }
@@ -108,7 +108,7 @@ char* cstr_append_n(cstr* self, const char* str, const isize len) {
     if (r.size + len > r.cap) {
         const size_t off = (size_t)(str - r.data);
         r.data = cstr_reserve(self, r.size*3/2 + len);
-        if (!r.data) return NULL;
+        if (r.data == NULL) return NULL;
         if (off <= (size_t)r.size) str = r.data + off; /* handle self append */
     }
     c_memcpy(r.data + r.size, str, len);
@@ -119,7 +119,7 @@ char* cstr_append_n(cstr* self, const char* str, const isize len) {
 cstr cstr_from_replace(csview in, csview search, csview repl, int32_t count) {
     cstr out = cstr_init();
     isize from = 0; char* res;
-    if (!count) count = INT32_MAX;
+    if (count == 0) count = INT32_MAX;
     if (search.size)
         while (count-- && (res = c_strnstrn(in.buf + from, in.size - from, search.buf, search.size))) {
             const isize pos = (res - in.buf);
@@ -160,7 +160,7 @@ void cstr_shrink_to_fit(cstr* self) {
 
 char* cstr_append_uninit(cstr *self, isize len) {
     cstr_view r = cstr_getview(self);
-    if (r.size + len > r.cap && !(r.data = cstr_reserve(self, r.size*3/2 + len)))
+    if (r.size + len > r.cap && (r.data = cstr_reserve(self, r.size*3/2 + len)) == NULL)
         return NULL;
     _cstr_set_size(self, r.size + len);
     return r.data + r.size;

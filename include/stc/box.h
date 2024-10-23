@@ -125,7 +125,7 @@ STC_INLINE Self _c_MEMB(_from)(_m_raw raw)
 
 #if !defined i_no_clone
     STC_INLINE Self _c_MEMB(_clone)(Self other) {
-        if (!other.get) return other;
+        if (other.get == NULL) return other;
         Self out = {_i_malloc(_m_value, 1)};
         *out.get = i_keyclone((*other.get));
         return out;

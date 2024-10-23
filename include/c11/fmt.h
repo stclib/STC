@@ -269,7 +269,7 @@ FMT_DEF int _fmt_parse(char* p, int nargs, const char *fmt, ...) {
             case 'g': if (empty) memcpy(p, ".8", 2), p += 2; break;
             case '@': ++arg; if (empty) memcpy(p, ".16", 3), p += 3; break;
             }
-            if (!strchr("csdioxXufFeEaAgGnp", fmt[-1]))
+            if (strchr("csdioxXufFeEaAgGnp", fmt[-1]) == NULL)
                 while (*arg) *p++ = *arg++;
             if (p0 && (p[-1] == 's' || p[-1] == 'c')) /* left-align str */
                 memmove(p0 + 1, p0, (size_t)(p++ - p0)), *p0 = '-';
