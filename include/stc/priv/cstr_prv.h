@@ -236,7 +236,7 @@ STC_INLINE void cstr_next(cstr_iter* it) {
 }
 
 STC_INLINE cstr_iter cstr_advance(cstr_iter it, isize u8pos) {
-    it.ref = c_const_cast(char *, utf8_offset(it.ref, u8pos));
+    it.ref = utf8_offset(it.ref, u8pos);
     it.chr.size = utf8_chr_size(it.ref);
     if (*it.ref == '\0') it.ref = NULL;
     return it;
