@@ -145,28 +145,40 @@ typedef struct {
 /* ============ ADVANCED, OPTIONAL ============= */
 
 /*
- * Iterators (for generators)
- * Gen must be an existing typedef struct, i.e., these must be defined:
- *     Gen_iter Gen_begin(Gen* g);      // return a coroutine object, advanced to the first yield
- *     int      Gen_next(Gen_iter* it); // resume the coroutine
+ * Iterators for coroutine generators
+ * A type Gen must be an existing generator typedef struct. Then:
  *
- * cco_default_begin(Gen);              // implements basic Gen_begin() function
- * ....
+ * typedef Gen Gen_value;
+ * typedef struct {
+ *     Gen* ref;
+ *     cco_state cco;
+ *     ...
+ * } Gen_iter;
+ *
+ * // the generator coroutine, get the next value:
+ * int Gen_next(Gen_iter* it) {
+ *     Gen* g = it->ref;
+ *     cco_scope (it) {
+ *        ...
+ *        cco_yield; // suspend exec, gen with value ready
+ *        ...
+ *        cco_cleanup:
+ *        it->ref = NULL; // stops the iteration
+ *     }
+ * }
+ *
+ * // create coroutine/iter, advance to the first yield:
+ * Gen_iter Gen_begin(Gen* g) {
+ *     Gen_iter it = {.ref = g};
+ *     ...
+ *     Gen_next(&it);
+ *     return it;
+ * }
+ * 
+ * ...
  * c_foreach (i, Gen, gen)
-	printf("%d ", *i.ref);
+ *     printf("%d ", *i.ref);
  */
-
-#define cco_iter_struct(Gen) \
-    typedef Gen Gen##_value; \
-    typedef struct Gen##_iter Gen##_iter; \
-    struct Gen##_iter
-
-#define cco_default_begin(Gen) \
-Gen##_iter Gen##_begin(Gen* g) { \
-    Gen##_iter it = {.ref = g}; \
-    Gen##_next(&it); \
-    return it; \
-} struct Gen##_iter
 
 
 /* Using c_filter with generators:

@@ -4,21 +4,22 @@
 #include "stc/coroutine.h"
 #include "stc/algorithm.h"
 
+// Create an iterable generator Triple with max_triples items.
+// Requires coroutine Triple_next() and function Triple_begin() to be defined.
+
 typedef struct {
     int max_triples;
     int a, b, c;
-} Triple;
+} Triple, Triple_value;
 
-// Create an iterable generator on an existing Triple type with count items.
-// Requires coroutine Triple_next() and function Triple_begin() to be defined.
-cco_iter_struct (Triple) {
-    Triple_value* ref; // required by iterator
+typedef struct {
+    Triple* ref;    // required by iterator
+    cco_state cco;  // required by coroutine
     int count;
-    cco_state cco;     // required by coroutine
-};
+} Triple_iter;
 
 int Triple_next(Triple_iter* it) {
-    Triple* g = it->ref; // note: before cco_scope
+    Triple* g = it->ref; // get generator before cco_scope starts!
     cco_scope(it)
     {
         for (g->c = 5;; ++g->c) {
@@ -40,14 +41,14 @@ int Triple_next(Triple_iter* it) {
 }
 
 Triple_iter Triple_begin(Triple* g) {
-    Triple_iter it = {.ref=g};
+    Triple_iter it = {.ref = g};
     Triple_next(&it);
     return it;
 }
 
 int main(void)
 {
-    Triple triple = {.max_triples=INT32_MAX};
+    Triple triple = {.max_triples = INT32_MAX};
 
     puts("Pythagorean triples.\nGet all triples with c < 40, using c_foreach:");
     c_foreach (i, Triple, triple) {
@@ -61,7 +62,8 @@ int main(void)
     c_filter(Triple, triple, true
         && (value->c < 40)
         && (cco_flt_take(10), // NB! use cco_flt_take(n) instead of c_flt_take(n)
-                              // to ensure coroutine/iter cleanup if needed
+                              // to ensure coroutine/iter cleanup.
+                              // Also applies to cco_flt_takewhile(pred)
             printf("%d: (%d, %d, %d)\n", c_flt_getcount(), value->a, value->b, value->c))
     );
 }

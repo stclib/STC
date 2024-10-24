@@ -1,6 +1,8 @@
 # STC Algorithms
 
-STC contains many generic algorithms and flow control abstactions.
+STC contains many generic algorithms and loop abstactions. Raw loops are one of the most prominent
+sources for errors in C and C++ code. By using the loop abstractions below, your code becomes more
+descriptive and reduces chances of making mistakes. It is often easier to read and write too.
 
 ## Ranged for-loops
 <details>
@@ -19,7 +21,7 @@ STC contains many generic algorithms and flow control abstactions.
 | `c_foreach_reverse (it, ctype, container)`| Iteratate elements in reverse: *vec, deque, queue, stack* |
 | `c_foreach_reverse (it, ctype, it1, it2)`| Iteratate range [it1, it2) elements in reverse. |
 | `c_foreach_n (it, ctype, container, n)`| Iteratate `n` first elements. Index variable is `{it}_index`. |
-| `c_foreach_kv (key, val, ctype, container)` | Iterate with structured binding           |
+| `c_foreach_kv (key, val, ctype, container)` | Iterate maps with "structured binding" |
 
 ```c
 #define i_type IMap, int, int
@@ -79,7 +81,7 @@ c_foritems (i, const char*, {"Hello", "crazy", "world"})
 ### c_forrange, c_forrange32, c_forrange_t
 - `c_forrange`: abstraction for iterating sequence of integers. Like python's **for** *i* **in** *range()* loop. Uses `isize` (*ptrdiff_t*) as control variable.
 - `c_forrange32` is like *c_forrange*, but uses `int32` as control variable.
-- `c_forrange_t` is like *c_forrange*, but takes an additional ***type*** as first argument for the control variable.
+- `c_forrange_t` is like *c_forrange*, but takes an additional ***type*** for the control variable as first argument.
 
 | Usage                                | Python equivalent                    |
 |:-------------------------------------|:-------------------------------------|
@@ -221,16 +223,21 @@ int main(void)
 <summary><b>c_func</b> - Function with on-the-fly defined return type</summary>
 
 ### c_func
-A convenient macro for defining functions with one or multiple return values, e.g. for errors.
+
+A macro for conveniently defining functions with multiple return values. This is for encouraging
+to write functions that returns extra error context when error occurs, or just multiple return values.
+
 ```c
 Vec get_data(void) {
     return c_init(Vec, {1, 2, 3, 4, 5, 6});
 }
-// same as get_data():
+
+// same as get_data(), but with the c_func macro "syntax".
 c_func (get_data1,(void), ->, Vec) {
     return c_init(Vec, {1, 2, 3, 4, 5, 6});
 }
 
+// return two Vec types "on-the-fly".
 c_func (get_data2,(void), ->, struct {Vec v1, v2;}) {
     return (get_data2_result){
         .v1=c_init(Vec, {1, 2, 3, 4, 5, 6}),
@@ -238,20 +245,23 @@ c_func (get_data2,(void), ->, struct {Vec v1, v2;}) {
     };
 }
 
-c_func (load_data,(const char* fname), ->, struct {Vec out; int err;}) {
+// return a Vec, and an err code which is 0 if OK.
+c_func (load_data,(const char* fname), ->, struct {Vec vec; int err;}) {
     FILE* fp = fopen(fname, "rb");
     if (fp == 0)
         return (load_data_result){.err=1};
 
-    load_data_result vec = {Vec_with_size(1024, '\0')};
-    fread(vec.out.data, sizeof(vec.out.data[0]), 1024, fp);
+    load_data_result out = {Vec_with_size(1024, '\0')};
+    fread(out.vec.data, sizeof(out.vec.data[0]), 1024, fp);
     fclose(fp);
-    return vec;
+    return out;
 }
 ```
 </details>
 <details>
 <summary><b>c_init, c_push, c_drop</b> - Generic container operations</summary>
+
+These work on any container. *c_init()* may also be used for **cspan** views.
 
 ### c_init, c_push, c_drop
 
@@ -268,11 +278,11 @@ c_func (load_data,(const char* fname), ->, struct {Vec out; int err;}) {
 #define i_type Map, int, int
 #include "stc/hmap.h"
 
-c_func (split_map,(Map map), ->, struct {Vec keys, vals;}) {
+c_func (split_map,(Map map), ->, struct {Vec keys, values;}) {
     split_map_result out = {0};
     c_foreach_kv (k, v, Map, map) {
         Vec_push(&out.keys, *k);
-        Vec_push(&out.vals, *v);
+        Vec_push(&out.values, *v);
     }
     return out;
 }
@@ -294,11 +304,11 @@ int main(void) {
 
     split_map_result res = split_map(map);
 
-    c_foreach (i, Vec, res.vals)
+    c_foreach (i, Vec, res.values)
         printf("%d ", *i.ref);
     puts("");
 
-    c_drop(Vec, &vec, &res.keys, &res.vals);
+    c_drop(Vec, &vec, &res.keys, &res.values);
     c_drop(Map, &map);
 }
 ```
