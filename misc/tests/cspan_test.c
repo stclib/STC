@@ -92,8 +92,15 @@ TEST(cspan, equality) {
 
     //puts(""); cspan_print(Span2, cspan_slice(Span2, &base2, {0, 3}, {1, 4}), "%d");
 
-    EXPECT_TRUE(Span2_equals(test2, cspan_slice(Span2, &base2, {0, 3}, {1, 4})));
+    // Test every 3x3 subtile in base2 against the test2 tile.
+    c_forrange (y, base2.shape[0] - 3 + 1) {
+        c_forrange (x, base2.shape[1] - 3 + 1) {
+            bool expect_eq = (y == 0 && x == 1) || (y == 3 && x == 2);
+            EXPECT_EQ(expect_eq, Span2_equals(test2, cspan_slice(Span2, &base2, {y, y+3}, {x, x+3})));
+        }
+    }
 
+    // Check that the two 3x4 tiles are equal.
     EXPECT_TRUE(Span2_equals(cspan_slice(Span2, &base2, {0, 3}, {0, 4}),
                              cspan_slice(Span2, &base2, {3, 6}, {1, 5})));
 }
