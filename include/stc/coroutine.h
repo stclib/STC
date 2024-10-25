@@ -145,17 +145,19 @@ typedef struct {
 /* ============ ADVANCED, OPTIONAL ============= */
 
 /*
- * Iterators for coroutine generators
- * A type Gen must be an existing generator typedef struct. Then:
+ * // Iterators for coroutine generators
+ * 
+ * typedef struct { // The generator
+ *     ...
+ * } Gen, Gen_value;
  *
- * typedef Gen Gen_value;
  * typedef struct {
  *     Gen* ref;
  *     cco_state cco;
  *     ...
  * } Gen_iter;
  *
- * // the generator coroutine, get the next value:
+ * // The iterator coroutine, produce the next value:
  * int Gen_next(Gen_iter* it) {
  *     Gen* g = it->ref;
  *     cco_scope (it) {
@@ -167,7 +169,7 @@ typedef struct {
  *     }
  * }
  *
- * // create coroutine/iter, advance to the first yield:
+ * // Create coroutine / iter, advance to the first yield:
  * Gen_iter Gen_begin(Gen* g) {
  *     Gen_iter it = {.ref = g};
  *     ...

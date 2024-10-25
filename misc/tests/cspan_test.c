@@ -20,6 +20,7 @@ TEST(cspan, subdim) {
     }
 }
 
+
 TEST(cspan, slice) {
     int array[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
     Span2 m1 = cspan_md(array, 3, 4);
@@ -43,7 +44,8 @@ TEST(cspan, slice) {
     EXPECT_EQ(45, sum2);
 }
 
-#define i_type Stack,int
+
+#define i_type Stack, int
 #include "stc/stack.h"
 
 TEST(cspan, slice2) {
@@ -71,6 +73,7 @@ TEST(cspan, slice2) {
         EXPECT_EQ(65112, sum);
     }
 }
+
 
 TEST(cspan, equality) {
     Span base = c_init(Span, {
@@ -106,7 +109,7 @@ TEST(cspan, equality) {
 }
 
 
-#define i_type Tiles,Span3
+#define i_type Tiles, Span3
 #include "stc/stack.h"
 
 TEST_FIXTURE(cspan_cube) {
@@ -115,7 +118,7 @@ TEST_FIXTURE(cspan_cube) {
 };
 
 TEST_SETUP(cspan_cube, fixt) {
-    enum {TSIZE=4, CUBE=64, N=CUBE*CUBE*CUBE};
+    enum {TSIZE = 4, CUBE = 64, N = CUBE*CUBE*CUBE};
 
     fixt->stack = Stack_init();
     fixt->tiles = Tiles_init();
@@ -144,8 +147,8 @@ TEST_TEARDOWN(cspan_cube, fixt) {
 
 
 TEST_F(cspan_cube, slice3, fixt) {
-    isize n = Stack_size(&fixt->stack);
-    int64_t sum = 0;
+    int64 n = Stack_size(&fixt->stack);
+    int64 sum = 0;
 
     // iterate each 3d tile in sequence
     c_foreach (tile, Tiles, fixt->tiles)

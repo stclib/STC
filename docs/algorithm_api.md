@@ -480,27 +480,29 @@ int main(void) {
 
 </details>
 <details>
-<summary><b>c_new, c_delete, c_malloc</b> - Allocation helpers</summary>
+<summary><b>c_new, c_delete, c_malloc, etc.</b> - Allocation helpers</summary>
 
 ### c_new, c_delete
 
-- `c_new(Type, val)` - Allocate *and init* a new object on the heap
-- `c_delete(Type, ptr)` - Drop *and free* an object allocated on the heap. NULL is OK.
+- `c_new(Type, value)` - Allocate *and initialize* a new object on the heap with *value*.
+- `c_new_n(Type, n)` - Allocate an array of ***n*** new objects on the heap, initialized to zero.
+- `c_delete(Type, ptr)` - *Type_drop(ptr)* and *c_free(ptr, ..)* allocated on the heap. NULL is OK.
+- `c_delete_n(Type, arr, n)` - *Type_drop(&arr[i])* and *c_free(arr, ..)* of ***n*** objects allocated on the heap. (NULL, 0) is OK.
 ```c
 #include "stc/cstr.h"
 
-cstr *str_p = c_new(cstr, cstr_lit("Hello"));
-printf("%s\n", cstr_str(str_p));
-c_delete(cstr, str_p);
+cstr* stringptr = c_new (cstr, cstr_from("Hello"));
+printf("%s\n", cstr_str(stringp));
+c_delete(cstr, stringptr);
 ```
 
 ### c_malloc, c_calloc, c_realloc, c_free
 Memory allocator wrappers which uses signed sizes. Note that the signatures for
 *c_realloc()* and *c_free()* have an extra size parameter. These will be used as
-default unless `i_malloc`, `i_calloc`, `i_realloc`, and `i_free` are defined. See
+default in containers unless `i_malloc`, `i_calloc`, `i_realloc`, and `i_free` are user defined. See
 [Per container-instance customization](../README.md#per-container-instance-customization)
 - `void* c_malloc(isize sz)`
-- `void* c_calloc(isize sz)`
+- `void* c_calloc(isize n, isize sz)`
 - `void* c_realloc(void* old_p, isize old_sz, isize new_sz)`
 - `void c_free(void* p, isize sz)`
 

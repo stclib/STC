@@ -72,29 +72,32 @@ typedef ptrdiff_t       isize;
 #define _c_SEL32(a, b, c) b
 #define _c_SEL33(a, b, c) c
 
+#define _i_malloc(T, n)     ((T*)i_malloc((n)*c_sizeof(T)))
+#define _i_calloc(T, n)     ((T*)i_calloc((n), c_sizeof(T)))
 #ifndef __cplusplus
-    #define _i_malloc(T, n)     ((T*)i_malloc((n)*c_sizeof(T)))
-    #define _i_calloc(T, n)     ((T*)i_calloc(n, c_sizeof(T)))
     #define c_new(T, ...)       ((T*)memcpy(malloc(sizeof(T)), ((T[]){__VA_ARGS__}), sizeof(T)))
     #define c_literal(T)        (T)
     #define c_make_array(T, ...) ((T[])__VA_ARGS__)
     #define c_make_array2d(T, N, ...) ((T[][N])__VA_ARGS__)
 #else
     #include <new>
-    #define _i_malloc(T, n)     static_cast<T*>(i_malloc((n)*c_sizeof(T)))
-    #define _i_calloc(T, n)     static_cast<T*>(i_calloc(n, c_sizeof(T)))
     #define c_new(T, ...)       new (malloc(sizeof(T))) T(__VA_ARGS__)
     #define c_literal(T)        T
     template<typename T, int M, int N> struct _c_Array { T data[M][N]; };
     #define c_make_array(T, ...) (_c_Array<T, 1, sizeof((T[])__VA_ARGS__)/sizeof(T)>{{__VA_ARGS__}}.data[0])
     #define c_make_array2d(T, N, ...) (_c_Array<T, sizeof((T[][N])__VA_ARGS__)/sizeof(T[N]), N>{__VA_ARGS__}.data)
 #endif
-#define c_new_n(T, n)           ((T*)malloc(sizeof(T)*c_i2u_size(n)))
-#define c_malloc(sz)            malloc(c_i2u_size(sz))
-#define c_calloc(n, sz)         calloc(c_i2u_size(n), c_i2u_size(sz))
-#define c_realloc(p, old_sz, sz) realloc(p, c_i2u_size(1 ? (sz) : (old_sz)))
-#define c_free(p, sz)           do { (void)(sz); free(p); } while(0)
-#define c_delete(T, ptr)        do { T *_tp = ptr; T##_drop(_tp); free(_tp); } while (0)
+#ifndef c_malloc
+    #define c_malloc(sz)        malloc(c_i2u_size(sz))
+    #define c_calloc(n, sz)     calloc(c_i2u_size(n), c_i2u_size(sz))
+    #define c_realloc(ptr, old_sz, sz) realloc(ptr, c_i2u_size(1 ? (sz) : (old_sz)))
+    #define c_free(ptr, sz)     do { (void)(sz); free(ptr); } while(0)
+#endif
+#define c_new_n(T, n)           ((T*)c_calloc(n, c_sizeof(T)))
+#define c_delete(T, ptr)        do { T* _tp = ptr; T##_drop(_tp); c_free(_tp, c_sizeof(T)); } while (0)
+#define c_delete_n(T, ptr, n)   do { T* _tp = ptr; isize _n = n, _m = _n; \
+                                     while (_n--) T##_drop((_tp + _n)); \
+                                     c_free(_tp, _m*c_sizeof(T)); } while (0)
 
 #define c_static_assert(expr)   (1 ? 0 : (int)sizeof(int[(expr) ? 1 : -1]))
 #if defined STC_NDEBUG || defined NDEBUG
