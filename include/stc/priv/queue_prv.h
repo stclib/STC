@@ -88,6 +88,17 @@ STC_INLINE const _m_value* _c_MEMB(_back)(const Self* self)
 STC_INLINE _m_value*    _c_MEMB(_back_mut)(Self* self)
                             { return (_m_value*)_c_MEMB(_back)(self); }
 
+STC_INLINE Self _c_MEMB(_move)(Self *self) {
+    Self m = *self;
+    memset(self, 0, sizeof *self);
+    return m;
+}
+
+STC_INLINE void _c_MEMB(_take)(Self *self, Self unowned) {
+    _c_MEMB(_drop)(self);
+    *self = unowned;
+}
+
 STC_INLINE void _c_MEMB(_pop)(Self* self) { // pop_front
     c_assert(!_c_MEMB(_is_empty)(self));
     i_keydrop((self->cbuf + self->start));

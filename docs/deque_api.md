@@ -41,13 +41,16 @@ See the c++ class [std::deque](https://en.cppreference.com/w/cpp/container/deque
 ```c
 deque_X         deque_X_init(void);
 deque_X         deque_X_with_capacity(isize size);
+
 deque_X         deque_X_clone(deque_X deque);
+void            deque_X_copy(deque_X* self, const deque_X* other);
+void            deque_X_take(deque_X* self, deque_X unowned);                    // take ownership of unowned
+deque_X         deque_X_move(deque_X* self);                                     // move
+void            deque_X_drop(deque_X* self);                                     // destructor
 
 void            deque_X_clear(deque_X* self);
-void            deque_X_copy(deque_X* self, const deque_X* other);
 bool            deque_X_reserve(deque_X* self, isize cap);
 void            deque_X_shrink_to_fit(deque_X* self);
-void            deque_X_drop(deque_X* self);                                     // destructor
 
 bool            deque_X_is_empty(const deque_X* self);
 isize           deque_X_size(const deque_X* self);

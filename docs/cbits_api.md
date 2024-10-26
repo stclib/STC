@@ -30,7 +30,7 @@ cbits           cbits_clone(cbits other);
 
 void            cbits_clear(cbits* self);
 cbits*          cbits_copy(cbits* self, const cbits* other);
-void            cbits_resize(cbits* self, isize size, bool value);      // NB! only for dynamic bitsets!
+bool            cbits_resize(cbits* self, isize size, bool value);      // NB! only for dynamic bitsets!
 void            cbits_drop(cbits* self);
 
 cbits*          cbits_take(cbits* self, const cbits* other);            // give other to self

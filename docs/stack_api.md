@@ -41,14 +41,16 @@ See the c++ class [std::stack](https://en.cppreference.com/w/cpp/container/stack
 stack_X         stack_X_init(void);
 stack_X         stack_X_with_capacity(isize cap);
 stack_X         stack_X_with_size(isize size, i_key fill);
+
 stack_X         stack_X_clone(stack_X st);
+void            stack_X_copy(stack_X* self, const stack_X* other);
+stack_X         stack_X_move(stack_X* self);                                    // move
+void            stack_X_take(stack_X* self, stack_X unowned);                   // take ownership of unowned
+void            stack_X_drop(stack_X* self);                                    // destructor
 
 void            stack_X_clear(stack_X* self);
 bool            stack_X_reserve(stack_X* self, isize n);
 void            stack_X_shrink_to_fit(stack_X* self);
-i_key*          stack_X_append_uninit(stack_X* self, isize n);
-void            stack_X_copy(stack_X* self, const stack_X* other);
-void            stack_X_drop(stack_X* self);                                    // destructor
 
 isize           stack_X_size(const stack_X* self);
 isize           stack_X_capacity(const stack_X* self);
@@ -66,6 +68,7 @@ i_key*          stack_X_back_mut(stack_X* self);
 
 i_key*          stack_X_push(stack_X* self, i_key value);
 i_key*          stack_X_emplace(stack_X* self, i_keyraw raw);
+i_key*          stack_X_append_uninit(stack_X* self, isize n);
 
 void            stack_X_pop(stack_X* self);                                     // destroy last element
 i_key           stack_X_pull(stack_X* self);                                    // move out last element

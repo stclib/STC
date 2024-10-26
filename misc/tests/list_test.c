@@ -1,9 +1,10 @@
 #include <stdio.h>
 #include "ctest.h"
 
-#define i_type IList,int
+#define i_type IList, int
 #define i_use_cmp
 #include "stc/list.h"
+
 
 TEST(list, splice)
 {
@@ -50,4 +51,40 @@ TEST(list, erase)
     EXPECT_TRUE(IList_eq(&res2, &L));
 
     c_drop(IList, &L, &res1, &res2);
+}
+
+
+TEST(list, misc)
+{
+    IList nums = {0}, nums2 = {0};
+    IList_clear(&nums);
+
+    for (int i = 0; i < 10; ++i)
+        IList_push_back(&nums, i);
+    for (int i = 100; i < 110; ++i)
+        IList_push_back(&nums2, i);
+
+    /* splice nums2 to front of nums */
+    IList_splice(&nums, IList_begin(&nums), &nums2);
+
+    IList res1 = c_init(IList, {100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9});
+    EXPECT_TRUE(IList_eq(&res1, &nums));
+
+    *IList_find(&nums, 104).ref += 50;
+    IList_remove(&nums, 103);
+    IList res2 = c_init(IList, {100, 101, 102, 154, 105, 106, 107, 108, 109, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9});
+    EXPECT_TRUE(IList_eq(&res2, &nums));
+
+    IList_iter it = IList_begin(&nums);
+    IList_erase_range(&nums, IList_advance(it, 5), IList_advance(it, 15));
+    IList res3 = c_init(IList, {100, 101, 102, 154, 105, 6, 7, 8, 9});
+    EXPECT_TRUE(IList_eq(&res3, &nums));
+
+    IList_pop_front(&nums);
+    IList_push_back(&nums, -99);
+    IList_sort(&nums);
+    IList res4 = c_init(IList, {-99, 6, 7, 8, 9, 101, 102, 105, 154});
+    EXPECT_TRUE(IList_eq(&res4, &nums));
+
+    c_drop(IList, &nums, &nums2, &res1, &res2, &res3, &res4);
 }

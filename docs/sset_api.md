@@ -37,13 +37,16 @@ See the c++ class [std::set](https://en.cppreference.com/w/cpp/container/set) fo
 ```c
 sset_X          sset_X_init(void);
 sset_X          sset_X_with_capacity(isize cap);
-bool            sset_X_reserve(sset_X* self, isize cap);
-void            sset_X_shrink_to_fit(sset_X* self);
+
 sset_X          sset_X_clone(sset_x set);
+void            sset_X_copy(sset_X* self, const sset_X* other);
+void            sset_X_take(sset_X* self, sset_X unowned);                           // take ownership of unowned
+sset_X          sset_X_move(sset_X* self);                                           // move
+void            sset_X_drop(sset_X* self);                                           // destructor
 
 void            sset_X_clear(sset_X* self);
-void            sset_X_copy(sset_X* self, const sset_X* other);
-void            sset_X_drop(sset_X* self);                                           // destructor
+bool            sset_X_reserve(sset_X* self, isize cap);
+void            sset_X_shrink_to_fit(sset_X* self);
 
 bool            sset_X_is_empty(const sset_X* self);
 isize           sset_X_size(const sset_X* self);

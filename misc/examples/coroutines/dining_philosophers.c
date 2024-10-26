@@ -58,7 +58,7 @@ int philosopher(struct Philosopher* p)
 // Dining coroutine
 int dining(struct Dining* d)
 {
-    cco_scope(d) {
+    cco_scope (d) {
         for (int i = 0; i < num_forks; ++i)
             cco_semaphore_set(&d->forks[i], 1); // all forks available
         for (int i = 0; i < num_philosophers; ++i) {
@@ -91,7 +91,7 @@ int main(void)
     struct Dining dine;
     cco_reset(&dine);
     int n=0;
-    cco_timer tm = cco_timer_from(5.0); // seconds
+    cco_timer tm = cco_timer_make(5.0); // seconds
     crand64_seed((uint64_t)time(NULL));
 
     cco_run_coroutine(dining(&dine))

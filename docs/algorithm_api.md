@@ -2,7 +2,7 @@
 
 STC contains many generic algorithms and loop abstactions. Raw loops are one of the most prominent
 sources for errors in C and C++ code. By using the loop abstractions below, your code becomes more
-descriptive and reduces chances of making mistakes. It is often easier to read and write too.
+descriptive and reduces chances of making mistakes. It is generally easier to read and write too.
 
 ## Ranged for-loops
 <details>
@@ -240,8 +240,8 @@ c_func (get_data1,(void), ->, Vec) {
 // return two Vec types "on-the-fly".
 c_func (get_data2,(void), ->, struct {Vec v1, v2;}) {
     return (get_data2_result){
-        .v1=c_init(Vec, {1, 2, 3, 4, 5, 6}),
-        .v2=c_init(Vec, {7, 8, 9, 10, 11})
+        .v1 = c_init(Vec, {1, 2, 3, 4, 5, 6}),
+        .v2 = c_init(Vec, {7, 8, 9, 10, 11})
     };
 }
 
@@ -249,7 +249,7 @@ c_func (get_data2,(void), ->, struct {Vec v1, v2;}) {
 c_func (load_data,(const char* fname), ->, struct {Vec vec; int err;}) {
     FILE* fp = fopen(fname, "rb");
     if (fp == 0)
-        return (load_data_result){.err=1};
+        return (load_data_result){.err = 1};
 
     load_data_result out = {Vec_with_size(1024, '\0')};
     fread(out.vec.data, sizeof(out.vec.data[0]), 1024, fp);

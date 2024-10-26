@@ -1,8 +1,11 @@
 # STC [crand64 / crand32](../include/stc/random.h): Pseudo Random Number Generator
 ![Random](pics/random.jpg)
 
-This features an excellent 32- and 64-bit Pseudo Random Number Geneator (PRNG).
-See [random](https://en.cppreference.com/w/cpp/header/random) for similar c++ functionality.
+A high quality, very fast 32- and 64-bit Pseudo Random Number Geneator (PRNG). It features
+uniform and normal distributed random numbers and float/doubles conversions.
+
+<details>
+<summary>A comparison with xoshiro256**</summary>
 
 Several programming languages uses xoshiro256\*\* as the default PRNG. Let's compare.
 
@@ -16,7 +19,7 @@ from currently available random test-suites. **SFC64** has a minimum period leng
     - Trivially predictable and invertible: previous outputs along with all future ones can trivially be computed from four
       output samples.
     - Requires *jump-functions*, which the user must call in order to split up the output ranges before parallel execution.
-    - Overkill: Even to create "as few as" 2^64 random numbers in one thread at 1ns per number takes 584 years. 
+    - Overkill: Even to create "as few as" 2^64 random numbers in one thread at 1ns per number takes 584 years.
     - The generator may end up in "zeroland" or "oneland" states (nearly all bits 0s or 1s for multiple outputs in a row), and will
       generate low quality output. See [A Quick Look at Xoshiro256\*\*](https://www.pcg-random.org/posts/a-quick-look-at-xoshiro256.html).
 - **crand64** does not need jump-functions. Instead one can simply pass a unique odd id/number to each stream/thread as argument.
@@ -27,6 +30,7 @@ from currently available random test-suites. **SFC64** has a minimum period leng
 - **xoshiro256\*\***'s output is not fed back into its state, instead every possible bit-state is iterated over by applying XOR and
 SHIFT bit-operations exclusively. Like with Mersenne Twister, the extreme period length has a cost: Because of the highly regulated
 state changes, a relative expensive output function with two multiplications is needed to achieve high quality output.
+</details>
 
 ## Header file
 ```c

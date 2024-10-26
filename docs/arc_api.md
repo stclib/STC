@@ -58,13 +58,12 @@ arc_X           arc_X_from_ptr(i_key* p);                       // create an arc
 arc_X           arc_X_make(i_key key);                          // create an arc from constructed key object. Faster than from_ptr().
 
 arc_X           arc_X_clone(arc_X other);                       // return other with increased use count
-arc_X           arc_X_move(arc_X* self);                        // transfer ownership to receiver; self becomes NULL
-void            arc_X_take(arc_X* self, arc_X unowned);         // take ownership of unowned.
 void            arc_X_assign(arc_X* self, arc_X other);         // shared assign (increases use count)
-
+void            arc_X_take(arc_X* self, arc_X unowned);         // take ownership of unowned.
+arc_X           arc_X_move(arc_X* self);                        // transfer ownership to receiver; self becomes NULL
 void            arc_X_drop(arc_X* self);                        // destruct (decrease use count, free at 0)
-long            arc_X_use_count(const arc_X* self);
 
+long            arc_X_use_count(const arc_X* self);
 void            arc_X_reset_to(arc_X* self, i_key* p);          // assign new arc from ptr. Takes ownership of p.
 
 size_t          arc_X_hash(const arc_X* x);                     // hash value

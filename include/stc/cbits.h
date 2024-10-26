@@ -181,10 +181,11 @@ STC_INLINE cbits* cbits_copy(cbits* self, const cbits* other) {
     return self;
 }
 
-STC_INLINE void cbits_resize(cbits* self, const isize size, const bool value) {
+STC_INLINE bool cbits_resize(cbits* self, const isize size, const bool value) {
     const isize new_w = _cbits_words(size), osize = self->_size, old_w = _cbits_words(osize);
-    self->buffer = (uintptr_t *)i_realloc(self->buffer, old_w*_cbits_WS, new_w*_cbits_WS);
-    self->_size = size;
+    uintptr_t* b = (uintptr_t *)i_realloc(self->buffer, old_w*_cbits_WS, new_w*_cbits_WS);
+    if (b == NULL) return false;
+    self->buffer = b; self->_size = size;
     if (size > osize) {
         c_memset(self->buffer + old_w, -(int)value, (new_w - old_w)*_cbits_WS);
         if (osize & (_cbits_WB - 1)) {
@@ -193,6 +194,7 @@ STC_INLINE void cbits_resize(cbits* self, const isize size, const bool value) {
             else       self->buffer[old_w - 1] &= mask;
         }
     }
+    return true;
 }
 
 STC_INLINE void cbits_set_all(cbits *self, const bool value);

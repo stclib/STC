@@ -46,13 +46,16 @@ vec_X           vec_X_with_size(isize size, i_key null);
 vec_X           vec_X_with_capacity(isize size);
 vec_X           vec_X_clone(vec_X vec);
 
-void            vec_X_clear(vec_X* self);
 void            vec_X_copy(vec_X* self, const vec_X* other);
 vec_X_iter      vec_X_copy_n(vec_X* self, isize idx, const i_key* arr, isize n);
+vec_X           vec_X_move(vec_X* self);                                    // move
+void            vec_X_take(vec_X* self, vec_X unowned);                     // take ownership of unowned
+void            vec_X_drop(vec_X* self);                                    // destructor
+
+void            vec_X_clear(vec_X* self);
 bool            vec_X_reserve(vec_X* self, isize cap);
 bool            vec_X_resize(vec_X* self, isize size, i_key null);
 void            vec_X_shrink_to_fit(vec_X* self);
-void            vec_X_drop(vec_X* self);                                    // destructor
 
 bool            vec_X_is_empty(const vec_X* self);
 isize           vec_X_size(const vec_X* self);

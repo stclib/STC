@@ -54,13 +54,16 @@ See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) fo
 ```c
 smap_X          smap_X_init(void);
 sset_X          smap_X_with_capacity(isize cap);
-bool            smap_X_reserve(smap_X* self, isize cap);
-void            smap_X_shrink_to_fit(smap_X* self);
+
 smap_X          smap_X_clone(smap_x map);
+void            smap_X_copy(smap_X* self, const smap_X* other);
+void            smap_X_take(smap_X* self, smap_X unowned);                               // take ownership of unowned
+smap_X          smap_X_move(smap_X* self);                                               // move
+void            smap_X_drop(smap_X* self);                                               // destructor
 
 void            smap_X_clear(smap_X* self);
-void            smap_X_copy(smap_X* self, const smap_X* other);
-void            smap_X_drop(smap_X* self);                                               // destructor
+bool            smap_X_reserve(smap_X* self, isize cap);
+void            smap_X_shrink_to_fit(smap_X* self);
 
 bool            smap_X_is_empty(const smap_X* self);
 isize           smap_X_size(const smap_X* self);

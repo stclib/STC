@@ -46,13 +46,18 @@
 #endif
 typedef i_keyraw _m_raw;
 
+STC_INLINE Self _c_MEMB(_init)(void)
+    { return (Self){0}; }
+
 #ifdef i_capacity
-STC_INLINE void _c_MEMB(_init)(Self* self)
-    { self->size = 0; }
+STC_INLINE Self _c_MEMB(_move)(Self *self)
+    { return *self; }
 #else
-STC_INLINE Self _c_MEMB(_init)(void) {
-    Self out = {0};
-    return out;
+
+STC_INLINE Self _c_MEMB(_move)(Self *self) {
+    Self m = *self;
+    memset(self, 0, sizeof *self);
+    return m;
 }
 
 STC_INLINE Self _c_MEMB(_with_capacity)(isize cap) {
@@ -80,6 +85,11 @@ STC_INLINE void _c_MEMB(_drop)(const Self* cself) {
 #ifndef i_capacity
     i_free(self->data, self->capacity*c_sizeof(*self->data));
 #endif
+}
+
+STC_INLINE void _c_MEMB(_take)(Self *self, Self unowned) {
+    _c_MEMB(_drop)(self);
+    *self = unowned;
 }
 
 STC_INLINE isize _c_MEMB(_size)(const Self* self)

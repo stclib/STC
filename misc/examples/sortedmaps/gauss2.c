@@ -1,12 +1,10 @@
 #include <stdio.h>
 #include <time.h>
 #include <math.h>
-
-#include "stc/cstr.h"
 #include "stc/random.h"
 
 // Declare int -> int sorted map.
-#define i_type SortedMap,int,int
+#define i_type SortedMap, int, int
 #include "stc/smap.h"
 
 int main(void)
@@ -22,14 +20,13 @@ int main(void)
     printf("Mean %f, StdDev %f\n", Mean, StdDev);
 
     // Setup random normal distribution.
-    crand64_normal_dist dist = {.mean=Mean, .stddev=StdDev};
+    crand64_normal_dist d = {.mean=Mean, .stddev=StdDev};
 
     // Create and init histogram map with defered destruct
     SortedMap hist = {0};
-    cstr bar = {0};
 
     c_forrange (N) {
-        int index = (int)round(crand64_normal(&dist));
+        int index = (int)round(crand64_normal(&d));
         SortedMap_insert(&hist, index, 0).ref->second += 1;
     }
 
@@ -37,10 +34,10 @@ int main(void)
     c_foreach_kv (index, count, SortedMap, hist) {
         int n = (int)round(2.5 * Scale * StdDev * (*count) / (isize)N);
         if (n > 0) {
-            cstr_resize(&bar, n, '*');
-            printf("%4d %s\n", *index, cstr_str(&bar));
+            printf("%4d ", *index);
+            while (n--) printf("*");
+            puts("");
         }
     }
-    cstr_drop(&bar);
     SortedMap_drop(&hist);
 }

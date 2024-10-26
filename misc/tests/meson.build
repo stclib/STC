@@ -12,6 +12,7 @@ if tests.enabled()
       'c_filter',
     ],
     'cregex': [
+      'ISO8601_parse_result',
       'compile_match_char',
       'compile_match_anchors',
       'compile_match_quantifiers1',
@@ -31,6 +32,19 @@ if tests.enabled()
       'subdim',
       'slice',
       'slice2',
+      'equality',
+    ],
+    'hmap': [
+      'mapdemo1',
+      'mapdemo2',
+      'mapdemo3',
+    ],
+    'smap': [
+      'erase',
+      'insert',
+    ],
+    'vec': [
+      'basics',
     ],
     'deque': [
       'basics',
@@ -38,6 +52,7 @@ if tests.enabled()
     'list': [
       'splice',
       'erase',
+      'misc',
     ],
   }
     test_exe = executable(

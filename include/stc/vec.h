@@ -90,6 +90,17 @@ STC_API _m_iter         _c_MEMB(_find_in)(_m_iter it1, _m_iter it2, _m_raw raw);
 STC_INLINE Self         _c_MEMB(_init)(void) { return c_literal(Self){0}; }
 STC_INLINE void         _c_MEMB(_value_drop)(_m_value* val) { i_keydrop(val); }
 
+STC_INLINE Self _c_MEMB(_move)(Self *self) {
+    Self m = *self;
+    memset(self, 0, sizeof *self);
+    return m;
+}
+
+STC_INLINE void _c_MEMB(_take)(Self *self, Self unowned) {
+    _c_MEMB(_drop)(self);
+    *self = unowned;
+}
+
 STC_INLINE _m_value* _c_MEMB(_push)(Self* self, _m_value value) {
     if (self->size == self->capacity)
         if (!_c_MEMB(_reserve)(self, self->size*2 + 4))
@@ -315,10 +326,11 @@ _c_MEMB(_insert_uninit)(Self* self, const isize idx, const isize n) {
 
 STC_DEF _m_iter
 _c_MEMB(_erase_n)(Self* self, const isize idx, const isize len) {
+    c_assert(idx + len <= self->size);
     _m_value* d = self->data + idx, *p = d, *end = self->data + self->size;
     for (isize i = 0; i < len; ++i, ++p)
         { i_keydrop(p); }
-    c_memmove(d, p, (end - p)*c_sizeof *d);
+    memmove(d, p, (size_t)(end - p)*sizeof *d);
     self->size -= len;
     return c_literal(_m_iter){p == end ? NULL : d, end - len};
 }

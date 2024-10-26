@@ -144,6 +144,17 @@ STC_INLINE void _c_MEMB(_value_drop)(_m_value* val) {
     _i_MAP_ONLY( i_valdrop((&val->second)); )
 }
 
+STC_INLINE Self _c_MEMB(_move)(Self *self) {
+    Self m = *self;
+    memset(self, 0, sizeof *self);
+    return m;
+}
+
+STC_INLINE void _c_MEMB(_take)(Self *self, Self unowned) {
+    _c_MEMB(_drop)(self);
+    *self = unowned;
+}
+
 #if !defined i_no_clone
 STC_INLINE _m_value _c_MEMB(_value_clone)(_m_value _val) {
     *_i_keyref(&_val) = i_keyclone((*_i_keyref(&_val)));

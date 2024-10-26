@@ -157,6 +157,17 @@ STC_INLINE _m_value*       _c_MEMB(_back_mut)(Self* self) { return &self->last->
 STC_INLINE _m_raw       _c_MEMB(_value_toraw)(const _m_value* pval) { return i_keytoraw(pval); }
 STC_INLINE void         _c_MEMB(_value_drop)(_m_value* pval) { i_keydrop(pval); }
 
+STC_INLINE Self _c_MEMB(_move)(Self *self) {
+    Self m = *self;
+    self->last = NULL;
+    return m;
+}
+
+STC_INLINE void _c_MEMB(_take)(Self *self, Self unowned) {
+    _c_MEMB(_drop)(self);
+    *self = unowned;
+}
+
 STC_INLINE isize
 _c_MEMB(_count)(const Self* self) {
     isize n = 1; const _m_node *node = self->last;

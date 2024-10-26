@@ -51,11 +51,14 @@ See the c++ class [std::list](https://en.cppreference.com/w/cpp/container/list) 
 
 ```c
 list_X          list_X_init(void);
+
 list_X          list_X_clone(list_X list);
+void            list_X_copy(list_X* self, const list_X* other);
+void            list_X_take(list_X* self, list_X unowned);                        // take ownership of unowned
+list_X          list_X_move(list_X* self);                                        // move
+void            list_X_drop(list_X* self);                                        // destructor
 
 void            list_X_clear(list_X* self);
-void            list_X_copy(list_X* self, const list_X* other);
-void            list_X_drop(list_X* self);                                        // destructor
 
 bool            list_X_is_empty(const list_X* list);
 isize           list_X_count(const list_X* list);                                 // size() in O(n) time

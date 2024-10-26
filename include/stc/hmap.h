@@ -177,6 +177,17 @@ STC_INLINE void _c_MEMB(_value_drop)(_m_value* _val) {
     _i_MAP_ONLY( i_valdrop((&_val->second)); )
 }
 
+STC_INLINE Self _c_MEMB(_move)(Self *self) {
+    Self m = *self;
+    memset(self, 0, sizeof *self);
+    return m;
+}
+
+STC_INLINE void _c_MEMB(_take)(Self *self, Self unowned) {
+    _c_MEMB(_drop)(self);
+    *self = unowned;
+}
+
 STC_INLINE _m_result
 _c_MEMB(_insert)(Self* self, _m_key _key _i_MAP_ONLY(, _m_mapped _mapped)) {
     _m_result _res = _c_MEMB(_insert_entry_)(self, i_keytoraw((&_key)));

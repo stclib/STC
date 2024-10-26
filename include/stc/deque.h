@@ -151,6 +151,7 @@ _c_MEMB(_push_front)(Self* self, _m_value value) {
 STC_DEF void
 _c_MEMB(_erase_n)(Self* self, const isize idx, const isize n) {
     const isize len = _c_MEMB(_size)(self);
+    c_assert(idx + n <= len);
     for (isize i = idx + n - 1; i >= idx; --i)
         i_keydrop(_c_MEMB(_at_mut)(self, i));
     for (isize i = idx, j = i + n; j < len; ++i, ++j)

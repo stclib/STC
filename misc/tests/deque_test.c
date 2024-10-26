@@ -17,7 +17,6 @@ TEST(deque, basics) {
     IDeq res1 = c_init(IDeq, {6, 7, 8, 9, 10, 11, 12, 20, 30, 40, 50, 60, 70, 80});
     EXPECT_TRUE(IDeq_eq(&res1, &d));
     EXPECT_EQ(14, IDeq_size(&d));
-    EXPECT_EQ(15, IDeq_capacity(&d)); // = k^2 - 1
 
     IDeq_erase_n(&d, 7, 4);
 

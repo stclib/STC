@@ -8,6 +8,17 @@
 #define M_END(m) (M_START(m) + (m).size)
 
 
+TEST(cregex, ISO8601_parse_result)
+{
+    const char* pattern = "(\\d\\d\\d\\d)-(\\d\\d)-(\\d\\d)";
+
+    csview match[4];
+    EXPECT_EQ(cregex_find_pattern(pattern, "2024-02-28", match), CREG_OK);
+    EXPECT_TRUE(csview_equals(match[1], "2024"));
+    EXPECT_TRUE(csview_equals(match[2], "02"));
+    EXPECT_TRUE(csview_equals(match[3], "28"));
+}
+
 TEST(cregex, compile_match_char)
 {
     const char* inp;

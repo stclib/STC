@@ -136,8 +136,10 @@ typedef struct {
     while ((1 ? (corocall) : -1) != CCO_DONE)
 
 #define cco_stop(co) \
-    ((co)->cco.state = (co)->cco.state >= CCO_STATE_INIT ? \
-                       CCO_STATE_CLEANUP : CCO_STATE_DONE)
+    do { \
+        int* _s = &(co)->cco.state; \
+        *_s = *_s >= CCO_STATE_INIT ? CCO_STATE_CLEANUP : CCO_STATE_DONE; \
+    } while (0)
 
 #define cco_reset(co) \
     (void)((co)->cco.state = 0)
@@ -148,6 +150,10 @@ typedef struct {
  * // Iterators for coroutine generators
  * 
  * typedef struct { // The generator
+ *     ...
+ * } Gen, Gen_value;
+ *
+ * typedef struct {
  *     ...
  * } Gen, Gen_value;
  *
@@ -176,7 +182,7 @@ typedef struct {
  *     Gen_next(&it);
  *     return it;
  * }
- * 
+ *
  * ...
  * c_foreach (i, Gen, gen)
  *     printf("%d ", *i.ref);
@@ -310,6 +316,11 @@ typedef struct { ptrdiff_t count; } cco_semaphore;
 
 typedef struct { double interval, start; } cco_timer;
 
+static inline cco_timer cco_timer_make(double sec) {
+    cco_timer tm = {.interval=sec, .start=cco_time()};
+    return tm;
+}
+
 #define cco_await_timer(tm, sec) cco_await_timer_with_return(tm, sec, CCO_AWAIT)
 #define cco_await_timer_v(...) c_MACRO_OVERLOAD(cco_await_timer_v, __VA_ARGS__)
 #define cco_await_timer_with_return(tm, sec, ret) \
@@ -321,11 +332,6 @@ typedef struct { double interval, start; } cco_timer;
 static inline void cco_timer_start(cco_timer* tm, double sec) {
     tm->interval = sec;
     tm->start = cco_time();
-}
-
-static inline cco_timer cco_timer_from(double sec) {
-    cco_timer tm = {.interval=sec, .start=cco_time()};
-    return tm;
 }
 
 static inline void cco_timer_restart(cco_timer* tm) {

@@ -51,9 +51,9 @@ box_X           box_X_from_ptr(i_key* ptr);                     // create a box 
 box_X           box_X_make(i_key val);                          // create a box from unowned val object.
 
 box_X           box_X_clone(box_X other);                       // return deep copied clone
-box_X           box_X_move(box_X* self);                        // transfer ownership to receiving box returned. self becomes NULL.
-void            box_X_take(box_X* self, box_X unowned);         // take ownership of unowned box object.
 void            box_X_assign(box_X* self, box_X* moved);        // transfer ownership from moved to self; moved becomes NULL.
+void            box_X_take(box_X* self, box_X unowned);         // take ownership of unowned box object.
+box_X           box_X_move(box_X* self);                        // transfer ownership to receiving box returned. self becomes NULL.
 void            box_X_drop(box_X* self);                        // destruct the contained object and free its heap memory.
 
 void            box_X_reset_to(box_X* self, i_key* p);          // assign new box from ptr. Takes ownership of p.

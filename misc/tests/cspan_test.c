@@ -14,7 +14,7 @@ TEST(cspan, subdim) {
         c_forrange (j, m.shape[1]) {
             Span sub_i_j = cspan_submd2(&sub_i, j);
             c_forrange (k, m.shape[2]) {
-               ASSERT_EQ(*cspan_at(&sub_i_j, k), *cspan_at(&m, i, j, k));
+               EXPECT_EQ(*cspan_at(&sub_i_j, k), *cspan_at(&m, i, j, k));
             }
         }
     }
@@ -155,5 +155,5 @@ TEST_F(cspan_cube, slice3, fixt) {
         c_foreach (i, Span3, *tile.ref)
             sum += *i.ref;
 
-    ASSERT_EQ(sum, n*(n + 1)/2);
+    EXPECT_EQ(sum, n*(n + 1)/2);
 }
