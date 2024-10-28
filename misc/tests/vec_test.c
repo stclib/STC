@@ -13,23 +13,23 @@ TEST(vec, basics) {
     c_forrange32 (i, 2, 9)
         IVec_push_back(&d, i*10);
 
-    IVec res1 = c_init(IVec, {6, 7, 8, 9, 10, 11, 12, 20, 30, 40, 50, 60, 70, 80});
-    EXPECT_TRUE(IVec_eq(&res1, &d));
+    IVec res = c_init(IVec, {6, 7, 8, 9, 10, 11, 12, 20, 30, 40, 50, 60, 70, 80});
+    EXPECT_TRUE(IVec_eq(&res, &d));
     EXPECT_EQ(14, IVec_size(&d));
 
     IVec_erase_n(&d, 7, 4);
 
-    IVec res2 = c_init(IVec, {6, 7, 8, 9, 10, 11, 12, 60, 70, 80});
-    EXPECT_TRUE(IVec_eq(&res2, &d));
+    IVec_take(&res, c_init(IVec, {6, 7, 8, 9, 10, 11, 12, 60, 70, 80}));
+    EXPECT_TRUE(IVec_eq(&res, &d));
 
     int nums[] = {200, 300, 400, 500};
     IVec_insert_n(&d, 7, nums, 4);
 
-    IVec res3 = c_init(IVec, {6, 7, 8, 9, 10, 11, 12, 200, 300, 400, 500, 60, 70, 80});
-    EXPECT_TRUE(IVec_eq(&res3, &d));
+    IVec_take(&res, c_init(IVec, {6, 7, 8, 9, 10, 11, 12, 200, 300, 400, 500, 60, 70, 80}));
+    EXPECT_TRUE(IVec_eq(&res, &d));
 
     EXPECT_EQ(14, IVec_size(&d));
     EXPECT_EQ(200, *IVec_at(&d, 7));
 
-    c_drop(IVec, &d, &res1, &res2, &res3);
+    c_drop(IVec, &d, &res);
 }

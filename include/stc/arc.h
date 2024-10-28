@@ -173,10 +173,10 @@ STC_INLINE void _c_MEMB(_take)(Self* self, Self unowned) {
 }
 
 // make shared ownership with owned arc
-STC_INLINE void _c_MEMB(_assign)(Self* self, Self owned) {
-    if (owned.use_count) _i_atomic_inc(owned.use_count);
+STC_INLINE void _c_MEMB(_assign)(Self* self, const Self* owned) {
+    if (owned->use_count) _i_atomic_inc(owned->use_count);
     _c_MEMB(_drop)(self);
-    *self = owned;
+    *self = *owned;
 }
 
 // clone by sharing. Does not use i_keyclone, so OK to always define.
