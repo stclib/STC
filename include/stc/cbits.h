@@ -202,7 +202,7 @@ STC_INLINE void cbits_set_pattern(cbits *self, const uintptr_t pattern);
 
 STC_INLINE cbits cbits_move(cbits* self) {
     cbits tmp = *self;
-    self->buffer = NULL, self->_size = 0;
+    memset(self, 0, sizeof *self);
     return tmp;
 }
 

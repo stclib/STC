@@ -62,12 +62,11 @@ extern  char* _cstr_internal_move(cstr* self, isize pos1, isize pos2);
 
 #define             cstr_init() (c_literal(cstr){0})
 #define             cstr_lit(literal) cstr_with_n(literal, c_litstrlen(literal))
-#define             cstr_join(sep, ...) \
-                        cstr_join_array(sep, c_make_array(const char*, {__VA_ARGS__}), \
-                                             c_NUMARGS(__VA_ARGS__))
+#define             cstr_join_vec(sep, vecp) \
+                        cstr_join_array_s(sep, (vecp)->data, (vecp)->size)
 #define             cstr_join_s(sep, ...) \
-                        cstr_join_array_s(sep, c_make_array(cstr, {__VA_ARGS__}), \
-                                               c_NUMARGS(__VA_ARGS__))
+                        cstr_join_array_s(sep, c_make_array(cstr, __VA_ARGS__), c_NUMARGS(__VA_ARGS__))
+
 extern  cstr        cstr_from_replace(csview sv, csview search, csview repl, int32_t count);
 extern  cstr        cstr_from_fmt(const char* fmt, ...);
 
