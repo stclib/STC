@@ -227,13 +227,13 @@ typedef const char* cstr_raw;
 
 // RAII scopes
 #define c_defer(...) \
-    for (int _c_i = 1; _c_i; _c_i = 0, __VA_ARGS__)
+    for (int _c_i = 0; _c_i++ == 0; __VA_ARGS__)
 
 #define c_with(...) c_MACRO_OVERLOAD(c_with, __VA_ARGS__)
 #define c_with_2(init, deinit) \
-    for (int _c_i = 1; _c_i; ) for (init; _c_i; _c_i = 0, deinit) // thanks, tstanisl
+    for (int _c_i = 0; _c_i == 0; ) for (init; _c_i++ == 0; deinit)
 #define c_with_3(init, condition, deinit) \
-    for (int _c_i = 1; _c_i; ) for (init; _c_i && (condition); _c_i = 0, deinit)
+    for (int _c_i = 0; _c_i == 0; ) for (init; _c_i++ == 0 && (condition); deinit)
 
 // General functions
 
