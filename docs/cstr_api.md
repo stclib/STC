@@ -28,13 +28,13 @@ cstr            cstr_from(const char* str);                             // const
 cstr            cstr_from_s(cstr s, isize pos, isize len);              // construct a substring
 cstr            cstr_from_sv(csview sv);                                // construct from a string view
 cstr            cstr_from_zv(zsview zv);                                // construct from a zero-terminated zsview
-cstr            cstr_from_fmt(const char* fmt, ...);                    // printf() formatting
+cstr            cstr_from_fmt(const char* fmt, ...);                    // construct from printf() formatting
 cstr            cstr_from_replace(csview sv, csview search, csview repl, int32_t count);
 cstr            cstr_with_n(const char* str, isize n);                  // construct from first n bytes of str
 cstr            cstr_with_capacity(isize cap);                          // make empty string with pre-allocated capacity.
 cstr            cstr_with_size(isize len, char fill);                   // make string with fill characters
-cstr            cstr_join(const char* sep, const char* str1, ...);      // construct by joining c-strings with separator
-cstr            cstr_join_s(const char* sep, cstr s1, ...);             // construct by joining cstrs with separator
+cstr            cstr_join_vec(const char* sep, Vec* vec);               // construct by joining vec/stack of cstrs with separator
+cstr            cstr_join_s(const char* sep, {cstr s1, ...});           // construct by joining cstrs with separator
 cstr            cstr_join_array(const char* sep, const char* arr[], isize n); // join c-string array with separator
 cstr            cstr_join_array_s(const char* sep, cstr arr[], isize n); // join cstr array with separator
 

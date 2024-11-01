@@ -51,12 +51,13 @@ box_X           box_X_from_ptr(i_key* ptr);                     // create a box 
 box_X           box_X_make(i_key val);                          // create a box from unowned val object.
 
 box_X           box_X_clone(box_X other);                       // return deep copied clone
-void            box_X_assign(box_X* self, box_X* moved);        // transfer ownership from moved to self; moved becomes NULL.
+void            box_X_assign(box_X* self, box_X* other);        // transfer ownership from other to self; other set to NULL.
 void            box_X_take(box_X* self, box_X unowned);         // take ownership of unowned box object.
-box_X           box_X_move(box_X* self);                        // transfer ownership to receiving box returned. self becomes NULL.
+box_X           box_X_move(box_X* self);                        // transfer ownership to receiving box. self set to NULL.
+i_key*          box_X_release(box_X* self);                     // release owned pointer; must be freed by receiver. self set NULL.
 void            box_X_drop(box_X* self);                        // destruct the contained object and free its heap memory.
 
-void            box_X_reset_to(box_X* self, i_key* p);          // assign new box from ptr. Takes ownership of p.
+void            box_X_reset_to(box_X* self, i_key* ptr);        // assign ptr, and take ownership of ptr.
 
 size_t          box_X_hash(const box_X* x);                     // hash value
 int             box_X_cmp(const box_X* x, const box_X* y);      // compares pointer addresses if no `i_cmp` is specified

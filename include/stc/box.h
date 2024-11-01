@@ -84,8 +84,6 @@ STC_INLINE Self _c_MEMB(_init)(void)
 STC_INLINE long _c_MEMB(_use_count)(const Self* self)
     { return (long)(self->get != NULL); }
 
-STC_INLINE Self _c_MEMB(_from_ptr)(_m_value* p)
-    { return c_literal(Self){p}; }
 
 // c++: std::make_unique<i_key>(val)
 STC_INLINE Self _c_MEMB(_make)(_m_value val) {
@@ -93,6 +91,12 @@ STC_INLINE Self _c_MEMB(_make)(_m_value val) {
     *box.get = val;
     return box;
 }
+
+STC_INLINE Self _c_MEMB(_from_ptr)(_m_value* p)
+    { return c_literal(Self){p}; }
+
+STC_INLINE Self _c_MEMB(_from)(_m_raw raw)
+    { return _c_MEMB(_make)(i_keyfrom(raw)); }
 
 STC_INLINE _m_raw _c_MEMB(_toraw)(const Self* self)
     { return i_keytoraw(self->get); }
@@ -105,23 +109,37 @@ STC_INLINE void _c_MEMB(_drop)(const Self* self) {
     }
 }
 
+// move ownership to receiving box
 STC_INLINE Self _c_MEMB(_move)(Self* self) {
     Self box = *self;
     self->get = NULL;
     return box;
 }
 
+// release owned pointer, must be manually freed by receiver
 STC_INLINE _m_value* _c_MEMB(_release)(Self* self)
     { return _c_MEMB(_move)(self).get; }
 
-// take ownership of p
+// take ownership of pointer p
 STC_INLINE void _c_MEMB(_reset_to)(Self* self, _m_value* p) {
     _c_MEMB(_drop)(self);
     self->get = p;
 }
 
-STC_INLINE Self _c_MEMB(_from)(_m_raw raw)
-    { return _c_MEMB(_make)(i_keyfrom(raw)); }
+// take ownership of unowned box
+STC_INLINE void _c_MEMB(_take)(Self* self, Self unowned) {
+    _c_MEMB(_drop)(self);
+    *self = unowned;
+}
+
+// transfer ownership from other; set other to NULL
+STC_INLINE void _c_MEMB(_assign)(Self* self, Self* owned) {
+    if (owned->get == self->get)
+        return;
+    _c_MEMB(_drop)(self);
+    *self = *owned;
+    owned->get = NULL;
+}
 
 #if !defined i_no_clone
     STC_INLINE Self _c_MEMB(_clone)(Self other) {
@@ -132,19 +150,6 @@ STC_INLINE Self _c_MEMB(_from)(_m_raw raw)
     }
 #endif // !i_no_clone
 
-// take ownership of unowned
-STC_INLINE void _c_MEMB(_take)(Self* self, Self unowned) {
-    _c_MEMB(_drop)(self);
-    *self = unowned;
-}
-// transfer ownership from moved; set moved to NULL
-STC_INLINE void _c_MEMB(_assign)(Self* self, Self* moved) {
-    if (moved->get == self->get)
-        return;
-    _c_MEMB(_drop)(self);
-    *self = *moved;
-    moved->get = NULL;
-}
 
 #if defined _i_has_cmp
     STC_INLINE int _c_MEMB(_raw_cmp)(const _m_raw* rx, const _m_raw* ry)
