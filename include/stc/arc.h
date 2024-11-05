@@ -155,7 +155,7 @@ STC_INLINE void _c_MEMB(_drop)(const Self* self) {
 // move ownership to receiving arc
 STC_INLINE Self _c_MEMB(_move)(Self* self) {
     Self arc = *self;
-    self->get = NULL, self->use_count = NULL;
+    memset(self, 0, sizeof *self);
     return arc; // now unowned
 }
 
@@ -167,7 +167,6 @@ STC_INLINE void _c_MEMB(_reset_to)(Self* self, _m_value* ptr) {
 
 // take ownership of unowned arc
 STC_INLINE void _c_MEMB(_take)(Self* self, Self unowned) {
-    c_assert(self->get != unowned.get);
     _c_MEMB(_drop)(self);
     *self = unowned;
 }
