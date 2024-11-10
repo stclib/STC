@@ -19,8 +19,8 @@ typedef struct {
 } Triple_iter;
 
 int Triple_next(Triple_iter* it) {
-    Triple* g = it->ref; // get generator before cco_scope starts!
-    cco_scope(it)
+    Triple* g = it->ref; // get generator before cco_routine starts!
+    cco_routine (it)
     {
         for (g->c = 5;; ++g->c) {
             for (g->a = 1; g->a < g->c; ++g->a) {

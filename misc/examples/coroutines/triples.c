@@ -25,7 +25,7 @@ struct triples {
 };
 
 int triples_coro(struct triples* t) {
-    cco_scope(t) {
+    cco_routine (t) {
         for (t->c = 5;; ++t->c) {
             for (t->a = 1; t->a < t->c; ++t->a) {
                 for (t->b = t->a + 1; t->b < t->c; ++t->b) {

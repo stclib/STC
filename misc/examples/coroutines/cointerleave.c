@@ -12,7 +12,7 @@ struct GenValue {
 
 static long get_value(struct GenValue* g)
 {
-    cco_scope(g) {
+    cco_routine (g) {
         cco_foreach (g->it, IVec, *g->v)
             cco_yield_v(*g->it.ref);
     }
@@ -28,7 +28,7 @@ struct Generator {
 
 int interleaved(struct Generator* g)
 {
-    cco_scope(g) {
+    cco_routine (g) {
         do {
             g->value = get_value(&g->x);
             g->xact = cco_active(&g->x);

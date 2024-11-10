@@ -11,41 +11,33 @@ Because these coroutines are stackless, local variables within the coroutine whe
 ### Coroutine API
 
 NB! ***cco_yield\*()*** / ***cco_await\*()*** may not be called from within a `switch` statement in a
-`cco_scope` scope; Use `if-else-if` constructs instead.
+`cco_routine` scope; Use `if-else-if` constructs instead.
 
-|           |  Function / operator                 | Description                             |
-|:----------|:-------------------------------------|:----------------------------------------|
+|           |  Main functions                      | Description                              |
+|:----------|:-------------------------------------|:-----------------------------------------|
 |`cco_result` | `CCO_DONE`, `CCO_AWAIT`, `CCO_YIELD` | Default set of return values from coroutines |
-|           | `cco_cleanup:`                       | Label for cleanup position in coroutine |
-| `bool`    | `cco_done(co)`                       | Is coroutine done?                      |
-|           | `cco_scope(co) {}`                   | The coroutine scope                     |
-|           | `cco_yield;`                         | Yield/suspend execution (return CCO_YIELD)|
-|           | `cco_yield_v(ret);`                  | Yield/suspend execution (return ret)    |
+|           | `cco_cleanup:`                       | Label for cleanup position in coroutine  |
+| `bool`    | `cco_done(co)`                       | Is coroutine done?                       |
+| `bool`    | `cco_active(co)`                     | Is coroutine active? (= not done)        |
+|           | `cco_routine(co) {}`                 | The coroutine scope                      |
+|           | `cco_yield;`                         | Yield/suspend execution with CCO_YIELD   |
+|           | `cco_yield_v(value);`                | Yield/suspend execution with (bit)value  |
 |           | `cco_yield_final;`                   | Yield final suspend, enter cleanup-state |
-|           | `cco_yield_final_v(ret);`            | Yield with a final value                 |
+|           | `cco_yield_final_v(value);`          | Yield with a final (bit)value            |
 |           | `cco_await(condition);`              | Suspend until condition is true (return CCO_AWAIT)|
-|           | `cco_await_coroutine(cocall);`       | Await for subcoro to finish (returns its ret value) |
-|           | `cco_await_coroutine(cocall, retbit);` | Await for subcoro's return to be in (retbit \| CCO_DONE)  |
-|           | `cco_return;`                        | Return from coroutine (inside cco_scope) |
-|           | ***c_filter() interoperability with coroutine iterators***: ||
-|           | `cco_flt_take(num);`                 | Use instead of *c_flt_take(num)* to ensure cleanup state |
-|           | `cco_flt_takewhile(predicate);`      | Use instead of *c_flt_takewhile(pred)* to ensure cleanup state |
-|           | `cco_flt_takewhile(predicate);`      | Use instead of *c_flt_takewhile(pred)* to ensure cleanup state |
-|           | ***Container iteration in coroutines***: ||
-|           | `cco_foreach(existing_it, ctype, cnt)` | Use existing iterator stored in coroutine object |
-|           | `cco_foreach_reverse(existing_it, ctype, cnt)` | Iterate in reverse order     |
-|           | ***Task objects***:                  ||
-|           | `cco_task_struct(Name, ...);`        | Define a coroutine task struct          |
-|           | `cco_await_task(task, cco_runtime* rt);`| Await for task to finish             |
-|           | `cco_await_task(task, rt, retbit);`  | Await for task's return to be in (retbit \| CCO_DONE) |
+|           | `cco_await_coroutine(cocall);`       | Await for subcoro to finish |
+|           | `cco_await_coroutine(cocall, awaitbits);` | Await for subcoro's suspend value<br> to be in (awaitbits \| CCO_DONE)  |
+|           | `cco_return;`                        | Execute `cco_cleanup:` section (if specified),<br>set coroutine in done state and return |
+||::  ::  ::||
+|           | **Task objects**                  ||
+|           | `cco_task_struct(Name) { <Name>_state cco; ... };` | Define a coroutine task struct          |
+|           | `cco_await_task(task, cco_runtime* rt);`| Await for task to finish (CCO_DONE)  |
+|           | `cco_await_task(task, rt, awaitbits);` | Await for task's suspend value<br> in (awaitbits \| CCO_DONE), then continue |
+|           | `cco_yield_task(task, rt);`          | Yield to task                        |
+|           | `cco_yield_task(task, rt, awaitbits);` | Yield to task and run until suspend value<br> in (awaitbits \| CCO_DONE) |
 |`cco_result`| `cco_resume_task(task, rt);`        | Resume suspended task                   |
-|           | ***Semaphores***:                    ||
-|           | `cco_semaphore`                      | Semaphore type                          |
-|           | `cco_await_semaphore(sem)`           | Await for the semaphore count > 0       |
-|`cco_semaphore`| `cco_semaphore_from(long value)` | Create semaphore                        |
-|           | `cco_semaphore_set(sem, long value)` | Set semaphore value                     |
-|           | `cco_semaphore_release(sem)`         | Signal the semaphore (count += 1)       |
-|           | ***Timers***:                        ||
+||::  ::  ::||
+|           | **Timers**                        ||
 |           | `cco_timer`                          | Timer type                              |
 |           | `cco_await_timer(tm, double sec)`    | Await secs for timer to expire (usec prec.)|
 |           | `cco_timer_start(tm, double sec)`    | Start timer for secs duration           |
@@ -53,15 +45,32 @@ NB! ***cco_yield\*()*** / ***cco_await\*()*** may not be called from within a `s
 | `bool`    | `cco_timer_expired(tm)`              | Return true if timer is expired         |
 | `double`  | `cco_timer_elapsed(tm)`              | Return seconds elapsed                  |
 | `double`  | `cco_timer_remaining(tm)`            | Return seconds remaining                |
-|           | ***From caller side***:              ||
+||::  ::  ::||
+|           | **Time functions**                ||
+| `double`  | `cco_time(void)`                     | Return secs with usec prec. since Epoch |
+|           | `cco_sleep(double sec)`              | Sleep for seconds (msec or usec prec.)  |
+||::  ::  ::||
+|           | **Semaphores**                    ||
+|           | `cco_semaphore`                      | Semaphore type                          |
+|           | `cco_await_semaphore(sem)`           | Await for the semaphore count > 0       |
+|`cco_semaphore`| `cco_semaphore_from(long value)` | Create semaphore                        |
+|           | `cco_semaphore_set(sem, long value)` | Set semaphore value                     |
+|           | `cco_semaphore_release(sem)`         | Signal the semaphore (count += 1)       |
+||::  ::  ::||
+|           | **From caller side**              ||
 | `void`    | `cco_stop(co)`                       | Next call of coroutine finalizes        |
 | `void`    | `cco_reset(co)`                      | Reset state to initial (for reuse)      |
 | `void`    | `cco_run_coroutine(cocall) {}`       | Run blocking until cocall is finished   |
 |           | `cco_run_task(task) {}`         | Run blocking until task is finished |
 |           | `cco_run_task(task, rt, STACKSZ) {}`| Run blocking until task is finished |
-|           | ***Time functions***:                ||
-| `double`  | `cco_time(void)`                     | Return secs with usec prec. since Epoch |
-|           | `cco_sleep(double sec)`              | Sleep for seconds (msec or usec prec.)  |
+||::  ::  ::||
+|           | **c_filter() interoperability with coroutine iterators** ||
+|           | `cco_flt_take(num);`                 | Use instead of *c_flt_take(num)* to ensure cleanup state |
+|           | `cco_flt_takewhile(predicate);`      | Use instead of *c_flt_takewhile(pred)* to ensure cleanup state |
+||::  ::  ::||
+|           | **Container iteration in coroutines** ||
+|           | `cco_foreach(existing_it, ctype, cnt)` | Use existing iterator (stored in coroutine object) |
+|           | `cco_foreach_reverse(existing_it, ctype, cnt)` | Iterate in reverse order     |
 
 ## Implementation and examples
 
@@ -74,8 +83,10 @@ cancelled (not resumed until they are done).
 A coroutine function may have almost any signature, but the implementation adds support for
 coroutines which returns an int, indicating CCO_DONE, CCO_AWAIT, or CCO_YIELD. It should also
 take a struct pointer as parameter which must contains the member `cco_state cco;`. The struct should
-store all *local* variables to be used within the coroutine, along with *input* and *output* data
-for the coroutine.
+store all *local* variables to be used within the coroutine which lifetime crosses any `cco_yield*` or `cco_await*()` statements, along with any *input* and *output* data for the coroutine.
+
+Both asymmetric and symmetric coroutines are supported when using ***tasks*** (closures/functors),
+and may also be combined.
 
 Note that this implementation is not limited to support a certain set of coroutine types,
 like generators. It can even operate like stackfull coroutines, i.e. you can efficiently
@@ -90,21 +101,21 @@ The first example is a generator of Pythagorian triples, and stops when diagonal
 #include "stc/coroutine.h"
 
 struct triples {
-    int max_c;     // input: max c.
-    int a, b, c;   // output
-    cco_state cco; // required member
+    cco_state cco;   // required member
+    int64_t max_c;   // input: max c.
+    int64_t a, b, c; // output
 };
 
-int triples(struct triples* i) {
-    cco_scope (i) {  // the coroutine scope!
-        for (i->c = 5;; ++i->c) {
-            for (i->a = 1; i->a < i->c; ++i->a) {
-                for (i->b = i->a + 1; i->b < i->c; ++i->b) {
-                    if ((int64_t)i->a * i->a +
-                        (int64_t)i->b * i->b ==
-                        (int64_t)i->c * i->c)
+int triples(struct triples* co) {
+    cco_routine (co) {  // the coroutine scope!
+        for (co->c = 5;; ++co->c) {
+            for (co->a = 1; co->a < co->c; ++co->a) {
+                for (co->b = co->a + 1; co->b < co->c; ++co->b) {
+                    if (co->a * co->a +
+                        co->b * co->b ==
+                        co->c * co->c)
                     {
-                        if (i->c > i->max_c)
+                        if (co->c > co->max_c)
                             cco_return; // "jump" to cco_cleanup if defined, else exit scope.
                         cco_yield;
                     }
@@ -122,7 +133,7 @@ int main(void) {
     int n = 0;
 
     cco_run_coroutine(triples(&co)) {
-        printf("%d: [%d, %d, %d]\n", ++n, co.a, co.b, co.c);
+        printf("%d: [%d, %d, %d]\n", ++n, (int)co.a, (int)co.b, (int)co.c);
     }
 }
 ```
@@ -147,26 +158,26 @@ struct gcd1_triples {
     cco_state cco;           // required
 };
 
-int gcd1_triples(struct gcd1_triples* i)
+int gcd1_triples(struct gcd1_triples* co)
 {
-    cco_scope (i) {
-        cco_reset(&i->tri);
-        i->tri.max_c = i->max_c;
+    cco_routine (co) {
+        cco_reset(&co->tri);
+        co->tri.max_c = co->max_c;
 
-        while (triples(&i->tri) != CCO_DONE) {
+        while (triples(&co->tri) != CCO_DONE) {
             // Skip triples with GCD(a,b) > 1
-            if (gcd(i->tri.a, i->tri.b) > 1)
+            if (gcd(co->tri.a, co->tri.b) > 1)
                 continue;
 
             // Done when count > max_n
-            if (++i->count > i->max_n)
+            if (++co->count > co->max_n)
                 cco_return;
             else
                 cco_yield;
         }
         cco_cleanup:
-        cco_stop(&i->tri); // to cleanup state if still active
-        triples(&i->tri);  // do cleanup (or no-op if done)
+        cco_stop(&co->tri); // to cleanup state if still active
+        triples(&co->tri);  // do cleanup (or no-op if done)
     }
     return 0;
 }
@@ -176,7 +187,7 @@ int main(void) {
     int n = 0;
 
     cco_run_coroutine(gcd1_triples(&co)) {
-        printf("%d: [%d, %d, %d]\n", ++n, co.tri.a, co.tri.b, co.tri.c);
+        printf("%d: [%d, %d, %d]\n", ++n, (int)co.a, (int)co.b, (int)co.c);
     }
 }
 ```
@@ -186,8 +197,8 @@ However, this means that it first calls ***gcd1_triples()***, which immediately 
 is efficient only when yielding or awaiting from the top- or second-level call like here, but naturally not
 when couroutine calls are more deeply nested or recursive.
 
-The STC coroutine implementation therefore also contains task-objects (`cco_task`), which are base-coroutine
-objects/enclosures. These can be executed using ***cco_run_task()*** instead of ***cco_run_coroutine()***.
+The STC coroutine implementation therefore also contains task-objects (`cco_task`), which are functors/closures.
+These should be executed using ***cco_run_task()*** instead of ***cco_run_coroutine()***.
 Inner coroutine calls are done by ***cco_await_task()***, where you may await for a certain return value, normally CCO_YIELD or just CCO_DONE. It uses a stack of pointers of task-enclosures to call the current
 inner-level function directly. The task-objects have the added benefit that coroutines can be managed
 by a scheduler, which is useful when dealing with large numbers of coroutines (like in many games and
@@ -199,33 +210,32 @@ it is often beneficial to call the sub-coroutine directly rather than via ***cco
 
 The following example uses task-objects with 3-levels deep coroutine calls. It emulates an async generator
 by awaiting a few seconds before producing a number, using a timer.
+
+[ [Run this code](https://godbolt.org/z/nqPKG6s6W) ]
 ```c
-// https://mariusbancila.ro/blog/2020/06/22/a-cpp20-coroutine-example/
 #include <time.h>
 #include <stdio.h>
 #include "stc/cstr.h"
 #include "stc/coroutine.h"
 
-cco_task_struct (next_value) {
-    next_value_state cco; // must be first member!
+struct next_value {
     int val;
     cco_timer tm;
+    cco_state cco;
 };
 
-int next_value(struct next_value* co, cco_runtime* rt)
-{
-    cco_scope (co) {
+int next_value(struct next_value* co) {
+    cco_routine (co) {
         while (true) {
-            cco_await_timer(&co->tm, 1 + rand() % 2); // suspend with CCO_AWAIT
+            cco_await_timer(&co->tm, 1 + rand() % 2);
             co->val = rand();
-            cco_yield;                                // suspend with CCO_YIELD
+            cco_yield;
         }
     }
     return 0;
 }
 
-void print_time()
-{
+void print_time(void) {
     time_t now = time(NULL);
     char mbstr[64];
     strftime(mbstr, sizeof(mbstr), "[%H:%M:%S]", localtime(&now));
@@ -233,66 +243,60 @@ void print_time()
 }
 
 // PRODUCER
-cco_task_struct (produce_items) {
-    produce_items_state cco;
+struct produce_items {
     struct next_value next;
     cstr text;
+    cco_state cco;
 };
 
-int produce_items(struct produce_items* p, cco_runtime* rt)
-{
-    cco_scope (p) {
-        p->text = cstr_init();
-        p->next.cco.func = next_value;
-        while (true)
-        {
-            // await for CCO_YIELD (or CCO_DONE)
-            cco_await_task(&p->next, rt, CCO_YIELD);
-            cstr_printf(&p->text, "item %d", p->next.val);
+int produce_items(struct produce_items* pr) {
+    cco_routine (pr) {
+        pr->text = cstr_init();
+        while (true) {
+            cco_await_coroutine(next_value(&pr->next), CCO_YIELD);
+            cstr_printf(&pr->text, "item %d", pr->next.val);
             print_time();
-            printf("produced %s\n", cstr_str(&p->text));
+            printf("produced %s\n", cstr_str(&pr->text));
             cco_yield;
         }
+
         cco_cleanup:
-        cstr_drop(&p->text);
+        cstr_drop(&pr->text);
         puts("done produce");
     }
     return 0;
 }
 
 // CONSUMER
-cco_task_struct (consume_items) {
-    consume_items_state cco;
+struct consume_items {
     int n, i;
-    struct produce_items produce;
+    cco_state cco;
 };
 
-int consume_items(struct consume_items* c, cco_runtime* rt)
-{
-   cco_scope (c) {
-        c->produce.cco.func = produce_items;
-
-        for (c->i = 1; c->i <= c->n; ++c->i)
-        {
-            printf("consume #%d\n", c->i);
-            cco_await_task(&c->produce, rt, CCO_YIELD);
+int consume_items(struct consume_items* co, struct produce_items* pr) {
+   cco_routine (co) {
+        for (co->i = 1; co->i <= co->n; ++co->i) {
+            printf("consume #%d\n", co->i);
+            cco_await_coroutine(produce_items(pr), CCO_YIELD);
             print_time();
-            printf("consumed %s\n", cstr_str(&c->produce.text));
+            printf("consumed %s\n", cstr_str(&pr->text));
         }
+
         cco_cleanup:
-        cco_stop(&c->produce);
-        cco_resume_task(&c->produce, rt);
         puts("done consume");
     }
     return 0;
 }
 
-int main(void)
-{
-    struct consume_items consume = {
-        .cco = {consume_items},
-        .n = 5,
-    };
-    cco_run_task(&consume);
+int main(void) {
+    struct produce_items produce = {0};
+    struct consume_items consume = {.n=5};
+    int count = 0;
+
+    cco_run_coroutine(consume_items(&consume, &produce)) {
+        ++count;
+    }
+    cco_cancel(&produce, produce_items);
+    printf("count: %d\n", count);
 }
 ```

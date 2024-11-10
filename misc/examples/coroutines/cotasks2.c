@@ -1,101 +1,94 @@
-// https://mariusbancila.ro/blog/2020/06/22/a-cpp20-coroutine-example/
-
 #include <time.h>
 #include <stdio.h>
-#include "stc/cstr.h"
 #include "stc/coroutine.h"
+#define i_type Inventory, int
+#include "stc/queue.h"
 
-cco_task_struct (next_value) {
-    next_value_state cco;
-    int val;
-    cco_timer tm;
-};
-
-int next_value(struct next_value* co, cco_runtime* rt)
-{
-    (void)rt;
-    cco_scope (co) {
-        while (true) {
-            cco_await_timer(&co->tm, 1 + rand() % 2);
-            co->val = rand();
-            cco_yield;
-        }
-    }
-    return 0;
-}
-
-void print_time(void)
-{
-    time_t now = time(NULL);
-    char mbstr[64];
-    strftime(mbstr, sizeof(mbstr), "[%H:%M:%S]", localtime(&now));
-    printf("%s ", mbstr);
-}
+// Example shows symmetric coroutines producer/consumer style.
 
 // PRODUCER
-
 cco_task_struct (produce_items) {
-    produce_items_state cco;
-    struct next_value next;
-    cstr text;
+    produce_items_state cco; // must be first
+    struct consume_items* consumer;
+    Inventory inv;
+    int limit, batch, serial, total;
 };
 
-int produce_items(struct produce_items* p, cco_runtime* rt)
-{
-    cco_scope (p) {
-        p->text = cstr_init();
-        p->next.cco.func = next_value;
-        while (true)
-        {
-            // await for next CCO_YIELD (or CCO_DONE) in next_value
-            cco_await_task(&p->next, rt, CCO_YIELD);
-            cstr_printf(&p->text, "item %d", p->next.val);
-            print_time();
-            printf("produced %s\n", cstr_str(&p->text));
-            cco_yield;
+// CONSUMER
+cco_task_struct (consume_items) {
+    consume_items_state cco; // must be first
+    struct produce_items* producer;
+};
+
+int produce_items(struct produce_items* co, cco_runtime* rt) {
+    cco_check_task_struct(produce_items); // compile-time check that cco is first member
+
+    cco_routine (co) {
+        while (1) {
+            if (co->serial > co->total) {
+                if (Inventory_is_empty(&co->inv))
+                    cco_return; // cleanup and finish
+            }
+            else if (Inventory_size(&co->inv) < co->limit) {
+                c_forrange (co->batch)
+                    Inventory_push(&co->inv, ++co->serial);
+
+                printf("produced %d items, Inventory has now %d items:\n",
+                       co->batch, (int)Inventory_size(&co->inv));
+
+                c_foreach (i, Inventory, co->inv)
+                    printf(" %2d", *i.ref);
+                puts("");
+            }
+
+            cco_yield_task(co->consumer, rt); // yield to consumer
         }
 
         cco_cleanup:
-        cstr_drop(&p->text);
-        puts("done produce");
+        cco_cancel_task(co->consumer, rt);
+        Inventory_drop(&co->inv);
+        puts("cleanup producer");
     }
     return 0;
 }
 
-// CONSUMER
+int consume_items(struct consume_items* co, cco_runtime* rt) {
+    cco_check_task_struct(consume_items);
 
-cco_task_struct (consume_items) {
-    consume_items_state cco;
-    struct produce_items produce;
-    int n, i;
-};
+    cco_routine (co) {
+        while (1) {
+            int n = rand() % 10;
+            int sz = (int)Inventory_size(&co->producer->inv);
+            if (n > sz) n = sz;
 
-int consume_items(struct consume_items* c, cco_runtime* rt)
-{
-   cco_scope (c) {
-        c->produce.cco.func = produce_items;
+            c_forrange (n)
+                Inventory_pop(&co->producer->inv);
+            printf("consumed %d items\n", n);
 
-        for (c->i = 1; c->i <= c->n; ++c->i)
-        {
-            printf("consume #%d\n", c->i);
-            cco_await_task(&c->produce, rt, CCO_YIELD);
-            print_time();
-            printf("consumed %s\n", cstr_str(&c->produce.text));
+            cco_yield_task(co->producer, rt); // yield to producer
         }
 
         cco_cleanup:
-        cco_stop(&c->produce);
-        cco_resume_task(&c->produce, rt);
-        puts("done consume");
+        puts("cleanup consumer");
     }
     return 0;
 }
 
 int main(void)
 {
-    struct consume_items consume = {
-        .cco = {consume_items},
-        .n = 3,
+    srand(time(0));
+    struct produce_items producer = {
+        .cco = {produce_items},
+        .inv = {0},
+        .limit = 12,
+        .batch = 8,
+        .total = 50,
     };
-    cco_run_task(&consume);
+    struct consume_items consumer = {
+        .cco = {consume_items},
+        .producer = &producer,
+    };
+    producer.consumer = &consumer;
+
+    cco_run_task(&producer);
 }

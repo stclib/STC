@@ -37,7 +37,7 @@
 
 #endif // STC_CSTR_H_INCLUDED
 
-#if defined i_implement || defined i_static
+#if defined i_implement
   #include "priv/cstr_prv.c"
 #endif // i_implement
 

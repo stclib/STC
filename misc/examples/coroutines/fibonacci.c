@@ -10,7 +10,7 @@ struct fibonacci {
 
 int fibonacci(struct fibonacci* g) {
     unsigned long long tmp;
-    cco_scope (g) {
+    cco_routine (g) {
         g->value = 0;
         g->b = 1;
         cco_yield;

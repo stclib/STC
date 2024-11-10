@@ -127,7 +127,7 @@ bool            c_memcmp_eq(const i_keyraw* a, const i_keyraw* b);    // !memcmp
 
 ## Examples
 
-[ [Run this code](https://godbolt.org/z/5v3nT4ser) ]
+[ [Run this code](https://godbolt.org/z/zocez8x1c) ]
 ```c
 #include "stc/cstr.h"
 
@@ -146,7 +146,8 @@ int main(void)
 
     // Iterate and print keys and values of unordered map
     c_foreach (n, hmap_cstr, umap) {
-        printf("Key:[%s] Value:[%s]\n", cstr_str(&n.ref->first), cstr_str(&n.ref->second));
+        hmap_cstr_raw v = hmap_cstr_value_toraw(n.ref);
+        printf("Key:[%s] Value:[%s]\n", v.first, v.second);
     }
 
     // Add two new entries to the unordered map
@@ -253,7 +254,7 @@ static inline void Viking_drop(Viking* vp) {
 }
 
 #define i_type Vikings
-#define i_keyclass Viking
+#define i_keyclass Viking // binds the four Viking_xxxx() functions above
 #define i_val int
 #include <stc/hmap.h>
 
@@ -284,7 +285,7 @@ In example 4 we needed to construct a lookup key which may allocate strings, and
 In this example we use keyraw feature to make it simpler to use and avoids the creation of a Viking object
 entirely when doing lookup.
 
-[ [Run this code](https://godbolt.org/z/qe86Kxs8W) ]
+[ [Run this code](https://godbolt.org/z/18v5vYq4M) ]
 ```c
 #include "stc/cstr.h"
 
@@ -308,49 +309,48 @@ Viking Viking_clone(Viking v) {
     return v;
 }
 
-// Define VikRaw, a Viking lookup struct with eq, hash and convertion functions between them:
-typedef struct VikRaw {
+// Define Viking_raw, a Viking lookup struct with eq, hash and convertion functions between them:
+typedef struct {
     const char* name;
     const char* country;
-} VikRaw;
+} Viking_raw;
 
-bool VikRaw_eq(const VikRaw* rx, const VikRaw* ry) {
+bool Viking_raw_eq(const Viking_raw* rx, const Viking_raw* ry) {
     return strcmp(rx->name, ry->name)==0 && strcmp(rx->country, ry->country)==0;
 }
 
-size_t VikRaw_hash(const VikRaw* rv) {
+size_t Viking_raw_hash(const Viking_raw* rv) {
     return c_hash_mix(c_hash_str(rv->name), c_hash_str(rv->country));
 }
 
-Viking Viking_from(VikRaw raw) { // note: parameter is by value
+Viking Viking_from(Viking_raw raw) { // note: parameter is by value
     Viking v = {cstr_from(raw.name), cstr_from(raw.country)}; return v;
 }
 
-VikRaw Viking_toraw(const Viking* vp) {
-    VikRaw rv = {cstr_str(&vp->name), cstr_str(&vp->country)}; return rv;
+Viking_raw Viking_toraw(const Viking* vp) {
+    Viking_raw rv = {cstr_str(&vp->name), cstr_str(&vp->country)}; return rv;
 }
 
 // With this in place, we define the Viking => int hash map type:
-#define i_type     Vikings
-#define i_keyclass Viking  // key "class": binds Viking_drop, Viking_clone, Viking_from, Viking_toraw
-#define i_rawclass VikRaw  // lookup "class": binds VikRaw_cmp, VikRaw_eq, VikRaw_hash
-#define i_val      int     // mapped health
+#define i_type   Vikings
+#define i_keypro Viking  // key "class": binds Viking_drop, Viking_clone, Viking_from, Viking_toraw
+#define i_val    int     // mapped health
 #include "stc/hmap.h"
 
 int main(void)
 {
     Vikings vikings = c_init(Vikings, {
-        {(VikRaw){"Einar", "Norway"}, 25},
-        {(VikRaw){"Olaf", "Denmark"}, 24},
-        {(VikRaw){"Harald", "Iceland"}, 12},
+        {{"Einar", "Norway"}, 25},
+        {{"Olaf", "Denmark"}, 24},
+        {{"Harald", "Iceland"}, 12},
     });
 
-    // Now lookup is using VikRaw, not Viking:
-    printf("Lookup: Olaf of Denmark has %d hp\n\n", *Vikings_at(&vikings, (VikRaw){"Olaf", "Denmark"}));
+    // Now lookup is using Viking_raw, not Viking:
+    printf("Lookup: Olaf of Denmark has %d hp\n\n", *Vikings_at(&vikings, (Viking_raw){"Olaf", "Denmark"}));
 
-    c_foreach_kv (viking, health, Vikings, vikings) {
-        printf("%s of %s has %d hp\n", cstr_str(&viking->name),
-                                       cstr_str(&viking->country), *health);
+    c_foreach (v, Vikings, vikings) {
+        Vikings_raw r = Vikings_value_toraw(v.ref);
+        printf("%s of %s has %d hp\n", r.first.name, r.first.country, r.second);
     }
     Vikings_drop(&vikings);
 }

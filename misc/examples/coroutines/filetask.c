@@ -16,7 +16,7 @@ cco_task_struct (file_read) {
 
 int file_read(struct file_read* co, cco_runtime* rt)
 {
-    cco_scope (co) {
+    cco_routine (co) {
         (void)rt;
         co->fp = fopen(co->path, "r");
         co->line = cstr_init();
@@ -49,7 +49,7 @@ cco_task_struct (count_line) {
 
 int count_line(struct count_line* co, cco_runtime* rt)
 {
-    cco_scope (co) {
+    cco_routine (co) {
         co->reader.cco.func = file_read;
         co->reader.path = cstr_str(&co->path);
 

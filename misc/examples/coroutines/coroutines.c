@@ -20,7 +20,7 @@ struct prime {
 enum { YIELD_PRM = 1<<0, YIELD_FIB = 1<<1};
 
 int prime(struct prime* g) {
-    cco_scope(g) {
+    cco_routine (g) {
         if (g->value < 2)
             g->value = 2;
         if (g->value == 2) {
@@ -52,7 +52,7 @@ struct fibonacci {
 int fibonacci(struct fibonacci* g) {
     assert(g->count < 94);
     long long tmp;
-    cco_scope(g) {
+    cco_routine (g) {
         if (g->value == 0)
             g->b = 1;
         while (true) {
@@ -79,7 +79,7 @@ struct combined {
 };
 
 int sequenced(struct combined* g) {
-    cco_scope(g) {
+    cco_routine (g) {
         cco_await_coroutine( prime(&g->prm) );
         cco_await_coroutine( fibonacci(&g->fib) );
 
@@ -90,7 +90,7 @@ int sequenced(struct combined* g) {
 }
 
 int parallel(struct combined* g) {
-    cco_scope(g) {
+    cco_routine (g) {
         cco_await_coroutine( prime(&g->prm) | fibonacci(&g->fib) );
 
         cco_cleanup:
