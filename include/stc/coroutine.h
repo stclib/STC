@@ -107,25 +107,25 @@ typedef struct {
     } while (0)
 
 #define cco_yield cco_yield_v(CCO_YIELD)
-#define cco_yield_v(value) \
+#define cco_yield_v(suspendval) \
     do { \
-        *_state = __LINE__; return value; goto _resume; \
+        *_state = __LINE__; return suspendval; goto _resume; \
         case __LINE__:; \
     } while (0)
 
 #define cco_yield_final cco_yield_final_v(CCO_YIELD)
-#define cco_yield_final_v(value) \
+#define cco_yield_final_v(suspendval) \
     do { \
         *_state = *_state >= CCO_STATE_INIT ? CCO_STATE_CLEANUP : CCO_STATE_DONE; \
-        return value; \
+        return suspendval; \
     } while (0)
 
 #define cco_await(until) cco_await_v(until, CCO_AWAIT)
-#define cco_await_v(until, value) \
+#define cco_await_v(until, suspendval) \
     do { \
         *_state = __LINE__; \
         /* fall through */ \
-        case __LINE__: if (!(until)) {return value; goto _resume;} \
+        case __LINE__: if (!(until)) {return suspendval; goto _resume;} \
     } while (0)
 
 /* cco_await_coroutine(): assumes coroutine returns a cco_result value (int) */
@@ -195,21 +195,21 @@ typedef struct cco_runtime {
     } while (0)
 
 #define cco_await_task(...) c_MACRO_OVERLOAD(cco_await_task, __VA_ARGS__)
-#define cco_await_task_2(task, rt) cco_await_3(task, rt, CCO_DONE)
+#define cco_await_task_2(task, rt) cco_await_task_3(task, rt, CCO_DONE)
 #define cco_await_task_3(task, rt, awaitbits) cco_await_task_v(task, rt, awaitbits, CCO_AWAIT)
-#define cco_await_task_v(task, rt, awaitbits, value) \
+#define cco_await_task_v(task, rt, awaitbits, suspendval) \
     do { \
         ((rt)->stack[++(rt)->top] = cco_cast_task(task))->cco.await = (awaitbits); \
-        cco_yield_v(value); \
+        cco_yield_v(suspendval); \
     } while (0)
 
-#define cco_yield_task(...) c_MACRO_OVERLOAD(cco_yield_task, __VA_ARGS__)
-#define cco_yield_task_2(task, rt) cco_yield_task_3(task, rt, CCO_DONE)
-#define cco_yield_task_3(task, rt, awaitbits) cco_yield_task_v(task, rt, awaitbits, CCO_AWAIT)
-#define cco_yield_task_v(task, rt, awaitbits, value) \
+#define cco_yield_task(task, rt) cco_yield_task_v(task, rt, CCO_AWAIT)
+#define cco_yield_task_v(task, rt, suspendval) \
     do { \
-        ((rt)->stack[(rt)->top] = cco_cast_task(task))->cco.await = (awaitbits); \
-        cco_yield_v(value); \
+        cco_task* _t = cco_cast_task(task); \
+        _t->cco.await = (rt)->stack[(rt)->top]->cco.await; \
+        (rt)->stack[(rt)->top] = _t; \
+        cco_yield_v(suspendval); \
     } while (0)
 
 #define cco_run_task(...) c_MACRO_OVERLOAD(cco_run_task, __VA_ARGS__)
@@ -284,9 +284,9 @@ typedef struct cco_runtime {
 typedef struct { ptrdiff_t count; } cco_semaphore;
 
 #define cco_await_semaphore(sem) cco_await_semaphore_v(sem, CCO_AWAIT)
-#define cco_await_semaphore_v(sem, value) \
+#define cco_await_semaphore_v(sem, suspendval) \
     do { \
-        cco_await_v((sem)->count > 0, value); \
+        cco_await_v((sem)->count > 0, suspendval); \
         --(sem)->count; \
     } while (0)
 
@@ -347,10 +347,10 @@ static inline cco_timer cco_timer_make(double sec) {
 }
 
 #define cco_await_timer(tm, sec) cco_await_timer_v(tm, sec, CCO_AWAIT)
-#define cco_await_timer_v(tm, sec, value) \
+#define cco_await_timer_v(tm, sec, suspendval) \
     do { \
         cco_timer_start(tm, sec); \
-        cco_await_v(cco_timer_expired(tm), value); \
+        cco_await_v(cco_timer_expired(tm), suspendval); \
     } while (0)
 
 static inline void cco_timer_start(cco_timer* tm, double sec) {
