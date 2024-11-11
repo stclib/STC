@@ -52,9 +52,10 @@ int produce_items(struct produce_items* co, cco_runtime* rt) {
 
 int consume_items(struct consume_items* co, cco_runtime* rt) {
     cco_routine (co) {
+        int n, sz;
         while (1) {
-            int n = rand() % 10;
-            int sz = (int)Inventory_size(&co->producer->inv);
+            n = rand() % 10;
+            sz = (int)Inventory_size(&co->producer->inv);
             if (n > sz) n = sz;
 
             c_forrange (n)

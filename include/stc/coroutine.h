@@ -206,9 +206,9 @@ typedef struct cco_runtime {
 #define cco_yield_task(task, rt) cco_yield_task_v(task, rt, CCO_AWAIT)
 #define cco_yield_task_v(task, rt, suspendval) \
     do { \
-        cco_task* _t = cco_cast_task(task); \
+        { cco_task* _t = cco_cast_task(task); \
         _t->cco.await = (rt)->stack[(rt)->top]->cco.await; \
-        (rt)->stack[(rt)->top] = _t; \
+        (rt)->stack[(rt)->top] = _t; } \
         cco_yield_v(suspendval); \
     } while (0)
 

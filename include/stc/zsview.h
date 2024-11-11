@@ -51,7 +51,7 @@ STC_INLINE bool zsview_equals(zsview zs, const char* str) {
 }
 
 STC_INLINE isize zsview_find(zsview zs, const char* search) {
-    char* res = strstr(zs.str, search);
+    const char* res = strstr(zs.str, search);
     return res ? (res - zs.str) : c_NPOS;
 }
 

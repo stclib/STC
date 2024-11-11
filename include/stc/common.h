@@ -177,19 +177,11 @@ typedef const char* cstr_raw;
          _it.ref != (C##_value*)_endref && (key = &_it.ref->first, val = &_it.ref->second); \
          C##_next(&_it))
 
-#ifndef __cplusplus
-    #define c_foritems(it, T, ...) \
-        for (struct {T* ref; int size, index;} \
-             it = {.ref=(T[])__VA_ARGS__, .size=(int)(sizeof((T[])__VA_ARGS__)/sizeof(T))} \
-             ; it.index < it.size; ++it.ref, ++it.index)
-#else
-    #include <initializer_list>
-    #define c_foritems(it, T, ...) \
-        for (struct {std::initializer_list<T> _il; std::initializer_list<T>::iterator ref; size_t size, index;} \
-             it = {._il=__VA_ARGS__, .ref=it._il.begin(), .size=it._il.size()} \
-             ; it.index < it.size; ++it.ref, ++it.index)
-#endif
-#define c_forlist(...) c_foritems(_VA_ARGS__) // [deprecated]
+#define c_foritems(it, T, ...) \
+    for (struct {T* ref; int size, index;} \
+         it = {.ref=c_make_array(T, __VA_ARGS__), .size=(int)(sizeof((T[])__VA_ARGS__)/sizeof(T))} \
+         ; it.index < it.size; ++it.ref, ++it.index)
+#define c_forlist(...) c_foritems(_VA_ARGS__)                      // [deprecated]
 #define c_forpair(...) 'c_forpair not_supported. Use c_foreach_kv' // [removed]
 
 // c_forrange, c_forrange32: python-like int range iteration
