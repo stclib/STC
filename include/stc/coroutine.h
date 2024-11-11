@@ -78,9 +78,18 @@ typedef struct {
 #define cco_done(co) ((co)->cco.state == CCO_STATE_DONE)
 #define cco_active(co) ((co)->cco.state != CCO_STATE_DONE)
 
+#if defined __GNUC__ || _MSC_VER >= 1939
+  #define _cco_check_task_struct(co) \
+    c_static_assert(/* error: co->cco not first member in task struct */ \
+                    sizeof((co)->cco) == sizeof(cco_state) || \
+                    offsetof(__typeof__(*(co)), cco) == 0)
+#else
+  #define _cco_check_task_struct(co) 0
+#endif
+
 #define cco_routine(co) \
-    _cco_check_task_struct(co); \
-    for (int* _state = &(co)->cco.state; *_state != CCO_STATE_DONE; *_state = CCO_STATE_DONE) \
+    for (int *_state = &(co)->cco.state + _cco_check_task_struct(co) \
+           ; *_state != CCO_STATE_DONE ; *_state = CCO_STATE_DONE) \
         _resume: switch (*_state) case CCO_STATE_INIT: // thanks, @liigo!
 
 #define cco_cleanup \
@@ -150,59 +159,6 @@ typedef struct {
 #define cco_reset(co) \
     (void)((co)->cco.state = 0)
 
-/* ============ ADVANCED, OPTIONAL ============= */
-
-/*
- * // Iterators for coroutine generators
- *
- * typedef struct { // The generator
- *     ...
- * } Gen, Gen_value;
- *
- * typedef struct {
- *     ...
- * } Gen, Gen_value;
- *
- * typedef struct {
- *     Gen* ref;
- *     cco_state cco;
- *     ...
- * } Gen_iter;
- *
- * // The iterator coroutine, produce the next value:
- * int Gen_next(Gen_iter* it) {
- *     Gen* g = it->ref;
- *     cco_routine (it) {
- *        ...
- *        cco_yield; // suspend exec, gen with value ready
- *        ...
- *        cco_cleanup:
- *        it->ref = NULL; // stops the iteration
- *     }
- * }
- *
- * // Create coroutine / iter, advance to the first yield:
- * Gen_iter Gen_begin(Gen* g) {
- *     Gen_iter it = {.ref = g};
- *     ...
- *     Gen_next(&it);
- *     return it;
- * }
- *
- * ...
- * c_foreach (i, Gen, gen)
- *     printf("%d ", *i.ref);
- */
-
-
-/* Using c_filter with generators:
- */
-#define cco_flt_take(n) \
-    (c_flt_take(n), _base.done ? _it.cco.state = CCO_STATE_CLEANUP : 1)
-
-#define cco_flt_takewhile(pred) \
-    (c_flt_takewhile(pred), _base.done ? _it.cco.state = CCO_STATE_CLEANUP : 1)
-
 
 /*
  * Tasks
@@ -227,16 +183,7 @@ typedef struct cco_runtime {
 } cco_runtime;
 
 #define cco_cast_task(task) \
-    ((struct cco_task *)(task) + 0*sizeof((task)->cco.func(task, (cco_runtime*)0)))
-
-#if defined __GNUC__ || _MSC_VER >= 1939
-  #define _cco_check_task_struct(co) \
-    (void)c_static_assert(/* error: cco not first member in task struct */ \
-                          sizeof((co)->cco) == sizeof(cco_state) || \
-                          offsetof(__typeof__(*(co)), cco) == 0)
-#else
-  #define _cco_check_task_struct(co) (void)0
-#endif
+    ((cco_task *)(task) + 0*sizeof((task)->cco.func(task, (cco_runtime*)0)))
 
 #define cco_resume_task(task, rt) \
     (task)->cco.func(task, rt)
@@ -273,14 +220,61 @@ typedef struct cco_runtime {
          (((rt.result = cco_resume_task(rt.stack[rt.top], (cco_runtime*)&rt)) & \
            ~rt.stack[rt.top]->cco.await) || --rt.top >= 0) ; )
 
+
+/* // Iterators for coroutine generators
+ *
+ * typedef struct { // A generator data struct
+ *     Data data; ...
+ * } Gen, Gen_value;
+ *
+ * // Define the iterator coroutine struct
+ * typedef struct {
+ *     cco_state cco; // or a task state cco.
+ *     Gen* ref;
+ *     ...
+ * } Gen_iter;
+ *
+ * // Define the iterator coroutine func; produce the next value:
+ * int Gen_next(Gen_iter* it) {
+ *     cco_routine (it) {
+ *        ... it->ref->data ...
+ *        cco_yield; // suspend exec, gen with value ready
+ *        ...
+ *        cco_cleanup:
+ *        it->ref = NULL; // stops the iteration
+ *     }
+ * }
+ *
+ * // Return the coroutine iter; advance to the first yield:
+ * Gen_iter Gen_begin(Gen* g) {
+ *     Gen_iter it = {.ref = g};
+ *     ...
+ *     Gen_next(&it);
+ *     return it;
+ * }
+ *
+ * ...
+ * c_foreach (i, Gen, gen)
+ *     printf("%d ", *i.ref);
+ */
+
 /*
  * Iterate containers with already defined iterator (prefer to use in coroutines only):
  */
-
 #define cco_foreach(existing_it, C, cnt) \
     for (existing_it = C##_begin(&cnt); (existing_it).ref; C##_next(&existing_it))
+
 #define cco_foreach_reverse(existing_it, C, cnt) \
     for (existing_it = C##_rbegin(&cnt); (existing_it).ref; C##_rnext(&existing_it))
+
+/* 
+ * Using c_filter with coroutine iterators:
+ */
+#define cco_flt_take(n) \
+    (c_flt_take(n), _base.done ? _it.cco.state = CCO_STATE_CLEANUP : 1)
+
+#define cco_flt_takewhile(pred) \
+    (c_flt_takewhile(pred), _base.done ? _it.cco.state = CCO_STATE_CLEANUP : 1)
 
 
 /*

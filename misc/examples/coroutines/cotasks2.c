@@ -72,7 +72,7 @@ int consume_items(struct consume_items* co, cco_runtime* rt) {
 
 int main(void)
 {
-    srand(time(0));
+    srand((unsigned)time(0));
     struct produce_items producer = {
         .cco = {produce_items},
         .inv = {0},
