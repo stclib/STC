@@ -8,8 +8,8 @@
 
 // PRODUCER
 cco_task_struct (produce_items) {
-    struct consume_items* consumer;
     produce_items_state cco; // must be first
+    struct consume_items* consumer;
     Inventory inv;
     int limit, batch, serial, total;
 };

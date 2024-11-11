@@ -232,8 +232,8 @@ typedef struct cco_runtime {
 #if defined __GNUC__ || _MSC_VER >= 1939
   #define _cco_check_task_struct(co) \
     (void)c_static_assert(/* error: cco not first member in task struct */ \
-                          (sizeof((co)->cco) == sizeof(cco_state) || \
-                           offsetof(__typeof__(*(co)), cco) == 0))
+                          sizeof((co)->cco) == sizeof(cco_state) || \
+                          offsetof(__typeof__(*(co)), cco) == 0)
 #else
   #define _cco_check_task_struct(co) (void)0
 #endif
