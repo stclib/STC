@@ -79,6 +79,7 @@ typedef struct {
 #define cco_active(co) ((co)->cco.state != CCO_STATE_DONE)
 
 #define cco_routine(co) \
+    _cco_check_task_struct(co); \
     for (int* _state = &(co)->cco.state; *_state != CCO_STATE_DONE; *_state = CCO_STATE_DONE) \
         _resume: switch (*_state) case CCO_STATE_INIT: // thanks, @liigo!
 
@@ -222,14 +223,20 @@ typedef struct cco_task cco_task;
 
 typedef struct cco_runtime {
     int result, top;
-    struct cco_task* stack[];
+    cco_task* stack[];
 } cco_runtime;
 
 #define cco_cast_task(task) \
-    ((struct cco_task *)(task) + 0*sizeof((task)->cco.func(task, (cco_runtime*)0) + ((int*)0 == &(task)->cco.state)))
+    ((struct cco_task *)(task) + 0*sizeof((task)->cco.func(task, (cco_runtime*)0)))
 
-#define cco_check_task_struct(name) \
-    (void)c_static_assert(offsetof(struct name, cco.func) == 0);
+#if defined __GNUC__ || _MSC_VER >= 1939
+  #define _cco_check_task_struct(co) \
+    (void)c_static_assert(/* error: cco not first member in task struct */ \
+                          (sizeof((co)->cco) == sizeof(cco_state) || \
+                           offsetof(__typeof__(*(co)), cco) == 0))
+#else
+  #define _cco_check_task_struct(co) (void)0
+#endif
 
 #define cco_resume_task(task, rt) \
     (task)->cco.func(task, rt)

@@ -8,8 +8,8 @@
 
 // PRODUCER
 cco_task_struct (produce_items) {
-    produce_items_state cco; // must be first
     struct consume_items* consumer;
+    produce_items_state cco; // must be first
     Inventory inv;
     int limit, batch, serial, total;
 };
@@ -21,8 +21,6 @@ cco_task_struct (consume_items) {
 };
 
 int produce_items(struct produce_items* co, cco_runtime* rt) {
-    cco_check_task_struct(produce_items); // compile-time check that cco is first member
-
     cco_routine (co) {
         while (1) {
             if (co->serial > co->total) {
@@ -53,8 +51,6 @@ int produce_items(struct produce_items* co, cco_runtime* rt) {
 }
 
 int consume_items(struct consume_items* co, cco_runtime* rt) {
-    cco_check_task_struct(consume_items);
-
     cco_routine (co) {
         while (1) {
             int n = rand() % 10;

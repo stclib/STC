@@ -32,7 +32,7 @@ int main(int argc, char const *argv[])
           count += std::binary_search(v.data, v.data + ivec_size(&v), r);
         #else
           #define LABEL "ivec_binary_search"
-          count += ivec_binary_search(&v, r) != -1;
+          count += ivec_binary_search(&v, r) != c_NPOS;
         #endif
     }
     t = clock() - t;
