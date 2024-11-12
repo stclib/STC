@@ -56,6 +56,7 @@ int main(void) {
     return 0;
 }
 */
+#include <stdlib.h>
 #include "common.h"
 
 enum {
@@ -164,23 +165,22 @@ typedef struct {
  * Tasks
  */
 
-struct cco_runtime;
+struct cco_task;
+typedef struct {
+    int32_t result; int16_t top, maxdepth;
+    struct cco_task* stack[];
+} cco_runtime;
 
 #define cco_task_struct(Task) \
     struct Task; \
     typedef struct { \
-        int (*func)(struct Task*, struct cco_runtime*); \
+        int (*func)(struct Task*, cco_runtime*); \
         int state, await; \
     } Task##_state; \
     struct Task
 
 cco_task_struct(cco_task) { cco_task_state cco; }; /* Define base Task struct type */
 typedef struct cco_task cco_task;
-
-typedef struct cco_runtime {
-    int result, top;
-    cco_task* stack[];
-} cco_runtime;
 
 #define cco_cast_task(task) \
     ((cco_task *)(task) + 0*sizeof((task)->cco.func(task, (cco_runtime*)0)))
@@ -215,10 +215,45 @@ typedef struct cco_runtime {
 #define cco_run_task(...) c_MACRO_OVERLOAD(cco_run_task, __VA_ARGS__)
 #define cco_run_task_1(task) cco_run_task_3(task, _rt, 16)
 #define cco_run_task_3(task, rt, STACKDEPTH) \
-    for (struct { int result, top; struct cco_task* stack[STACKDEPTH]; } \
-         rt = {.stack = {cco_cast_task(task)}} ; \
-         (((rt.result = cco_resume_task(rt.stack[rt.top], (cco_runtime*)&rt)) & \
-           ~rt.stack[rt.top]->cco.await) || --rt.top >= 0) ; )
+    for (struct {int result, top; struct cco_task *stack[STACKDEPTH], *curr;} \
+            rt = {.stack = {cco_cast_task(task)}} \
+         ; (rt.curr = rt.stack[rt.top], \
+            ((rt.result = cco_resume_task(rt.curr, (cco_runtime*)&rt)) & ~rt.curr->cco.await) \
+            || --rt.top >= 0) \
+         ; )
+
+struct cco_taskrunner {
+    cco_runtime* rt;
+    cco_state cco;
+};
+
+#define cco_make_taskrunner(task, maxdepth) _cco_make_taskrunner(cco_cast_task(task), maxdepth)
+static inline
+struct cco_taskrunner _cco_make_taskrunner(cco_task* task, int depth) {
+    struct cco_taskrunner ex = {
+        .rt = (cco_runtime *)malloc(sizeof(cco_runtime) + depth*sizeof(cco_task*)),
+    };
+    ex.rt->maxdepth = depth;
+    ex.rt->stack[0] = task;
+    return ex;
+}
+
+static inline int cco_taskrunner(struct cco_taskrunner* co) {
+    cco_routine (co) {
+        while (1) {{
+            cco_task* curr = co->rt->stack[co->rt->top];
+            co->rt->result = cco_resume_task(curr, co->rt);
+            if (!((co->rt->result & ~curr->cco.await) || --co->rt->top >= 0)) {
+                break;
+            }}
+            cco_yield;
+        }
+        cco_cleanup:
+        free(co->rt);
+        co->rt = NULL;
+    }
+    return 0;
+}
 
 
 /* // Iterators for coroutine generators

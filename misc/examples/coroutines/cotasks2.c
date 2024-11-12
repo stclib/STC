@@ -86,6 +86,8 @@ int main(void)
         .producer = &producer,
     };
     producer.consumer = &consumer;
+    //cco_run_task(&producer);
 
-    cco_run_task(&producer);
+    struct cco_taskrunner ex = cco_make_taskrunner(&producer, 2);
+    cco_run_coroutine(cco_taskrunner(&ex));
 }
