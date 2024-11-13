@@ -218,9 +218,8 @@ typedef struct cco_task cco_task;
 #define cco_run_task(...) c_MACRO_OVERLOAD(cco_run_task, __VA_ARGS__)
 #define cco_run_task_1(task) cco_run_task_2(task, _rt)
 #define cco_run_task_2(task, rt) \
-    for (struct {int result; cco_task *curr;} \
-            rt = {.curr = cco_cast_task(task)} \
-         ; rt.result = cco_resume_task(rt.curr, (cco_runtime*)&rt), \
+    for (cco_runtime rt = {.curr = cco_cast_task(task)} \
+         ; rt.result = cco_resume_task(rt.curr, &rt), \
             (rt.result & ~rt.curr->cco.await) || (rt.curr = rt.curr->cco.prev) != NULL \
          ; )
 
