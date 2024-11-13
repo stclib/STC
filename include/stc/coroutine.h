@@ -68,6 +68,7 @@ typedef enum {
     CCO_DONE = 0,
     CCO_YIELD = 1<<29,
     CCO_AWAIT = 1<<30,
+    CCO_NOOP = 1<<31,
 } cco_result;
 
 typedef struct {
@@ -137,8 +138,8 @@ typedef struct {
         *_state = __LINE__; \
         /* fall through */ \
         case __LINE__: { \
-            int _r = corocall; \
-            if (_r & ~(awaitbits)) { return _r; goto _resume; } \
+            int _res = corocall; \
+            if (_res & ~(awaitbits)) { return _res; goto _resume; } \
         } \
     } while (0)
 
@@ -148,8 +149,8 @@ typedef struct {
 
 #define cco_stop(co) \
     do { \
-        int* _s = &(co)->cco.state; \
-        *_s = *_s >= CCO_STATE_INIT ? CCO_STATE_CLEANUP : CCO_STATE_DONE; \
+        int* _state = &(co)->cco.state; \
+        *_state = *_state >= CCO_STATE_INIT ? CCO_STATE_CLEANUP : CCO_STATE_DONE; \
     } while (0)
 
 #define cco_cancel(co, func) \
@@ -197,22 +198,20 @@ typedef struct cco_task cco_task;
 
 #define cco_await_task(...) c_MACRO_OVERLOAD(cco_await_task, __VA_ARGS__)
 #define cco_await_task_2(task, rt) cco_await_task_3(task, rt, CCO_DONE)
-#define cco_await_task_3(task, rt, awaitbits) cco_await_task_v(task, rt, awaitbits, CCO_AWAIT)
-#define cco_await_task_v(task, rt, awaitbits, suspendval) \
+#define cco_await_task_3(task, rt, awaitbits) \
     do {{cco_task* _prev = (rt)->curr; \
         (rt)->curr = cco_cast_task(task); \
         (rt)->curr->cco.await = (awaitbits); \
         (rt)->curr->cco.prev = _prev;} \
-        cco_yield_v(suspendval); \
+        cco_yield_v(CCO_NOOP); \
     } while (0)
 
-#define cco_yield_task(task, rt) cco_yield_task_v(task, rt, CCO_AWAIT)
-#define cco_yield_task_v(task, rt, suspendval) \
+#define cco_yield_task(task, rt) \
     do {{cco_task* _task = cco_cast_task(task); \
         _task->cco.await = (rt)->curr->cco.await; \
         _task->cco.prev = (rt)->curr->cco.prev; \
         (rt)->curr = _task;} \
-        cco_yield_v(suspendval); \
+        cco_yield_v(CCO_NOOP); \
     } while (0)
 
 #define cco_run_task(...) c_MACRO_OVERLOAD(cco_run_task, __VA_ARGS__)
@@ -232,14 +231,14 @@ struct cco_taskrunner {
     ((struct cco_taskrunner){.rt = {.curr = cco_cast_task(task)}})
 
 static inline int cco_taskrunner(struct cco_taskrunner* co) {
+    cco_runtime* rt = &co->rt;
     cco_routine (co) {
-        while (1) {{
-            cco_task* curr = co->rt.curr;
-            co->rt.result = cco_resume_task(curr, &co->rt);
-            if (!((co->rt.result & ~curr->cco.await) || (co->rt.curr = curr->cco.prev) != NULL)) {
+        while (1) {
+            rt->result = cco_resume_task(rt->curr, rt);
+            if (!((rt->result & ~rt->curr->cco.await) || (rt->curr = rt->curr->cco.prev) != NULL)) {
                 break;
-            }}
-            cco_yield;
+            }
+            cco_yield_v(CCO_NOOP);
         }
     }
     return 0;
