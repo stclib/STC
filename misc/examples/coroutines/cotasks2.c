@@ -8,7 +8,7 @@
 
 // PRODUCER
 cco_task_struct (produce_items) {
-    produce_items_state cco; // must be first
+    produce_items_state cco; // must be first (compile-time checked)
     struct consume_items* consumer;
     Inventory inv;
     int limit, batch, serial, total;
@@ -86,8 +86,10 @@ int main(void)
         .producer = &producer,
     };
     producer.consumer = &consumer;
-    //cco_run_task(&producer);
-
-    struct cco_taskrunner ex = cco_make_taskrunner(&producer, 2);
-    cco_run_coroutine(cco_taskrunner(&ex));
+#if 1
+    cco_run_task(&producer);
+#else
+    struct cco_taskrunner runner = cco_make_taskrunner(&producer);
+    cco_run_coroutine(cco_taskrunner(&runner));
+#endif
 }

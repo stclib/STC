@@ -162,13 +162,13 @@ typedef struct {
 
 
 /*
- * Tasks
+ * Tasks: typesafe coroutine function objects
  */
 
 struct cco_task;
 typedef struct {
-    int32_t result; int16_t top, maxdepth;
-    struct cco_task* stack[];
+    int result;
+    struct cco_task* curr;
 } cco_runtime;
 
 #define cco_task_struct(Task) \
@@ -176,6 +176,7 @@ typedef struct {
     typedef struct { \
         int (*func)(struct Task*, cco_runtime*); \
         int state, await; \
+        struct cco_task* prev; \
     } Task##_state; \
     struct Task
 
@@ -190,67 +191,57 @@ typedef struct cco_task cco_task;
 
 #define cco_cancel_task(task, rt) \
     do { \
-        cco_task* _t = cco_cast_task(task); \
-        cco_stop(_t); _t->cco.func(_t, rt); \
+        cco_task* _task = cco_cast_task(task); \
+        cco_stop(_task); _task->cco.func(_task, rt); \
     } while (0)
 
 #define cco_await_task(...) c_MACRO_OVERLOAD(cco_await_task, __VA_ARGS__)
 #define cco_await_task_2(task, rt) cco_await_task_3(task, rt, CCO_DONE)
 #define cco_await_task_3(task, rt, awaitbits) cco_await_task_v(task, rt, awaitbits, CCO_AWAIT)
 #define cco_await_task_v(task, rt, awaitbits, suspendval) \
-    do { \
-        ((rt)->stack[++(rt)->top] = cco_cast_task(task))->cco.await = (awaitbits); \
+    do {{cco_task* _prev = (rt)->curr; \
+        (rt)->curr = cco_cast_task(task); \
+        (rt)->curr->cco.await = (awaitbits); \
+        (rt)->curr->cco.prev = _prev;} \
         cco_yield_v(suspendval); \
     } while (0)
 
 #define cco_yield_task(task, rt) cco_yield_task_v(task, rt, CCO_AWAIT)
 #define cco_yield_task_v(task, rt, suspendval) \
-    do { \
-        { cco_task* _t = cco_cast_task(task); \
-        _t->cco.await = (rt)->stack[(rt)->top]->cco.await; \
-        (rt)->stack[(rt)->top] = _t; } \
+    do {{cco_task* _task = cco_cast_task(task); \
+        _task->cco.await = (rt)->curr->cco.await; \
+        _task->cco.prev = (rt)->curr->cco.prev; \
+        (rt)->curr = _task;} \
         cco_yield_v(suspendval); \
     } while (0)
 
 #define cco_run_task(...) c_MACRO_OVERLOAD(cco_run_task, __VA_ARGS__)
-#define cco_run_task_1(task) cco_run_task_3(task, _rt, 16)
-#define cco_run_task_3(task, rt, STACKDEPTH) \
-    for (struct {int result, top; struct cco_task *stack[STACKDEPTH], *curr;} \
-            rt = {.stack = {cco_cast_task(task)}} \
-         ; (rt.curr = rt.stack[rt.top], \
-            ((rt.result = cco_resume_task(rt.curr, (cco_runtime*)&rt)) & ~rt.curr->cco.await) \
-            || --rt.top >= 0) \
+#define cco_run_task_1(task) cco_run_task_2(task, _rt)
+#define cco_run_task_2(task, rt) \
+    for (struct {int result; cco_task *curr;} \
+            rt = {.curr = cco_cast_task(task)} \
+         ; rt.result = cco_resume_task(rt.curr, (cco_runtime*)&rt), \
+            (rt.result & ~rt.curr->cco.await) || (rt.curr = rt.curr->cco.prev) != NULL \
          ; )
 
 struct cco_taskrunner {
-    cco_runtime* rt;
+    cco_runtime rt;
     cco_state cco;
 };
 
-#define cco_make_taskrunner(task, maxdepth) _cco_make_taskrunner(cco_cast_task(task), maxdepth)
-static inline
-struct cco_taskrunner _cco_make_taskrunner(cco_task* task, int depth) {
-    struct cco_taskrunner ex = {
-        .rt = (cco_runtime *)malloc(sizeof(cco_runtime) + depth*sizeof(cco_task*)),
-    };
-    ex.rt->maxdepth = depth;
-    ex.rt->stack[0] = task;
-    return ex;
-}
+#define cco_make_taskrunner(task) \
+    ((struct cco_taskrunner){.rt = {.curr = cco_cast_task(task)}})
 
 static inline int cco_taskrunner(struct cco_taskrunner* co) {
     cco_routine (co) {
         while (1) {{
-            cco_task* curr = co->rt->stack[co->rt->top];
-            co->rt->result = cco_resume_task(curr, co->rt);
-            if (!((co->rt->result & ~curr->cco.await) || --co->rt->top >= 0)) {
+            cco_task* curr = co->rt.curr;
+            co->rt.result = cco_resume_task(curr, &co->rt);
+            if (!((co->rt.result & ~curr->cco.await) || (co->rt.curr = curr->cco.prev) != NULL)) {
                 break;
             }}
             cco_yield;
         }
-        cco_cleanup:
-        free(co->rt);
-        co->rt = NULL;
     }
     return 0;
 }
@@ -302,7 +293,7 @@ static inline int cco_taskrunner(struct cco_taskrunner* co) {
 #define cco_foreach_reverse(existing_it, C, cnt) \
     for (existing_it = C##_rbegin(&cnt); (existing_it).ref; C##_rnext(&existing_it))
 
-/* 
+/*
  * Using c_filter with coroutine iterators:
  */
 #define cco_flt_take(n) \
