@@ -340,6 +340,20 @@ After erasing the elements found:
 
 ## Installation
 
+STC uses meson build system. Make sure to have meson and ninja installed, e.g. as a python pip package from a bash shell:
+```bash
+pip install meson ninja
+export LIBRARY_PATH=$LIBRARY_PATH:~/.local/lib
+export CPATH=$CPATH:~/.local/include
+export CC=gcc
+```
+To create a build folder and to set the install folder to e.g. ~/.local:
+```bash
+meson setup --buildtype debug build --prefix ~/.local
+cd build
+ninja
+ninja install
+```
 STC is mixed *"headers-only"* / traditional library, i.e the templated container headers (and the *sort*/*lower_bound*
 algorithms) can simply be included - they have no library dependencies. By default, all templated functions are
 static (many inlined). This is often optimal for both performance and compiled binary size. However, for frequently

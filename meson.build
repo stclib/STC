@@ -26,6 +26,7 @@ libsrc = files(
   'src/csview.c',
   'src/fmt.c',
   'src/random.c',
+  'src/corestc.c',
 )
 
 inc = include_directories('include')

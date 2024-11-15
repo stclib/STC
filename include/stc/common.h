@@ -230,28 +230,20 @@ typedef const char* cstr_raw;
 // General functions
 
 // hashing
+size_t c_basehash_n(const void* key, isize len);
+
 STC_INLINE size_t c_hash_n(const void* key, isize len) {
-    union { size_t block; uint64_t b8; uint32_t b4; } u = {0};
+    uint64_t b8; uint32_t b4;
     switch (len) {
-        case 8: memcpy(&u.b8, key, 8); return (size_t)(u.b8 * 0xc6a4a7935bd1e99d);
-        case 4: memcpy(&u.b4, key, 4); return u.b4 * (size_t)0xa2ffeb2f01000193;
+        case 8: memcpy(&b8, key, 8); return (size_t)(b8 * 0xc6a4a7935bd1e99d);
+        case 4: memcpy(&b4, key, 4); return b4 * (size_t)0xa2ffeb2f01000193;
         case 0: return 0x811c9dc5;
     }
-    size_t hash = 0x811c9dc5;
-    const uint8_t* msg = (const uint8_t*)key;
-    while (len >= c_sizeof(size_t)) {
-        memcpy(&u.block, msg, sizeof(size_t));
-        hash = (hash ^ u.block) * (size_t)0x89bb179901000193;
-        msg += c_sizeof(size_t);
-        len -= c_sizeof(size_t);
-    }
-    c_memcpy(&u.block, msg, len);
-    hash = (hash ^ u.block) * (size_t)0xb0340f4501000193;
-    return hash ^ (hash >> 3);
+    return c_basehash_n(key, len);
 }
 
 STC_INLINE size_t c_hash_str(const char *str)
-    { return c_hash_n(str, c_strlen(str)); }
+    { return c_basehash_n(str, c_strlen(str)); }
 
 STC_INLINE size_t _chash_mix(size_t h[], int n) {
     for (int i = 1; i < n; ++i) h[0] += h[0] ^ h[i];
@@ -283,8 +275,11 @@ STC_INLINE isize c_next_pow2(isize n) {
 }
 
 // substring in substring?
-STC_INLINE char* c_strnstrn(const char *str, isize slen,
-                            const char *needle, isize nlen) {
+char* c_strnstrn(const char *str, isize slen, const char *needle, isize nlen);
+
+#if defined STC_IMPLEMENT_COMMON
+
+char* c_strnstrn(const char *str, isize slen, const char *needle, isize nlen) {
     if (nlen == 0) return (char *)str;
     if (nlen > slen) return NULL;
     slen -= nlen;
@@ -296,4 +291,18 @@ STC_INLINE char* c_strnstrn(const char *str, isize slen,
     return NULL;
 }
 
+size_t c_basehash_n(const void* key, isize len) {
+    size_t block, hash = 0x811c9dc5;
+    const uint8_t* msg = (const uint8_t*)key;
+    while (len >= c_sizeof(size_t)) {
+        memcpy(&block, msg, sizeof(size_t));
+        hash = (hash ^ block) * (size_t)0x89bb179901000193;
+        msg += c_sizeof(size_t);
+        len -= c_sizeof(size_t);
+    }
+    c_memcpy(&block, msg, len);
+    hash = (hash ^ block) * (size_t)0xb0340f4501000193;
+    return hash ^ (hash >> 3);
+}
+#endif
 #endif // STC_COMMON_H_INCLUDED

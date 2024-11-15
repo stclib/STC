@@ -253,7 +253,7 @@ int cco_taskrunner(struct cco_taskrunner* co) {
         }
         cco_cleanup:
         if (rt->error_code != 0) {
-            fprintf(stderr, __FILE__ "(%d): error: unhandled error '%d' in a coroutine task at line %d\n",
+            fprintf(stderr, __FILE__ ":%d: error: unhandled error '%d' in a coroutine task at line %d.\n",
                             __LINE__, rt->error_code, rt->error_line);
         }
     }

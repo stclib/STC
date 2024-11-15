@@ -20,9 +20,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#define i_header // external linkage by default. override with i_static.
-#include "priv/linkage.h"
-
 // csview is a non-zero-terminated string view.
 
 #ifndef STC_CSVIEW_H_INCLUDED
@@ -36,15 +33,13 @@
 #define             csview_drop(p) c_default_drop(p)
 #define             csview_clone(sv) c_default_clone(sv)
 
-STC_API csview_iter csview_advance(csview_iter it, isize u8pos);
-STC_API isize       csview_find_sv(csview sv, csview search);
-STC_API size_t      csview_hash(const csview *self);
-STC_API csview      csview_slice_ex(csview sv, isize p1, isize p2);
-STC_API csview      csview_subview_ex(csview sv, isize pos, isize n);
-STC_API csview      csview_token(csview sv, const char* sep, isize* pos);
-STC_API csview      csview_u8_subview(csview sv, isize u8pos, isize u8len);
-STC_API csview      csview_u8_tail(csview sv, isize u8len);
-STC_API csview      csview_u8_chr(csview sv, isize u8pos);
+csview_iter         csview_advance(csview_iter it, isize u8pos);
+csview              csview_slice_ex(csview sv, isize p1, isize p2);
+csview              csview_subview_ex(csview sv, isize pos, isize n);
+csview              csview_token(csview sv, const char* sep, isize* pos);
+csview              csview_u8_subview(csview sv, isize u8pos, isize u8len);
+csview              csview_u8_tail(csview sv, isize u8len);
+csview              csview_u8_chr(csview sv, isize u8pos);
 
 STC_INLINE csview   csview_from(const char* str)
     { return c_literal(csview){str, c_strlen(str)}; }
@@ -60,6 +55,14 @@ STC_INLINE bool csview_equals_sv(csview sv1, csview sv2)
 
 STC_INLINE bool csview_equals(csview sv, const char* str)
     { return csview_equals_sv(sv, c_sv_2(str, c_strlen(str))); }
+
+STC_INLINE size_t csview_hash(const csview *self)
+    { return c_basehash_n(self->buf, self->size); }
+
+STC_INLINE isize csview_find_sv(csview sv, csview search) {
+    char* res = c_strnstrn(sv.buf, sv.size, search.buf, search.size);
+    return res ? (res - sv.buf) : c_NPOS;
+}
 
 STC_INLINE isize csview_find(csview sv, const char* str)
     { return csview_find_sv(sv, c_sv_2(str, c_strlen(str))); }
@@ -176,14 +179,11 @@ STC_INLINE bool csview_iends_with(csview sv, const char* str) {
 #endif // STC_CSVIEW_H_INCLUDED
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if defined i_implement || defined i_static
+#if defined STC_IMPLEMENT || defined i_implement
 #ifndef STC_CSVIEW_C_INCLUDED
 #define STC_CSVIEW_C_INCLUDED
 
-STC_DEF size_t csview_hash(const csview *self)
-    { return c_hash_n(self->buf, self->size); }
-
-STC_DEF csview_iter csview_advance(csview_iter it, isize u8pos) {
+csview_iter csview_advance(csview_iter it, isize u8pos) {
     int inc = 1;
     if (u8pos < 0) u8pos = -u8pos, inc = -1;
     while (u8pos && it.ref != it.u8.end)
@@ -193,12 +193,7 @@ STC_DEF csview_iter csview_advance(csview_iter it, isize u8pos) {
     return it;
 }
 
-STC_DEF isize csview_find_sv(csview sv, csview search) {
-    char* res = c_strnstrn(sv.buf, sv.size, search.buf, search.size);
-    return res ? (res - sv.buf) : c_NPOS;
-}
-
-STC_DEF csview csview_subview_ex(csview sv, isize pos, isize n) {
+csview csview_subview_ex(csview sv, isize pos, isize n) {
     if (pos < 0) {
         pos += sv.size;
         if (pos < 0) pos = 0;
@@ -209,7 +204,7 @@ STC_DEF csview csview_subview_ex(csview sv, isize pos, isize n) {
     return sv;
 }
 
-STC_DEF csview csview_slice_ex(csview sv, isize p1, isize p2) {
+csview csview_slice_ex(csview sv, isize p1, isize p2) {
     if (p1 < 0) {
         p1 += sv.size;
         if (p1 < 0) p1 = 0;
@@ -220,7 +215,7 @@ STC_DEF csview csview_slice_ex(csview sv, isize p1, isize p2) {
     return sv;
 }
 
-STC_DEF csview csview_token(csview sv, const char* sep, isize* pos) {
+csview csview_token(csview sv, const char* sep, isize* pos) {
     isize sep_size = c_strlen(sep);
     csview slice = {sv.buf + *pos, sv.size - *pos};
     const char* res = c_strnstrn(slice.buf, slice.size, sep, sep_size);
@@ -229,7 +224,7 @@ STC_DEF csview csview_token(csview sv, const char* sep, isize* pos) {
     return tok;
 }
 
-STC_DEF csview csview_u8_subview(csview sv, isize u8pos, isize u8len) {
+csview csview_u8_subview(csview sv, isize u8pos, isize u8len) {
     const char* s, *end = &sv.buf[sv.size];
     while ((u8pos > 0) & (sv.buf != end))
         u8pos -= (*++sv.buf & 0xC0) != 0x80;
@@ -239,7 +234,7 @@ STC_DEF csview csview_u8_subview(csview sv, isize u8pos, isize u8len) {
     sv.size = s - sv.buf; return sv;
 }
 
-STC_DEF csview csview_u8_tail(csview sv, isize u8len) {
+csview csview_u8_tail(csview sv, isize u8len) {
     const char* p = &sv.buf[sv.size];
     while (u8len && p != sv.buf)
         u8len -= (*--p & 0xC0) != 0x80;
@@ -247,7 +242,7 @@ STC_DEF csview csview_u8_tail(csview sv, isize u8len) {
     return sv;
 }
 
-STC_DEF csview csview_u8_chr(csview sv, isize u8pos) {
+csview csview_u8_chr(csview sv, isize u8pos) {
     const char *end = &sv.buf[sv.size];
     while ((u8pos > 0) & (sv.buf != end))
         u8pos -= (*++sv.buf & 0xC0) != 0x80;
@@ -261,4 +256,3 @@ STC_DEF csview csview_u8_chr(csview sv, isize u8pos) {
 #if defined i_import
   #include "priv/utf8_prv.c"
 #endif
-#include "priv/linkage2.h"

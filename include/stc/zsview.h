@@ -20,8 +20,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#define i_header // external linkage by default. override with i_static.
-#include "priv/linkage.h"
 
 // zsview is a zero-terminated string view.
 
@@ -176,4 +174,3 @@ STC_INLINE bool zsview_iends_with(zsview zs, const char* str) {
 #if defined i_import
   #include "priv/utf8_prv.c"
 #endif
-#include "priv/linkage2.h"
