@@ -66,9 +66,9 @@ enum {
 };
 typedef enum {
     CCO_DONE = 0,
-    CCO_YIELD = 1<<29,
-    CCO_AWAIT = 1<<30,
-    CCO_NOOP = 1<<31,
+    CCO_YIELD = 1<<28,
+    CCO_AWAIT = 1<<29,
+    CCO_NOOP = 1<<30,
 } cco_result;
 
 typedef struct {
@@ -159,7 +159,7 @@ typedef struct {
     } while (0)
 
 #define cco_reset(co) \
-    (void)((co)->cco.state = 0)
+    (void)((co)->cco.state = CCO_STATE_INIT)
 
 
 /*
@@ -169,6 +169,7 @@ typedef struct {
 struct cco_task;
 typedef struct {
     int result;
+    uint16_t error_code, error_line;
     struct cco_task* curr;
 } cco_runtime;
 
@@ -193,7 +194,7 @@ typedef struct cco_task cco_task;
 #define cco_cancel_task(task, rt) \
     do { \
         cco_task* _task = cco_cast_task(task); \
-        cco_stop(_task); _task->cco.func(_task, rt); \
+        cco_stop(_task); cco_resume_task(_task, rt); \
     } while (0)
 
 #define cco_await_task(...) c_MACRO_OVERLOAD(cco_await_task, __VA_ARGS__)
@@ -214,35 +215,60 @@ typedef struct cco_task cco_task;
         cco_yield_v(CCO_NOOP); \
     } while (0)
 
-#define cco_run_task(...) c_MACRO_OVERLOAD(cco_run_task, __VA_ARGS__)
-#define cco_run_task_1(task) cco_run_task_2(task, _rt)
-#define cco_run_task_2(task, rt) \
-    for (cco_runtime rt = {.curr = cco_cast_task(task)} \
-         ; rt.result = cco_resume_task(rt.curr, &rt), \
-            (rt.result & ~rt.curr->cco.await) || (rt.curr = rt.curr->cco.prev) != NULL \
-         ; )
+#define cco_yield_error(err_code, rt) \
+    do { \
+        (rt)->error_code = err_code; \
+        (rt)->error_line = __LINE__; \
+        cco_return; \
+    } while (0)
 
+
+/* Task dispatcher coroutine */
 struct cco_taskrunner {
     cco_runtime rt;
     cco_state cco;
 };
 
-#define cco_make_taskrunner(task) \
-    ((struct cco_taskrunner){.rt = {.curr = cco_cast_task(task)}})
+extern int cco_taskrunner(struct cco_taskrunner* co);
 
-static inline int cco_taskrunner(struct cco_taskrunner* co) {
+/* -------------------------- IMPLEMENTATION ------------------------- */
+#if defined i_implement || defined STC_IMPLEMENT
+#include <stdio.h>
+// Coroutine task runner
+int cco_taskrunner(struct cco_taskrunner* co) {
     cco_runtime* rt = &co->rt;
     cco_routine (co) {
         while (1) {
             rt->result = cco_resume_task(rt->curr, rt);
+            if (rt->error_code != 0) {
+                do {
+                    cco_cancel_task(rt->curr, rt);
+                } while (rt->error_code != 0 && (rt->curr = rt->curr->cco.prev) != NULL);
+                if (rt->curr == NULL) break;
+            }
             if (!((rt->result & ~rt->curr->cco.await) || (rt->curr = rt->curr->cco.prev) != NULL)) {
                 break;
             }
             cco_yield_v(CCO_NOOP);
         }
+        cco_cleanup:
+        if (rt->error_code != 0) {
+            fprintf(stderr, __FILE__ "(%d): error: unhandled error '%d' in a coroutine task at line %d\n",
+                            __LINE__, rt->error_code, rt->error_line);
+        }
     }
     return 0;
 }
+#undef i_implement
+#endif
+
+#define cco_make_taskrunner(task) \
+    ((struct cco_taskrunner){.rt = {.curr = cco_cast_task(task)}})
+
+#define cco_run_task(...) c_MACRO_OVERLOAD(cco_run_task, __VA_ARGS__)
+#define cco_run_task_1(task) cco_run_task_2(task, _runner)
+#define cco_run_task_2(task, runner) \
+    for (struct cco_taskrunner runner = cco_make_taskrunner(task); cco_taskrunner(&runner) != CCO_DONE; )
 
 
 /* // Iterators for coroutine generators
