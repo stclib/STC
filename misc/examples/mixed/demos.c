@@ -165,11 +165,11 @@ void mapdemo3(void)
     hmap_cstr_iter it = hmap_cstr_find(&table, "Make");
     c_foreach (i, hmap_cstr, table)
         printf("entry: %s: %s\n", cstr_str(&i.ref->first), cstr_str(&i.ref->second));
-    printf("size %" c_ZI ": remove: Make: %s\n", hmap_cstr_size(&table), cstr_str(&it.ref->second));
+    printf("size %d: remove: Make: %s\n", (int)hmap_cstr_size(&table), cstr_str(&it.ref->second));
     //hmap_cstr_erase(&table, "Make");
     hmap_cstr_erase_at(&table, it);
 
-    printf("size %" c_ZI "\n", hmap_cstr_size(&table));
+    printf("size %d\n", (int)hmap_cstr_size(&table));
     c_foreach (i, hmap_cstr, table)
         printf("entry: %s: %s\n", cstr_str(&i.ref->first), cstr_str(&i.ref->second));
 

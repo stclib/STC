@@ -237,9 +237,8 @@ STC_INLINE size_t c_hash_n(const void* key, isize len) {
     switch (len) {
         case 8: memcpy(&b8, key, 8); return (size_t)(b8 * 0xc6a4a7935bd1e99d);
         case 4: memcpy(&b4, key, 4); return b4 * (size_t)0xa2ffeb2f01000193;
-        case 0: return 0x811c9dc5;
+        default: return c_basehash_n(key, len);
     }
-    return c_basehash_n(key, len);
 }
 
 STC_INLINE size_t c_hash_str(const char *str)
@@ -292,7 +291,7 @@ char* c_strnstrn(const char *str, isize slen, const char *needle, isize nlen) {
 }
 
 size_t c_basehash_n(const void* key, isize len) {
-    size_t block, hash = 0x811c9dc5;
+    size_t block = 0, hash = 0x811c9dc5;
     const uint8_t* msg = (const uint8_t*)key;
     while (len >= c_sizeof(size_t)) {
         memcpy(&block, msg, sizeof(size_t));

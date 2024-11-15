@@ -34,7 +34,7 @@ int main(void)
     StackList* list = &ListMap_insert(lmap, 42, StackList_init()).ref->second;
     FloatStack* stack = StackList_push_back(list, FloatStack_with_size(10, 0));
     stack->data[3] = 3.1415927f;
-    printf("stack size: %" c_ZI "\n", FloatStack_size(stack));
+    printf("stack size: %d\n", (int)FloatStack_size(stack));
 
     // Access the data entry
     const ListMap* lmap_p = MapMap_at(&mmap, "first");

@@ -32,8 +32,8 @@ int main(void)
     // When collections store owned values (String), they can still be
     // queried using references (&str).
     if (hmap_cstr_contains(&book_reviews, "Les Misérables")) {
-        printf("We've got %" c_ZI " reviews, but Les Misérables ain't one.",
-                    hmap_cstr_size(&book_reviews));
+        printf("We've got %d reviews, but Les Misérables ain't one.",
+                    (int)hmap_cstr_size(&book_reviews));
     }
 
     // oops, this review has a lot of spelling mistakes, let's delete it.
