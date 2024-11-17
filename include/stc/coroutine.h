@@ -153,6 +153,7 @@ typedef struct {
         *_state = *_state >= CCO_STATE_INIT ? CCO_STATE_CLEANUP : CCO_STATE_DONE; \
     } while (0)
 
+/* Stop and immediate cleanup */
 #define cco_cancel(co, func) \
     do { \
         cco_stop(co); func(co); \
@@ -170,19 +171,21 @@ struct cco_task;
 typedef struct {
     int result;
     uint16_t error_code, error_line;
-    struct cco_task* curr;
+    struct cco_task* current;
 } cco_runtime;
 
+/* Define a Task struct */
 #define cco_task_struct(Task) \
     struct Task; \
     typedef struct { \
         int (*func)(struct Task*, cco_runtime*); \
-        int state, await; \
-        struct cco_task* prev; \
+        int state, awaitbits; \
+        struct cco_task* previous; \
     } Task##_state; \
     struct Task
 
-cco_task_struct(cco_task) { cco_task_state cco; }; /* Define base Task struct type */
+/* Base cco_task type */
+cco_task_struct(cco_task) { cco_task_state cco; };
 typedef struct cco_task cco_task;
 
 #define cco_cast_task(task) \
@@ -191,33 +194,36 @@ typedef struct cco_task cco_task;
 #define cco_resume_task(task, rt) \
     (task)->cco.func(task, rt)
 
+/* Stop and immediate cleanup */
 #define cco_cancel_task(task, rt) \
     do { \
         cco_task* _task = cco_cast_task(task); \
         cco_stop(_task); cco_resume_task(_task, rt); \
     } while (0)
 
+/* Asymmetric coroutine await/call */
 #define cco_await_task(...) c_MACRO_OVERLOAD(cco_await_task, __VA_ARGS__)
 #define cco_await_task_2(task, rt) cco_await_task_3(task, rt, CCO_DONE)
-#define cco_await_task_3(task, rt, awaitbits) \
-    do {{cco_task* _prev = (rt)->curr; \
-        (rt)->curr = cco_cast_task(task); \
-        (rt)->curr->cco.await = (awaitbits); \
-        (rt)->curr->cco.prev = _prev;} \
+#define cco_await_task_3(task, rt, _awaitbits) \
+    do {{cco_task* _task = cco_cast_task(task); \
+        _task->cco.awaitbits = (_awaitbits); \
+        _task->cco.previous = (rt)->current; \
+        (rt)->current = _task;} \
         cco_yield_v(CCO_NOOP); \
     } while (0)
 
+/* Symmetric coroutine flow control transfer */
 #define cco_yield_task(task, rt) \
     do {{cco_task* _task = cco_cast_task(task); \
-        _task->cco.await = (rt)->curr->cco.await; \
-        _task->cco.prev = (rt)->curr->cco.prev; \
-        (rt)->curr = _task;} \
+        _task->cco.awaitbits = (rt)->current->cco.awaitbits; \
+        _task->cco.previous = (rt)->current->cco.previous; \
+        (rt)->current = _task;} \
         cco_yield_v(CCO_NOOP); \
     } while (0)
 
-#define cco_yield_error(err_code, rt) \
+#define cco_yield_error(_error_code, rt) \
     do { \
-        (rt)->error_code = err_code; \
+        (rt)->error_code = _error_code; \
         (rt)->error_line = __LINE__; \
         cco_return; \
     } while (0)
@@ -239,18 +245,21 @@ int cco_taskrunner(struct cco_taskrunner* co) {
     cco_runtime* rt = &co->rt;
     cco_routine (co) {
         while (1) {
-            rt->result = cco_resume_task(rt->curr, rt);
+            rt->result = cco_resume_task(rt->current, rt);
             if (rt->error_code != 0) {
                 do {
-                    cco_cancel_task(rt->curr, rt);
-                } while (rt->error_code != 0 && (rt->curr = rt->curr->cco.prev) != NULL);
-                if (rt->curr == NULL) break;
+                    cco_cancel_task(rt->current, rt);
+                } while ((rt->error_code != 0) && 
+                         (rt->current = rt->current->cco.previous) != NULL);
+                if (rt->current == NULL) break;
             }
-            if (!((rt->result & ~rt->curr->cco.await) || (rt->curr = rt->curr->cco.prev) != NULL)) {
+            if (!((rt->result & ~rt->current->cco.awaitbits) ||
+                  (rt->current = rt->current->cco.previous) != NULL)) {
                 break;
             }
             cco_yield_v(CCO_NOOP);
         }
+
         cco_cleanup:
         if (rt->error_code != 0) {
             fprintf(stderr, __FILE__ ":%d: error: unhandled error '%d' in a coroutine task at line %d.\n",
@@ -263,7 +272,7 @@ int cco_taskrunner(struct cco_taskrunner* co) {
 #endif
 
 #define cco_make_taskrunner(task) \
-    ((struct cco_taskrunner){.rt = {.curr = cco_cast_task(task)}})
+    ((struct cco_taskrunner){.rt = {.current = cco_cast_task(task)}})
 
 #define cco_run_task(...) c_MACRO_OVERLOAD(cco_run_task, __VA_ARGS__)
 #define cco_run_task_1(task) cco_run_task_2(task, _runner)
