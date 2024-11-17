@@ -191,33 +191,38 @@ typedef struct cco_task cco_task;
 #define cco_cast_task(task) \
     ((cco_task *)(task) + 0*sizeof((task)->cco.func(task, (cco_runtime*)0)))
 
+
 #define cco_resume_task(task, rt) \
-    (task)->cco.func(task, rt)
+    do { \
+        cco_task* _resume_task = (cco_task *)(task); \
+        (rt)->result = (_resume_task)->cco.func(_resume_task, rt); \
+    } while (0)
 
 /* Stop and immediate cleanup */
 #define cco_cancel_task(task, rt) \
     do { \
-        cco_task* _task = cco_cast_task(task); \
-        cco_stop(_task); cco_resume_task(_task, rt); \
+        cco_task* _cancel_task = cco_cast_task(task); \
+        cco_stop(_cancel_task); \
+        cco_resume_task(_cancel_task, rt); \
     } while (0)
 
 /* Asymmetric coroutine await/call */
 #define cco_await_task(...) c_MACRO_OVERLOAD(cco_await_task, __VA_ARGS__)
 #define cco_await_task_2(task, rt) cco_await_task_3(task, rt, CCO_DONE)
 #define cco_await_task_3(task, rt, _awaitbits) \
-    do {{cco_task* _task = cco_cast_task(task); \
-        _task->cco.awaitbits = (_awaitbits); \
-        _task->cco.previous = (rt)->current; \
-        (rt)->current = _task;} \
+    do {{cco_task* _await_task = cco_cast_task(task); \
+        _await_task->cco.awaitbits = (_awaitbits); \
+        _await_task->cco.previous = (rt)->current; \
+        (rt)->current = _await_task;} \
         cco_yield_v(CCO_NOOP); \
     } while (0)
 
 /* Symmetric coroutine flow control transfer */
 #define cco_yield_task(task, rt) \
-    do {{cco_task* _task = cco_cast_task(task); \
-        _task->cco.awaitbits = (rt)->current->cco.awaitbits; \
-        _task->cco.previous = (rt)->current->cco.previous; \
-        (rt)->current = _task;} \
+    do {{cco_task* _yield_task = cco_cast_task(task); \
+        _yield_task->cco.awaitbits = (rt)->current->cco.awaitbits; \
+        _yield_task->cco.previous = (rt)->current->cco.previous; \
+        (rt)->current = _yield_task;} \
         cco_yield_v(CCO_NOOP); \
     } while (0)
 
@@ -245,7 +250,7 @@ int cco_taskrunner(struct cco_taskrunner* co) {
     cco_runtime* rt = &co->rt;
     cco_routine (co) {
         while (1) {
-            rt->result = cco_resume_task(rt->current, rt);
+            cco_resume_task(rt->current, rt);
             if (rt->error_code != 0) {
                 do {
                     cco_cancel_task(rt->current, rt);

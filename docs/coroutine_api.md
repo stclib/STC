@@ -35,7 +35,7 @@ NB! ***cco_yield\*()*** / ***cco_await\*()*** may not be called from within a `s
 |           | `cco_await_task(task, rt, awaitbits);` | Await for task's suspend value<br> in (awaitbits \| CCO_DONE), then continue |
 |           | `cco_yield_task(task, rt);`          | Yield to task                        |
 |           | `cco_yield_task(task, rt, awaitbits);` | Yield to task and run until suspend value<br> in (awaitbits \| CCO_DONE) |
-|`cco_result`| `cco_resume_task(task, rt);`        | Resume suspended task                   |
+|`void`     | `cco_resume_task(task, rt);`         | Resume suspended task, return value in rt->result |
 ||::  ::  ::||
 |           | **Timers**                        ||
 |           | `cco_timer`                          | Timer type                              |

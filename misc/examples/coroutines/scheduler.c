@@ -7,21 +7,29 @@
 #define i_no_clone
 #include "stc/queue.h"
 
-typedef struct {
+cco_task_struct (Scheduler) {
+    Scheduler_state cco;
+    cco_task* pulled;
     Tasks tasks;
-} Scheduler;
+};
 
-void Scheduler_drop(Scheduler* sched) {
-    Tasks_drop(&sched->tasks);
-}
+int scheduler(struct Scheduler* sc, cco_runtime* rt) {
+    cco_routine (sc) {
+        while (!Tasks_is_empty(&sc->tasks)) {
+            sc->pulled = Tasks_pull(&sc->tasks);
+    
+            cco_await_task(sc->pulled, rt, CCO_YIELD);
 
-int Scheduler_run(Scheduler* sched) {
-    while (!Tasks_is_empty(&sched->tasks)) {
-        struct cco_task* task = Tasks_pull(&sched->tasks);
-        if (cco_resume_task(task, NULL))
-            Tasks_push(&sched->tasks, task);
-        else
-            Tasks_value_drop(&task);
+            if (rt->result == CCO_YIELD) {
+                Tasks_push(&sc->tasks, sc->pulled);
+            } else {
+                Tasks_value_drop(&sc->pulled);
+            }
+        }
+
+        cco_cleanup:
+        Tasks_drop(&sc->tasks);
+        puts("Scheduler dropped");
     }
     return 0;
 }
@@ -36,6 +44,9 @@ static int taskA(struct cco_task* task, cco_runtime* rt) {
         puts("A is back doing more work");
         cco_yield;
         puts("A is back doing even more work");
+        
+        cco_cleanup:
+        puts("A done");
     }
     return 0;
 }
@@ -48,21 +59,21 @@ static int taskB(struct cco_task* task, cco_runtime* rt) {
         puts("B is back doing work");
         cco_yield;
         puts("B is back doing more work");
+
+        cco_cleanup:
+        puts("B done");
     }
     return 0;
 }
 
-void Use(void) {
-    Scheduler sched = {.tasks = c_init(Tasks, {
-        c_new(struct cco_task, {.cco={taskA}}),
-        c_new(struct cco_task, {.cco={taskB}}),
-    })};
+int main(void) {
+    struct Scheduler schedule = {
+        .cco={scheduler},
+        .tasks = c_init(Tasks, {
+            c_new(cco_task, {.cco={taskA}}),
+            c_new(cco_task, {.cco={taskB}}),
+        }
+    )};
 
-    Scheduler_run(&sched);
-    Scheduler_drop(&sched);
-}
-
-int main(void)
-{
-    Use();
+    cco_run_task(&schedule);
 }
