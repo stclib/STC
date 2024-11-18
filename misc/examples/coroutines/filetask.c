@@ -79,12 +79,9 @@ int main(void)
 
     // Execute coroutine as top-level blocking
     int loop = 0;
-#if 0
+
     cco_run_task(&countTask) { ++loop; }
-#else
-    struct cco_taskrunner runner = cco_make_taskrunner(&countTask);
-    cco_run_coroutine(cco_taskrunner(&runner)) { ++loop; }
-#endif
+
     printf("line count = %d\n", countTask.lineCount);
     printf("exec count = %d\n", loop);
 }

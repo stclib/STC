@@ -153,12 +153,6 @@ typedef struct {
         *_state = *_state >= CCO_STATE_INIT ? CCO_STATE_CLEANUP : CCO_STATE_DONE; \
     } while (0)
 
-/* Stop and immediate cleanup */
-#define cco_cancel(co, func) \
-    do { \
-        cco_stop(co); func(co); \
-    } while (0)
-
 #define cco_reset(co) \
     (void)((co)->cco.state = CCO_STATE_INIT)
 
@@ -180,7 +174,7 @@ typedef struct {
     typedef struct { \
         int (*func)(struct Task*, cco_runtime*); \
         int state, awaitbits; \
-        struct cco_task* previous; \
+        struct cco_task* parent; \
     } Task##_state; \
     struct Task
 
@@ -189,12 +183,12 @@ cco_task_struct(cco_task) { cco_task_state cco; };
 typedef struct cco_task cco_task;
 
 #define cco_cast_task(task) \
-    ((cco_task *)(task) + 0*sizeof((task)->cco.func(task, (cco_runtime*)0)))
+    ((cco_task *)(task) + (1 ? 0 : sizeof((task)->cco.func(task, (cco_runtime*)0))))
 
 
 #define cco_resume_task(task, rt) \
     do { \
-        cco_task* _resume_task = (cco_task *)(task); \
+        cco_task* _resume_task = cco_cast_task(task); \
         (rt)->result = (_resume_task)->cco.func(_resume_task, rt); \
     } while (0)
 
@@ -203,7 +197,7 @@ typedef struct cco_task cco_task;
     do { \
         cco_task* _cancel_task = cco_cast_task(task); \
         cco_stop(_cancel_task); \
-        cco_resume_task(_cancel_task, rt); \
+        (rt)->result = (_cancel_task)->cco.func(_cancel_task, rt); \
     } while (0)
 
 /* Asymmetric coroutine await/call */
@@ -212,7 +206,7 @@ typedef struct cco_task cco_task;
 #define cco_await_task_3(task, rt, _awaitbits) \
     do {{cco_task* _await_task = cco_cast_task(task); \
         _await_task->cco.awaitbits = (_awaitbits); \
-        _await_task->cco.previous = (rt)->current; \
+        _await_task->cco.parent = (rt)->current; \
         (rt)->current = _await_task;} \
         cco_yield_v(CCO_NOOP); \
     } while (0)
@@ -221,7 +215,7 @@ typedef struct cco_task cco_task;
 #define cco_yield_task(task, rt) \
     do {{cco_task* _yield_task = cco_cast_task(task); \
         _yield_task->cco.awaitbits = (rt)->current->cco.awaitbits; \
-        _yield_task->cco.previous = (rt)->current->cco.previous; \
+        _yield_task->cco.parent = (rt)->current->cco.parent; \
         (rt)->current = _yield_task;} \
         cco_yield_v(CCO_NOOP); \
     } while (0)
@@ -255,11 +249,11 @@ int cco_taskrunner(struct cco_taskrunner* co) {
                 do {
                     cco_cancel_task(rt->current, rt);
                 } while ((rt->error_code != 0) && 
-                         (rt->current = rt->current->cco.previous) != NULL);
+                         (rt->current = rt->current->cco.parent) != NULL);
                 if (rt->current == NULL) break;
             }
             if (!((rt->result & ~rt->current->cco.awaitbits) ||
-                  (rt->current = rt->current->cco.previous) != NULL)) {
+                  (rt->current = rt->current->cco.parent) != NULL)) {
                 break;
             }
             cco_yield_v(CCO_NOOP);
@@ -282,8 +276,9 @@ int cco_taskrunner(struct cco_taskrunner* co) {
 #define cco_run_task(...) c_MACRO_OVERLOAD(cco_run_task, __VA_ARGS__)
 #define cco_run_task_1(task) cco_run_task_2(task, _runner)
 #define cco_run_task_2(task, runner) \
-    for (struct cco_taskrunner runner = cco_make_taskrunner(task); cco_taskrunner(&runner) != CCO_DONE; )
-
+    for (struct cco_taskrunner runner = cco_make_taskrunner(task) \
+         ; cco_taskrunner(&runner) != CCO_DONE \
+         ; )
 
 /* // Iterators for coroutine generators
  *

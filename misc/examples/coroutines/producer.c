@@ -30,13 +30,13 @@ void print_time(void) {
 }
 
 // PRODUCER
-struct produce_items {
+struct produce {
     struct next_value next;
     cstr text;
     cco_state cco;
 };
 
-int produce_items(struct produce_items* pr) {
+int produce(struct produce* pr) {
     cco_routine (pr) {
         pr->text = cstr_init();
         while (true) {
@@ -49,42 +49,43 @@ int produce_items(struct produce_items* pr) {
 
         cco_cleanup:
         cstr_drop(&pr->text);
-        puts("done produce");
+        puts("done producer");
     }
     return 0;
 }
 
 // CONSUMER
-struct consume_items {
+struct consume {
     int n, i;
     cco_state cco;
 };
 
-int consume_items(struct consume_items* co, struct produce_items* pr) {
+int consume(struct consume* co, struct produce* pr) {
    cco_routine (co) {
         for (co->i = 1; co->i <= co->n; ++co->i) {
-            printf("consume #%d\n", co->i);
-            cco_await_coroutine(produce_items(pr), CCO_YIELD);
+            printf("consumer #%d\n", co->i);
+            cco_await_coroutine(produce(pr), CCO_YIELD);
             print_time();
             printf("consumed %s\n", cstr_str(&pr->text));
         }
 
         cco_cleanup:
-        puts("done consume");
+        puts("done consumer");
     }
     return 0;
 }
 
 int main(void) {
-    struct produce_items produce = {0};
-    struct consume_items consume = {.n=5};
+    struct produce producer = {0};
+    struct consume consumer = {.n=5};
     int count = 0;
 
-    cco_run_coroutine(consume_items(&consume, &produce)) {
+    cco_run_coroutine(consume(&consumer, &producer)) {
         ++count;
         //cco_sleep(0.001);
-        //if (consume.i == 3) cco_stop(&consume);
+        //if (consumer.i == 3) cco_stop(&consumer);
     }
-    cco_cancel(&produce, produce_items);
+    cco_stop(&producer);
+    produce(&producer);
     printf("count: %d\n", count);
 }

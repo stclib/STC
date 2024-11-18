@@ -6,21 +6,20 @@
 
 // Example shows symmetric coroutines producer/consumer style.
 
-// PRODUCER
-cco_task_struct (produce_items) {
-    produce_items_state cco; // must be first (compile-time checked)
-    struct consume_items* consumer;
+cco_task_struct (produce) {
+    produce_state cco; // must be first (compile-time checked)
+    struct consume* consumer;
     Inventory inv;
     int limit, batch, serial, total;
 };
 
-// CONSUMER
-cco_task_struct (consume_items) {
-    consume_items_state cco; // must be first
-    struct produce_items* producer;
+cco_task_struct (consume) {
+    consume_state cco; // must be first
+    struct produce* producer;
 };
 
-int produce_items(struct produce_items* co, cco_runtime* rt) {
+
+int produce(struct produce* co, cco_runtime* rt) {
     cco_routine (co) {
         while (1) {
             if (co->serial > co->total) {
@@ -50,7 +49,7 @@ int produce_items(struct produce_items* co, cco_runtime* rt) {
     return 0;
 }
 
-int consume_items(struct consume_items* co, cco_runtime* rt) {
+int consume(struct consume* co, cco_runtime* rt) {
     cco_routine (co) {
         int n, sz;
         while (1) {
@@ -74,15 +73,15 @@ int consume_items(struct consume_items* co, cco_runtime* rt) {
 int main(void)
 {
     srand((unsigned)time(0));
-    struct produce_items producer = {
-        .cco = {produce_items},
+    struct produce producer = {
+        .cco = {produce},
         .inv = {0},
         .limit = 12,
         .batch = 8,
         .total = 50,
     };
-    struct consume_items consumer = {
-        .cco = {consume_items},
+    struct consume consumer = {
+        .cco = {consume},
         .producer = &producer,
     };
     producer.consumer = &consumer;
