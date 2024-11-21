@@ -10,7 +10,9 @@ Because these coroutines are stackless, local variables within the coroutine whe
 
 ### Coroutine API
 
-NB! ***cco_yield\*()*** / ***cco_await\*()*** may not be called from within a `switch` statement in a
+Restrictions:
+- Local variables must not be used within a `cco_routine` scope. Place them in the coroutine struct.
+- ***cco_yield\*()*** / ***cco_await\*()*** may not be called from within a `switch` statement within a
 `cco_routine` scope; Use `if-else-if` constructs instead.
 
 |           |  Main functions                      | Description                              |
@@ -34,8 +36,8 @@ NB! ***cco_yield\*()*** / ***cco_await\*()*** may not be called from within a `s
 |           | `cco_await_task(cco_task* task, cco_runtime* rt);`| Await for task to finish (suspend value CCO_DONE)  |
 |           | `cco_await_task(cco_task* task, cco_runtime* rt, int awaitbits);` | Await for task's suspend value<br> in (awaitbits \| CCO_DONE), then continue |
 |           | `cco_yield_to(cco_task* task, cco_runtime* rt);`            | Yield to task                        |
-|           | `cco_throw(uint16_t error_code, cco_runtime* rt);` | Throw an error and return |
-|`void`     | `cco_resume_task(cco_task* task, cco_runtime* rt);`         | Resume suspended task, return value in rt->result |
+|           | `cco_throw_error(uint16_t error, cco_runtime* rt);` | Throw an error and return. Accessible as `rt->error`<br> and `rt->error_line` while call chain is unwinded. |
+|`void`     | `cco_resume_task(cco_task* task, cco_runtime* rt);`         | Resume suspended task, return value in `rt->result` |
 ||::  ::  ::||
 |           | **Timers**                        ||
 |           | `cco_timer`                          | Timer type                              |

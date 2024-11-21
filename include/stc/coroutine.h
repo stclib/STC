@@ -164,7 +164,7 @@ typedef struct {
 struct cco_task;
 typedef struct {
     int result;
-    uint16_t error_code, error_line;
+    uint16_t error, error_line;
     struct cco_task* current;
 } cco_runtime;
 
@@ -213,17 +213,17 @@ typedef struct cco_task cco_task;
 
 /* Symmetric coroutine flow of control transfer */
 #define cco_yield_to(task, rt) \
-    do {{cco_task* _yield_task = cco_cast_task(task); \
-        _yield_task->cco.awaitbits = (rt)->current->cco.awaitbits; \
-        _yield_task->cco.parent = (rt)->current->cco.parent; \
-        (rt)->current = _yield_task;} \
+    do {{cco_task* _to_task = cco_cast_task(task); \
+        _to_task->cco.awaitbits = (rt)->current->cco.awaitbits; \
+        _to_task->cco.parent = (rt)->current->cco.parent; \
+        (rt)->current = _to_task;} \
         cco_yield_v(CCO_NOOP); \
     } while (0)
 
 /* Throw an error "exception"; can be catched up in the cco_await_task call tree */
-#define cco_throw(_error_code, rt) \
+#define cco_throw_error(error_code, rt) \
     do { \
-        (rt)->error_code = _error_code; \
+        (rt)->error = error_code; \
         (rt)->error_line = __LINE__; \
         cco_return; \
     } while (0)
@@ -246,10 +246,10 @@ int cco_taskrunner(struct cco_taskrunner* co) {
     cco_routine (co) {
         while (1) {
             cco_resume_task(rt->current, rt);
-            if (rt->error_code != 0) {
+            if (rt->error != 0) {
                 do {
                     cco_cancel_task(rt->current, rt);
-                } while ((rt->error_code != 0) &&
+                } while ((rt->error != 0) &&
                          (rt->current = rt->current->cco.parent) != NULL);
                 if (rt->current == NULL) break;
             }
@@ -261,9 +261,9 @@ int cco_taskrunner(struct cco_taskrunner* co) {
         }
 
         cco_cleanup:
-        if (rt->error_code != 0) {
+        if (rt->error != 0) {
             fprintf(stderr, __FILE__ ":%d: error: unhandled error '%d' in a coroutine task at line %d.\n",
-                            __LINE__, rt->error_code, rt->error_line);
+                            __LINE__, rt->error, rt->error_line);
         }
     }
     return 0;
