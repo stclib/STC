@@ -22,11 +22,11 @@ libsrc = files(
   'src/cspan.c',
   'src/cstr_core.c',
   'src/cstr_io.c',
-  'src/cstr_u8.c',
+  'src/cstr_utf8.c',
   'src/csview.c',
   'src/fmt.c',
   'src/random.c',
-  'src/corestc.c',
+  'src/stc_core.c',
 )
 
 inc = include_directories('include')

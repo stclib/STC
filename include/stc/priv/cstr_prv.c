@@ -20,8 +20,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef STC_CSTR_CORE_INCLUDED
-#define STC_CSTR_CORE_INCLUDED
+// ------------------- STC_CSTR_CORE --------------------
+#if !defined STC_CSTR_CORE_C_INCLUDED && \
+    (defined i_implement || defined STC_CSTR_CORE)
+#define STC_CSTR_CORE_C_INCLUDED
 
 size_t cstr_hash(const cstr *self) {
     csview sv = cstr_sv(self);
@@ -151,10 +153,12 @@ void cstr_shrink_to_fit(cstr* self) {
         i_free(r.data, r.cap + 1);
     }
 }
-#endif // STC_CSTR_CORE_INCLUDED
+#endif // STC_CSTR_CORE_C_INCLUDED
 
-#if !defined STC_CSTR_IO_INCLUDED && defined i_import
-#define STC_CSTR_IO_INCLUDED
+// ------------------- STC_CSTR_IO --------------------
+#if !defined STC_CSTR_IO_C_INCLUDED && \
+    (defined i_import || defined STC_IMPLEMENT || defined STC_CSTR_IO)
+#define STC_CSTR_IO_C_INCLUDED
 
 #include <stdarg.h>
 
@@ -221,11 +225,13 @@ isize cstr_printf(cstr* self, const char* fmt, ...) {
     va_end(args);
     return n;
 }
-#endif // STC_CSTR_IO_INCLUDED
+#endif // STC_CSTR_IO_C_INCLUDED
 
-/* ----------------------- UTF8 CASE CONVERSION ---------------------- */
-#if !defined STC_CSTR_UTF8_INCLUDED && (defined i_import || defined STC_UTF8_PRV_C_INCLUDED)
-#define STC_CSTR_UTF8_INCLUDED
+// ------------------- STC_CSTR_UTF8 --------------------
+#if !defined STC_CSTR_UTF8_C_INCLUDED && \
+    (defined i_import || defined STC_IMPLEMENT || \
+     defined STC_CSTR_UTF8 || defined STC_UTF8_PRV_C_INCLUDED)
+#define STC_CSTR_UTF8_C_INCLUDED
 
 #include <ctype.h>
 
@@ -267,4 +273,4 @@ cstr cstr_tocase_sv(csview sv, int k) {
     cstr_shrink_to_fit(&out);
     return out;
 }
-#endif // i_import STC_CSTR_UTF8_INCLUDED
+#endif // i_import STC_CSTR_UTF8_C_INCLUDED

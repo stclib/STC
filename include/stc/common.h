@@ -229,6 +229,9 @@ typedef const char* cstr_raw;
 
 // General functions
 
+// substring in substring?
+char* c_strnstrn(const char *str, isize slen, const char *needle, isize nlen);
+
 // hashing
 size_t c_basehash_n(const void* key, isize len);
 
@@ -272,11 +275,10 @@ STC_INLINE isize c_next_pow2(isize n) {
     #endif
     return n + 1;
 }
+#endif // STC_COMMON_H_INCLUDED
 
-// substring in substring?
-char* c_strnstrn(const char *str, isize slen, const char *needle, isize nlen);
-
-#if defined STC_IMPLEMENT_COMMON
+#if !defined STC_COMMON_C_INCLUDED && defined STC_IMPLEMENT
+#define STC_COMMON_C_INCLUDED
 
 char* c_strnstrn(const char *str, isize slen, const char *needle, isize nlen) {
     if (nlen == 0) return (char *)str;
@@ -303,5 +305,4 @@ size_t c_basehash_n(const void* key, isize len) {
     hash = (hash ^ block) * (size_t)0xb0340f4501000193;
     return hash ^ (hash >> 3);
 }
-#endif
-#endif // STC_COMMON_H_INCLUDED
+#endif // STC_COMMON_C_INCLUDED
