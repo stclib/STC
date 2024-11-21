@@ -33,8 +33,8 @@ NB! ***cco_yield\*()*** / ***cco_await\*()*** may not be called from within a `s
 |           | `cco_task_struct(Name) { <Name>_state cco; ... };` | Define a coroutine task struct          |
 |           | `cco_await_task(task, cco_runtime* rt);`| Await for task to finish (CCO_DONE)  |
 |           | `cco_await_task(task, rt, awaitbits);` | Await for task's suspend value<br> in (awaitbits \| CCO_DONE), then continue |
-|           | `cco_yield_task(task, rt);`          | Yield to task                        |
-|           | `cco_yield_task(task, rt, awaitbits);` | Yield to task and run until suspend value<br> in (awaitbits \| CCO_DONE) |
+|           | `cco_yield_to(task, rt);`            | Yield to task                        |
+|           | `cco_yield_error(uint16_t error_code, cco_runtime* rt);` | Throw an error and return |
 |`void`     | `cco_resume_task(task, rt);`         | Resume suspended task, return value in rt->result |
 ||::  ::  ::||
 |           | **Timers**                        ||

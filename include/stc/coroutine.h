@@ -211,8 +211,8 @@ typedef struct cco_task cco_task;
         cco_yield_v(CCO_NOOP); \
     } while (0)
 
-/* Symmetric coroutine flow control transfer */
-#define cco_yield_task(task, rt) \
+/* Symmetric coroutine flow of control transfer */
+#define cco_yield_to(task, rt) \
     do {{cco_task* _yield_task = cco_cast_task(task); \
         _yield_task->cco.awaitbits = (rt)->current->cco.awaitbits; \
         _yield_task->cco.parent = (rt)->current->cco.parent; \
@@ -220,6 +220,7 @@ typedef struct cco_task cco_task;
         cco_yield_v(CCO_NOOP); \
     } while (0)
 
+/* Throw an error "exception"; can be catched in the call tree */
 #define cco_yield_error(_error_code, rt) \
     do { \
         (rt)->error_code = _error_code; \
@@ -248,7 +249,7 @@ int cco_taskrunner(struct cco_taskrunner* co) {
             if (rt->error_code != 0) {
                 do {
                     cco_cancel_task(rt->current, rt);
-                } while ((rt->error_code != 0) && 
+                } while ((rt->error_code != 0) &&
                          (rt->current = rt->current->cco.parent) != NULL);
                 if (rt->current == NULL) break;
             }

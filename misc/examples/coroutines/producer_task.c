@@ -38,7 +38,7 @@ int produce(struct produce* co, cco_runtime* rt) {
                 puts("");
             }
 
-            cco_yield_task(co->consumer, rt); // yield to consumer
+            cco_yield_to(co->consumer, rt); // symmetric transfer
         }
 
         cco_cleanup:
@@ -61,7 +61,7 @@ int consume(struct consume* co, cco_runtime* rt) {
                 Inventory_pop(&co->producer->inv);
             printf("consumed %d items\n", n);
 
-            cco_yield_task(co->producer, rt); // yield to producer
+            cco_yield_to(co->producer, rt); // symmetric transfer
         }
 
         cco_cleanup:
