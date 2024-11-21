@@ -21,30 +21,30 @@ NB! ***cco_yield\*()*** / ***cco_await\*()*** may not be called from within a `s
 | `bool`    | `cco_active(co)`                     | Is coroutine active? (= not done)        |
 |           | `cco_routine(co) {}`                 | The coroutine scope                      |
 |           | `cco_yield;`                         | Yield/suspend execution with CCO_YIELD   |
-|           | `cco_yield_v(value);`                | Yield/suspend execution with (bit)value  |
+|           | `cco_yield_v(int value);`                | Yield/suspend execution with (bit)value  |
 |           | `cco_yield_final;`                   | Yield final suspend, enter cleanup-state |
-|           | `cco_yield_final_v(value);`          | Yield with a final (bit)value            |
-|           | `cco_await(condition);`              | Suspend until condition is true (return CCO_AWAIT)|
-|           | `cco_await_coroutine(cocall);`       | Await for subcoro to finish |
-|           | `cco_await_coroutine(cocall, awaitbits);` | Await for subcoro's suspend value<br> to be in (awaitbits \| CCO_DONE)  |
+|           | `cco_yield_final_v(int value);`          | Yield with a final (bit)value            |
+|           | `cco_await(bool condition);`              | Suspend until condition is true (return CCO_AWAIT)|
+|           | `cco_await_coroutine(coroutine(co));`       | Await for subcoro to finish |
+|           | `cco_await_coroutine(coroutine(co), int awaitbits);` | Await for subcoro's suspend value<br> to be in (awaitbits \| CCO_DONE)  |
 |           | `cco_return;`                        | Execute `cco_cleanup:` section (if specified),<br>set coroutine in done state and return |
 ||::  ::  ::||
 |           | **Task objects**                  ||
 |           | `cco_task_struct(Name) { <Name>_state cco; ... };` | Define a coroutine task struct          |
-|           | `cco_await_task(task, cco_runtime* rt);`| Await for task to finish (CCO_DONE)  |
-|           | `cco_await_task(task, rt, awaitbits);` | Await for task's suspend value<br> in (awaitbits \| CCO_DONE), then continue |
-|           | `cco_yield_to(task, rt);`            | Yield to task                        |
-|           | `cco_yield_error(uint16_t error_code, cco_runtime* rt);` | Throw an error and return |
-|`void`     | `cco_resume_task(task, rt);`         | Resume suspended task, return value in rt->result |
+|           | `cco_await_task(cco_task* task, cco_runtime* rt);`| Await for task to finish (suspend value CCO_DONE)  |
+|           | `cco_await_task(cco_task* task, cco_runtime* rt, int awaitbits);` | Await for task's suspend value<br> in (awaitbits \| CCO_DONE), then continue |
+|           | `cco_yield_to(cco_task* task, cco_runtime* rt);`            | Yield to task                        |
+|           | `cco_throw(uint16_t error_code, cco_runtime* rt);` | Throw an error and return |
+|`void`     | `cco_resume_task(cco_task* task, cco_runtime* rt);`         | Resume suspended task, return value in rt->result |
 ||::  ::  ::||
 |           | **Timers**                        ||
 |           | `cco_timer`                          | Timer type                              |
-|           | `cco_await_timer(tm, double sec)`    | Await secs for timer to expire (usec prec.)|
-|           | `cco_timer_start(tm, double sec)`    | Start timer for secs duration           |
-|           | `cco_timer_restart(tm)`              | Restart timer with same duration        |
-| `bool`    | `cco_timer_expired(tm)`              | Return true if timer is expired         |
-| `double`  | `cco_timer_elapsed(tm)`              | Return seconds elapsed                  |
-| `double`  | `cco_timer_remaining(tm)`            | Return seconds remaining                |
+|           | `cco_await_timer(cco_timer* tm, double sec)`    | Await secs for timer to expire (usec prec.)|
+|           | `cco_timer_start(cco_timer* tm, double sec)`    | Start timer for secs duration           |
+|           | `cco_timer_restart(cco_timer* tm)`              | Restart timer with same duration        |
+| `bool`    | `cco_timer_expired(cco_timer* tm)`              | Return true if timer is expired         |
+| `double`  | `cco_timer_elapsed(cco_timer* tm)`              | Return seconds elapsed                  |
+| `double`  | `cco_timer_remaining(cco_timer* tm)`            | Return seconds remaining                |
 ||::  ::  ::||
 |           | **Time functions**                ||
 | `double`  | `cco_time(void)`                     | Return secs with usec prec. since Epoch |
@@ -52,17 +52,16 @@ NB! ***cco_yield\*()*** / ***cco_await\*()*** may not be called from within a `s
 ||::  ::  ::||
 |           | **Semaphores**                    ||
 |           | `cco_semaphore`                      | Semaphore type                          |
-|           | `cco_await_semaphore(sem)`           | Await for the semaphore count > 0       |
 |`cco_semaphore`| `cco_semaphore_from(long value)` | Create semaphore                        |
-|           | `cco_semaphore_set(sem, long value)` | Set semaphore value                     |
-|           | `cco_semaphore_release(sem)`         | Signal the semaphore (count += 1)       |
+|           | `cco_await_semaphore(cco_semaphore* sem)`           | Await for the semaphore count > 0       |
+|           | `cco_semaphore_set(cco_semaphore* sem, long value)` | Set semaphore value                     |
+|           | `cco_semaphore_release(cco_semaphore* sem)`         | Signal the semaphore (count += 1)       |
 ||::  ::  ::||
 |           | **From caller side**              ||
 | `void`    | `cco_stop(co)`                       | Next call of coroutine finalizes        |
 | `void`    | `cco_reset(co)`                      | Reset state to initial (for reuse)      |
-| `void`    | `cco_run_coroutine(cocall) {}`       | Run blocking until cocall is finished   |
-|           | `cco_run_task(task) {}`         | Run blocking until task is finished |
-|           | `cco_run_task(task, rt, STACKSZ) {}`| Run blocking until task is finished |
+| `void`    | `cco_run_coroutine(coroutine(co)) {}`    | Run blocking until coroutine is finished   |
+|           | `cco_run_task(cco_task* task) {}`        | Run blocking until task is finished |
 ||::  ::  ::||
 |           | **c_filter() interoperability with coroutine iterators** ||
 |           | `cco_flt_take(num);`                 | Use instead of *c_flt_take(num)* to ensure cleanup state |

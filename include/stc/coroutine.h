@@ -220,8 +220,8 @@ typedef struct cco_task cco_task;
         cco_yield_v(CCO_NOOP); \
     } while (0)
 
-/* Throw an error "exception"; can be catched in the call tree */
-#define cco_yield_error(_error_code, rt) \
+/* Throw an error "exception"; can be catched up in the cco_await_task call tree */
+#define cco_throw(_error_code, rt) \
     do { \
         (rt)->error_code = _error_code; \
         (rt)->error_line = __LINE__; \
