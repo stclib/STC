@@ -80,7 +80,7 @@ typedef struct {
 #define cco_done(co) ((co)->cco.state == CCO_STATE_DONE)
 #define cco_active(co) ((co)->cco.state != CCO_STATE_DONE)
 
-#if defined __GNUC__ || _MSC_VER >= 1939
+#if defined __GNUC__ || defined __clang__ || defined __TINYC__ || _MSC_VER >= 1939
   #define _cco_check_task_struct(co) \
     c_static_assert(/* error: co->cco not first member in task struct */ \
                     sizeof((co)->cco) == sizeof(cco_state) || \
@@ -153,7 +153,7 @@ typedef struct {
         *_state = *_state >= CCO_STATE_INIT ? CCO_STATE_CLEANUP : CCO_STATE_DONE; \
     } while (0)
 
-#define cco_reset(co) \
+#define cco_reset_state(co) \
     (void)((co)->cco.state = CCO_STATE_INIT)
 
 
@@ -184,7 +184,6 @@ typedef struct cco_task cco_task;
 
 #define cco_cast_task(task) \
     ((cco_task *)(task) + (1 ? 0 : sizeof((task)->cco.func(task, (cco_runtime*)0))))
-
 
 #define cco_resume_task(task, rt) \
     do { \
@@ -343,16 +342,16 @@ int cco_taskrunner(struct cco_taskrunner* co) {
 
 typedef struct { ptrdiff_t count; } cco_semaphore;
 
+#define cco_make_semaphore(value) ((cco_semaphore){value})
+#define cco_set_semaphore(sem, value) ((sem)->count = value)
+#define cco_release_semaphore(sem) (++(sem)->count)
+
 #define cco_await_semaphore(sem) cco_await_semaphore_v(sem, CCO_AWAIT)
 #define cco_await_semaphore_v(sem, suspendval) \
     do { \
         cco_await_v((sem)->count > 0, suspendval); \
         --(sem)->count; \
     } while (0)
-
-#define cco_semaphore_release(sem) ++(sem)->count
-#define cco_semaphore_from(value) ((cco_semaphore){value})
-#define cco_semaphore_set(sem, value) ((sem)->count = value)
 
 
 /*
@@ -380,7 +379,7 @@ typedef struct { ptrdiff_t count; } cco_semaphore;
         return (double)(quad - 116444736000000000ULL)*1e-7;  /* time diff Jan 1 1601-Jan 1 1970 in 1/10th usecs */
     }
 
-    static inline void cco_sleep(double sec) {
+    static inline void cco_sleep_sec(double sec) {
         Sleep((unsigned long)(sec*1000.0));
     }
 #else
@@ -391,7 +390,7 @@ typedef struct { ptrdiff_t count; } cco_semaphore;
         return (double)tv.tv_sec + (double)tv.tv_usec*1e-6;
     }
 
-    static inline void cco_sleep(double sec) {
+    static inline void cco_sleep_sec(double sec) {
         struct timeval tv;
         tv.tv_sec = (time_t)sec;
         tv.tv_usec = (suseconds_t)((sec - (double)(long)sec)*1e6);
@@ -401,24 +400,24 @@ typedef struct { ptrdiff_t count; } cco_semaphore;
 
 typedef struct { double interval, start; } cco_timer;
 
-static inline cco_timer cco_timer_make(double sec) {
+static inline cco_timer cco_make_timer_sec(double sec) {
     cco_timer tm = {.interval=sec, .start=cco_time()};
     return tm;
 }
 
-#define cco_await_timer(tm, sec) cco_await_timer_v(tm, sec, CCO_AWAIT)
-#define cco_await_timer_v(tm, sec, suspendval) \
+#define cco_await_timer_sec(tm, sec) cco_await_timer_sec_v(tm, sec, CCO_AWAIT)
+#define cco_await_timer_sec_v(tm, sec, suspendval) \
     do { \
-        cco_timer_start(tm, sec); \
+        cco_start_timer_sec(tm, sec); \
         cco_await_v(cco_timer_expired(tm), suspendval); \
     } while (0)
 
-static inline void cco_timer_start(cco_timer* tm, double sec) {
+static inline void cco_start_timer_sec(cco_timer* tm, double sec) {
     tm->interval = sec;
     tm->start = cco_time();
 }
 
-static inline void cco_timer_restart(cco_timer* tm) {
+static inline void cco_restart_timer(cco_timer* tm) {
     tm->start = cco_time();
 }
 
@@ -426,11 +425,11 @@ static inline bool cco_timer_expired(cco_timer* tm) {
     return cco_time() - tm->start >= tm->interval;
 }
 
-static inline double cco_timer_elapsed(cco_timer* tm) {
+static inline double cco_timer_sec_elapsed(cco_timer* tm) {
     return cco_time() - tm->start;
 }
 
-static inline double cco_timer_remaining(cco_timer* tm) {
+static inline double cco_timer_sec_remaining(cco_timer* tm) {
     return tm->start + tm->interval - cco_time();
 }
 

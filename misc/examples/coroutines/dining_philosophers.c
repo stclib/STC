@@ -34,7 +34,7 @@ int philosopher(struct Philosopher* ph)
         while (1) {
             duration = 1.0 + crand64_real()*2.0;
             printf("Philosopher %d is thinking for %.0f minutes...\n", ph->id, duration*10);
-            cco_await_timer(&ph->tm, duration);
+            cco_await_timer_sec(&ph->tm, duration);
 
             printf("Philosopher %d is hungry...\n", ph->id);
             cco_await_semaphore(ph->left_fork);
@@ -42,10 +42,10 @@ int philosopher(struct Philosopher* ph)
 
             duration = 0.5 + crand64_real();
             printf("Philosopher %d is eating for %.0f minutes...\n", ph->id, duration*10);
-            cco_await_timer(&ph->tm, duration);
+            cco_await_timer_sec(&ph->tm, duration);
 
-            cco_semaphore_release(ph->left_fork);
-            cco_semaphore_release(ph->right_fork);
+            cco_release_semaphore(ph->left_fork);
+            cco_release_semaphore(ph->right_fork);
         }
 
         cco_cleanup:
@@ -60,9 +60,9 @@ int dining(struct Dining* di)
 {
     cco_routine (di) {
         for (int i = 0; i < num_forks; ++i)
-            cco_semaphore_set(&di->forks[i], 1); // all forks available
+            cco_set_semaphore(&di->forks[i], 1); // all forks available
         for (int i = 0; i < num_philosophers; ++i) {
-            cco_reset(&di->ph[i]);
+            cco_reset_state(&di->ph[i]);
             di->ph[i].id = i + 1;
             di->ph[i].left_fork = &di->forks[i];
             di->ph[i].right_fork = &di->forks[(i + 1) % num_forks];
@@ -89,16 +89,16 @@ int dining(struct Dining* di)
 int main(void)
 {
     struct Dining dine;
-    cco_reset(&dine);
+    cco_reset_state(&dine);
     int n=0;
-    cco_timer tm = cco_timer_make(5.0); // seconds
+    cco_timer tm = cco_make_timer_sec(5.0);
     crand64_seed((uint64_t)time(NULL));
 
     cco_run_coroutine(dining(&dine))
     {
         if (cco_timer_expired(&tm))
             cco_stop(&dine);
-        cco_sleep(0.001);
+        cco_sleep_sec(0.001);
         ++n;
     }
     printf("n=%d\n", n);

@@ -13,6 +13,16 @@ cco_task_struct (Scheduler) {
     Tasks tasks;
 };
 
+cco_task_struct (TaskA) {
+    TaskA_state cco;
+    int value_a;
+};
+
+cco_task_struct (TaskB) {
+    TaskB_state cco;
+    double value_b;
+};
+
 int scheduler(struct Scheduler* sc, cco_runtime* rt) {
     cco_routine (sc) {
         while (!Tasks_is_empty(&sc->tasks)) {
@@ -29,12 +39,12 @@ int scheduler(struct Scheduler* sc, cco_runtime* rt) {
 
         cco_cleanup:
         Tasks_drop(&sc->tasks);
-        puts("Scheduler dropped");
+        puts("Task queue dropped");
     }
     return 0;
 }
 
-static int taskA(struct cco_task* task, cco_runtime* rt) {
+static int taskA(struct TaskA* task, cco_runtime* rt) {
     (void)rt;
     cco_routine (task) {
         puts("Hello, from task A");
@@ -51,7 +61,7 @@ static int taskA(struct cco_task* task, cco_runtime* rt) {
     return 0;
 }
 
-static int taskB(struct cco_task* task, cco_runtime* rt) {
+static int taskB(struct TaskB* task, cco_runtime* rt) {
     (void)rt;
     cco_routine (task) {
         puts("Hello, from task B");
@@ -70,10 +80,10 @@ int main(void) {
     struct Scheduler schedule = {
         .cco={scheduler},
         .tasks = c_init(Tasks, {
-            c_new(cco_task, {.cco={taskA}}),
-            c_new(cco_task, {.cco={taskB}}),
-        }
-    )};
+            cco_cast_task(c_new(struct TaskA, {{taskA}})),
+            cco_cast_task(c_new(struct TaskB, {{taskB}})),
+        })
+    };
 
     cco_run_task(&schedule);
 }
