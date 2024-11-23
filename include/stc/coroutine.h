@@ -425,11 +425,11 @@ static inline bool cco_timer_expired(cco_timer* tm) {
     return cco_time() - tm->start >= tm->interval;
 }
 
-static inline double cco_timer_sec_elapsed(cco_timer* tm) {
+static inline double cco_timer_elapsed_sec(cco_timer* tm) {
     return cco_time() - tm->start;
 }
 
-static inline double cco_timer_sec_remaining(cco_timer* tm) {
+static inline double cco_timer_remaining_sec(cco_timer* tm) {
     return tm->start + tm->interval - cco_time();
 }
 

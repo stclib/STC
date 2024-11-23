@@ -15,63 +15,79 @@ Restrictions:
 - ***cco_yield\*()*** / ***cco_await\*()*** may not be called from within a `switch` statement within a
 `cco_routine` scope; Use `if-else-if` constructs instead.
 
-|           |  Main functions                      | Description                              |
-|:----------|:-------------------------------------|:-----------------------------------------|
-|`cco_result` | `CCO_DONE`, `CCO_AWAIT`, `CCO_YIELD` | Default set of return values from coroutines |
-|           | `cco_cleanup:`                       | Label for cleanup position in coroutine  |
-| `bool`    | `cco_done(co)`                       | Is coroutine done?                       |
-| `bool`    | `cco_active(co)`                     | Is coroutine active? (= not done)        |
-|           | `cco_routine(co) {}`                 | The coroutine scope                      |
-|           | `cco_yield;`                         | Yield/suspend execution with CCO_YIELD   |
-|           | `cco_yield_v(int value);`                | Yield/suspend execution with (bit)value  |
-|           | `cco_yield_final;`                   | Yield final suspend, enter cleanup-state |
-|           | `cco_yield_final_v(int value);`          | Yield with a final (bit)value            |
-|           | `cco_await(bool condition);`              | Suspend until condition is true (return CCO_AWAIT)|
-|           | `cco_await_coroutine(coroutine(co));`       | Await for subcoro to finish |
-|           | `cco_await_coroutine(coroutine(co), int awaitbits);` | Await for subcoro's suspend value<br> to be in (awaitbits \| CCO_DONE)  |
-|           | `cco_return;`                        | Execute `cco_cleanup:` section (if specified),<br>set coroutine in done state and return |
-||::  ::  ::||
-|           | **Task objects**                  ||
-|           | `cco_task_struct(Name) { <Name>_state cco; ... };` | Define a coroutine task struct          |
-|           | `cco_await_task(cco_task* task, cco_runtime* rt);`| Await for task to finish (suspend value CCO_DONE)  |
-|           | `cco_await_task(cco_task* task, cco_runtime* rt, int awaitbits);` | Await for task's suspend value<br> in (awaitbits \| CCO_DONE), then continue |
-|           | `cco_yield_to(cco_task* task, cco_runtime* rt);`            | Yield to task                        |
-|           | `cco_throw_error(uint16_t error, cco_runtime* rt);` | Throw an error and return. Accessible as `rt->error`<br> and `rt->error_line` while call chain is unwinded. |
-|`void`     | `cco_resume_task(cco_task* task, cco_runtime* rt);`         | Resume suspended task, return value in `rt->result` |
-||::  ::  ::||
-|           | **Timers**                        ||
-|           | `cco_timer`                          | Timer type                              |
-|           | `cco_await_timer_sec(cco_timer* tm, double sec)`    | Await secs for timer to expire (usec prec.)|
-|           | `cco_start_timer_sec(cco_timer* tm, double sec)`    | Start timer for secs duration           |
-|           | `cco_restart_timer(cco_timer* tm)`              | Restart timer with same duration        |
-| `bool`    | `cco_timer_expired(cco_timer* tm)`              | Return true if timer is expired         |
-| `double`  | `cco_timer_sec_elapsed(cco_timer* tm)`              | Return seconds elapsed                  |
-| `double`  | `cco_timer_sec_remaining(cco_timer* tm)`            | Return seconds remaining                |
-||::  ::  ::||
-|           | **Time functions**                ||
-| `double`  | `cco_time(void)`                     | Return secs with usec prec. since Epoch |
-|           | `cco_sleep_sec(double sec)`              | Sleep for seconds (msec or usec prec.)  |
-||::  ::  ::||
-|           | **Semaphores**                    ||
-|           | `cco_semaphore`                      | Semaphore type                          |
-|`cco_semaphore`| `cco_make_semaphore(long value)` | Create semaphore                        |
-|           | `cco_await_semaphore(cco_semaphore* sem)`           | Await for the semaphore count > 0       |
-|           | `cco_set_semaphore(cco_semaphore* sem, long value)` | Set semaphore value                     |
-|           | `cco_release_semaphore(cco_semaphore* sem)`         | Signal the semaphore (count += 1)       |
-||::  ::  ::||
-|           | **From caller side**              ||
-| `void`    | `cco_stop(co)`                       | Next call of coroutine finalizes        |
-| `void`    | `cco_reset_state(co)`                      | Reset state to initial (for reuse)      |
-| `void`    | `cco_run_coroutine(coroutine(co)) {}`    | Run blocking until coroutine is finished   |
-|           | `cco_run_task(cco_task* task) {}`        | Run blocking until task is finished |
-||::  ::  ::||
-|           | **c_filter() interoperability with coroutine iterators** ||
-|           | `cco_flt_take(num);`                 | Use instead of *c_flt_take(num)* to ensure cleanup state |
-|           | `cco_flt_takewhile(predicate);`      | Use instead of *c_flt_takewhile(pred)* to ensure cleanup state |
-||::  ::  ::||
-|           | **Container iteration in coroutines** ||
-|           | `cco_foreach(existing_it, ctype, cnt)` | Use existing iterator (stored in coroutine object) |
-|           | `cco_foreach_reverse(existing_it, ctype, cnt)` | Iterate in reverse order     |
+## Types
+| Type name         | Type definition / usage                             | Used to represent... |
+|:------------------|:----------------------------------------------------|:---------------------|
+|`cco_result`       | `CCO_DONE`, `CCO_AWAIT`, `CCO_YIELD`                | Default set of return values from coroutines |
+|`cco_cleanup:`     | Label inside coroutine | Label at cleanup position in coroutine |
+|`cco_task`         | Function object coroutine type |
+|`cco_timer`        | Timer type |
+|`cco_semaphore`    | Semaphore type |
+|`cco_taskrunner`   | Coroutine | Executor coroutine which handles asymmetric and<br> symmetric coroutine control flows, |
+|`cco_runtime`      | Struct type | Runtime object to manage cco_taskrunner states |
+
+## Methods and flow control statements
+```c
+                // Coroutine basics
+                cco_routine (Coroutine* co) { ... }                 // The coroutine scope.
+                cco_yield;                                          // Yield/suspend execution with CCO_YIELD.
+                cco_yield_v(int value);                             // Yield/suspend execution with (bit)value.
+                cco_yield_final;                                    // Yield final suspend, enter cleanup-state.
+                cco_yield_final_v(int value);                       // Yield with a final (bit)value.
+                cco_await(bool condition);                          // Suspend until condition is true (return CCO_AWAIT).
+                cco_await_coroutine(coroutine(co));                 // Await for subcoro to finish.
+                cco_await_coroutine(coroutine(co), int awaitbits);  // Await for subcoro's suspend value to be in (awaitbits | CCO_DONE)
+                cco_return;                                         // Execute `cco_cleanup:` section (if specified).
+bool            cco_active(Coroutine* co);                          // Is coroutine active? (= not done).
+bool            cco_done(Coroutine* co);                            // Is coroutine done?
+void            cco_reset_state(Coroutine* co);                     // Reset state to initial (for reuse).
+                                                                    // Set coroutine in done state and return.
+void            cco_stop(Coroutine* co);                            // Next call of coroutine finalizes.
+                cco_run_coroutine(coroutine(co)) {};                // Run blocking until coroutine is finished.
+```
+```c
+                // Task specific (coroutine function objects)
+                cco_task_struct(name) { <name>_state cco; ... };    // Define a coroutine task struct.
+void            cco_await_task(cco_task* task, cco_runtime* rt);    // Await for task to return CCO_DONE (asymmetric call).
+void            cco_await_task(cco_task* task, cco_runtime* rt, int awaitbits); // Await until task's suspend/return value
+                                                                                // to be in (awaitbits | CCO_DONE).
+void            cco_yield_to(cco_task* task, cco_runtime* rt);      // Yield to task (symmetric control transfer).
+void            cco_throw_error(uint16_t error, cco_runtime* rt);   // Throw an error and unwind call stack at cco_setup: label.
+                                                                    // Accessible as `rt->error` and `rt->error_line` while
+                                                                    // call chain is unwinded.
+void            cco_resume_task(cco_task* task, cco_runtime* rt);   // Resume suspended task, return value in `rt->result`.
+                cco_run_task(cco_task* task) {};                    // Run blocking until task is finished.
+```
+```c
+                // Timers
+                cco_await_timer_sec(cco_timer* tm, double sec);     // Await secs for timer to expire (usec prec.)
+                cco_start_timer_sec(cco_timer* tm, double sec);     // Start timer for secs duration.
+                cco_restart_timer(cco_timer* tm);                   // Restart timer with same duration.
+bool            cco_timer_expired(cco_timer* tm);                   // Return true if timer is expired.
+double          cco_timer_elapsed_sec(cco_timer* tm);               // Return elapsed seconds.
+double          cco_timer_remaining_sec(cco_timer* tm);             // Return remaining seconds.
+
+                // Time functions
+double          cco_time(void);                                     // Return secs with usec prec. since Epoch.
+                cco_sleep_sec(double sec);                          // Sleep for seconds (msec or usec. precision)
+
+```
+```c
+                // Semaphores
+cco_semaphore   cco_make_semaphore(long value);                     // Create semaphore
+                cco_set_semaphore(cco_semaphore* sem, long value);  // Set initial semaphore value
+                cco_await_semaphore(cco_semaphore* sem);            // Await for the semaphore count > 0, then count -= 1
+                cco_release_semaphore(cco_semaphore* sem);          // "Signal" the semaphore (count += 1)
+```
+```c
+                // Container iteration within coroutines
+                cco_foreach (iter_name, ctype, cnt);                // Use existing iterator (stored in coroutine object)
+                cco_foreach_reverse (iter_name, ctype, cnt);        // Iterate in reverse order
+
+                // c_filter() interoperability with coroutine iterators
+                cco_flt_take(int num);                              // Use instead of *c_flt_take(num)* to ensure cleanup state
+                cco_flt_takewhile(bool predicate);                  // Use instead of *c_flt_takewhile(pred)* to ensure cleanup state
+```
 
 ## Implementation and examples
 
@@ -97,7 +113,6 @@ The first example is a generator of Pythagorian triples, and stops when diagonal
 
 [ [Run this code](https://godbolt.org/z/r7h3K3e5j) ]
 ```c
-// https://quuxplusone.github.io/blog/2019/03/06/pythagorean-triples/
 #include <stdio.h>
 #include "stc/coroutine.h"
 
@@ -162,7 +177,7 @@ struct gcd1_triples {
 int gcd1_triples(struct gcd1_triples* co)
 {
     cco_routine (co) {
-        cco_reset_state(&co->tri);
+        cco_reset(&co->tri);
         co->tri.max_c = co->max_c;
 
         while (triples(&co->tri) != CCO_DONE) {
@@ -228,7 +243,7 @@ struct next_value {
 int next_value(struct next_value* co) {
     cco_routine (co) {
         while (true) {
-            cco_await_timer_sec(&co->tm, 1 + rand() % 2);
+            cco_await_timer(&co->tm, 1 + rand() % 2);
             co->val = rand();
             cco_yield;
         }
