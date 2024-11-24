@@ -37,7 +37,7 @@ void print_phone_book(hmap_cstr phone_book)
 
 int main(void)
 {
-    hmap_cstr phone_book = c_init(hmap_cstr, {
+    hmap_cstr phone_book = c_make(hmap_cstr, {
         {"Lilia Friedman", "(892) 670-4739"},
         {"Tariq Beltran", "(489) 600-7575"},
         {"Laiba Juarez", "(303) 885-5692"},

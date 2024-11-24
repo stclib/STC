@@ -34,7 +34,7 @@ int main(void)
     printmap(m1);
 
     // Fill in some data to test with
-    mymap m2 = c_init(mymap, {
+    mymap m2 = c_make(mymap, {
         {10, "Bob"},
         {11, "Rob"},
         {12, "Robert"},

@@ -96,7 +96,7 @@ i_key           sset_X_value_clone(i_key val);
 
 int main(void)
 {
-    SSet second = c_init(SSet, {"red", "green", "blue"});
+    SSet second = c_make(SSet, {"red", "green", "blue"});
     SSet third={0}, fourth={0}, fifth={0};
 
     c_foritems (i, const char*, {"orange", "pink", "yellow"})

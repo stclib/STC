@@ -56,7 +56,7 @@ int main(void) {
 #include "stc/deque.h"
 
 int main(void) {
-    IDeq nums = c_init(IDeq, {5434, 25, 245, 1, 654, 33, 543, 21});
+    IDeq nums = c_make(IDeq, {5434, 25, 245, 1, 654, 33, 543, 21});
     IDeq_push_front(&nums, 23);
     IDeq_push_front(&nums, 321);
 

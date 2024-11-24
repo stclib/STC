@@ -33,18 +33,18 @@ typedef struct Point { int x, y; } Point;
 
 int main(void)
 {
-    hmap_pnt pmap = c_init(hmap_pnt, {{{42, 14}, 1}, {{32, 94}, 2}, {{62, 81}, 3}});
+    hmap_pnt pmap = c_make(hmap_pnt, {{{42, 14}, 1}, {{32, 94}, 2}, {{62, 81}, 3}});
 
     c_foreach (i, hmap_pnt, pmap)
         printf(" (%d, %d: %d)", i.ref->first.x, i.ref->first.y, i.ref->second);
     puts("");
 
-    hmap_cstr smap = c_init(hmap_cstr, {
+    hmap_cstr smap = c_make(hmap_cstr, {
         {"Hello, friend", "long time no see"},
         {"So long", "see you around"},
     });
 
-    hset_cstr sset = c_init(hset_cstr, {
+    hset_cstr sset = c_make(hset_cstr, {
         "Hello, friend",
         "Nice to see you again",
         "So long",

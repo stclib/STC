@@ -34,7 +34,7 @@ int main(void) {
         && printf("%4d: %10f\n", c_flt_getcount(), *value));
 
     DList_drop(&list);
-    list = c_init(DList, {10, 20, 30, 40, 30, 50});
+    list = c_make(DList, {10, 20, 30, 40, 30, 50});
 
     printf("List: ");
     c_foreach (i, DList, list)

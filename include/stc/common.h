@@ -181,8 +181,6 @@ typedef const char* cstr_raw;
     for (struct {T* ref; int size, index;} \
          it = {.ref=c_make_array(T, __VA_ARGS__), .size=(int)(sizeof((T[])__VA_ARGS__)/sizeof(T))} \
          ; it.index < it.size; ++it.ref, ++it.index)
-#define c_forlist(...) c_foritems(_VA_ARGS__)                      // [deprecated]
-#define c_forpair(...) 'c_forpair not_supported. Use c_foreach_kv' // [removed]
 
 // c_forrange, c_forrange32: python-like int range iteration
 #define c_forrange_t(...) c_MACRO_OVERLOAD(c_forrange_t, __VA_ARGS__)
@@ -204,16 +202,24 @@ typedef const char* cstr_raw;
 #define c_forrange32_3(i, start, stop) c_forrange_t_4(int32_t, i, start, stop)
 #define c_forrange32_4(i, start, stop, step) c_forrange_t_5(int32_t, i, start, stop, step)
 
-// init container with literal list, and drop multiple containers of same type
-#define c_init(C, ...) \
+// deprecated/removed:
+#define c_init(C, ...) c_make(C, __VA_ARGS__)                      // [deprecated]
+#define c_forlist(...) c_foritems(_VA_ARGS__)                      // [deprecated]
+#define c_forpair(...) 'c_forpair not_supported. Use c_foreach_kv' // [removed]
+
+// make container from a literal list, and drop multiple containers of same type
+#define c_make(C, ...) \
     C##_with_n(c_make_array(C##_raw, __VA_ARGS__), c_sizeof((C##_raw[])__VA_ARGS__)/c_sizeof(C##_raw))
 
+// push multiple elements from a literal list into a container
 #define c_push(C, cnt, ...) \
     C##_put_n(cnt, c_make_array(C##_raw, __VA_ARGS__), c_sizeof((C##_raw[])__VA_ARGS__)/c_sizeof(C##_raw))
 
+// drop multiple containers of same type
 #define c_drop(C, ...) \
     do { c_foritems (_c_i, C*, {__VA_ARGS__}) C##_drop(*_c_i.ref); } while(0)
 
+// define function with "on-the-fly" defined return type (e.g. variant, optional)
 #define c_func(name, args, RIGHTARROW, ...) \
     typedef __VA_ARGS__ name##_result; name##_result name args
 

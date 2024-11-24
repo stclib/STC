@@ -40,7 +40,7 @@ void findit(smap_istr c, smap_istr_key val)
 
 int main(void)
 {
-    smap_istr m1 = c_init(smap_istr, {{40, "Zr"}, {45, "Rh"}});
+    smap_istr m1 = c_make(smap_istr, {{40, "Zr"}, {45, "Rh"}});
     vec_istr v = {0};
 
     puts("The starting map m1 is (key, value):");

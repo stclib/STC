@@ -94,7 +94,7 @@ hset_X_value    hset_X_value_clone(hset_X_value val);
 
 int main(void)
 {
-    Strings first = c_init(Strings, {"red", "green", "blue"});
+    Strings first = c_make(Strings, {"red", "green", "blue"});
     Strings second={0}, third={0}, fourth={0}, fifth={0};
 
     c_foritems (i, const char*, {"orange", "pink", "yellow"})

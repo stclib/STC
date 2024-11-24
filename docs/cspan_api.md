@@ -39,8 +39,8 @@ it may be expanded multiple times. However, all index arguments are safe, e.g.
 of arguments does not match the span rank, a compile error is issued. Runtime bounds checks are enabled
 by default (define `STC_NDEBUG` or `NDEBUG` to disable).
 ```c
-SpanType        c_init(<TYPE> SpanType, {v1, v2, ...});             // initialize a 1-d cspan from value list
-SpanType        cspan_init(<TYPE> SpanType, {v1, v2, ...});         // make a static 1-d cspan from value list
+SpanType        c_make(<TYPE> SpanType, {v1, v2, ...});             // initialize a 1-d cspan from value list
+SpanType        cspan_make(<TYPE> SpanType, {v1, v2, ...});         // make a static 1-d cspan from value list
 SpanType        cspan_with_n(ValueType* ptr, int32 n);              // make a 1-d cspan from a pointer and length
 SpanType        cspan_from_array(ValueType array[]);                // make a 1-d cspan from a C array
 SpanType        cspan_from(STCContainer* cnt);                      // make a 1-d cspan from a vec or stack
@@ -145,18 +145,18 @@ void printMe(intspan container) {
 
 int main(void)
 {
-    printMe( c_init(intspan, {1, 2, 3, 4}) );
+    printMe( c_make(intspan, {1, 2, 3, 4}) );
 
     int arr[] = {1, 2, 3, 4, 5};
     printMe( (intspan)cspan_from_array(arr) );
 
-    vec_int vec = c_init(vec_int, {1, 2, 3, 4, 5, 6});
+    vec_int vec = c_make(vec_int, {1, 2, 3, 4, 5, 6});
     printMe( (intspan)cspan_from(&vec) );
 
-    stack_int stk = c_init(stack_int, {1, 2, 3, 4, 5, 6, 7});
+    stack_int stk = c_make(stack_int, {1, 2, 3, 4, 5, 6, 7});
     printMe( (intspan)cspan_from(&stk) );
 
-    intspan spn = c_init(intspan, {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12});
+    intspan spn = c_make(intspan, {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12});
     printMe( (intspan)cspan_subspan(&spn, 2, 8) );
 
     // cleanup
@@ -261,7 +261,7 @@ using_cspan3(Span, int); // Shorthand to define Span, Span2, and Span3
 
 int main(void)
 {
-    Span span = c_init(Span, {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
+    Span span = c_make(Span, {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
                               14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24});
     Span3 span3 = cspan_md(span.data, 2, 4, 3);
 

@@ -27,7 +27,7 @@ int scheduler(struct Scheduler* sc, cco_runtime* rt) {
     cco_routine (sc) {
         while (!Tasks_is_empty(&sc->tasks)) {
             sc->pulled = Tasks_pull(&sc->tasks);
-    
+
             cco_await_task(sc->pulled, rt, CCO_YIELD);
 
             if (rt->result == CCO_YIELD) {
@@ -54,7 +54,7 @@ static int taskA(struct TaskA* task, cco_runtime* rt) {
         puts("A is back doing more work");
         cco_yield;
         puts("A is back doing even more work");
-        
+
         cco_cleanup:
         puts("A done");
     }
@@ -79,7 +79,7 @@ static int taskB(struct TaskB* task, cco_runtime* rt) {
 int main(void) {
     struct Scheduler schedule = {
         .cco={scheduler},
-        .tasks = c_init(Tasks, {
+        .tasks = c_make(Tasks, {
             cco_cast_task(c_new(struct TaskA, {{taskA}})),
             cco_cast_task(c_new(struct TaskB, {{taskB}})),
         })

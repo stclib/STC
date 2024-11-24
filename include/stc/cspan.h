@@ -138,9 +138,9 @@ using_cspan_tuple(3); using_cspan_tuple(4);
 using_cspan_tuple(5); using_cspan_tuple(6);
 using_cspan_tuple(7); using_cspan_tuple(8);
 
-// cspan_init: create static/global 1d-span from an initializer list
-// For non-static spans, use c_init(Span, ...) as it is consistent with initing other containers.
-#define cspan_init(Span, ...) \
+// cspan_make: create static/global 1d-span from an initializer list
+// For non-static spans, use c_make(Span, ...) as it is consistent with initing other containers.
+#define cspan_make(Span, ...) \
     (c_literal(Span){.data=c_make_array(Span##_value, __VA_ARGS__), \
                      .shape={sizeof((Span##_value[])__VA_ARGS__)/sizeof(Span##_value)}, \
                      .stride=(cspan_tuple1){.d={1}}})

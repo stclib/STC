@@ -9,7 +9,7 @@ typedef struct Point { int x, y; } Point;
 
 int main(void)
 {
-    PointQ pqueue = c_init(PointQ, {{23, 80}, {12, 32}, {54, 74}, {12, 62}});
+    PointQ pqueue = c_make(PointQ, {{23, 80}, {12, 32}, {54, 74}, {12, 62}});
     // print
     for (; !PointQ_is_empty(&pqueue); PointQ_pop(&pqueue))
     {

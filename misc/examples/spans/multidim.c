@@ -9,7 +9,7 @@ using_cspan3(ispan, int);
 
 int main(void)
 {
-    stack_int v = c_init(stack_int, {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24});
+    stack_int v = c_make(stack_int, {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24});
 
     // Create 1d span from a compatibel container
     ispan ms1 = cspan_from(&v);

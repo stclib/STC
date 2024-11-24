@@ -141,7 +141,7 @@ Interleave *push_front()* / *push_back()* then *sort()*:
 #include <stdio.h>
 
 int main(void) {
-    DList list = c_init(DList, {10., 20., 30., 40., 50., 60., 70., 80., 90.});
+    DList list = c_make(DList, {10., 20., 30., 40., 50., 60., 70., 80., 90.});
 
     c_forrange (i, 1, 10) {
         if (i & 1) DList_push_front(&list, (double) i);
@@ -173,7 +173,7 @@ Use of *erase_at()* and *erase_range()*:
 
 int main(void)
 {
-    IList L = c_init(IList, {10, 20, 30, 40, 50});
+    IList L = c_make(IList, {10, 20, 30, 40, 50});
                                             // 10 20 30 40 50
     IList_iter it = IList_begin(&L);        // ^
     IList_next(&it);
@@ -205,8 +205,8 @@ Splice `[30, 40]` from *L2* into *L1* before `3`:
 #include <stdio.h>
 
 int main(void) {
-    IList L1 = c_init(IList, {1, 2, 3, 4, 5});
-    IList L2 = c_init(IList, {10, 20, 30, 40, 50});
+    IList L1 = c_make(IList, {1, 2, 3, 4, 5});
+    IList L2 = c_make(IList, {10, 20, 30, 40, 50});
 
     IList_iter i = IList_advance(IList_begin(&L1), 2);
     IList_iter j1 = IList_advance(IList_begin(&L2), 2), j2 = IList_advance(j1, 2);

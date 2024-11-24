@@ -50,8 +50,8 @@ TEST(hmap, mapdemo3)
     hmap_cstr_erase_at(&map, it);
     hmap_cstr_erase(&map, "Hello");
 
-    hmap_cstr res1 = c_init(hmap_cstr, {{"Map", ""}, {"Sunny", ""}});
-    hmap_cstr res2 = c_init(hmap_cstr, {{"Sunny", ""}, {"Map", ""}});
+    hmap_cstr res1 = c_make(hmap_cstr, {{"Map", ""}, {"Sunny", ""}});
+    hmap_cstr res2 = c_make(hmap_cstr, {{"Sunny", ""}, {"Map", ""}});
 
     EXPECT_TRUE(hmap_cstr_eq(&res1, &map));
     EXPECT_TRUE(hmap_cstr_eq(&res2, &map));

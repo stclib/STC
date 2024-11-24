@@ -44,7 +44,7 @@ TEST(algorithm, cstr_append)
 
 TEST(algorithm, c_find_if)
 {
-    ISpan nums = c_init(ISpan, {1,1,2,3,5,8,13,21,34});
+    ISpan nums = c_make(ISpan, {1,1,2,3,5,8,13,21,34});
 
     ISpan_iter it;
     c_find_if(ISpan, nums, &it, *value == 13);
@@ -55,7 +55,7 @@ TEST(algorithm, c_find_if)
 
 TEST(algorithm, c_filter)
 {
-    IVec vec = c_init(IVec, {1,1,2,3,5,8,13,21,34,10});
+    IVec vec = c_make(IVec, {1,1,2,3,5,8,13,21,34,10});
     #define f_is_even(v) ((v & 1) == 0)
     #define f_is_odd(v) ((v & 1) == 1)
 

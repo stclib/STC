@@ -23,16 +23,16 @@ TEST(smap, erase)
     mymap_insert(&m1, 5, cstr_lit("E"));
 
     // Starting data of map m1 is:
-    mymap_take(&res, c_init(mymap, {{1, "A"}, {2, "B"}, {3, "C"}, {4, "D"}, {5, "E"}}));
+    mymap_take(&res, c_make(mymap, {{1, "A"}, {2, "B"}, {3, "C"}, {4, "D"}, {5, "E"}}));
     EXPECT_TRUE(mymap_eq(&res, &m1));
     // The 1st member function removes an element at a given position
     mymap_erase_at(&m1, mymap_advance(mymap_begin(&m1), 1));
     // After the 2nd element is deleted, the map m1 is:
-    mymap_take(&res, c_init(mymap, {{1, "A"}, {3, "C"}, {4, "D"}, {5, "E"}, }));
+    mymap_take(&res, c_make(mymap, {{1, "A"}, {3, "C"}, {4, "D"}, {5, "E"}, }));
     EXPECT_TRUE(mymap_eq(&res, &m1));
 
     // Fill in some data to test with
-    mymap m2 = c_init(mymap, {
+    mymap m2 = c_make(mymap, {
         {10, "Bob"},
         {11, "Rob"},
         {12, "Robert"},
@@ -48,7 +48,7 @@ TEST(smap, erase)
     // in the range [First, Last)
     mymap_erase_range(&m2, it1, it2);
     // After the middle elements are deleted, the map m2 is:
-    mymap_take(&res, c_init(mymap, {{10, "Bob"}, {14, "Bobby"}, }));
+    mymap_take(&res, c_make(mymap, {{10, "Bob"}, {14, "Bobby"}, }));
     EXPECT_TRUE(mymap_eq(&res, &m2));
 
     mymap m3 = {0};
@@ -63,14 +63,14 @@ TEST(smap, erase)
     mymap_emplace(&m3, 7, "pink");
 
     // Starting data of map m3 is:
-    mymap_take(&res, c_init(mymap, {{1, "red"}, {2, "yellow"}, {3, "blue"}, {4, "green"}, {5, "orange"}, {6, "purple"}, {7, "pink"}, }));
+    mymap_take(&res, c_make(mymap, {{1, "red"}, {2, "yellow"}, {3, "blue"}, {4, "green"}, {5, "orange"}, {6, "purple"}, {7, "pink"}, }));
     EXPECT_TRUE(mymap_eq(&res, &m3));
     // The 3rd member function removes elements with a given Key
     int count = mymap_erase(&m3, 2);
     // The 3rd member function also returns the number of elements removed:
     EXPECT_EQ(1, count);
     // After the element with a key of 2 is deleted, the map m3 is:
-    mymap_take(&res, c_init(mymap, {{1, "red"}, {3, "blue"}, {4, "green"}, {5, "orange"}, {6, "purple"}, {7, "pink"}}));
+    mymap_take(&res, c_make(mymap, {{1, "red"}, {3, "blue"}, {4, "green"}, {5, "orange"}, {6, "purple"}, {7, "pink"}}));
     EXPECT_TRUE(mymap_eq(&res, &m3));
 
     c_drop(mymap, &m1, &m2, &m3, &res);
@@ -98,7 +98,7 @@ TEST(smap, insert)
     smap_ii_push(&m1, (smap_ii_value){2, 20});
 
     // The original key and mapped values of m1 are:
-    smap_ii_take(&res, c_init(smap_ii, {{1, 10}, {2, 20}}));
+    smap_ii_take(&res, c_make(smap_ii, {{1, 10}, {2, 20}}));
     EXPECT_TRUE(smap_ii_eq(&res, &m1));
 
     // intentionally attempt a duplicate, single element
@@ -107,7 +107,7 @@ TEST(smap, insert)
 
     smap_ii_insert(&m1, 3, 30);
     // The modified key and mapped values of m1 are:
-    smap_ii_take(&res, c_init(smap_ii, {{1, 10}, {2, 20}, {3, 30}}));
+    smap_ii_take(&res, c_make(smap_ii, {{1, 10}, {2, 20}, {3, 30}}));
     EXPECT_TRUE(smap_ii_eq(&res, &m1));
 
     // The templatized version inserting a jumbled range
@@ -125,7 +125,7 @@ TEST(smap, insert)
         smap_ii_insert_or_assign(&m2, e.ref->first, e.ref->second);
 
     // The modified key and mapped values of m2 are:
-    smap_ii_take(&res, c_init(smap_ii, {{41, 262}, {42, 277}, {43, 294}, {44, 311}, {45, 330}}));
+    smap_ii_take(&res, c_make(smap_ii, {{41, 262}, {42, 277}, {43, 294}, {44, 311}, {45, 330}}));
     EXPECT_TRUE(smap_ii_eq(&res, &m2));
 
     // The templatized versions move-constructing elements
@@ -137,13 +137,13 @@ TEST(smap, insert)
     // single element
     mymap_insert(&m3, ip1.first, cstr_move(&ip1.second));
     // After the first move insertion, m3 contains:
-    mymap_take(&res3, c_init(mymap, {{475, "blue"}}));
+    mymap_take(&res3, c_make(mymap, {{475, "blue"}}));
     EXPECT_TRUE(mymap_eq(&res3, &m3));
 
     // single element
     mymap_insert(&m3, ip2.first, cstr_move(&ip2.second));
     // After the second move insertion, m3 contains:
-    mymap_take(&res3, c_init(mymap, {{475, "blue"}, {510, "green"}}));
+    mymap_take(&res3, c_make(mymap, {{475, "blue"}, {510, "green"}}));
     EXPECT_TRUE(mymap_eq(&res3, &m3));
 
     c_drop(smap_ii, &m1, &m2, &res);

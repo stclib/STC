@@ -138,7 +138,7 @@ bool            c_memcmp_eq(const i_keyraw* a, const i_keyraw* b);    // !memcmp
 int main(void)
 {
     // Create an unordered_map of three strings (that map to strings)
-    hmap_cstr umap = c_init(hmap_cstr, {
+    hmap_cstr umap = c_make(hmap_cstr, {
         {"RED", "#FF0000"},
         {"GREEN", "#00FF00"},
         {"BLUE", "#0000FF"}
@@ -261,7 +261,7 @@ static inline void Viking_drop(Viking* vp) {
 int main(void)
 {
     // Use a HashMap to store the vikings' health points.
-    Vikings vikings = c_init(Vikings, {
+    Vikings vikings = c_make(Vikings, {
         {Viking_make("Einar", "Norway"), 25},
         {Viking_make("Olaf", "Denmark"), 24},
         {Viking_make("Harald", "Iceland"), 12},
@@ -339,7 +339,7 @@ Viking_raw Viking_toraw(const Viking* vp) {
 
 int main(void)
 {
-    Vikings vikings = c_init(Vikings, {
+    Vikings vikings = c_make(Vikings, {
         {{"Einar", "Norway"}, 25},
         {{"Olaf", "Denmark"}, 24},
         {{"Harald", "Iceland"}, 12},

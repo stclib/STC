@@ -15,7 +15,7 @@ void show_drop(int* x) { printf("drop: %d\n", *x); }
 
 int main(void)
 {
-    Vec vec = c_init(Vec, {2012, 1990, 2012, 2019, 2015});
+    Vec vec = c_make(Vec, {2012, 1990, 2012, 2019, 2015});
 
     // clone the second 2012 and push it back.
     // note: cloning make sure that vec.data[2] has ref count 2.

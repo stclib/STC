@@ -81,7 +81,7 @@ same element access syntax. The following works for single-element type containe
 #define i_type MyInts, int
 #include "stc/list.h"
 ...
-MyInts ints = c_init(MyInts, {3, 5, 9, 7, 2});
+MyInts ints = c_make(MyInts, {3, 5, 9, 7, 2});
 c_foreach (it, MyInts, ints) *it.ref += 42;
 ```
 </details>
@@ -110,7 +110,7 @@ Benchmark notes:
 
 - Naming conventions
     - Non-templated container names are prefixed by `c`, e.g. `cstr`, `cbits`, `cregex`.
-    - Public STC macros and "keywords" are prefixed by `c_`, e.g. `c_foreach`, `c_init`.
+    - Public STC macros and "keywords" are prefixed by `c_`, e.g. `c_foreach`, `c_make`.
     - Template parameter macros are prefixed by `i_`, e.g. `i_key`, `i_type`.
     - All owning containers can be initialized with `{0}` (also `cstr`), i.e. no heap allocation initially.
 
@@ -226,9 +226,9 @@ int main(void)
     Vec_push(v, 30.f);
     Vec_push(v, 40.f);
 
-    Vec2D vec_b = c_init(Vec2D, {
-        c_init(Vec, {10.f, 20.f}),
-        c_init(Vec, {30.f, 40.f}),
+    Vec2D vec_b = c_make(Vec2D, {
+        c_make(Vec, {10.f, 20.f}),
+        c_make(Vec, {30.f, 40.f}),
     });
     printf("vec_a == vec_b is %s.\n", Vec2D_eq(&vec_a, &vec_b) ? "true":"false");
 
@@ -769,7 +769,7 @@ STC is generally very memory efficient. Memory usage for the different container
 - Renamed i_extern => `i_import` (i_extern deprecated).
     - Define `i_import` before `#include "stc/cstr.h"` will also define full utf8 case conversions.
     - Define `i_import` before `#include "stc/cregex.h"` will also define cstr + utf8 tables.
-- Renamed c_make() => ***c_init()*** macro for initializing containers with element lists. c_make deprecated.
+- Renamed c_make() => ***c_make()*** macro for initializing containers with element lists. c_make deprecated.
 - Removed deprecated uppercase flow-control macro names.
 - Other smaller additions, bug fixes and improved documentation.
 

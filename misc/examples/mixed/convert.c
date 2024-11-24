@@ -23,7 +23,7 @@ int main(void)
         vec_cstr_drop(&values),
         list_cstr_drop(&list)
     ){
-        map = c_init(hmap_cstr, {
+        map = c_make(hmap_cstr, {
             {"green", "#00ff00"},
             {"blue", "#0000ff"},
             {"yellow", "#ffff00"},

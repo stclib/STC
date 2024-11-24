@@ -14,7 +14,7 @@
 
 void demo1(void)
 {
-    IVec vec = c_init(IVec, {0, 1, 2, 3, 4, 5, 80, 6, 7, 80, 8, 9, 80,
+    IVec vec = c_make(IVec, {0, 1, 2, 3, 4, 5, 80, 6, 7, 80, 8, 9, 80,
                              10, 11, 12, 13, 14, 15, 80, 16, 17});
 
     c_filter(IVec, vec, f_skipValue(80) && printf(" %d", (int) *value));

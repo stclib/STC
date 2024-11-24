@@ -6,7 +6,7 @@
 
 int main(void)
 {
-    IList L = c_init(IList, {10, 20, 30, 40, 50});
+    IList L = c_make(IList, {10, 20, 30, 40, 50});
 
     c_foreach (x, IList, L)
         printf("%d ", *x.ref);

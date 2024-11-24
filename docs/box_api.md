@@ -109,7 +109,7 @@ void int_drop(int* x) {
 
 int main(void)
 {
-    IVec vec = c_init(IVec, {2021, 2012, 2022, 2015});
+    IVec vec = c_make(IVec, {2021, 2012, 2022, 2015});
     ISet set = {0};
 
     printf("vec:");

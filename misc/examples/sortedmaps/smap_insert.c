@@ -94,7 +94,7 @@ int main(void)
 
     smap_ii m4 = {0};
     // Insert the elements from an initializer_list
-    m4 = c_init(smap_ii, {{4, 44}, {2, 22}, {3, 33}, {1, 11}, {5, 55}});
+    m4 = c_make(smap_ii, {{4, 44}, {2, 22}, {3, 33}, {1, 11}, {5, 55}});
     puts("After initializer_list insertion, m4 contains:");
     print_ii(m4);
     puts("");

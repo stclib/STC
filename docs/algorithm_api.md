@@ -27,7 +27,7 @@ descriptive and reduces chances of making mistakes. It is generally easier to re
 #define i_type IMap, int, int
 #include "stc/smap.h"
 // ...
-IMap map = c_init(IMap, {{23,1}, {3,2}, {7,3}, {5,4}, {12,5}});
+IMap map = c_make(IMap, {{23,1}, {3,2}, {7,3}, {5,4}, {12,5}});
 
 c_foreach (i, IMap, map)
     printf(" %d", i.ref->first);
@@ -201,7 +201,7 @@ It enables a subset of functional programming like in other popular languages.
 
 int main(void)
 {
-    Vec vec = c_init(Vec, {1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 9, 10, 11, 12, 5});
+    Vec vec = c_make(Vec, {1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 9, 10, 11, 12, 5});
 
     c_filter(Vec, vec, true
         && c_flt_skipwhile(*value < 3)  // skip leading values < 3
@@ -229,19 +229,19 @@ to write functions that returns extra error context when error occurs, or just m
 
 ```c
 Vec get_data(void) {
-    return c_init(Vec, {1, 2, 3, 4, 5, 6});
+    return c_make(Vec, {1, 2, 3, 4, 5, 6});
 }
 
 // same as get_data(), but with the c_func macro "syntax".
 c_func (get_data1,(void), ->, Vec) {
-    return c_init(Vec, {1, 2, 3, 4, 5, 6});
+    return c_make(Vec, {1, 2, 3, 4, 5, 6});
 }
 
 // return two Vec types "on-the-fly".
 c_func (get_data2,(void), ->, struct {Vec v1, v2;}) {
     return (get_data2_result){
-        .v1 = c_init(Vec, {1, 2, 3, 4, 5, 6}),
-        .v2 = c_init(Vec, {7, 8, 9, 10, 11})
+        .v1 = c_make(Vec, {1, 2, 3, 4, 5, 6}),
+        .v2 = c_make(Vec, {7, 8, 9, 10, 11})
     };
 }
 
@@ -259,13 +259,13 @@ c_func (load_data,(const char* fname), ->, struct {Vec vec; int err;}) {
 ```
 </details>
 <details>
-<summary><b>c_init, c_push, c_drop</b> - Generic container operations</summary>
+<summary><b>c_make, c_push, c_drop</b> - Generic container operations</summary>
 
-These work on any container. *c_init()* may also be used for **cspan** views.
+These work on any container. *c_make()* may also be used for **cspan** views.
 
-### c_init, c_push, c_drop
+### c_make, c_push, c_drop
 
-- **c_init** - construct any container from an initializer list
+- **c_make** - construct any container from an initializer list
 - **c_push** - push values onto any container from an initializer list
 - **c_drop** - drop (destroy) multiple containers of the same type
 
@@ -288,8 +288,8 @@ c_func (split_map,(Map map), ->, struct {Vec keys, values;}) {
 }
 
 int main(void) {
-    Vec vec = c_init(Vec, {1, 2, 3, 4, 5, 6});
-    Map map = c_init(Map, {{1, 2}, {3, 4}, {5, 6}});
+    Vec vec = c_make(Vec, {1, 2, 3, 4, 5, 6});
+    Map map = c_make(Map, {{1, 2}, {3, 4}, {5, 6}});
 
     c_push(Vec, &vec, {7, 8, 9, 10, 11, 12});
     c_push(Map, &map, {{7, 8}, {9, 10}, {11, 12}});
@@ -360,7 +360,7 @@ Erase linearily in containers using a predicate. `value` is a pointer to each el
 int main(void)
 {
     // Clone all *value > 10 to outvec. Note: `value` is a pointer to current element
-    Vec vec = c_init(Vec, {2, 30, 21, 5, 9, 11});
+    Vec vec = c_make(Vec, {2, 30, 21, 5, 9, 11});
     Vec outvec = {0};
 
     c_copy_if(Vec, vec, &outvec, *value > 10);
@@ -379,14 +379,14 @@ int main(void)
     puts("");
 
     // Erase all values > 20 in a linked list:
-    List list = c_init(List, {2, 30, 21, 5, 9, 11});
+    List list = c_make(List, {2, 30, 21, 5, 9, 11});
 
     c_erase_if(List, &list, *value > 20);
     c_foreach (i, List, list) printf(" %d", *i.ref);
     puts("");
 
     // Search a sorted map from it1, for the first string containing "hello" and erase it:
-    Map map = c_init(Map, {{"yes",1}, {"no",2}, {"say hello from me",3}, {"goodbye",4}});
+    Map map = c_make(Map, {{"yes",1}, {"no",2}, {"say hello from me",3}, {"goodbye",4}});
     Map_iter res, it1 = Map_begin(&map);
 
     c_find_if(Map, it1, Map_end(&map), &res, cstr_contains(&value->first, "hello"));
@@ -470,7 +470,7 @@ int main(void) {
 #include <stdio.h>
 
 int main(void) {
-    MyDeq deq = c_init(MyDeq, {5, 3, 5, 9, 7, 4, 7});
+    MyDeq deq = c_make(MyDeq, {5, 3, 5, 9, 7, 4, 7});
 
     MyDeq_sort(&deq);
     c_foreach (i, MyDeq, deq) printf(" %d", *i.ref); puts("");

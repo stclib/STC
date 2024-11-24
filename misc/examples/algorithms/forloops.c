@@ -31,8 +31,8 @@ int main(void)
         printf(" %s", *i.ref);
     puts("");
 
-    IVec vec = c_init(IVec, {12, 23, 453, 65, 113, 215, 676, 34, 67, 20, 27, 66, 189, 45, 280, 199});
-    IMap map = c_init(IMap, {{12, 23}, {453, 65}, {676, 123}, {34, 67}});
+    IVec vec = c_make(IVec, {12, 23, 453, 65, 113, 215, 676, 34, 67, 20, 27, 66, 189, 45, 280, 199});
+    IMap map = c_make(IMap, {{12, 23}, {453, 65}, {676, 123}, {34, 67}});
 
     puts("\n\nc_foreach:");
     c_foreach (i, IVec, vec)

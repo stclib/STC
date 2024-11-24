@@ -20,18 +20,18 @@ void printMe(intspan container) {
 
 int main(void)
 {
-    printMe( c_init(intspan, {1, 2, 3, 4}) );
+    printMe( c_make(intspan, {1, 2, 3, 4}) );
 
     int arr[] = {1, 2, 3, 4, 5};
     printMe( (intspan)cspan_from_array(arr) );
 
-    vec_int vec = c_init(vec_int, {1, 2, 3, 4, 5, 6});
+    vec_int vec = c_make(vec_int, {1, 2, 3, 4, 5, 6});
     printMe( (intspan)cspan_from(&vec) );
 
-    stack_int stk = c_init(stack_int, {1, 2, 3, 4, 5, 6, 7});
+    stack_int stk = c_make(stack_int, {1, 2, 3, 4, 5, 6, 7});
     printMe( (intspan)cspan_from(&stk) );
 
-    intspan spn = c_init(intspan, {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12});
+    intspan spn = c_make(intspan, {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12});
     printMe( (intspan)cspan_subspan(&spn, 2, 8) );
 
     // cleanup

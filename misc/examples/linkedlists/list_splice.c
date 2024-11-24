@@ -14,8 +14,8 @@ void print_IList(const char* s, IList list)
 
 int main(void)
 {
-    IList list1 = c_init(IList, {1, 2, 3, 4, 5});
-    IList list2 = c_init(IList, {10, 20, 30, 40, 50});
+    IList list1 = c_make(IList, {1, 2, 3, 4, 5});
+    IList list2 = c_make(IList, {10, 20, 30, 40, 50});
 
     print_IList("list1:", list1);
     print_IList("list2:", list2);

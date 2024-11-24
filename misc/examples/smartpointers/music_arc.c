@@ -56,7 +56,7 @@ inline static size_t SongView_hash(const SongView* xw)
 
 void example3(void)
 {
-    SongSet set1 = c_init(SongSet, {
+    SongSet set1 = c_make(SongSet, {
         (SongView){"Bob Dylan", "The Times They Are A Changing"},
         (SongView){"Aretha Franklin", "Bridge Over Troubled Water"},
         (SongView){"Thalia", "Entre El Mar y Una Estrella"},

@@ -76,7 +76,7 @@ TEST(cspan, slice2) {
 
 
 TEST(cspan, equality) {
-    Span base = c_init(Span, {
+    Span base = c_make(Span, {
         3, 1, 2, 3, 1,
         2, 4, 5, 6, 2,
         1, 7, 8, 9, 3,
@@ -86,7 +86,7 @@ TEST(cspan, equality) {
     });
     Span2 base2 = cspan_md(base.data, 6, 5);
 
-    Span test = c_init(Span, {
+    Span test = c_make(Span, {
         1, 2, 3,
         4, 5, 6,
         7, 8, 9,

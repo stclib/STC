@@ -12,7 +12,7 @@ int main(void)
     // TEST SORTED VECTOR
     {
         int key;
-        IVec vec = c_init(IVec, {40, 600, 1, 7000, 2, 500, 30});
+        IVec vec = c_make(IVec, {40, 600, 1, 7000, 2, 500, 30});
 
         IVec_sort(&vec);
 
@@ -41,7 +41,7 @@ int main(void)
     // TEST SORTED SET
     {
         int key, *res;
-        ISet set = c_init(ISet, {40, 600, 1, 7000, 2, 500, 30});
+        ISet set = c_make(ISet, {40, 600, 1, 7000, 2, 500, 30});
 
         key = 100;
         res = ISet_lower_bound(&set, key).ref;

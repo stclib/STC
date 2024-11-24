@@ -28,7 +28,7 @@
 
 int main(void)
 {
-    Vec vec = c_init(Vec, {1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 9, 10, 11, 12, 5});
+    Vec vec = c_make(Vec, {1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 9, 10, 11, 12, 5});
 
     c_filter(Vec, vec, true
         && c_flt_skipwhile(*value < 3)  // skip leading values < 3
