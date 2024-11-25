@@ -27,7 +27,7 @@ struct Dining {
 
 
 // Philosopher coroutine
-int philosopher(struct Philosopher* ph)
+int Philosopher(struct Philosopher* ph)
 {
     double duration;
     cco_routine (ph) {
@@ -56,13 +56,13 @@ int philosopher(struct Philosopher* ph)
 
 
 // Dining coroutine
-int dining(struct Dining* di)
+int Dining(struct Dining* di)
 {
     cco_routine (di) {
         for (int i = 0; i < num_forks; ++i)
             cco_set_semaphore(&di->forks[i], 1); // all forks available
         for (int i = 0; i < num_philosophers; ++i) {
-            cco_reset_state(&di->ph[i]);
+            cco_reset(&di->ph[i]);
             di->ph[i].id = i + 1;
             di->ph[i].left_fork = &di->forks[i];
             di->ph[i].right_fork = &di->forks[(i + 1) % num_forks];
@@ -71,7 +71,7 @@ int dining(struct Dining* di)
         while (1) {
             // per-"frame" logic resume each philosopher
             for (int i = 0; i < num_philosophers; ++i) {
-                philosopher(&di->ph[i]);
+                Philosopher(&di->ph[i]);
             }
             cco_yield; // suspend, return control back to main
         }
@@ -79,7 +79,7 @@ int dining(struct Dining* di)
         cco_cleanup:
         for (int i = 0; i < num_philosophers; ++i) {
             cco_stop(&di->ph[i]);
-            philosopher(&di->ph[i]);
+            Philosopher(&di->ph[i]);
         }
         puts("Dining finished");
     }
@@ -88,16 +88,15 @@ int dining(struct Dining* di)
 
 int main(void)
 {
-    struct Dining dine;
-    cco_reset_state(&dine);
+    struct Dining dining;
+    cco_reset(&dining);
     int n=0;
     cco_timer tm = cco_make_timer_sec(5.0);
     crand64_seed((uint64_t)time(NULL));
 
-    cco_run_coroutine(dining(&dine))
-    {
+    cco_run_coroutine(Dining(&dining)) {
         if (cco_timer_expired(&tm))
-            cco_stop(&dine);
+            cco_stop(&dining);
         cco_sleep_sec(0.001);
         ++n;
     }

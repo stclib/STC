@@ -10,48 +10,49 @@ Because these coroutines are stackless, local variables within the coroutine whe
 
 ## Methods and statements
 
-- Local variables must not be declared within a `cco_routine` scope. Place them in the coroutine struct.
-- ***cco_yield\**** / ***cco_await\**** must not be called inside a `switch` statement within a
+- Do not declare local variables within a `cco_routine` scope. Place them in the coroutine struct.
+- Do not call ***cco_yield\**** / ***cco_await\**** inside a `switch` statement within a
 `cco_routine` scope; use `if-else-if` constructs instead.
 
 #### Coroutine basics
 ```c
                 cco_routine (Coroutine* co) { ... }                 // The coroutine scope.
-                cco_yield;                                          // Yield/suspend execution with CCO_YIELD.
-                cco_yield_v(int value);                             // Yield/suspend execution with (bit)value.
+                cco_yield;                                          // Yield/suspend execution with CCO_YIELD returned.
+                cco_yield_v(value);                                 // Yield/suspend execution with value returned.
                 cco_yield_final;                                    // Yield final suspend, enter cleanup-state.
-                cco_yield_final_v(int value);                       // Yield with a final (bit)value.
-                cco_await(bool condition);                          // Suspend until condition is true (return CCO_AWAIT).
-                cco_await_coroutine(coroutine(co));                 // Await for coroutine to finish.
-                cco_await_coroutine(coroutine(co), int awaitbits);  // Await for coroutine suspend value in (awaitbits | CCO_DONE)
-                cco_return;                                         // Execute `cco_cleanup:` section if specified,
-                                                                    // then set coroutine in done state and return.
+                cco_yield_final_v(value);                           // Yield with a final value.
+                cco_await(bool condition);                          // Await for condition to be true else suspend with CCO_AWAIT.
+                cco_await_coroutine(coroutine(co));                 // Await for coroutine to finish else suspend with CCO_AWAIT.
+                cco_await_coroutine(coroutine(co), int awaitbits);  // Await for coroutine suspend value in (awaitbits | CCO_DONE).
+                cco_return;                                         // Execute `cco_cleanup:` section if present,
+                                                                    // then set coroutine to done-state and return CCO_DONE.
 bool            cco_active(Coroutine* co);                          // Is coroutine active? (= not done).
 bool            cco_done(Coroutine* co);                            // Is coroutine done?
-void            cco_reset_state(Coroutine* co);                     // Reset state to initial (for reuse).
+void            cco_reset(Coroutine* co);                           // Reset state to initial (for reuse).
 void            cco_stop(Coroutine* co);                            // Next resume of coroutine enters `cco_cleanup:`.
                 cco_run_coroutine(coroutine(co)) {};                // Run blocking until coroutine is finished.
 ```
-#### Task specific (coroutine function objects)
+#### Task specific (coroutine function-objects)
 ```c
                 cco_task_struct(name) { <name>_state cco; ... };    // A custom coroutine task struct; extends cco_task struct.
 void            cco_await_task(cco_task* task, cco_runtime* rt);    // Await for task to return CCO_DONE (asymmetric call).
 void            cco_await_task(cco_task* task, cco_runtime* rt, int awaitbits); // Await until task's suspend/return value
                                                                                 // to be in (awaitbits | CCO_DONE).
 void            cco_yield_to(cco_task* task, cco_runtime* rt);      // Yield to task (symmetric control transfer).
-void            cco_throw_error(uint16_t error, cco_runtime* rt);   // Throw an error and unwind call stack at cco_setup: label,
-                                                                    // accessible as `rt->error` and `rt->error_line`.
+void            cco_throw_error(uint16_t error, cco_runtime* rt);   // Throw an error and unwind call stack at the cco_setup: point.
+                                                                    // Error accessible as `rt->error` and `rt->error_line`.
 void            cco_resume_task(cco_task* task, cco_runtime* rt);   // Resume suspended task, return value in `rt->result`.
                 cco_run_task(cco_task* task) {};                    // Run blocking until task is finished.
+                cco_run_task(cco_task* task, <Context> *ctx, runnername) {}; // Run task blocking and pass a context and name of runner.
 ```
 #### Timers and time functions
 ```c
-                cco_await_timer_sec(cco_timer* tm, double sec);     // Await seconds for timer to expire
                 cco_start_timer_sec(cco_timer* tm, double sec);     // Start timer with seconds duration.
                 cco_restart_timer(cco_timer* tm);                   // Restart timer with previous duration.
 bool            cco_timer_expired(cco_timer* tm);                   // Return true if timer is expired.
 double          cco_timer_elapsed_sec(cco_timer* tm);               // Return elapsed seconds.
 double          cco_timer_remaining_sec(cco_timer* tm);             // Return remaining seconds.
+                cco_await_timer_sec(cco_timer* tm, double sec);     // Start timer with duration and await for it to expire
 
 double          cco_time(void);                                     // Return secs with usec precision since Epoch.
                 cco_sleep_sec(double sec);                          // Sleep for seconds (msec or usec. precision)
@@ -78,9 +79,9 @@ cco_semaphore   cco_make_semaphore(long value);                     // Create se
 ## Types
 | Type name         | Type definition / usage                             | Used to represent... |
 |:------------------|:----------------------------------------------------|:---------------------|
-|`cco_result`       | `CCO_DONE`, `CCO_AWAIT`, `CCO_YIELD`                | Default set of return values from coroutines |
+|`cco_result`       | enum `CCO_DONE`, `CCO_AWAIT`, `CCO_YIELD`           | Default set of return values from coroutines |
 |`cco_cleanup:`     | Label inside coroutine | Label at cleanup position in coroutine |
-|`cco_task`         | Function object coroutine type |
+|`cco_task`         | Base function-object coroutine type |
 |`cco_timer`        | Timer type |
 |`cco_semaphore`    | Semaphore type |
 |`cco_taskrunner`   | Coroutine | Executor coroutine which handles asymmetric and<br> symmetric coroutine control flows, |

@@ -109,25 +109,24 @@ typedef struct {
     } while (0)
 
 #define cco_yield cco_yield_v(CCO_YIELD)
-#define cco_yield_v(suspendval) \
+#define cco_yield_v(value) \
     do { \
-        *_state = __LINE__; return suspendval; goto _resume; \
+        *_state = __LINE__; return value; goto _resume; \
         case __LINE__:; \
     } while (0)
 
 #define cco_yield_final cco_yield_final_v(CCO_YIELD)
-#define cco_yield_final_v(suspendval) \
+#define cco_yield_final_v(value) \
     do { \
         *_state = *_state >= CCO_STATE_INIT ? CCO_STATE_CLEANUP : CCO_STATE_DONE; \
-        return suspendval; \
+        return value; \
     } while (0)
 
-#define cco_await(until) cco_await_v(until, CCO_AWAIT)
-#define cco_await_v(until, suspendval) \
+#define cco_await(until) \
     do { \
         *_state = __LINE__; \
         /* fall through */ \
-        case __LINE__: if (!(until)) {return suspendval; goto _resume;} \
+        case __LINE__: if (!(until)) {return CCO_AWAIT; goto _resume;} \
     } while (0)
 
 /* cco_await_coroutine(): assumes coroutine returns a cco_result value (int) */
@@ -153,7 +152,7 @@ typedef struct {
         *_state = *_state >= CCO_STATE_INIT ? CCO_STATE_CLEANUP : CCO_STATE_DONE; \
     } while (0)
 
-#define cco_reset_state(co) \
+#define cco_reset(co) \
     (void)((co)->cco.state = CCO_STATE_INIT)
 
 
@@ -166,6 +165,7 @@ typedef struct {
     int result;
     uint16_t error, error_line;
     struct cco_task* current;
+    void* context;
 } cco_runtime;
 
 /* Define a Task struct */
@@ -270,13 +270,13 @@ int cco_taskrunner(struct cco_taskrunner* co) {
 #undef i_implement
 #endif
 
-#define cco_make_taskrunner(task) \
-    ((struct cco_taskrunner){.rt = {.current = cco_cast_task(task)}})
+#define cco_make_taskrunner(task, ctx) \
+    ((struct cco_taskrunner){.rt = {.current = cco_cast_task(task), .context = ctx}})
 
 #define cco_run_task(...) c_MACRO_OVERLOAD(cco_run_task, __VA_ARGS__)
-#define cco_run_task_1(task) cco_run_task_2(task, _runner)
-#define cco_run_task_2(task, runner) \
-    for (struct cco_taskrunner runner = cco_make_taskrunner(task) \
+#define cco_run_task_1(task) cco_run_task_3(task, NULL, _runner)
+#define cco_run_task_3(task, ctx, runner) \
+    for (struct cco_taskrunner runner = cco_make_taskrunner(task, ctx) \
          ; cco_taskrunner(&runner) != CCO_DONE \
          ; )
 
@@ -346,10 +346,9 @@ typedef struct { ptrdiff_t count; } cco_semaphore;
 #define cco_set_semaphore(sem, value) ((sem)->count = value)
 #define cco_release_semaphore(sem) (++(sem)->count)
 
-#define cco_await_semaphore(sem) cco_await_semaphore_v(sem, CCO_AWAIT)
-#define cco_await_semaphore_v(sem, suspendval) \
+#define cco_await_semaphore(sem) \
     do { \
-        cco_await_v((sem)->count > 0, suspendval); \
+        cco_await((sem)->count > 0); \
         --(sem)->count; \
     } while (0)
 
@@ -398,39 +397,38 @@ typedef struct { ptrdiff_t count; } cco_semaphore;
     }
 #endif
 
-typedef struct { double interval, start; } cco_timer;
+typedef struct { double duration, start_time; } cco_timer;
 
 static inline cco_timer cco_make_timer_sec(double sec) {
-    cco_timer tm = {.interval=sec, .start=cco_time()};
+    cco_timer tm = {.duration=sec, .start_time=cco_time()};
     return tm;
 }
 
-#define cco_await_timer_sec(tm, sec) cco_await_timer_sec_v(tm, sec, CCO_AWAIT)
-#define cco_await_timer_sec_v(tm, sec, suspendval) \
-    do { \
-        cco_start_timer_sec(tm, sec); \
-        cco_await_v(cco_timer_expired(tm), suspendval); \
-    } while (0)
-
 static inline void cco_start_timer_sec(cco_timer* tm, double sec) {
-    tm->interval = sec;
-    tm->start = cco_time();
+    tm->duration = sec;
+    tm->start_time = cco_time();
 }
 
 static inline void cco_restart_timer(cco_timer* tm) {
-    tm->start = cco_time();
+    tm->start_time = cco_time();
 }
 
 static inline bool cco_timer_expired(cco_timer* tm) {
-    return cco_time() - tm->start >= tm->interval;
+    return cco_time() - tm->start_time >= tm->duration;
 }
 
 static inline double cco_timer_elapsed_sec(cco_timer* tm) {
-    return cco_time() - tm->start;
+    return cco_time() - tm->start_time;
 }
 
 static inline double cco_timer_remaining_sec(cco_timer* tm) {
-    return tm->start + tm->interval - cco_time();
+    return tm->start_time + tm->duration - cco_time();
 }
+
+#define cco_await_timer_sec(tm, sec) \
+    do { \
+        cco_start_timer_sec(tm, sec); \
+        cco_await(cco_timer_expired(tm)); \
+    } while (0)
 
 #endif // STC_COROUTINE_H_INCLUDED
