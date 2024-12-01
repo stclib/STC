@@ -41,7 +41,7 @@ int produce(struct produce* co, cco_runtime* rt) {
             cco_yield_to(co->consumer, rt); // symmetric transfer
         }
 
-        cco_cleanup:
+        cco_finally:
         cco_cancel_task(co->consumer, rt);
         Inventory_drop(&co->inv);
         puts("cleanup producer");
@@ -64,7 +64,7 @@ int consume(struct consume* co, cco_runtime* rt) {
             cco_yield_to(co->producer, rt); // symmetric transfer
         }
 
-        cco_cleanup:
+        cco_finally:
         puts("cleanup consumer");
     }
     return 0;

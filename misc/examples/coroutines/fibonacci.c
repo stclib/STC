@@ -22,7 +22,7 @@ int fibonacci(struct fibonacci* g) {
             cco_yield;
         }
 
-        cco_cleanup:
+        cco_finally:
         puts("done");
     }
     return 0;

@@ -33,7 +33,7 @@ int Triple_next(Triple_iter* it) {
                 }
             }
         }
-        cco_cleanup:
+        cco_finally:
         it->ref = NULL; // stop iteration
         printf("Done\n");
     }

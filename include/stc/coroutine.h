@@ -38,7 +38,7 @@ int iterpair(struct iterpair* I) {
             for (I->y = 0; I->y < I->max_y; I->y++)
                 cco_yield; // suspend
 
-        cco_cleanup: // required if there is cleanup code
+        cco_finally: // required if there is cleanup code
         puts("done");
     }
     return 0; // CCO_DONE
@@ -61,11 +61,12 @@ int main(void) {
 
 enum {
     CCO_STATE_INIT = 0,
-    CCO_STATE_CLEANUP = -1,
+    CCO_STATE_FINALLY = -1,
     CCO_STATE_DONE = -2,
 };
 typedef enum {
     CCO_DONE = 0,
+    CCO_YIELD_FINAL = 1<<27,
     CCO_YIELD = 1<<28,
     CCO_AWAIT = 1<<29,
     CCO_NOOP = 1<<30,
@@ -94,17 +95,26 @@ typedef struct {
            ; *_state != CCO_STATE_DONE ; *_state = CCO_STATE_DONE) \
         _resume: switch (*_state) case CCO_STATE_INIT: // thanks, @liigo!
 
-#define cco_cleanup \
-    *_state = CCO_STATE_CLEANUP; \
-    /* fall through */ \
-    case CCO_STATE_CLEANUP
+/* Throw an error "exception"; can be catched up in the cco_await_task call tree */
+#define cco_throw_error(error_code, rt) \
+    do { \
+        (rt)->error = error_code; \
+        (rt)->error_line = __LINE__; \
+        cco_return; \
+    } while (0)
 
-#define cco_scope cco_routine // [deprecated]
-#define cco_final cco_cleanup // [deprecated]
+#define cco_finally \
+    *_state = CCO_STATE_FINALLY; \
+    /* fall through */ \
+    case CCO_STATE_FINALLY
+
+#define cco_scope cco_routine   // [deprecated]
+#define cco_final cco_finally   // [deprecated]
+#define cco_cleanup cco_finally // [deprecated]
 
 #define cco_return \
     do { \
-        *_state = *_state >= CCO_STATE_INIT ? CCO_STATE_CLEANUP : CCO_STATE_DONE; \
+        *_state = *_state >= CCO_STATE_INIT ? CCO_STATE_FINALLY : CCO_STATE_DONE; \
         goto _resume; \
     } while (0)
 
@@ -118,7 +128,7 @@ typedef struct {
 #define cco_yield_final cco_yield_final_v(CCO_YIELD)
 #define cco_yield_final_v(value) \
     do { \
-        *_state = *_state >= CCO_STATE_INIT ? CCO_STATE_CLEANUP : CCO_STATE_DONE; \
+        *_state = *_state >= CCO_STATE_INIT ? CCO_STATE_FINALLY : CCO_STATE_DONE; \
         return value; \
     } while (0)
 
@@ -149,7 +159,7 @@ typedef struct {
 #define cco_stop(co) \
     do { \
         int* _state = &(co)->cco.state; \
-        *_state = *_state >= CCO_STATE_INIT ? CCO_STATE_CLEANUP : CCO_STATE_DONE; \
+        *_state = *_state >= CCO_STATE_INIT ? CCO_STATE_FINALLY : CCO_STATE_DONE; \
     } while (0)
 
 #define cco_reset(co) \
@@ -219,15 +229,6 @@ typedef struct cco_task cco_task;
         cco_yield_v(CCO_NOOP); \
     } while (0)
 
-/* Throw an error "exception"; can be catched up in the cco_await_task call tree */
-#define cco_throw_error(error_code, rt) \
-    do { \
-        (rt)->error = error_code; \
-        (rt)->error_line = __LINE__; \
-        cco_return; \
-    } while (0)
-
-
 /* Task dispatcher coroutine */
 struct cco_taskrunner {
     cco_runtime rt;
@@ -259,10 +260,11 @@ int cco_taskrunner(struct cco_taskrunner* co) {
             cco_yield_v(CCO_NOOP);
         }
 
-        cco_cleanup:
+        cco_finally:
         if (rt->error != 0) {
             fprintf(stderr, __FILE__ ":%d: error: unhandled error '%d' in a coroutine task at line %d.\n",
                             __LINE__, rt->error, rt->error_line);
+            exit(rt->error);
         }
     }
     return 0;
@@ -274,8 +276,9 @@ int cco_taskrunner(struct cco_taskrunner* co) {
     ((struct cco_taskrunner){.rt = {.current = cco_cast_task(task), .context = ctx}})
 
 #define cco_run_task(...) c_MACRO_OVERLOAD(cco_run_task, __VA_ARGS__)
-#define cco_run_task_1(task) cco_run_task_3(task, NULL, _runner)
-#define cco_run_task_3(task, ctx, runner) \
+#define cco_run_task_1(task) cco_run_task_3(task, _runner, NULL)
+#define cco_run_task_2(task, runner) cco_run_task_3(task, runner, NULL)
+#define cco_run_task_3(task, runner, ctx) \
     for (struct cco_taskrunner runner = cco_make_taskrunner(task, ctx) \
          ; cco_taskrunner(&runner) != CCO_DONE \
          ; )
@@ -299,7 +302,7 @@ int cco_taskrunner(struct cco_taskrunner* co) {
  *        ... it->ref->data ...
  *        cco_yield; // suspend exec, gen with value ready
  *        ...
- *        cco_cleanup:
+ *        cco_finally:
  *        it->ref = NULL; // stops the iteration
  *     }
  * }
@@ -330,10 +333,10 @@ int cco_taskrunner(struct cco_taskrunner* co) {
  * Using c_filter with coroutine iterators:
  */
 #define cco_flt_take(n) \
-    (c_flt_take(n), _base.done ? _it.cco.state = CCO_STATE_CLEANUP : 1)
+    (c_flt_take(n), _base.done ? _it.cco.state = CCO_STATE_FINALLY : 1)
 
 #define cco_flt_takewhile(pred) \
-    (c_flt_takewhile(pred), _base.done ? _it.cco.state = CCO_STATE_CLEANUP : 1)
+    (c_flt_takewhile(pred), _base.done ? _it.cco.state = CCO_STATE_FINALLY : 1)
 
 
 /*

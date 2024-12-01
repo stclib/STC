@@ -48,7 +48,7 @@ int Philosopher(struct Philosopher* ph)
             cco_release_semaphore(ph->right_fork);
         }
 
-        cco_cleanup:
+        cco_finally:
         printf("Philosopher %d finished\n", ph->id);
     }
     return 0;
@@ -76,7 +76,7 @@ int Dining(struct Dining* di)
             cco_yield; // suspend, return control back to main
         }
 
-        cco_cleanup:
+        cco_finally:
         for (int i = 0; i < num_philosophers; ++i) {
             cco_stop(&di->ph[i]);
             Philosopher(&di->ph[i]);

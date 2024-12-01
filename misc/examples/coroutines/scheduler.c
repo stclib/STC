@@ -37,7 +37,7 @@ int scheduler(struct Scheduler* sc, cco_runtime* rt) {
             }
         }
 
-        cco_cleanup:
+        cco_finally:
         Tasks_drop(&sc->tasks);
         puts("Task queue dropped");
     }
@@ -55,7 +55,7 @@ static int taskA(struct TaskA* task, cco_runtime* rt) {
         cco_yield;
         puts("A is back doing even more work");
 
-        cco_cleanup:
+        cco_finally:
         puts("A done");
     }
     return 0;
@@ -70,7 +70,7 @@ static int taskB(struct TaskB* task, cco_runtime* rt) {
         cco_yield;
         puts("B is back doing more work");
 
-        cco_cleanup:
+        cco_finally:
         puts("B done");
     }
     return 0;
