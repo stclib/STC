@@ -307,7 +307,7 @@ where the error can be catched (handled).
 - Coroutine `start`  await `A` => `A` await `B` => `B` await `C` => `C` throws error => unwind => `A` catches error.
 - `cco_runtime` type has an opaque `context` pointer, where A, B, C tasks are stored.
 
-[ [Run this code](https://godbolt.org/z/adM513TK4) ]
+[ [Run this code](https://godbolt.org/z/7oGs6e9n4) ]
 ```c
 #include <stdio.h>
 #include "stc/coroutine.h"
@@ -321,9 +321,12 @@ int C(struct C* self, cco_runtime* rt) {
     cco_routine (self) {
         puts("C start");
         if (true) {
+            // try commenting out next line...
             cco_throw_error(42, rt);
         }
         puts("C work");
+        cco_yield;
+        puts("C more work");
 
         cco_finally:
         if (rt->error) {
@@ -339,6 +342,7 @@ int B(struct B* self, cco_runtime* rt) {
     cco_routine (self) {
         puts("B start");
         cco_await_task(&ctx->C, rt);
+        puts("B work");
 
         cco_finally:
         puts("B done");
@@ -354,6 +358,7 @@ int A(struct A* self, cco_runtime* rt) {
 
         cco_finally:
         if (rt->error == 42) {
+            // try uncommenting next two lines to see 'unhandled error'...
             printf("A recovered error '42' thrown on line %d\n", rt->error_line);
             rt->error = 0;
         }
