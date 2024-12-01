@@ -41,7 +41,7 @@ int main(void) {
         printf(" %g", *i.ref);
     puts("");
 
-    const double* v = DList_get(&list, 30);
+    const double* v = DList_find(&list, 30).ref;
     printf("Found: %g\n", *v);
 
     DList_remove(&list, 30);

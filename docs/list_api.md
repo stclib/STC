@@ -66,11 +66,9 @@ isize           list_X_count(const list_X* list);                               
 list_X_iter     list_X_find(const list_X* self, i_keyraw raw);
 list_X_iter     list_X_find_in(list_X_iter it1, list_X_iter it2, i_keyraw raw);
 
-const i_key*    list_X_get(const list_X* self, i_keyraw raw);
 const i_key*    list_X_back(const list_X* self);
 const i_key*    list_X_front(const list_X* self);
 
-i_key*          list_X_get_mut(list_X* self, i_keyraw raw);
 i_key*          list_X_back_mut(list_X* self);
 i_key*          list_X_front_mut(list_X* self);
 
@@ -93,14 +91,15 @@ isize           list_X_remove(list_X* self, i_keyraw raw);                      
 list_X          list_X_split_off(list_X* self, list_X_iter i1, list_X_iter i2);   // split off [i1, i2)
 list_X_iter     list_X_splice(list_X* self, list_X_iter it, list_X* other);       // return updated valid it
 list_X_iter     list_X_splice_range(list_X* self, list_X_iter it,                 // return updated valid it
-                                    list_X* other, list_X_iter it1, list_X_iter it2);
+                                    list_X* other, list_X_iter it1, li
+                                    st_X_iter it2);
 
 void            list_X_reverse(list_X* self);
 void            list_X_sort(list_X* self);
 void            list_X_sort_with(list_X* self, int(*cmp)(const i_key*, const i_key*));
 
 // Node API
-list_X_node*    list_X_get_node(i_key* val);                                      // get enclosing node
+list_X_node*    list_X_get_node(i_key* val);                                      // get the enclosing node
 i_key*          list_X_push_back_node(list_X* self, list_X_node* node);
 i_key*          list_X_insert_after_node(list_X* self, list_X_node* ref, list_X_node* node);
 list_X_node*    list_X_unlink_after_node(list_X* self, list_X_node* ref);         // return unlinked node

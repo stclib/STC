@@ -60,12 +60,10 @@ deque_X_iter    deque_X_find(const deque_X* self, i_keyraw raw);
 deque_X_iter    deque_X_find_in(deque_X_iter i1, deque_X_iter i2, i_keyraw raw); // return vec_X_end() if not found
 
 const i_key*    deque_X_at(const deque_X* self, isize idx);
-const i_key*    deque_X_get(const deque_X* self, i_keyraw raw);                  // return NULL if not found
 const i_key*    deque_X_front(const deque_X* self);
 const i_key*    deque_X_back(const deque_X* self);
 
 i_key*          deque_X_at_mut(deque_X* self, isize idx);
-i_key*          deque_X_get_mut(deque_X* self, i_keyraw raw);                   // mutable get
 i_key*          deque_X_front_mut(deque_X* self);
 i_key*          deque_X_back_mut(deque_X* self);
 

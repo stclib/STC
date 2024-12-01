@@ -117,15 +117,6 @@ STC_INLINE _m_iter
 _c_MEMB(_find)(const Self* self, _m_raw raw) {
     return _c_MEMB(_find_in)(_c_MEMB(_begin)(self), _c_MEMB(_end)(self), raw);
 }
-
-STC_INLINE const _m_value*
-_c_MEMB(_get)(const Self* self, _m_raw raw) {
-    return _c_MEMB(_find_in)(_c_MEMB(_begin)(self), _c_MEMB(_end)(self), raw).ref;
-}
-
-STC_INLINE _m_value*
-_c_MEMB(_get_mut)(Self* self, _m_raw raw)
-    { return (_m_value *) _c_MEMB(_get)(self, raw); }
 #endif // _i_has_eq
 
 #if defined _i_has_cmp

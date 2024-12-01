@@ -70,7 +70,7 @@ int main(void)
 
         // Look-up Audrey!
         Person a = Person_make("Audrey", "Home");
-        const PSPtr *v = Persons_get(&vec, a);
+        const PSPtr *v = Persons_find(&vec, a).ref;
         if (v) printf("found: %s %s\n", cstr_str(&v->get->name), cstr_str(&v->get->last));
         Person_drop(&a);
     }

@@ -211,16 +211,6 @@ _c_MEMB(_find)(const Self* self, _m_raw val) {
     return _c_MEMB(_find_in)(_c_MEMB(_begin)(self), _c_MEMB(_end)(self), val);
 }
 
-STC_INLINE const _m_value*
-_c_MEMB(_get)(const Self* self, _m_raw val) {
-    return _c_MEMB(_find_in)(_c_MEMB(_begin)(self), _c_MEMB(_end)(self), val).ref;
-}
-
-STC_INLINE _m_value*
-_c_MEMB(_get_mut)(Self* self, _m_raw val) {
-    return _c_MEMB(_find_in)(_c_MEMB(_begin)(self), _c_MEMB(_end)(self), val).ref;
-}
-
 STC_INLINE bool _c_MEMB(_eq)(const Self* self, const Self* other) {
     _m_iter i = _c_MEMB(_begin)(self), j = _c_MEMB(_begin)(other);
     for (; i.ref && j.ref; _c_MEMB(_next)(&i), _c_MEMB(_next)(&j)) {
