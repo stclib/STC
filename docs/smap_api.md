@@ -14,7 +14,7 @@ See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) fo
 
 ## Header file and declaration
 
-```c
+```c++
 #define i_type <ct>,<kt>,<vt> // shorthand for defining i_type, i_key, i_val
 #define i_type <t>            // container type name (default: smap_{i_key})
 // One of the following:
@@ -51,7 +51,7 @@ See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) fo
 
 ## Methods
 
-```c
+```c++
 smap_X          smap_X_init(void);
 sset_X          smap_X_with_capacity(isize cap);
 
@@ -117,7 +117,7 @@ void            smap_X_value_drop(i_key* pval);
 | `smap_X_iter`      | `struct { smap_X_value *ref; ... }`              | Iterator type                |
 
 ## Examples
-```c
+```c++
 #include "stc/cstr.h"
 
 #define i_keypro cstr // special macro for i_key = cstr
@@ -165,7 +165,7 @@ Translate a
  to STC:
 
 [ [Run this code](https://godbolt.org/z/3Kfrax43r) ]
-```c
+```c++
 #include "stc/cstr.h"
 #define i_type strmap
 #define i_keypro cstr // key = cstr class
@@ -197,7 +197,7 @@ int main(void)
 
 ### Example 3
 This example uses a smap with cstr as mapped value.
-```c
+```c++
 #include "stc/cstr.h"
 
 #define i_type IDSMap, int
@@ -225,7 +225,7 @@ int main(void)
 }
 ```
 Output:
-```c
+```c++
 100: Red
 110: White
 120: #cc7744ff
@@ -233,7 +233,7 @@ Output:
 
 ### Example 4
 Demonstrate smap with plain-old-data key type Vec3i and int as mapped type: smap<Vec3i, int>.
-```c
+```c++
 typedef struct { int x, y, z; } Vec3i;
 
 static int Vec3i_cmp(const Vec3i* a, const Vec3i* b) {
@@ -264,7 +264,7 @@ int main(void)
 }
 ```
 Output:
-```c
+```c++
 {   0,   0, 100 }: 3
 {   0, 100,   0 }: 2
 { 100,   0,   0 }: 1

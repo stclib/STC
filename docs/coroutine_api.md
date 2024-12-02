@@ -119,7 +119,7 @@ Although there are no specific support for generator coroutines, a minimal gener
 to write:
 
 [ [Run this code](https://godbolt.org/z/xMf3d44Gz) ]
-```c
+```c++
 #include <stdio.h>
 #include "stc/coroutine.h"
 
@@ -142,7 +142,7 @@ int main(void) {
 }
 ```
 To be more expressive, you may use the `cco_run_coroutine()` macro:
-```c
+```c++
     cco_run_coroutine(Gen(&gen)) {
         printf("%d, ", gen.value);
     }
@@ -158,7 +158,7 @@ Notice that `Gen` now becomes the "container", while `Gen_iter` is the coroutine
 <summary>Iterable generator coroutine implementation</summary>
 
 [ [Run this code](https://godbolt.org/z/bbd8oGYxG) ]
-```c
+```c++
 #include <stdio.h>
 #include "stc/coroutine.h"
 
@@ -202,7 +202,7 @@ implementation uses `cco_await_*()` for timers and semaphores:
 <summary>The "Dining philosophers" C implementation</summary>
 
 [ [Run this code](https://godbolt.org/z/To4nabh8f) ]
-```c
+```c++
 #include <stdio.h>
 #include <time.h>
 #include "stc/random.h"
@@ -309,7 +309,7 @@ where the error can be catched (handled).
 - `cco_runtime` type has an opaque `context` pointer, where A, B, C tasks are stored.
 
 [ [Run this code](https://godbolt.org/z/4es95Eh74) ]
-```c
+```c++
 #include <stdio.h>
 #include "stc/coroutine.h"
 
@@ -401,7 +401,7 @@ two or more coroutines cooperate like in the producer-consumer pattern:
 <summary>Producer-consumer coroutine implementation</summary>
 
 [ [Run this code](https://godbolt.org/z/5cGnG4WcT) ]
-```c
+```c++
 #include <time.h>
 #include <stdio.h>
 #include "stc/coroutine.h"
@@ -508,7 +508,7 @@ Note that the scheduler awaits the next CCO_YIELD to be returned, not only the d
 <summary>Scheduled coroutines implementation</summary>
 
 [ [Run this code](https://godbolt.org/z/f46W66dad) ]
-```c
+```c++
 // https://www.youtube.com/watch?v=8sEe-4tig_A
 #include <stdio.h>
 #include "stc/coroutine.h"

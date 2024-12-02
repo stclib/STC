@@ -16,12 +16,12 @@ for string capacity up to 22 bytes.
 
 All cstr definitions and prototypes are available by including a single header file.
 
-```c
+```c++
 #include "stc/cstr.h"
 ```
 
 ## Methods
-```c
+```c++
 cstr            cstr_lit(const char literal_only[]);                    // cstr from literal; no strlen() call.
 cstr            cstr_init(void);                                        // make an empty string
 cstr            cstr_from(const char* str);                             // construct from a zero-terminated c-string.
@@ -109,7 +109,7 @@ bool            cstr_getdelim(cstr *self, int delim, FILE *stream);     // does 
 ```
 
 #### UTF8 methods
-```c
+```c++
 cstr            cstr_u8_from(const char* str, isize u8pos, isize u8len);// make cstr from an utf8 substring
 isize           cstr_u8_size(const cstr* self);                         // number of utf8 runes
 isize           cstr_u8_to_index(const cstr* self, isize u8pos);        // get byte index at rune position
@@ -142,7 +142,7 @@ void            cstr_uppercase(cstr* self);                             // trans
 Note that all methods with arguments `(..., const char* str, isize n)`, `n` must be within the range of `str` length.
 
 #### Helper methods:
-```c
+```c++
 size_t          cstr_hash(const cstr* self);
 int             cstr_cmp(const cstr* s1, const cstr* s2);
 bool            cstr_eq(const cstr* s1, const cstr* s2);
@@ -168,7 +168,7 @@ char*           c_strnstrn(const char* str, isize slen, const char* needle, isiz
 |  `c_NPOS`       | `INTPTR_MAX`      |
 
 ## Example
-```c
+```c++
 #include "stc/cstr.h"
 
 int main(void) {

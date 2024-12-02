@@ -7,7 +7,7 @@ See the c++ class [std::set](https://en.cppreference.com/w/cpp/container/set) fo
 
 ## Header file and declaration
 
-```c
+```c++
 #define i_type <ct>,<kt> // shorthand for defining i_type, i_key
 #define i_type <t>       // container type name (default: sset_{i_key})
 // One of the following:
@@ -34,7 +34,7 @@ See the c++ class [std::set](https://en.cppreference.com/w/cpp/container/set) fo
 
 ## Methods
 
-```c
+```c++
 sset_X          sset_X_init(void);
 sset_X          sset_X_with_capacity(isize cap);
 
@@ -87,7 +87,7 @@ i_key           sset_X_value_clone(i_key val);
 | `sset_X_iter`     | `struct { sset_X_value *ref; ... }`             | Iterator type               |
 
 ## Example
-```c
+```c++
 #include "stc/cstr.h"
 
 #define i_type SSet

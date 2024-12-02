@@ -7,7 +7,7 @@ See the c++ class [std::stack](https://en.cppreference.com/w/cpp/container/stack
 
 ## Header file and declaration
 
-```c
+```c++
 #define i_type <ct>,<kt> // shorthand for defining i_type, i_key
 #define i_type <t>       // container type name (default: stack_{i_key})
 // One of the following:
@@ -37,7 +37,7 @@ See the c++ class [std::stack](https://en.cppreference.com/w/cpp/container/stack
 
 ## Methods
 
-```c
+```c++
 stack_X         stack_X_init(void);
 stack_X         stack_X_with_capacity(isize cap);
 stack_X         stack_X_with_size(isize size, i_key fill);
@@ -98,7 +98,7 @@ void            stack_X_value_drop(vec_X_value* pval);
 | `stack_X_iter`     | `struct { stack_value *ref; }`      | stack iterator             |
 
 ## Example
-```c
+```c++
 #define i_type IStack, int
 #include "stc/stack.h"
 

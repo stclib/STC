@@ -8,11 +8,11 @@ referred to as a ***rune***, and can be 1 to 4 bytes long.
 
 This header file is rarely needed alone. It is included by all the string/view types mentioned above.
 
-```c
+```c++
 #include "stc/utf8.h"
 ```
 ## Methods
-```c
+```c++
 isize           utf8_count(const char *s);                      // number of utf8 runes in s
 isize           utf8_count_n(const char *s, isize nbytes);      // number of utf8 runes within n bytes
 isize           utf8_to_index(const char* s, isize u8pos);      // from utf8 pos to byte index
@@ -45,7 +45,7 @@ bool            utf8_isgroup(int group, uint32_t c);
 ```
 
 ## Example: UTF8 iteration and case conversion
-```c
+```c++
 #include "stc/cstr.h"
 #include "stc/zsview.h"
 

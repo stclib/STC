@@ -6,7 +6,7 @@ The **queue** is container that gives the programmer the functionality of a queu
 See the c++ class [std::queue](https://en.cppreference.com/w/cpp/container/queue) for a functional reference.
 
 ## Header file and declaration
-```c
+```c++
 #define i_type <ct>,<kt> // shorthand for defining i_type, i_key
 #define i_type <t>       // queue container type name (default: queue_{i_key})
 // One of the following:
@@ -29,7 +29,7 @@ In the following, `X` is the value of `i_key` unless `i_type` is defined.
 
 ## Methods
 
-```c
+```c++
 queue_X         queue_X_init(void);
 queue_X         queue_X_with_capacity(isize size);
 
@@ -76,7 +76,7 @@ void            queue_X_value_drop(i_key* pval);
 | `queue_X_iter`     | `deque_X_iter`      | queue iterator          |
 
 ## Examples
-```c
+```c++
 #define i_type queue, int
 #include "stc/queue.h"
 

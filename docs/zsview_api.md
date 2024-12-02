@@ -15,12 +15,12 @@ storage. It keeps the length of the string, i.e. no need to call *strlen()* for 
 
 All zsview definitions and prototypes are available by including a single header file.
 
-```c
+```c++
 #include "stc/zsview.h"
 ```
 
 ## Methods
-```c
+```c++
 zsview          c_zv(const char literal_only[]);                    // create from string literal only
 zsview          zsview_from(const char* str);                       // construct from const char*
 zsview          zsview_from_position(zsview zv, isize pos);         // subview starting from index pos
@@ -41,7 +41,7 @@ bool            zsview_ends_with(zsview zv, const char* str);
 ```
 
 #### UTF8 methods
-```c
+```c++
 zsview          zsview_u8_from_position(zsview zv, isize u8pos);    // subview starting from rune u8pos
 isize           zsview_u8_size(zsview zv);                          // number of utf8 runes
 csview          zsview_u8_chr(zsview zv, isize u8pos);              // get rune at rune position
@@ -60,7 +60,7 @@ zsview_iter     zsview_advance(zsview_iter it, isize u8pos);        // advance +
 ```
 
 #### Helper methods for usage in containers
-```c
+```c++
 size_t          zsview_hash(const zsview* x);
 int             zsview_cmp(const zsview* x, const zsview* y);
 bool            zsview_eq(const zsview* x, const zsview* y);
@@ -77,7 +77,7 @@ bool            zsview_ieq(const zsview* s1, const zsview* s2);     // "
 | `zsview_iter`  | `union { zsview_value *ref; csview chr; }`   | UTF8 iterator           |
 
 ## Example: UTF8 iteration and case conversion
-```c
+```c++
 #include "stc/cstr.h"
 #include "stc/zsview.h"
 

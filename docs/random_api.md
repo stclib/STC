@@ -33,13 +33,13 @@ state changes, a relative expensive output function with two multiplications is 
 </details>
 
 ## Header file
-```c
+```c++
 #include "stc/random.h"
 ```
 
 ## Methods (64-bit)
 
-```c
+```c++
                 // Use global state
 void            crand64_seed(uint64_t seed);                        // seed global rng64 state
 uint64_t        crand64_uint(void);                                 // global crand64_uint_r(rng64, 1)
@@ -50,7 +50,7 @@ int64_t         crand64_uniform(crand64_uniform_dist* d);           // global cr
                 // requires linking with stc lib.
 double          crand64_normal(crand64_normal_dist* d);             // global crand64_normal_r(rng64, 1, d)
 ```
-```c
+```c++
                 // Use local state
 crand64         crand64_from(uint64_t seed);                        // create a crand64 state from a seed value
 uint64_t        crand64_uint_r(crand64* rng, uint64_t strm);        // reentrant; return rnd in [0, UINT64_MAX]
@@ -58,7 +58,7 @@ double          crand64_real_r(crand64* rng, uint64_t strm);        // reentrant
 int64_t         crand64_uniform_r(crand64* rng, uint64_t strm, crand64_uniform_dist* d); // return rnd in [low, high]
 double          crand64_normal_r(crand64* rng, uint64_t strm, crand64_normal_dist* d);   // return normal distributed rnd's
 ```
-```c
+```c++
                 // Generic algorithms (uses 64 or 32 bit depending on word size):
 void            c_shuffle_seed(size_t seed);                        // calls crand64_seed() or crand32_seed()
 void            c_shuffle_array(T* array, isize n);                 // shuffle an array of elements.
@@ -74,7 +74,7 @@ Note that `strm` must be an odd number.
 | `crand64_normal_dist`  | `struct {double mean, stddev;}`   | Normal distribution struct     |
 
 ## Methods (32-bit)
-```c
+```c++
 void                 crand32_seed(uint32_t seed);                        // seed global rng32 state
 uint32_t             crand32_uint(void);                                 // global crand32_uint_r(rng32, 1)
 float                crand32_real(void);                                 // global crand32_real_r(rng32, 1)
@@ -95,7 +95,7 @@ int32_t              crand32_uniform_r(crand32* rng, uint32_t strm, crand32_unif
 ## Example
 
 [ [Run this code](https://godbolt.org/z/sWa3ea1cr) ]
-```c
+```c++
 #include <stdio.h>
 #include <time.h>
 #include <math.h>

@@ -20,7 +20,7 @@ See similar c++ class [std::shared_ptr](https://en.cppreference.com/w/cpp/memory
 
 ## Header file and declaration
 
-```c
+```c++
 #define i_type <ct>,<kt> // shorthand for defining i_type, i_key
 #define i_type <t>       // arc container type name
 // One of the following:
@@ -51,7 +51,7 @@ When defining a container with **arc** elements, specify `#define i_keypro <arc-
 In the following, `X` is the value of `i_key` unless `i_type` is defined.
 
 ## Methods
-```c
+```c++
 arc_X           arc_X_init();                                   // empty shared pointer
 arc_X           arc_X_from(i_keyraw raw);                       // create an arc from raw type (available if i_keyraw defined by user).
 arc_X           arc_X_from_ptr(i_key* p);                       // create an arc from raw pointer. Takes ownership of p.
@@ -90,7 +90,7 @@ bool            arc_X_value_eq(const i_key* x, const i_key* y);
 ## Example
 
 [ [Run this code](https://godbolt.org/z/bjrf47qbv) ]
-```c
+```c++
 // Create two stacks with arcs to maps.
 // Demonstrate sharing and cloning of maps.
 // Show elements dropped.

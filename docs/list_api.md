@@ -21,7 +21,7 @@ See the c++ class [std::list](https://en.cppreference.com/w/cpp/container/list) 
 
 ## Header file and declaration
 
-```c
+```c++
 #define i_type <ct>,<kt> // shorthand for defining i_type, i_key
 #define i_type <t>       // list container type name (default: list_{i_key})
 // One of the following:
@@ -49,7 +49,7 @@ See the c++ class [std::list](https://en.cppreference.com/w/cpp/container/list) 
 
 ## Methods
 
-```c
+```c++
 list_X          list_X_init(void);
 
 list_X          list_X_clone(list_X list);
@@ -132,7 +132,7 @@ void            list_X_value_drop(i_key* pval);
 Interleave *push_front()* / *push_back()* then *sort()*:
 
 [ [Run this code](https://godbolt.org/z/dqWqfWrMd) ]
-```c
+```c++
 #define i_type DList, double
 #define i_use_cmp
 #include "stc/list.h"
@@ -165,7 +165,7 @@ int main(void) {
 Use of *erase_at()* and *erase_range()*:
 
 [ [Run this code](https://godbolt.org/z/G6qPv4nrh) ]
-```c
+```c++
 #include <stdio.h>
 #define i_type IList, int
 #include "stc/list.h"
@@ -198,7 +198,7 @@ mylist contains: 10 30
 ### Example 3
 
 Splice `[30, 40]` from *L2* into *L1* before `3`:
-```c
+```c++
 #define i_type IList, int
 #include "stc/list.h"
 #include <stdio.h>

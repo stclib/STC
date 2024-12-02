@@ -12,7 +12,7 @@ usage.
 
 - **csview** iterators works on UTF8 codepoints - like **cstr** and **zsview** (see Example 2).
 - Because it is not zero-terminated, it must be printed the following way:
-```c
+```c++
 csview sv = c_sv("Hello world");
 sv = csview_subview(sv, 0, 5);
 printf(c_svfmt "\n", c_svarg(sv)); // "Hello"
@@ -25,13 +25,13 @@ for a functional description.
 
 All csview definitions and prototypes are available by including a single header file.
 
-```c
+```c++
 #include "stc/cstr.h"
 #include "stc/csview.h" // after cstr.h: include extra cstr-csview functions
 ```
 ## Methods
 
-```c
+```c++
 csview          c_sv(const char literal_only[]);                        // from string literal only
 csview          c_sv(const char* str, isize n);                         // from a const char* and length n
 csview          csview_from(const char* str);                           // from const char* str
@@ -62,7 +62,7 @@ csview          csview_token(csview sv, const char* sep, isize* start); // *star
 ```
 
 #### UTF8 methods
-```c
+```c++
 csview          csview_u8_from(const char* str, isize u8pos, isize u8len); // construct csview with u8len runes
 isize           csview_u8_size(csview sv);                              // number of utf8 runes
 csview          csview_u8_chr(csview sv, isize u8pos);                  // get rune at rune position
@@ -86,14 +86,14 @@ Iterate tokens in an input string split by a separator string:
 - `c_fortoken_sv (it, const char* separator, csview input_sv);`
 - `it.token` is a csview of the current token.
 
-```c
+```c++
 c_fortoken (i, ", ", "hello, one, two, three")
     printf("'" c_svfmt "' ", c_svarg(i.token));
 // 'hello' 'one' 'two' 'three'
 ```
 
 #### Helper methods
-```c
+```c++
 size_t          csview_hash(const csview* x);
 int             csview_cmp(const csview* x, const csview* y);
 bool            csview_eq(const csview* x, const csview* y);
@@ -116,7 +116,7 @@ bool            csview_ieq(const csview* x, const csview* y);
 | `c_svarg(sv)`  | printf argument      | `printf("sv: " c_svfmt "\n", c_svarg(sv));`         |
 
 ## Example
-```c
+```c++
 #include "stc/cstr.h"
 #include "stc/csview.h"
 
@@ -146,7 +146,7 @@ red Apples
 ```
 
 ### Example 2: UTF8 handling
-```c
+```c++
 #include "stc/cstr.h"
 
 int main(void)
@@ -171,7 +171,7 @@ h,e,l,l,😀, ,w,ø,r,l,d,
 ### Example 3: csview tokenizer (string split)
 Splits strings into tokens. *print_split()* makes **no** memory allocations or *strlen()* calls,
 and does not depend on zero-terminated strings. *string_split()* function returns a vector of cstr.
-```c
+```c++
 #include <stdio.h>
 #include "stc/csview.h"
 

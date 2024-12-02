@@ -16,7 +16,7 @@ See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/contain
 
 ## Header file and declaration
 
-```c
+```c++
 #define i_type <ct>,<kt>,<vt> // shorthand for defining i_type, i_key, i_val
 #define i_type <t>            // container type name (default: hmap_{i_key})
 // One of the following:
@@ -51,7 +51,7 @@ See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/contain
 - **emplace**-functions are only available when `i_keyraw`/`i_valraw` are implicitly or explicitly defined.
 ## Methods
 
-```c
+```c++
 hmap_X          hmap_X_init(void);
 hmap_X          hmap_X_with_capacity(isize cap);
 
@@ -99,7 +99,7 @@ hmap_X_value    hmap_X_value_clone(hmap_X_value val);
 hmap_X_raw      hmap_X_value_toraw(hmap_X_value* pval);
 ```
 Free helper functions:
-```c
+```c++
 size_t          c_hash_n(const void *data, isize n);                  // generic hash function of n bytes
 size_t          c_hash_str(const char *str);                          // string hash function, uses strlen()
 size_t          c_hash_mix(size_t h1, size_t h2, ...);                // mix/combine computed hashes
@@ -128,7 +128,7 @@ bool            c_memcmp_eq(const i_keyraw* a, const i_keyraw* b);    // !memcmp
 ## Examples
 
 [ [Run this code](https://godbolt.org/z/zocez8x1c) ]
-```c
+```c++
 #include "stc/cstr.h"
 
 #define i_keypro cstr
@@ -166,7 +166,7 @@ int main(void)
 Demonstrate hmap with mapped POD type Vec3i: hmap<int, Vec3i>:
 
 [ [Run this code](https://godbolt.org/z/1bbdv6qnx) ]
-```c
+```c++
 #include <stdio.h>
 typedef struct { int x, y, z; } Vec3i;
 
@@ -193,7 +193,7 @@ int main(void)
 Inverse: Demonstrate hmap with plain-old-data key type Vec3i and int as mapped type: hmap<Vec3i, int>.
 
 [ [Run this code](https://godbolt.org/z/x1vn36joc) ]
-```c
+```c++
 #include <stdio.h>
 typedef struct { int x, y, z; } Vec3i;
 
@@ -222,7 +222,7 @@ int main(void)
 Key type is struct. Based on https://doc.rust-lang.org/std/collections/struct.HashMap.html
 
 [ [Run this code](https://godbolt.org/z/jhTv4x1e4) ]
-```c
+```c++
 #include <stc/cstr.h>
 
 typedef struct {
@@ -286,7 +286,7 @@ In this example we use keyraw feature to make it simpler to use and avoids the c
 entirely when doing lookup.
 
 [ [Run this code](https://godbolt.org/z/18v5vYq4M) ]
-```c
+```c++
 #include "stc/cstr.h"
 
 typedef struct Viking {

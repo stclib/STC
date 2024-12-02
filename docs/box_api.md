@@ -14,7 +14,7 @@ See similar c++ class [std::unique_ptr](https://en.cppreference.com/w/cpp/memory
 
 ## Header file and declaration
 
-```c
+```c++
 #define i_type <ct>,<kt> // shorthand for defining i_type, i_key
 #define i_type <t>       // box container type name (default: box_{i_key})
 // One of the following:
@@ -44,7 +44,7 @@ Unless `c_use_cmp` is defined, comparison between i_key's is not needed/availabl
 compare the pointer addresses when used. Additionally, `c_no_clone` or `i_is_fwd` may be defined.
 
 ## Methods
-```c
+```c++
 box_X           box_X_init();                                   // return an empty box
 box_X           box_X_from(i_keyraw raw);                       // create a box from raw type. Avail if i_keyraw user defined.
 box_X           box_X_from_ptr(i_key* ptr);                     // create a box from a pointer. Takes ownership of ptr.
@@ -83,7 +83,7 @@ bool            box_X_value_eq(const i_key* x, const i_key* y);
 Create a vec and a set with owned pointers to int elements, using box.
 
 [ [Run this code](https://godbolt.org/z/YTcfT5fMr) ]
-```c
+```c++
 #include <stdio.h>
 
 void int_drop(int* x) {

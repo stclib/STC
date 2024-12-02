@@ -6,7 +6,7 @@ A **hset** is an associative container that contains a set of unique objects of 
 
 ## Header file and declaration
 
-```c
+```c++
 #define i_type <ct>,<kt> // shorthand for defining i_type, i_key
 #define i_type <t>       // container type name (default: hset_{i_key})
 // One of the following:
@@ -31,7 +31,7 @@ A **hset** is an associative container that contains a set of unique objects of 
 
 ## Methods
 
-```c
+```c++
 hset_X          hset_X_init(void);
 hset_X          hset_X_with_capacity(isize cap);
 
@@ -85,7 +85,7 @@ hset_X_value    hset_X_value_clone(hset_X_value val);
 
 ## Example
 [ [Run this code](https://godbolt.org/z/MK4j4b9KP) ]
-```c
+```c++
 #include "stc/cstr.h"
 
 #define i_type Strings

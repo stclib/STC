@@ -77,7 +77,7 @@ to lookup a **cstr** object. Also, one may pass a c-string literal to one of the
 as an alternative to `vec_cstr_push(&vec, cstr_from("Hello"))`.
 3. ***Standardized container iterators***. All containers can be iterated in the same manner, and all use the
 same element access syntax. The following works for single-element type containers, e.g a linked list:
-```c
+```c++
 #define i_type MyInts, int
 #include "stc/list.h"
 ...
@@ -146,7 +146,7 @@ STC containers have similar functionality to the C++ STL standard containers. Al
 like **cstr** and **cbits** are generic/templated. No type casting is used, so containers are type-safe like
 templated types in C++. To specify template parameters with STC, you define them as macros prior to
 including the container, e.g.
-```c
+```c++
 #define i_type Floats, float // Container type (name, element type)
 #include "stc/vec.h"         // "instantiate" the desired container type
 #include <stdio.h>
@@ -170,7 +170,7 @@ int main(void)
 Switching to a different container type, e.g. a sorted set (sset):
 <!-- https://raw.githubusercontent.com/stclib/stcsingle/main/ -->
 [ [Run this code](https://godbolt.org/z/cedobWETq) ]
-```c
+```c++
 #define i_type Floats, float
 #include "stc/sset.h" // Use a sorted set instead
 #include <stdio.h>
@@ -201,7 +201,7 @@ If an element destructor `i_keydrop` is defined, `i_keyclone` function is requir
 Let's make a vector of vectors, which can be cloned. All of its element vectors will be destroyed when destroying the Vec2D.
 
 [ [Run this code](https://godbolt.org/z/PW3vso45G) ]
-```c
+```c++
 #include <stdio.h>
 #include "stc/algorithm.h"
 
@@ -244,7 +244,7 @@ int main(void)
 This example uses four different container types:
 
 [ [Run this code](https://godbolt.org/z/n1z16bdTr) ]
-```c
+```c++
 #include <stdio.h>
 
 #define i_type hset_int, int
@@ -358,7 +358,7 @@ STC is mixed *"headers-only"* / traditional library, i.e the templated container
 algorithms) can simply be included - they have no library dependencies. By default, all templated functions are
 static (many inlined). This is often optimal for both performance and compiled binary size. However, for frequently
 used container type instances (more than 2-3 TUs), consider creating a separate header file for them, e.g.:
-```c
+```c++
 // intvec.h
 #ifndef INTVEC_H_
 #define INTVEC_H_
@@ -369,7 +369,7 @@ used container type instances (more than 2-3 TUs), consider creating a separate 
 ```
 So anyone may use the shared vec-type. Implement the shared functions in one C file (if several containers are shared,
 you may define STC_IMPLEMENT on top of the file once instead).
-```c
+```c++
 // shared.c
 #define i_implement // implement the shared intvec.
 #include "intvec.h"
@@ -497,7 +497,7 @@ the **emplace** functions are ***not*** available (or needed), as it can easier 
 Strings are the most commonly used non-trivial data type. STC containers have proper pre-defined
 definitions for cstr container elements, so they are fail-safe to use both with the **emplace**
 and non-emplace methods:
-```c
+```c++
 #include "stc/cstr.h"
 
 #define i_keypro cstr  // use i_keypro for "pro" types like cstr, arc, box
@@ -523,7 +523,7 @@ methods to the container value type.
 
 Rawvalues are primarily beneficial for **lookup** and **map insertions**, however the
 **emplace** methods constructs `cstr`-objects from the rawvalues, but only when required:
-```c
+```c++
 hmap_cstr_emplace(&map, "Hello", "world");
 // Two cstr-objects were constructed by emplace
 
@@ -562,7 +562,7 @@ last example on the **hmap** page demonstrates how to specify a map with non-tri
 ## User-defined container type name
 
 Define `i_type` and/or `i_key`:
-```c
+```c++
 // #define i_type MyVec, int // shorthand
 #define i_type MyVec
 #define i_key int
@@ -588,7 +588,7 @@ user struct (the container functions will not be available to the user).
 ### 1. Include as a header file
 
 Create a dedicated header for the container type instance:
-```c
+```c++
 #ifndef PointVec_H_
 #define PointVec_H_
 // Do not to include user defined headers here if they use templated containers themselves
@@ -601,7 +601,7 @@ Create a dedicated header for the container type instance:
 #endif
 ```
 Usage from e.g. other headers is trivial:
-```c
+```c++
 #ifndef Dataset_H_
 #define Dataset_H_
 #include "Point.h"         // include element type separately
@@ -616,7 +616,7 @@ typedef struct Dataset {
 ```
 
 Implement PointVec in a c-file:
-```c
+```c++
 #include "Point.h"
 #define i_implement        // define immediately before PointVec.h
 #include "PointVec.h"
@@ -624,7 +624,7 @@ Implement PointVec in a c-file:
 ```
 
 ### 2. Forward declare only
-```c
+```c++
 // Dataset.h
 #ifndef Dataset_H_
 #define Dataset_H_
@@ -643,7 +643,7 @@ void Dataset_drop(Dataset* self);
 #endif
 ```
 Define and use the "private" container in the c-file:
-```c
+```c++
 // Dataset.c
 #include "Dataset.h"
 #include "Point.h"          // struct Point must be defined here.
@@ -677,7 +677,7 @@ allocated size of the given pointer, unlike standard `realloc` and `free`.
 - `i_eq`: **vec**, **deque**, **list**
 - `i_less`: **pqueue**
 
-```c
+```c++
 // stcpgs.h
 #define pgs_malloc(sz) MemoryContextAlloc(self->aux.memctx, sz)
 #define pgs_calloc(n, sz) MemoryContextAllocZero(self->aux.memctx, (n)*(sz))
@@ -689,7 +689,7 @@ allocated size of the given pointer, unlike standard `realloc` and `free`.
 #define i_no_clone
 ```
 Usage is straight forward:
-```c
+```c++
 #define i_type IMap, int, int
 #include "stcpgs.h"
 #include "stc/smap.h"

@@ -9,7 +9,7 @@ See the c++ class [std::deque](https://en.cppreference.com/w/cpp/container/deque
 
 ## Header file and declaration
 
-```c
+```c++
 #define i_type <ct>,<kt> // shorthand for defining i_type, i_key
 #define i_type <t>       // deque container type name (default: deque_{i_key})
 // One of the following:
@@ -38,7 +38,7 @@ See the c++ class [std::deque](https://en.cppreference.com/w/cpp/container/deque
 
 ## Methods
 
-```c
+```c++
 deque_X         deque_X_init(void);
 deque_X         deque_X_with_capacity(isize size);
 
@@ -117,7 +117,7 @@ void            deque_X_value_drop(i_key* pval);
 ## Examples
 
 [ [Run this code](https://godbolt.org/z/6ojqqMzrz) ]
-```c
+```c++
 #define i_type Deque, int32_t
 #include "stc/deque.h"
 #include <stdio.h>

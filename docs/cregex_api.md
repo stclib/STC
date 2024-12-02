@@ -21,7 +21,7 @@ The API is simple and includes powerful string pattern matches and replace funct
     - CREG_REPLACEALL - replace all occurrences of matched pattern (INT32_MAX)
 
 ## Methods
-```c
+```c++
 cregex          cregex_from(const char* pattern);
 cregex          cregex_from_ex(const char* pattern, int cflags);
 
@@ -82,7 +82,7 @@ void            cregex_drop(cregex* self);
 ## Usage
 
 ### Compiling a regular expression
-```c
+```c++
 cregex re1 = {0};
 int result = cregex_compile(&re1, "[0-9]+");
 if (result < 0) return result;
@@ -100,7 +100,7 @@ If an error occurs ```cregex_compile``` returns a negative error code stored in 
 ### Getting the first match and making text replacements
 
 [ [Run this code](https://godbolt.org/z/9EovPvK5K) ]
-```c
+```c++
 #include "stc/cregex.h"
 
 int main(void) {
@@ -126,7 +126,7 @@ int main(void) {
 }
 ```
 For a single match you may use the all-in-one function:
-```c
+```c++
 if (cregex_find_pattern(pattern, input, match))
     printf("Found date: " c_svfmt "\n", c_svarg(match[0]));
 ```
@@ -137,14 +137,14 @@ In order to use a callback function in the replace call, see `examples/regex_rep
 ### Iterate through regex matches, *c_formatch*
 
 To iterate multiple matches in an input string, you may use
-```c
+```c++
 csview match[5] = {0};
 while (cregex_find(&re, input, match, CREG_NEXT) == CREG_OK)
     for (int k = 1; i <= cregex_captures(&re); ++k)
         printf("submatch %d: " c_svfmt "\n", k, c_svarg(match[k]));
 ```
 There is also a `c_formatch` macro which simplifies this:
-```c
+```c++
 c_formatch (it, &re, input)
     for (int k = 1; i <= cregex_captures(&re); ++k)
         printf("submatch %d: " c_svfmt "\n", k, c_svarg(it.match[k]));

@@ -11,7 +11,7 @@ See the c++ class [std::vector](https://en.cppreference.com/w/cpp/container/vect
 
 ## Header file and declaration
 
-```c
+```c++
 #define i_type <ct>,<kt> // shorthand for defining i_type, i_key
 #define i_type <t>       // container type name (default: vec_{i_key})
 // One of the following:
@@ -40,7 +40,7 @@ See the c++ class [std::vector](https://en.cppreference.com/w/cpp/container/vect
 
 ## Methods
 
-```c
+```c++
 vec_X           vec_X_init(void);
 vec_X           vec_X_with_size(isize size, i_key null);
 vec_X           vec_X_with_capacity(isize size);
@@ -119,7 +119,7 @@ vec_X_raw       vec_X_value_drop(vec_X_value* pval);
 | `vec_X_iter`      | `struct { vec_X_value* ref; }`   | The iterator type     |
 
 ## Examples
-```c
+```c++
 #define i_key int
 #define i_use_cmp // enable sorting/searhing using default <, == operators
 #include "stc/vec.h"
@@ -160,7 +160,7 @@ initial: 25 13 7 5 16 8
 sorted: 5 7 8 13 16 25
 ```
 ### Example 2
-```c
+```c++
 #include "stc/cstr.h"
 
 #define i_keypro cstr
@@ -196,7 +196,7 @@ item: 2 elements so far
 ### Example 3
 
 Container with elements of structs:
-```c
+```c++
 #include "stc/cstr.h"
 
 typedef struct {

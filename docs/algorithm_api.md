@@ -10,7 +10,7 @@ descriptive and reduces chances of making mistakes. It is generally easier to re
 "No raw loops" - Sean Parent
 
 ### c_foreach, c_foreach_reverse, c_foreach_n, c_foreach_kv
-```c
+```c++
 #include "stc/common.h"
 ```
 
@@ -23,7 +23,7 @@ descriptive and reduces chances of making mistakes. It is generally easier to re
 | `c_foreach_n (it, ctype, container, n)`| Iteratate `n` first elements. Index variable is `{it}_index`. |
 | `c_foreach_kv (key, val, ctype, container)` | Iterate maps with "structured binding" |
 
-```c
+```c++
 #define i_type IMap, int, int
 #include "stc/smap.h"
 // ...
@@ -58,7 +58,7 @@ c_foreach_kv (id, count, IMap, map)
 
 ### c_foritems
 Iterate compound literal array elements. In addition to `i.ref`, you can access `i.index` and `i.size`.
-```c
+```c++
 // apply multiple push_backs
 c_foritems (i, int, {4, 5, 6, 7})
     list_i_push_back(&lst, *i.ref);
@@ -96,7 +96,7 @@ c_foritems (i, const char*, {"Hello", "crazy", "world"})
 | `c_forrange_t(IntType, i, start, stop)`        |
 | `c_forrange_t(IntType, i, start, stop, step)`  |
 
-```c
+```c++
 c_forrange (5) printf("x");
 // xxxxx
 c_forrange (i, 5) printf(" %lld", i);
@@ -116,7 +116,7 @@ An integer sequence generator type, similar to [boost::irange](https://www.boost
 - `crange` uses `isize` (ptrdiff_t) as control variable
 - `crange32` is like *crange*, but uses `int32` as control variable, which may be faster.
 
-```c
+```c++
 crange      crange_make(stop);              // 0, 1, ... stop-1
 crange      crange_make(start, stop);       // start, start+1, ... stop-1
 crange      crange_make(start, stop, step); // start, start+step, ... upto-not-including stop,
@@ -130,7 +130,7 @@ crange&     c_iota(start, stop);            // l-value; otherwise like crange_ma
 crange&     c_iota(start, stop, step);      // l-value; otherwise like crange_make(start, stop, step)
 ```
  The **crange_value** type is *isize*. Variables *start*, *stop*, and *step* are of type *crange_value*.
-```c
+```c++
 // 1. All primes less than 32: See below for c_filter() and is_prime()
 crange r1 = crange_make(3, 32, 2);
 printf("2"); // first prime
@@ -193,7 +193,7 @@ It enables a subset of functional programming like in other popular languages.
 | `value1, value2`             | Pointer variables to (possible mapped) values |
 
 [ [Run this example](https://godbolt.org/z/MhW7xz5sn) ]
-```c
+```c++
 #include <stdio.h>
 #define i_type Vec, int
 #include "stc/stack.h"
@@ -227,7 +227,7 @@ int main(void)
 A macro for conveniently defining functions with multiple return values. This is for encouraging
 to write functions that returns extra error context when error occurs, or just multiple return values.
 
-```c
+```c++
 Vec get_data(void) {
     return c_make(Vec, {1, 2, 3, 4, 5, 6});
 }
@@ -270,7 +270,7 @@ These work on any container. *c_make()* may also be used for **cspan** views.
 - **c_drop** - drop (destroy) multiple containers of the same type
 
 [ [Run this code](https://godbolt.org/z/K9Y5EMGxM) ]
-```c
+```c++
 #include <stdio.h>
 #define i_type Vec, int
 #include "stc/vec.h"
@@ -339,7 +339,7 @@ Copy linearily in containers using a predicate. `value` is a pointer to each ele
 Erase linearily in containers using a predicate. `value` is a pointer to each element in predicate.
 - `c_erase_if(CntType, cnt_ptr, pred)`. Use with **list**, **hmap**, **hset**, **smap**, and **sset**.
 - `c_eraseremove_if(CntType, cnt_ptr, pred)`. Use with **stack**, **vec**, **deque**, and **queue** only.
-```c
+```c++
 #include <stdio.h>
 #include "stc/cstr.h"
 #include "stc/algorithm.h"
@@ -410,7 +410,7 @@ Test a container/range using a predicate. ***result*** is output and must be dec
 - `void c_all_of(CntType, cnt, bool* result, pred)`
 - `void c_any_of(CntType, cnt, bool* result, pred)`
 - `void c_none_of(CntType, cnt, bool* result, pred)`
-```c
+```c++
 #define DivisibleBy(n) (*value % (n) == 0) // `value` refers to the current element
 
 bool result;
@@ -428,7 +428,7 @@ if (result)
 - All containers with random access may be sorted, including regular C-arrays, i.e. **stack**, **vec**
 and **deque** when either `i_use_cmp`, `i_cmp` or `i_less` is defined.
 - Linked **list** may also be sorted, i.e. only *X_sort()* is available.
-```c
+```c++
                 // Sort c-arrays by defining i_type and include "stc/sort.h":
 void            X_sort(const X array[], isize len);
 isize           X_lower_bound(const X array[], i_key key, isize len);
@@ -451,7 +451,7 @@ The *X_sort()*, *X_sort_lowhigh()* functions are about twice as fast as *qsort()
 speed with *std::sort()**. Both *X_binary_seach()* and *X_lower_bound()* are about 30% faster than
 c++ *std::lower_bound()*. There is a [benchmark/test file here](../misc/benchmarks/various/quicksort_bench.c).
 ##### Usage examples
-```c
+```c++
 #define i_key int // sort a regular c-array of ints
 #include "stc/sort.h"
 #include <stdio.h>
@@ -463,7 +463,7 @@ int main(void) {
 }
 ```
 
-```c
+```c++
 #define i_type MyDeq, int
 #define i_use_cmp      // enable sorting
 #include "stc/deque.h" // can be swapped with any of the above
@@ -488,7 +488,7 @@ int main(void) {
 - `c_new_n(Type, n)` - Allocate an array of ***n*** new objects on the heap, initialized to zero.
 - `c_delete(Type, ptr)` - *Type_drop(ptr)* and *c_free(ptr, ..)* allocated on the heap. NULL is OK.
 - `c_delete_n(Type, arr, n)` - *Type_drop(&arr[i])* and *c_free(arr, ..)* of ***n*** objects allocated on the heap. (NULL, 0) is OK.
-```c
+```c++
 #include "stc/cstr.h"
 
 cstr* stringptr = c_new (cstr, cstr_from("Hello"));
@@ -512,13 +512,13 @@ default in containers unless `i_malloc`, `i_calloc`, `i_realloc`, and `i_free` a
 
 ### c_arraylen
 Return number of elements in an array. array must not be a pointer!
-```c
+```c++
 int array[] = {1, 2, 3, 4};
 isize n = c_arraylen(array);
 ```
 
 ### c_swap, c_const_cast
-```c
+```c++
 // Side effect- and typesafe macro for swapping internals of two objects of same type:
 c_swap(&map1, &map2);
 
@@ -537,7 +537,7 @@ int* ip = c_const_cast(int*, cs);  // issues a warning!
 ### Predefined template parameter functions
 
 **cstr_raw** - Non-owning `const char*` "class" element type: `#define i_keyclass cstr_raw`
-```c
+```c++
 typedef         const char* cstr_raw;
 int             cstr_raw_cmp(const cstr_raw* x, const cstr_raw* y);
 size_t          cstr_raw_hash(const cstr_raw* x);
@@ -545,7 +545,7 @@ cstr_raw        cstr_raw_clone(cstr_raw sp);
 void            cstr_raw_drop(cstr_raw* x);
 ```
 Default implementations
-```c
+```c++
 int             c_default_cmp(const Type*, const Type*);    // <=>
 bool            c_default_less(const Type*, const Type*);   // <
 bool            c_default_eq(const Type*, const Type*);     // ==
@@ -570,7 +570,7 @@ void            c_default_drop(Type* p);                    // does nothing
 *Note*: Regular `return`, `break` and `continue` must not be used
 anywhere inside a defer scope.
 
-```c
+```c++
 // declare and init a new scoped variable and specify the deinitialize call:
 c_with (cstr str = cstr_lit("Hello"), cstr_drop(&str))
 {
@@ -588,7 +588,7 @@ c_with (pthread_mutex_lock(&lock), pthread_mutex_unlock(&lock))
 ```
 
 **Example 2**: Load each line of a text file into a vector of strings:
-```c
+```c++
 #include <errno.h>
 #include "stc/cstr.h"
 

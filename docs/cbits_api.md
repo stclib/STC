@@ -12,7 +12,7 @@ for a functional description.
 ## Header file
 All cbits definitions and prototypes are available by including a single header file.
 
-```c
+```c++
 // if i_type is defined, the bitset will be fixed-size of N bits on the stack, and with the given type name.
 #define i_type MyBits, MY_MAX_BITS
 #include "stc/cbits.h"
@@ -22,7 +22,7 @@ All cbits definitions and prototypes are available by including a single header 
 ```
 ## Methods
 
-```c
+```c++
 cbits           cbits_from(const char* str);
 cbits           cbits_with_size(isize size, bool value);                // size must be <= N if N is defined
 cbits           cbits_with_pattern(isize size, size_t pattern);
@@ -72,7 +72,7 @@ void            cbits_xor(cbits* self, const cbits* other);             // set o
 | `cbits_iter`        | `struct { ... }`          | The cbits iterator type      |
 
 ## Example
-```c
+```c++
 #include "stc/cbits.h"
 #include <stdio.h>
 #include <math.h>

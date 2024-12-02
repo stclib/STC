@@ -7,7 +7,7 @@ See the c++ class [std::priority_queue](https://en.cppreference.com/w/cpp/contai
 
 ## Header file and declaration
 
-```c
+```c++
 #define i_type <ct>,<kt> // shorthand for defining i_type, i_key
 #define i_type <t>       // pqueue container type name (default: pqueue_{i_key})
 // One of the following:
@@ -33,7 +33,7 @@ In the following, `X` is the value of `i_key` unless `i_type` is defined.
 
 ## Methods
 
-```c
+```c++
 pqueue_X        pqueue_X_init(void);                                // create empty pri-queue.
 pqueue_X        pqueue_X_with_capacity(isize cap);
 pqueue_X        pqueue_X_with_size(isize size, i_key null);
@@ -73,7 +73,7 @@ i_key           pqueue_X_value_clone(i_key value);
 ## Example
 
 [ [Run this code](https://godbolt.org/z/cMhWYc9cb) ]
-```c
+```c++
 #include <stdio.h>
 #include "stc/random.h"
 
