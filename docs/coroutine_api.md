@@ -17,7 +17,7 @@ Because these coroutines are stackfull, all variables used within the coroutine 
 ## Methods and statements
 
 #### Coroutine basics
-```c
+```c++
                 cco_routine (Coroutine* co) { ... }                 // The coroutine scope.
                 cco_yield;                                          // Yield/suspend execution with CCO_YIELD returned.
                 cco_yield_v(value);                                 // Yield/suspend execution with value returned.
@@ -35,7 +35,7 @@ void            cco_stop(Coroutine* co);                            // Next resu
                 cco_run_coroutine(coroutine(co)) {};                // Run blocking until coroutine is finished.
 ```
 #### Task specific (coroutine function-objects)
-```c
+```c++
                 cco_task_struct(name) { <name>_state cco; ... };    // A custom coroutine task struct; extends cco_task struct.
 void            cco_await_task(cco_task* task, cco_runtime* rt);    // Await for task to return CCO_DONE (asymmetric call).
 void            cco_await_task(cco_task* task, cco_runtime* rt, int awaitbits); // Await until task's suspend/return value
@@ -45,11 +45,12 @@ void            cco_throw_error(uint16_t error, cco_runtime* rt);   // Throw an 
                                                                     // Error accessible as `rt->error` and `rt->error_line`.
 void            cco_resume_task(cco_task* task, cco_runtime* rt);   // Resume suspended task, return value in `rt->result`.
                 cco_run_task(cco_task* task) {}                     // Run blocking until task is finished.
-                cco_run_task(cco_task* task, runnername, <Context> *ctx) {} // Run blocking and pass a runner
-                                                                            // name and a context pointer.
+                cco_run_task(cco_task* task, <Context> *ctx) {}     // Run blocking with context data
+                cco_run_task(cco_task* task, <Context> *ctx, runnername) {} // Run blocking with context data and
+                                                                            // name of the cco_taskrunner.
 ```
 #### Timers and time functions
-```c
+```c++
                 cco_start_timer_sec(cco_timer* tm, double sec);     // Start timer with seconds duration.
                 cco_restart_timer(cco_timer* tm);                   // Restart timer with previous duration.
 bool            cco_timer_expired(cco_timer* tm);                   // Return true if timer is expired.
@@ -62,14 +63,14 @@ double          cco_time(void);                                     // Return se
 
 ```
 #### Semaphores
-```c
+```c++
 cco_semaphore   cco_make_semaphore(long value);                     // Create semaphore
                 cco_set_semaphore(cco_semaphore* sem, long value);  // Set initial semaphore value
                 cco_await_semaphore(cco_semaphore* sem);            // Await for the semaphore count > 0, then count -= 1
                 cco_release_semaphore(cco_semaphore* sem);          // "Signal" the semaphore (count += 1)
 ```
 #### Interoperability with iterators and filters
-```c
+```c++
                 // Container iteration within coroutines
                 cco_foreach (iter_name, ctype, cnt);                // Use an existing iterator (stored in coroutine object)
                 cco_foreach_reverse (iter_name, ctype, cnt);        // Iterate in reverse order
@@ -91,13 +92,13 @@ cco_semaphore   cco_make_semaphore(long value);                     // Create se
 |`cco_runtime`      | Struct type | Runtime object to manage cco_taskrunner states |
 
 ## Rules
-1. Do not declare local variables within a `cco_routine` scope. Place them in the coroutine struct. Be particularly careful with control variables in loops.
+1. Avoid declaring local variables within a `cco_routine` scope. Place them in the coroutine struct. Be particularly careful with control variables in loops.
 2. Do not call ***cco_yield\**** or ***cco_await\**** inside a `switch` statement within a
 `cco_routine` scope. In general, use `if-else-if` to avoid this trap.
 3. Do not call ***cco_yield\**** or ***cco_await\**** after the `cco_finally:` label.
 
 ## Implementation and examples
-A regular coroutine may have any signature, but this implementation has extra support for
+A regular coroutine may have any signature, however this implementation has specific support for
 coroutines which returns `int`, indicating CCO_DONE, CCO_AWAIT, CCO_YIELD, or a custom value.
 It should take a struct pointer as one of the parameter which must contains a cco-state member named `cco`.
 The coroutine struct should normally store all *local* variables to be used within the coroutine
@@ -108,7 +109,7 @@ Both asymmetric and symmetric coroutine control flow transfer are supported when
 (closures/functors), and they may be combined.
 
 This implementation is not limited to support only a certain set of coroutine types,
-like generators. It operates like stackfull coroutines, i.e. tasks can efficiently yield
+like generators. They operate like stackfull coroutines, i.e. tasks can efficiently yield
 or await from a deeply nested coroutine call by utilizing extended `cco_task` structs described below.
 
 ----
@@ -154,7 +155,7 @@ the way you iterate STC containers. Then you may apply [other algorithms](algori
 Notice that `Gen` now becomes the "container", while `Gen_iter` is the coroutine:
 
 <details>
-<summary>Iterable generator coroutines implementation</summary>
+<summary>Iterable generator coroutine implementation</summary>
 
 [ [Run this code](https://godbolt.org/z/bbd8oGYxG) ]
 ```c
@@ -165,12 +166,12 @@ typedef int Gen_value;
 typedef struct { Gen_value start, end, value; } Gen;
 typedef struct { cco_state cco; Gen* g; Gen_value* ref; } Gen_iter;
 
-int Gen_next(Gen_iter* i) {
-     cco_routine (i) {
-        for (*i->ref = i->g->start; *i->ref < i->g->end; ++*i->ref)
+int Gen_next(Gen_iter* it) {
+     cco_routine (it) {
+        for (*it->ref = it->g->start; *it->ref < it->g->end; ++*it->ref)
             cco_yield;
         cco_finally:
-        i->ref = NULL; // stop
+        it->ref = NULL; // stop
      }
      return 0;
  }
@@ -200,7 +201,7 @@ implementation uses `cco_await_*()` for timers and semaphores:
 <details>
 <summary>The "Dining philosophers" C implementation</summary>
 
-[ [Run this code](https://godbolt.org/z/b3MTe5jeq) ]
+[ [Run this code](https://godbolt.org/z/To4nabh8f) ]
 ```c
 #include <stdio.h>
 #include <time.h>
@@ -247,7 +248,7 @@ int Philosopher(struct Philosopher* self) {
 // Dining coroutine
 struct Dining {
     cco_semaphore forks[num_philosophers]; // controls when forks are available
-    struct Philosopher self[num_philosophers];
+    struct Philosopher philos[num_philosophers];
     cco_state cco; // required
 };
 
@@ -255,16 +256,16 @@ int Dining(struct Dining* self) {
     cco_routine (self) {
         for (int i = 0; i < num_philosophers; ++i) {
             cco_set_semaphore(&self->forks[i], 1); // all forks available
-            cco_reset(&self->self[i]);
-            self->self[i].id = i + 1;
-            self->self[i].left_fork = &self->forks[i];
-            self->self[i].right_fork = &self->forks[(i + 1) % num_philosophers];
+            cco_reset(&self->philos[i]);
+            self->philos[i].id = i + 1;
+            self->philos[i].left_fork = &self->forks[i];
+            self->philos[i].right_fork = &self->forks[(i + 1) % num_philosophers];
         }
 
         while (1) {
             // NB! local i OK here as it does not cross yield/await.
             for (int i = 0; i < num_philosophers; ++i) {
-                Philosopher(&self->self[i]); // resume philosopher
+                Philosopher(&self->philos[i]); // resume philosopher
             }
             cco_yield; // suspend, return control back to caller who
                        // can do other tasks before resuming dining.
@@ -272,8 +273,8 @@ int Dining(struct Dining* self) {
 
         cco_finally:
         for (int i = 0; i < num_philosophers; ++i) {
-            cco_stop(&self->self[i]);
-            Philosopher(&self->self[i]); // execute cco_finally.
+            cco_stop(&self->philos[i]);
+            Philosopher(&self->philos[i]); // execute cco_finally.
         }
         puts("Dining done");
     }
@@ -289,7 +290,7 @@ int main(void)
     cco_run_coroutine(Dining(&dining)) {
         if (cco_timer_expired(&tm))
             cco_stop(&dining);
-        cco_sleep_sec(0.001);
+        cco_sleep_sec(0.001); // do other things
     }
 }
 ```
@@ -307,7 +308,7 @@ where the error can be catched (handled).
 - Coroutine `start`  await `A` => `A` await `B` => `B` await `C` => `C` throws error => unwind => `A` catches error.
 - `cco_runtime` type has an opaque `context` pointer, where A, B, C tasks are stored.
 
-[ [Run this code](https://godbolt.org/z/7oGs6e9n4) ]
+[ [Run this code](https://godbolt.org/z/4es95Eh74) ]
 ```c
 #include <stdio.h>
 #include "stc/coroutine.h"
@@ -338,7 +339,7 @@ int C(struct C* self, cco_runtime* rt) {
 }
 
 int B(struct B* self, cco_runtime* rt) {
-    MyCtx* ctx = (MyCtx*)rt->context;
+    MyCtx* ctx = (MyCtx*)rt->context; // NB before cco_routine
     cco_routine (self) {
         puts("B start");
         cco_await_task(&ctx->C, rt);
@@ -383,7 +384,7 @@ int main(void)
 {
     MyCtx context = {.A={{A}}, .B={{B}}, .C={{C}}};
     cco_task task = {{start}};
-    cco_run_task(&task, runner, &context);
+    cco_run_task(&task, &context);
 }
 ```
 </details>
@@ -422,49 +423,49 @@ cco_task_struct (consume) {
 };
 
 
-int produce(struct produce* co, cco_runtime* rt) {
-    cco_routine (co) {
+int produce(struct produce* self, cco_runtime* rt) {
+    cco_routine (self) {
         while (1) {
-            if (co->serial > co->total) {
-                if (Inventory_is_empty(&co->inventory))
+            if (self->serial > self->total) {
+                if (Inventory_is_empty(&self->inventory))
                     cco_return; // cleanup and finish
             }
-            else if (Inventory_size(&co->inventory) < co->limit) {
-                c_forrange (co->batch)
-                    Inventory_push(&co->inventory, ++co->serial);
+            else if (Inventory_size(&self->inventory) < self->limit) {
+                c_forrange (self->batch)
+                    Inventory_push(&self->inventory, ++self->serial);
 
                 printf("produced %d items, Inventory has now %d items:\n",
-                       co->batch, (int)Inventory_size(&co->inventory));
+                       self->batch, (int)Inventory_size(&self->inventory));
 
-                c_foreach (i, Inventory, co->inventory)
+                c_foreach (i, Inventory, self->inventory)
                     printf(" %2d", *i.ref);
                 puts("");
             }
 
-            cco_yield_to(co->consumer, rt); // symmetric transfer
+            cco_yield_to(self->consumer, rt); // symmetric transfer
         }
 
         cco_finally:
-        cco_cancel_task(co->consumer, rt);
-        Inventory_drop(&co->inventory);
+        cco_cancel_task(self->consumer, rt);
+        Inventory_drop(&self->inventory);
         puts("cleanup producer");
     }
     return 0;
 }
 
-int consume(struct consume* co, cco_runtime* rt) {
-    cco_routine (co) {
+int consume(struct consume* self, cco_runtime* rt) {
+    cco_routine (self) {
         int n, sz;
         while (1) {
             n = rand() % 10;
-            sz = (int)Inventory_size(&co->producer->inventory);
+            sz = (int)Inventory_size(&self->producer->inventory);
             if (n > sz) n = sz;
 
             c_forrange (n)
-                Inventory_pop(&co->producer->inventory);
+                Inventory_pop(&self->producer->inventory);
             printf("consumed %d items\n", n);
 
-            cco_yield_to(co->producer, rt); // symmetric transfer
+            cco_yield_to(self->producer, rt); // symmetric transfer
         }
 
         cco_finally:
@@ -506,7 +507,7 @@ Note that the scheduler awaits the next CCO_YIELD to be returned, not only the d
 <details>
 <summary>Scheduled coroutines implementation</summary>
 
-[ [Run this code](https://godbolt.org/z/9Y6716bj3) ]
+[ [Run this code](https://godbolt.org/z/f46W66dad) ]
 ```c
 // https://www.youtube.com/watch?v=8sEe-4tig_A
 #include <stdio.h>
@@ -532,22 +533,22 @@ cco_task_struct (TaskX) {
     char id;
 };
 
-int scheduler(struct Scheduler* sched, cco_runtime* rt) {
-    cco_routine (sched) {
-        while (!Tasks_is_empty(&sched->tasks)) {
-            sched->pulled = Tasks_pull(&sched->tasks);
+int scheduler(struct Scheduler* self, cco_runtime* rt) {
+    cco_routine (self) {
+        while (!Tasks_is_empty(&self->tasks)) {
+            self->pulled = Tasks_pull(&self->tasks);
 
-            cco_await_task(sched->pulled, rt, CCO_YIELD);
+            cco_await_task(self->pulled, rt, CCO_YIELD);
 
             if (rt->result == CCO_YIELD) {
-                Tasks_push(&sched->tasks, sched->pulled);
+                Tasks_push(&self->tasks, self->pulled);
             } else { // CCO_DONE
-                Tasks_value_drop(&sched->pulled);
+                Tasks_value_drop(&self->pulled);
             }
         }
 
         cco_finally:
-        Tasks_drop(&sched->tasks);
+        Tasks_drop(&self->tasks);
         puts("Task queue dropped");
     }
     return 0;
@@ -569,7 +570,6 @@ static int taskX(struct TaskX* self, cco_runtime* rt) {
 }
 
 static int taskA(struct TaskA* self, cco_runtime* rt) {
-    (void)rt;
     cco_routine (self) {
         puts("Hello from task A");
         cco_yield;
@@ -596,7 +596,7 @@ int main(void) {
         })
     };
 
-    cco_run_task(&schedule, running, &schedule.tasks);
+    cco_run_task(&schedule, &schedule.tasks);
 }
 ```
 

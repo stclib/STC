@@ -276,9 +276,9 @@ int cco_taskrunner(struct cco_taskrunner* co) {
     ((struct cco_taskrunner){.rt = {.current = cco_cast_task(task), .context = ctx}})
 
 #define cco_run_task(...) c_MACRO_OVERLOAD(cco_run_task, __VA_ARGS__)
-#define cco_run_task_1(task) cco_run_task_3(task, _runner, NULL)
-#define cco_run_task_2(task, runner) cco_run_task_3(task, runner, NULL)
-#define cco_run_task_3(task, runner, ctx) \
+#define cco_run_task_1(task) cco_run_task_3(task, NULL, _runner)
+#define cco_run_task_2(task, ctx) cco_run_task_3(task, ctx, _runner)
+#define cco_run_task_3(task, ctx, runner) \
     for (struct cco_taskrunner runner = cco_make_taskrunner(task, ctx) \
          ; cco_taskrunner(&runner) != CCO_DONE \
          ; )
