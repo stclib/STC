@@ -347,6 +347,7 @@ typedef struct { ptrdiff_t count; } cco_semaphore;
 
 #define cco_make_semaphore(value) ((cco_semaphore){value})
 #define cco_set_semaphore(sem, value) ((sem)->count = value)
+#define cco_acquire_semaphore(sem) (--(sem)->count)
 #define cco_release_semaphore(sem) (++(sem)->count)
 
 #define cco_await_semaphore(sem) \
@@ -366,18 +367,13 @@ typedef struct { ptrdiff_t count; } cco_semaphore;
     #else
       #define _c_LINKC __declspec(dllimport)
     #endif
-    #if 1 // _WIN32_WINNT < _WIN32_WINNT_WIN8 || defined __TINYC__
-      #define _c_getsystime GetSystemTimeAsFileTime
-    #else
-      #define _c_getsystime GetSystemTimePreciseAsFileTime
-    #endif
     struct _FILETIME;
-    _c_LINKC void _c_getsystime(struct _FILETIME*);
+    _c_LINKC void GetSystemTimeAsFileTime(struct _FILETIME*);
     _c_LINKC void Sleep(unsigned long);
 
     static inline double cco_time(void) { /* seconds since epoch */
         unsigned long long quad;          /* 64-bit value representing 1/10th usecs since Jan 1 1601, 00:00 UTC */
-        _c_getsystime((struct _FILETIME*)&quad);
+        GetSystemTimeAsFileTime((struct _FILETIME*)&quad);
         return (double)(quad - 116444736000000000ULL)*1e-7;  /* time diff Jan 1 1601-Jan 1 1970 in 1/10th usecs */
     }
 

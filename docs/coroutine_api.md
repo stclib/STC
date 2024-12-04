@@ -1,15 +1,13 @@
 # STC [Coroutines](../include/stc/coroutine.h)
 ![Coroutine](pics/coroutine.png)
 
-This small implementation of coroutines is inspired by [Adam Dunkel's photothreads](https://dunkels.com/adam/pt),
-which utilizes Duff's device. However, STC coroutines is a huge improvement with regards to ergonomics,
-features, and type-safety.
+This is small and portable implementation of coroutines, losely inspired by [Adam Dunkel's photothreads](https://dunkels.com/adam/pt).
 
-* Stackful, typesafe coroutines, allows both asymmetric coroutine calls and symmetric transfer of control.
-* No awkward macros, minimal boilerplate code.
+* Stackfull, typesafe coroutines. Allows both asymmetric coroutine calls and symmetric transfer of control.
+* Great ergonomics and minimal boilerplate code. No awkward macros.
 * Tiny memory usage, very efficient context switching, and no allocation required by default.
-* Coroutines can be cleaned up when they reach `cco_finally:` label. Will also happen on errors and cancelation.
-* Allows "throwing" errors. Should be handled in `cco_finally:` during the immediate unwinding of the call stack.
+* Coroutines are to be cleaned up at the `cco_finally:` label. Will also happen on errors and cancelation.
+* Allows "throwing" errors. To be handled in a `cco_finally:` during the immediate unwinding of the call stack.
 Unhandled errors will exit program with an error message including the offendig throw's line number.
 
 Because these coroutines are stackfull, all variables used within the coroutine scope (where usage crosses `cco_yield*` or `cco_await*`) must be stored in a struct which is passed as pointer to the coroutine. This has the advantages that they become extremely lightweight and therefore useful on severely memory constrained systems like small microcontrollers where other solutions are impractical.
@@ -66,8 +64,9 @@ double          cco_time(void);                                     // Return se
 ```c++
 cco_semaphore   cco_make_semaphore(long value);                     // Create semaphore
                 cco_set_semaphore(cco_semaphore* sem, long value);  // Set initial semaphore value
-                cco_await_semaphore(cco_semaphore* sem);            // Await for the semaphore count > 0, then count -= 1
+                cco_acquire_semaphore(cco_semaphore* sem);          // if (count > 0) count -= 1
                 cco_release_semaphore(cco_semaphore* sem);          // "Signal" the semaphore (count += 1)
+                cco_await_semaphore(cco_semaphore* sem);            // Await for the semaphore count > 0, then count -= 1
 ```
 #### Interoperability with iterators and filters
 ```c++
@@ -92,7 +91,8 @@ cco_semaphore   cco_make_semaphore(long value);                     // Create se
 |`cco_runtime`      | Struct type | Runtime object to manage cco_taskrunner states |
 
 ## Rules
-1. Avoid declaring local variables within a `cco_routine` scope. Place them in the coroutine struct. Be particularly careful with control variables in loops.
+1. Avoid declaring local variables within a `cco_routine` scope. They are only alive until next `cco_yield*` or `cco_await*`
+suspension point. Normally place them in the coroutine struct. Be particularly careful with control variables in loops.
 2. Do not call ***cco_yield\**** or ***cco_await\**** inside a `switch` statement within a
 `cco_routine` scope. In general, use `if-else-if` to avoid this trap.
 3. Do not call ***cco_yield\**** or ***cco_await\**** after the `cco_finally:` label.
@@ -115,7 +115,7 @@ or await from a deeply nested coroutine call by utilizing extended `cco_task` st
 ----
 ### Generators
 
-Although there are no specific support for generator coroutines, a minimal generator is trivial
+There are no specific framework support for generator coroutines, still a minimal generator is trivial
 to write:
 
 [ [Run this code](https://godbolt.org/z/xMf3d44Gz) ]
@@ -197,25 +197,30 @@ int main(void) {
 ### Actor models of concurrency in video games and simulations
 A common usage of coroutines is long-running concurrent tasks, often found in video games. An example of this is the
 [Dining philosopher's problem](https://en.wikipedia.org/wiki/Dining_philosophers_problem). The following
-implementation uses `cco_await_*()` for timers and semaphores:
+implementation uses `cco_await*()` and `cco_yield`. It avoids deadlocks because it waits until both forks are
+available before aquiring them. It also avoids starvation as the neighbor's hunger increases for each "round".
+
 <details>
 <summary>The "Dining philosophers" C implementation</summary>
 
-[ [Run this code](https://godbolt.org/z/To4nabh8f) ]
+[ [Run this code](https://godbolt.org/z/WoaMv6js5) ]
 ```c++
 #include <stdio.h>
 #include <time.h>
 #include "stc/random.h"
 #include "stc/coroutine.h"
-
-enum { num_philosophers = 5 };
+// Define the number of philosophers
+enum {num_philosophers = 5};
+enum {ph_thinking, ph_eating, ph_hungry};
 
 // Philosopher coroutine
 struct Philosopher {
     int id;
     cco_timer tm;
-    cco_semaphore* left_fork;
-    cco_semaphore* right_fork;
+    int state;
+    int hunger;
+    struct Philosopher* left;
+    struct Philosopher* right;
     cco_state cco; // required
 };
 
@@ -225,18 +230,22 @@ int Philosopher(struct Philosopher* self) {
         while (1) {
             duration = 1.0 + crand64_real()*2.0;
             printf("Philosopher %d is thinking for %.0f minutes...\n", self->id, duration*10);
+            self->hunger = 0;
+            self->state = ph_thinking;
             cco_await_timer_sec(&self->tm, duration);
 
             printf("Philosopher %d is hungry...\n", self->id);
-            cco_await_semaphore(self->left_fork);
-            cco_await_semaphore(self->right_fork);
+            self->state = ph_hungry;
+            cco_await(self->hunger >= self->left->hunger &&
+                      self->hunger >= self->right->hunger);
+            self->left->hunger++; // don't starve the neighbours
+            self->right->hunger++;
 
             duration = 0.5 + crand64_real();
             printf("Philosopher %d is eating for %.0f minutes...\n", self->id, duration*10);
+            self->hunger = INT32_MAX;
+            self->state = ph_eating;
             cco_await_timer_sec(&self->tm, duration);
-
-            cco_release_semaphore(self->left_fork);
-            cco_release_semaphore(self->right_fork);
         }
 
         cco_finally:
@@ -247,7 +256,6 @@ int Philosopher(struct Philosopher* self) {
 
 // Dining coroutine
 struct Dining {
-    cco_semaphore forks[num_philosophers]; // controls when forks are available
     struct Philosopher philos[num_philosophers];
     cco_state cco; // required
 };
@@ -255,17 +263,16 @@ struct Dining {
 int Dining(struct Dining* self) {
     cco_routine (self) {
         for (int i = 0; i < num_philosophers; ++i) {
-            cco_set_semaphore(&self->forks[i], 1); // all forks available
             cco_reset(&self->philos[i]);
             self->philos[i].id = i + 1;
-            self->philos[i].left_fork = &self->forks[i];
-            self->philos[i].right_fork = &self->forks[(i + 1) % num_philosophers];
+            self->philos[i].left = &self->philos[i];
+            self->philos[i].right = &self->philos[(i + 1) % num_philosophers];
         }
 
         while (1) {
             // NB! local i OK here as it does not cross yield/await.
             for (int i = 0; i < num_philosophers; ++i) {
-                Philosopher(&self->philos[i]); // resume philosopher
+                Philosopher(&self->philos[i]); // resume until next yield
             }
             cco_yield; // suspend, return control back to caller who
                        // can do other tasks before resuming dining.
@@ -274,7 +281,7 @@ int Dining(struct Dining* self) {
         cco_finally:
         for (int i = 0; i < num_philosophers; ++i) {
             cco_stop(&self->philos[i]);
-            Philosopher(&self->philos[i]); // execute cco_finally.
+            Philosopher(&self->philos[i]); // execute philos. cco_finally.
         }
         puts("Dining done");
     }
@@ -298,9 +305,9 @@ int main(void)
 
 ----
 ### Task coroutines (function objects) and error handling
-Tasks are coroutine objects which contains a function pointer. A task can await another task (asymmetric call).
-This allows for proper error handling, i.e. an error can be thrown, which will unwind the call stack
-where the error can be catched (handled).
+Tasks are coroutine objects which contains a typesafe function pointer. A task can await another task
+(asymmetric call). This allows for proper error handling, i.e. an error can be thrown, which will unwind
+the call stack where the error can be catched (handled).
 
 <details>
 <summary>Implementation of nested awaiting coroutines with error handling</summary>
@@ -502,25 +509,29 @@ The task-objects have the added benefit that coroutines can be managed by a sche
 which is useful when dealing with large numbers of coroutines (like in simulations).
 Below is a simple coroutine scheduler using a queue. It sends the suspended coroutines
 to the end of the queue, and resumes the coroutine in the front.
-Note that the scheduler awaits the next CCO_YIELD to be returned, not only the default CCO_DONE.
+Note that the scheduler awaits the next CCO_YIELD to be returned, not *only* the default CCO_DONE
+(in the code below, `| CCO_DONE` is redundant and only to show how to await for multiple/custom bit-values).
+
+This example allocates the coroutine frames and the queue on the heap, so it may be executed in
+another thread/scope which outlives the scope that it was created.
 
 <details>
 <summary>Scheduled coroutines implementation</summary>
 
-[ [Run this code](https://godbolt.org/z/f46W66dad) ]
+[ [Run this code](https://godbolt.org/z/6xffYoPaT) ]
 ```c++
-// https://www.youtube.com/watch?v=8sEe-4tig_A
+// Based on https://www.youtube.com/watch?v=8sEe-4tig_A
 #include <stdio.h>
 #include "stc/coroutine.h"
 
 #define i_type Tasks, cco_task*
-#define i_keydrop(x) free(*x) // { puts("free task"); free(*x); }
+#define i_keydrop(p) free(*p) // { puts("free task"); free(*p); }
 #define i_no_clone
 #include "stc/queue.h"
 
 cco_task_struct (Scheduler) {
     Scheduler_state cco;
-    cco_task* pulled;
+    cco_task* _pulled;
     Tasks tasks;
 };
 
@@ -536,14 +547,14 @@ cco_task_struct (TaskX) {
 int scheduler(struct Scheduler* self, cco_runtime* rt) {
     cco_routine (self) {
         while (!Tasks_is_empty(&self->tasks)) {
-            self->pulled = Tasks_pull(&self->tasks);
+            self->_pulled = Tasks_pull(&self->tasks);
 
-            cco_await_task(self->pulled, rt, CCO_YIELD);
+            cco_await_task(self->_pulled, rt, CCO_YIELD | CCO_DONE);
 
             if (rt->result == CCO_YIELD) {
-                Tasks_push(&self->tasks, self->pulled);
+                Tasks_push(&self->tasks, self->_pulled);
             } else { // CCO_DONE
-                Tasks_value_drop(&self->pulled);
+                Tasks_value_drop(&self->_pulled);
             }
         }
 
@@ -562,9 +573,10 @@ static int taskX(struct TaskX* self, cco_runtime* rt) {
         printf("%c is back doing work\n", self->id);
         cco_yield;
         printf("%c is back doing more work\n", self->id);
+        cco_yield;
 
         cco_finally:
-        printf("%c done\n", self->id);
+        printf("%c is done\n", self->id);
     }
     return 0;
 }
@@ -573,30 +585,35 @@ static int taskA(struct TaskA* self, cco_runtime* rt) {
     cco_routine (self) {
         puts("Hello from task A");
         cco_yield;
+        puts("A is back doing work");
+        cco_yield;
         puts("A adds task C");
-        { Tasks* tasks = (Tasks *)rt->context;
-          Tasks_push(tasks, cco_cast_task(c_new(struct TaskX, {.cco={taskX}, .id='C'}))); }
+        Tasks *_tasks = (Tasks *)rt->context; // local var only alive until cco_yield.
+        Tasks_push(_tasks, cco_cast_task(c_new(struct TaskX, {.cco={taskX}, .id='C'})));
         cco_yield;
         puts("A is back doing more work");
         cco_yield;
-        puts("A is back doing even more work");
 
         cco_finally:
-        puts("A done");
+        puts("A is done");
     }
     return 0;
 }
 
 int main(void) {
-    struct Scheduler schedule = {
+    // Allocate everything on the heap, so it could be ran in another thread.
+    struct Scheduler* schedule = c_new(struct Scheduler, {
         .cco={scheduler},
         .tasks = c_make(Tasks, {
             cco_cast_task(c_new(struct TaskA, {.cco={taskA}})),
             cco_cast_task(c_new(struct TaskX, {.cco={taskX}, .id='B'})),
         })
-    };
+    });
 
-    cco_run_task(&schedule, &schedule.tasks);
+    cco_run_task(schedule, &schedule->tasks);
+
+    // schedule is now cleaned up/destructed, free heap mem.
+    free(schedule);
 }
 ```
 

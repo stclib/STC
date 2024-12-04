@@ -3,12 +3,14 @@
 
 # STC - Smart Template Containers
 
-### Version 5.0 RC4
+### Version 5.0 RC5
+*This library is a tribute to the C language and its creator, Dennis M. Ritchie.*
 
-STC is a *modern*, *typesafe* and *fast* general purpose container and algorithms library
-for C99. This library aims to elevate C-programming to be even more fun, highly productive,
-less error-prone by encouraging broad usage of fundamental abstractions for loops, type-safe
-generic datatypes and algorithms.
+STC is a *modern*, *typesafe* and *fast* templated general purpose container and algorithms
+library for C99. It aims to elevate C-programming to be even more fun, more productive, and
+substantially safer due to the encouragement of broad usage of loop abstractions, typesafe
+high-level generic datatypes and algorithms, and through consistent handling of
+object ownership and lifetimes.
 
 Containers
 ----------
