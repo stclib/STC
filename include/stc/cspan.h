@@ -67,17 +67,18 @@ typedef isize _isize_triple[3];
 
 #define using_cspan(...) c_MACRO_OVERLOAD(using_cspan, __VA_ARGS__)
 #define using_cspan_2(Self, T) \
-    using_cspan_with_eq(Self, T, c_default_eq)
+    using_cspan_3(Self, T, 1); \
+    STC_INLINE Self Self##_with_n(Self##_value* values, isize n) \
+        { return (Self)cspan_with_n(values, n); } \
+    struct stc_nostruct
+
 #define using_cspan_with_eq(Self, T, i_eq) \
     using_cspan_4(Self, T, 1, i_eq); \
-    STC_INLINE Self Self##_with_n(Self##_value* values, isize n) { \
-        return (Self)cspan_with_n(values, n); \
-    } \
+    STC_INLINE Self Self##_with_n(Self##_value* values, isize n) \
+        { return (Self)cspan_with_n(values, n); } \
     struct stc_nostruct
 
 #define using_cspan_3(Self, T, RANK) \
-    using_cspan_4(Self, T, RANK, c_default_eq)
-#define using_cspan_no_eq(Self, T, RANK) \
     typedef T Self##_value; \
     typedef T Self##_raw; \
     typedef struct { \
@@ -116,7 +117,7 @@ typedef isize _isize_triple[3];
     struct stc_nostruct
 
 #define using_cspan_4(Self, T, RANK, i_eq) \
-    using_cspan_no_eq(Self, T, RANK); \
+    using_cspan_3(Self, T, RANK); \
     STC_INLINE bool Self##_eq(const Self* x, const Self* y) { \
         if (memcmp(x->shape, y->shape, sizeof x->shape) != 0) \
             return false; \
