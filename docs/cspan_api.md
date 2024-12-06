@@ -16,30 +16,30 @@ See also C++
 ## Header file and declaration
 **cspan** types are defined by the *using_cspan()* macro after the header is included.
 This is different from other containers where template parameters are defined prior to
-including each container. This works well mainly because cspan is non-owning.
+including each container. This works well mainly because cspan is a non-owning type.
 ```c++
 #include "stc/cspan.h"
-using_cspan(SpanType, ValueType);        // Define a 1-d SpanType with ValueType elements.
-using_cspan(SpanTypeN, ValueType, RANK); // Define multi-dimensional span with RANK.
-                                         // RANK is the constant number of dimensions
-                                         // Assumes element types are comparable with the == op.
-using_cspan(SpanTypeN, ValueType, RANK, Eq);    // Supply a custom equality function
-using_cspan_no_eq(SpanTypeN, ValueType, RANK);  // No cspan equality test support.
+using_cspan(SpanType, ValueType);                       // Define a 1-d span with ValueType elements.
+using_cspan(SpanTypeN, ValueType, RANK);                // Define multi-dimensional span with RANK.
+                                                        // RANK is the number (constant) of dimensions
+                                                        // Has no equality test support.
+using_cspan_with_eq(SpanType, ValueType, eq);           // Define a 1-d span with equality function support
+using_cspan_with_eq(SpanTypeN, ValueType, eq, RANK);    // Define span with equality function support
 
 // Shorthands:
-using_cspan2(S, ValueType);              // Define span types S, S2 with ranks 1, 2.
-using_cspan3(S, ValueType);              // Define span types S, S2, S3 with ranks 1, 2, 3.
-using_cspan4(S, ValueType);              // Define span types S, S2, S3, S4 with ranks 1, 2, 3, 4.
+using_cspan2(S, ValueType);                            // Define span types S, S2 with ranks 1, 2.
+using_cspan3(S, ValueType);                            // Define span types S, S2, S3 with ranks 1, 2, 3.
+
+using_cspan2_with_eq(S, ValueType, eq);                // As above, but with equality function support
+using_cspan3_with_eq(S, ValueType, eq);                // Use c_default_eq for primary type elements.
 ```
 ## Methods
 
-All functions are type-safe. NOTE: the span argument itself is generally **not** side-effect safe -
-it may be expanded multiple times. However, all index arguments are safe, e.g.
-`cspan_at(&ms3, i++, j++, k++)` is safe, but `cspan_at(&spans[n++], i, j)` is an error! If the number
-of arguments does not match the span rank, a compile error is issued. Runtime bounds checks are enabled
-by default (define `STC_NDEBUG` or `NDEBUG` to disable).
+All index arguments are side-effect safe, e.g. `*cspan_at(&ms3, i++, j++, k++)` is safe, however `*cspan_at(&spans[n++], i, j)`
+is an error, i.e. the *span* argument itself is not side-effect safe. If the number of arguments does not match the span rank,
+a compile error is issued. Runtime bounds checks are enabled by default (define `STC_NDEBUG` or `NDEBUG` to disable).
 ```c++
-SpanType        c_make(<TYPE> SpanType, {v1, v2, ...});             // initialize a 1-d cspan from value list
+SpanType        c_make(<TYPE> SpanType, {v1, v2, ...});             // make a 1-d cspan from value list
 SpanType        cspan_make(<TYPE> SpanType, {v1, v2, ...});         // make a static 1-d cspan from value list
 SpanType        cspan_with_n(ValueType* ptr, int32 n);              // make a 1-d cspan from a pointer and length
 SpanType        cspan_from_array(ValueType array[]);                // make a 1-d cspan from a C array

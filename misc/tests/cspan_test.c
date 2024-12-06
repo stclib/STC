@@ -2,9 +2,7 @@
 #include "stc/cspan.h"
 #include "ctest.h"
 
-using_cspan_with_eq(Span, int, c_default_eq);
-using_cspan(Span2, int, 2, c_default_eq);
-using_cspan(Span3, int, 3, c_default_eq);
+using_cspan3_with_eq(Span, int, c_default_eq);
 
 TEST(cspan, subdim) {
     int array[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
