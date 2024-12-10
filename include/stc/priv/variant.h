@@ -31,7 +31,7 @@ typedef struct {
     int32 v1, v2;
 } RunFunc;
 
-c_variant_type (Action,
+c_sumtype (Action,
     (ActionSpeak, cstr),
     (ActionQuit, bool),
     (ActionRunFunc, RunFunc)
@@ -91,11 +91,11 @@ int main(void) {
 #define c_EVAL(...) _c_E2(_c_E2(_c_E2(_c_E2(_c_E2(_c_E2(__VA_ARGS__))))))
 #define c_LOOP(f,T,x,...) _c_CHECK(_c_LOOP0, c_JOIN(_c_LOOP_END_, c_NUMARGS x))(f,T,x,__VA_ARGS__)
 
-#define _c_vartuple_tag(T, Ident, ...) Ident##_tag,
-#define _c_vartuple_type(T, Ident, ...) typedef __VA_ARGS__ Ident##_type; typedef T Ident##_variant;
-#define _c_vartuple_var(T, Ident, ...) struct { uint8_t _tag; Ident##_type _var; } Ident;
+#define _c_vartuple_tag(T, Choice, ...) Choice##_tag,
+#define _c_vartuple_type(T, Choice, ...) typedef __VA_ARGS__ Choice##_type; typedef T Choice##_sumtype;
+#define _c_vartuple_var(T, Choice, ...) struct { uint8_t _tag; Choice##_type _var; } Choice;
 
-#define c_variant_type(T, ...) \
+#define c_sumtype(T, ...) \
     typedef union T T; \
     c_EVAL(c_LOOP(_c_vartuple_type, T,  __VA_ARGS__, (0))) \
     enum { T##_nulltag, c_EVAL(c_LOOP(_c_vartuple_tag, T, __VA_ARGS__, (0))) }; \
@@ -108,18 +108,18 @@ int main(void) {
     for (void *_match = (void *)(variant); _match != NULL; _match = NULL) \
     switch ((variant)->_current._tag)
 
-#define c_of(Ident, x) \
-    break; case Ident##_tag: \
-    for (Ident##_type *x = &((Ident##_variant *)_match)->Ident._var; x != NULL; x = NULL)
+#define c_of(Choice, x) \
+    break; case Choice##_tag: \
+    for (Choice##_type *x = &((Choice##_sumtype *)_match)->Choice._var; x != NULL; x = NULL)
 
 #define c_otherwise \
     break; default:
 
-#define c_variant(Ident, ...) \
-    ((Ident##_variant){.Ident={._tag=Ident##_tag, ._var=__VA_ARGS__}})
+#define c_variant(Choice, ...) \
+    ((Choice##_sumtype){.Choice={._tag=Choice##_tag, ._var=__VA_ARGS__}})
 
-#define c_variant_holds(Ident, variant) \
-    ((variant)->Ident._tag == Ident##_tag)
+#define c_variant_holds(Choice, variant) \
+    ((variant)->Choice._tag == Choice##_tag)
 
 #define c_variant_tag(variant) \
     ((variant)->_current._tag)
