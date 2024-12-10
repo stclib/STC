@@ -32,30 +32,30 @@ typedef struct {
 } RunFunc;
 
 c_variant (Action,
-    (Speak, cstr),
-    (Quit, bool),
-    (RunFunc, RunFunc)
+    (ActionSpeak, cstr),
+    (ActionQuit, bool),
+    (ActionRunFunc, RunFunc)
 );
 
 void Action_drop(Action* self) {
     c_match (self) {
-        c_of(Speak, x) cstr_drop(x);
+        c_of(ActionSpeak, x) cstr_drop(x);
     }
 }
 
 int main(void) {
-    Action act1 = c_make_variant(Speak, cstr_from("Hello"));
-    Action act2 = c_make_variant(Quit, true);
+    Action act1 = c_make_variant(ActionSpeak, cstr_from("Hello"));
+    Action act2 = c_make_variant(ActionQuit, true);
 
     c_foritems (i, Action*, {&act1, &act2})
     c_match (*i.ref) {
-        c_of(Speak, value) {
+        c_of(ActionSpeak, value) {
             printf("Asked to speak: %s\n", cstr_str(value));
         }
-        c_of(Quit, value) {
+        c_of(ActionQuit, value) {
             printf("Asked to quit!\n");
         }
-        c_of(RunFunc, r) {
+        c_of(ActionRunFunc, r) {
             int32 res = r->func(r->v1, r->v2);
             printf("v1 : %d, v2: %d, res: %d\n", r->v1, r->v2, res);
         }
@@ -84,14 +84,14 @@ int main(void) {
 #define c_EVAL(...) _c_E2(_c_E2(_c_E2(_c_E2(_c_E2(_c_E2(__VA_ARGS__))))))
 #define c_LOOP(T,f,x,...) _c_CHECK(_c_LOOP0, c_JOIN(_c_LOOP_END_, c_NUMARGS x))(T,f,x,__VA_ARGS__)
 
-#define _c_vartuple_enum(T, Value, type) Value##_vartag,
+#define _c_vartuple_tag(T, Value, type) Value##_vartag,
 #define _c_vartuple_type(T, Value, type) typedef type Value##_vartype; typedef union T Value##_variant;
 #define _c_vartuple_var(T, Value, type) struct { uint8_t tag; Value##_vartype var; } Value;
 
 #define c_variant(T, ...) \
     typedef union T T; \
     c_EVAL(c_LOOP(T, _c_vartuple_type, __VA_ARGS__, (0))) \
-    enum { T##_dummy, c_EVAL(c_LOOP(T, _c_vartuple_enum, __VA_ARGS__, (0))) }; \
+    enum { T##_dummytag, c_EVAL(c_LOOP(T, _c_vartuple_tag, __VA_ARGS__, (0))) }; \
     union T { \
         struct { uint8_t tag; } _dummy; \
         c_EVAL(c_LOOP(T, _c_vartuple_var, __VA_ARGS__, (0))) \
