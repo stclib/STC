@@ -53,7 +53,7 @@ int32 Run(int32 a, int32 b) {
 int main(void) {
     Action act1 = c_variant(ActionSpeak, cstr_from("Hello"));
     Action act2 = c_variant(ActionQuit, true);
-    Action act3 = c_variant(ActionRunFunc, {Run, 9, 11});
+    Action act3 = c_variant(ActionRunFunc, {Run, 3, 33});
 
     c_foritems (i, Action*, {&act1, &act2, &act3})
     c_match (*i.ref) {
