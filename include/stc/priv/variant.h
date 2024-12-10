@@ -78,24 +78,22 @@ int main(void) {
 
 #include "stc/common.h"
 
-#define c_STRIP_PARENS(X) _c_STRIP_PARENS( _c_E1 X )
-#define c_CALL(f, ...) f(__VA_ARGS__)
-#define _c_STRIP_PARENS(X) X
 #define _c_EMPTY()
+#define _c_CALL(f, ...) f(__VA_ARGS__)
+#define _c_LOOP_INDIRECTION() c_LOOP
+#define _c_LOOP_END_1 ,_c_LOOP1
+#define _c_LOOP0(T,f,x,...) _c_CALL(f, T, c_EXPAND x) _c_LOOP_INDIRECTION _c_EMPTY()()(T,f,__VA_ARGS__)
+#define _c_LOOP1(...)
 #define _c_TUPLE_AT_1(x,y,...) y
 #define _c_CHECK(x,...) _c_TUPLE_AT_1(__VA_ARGS__,x,)
-#define _c_LOOP_END_1 ,_c_LOOP1
-#define _c_LOOP_INDIRECTION() c_LOOP
-#define _c_LOOP0(T,f,x,...) c_CALL(f, T, c_STRIP_PARENS(x)) _c_LOOP_INDIRECTION _c_EMPTY()() (T,f,__VA_ARGS__)
-#define _c_LOOP1(...)
 #define _c_E1(...) __VA_ARGS__
 #define _c_E2(...) _c_E1(_c_E1(_c_E1(_c_E1(_c_E1(_c_E1(__VA_ARGS__))))))
 #define c_EVAL(...) _c_E2(_c_E2(_c_E2(_c_E2(_c_E2(_c_E2(__VA_ARGS__))))))
 #define c_LOOP(T,f,x,...) _c_CHECK(_c_LOOP0, c_JOIN(_c_LOOP_END_, c_NUMARGS x))(T,f,x,__VA_ARGS__)
 
-#define _c_vartuple_tag(T, Ident, Type) Ident##_tag,
-#define _c_vartuple_type(T, Ident, Type) typedef Type Ident##_type; typedef T Ident##_variant;
-#define _c_vartuple_var(T, Ident, Type) struct { uint8_t _tag; Ident##_type _var; } Ident;
+#define _c_vartuple_tag(T, Ident, ...) Ident##_tag,
+#define _c_vartuple_type(T, Ident, ...) typedef __VA_ARGS__ Ident##_type; typedef T Ident##_variant;
+#define _c_vartuple_var(T, Ident, ...) struct { uint8_t _tag; Ident##_type _var; } Ident;
 
 #define c_variant_type(T, ...) \
     typedef union T T; \

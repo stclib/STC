@@ -219,6 +219,14 @@ int main(void)
 
 ## Generic algorithms
 
+
+<details>
+<summary><b>Variant</b> - automated tagged union</summary>
+
+### Variant
+
+</details>
+
 <details>
 <summary><b>c_func</b> - Function with on-the-fly defined return type</summary>
 
