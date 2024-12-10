@@ -353,7 +353,7 @@ typedef struct { ptrdiff_t count; } cco_semaphore;
 #define cco_await_semaphore(sem) \
     do { \
         cco_await((sem)->count > 0); \
-        --(sem)->count; \
+        cco_acquire_semaphore(sem); \
     } while (0)
 
 
