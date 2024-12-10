@@ -31,7 +31,7 @@ typedef struct {
     int32 v1, v2;
 } RunFunc;
 
-c_variant (Action,
+c_variant_type (Action,
     (ActionSpeak, cstr),
     (ActionQuit, bool),
     (ActionRunFunc, RunFunc)
@@ -51,9 +51,9 @@ int32 Run(int32 a, int32 b) {
 }
 
 int main(void) {
-    Action act1 = c_make_variant(ActionSpeak, cstr_from("Hello"));
-    Action act2 = c_make_variant(ActionQuit, true);
-    Action act3 = c_make_variant(ActionRunFunc, {Run, 9, 11});
+    Action act1 = c_variant(ActionSpeak, cstr_from("Hello"));
+    Action act2 = c_variant(ActionQuit, true);
+    Action act3 = c_variant(ActionRunFunc, {Run, 9, 11});
 
     c_foritems (i, Action*, {&act1, &act2, &act3})
     c_match (*i.ref) {
@@ -96,7 +96,7 @@ int main(void) {
 #define _c_vartuple_type(T, Value, type) typedef type Value##_vartype; typedef union T Value##_variant;
 #define _c_vartuple_var(T, Value, type) struct { uint8_t tag; Value##_vartype var; } Value;
 
-#define c_variant(T, ...) \
+#define c_variant_type(T, ...) \
     typedef union T T; \
     c_EVAL(c_LOOP(T, _c_vartuple_type, __VA_ARGS__, (0))) \
     enum { T##_dummytag, c_EVAL(c_LOOP(T, _c_vartuple_tag, __VA_ARGS__, (0))) }; \
@@ -116,7 +116,7 @@ int main(void) {
 #define c_otherwise \
     break; default:
 
-#define c_make_variant(Value, ...) \
+#define c_variant(Value, ...) \
     ((Value##_variant){.Value={.tag=Value##_vartag, .var=__VA_ARGS__}})
 
 #endif // STC_VARIANT_H_INCLUDED
