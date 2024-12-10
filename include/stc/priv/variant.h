@@ -39,15 +39,23 @@ c_variant (Action,
 
 void Action_drop(Action* self) {
     c_match (self) {
-        c_of(ActionSpeak, x) cstr_drop(x);
+        c_of(ActionSpeak, x) {
+            printf("dropping %s\n", cstr_str(x));
+            cstr_drop(x);
+        }
     }
+}
+
+int32 Run(int32 a, int32 b) {
+    return a*b;
 }
 
 int main(void) {
     Action act1 = c_make_variant(ActionSpeak, cstr_from("Hello"));
     Action act2 = c_make_variant(ActionQuit, true);
+    Action act3 = c_make_variant(ActionRunFunc, {Run, 9, 11});
 
-    c_foritems (i, Action*, {&act1, &act2})
+    c_foritems (i, Action*, {&act1, &act2, &act3})
     c_match (*i.ref) {
         c_of(ActionSpeak, x) {
             printf("Asked to speak: %s\n", cstr_str(x));
@@ -57,11 +65,11 @@ int main(void) {
         }
         c_of(ActionRunFunc, r) {
             int32 res = r->func(r->v1, r->v2);
-            printf("v1 : %d, v2: %d, res: %d\n", r->v1, r->v2, res);
+            printf("v1: %d, v2: %d, res: %d\n", r->v1, r->v2, res);
         }
         c_otherwise assert(!"no match");
     }
-    c_drop(Action, &act1, &act2);
+    c_drop(Action, &act1, &act2, &act3);
 }
 */
 #ifndef STC_VARIANT_H_INCLUDED
@@ -108,7 +116,7 @@ int main(void) {
 #define c_otherwise \
     break; default:
 
-#define c_make_variant(Value, value) \
-    ((Value##_variant){.Value={.tag=Value##_vartag, .var=value}})
+#define c_make_variant(Value, ...) \
+    ((Value##_variant){.Value={.tag=Value##_vartag, .var=__VA_ARGS__}})
 
 #endif // STC_VARIANT_H_INCLUDED
