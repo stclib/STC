@@ -39,21 +39,21 @@ c_variant_type (Action,
 
 void Action_drop(Action* self) {
     c_match (self) {
-        c_of(ActionSpeak, x) {
-            printf("dropping %s\n", cstr_str(x));
-            cstr_drop(x);
-        }
+        c_of(ActionSpeak, x) cstr_drop(x);
     }
 }
 
-int32 Run(int32 a, int32 b) {
-    return a*b;
+int32 add(int32 a, int32 b) {
+    return a + b;
 }
 
 int main(void) {
     Action act1 = c_variant(ActionSpeak, cstr_from("Hello"));
     Action act2 = c_variant(ActionQuit, true);
-    Action act3 = c_variant(ActionRunFunc, {Run, 3, 33});
+    Action act3 = c_variant(ActionRunFunc, {add, 29, 13});
+
+    c_assert(c_variant_holds(ActionQuit, &act2));
+    printf("ActionQuit tag: %d\n", c_variant_tag(&act2));
 
     c_foritems (i, Action*, {&act1, &act2, &act3})
     c_match (*i.ref) {
@@ -69,6 +69,7 @@ int main(void) {
         }
         c_otherwise assert(!"no match");
     }
+
     c_drop(Action, &act1, &act2, &act3);
 }
 */
@@ -92,31 +93,37 @@ int main(void) {
 #define c_EVAL(...) _c_E2(_c_E2(_c_E2(_c_E2(_c_E2(_c_E2(__VA_ARGS__))))))
 #define c_LOOP(T,f,x,...) _c_CHECK(_c_LOOP0, c_JOIN(_c_LOOP_END_, c_NUMARGS x))(T,f,x,__VA_ARGS__)
 
-#define _c_vartuple_tag(T, Value, type) Value##_vartag,
-#define _c_vartuple_type(T, Value, type) typedef type Value##_vartype; typedef union T Value##_variant;
-#define _c_vartuple_var(T, Value, type) struct { uint8_t tag; Value##_vartype var; } Value;
+#define _c_vartuple_tag(T, Ident, Type) Ident##_tag,
+#define _c_vartuple_type(T, Ident, Type) typedef Type Ident##_type; typedef T Ident##_variant;
+#define _c_vartuple_var(T, Ident, Type) struct { uint8_t _tag; Ident##_type _var; } Ident;
 
 #define c_variant_type(T, ...) \
     typedef union T T; \
     c_EVAL(c_LOOP(T, _c_vartuple_type, __VA_ARGS__, (0))) \
-    enum { T##_dummytag, c_EVAL(c_LOOP(T, _c_vartuple_tag, __VA_ARGS__, (0))) }; \
+    enum { T##_nulltag, c_EVAL(c_LOOP(T, _c_vartuple_tag, __VA_ARGS__, (0))) }; \
     union T { \
-        struct { uint8_t tag; } _dummy; \
+        struct { uint8_t _tag; } _current; \
         c_EVAL(c_LOOP(T, _c_vartuple_var, __VA_ARGS__, (0))) \
     }
 
 #define c_match(variant) \
     for (void *_match = (void *)(variant); _match != NULL; _match = NULL) \
-    switch ((variant)->_dummy.tag)
+    switch ((variant)->_current._tag)
 
-#define c_of(Value, x) \
-    break; case Value##_vartag: \
-    for (Value##_vartype *x = &((Value##_variant *)_match)->Value.var; x != NULL; x = NULL)
+#define c_of(Ident, x) \
+    break; case Ident##_tag: \
+    for (Ident##_type *x = &((Ident##_variant *)_match)->Ident._var; x != NULL; x = NULL)
 
 #define c_otherwise \
     break; default:
 
-#define c_variant(Value, ...) \
-    ((Value##_variant){.Value={.tag=Value##_vartag, .var=__VA_ARGS__}})
+#define c_variant(Ident, ...) \
+    ((Ident##_variant){.Ident={._tag=Ident##_tag, ._var=__VA_ARGS__}})
+
+#define c_variant_holds(Ident, variant) \
+    ((variant)->Ident._tag == Ident##_tag)
+
+#define c_variant_tag(variant) \
+    ((variant)->_current._tag)
 
 #endif // STC_VARIANT_H_INCLUDED
