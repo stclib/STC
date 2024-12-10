@@ -96,6 +96,7 @@ install_headers(
   'include/stc/priv/template2.h',
   'include/stc/priv/utf8_prv.h',
   'include/stc/priv/utility.h',
+  'include/stc/priv/variant.h',
   subdir: 'stc/priv',
 )
 

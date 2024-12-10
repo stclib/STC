@@ -24,7 +24,7 @@
 // https://stackoverflow.com/questions/70935435/how-to-create-variants-in-rust
 #include <stdio.h>
 #include "stc/cstr.h"
-#include "stc/variant.h"
+#include "stc/algorithm.h"
 
 typedef struct {
     int32 (*func)(int32, int32);
@@ -49,10 +49,10 @@ int main(void) {
 
     c_foritems (i, Action*, {&act1, &act2})
     c_match (*i.ref) {
-        c_of(ActionSpeak, value) {
-            printf("Asked to speak: %s\n", cstr_str(value));
+        c_of(ActionSpeak, x) {
+            printf("Asked to speak: %s\n", cstr_str(x));
         }
-        c_of(ActionQuit, value) {
+        c_of(ActionQuit, x) {
             printf("Asked to quit!\n");
         }
         c_of(ActionRunFunc, r) {
