@@ -95,6 +95,8 @@ int main(void) {
 #define _c_vartuple_type(T, Choice, ...) typedef __VA_ARGS__ Choice##_type; typedef T Choice##_sumtype;
 #define _c_vartuple_var(T, Choice, ...) struct { uint8_t _tag; Choice##_type _var; } Choice;
 
+typedef union { struct { uint8_t _tag; } _current; } c_base_variant;
+
 #define c_sumtype(T, ...) \
     typedef union T T; \
     c_EVAL(c_LOOP(_c_vartuple_type, T,  __VA_ARGS__, (0),)) \
@@ -105,8 +107,9 @@ int main(void) {
     }
 
 #define c_match(variant) \
-    for (void *_match = (void *)(variant); _match != NULL; _match = NULL) \
-    switch ((variant)->_current._tag)
+    for (c_base_variant* _match = (c_base_variant *)(variant) + 0*sizeof((variant)->_current._tag) \
+         ; _match != NULL ; _match = NULL) \
+    switch (_match->_current._tag)
 
 #define c_of(Choice, x) \
     break; case Choice##_tag: \
