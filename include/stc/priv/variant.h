@@ -26,20 +26,34 @@
 #include "stc/cstr.h"
 #include "stc/algorithm.h"
 
-typedef struct {
-    int32 (*func)(int32, int32);
-    int32 v1, v2;
-} RunFunc;
-
 c_sumtype (Action,
     (ActionSpeak, cstr),
-    (ActionQuit, bool),
-    (ActionRunFunc, RunFunc)
+    (ActionQuit, _Bool),
+    (ActionRunFunc, struct {
+        int32 (*func)(int32, int32);
+        int32 v1, v2;
+    })
 );
 
 void Action_drop(Action* self) {
     c_match (self) {
         c_of(ActionSpeak, x) cstr_drop(x);
+    }
+}
+
+void action(Action* action) {
+    c_match (action) {
+        c_of(ActionSpeak, s) {
+            printf("Asked to speak: %s\n", cstr_str(s));
+        }
+        c_of(ActionQuit, _) {
+            printf("Asked to quit!\n");
+        }
+        c_of(ActionRunFunc, r) {
+            int32 res = r->func(r->v1, r->v2);
+            printf("v1: %d, v2: %d, res: %d\n", r->v1, r->v2, res);
+        }
+        c_otherwise assert(!"no match");
     }
 }
 
@@ -49,26 +63,12 @@ int32 add(int32 a, int32 b) {
 
 int main(void) {
     Action act1 = c_variant(ActionSpeak, cstr_from("Hello"));
-    Action act2 = c_variant(ActionQuit, true);
-    Action act3 = c_variant(ActionRunFunc, {add, 29, 13});
+    Action act2 = c_variant(ActionQuit, 1);
+    Action act3 = c_variant(ActionRunFunc, {add, 5, 6});
 
-    c_assert(c_variant_holds(ActionQuit, &act2));
-    printf("ActionQuit tag: %d\n", c_variant_tag(&act2));
-
-    c_foritems (i, Action*, {&act1, &act2, &act3})
-    c_match (*i.ref) {
-        c_of(ActionSpeak, x) {
-            printf("Asked to speak: %s\n", cstr_str(x));
-        }
-        c_of(ActionQuit, x) {
-            printf("Asked to quit!\n");
-        }
-        c_of(ActionRunFunc, r) {
-            int32 res = r->func(r->v1, r->v2);
-            printf("v1: %d, v2: %d, res: %d\n", r->v1, r->v2, res);
-        }
-        c_otherwise assert(!"no match");
-    }
+    action(&act1);
+    action(&act2);
+    action(&act3);
 
     c_drop(Action, &act1, &act2, &act3);
 }
