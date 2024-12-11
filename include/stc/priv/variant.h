@@ -91,49 +91,52 @@ int main(void) {
 #define c_EVAL(...) _c_E2(_c_E2(_c_E2(_c_E2(_c_E2(_c_E2(__VA_ARGS__))))))
 #define c_LOOP(f,T,x,...) _c_CHECK(_c_LOOP0, c_JOIN(_c_LOOP_END_, c_NUMARGS x))(f,T,x,__VA_ARGS__)
 
-#define _c_vartuple_tag(T, Choice, ...) Choice##_tag,
-#define _c_vartuple_type(T, Choice, ...) typedef __VA_ARGS__ Choice##_type; typedef T Choice##_sumtype;
-#define _c_vartuple_var(T, Choice, ...) struct { uint8_t _tag; Choice##_type _var; } Choice;
+#define _c_vartuple_tag(T, Tag, ...) Tag##_tag_,
+#define _c_vartuple_type(T, Tag, ...) typedef __VA_ARGS__ Tag##_type_; typedef T Tag##_sumtype_;
+#define _c_vartuple_var(T, Tag, ...) struct { uint8_t tag_; Tag##_type_ var_; } Tag;
 
 #define c_sumtype(T, ...) \
     typedef union T T; \
     c_EVAL(c_LOOP(_c_vartuple_type, T,  __VA_ARGS__, (0),)) \
     enum { T##_nulltag, c_EVAL(c_LOOP(_c_vartuple_tag, T, __VA_ARGS__, (0),)) }; \
     union T { \
-        struct { uint8_t _tag; } _current; \
+        struct { uint8_t tag_; } current_; \
         c_EVAL(c_LOOP(_c_vartuple_var, T, __VA_ARGS__, (0),)) \
     }
 
 #if defined __GNUC__ || defined __clang__ || defined __TINYC__ || _MSC_VER >= 1939
     #define c_match(variant) \
         for (__typeof__(variant) _match = (variant); _match; _match = NULL) \
-        switch (_match->_current._tag)
+        switch (_match->current_.tag_)
 
-    #define c_of(Choice, x) \
-        break; case Choice##_tag: \
-        for (Choice##_type *x = &_match->Choice._var; x; x = NULL)
+    #define c_of(Tag, x) \
+        break; case Tag##_tag_: \
+        for (Tag##_type_ *x = &_match->Tag.var_; x; x = NULL)
 #else
-    typedef union { struct { uint8_t _tag; } _current; } c_base_variant;
+    typedef union { struct { uint8_t tag_; } current_; } c_base_variant;
     #define c_match(variant) \
-        for (c_base_variant* _match = (c_base_variant *)(variant) + 0*sizeof((variant)->_current._tag) \
+        for (c_base_variant* _match = (c_base_variant *)(variant) + 0*sizeof((variant)->current_.tag_) \
             ; _match ; _match = NULL) \
-        switch (_match->_current._tag)
+        switch (_match->current_.tag_)
 
-    #define c_of(Choice, x) \
-        break; case Choice##_tag: \
-        for (Choice##_type *x = &((Choice##_sumtype *)_match)->Choice._var; x; x = NULL)
+    #define c_of(Tag, x) \
+        break; case Tag##_tag_: \
+        for (Tag##_type_ *x = &((Tag##_sumtype_ *)_match)->Tag.var_; x; x = NULL)
 #endif
 
 #define c_otherwise \
     break; default:
 
-#define c_variant(Choice, ...) \
-    ((Choice##_sumtype){.Choice={._tag=Choice##_tag, ._var=__VA_ARGS__}})
+#define c_variant(Tag, ...) \
+    ((Tag##_sumtype_){.Tag={.tag_=Tag##_tag_, .var_=__VA_ARGS__}})
 
-#define c_variant_holds(Choice, variant) \
-    ((variant)->Choice._tag == Choice##_tag)
+#define c_holds(Tag, variant) \
+    ((variant)->Tag.tag_ == Tag##_tag_)
 
-#define c_variant_tag(variant) \
-    ((variant)->_current._tag)
+#define c_tag_value(variant) \
+    ((variant)->current_.tag_)
+
+#define c_get(Tag, variant) \
+    (c_assert(c_holds(Tag, variant)), &(variant)->Tag.var_)
 
 #endif // STC_VARIANT_H_INCLUDED
