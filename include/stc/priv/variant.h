@@ -97,11 +97,11 @@ int main(void) {
 
 #define c_sumtype(T, ...) \
     typedef union T T; \
-    c_EVAL(c_LOOP(_c_vartuple_type, T,  __VA_ARGS__, (0))) \
-    enum { T##_nulltag, c_EVAL(c_LOOP(_c_vartuple_tag, T, __VA_ARGS__, (0))) }; \
+    c_EVAL(c_LOOP(_c_vartuple_type, T,  __VA_ARGS__, (0),)) \
+    enum { T##_nulltag, c_EVAL(c_LOOP(_c_vartuple_tag, T, __VA_ARGS__, (0),)) }; \
     union T { \
         struct { uint8_t _tag; } _current; \
-        c_EVAL(c_LOOP(_c_vartuple_var, T, __VA_ARGS__, (0))) \
+        c_EVAL(c_LOOP(_c_vartuple_var, T, __VA_ARGS__, (0),)) \
     }
 
 #define c_match(variant) \
