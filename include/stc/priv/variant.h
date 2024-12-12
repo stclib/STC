@@ -28,7 +28,7 @@
 
 c_sumtype (Action,
     (ActionSpeak, cstr),
-    (ActionQuit, _Bool),
+    (ActionQuit, _enum_),
     (ActionRunFunc, struct {
         int32 (*func)(int32, int32);
         int32 v1, v2;
@@ -87,56 +87,57 @@ int main(void) {
 #define _c_TUPLE_AT_1(x,y,...) y
 #define _c_CHECK(x,...) _c_TUPLE_AT_1(__VA_ARGS__,x,)
 #define _c_E1(...) __VA_ARGS__
-#define _c_E2(...) _c_E1(_c_E1(_c_E1(_c_E1(_c_E1(_c_E1(__VA_ARGS__))))))
-#define c_EVAL(...) _c_E2(_c_E2(_c_E2(_c_E2(_c_E2(_c_E2(__VA_ARGS__))))))
+#define _c_E2(...) _c_E1(_c_E1(_c_E1(_c_E1(_c_E1(_c_E1(_c_E1(__VA_ARGS__)))))))
+#define c_EVAL(...) _c_E2(_c_E2(_c_E2(_c_E2(_c_E2(_c_E2(_c_E2(__VA_ARGS__)))))))
 #define c_LOOP(f,T,x,...) _c_CHECK(_c_LOOP0, c_JOIN(_c_LOOP_END_, c_NUMARGS x))(f,T,x,__VA_ARGS__)
 
-#define _c_vartuple_tag(T, Tag, ...) Tag##_tag_,
-#define _c_vartuple_type(T, Tag, ...) typedef __VA_ARGS__ Tag##_type_; typedef T Tag##_sumtype_;
-#define _c_vartuple_var(T, Tag, ...) struct { uint8_t tag_; Tag##_type_ var_; } Tag;
+#define _c_vartuple_tag(T, Tag, ...) Tag##_tag,
+#define _c_vartuple_type(T, Tag, ...) typedef __VA_ARGS__ Tag##_type; typedef T Tag##_sumtype;
+#define _c_vartuple_var(T, Tag, ...) struct { uint8_t tag; Tag##_type var; } Tag;
 
+#define _enum_ uint8_t
 #define c_sumtype(T, ...) \
     typedef union T T; \
     c_EVAL(c_LOOP(_c_vartuple_type, T,  __VA_ARGS__, (0),)) \
     enum { T##_nulltag, c_EVAL(c_LOOP(_c_vartuple_tag, T, __VA_ARGS__, (0),)) }; \
     union T { \
-        struct { uint8_t tag_; } current_; \
+        struct { uint8_t tag; } _any_; \
         c_EVAL(c_LOOP(_c_vartuple_var, T, __VA_ARGS__, (0),)) \
     }
 
 #if defined __GNUC__ || defined __clang__ || defined __TINYC__ || _MSC_VER >= 1939
     #define c_match(variant) \
         for (__typeof__(variant) _match = (variant); _match; _match = NULL) \
-        switch (_match->current_.tag_)
+        switch (_match->_any_.tag)
 
     #define c_of(Tag, x) \
-        break; case Tag##_tag_: \
-        for (Tag##_type_ *x = &_match->Tag.var_; x; x = NULL)
+        break; case Tag##_tag: \
+        for (Tag##_type *x = &_match->Tag.var; x; x = NULL)
 #else
-    typedef union { struct { uint8_t tag_; } current_; } c_base_variant;
+    typedef union { struct { uint8_t tag; } _any_; } _c_any_variant;
     #define c_match(variant) \
-        for (c_base_variant* _match = (c_base_variant *)(variant) + 0*sizeof((variant)->current_.tag_) \
+        for (_c_any_variant* _match = (_c_any_variant *)(variant) + 0*sizeof((variant)->_any_.tag) \
             ; _match ; _match = NULL) \
-        switch (_match->current_.tag_)
+        switch (_match->_any_.tag)
 
     #define c_of(Tag, x) \
-        break; case Tag##_tag_: \
-        for (Tag##_type_ *x = &((Tag##_sumtype_ *)_match)->Tag.var_; x; x = NULL)
+        break; case Tag##_tag: \
+        for (Tag##_type *x = &((Tag##_sumtype *)_match)->Tag.var; x; x = NULL)
 #endif
 
 #define c_otherwise \
     break; default:
 
 #define c_variant(Tag, ...) \
-    ((Tag##_sumtype_){.Tag={.tag_=Tag##_tag_, .var_=__VA_ARGS__}})
-
-#define c_holds(Tag, variant) \
-    ((variant)->Tag.tag_ == Tag##_tag_)
+    ((Tag##_sumtype){.Tag={.tag=Tag##_tag, .var=__VA_ARGS__}})
 
 #define c_tag_value(variant) \
-    ((variant)->current_.tag_)
+    ((variant)->_any_.tag)
+
+#define c_holds(Tag, variant) \
+    (c_tag_value(variant) == Tag##_tag)
 
 #define c_get(Tag, variant) \
-    (c_assert(c_holds(Tag, variant)), &(variant)->Tag.var_)
+    (c_assert(c_holds(Tag, variant)), &(variant)->Tag.var)
 
 #endif // STC_VARIANT_H_INCLUDED
