@@ -112,8 +112,7 @@ int main(void) {
         switch (_match->_any_.tag)
 
     #define c_of(Tag, x) \
-        break; case Tag: \
-        for (Tag##_valtype *x = &_match->Tag.value; x; x = NULL)
+        break; case Tag: for (Tag##_valtype *x = &_match->Tag.value; x; x = NULL)
 #else
     typedef union { struct { uint8_t tag; } _any_; } _c_any_variant;
     #define c_match(var) \
@@ -125,6 +124,9 @@ int main(void) {
         break; case Tag: \
         for (Tag##_valtype *x = &((Tag##_sumtype *)_match)->Tag.value; x; x = NULL)
 #endif
+
+#define c_or_of(Tag) \
+    ; case Tag:
 
 #define c_otherwise \
     break; default:
