@@ -112,7 +112,8 @@ int main(void) {
         switch (_match->_any_.tag)
 
     #define c_of(Tag, x) \
-        break; case Tag: for (valtype_##Tag *x = &_match->Tag.value; x; x = NULL)
+        break; case Tag: \
+        for (__typeof__(_match->Tag.value)* x = &_match->Tag.value; x; x = NULL)
 #else
     typedef union { struct { uint8_t tag; } _any_; } _c_any_variant;
     #define c_match(var) \
