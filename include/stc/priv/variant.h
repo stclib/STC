@@ -93,14 +93,14 @@ int main(void) {
 #define c_LOOP(f,T,x,...) _c_CHECK(_c_LOOP0, c_JOIN(_c_LOOP_END_, c_NUMARGS x))(f,T,x,__VA_ARGS__)
 
 #define _c_vartuple_tag(T, Tag, ...) Tag,
-#define _c_vartuple_type(T, Tag, ...) typedef __VA_ARGS__ Tag##_valtype; typedef T Tag##_sumtype;
-#define _c_vartuple_var(T, Tag, ...) struct { uint8_t tag; Tag##_valtype value; } Tag;
+#define _c_vartuple_type(T, Tag, ...) typedef __VA_ARGS__ valtype_##Tag; typedef T sumtype_##Tag;
+#define _c_vartuple_var(T, Tag, ...) struct { uint8_t tag; valtype_##Tag value; } Tag;
 
 #define _enum_ uint8_t
 #define c_sumtype(T, ...) \
     typedef union T T; \
     c_EVAL(c_LOOP(_c_vartuple_type, T,  __VA_ARGS__, (0),)) \
-    enum { T##_nulltag, c_EVAL(c_LOOP(_c_vartuple_tag, T, __VA_ARGS__, (0),)) }; \
+    enum enum_##T { null_##T, c_EVAL(c_LOOP(_c_vartuple_tag, T, __VA_ARGS__, (0),)) }; \
     union T { \
         struct { uint8_t tag; } _any_; \
         c_EVAL(c_LOOP(_c_vartuple_var, T, __VA_ARGS__, (0),)) \
@@ -112,7 +112,7 @@ int main(void) {
         switch (_match->_any_.tag)
 
     #define c_of(Tag, x) \
-        break; case Tag: for (Tag##_valtype *x = &_match->Tag.value; x; x = NULL)
+        break; case Tag: for (valtype_##Tag *x = &_match->Tag.value; x; x = NULL)
 #else
     typedef union { struct { uint8_t tag; } _any_; } _c_any_variant;
     #define c_match(var) \
@@ -122,7 +122,7 @@ int main(void) {
 
     #define c_of(Tag, x) \
         break; case Tag: \
-        for (Tag##_valtype *x = &((Tag##_sumtype *)_match)->Tag.value; x; x = NULL)
+        for (valtype_##Tag *x = &((sumtype_##Tag *)_match)->Tag.value; x; x = NULL)
 #endif
 
 #define c_or_of(Tag) \
@@ -132,7 +132,7 @@ int main(void) {
     break; default:
 
 #define c_variant(Tag, ...) \
-    ((Tag##_sumtype){.Tag={.tag=Tag, .value=__VA_ARGS__}})
+    ((sumtype_##Tag){.Tag={.tag=Tag, .value=__VA_ARGS__}})
 
 #define c_tag_index(var) \
     ((var)->_any_.tag)
@@ -141,7 +141,7 @@ int main(void) {
     (c_tag_index(var) == Tag)
 
 #define c_if_holds(var, Tag, x) \
-    for (Tag##_sumtype* _var = (var); _var; _var = NULL) \
-    if (c_holds(_var, Tag)) for (Tag##_valtype *x = &_var->Tag.value; x; x = NULL)
+    for (sumtype_##Tag* _var = (var); _var; _var = NULL) \
+    if (c_holds(_var, Tag)) for (valtype_##Tag *x = &_var->Tag.value; x; x = NULL)
 
 #endif // STC_VARIANT_H_INCLUDED
