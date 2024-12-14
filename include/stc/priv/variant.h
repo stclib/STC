@@ -92,9 +92,9 @@ int main(void) {
 #define c_EVAL(...) _c_E2(_c_E2(_c_E2(_c_E2(__VA_ARGS__))))
 #define c_LOOP(f,T,x,...) _c_CHECK(_c_LOOP0, c_JOIN(_c_LOOP_END_, c_NUMARGS x))(f,T,x,__VA_ARGS__)
 
-#define _c_vartuple_tag(T, Tag, ...) Tag##_vtag,
-#define _c_vartuple_type(T, Tag, ...) typedef __VA_ARGS__ Tag##_vtype; typedef T Tag##_sumtype;
-#define _c_vartuple_var(T, Tag, ...) struct { uint8_t tag; Tag##_vtype variant; } Tag;
+#define _c_vartuple_tag(T, Tag, ...) Tag,
+#define _c_vartuple_type(T, Tag, ...) typedef __VA_ARGS__ Tag##_valtype; typedef T Tag##_sumtype;
+#define _c_vartuple_var(T, Tag, ...) struct { uint8_t tag; Tag##_valtype value; } Tag;
 
 #define _enum_ uint8_t
 #define c_sumtype(T, ...) \
@@ -112,8 +112,8 @@ int main(void) {
         switch (_match->_any_.tag)
 
     #define c_of(Tag, x) \
-        break; case Tag##_vtag: \
-        for (Tag##_vtype *x = &_match->Tag.variant; x; x = NULL)
+        break; case Tag: \
+        for (Tag##_valtype *x = &_match->Tag.value; x; x = NULL)
 #else
     typedef union { struct { uint8_t tag; } _any_; } _c_any_variant;
     #define c_match(var) \
@@ -122,23 +122,24 @@ int main(void) {
         switch (_match->_any_.tag)
 
     #define c_of(Tag, x) \
-        break; case Tag##_vtag: \
-        for (Tag##_vtype *x = &((Tag##_sumtype *)_match)->Tag.variant; x; x = NULL)
+        break; case Tag: \
+        for (Tag##_valtype *x = &((Tag##_sumtype *)_match)->Tag.value; x; x = NULL)
 #endif
 
 #define c_otherwise \
     break; default:
 
 #define c_variant(Tag, ...) \
-    ((Tag##_sumtype){.Tag={.tag=Tag##_vtag, .variant=__VA_ARGS__}})
+    ((Tag##_sumtype){.Tag={.tag=Tag, .value=__VA_ARGS__}})
 
 #define c_tag_index(var) \
     ((var)->_any_.tag)
 
 #define c_holds(var, Tag) \
-    (c_tag_index(var) == Tag##_vtag)
+    (c_tag_index(var) == Tag)
 
-#define c_get(var, Tag) \
-    (c_assert(c_holds(var, Tag)), var)->Tag.variant
+#define c_if_holds(var, Tag, x) \
+    for (Tag##_sumtype* _var = (var); _var; _var = NULL) \
+    if (c_holds(_var, Tag)) for (Tag##_valtype *x = &_var->Tag.value; x; x = NULL)
 
 #endif // STC_VARIANT_H_INCLUDED
