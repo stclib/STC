@@ -136,13 +136,9 @@ int main(void) {
     ((sumtype_##Tag){.Tag={.tag=Tag, .value=__VA_ARGS__}})
 
 #define c_tag_index(var) \
-    ((var)->_any_.tag)
+    ((var)._any_.tag)
 
 #define c_holds(var, Tag) \
     (c_tag_index(var) == Tag)
-
-#define c_if_holds(var, Tag, x) \
-    for (sumtype_##Tag* _var = (var); _var; _var = NULL) \
-    if (c_holds(_var, Tag)) for (valtype_##Tag *x = &_var->Tag.value; x; x = NULL)
 
 #endif // STC_VARIANT_H_INCLUDED
