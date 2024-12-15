@@ -93,8 +93,8 @@ int main(void) {
 #define c_LOOP(f,T,x,...) _c_CHECK(_c_LOOP0, c_JOIN(_c_LOOP_END_, c_NUMARGS x))(f,T,x,__VA_ARGS__)
 
 #define _c_vartuple_tag(T, Tag, ...) Tag,
-#define _c_vartuple_type(T, Tag, ...) typedef __VA_ARGS__ valtype_##Tag; typedef T sumtype_##Tag;
-#define _c_vartuple_var(T, Tag, ...) struct { uint8_t tag; valtype_##Tag var; } Tag;
+#define _c_vartuple_type(T, Tag, ...) typedef __VA_ARGS__ Tag##_type; typedef T Tag##_sumtype;
+#define _c_vartuple_var(T, Tag, ...) struct { uint8_t tag; Tag##_type var; } Tag;
 
 #define _enum_ uint8_t
 #define c_sumtype(T, ...) \
@@ -123,7 +123,7 @@ int main(void) {
 
     #define c_of(Tag, x) \
         break; case Tag: \
-        for (valtype_##Tag *x = &((sumtype_##Tag *)_match)->Tag.var; x; x = NULL)
+        for (Tag##_type *x = &((Tag##_sumtype *)_match)->Tag.var; x; x = NULL)
 #endif
 
 #define c_or_of(Tag) \
@@ -133,7 +133,7 @@ int main(void) {
     break; default:
 
 #define c_variant(Tag, ...) \
-    ((sumtype_##Tag){.Tag={.tag=Tag, .var=__VA_ARGS__}})
+    ((Tag##_sumtype){.Tag={.tag=Tag, .var=__VA_ARGS__}})
 
 #define c_tag_index(var) \
     ((var)._any_.tag)
