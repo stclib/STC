@@ -1,6 +1,15 @@
 # Makefile for STC. Linux/Mac + Windows
-# On Windows, the makefile requires mkdir and rm,
-# which are found in C:\Program Files\Git\usr\bin.
+# On Windows, the makefile requires mkdir, rm, and printf
+# which are all found in C:\Program Files\Git\usr\bin
+
+CC        ?= gcc
+CFLAGS 	  ?= -Iinclude -MMD -O2 -std=c11 -Wpedantic -Wall -Wextra -Werror -Wno-missing-field-initializers
+CXX       ?= g++
+CXXFLAGS  ?= -std=c++20 -O2 -MMD -Iinclude
+LDFLAGS   ?=
+AR_RCS    := ar rcs
+MKDIR_P   := mkdir -p
+RM_F      := rm -f
 
 ifeq ($(OS),Windows_NT)
 	EXE := .exe
@@ -8,16 +17,6 @@ ifeq ($(OS),Windows_NT)
 else
 	BUILDDIR := build/$(shell uname)
 endif
-
-CC        ?= gcc
-CWARNS    ?= -MMD -Werror -Wimplicit-fallthrough=3 -Wno-missing-field-initializers
-CFLAGS 	  ?= -Iinclude -O2 -std=c11 -Wpedantic -Wall -Wextra
-CXX       ?= g++
-CXXFLAGS  ?= -std=c++20 -O2 -MMD -Iinclude
-LDFLAGS   ?=
-AR_RCS    := ar rcs
-MKDIR_P   := mkdir -p
-RM_F      := rm -f
 
 OBJ_DIR   := $(BUILDDIR)
 
@@ -55,8 +54,8 @@ $(LIB_PATH): $(LIB_OBJS)
 
 $(OBJ_DIR)/%.o: %.c
 	@$(MKDIR_P) $(@D)
-	@printf "\r\e[2K%s" "$(CC) $< -o $@ -c $(CFLAGS)"
-	@$(CC) $< -o $@ -c $(CFLAGS) $(CWARNS)
+	@printf "\r\e[2K%s" "$(CC) $< -o $@ -c"
+	@$(CC) $< -o $@ -c $(CFLAGS)
 
 $(OBJ_DIR)/%.o: %.cpp
 	@$(MKDIR_P) $(@D)
@@ -65,8 +64,8 @@ $(OBJ_DIR)/%.o: %.cpp
 
 $(OBJ_DIR)/%$(EXE): %.c $(LIB_PATH)
 	@$(MKDIR_P) $(@D)
-	@printf "\r\e[2K%s" "$(CC) $< $(CFLAGS) -o $(@F) -s $(LDFLAGS) -L$(BUILDDIR) -l$(LIB_NAME) -lm"
-	@$(CC) $< $(CFLAGS) $(CWARNS) -o $@ -s $(LDFLAGS) -L$(BUILDDIR) -l$(LIB_NAME) -lm
+	@printf "\r\e[2K%s" "$(CC) $< -o $(@F) -s $(LDFLAGS) -L$(BUILDDIR) -l$(LIB_NAME) -lm"
+	@$(CC) $< $(CFLAGS) -o $@ -s $(LDFLAGS) -L$(BUILDDIR) -l$(LIB_NAME) -lm
 
 .SECONDARY: $(EX_OBJS) # Prevent deleting objs after building
 .PHONY: all clean distclean
