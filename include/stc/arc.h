@@ -144,9 +144,9 @@ STC_INLINE void _c_MEMB(_drop)(const Self* self) {
         i_keydrop(self->get);
 
         if ((char*)self->use_count + OFFSET == (char*)self->get) {
-            i_free(self->use_count, c_sizeof(struct _c_MEMB(_rep_))); // _make()
+            i_free((void*)self->use_count, c_sizeof(struct _c_MEMB(_rep_))); // _make()
         } else {
-            i_free(self->use_count, OFFSET + 4); // _from_ptr()
+            i_free((void*)self->use_count, OFFSET + 4); // _from_ptr()
             i_free(self->get, c_sizeof *self->get);
         }
     }

@@ -1072,7 +1072,7 @@ _regexec1(const _Reprog *progp,  /* program to run */
 
                 switch (inst->type) {
                 case TOK_IRUNE:
-                    r = utf8_casefold(r); /* @fallthrough@ */
+                    r = utf8_casefold(r); /* FALLTHRU */
                 case TOK_RUNE:
                     ok = _runematch(inst->r.rune, r);
                     break;
@@ -1098,7 +1098,7 @@ _regexec1(const _Reprog *progp,  /* program to run */
                     if (s == bol) continue;
                     break;
                 case TOK_EOL:
-                    if (r == '\n') continue; /* @fallthrough@ */
+                    if (r == '\n') continue; /* FALLTHRU */
                 case TOK_EOS:
                     if (s == j->eol || r == 0) continue;
                     break;
@@ -1106,14 +1106,14 @@ _regexec1(const _Reprog *progp,  /* program to run */
                     if (s == j->eol || r == 0 || (r == '\n' && s[1] == 0)) continue;
                     break;
                 case TOK_NWBOUND:
-                    ok = true; /* @fallthrough@ */
+                    ok = true; /* FALLTHRU */
                 case TOK_WBOUND:
                     if (ok ^ (s == bol || s == j->eol || (utf8_isword(utf8_peek_at(s, -1))
                                                         ^ utf8_isword(utf8_peek(s)))))
                         continue;
                     break;
                 case TOK_NCCLASS:
-                    ok = true; /* @fallthrough@ */
+                    ok = true; /* FALLTHRU */
                 case TOK_CCLASS:
                     ep = inst->r.classp->end;
                     if (icase) r = utf8_casefold(r);

@@ -256,12 +256,12 @@ FMT_DEF int _fmt_parse(char* p, int nargs, const char *fmt, ...) {
             arg = va_arg(args, char *);
             *p++ = '%', p0 = p;
             while (1) switch (*fmt) {
-                case '\0': n = 99; /* @fallthrough@ */
+                case '\0': n = 99; /* FALLTHRU */
                 case '}': goto done;
                 case '<': *p++ = '-', ++fmt; break;
-                case '>': p0 = NULL; /* @fallthrough@ */
+                case '>': p0 = NULL; /* FALLTHRU */
                 case '-': ++fmt; break;
-                case '*': if (++n <= nargs) arg = va_arg(args, char *); /* @fallthrough@ */
+                case '*': if (++n <= nargs) arg = va_arg(args, char *); /* FALLTHRU */
                 default: *p++ = *fmt++;
             }
             done:

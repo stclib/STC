@@ -104,8 +104,7 @@ typedef struct {
     } while (0)
 
 #define cco_finally \
-    *_state = CCO_STATE_FINALLY; \
-    /* @fallthrough@ */ \
+    *_state = CCO_STATE_FINALLY; /* FALLTHRU */ \
     case CCO_STATE_FINALLY
 
 #define cco_scope cco_routine   // [deprecated]
@@ -134,8 +133,7 @@ typedef struct {
 
 #define cco_await(until) \
     do { \
-        *_state = __LINE__; \
-        /* @fallthrough@ */ \
+        *_state = __LINE__; /* FALLTHRU */ \
         case __LINE__: if (!(until)) {return CCO_AWAIT; goto _resume;} \
     } while (0)
 
@@ -144,8 +142,7 @@ typedef struct {
 #define cco_await_coroutine_1(corocall) cco_await_coroutine_2(corocall, CCO_DONE)
 #define cco_await_coroutine_2(corocall, awaitbits) \
     do { \
-        *_state = __LINE__; \
-        /* @fallthrough@ */ \
+        *_state = __LINE__; /* FALLTHRU */ \
         case __LINE__: { \
             int _res = corocall; \
             if (_res & ~(awaitbits)) { return _res; goto _resume; } \
