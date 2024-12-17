@@ -7,12 +7,12 @@ if [ "$(uname)" = 'Linux' ]; then
     clibs='-lm' # -pthread
     oflag='-o '
 fi
-common="-std=c99 -Werror -Wall"
+common="-std=c99 -Wpedantic -Wall -Werror"
 #cc=clang; cflags="-s -O3 $common"
 cc=gcc; cflags="-s -O3 $common"
 #cc=gcc; cflags="-g $sanitize $common"
 #cc=gcc; cflags="-x c++ -std=c++17 -O2 -s -DSTC_IMPLEMENT -Di_import"
-#cc=tcc; cflags="-std=c99 -Wall"
+#cc=tcc; cflags="-std=c99"
 #cc=cl; cflags="-nologo -O2 -MD -W3 -std:c11 -wd4003"
 #cc=cl; cflags="-nologo -O2 -MD -W3 -wd4003"
 #cc=cl; cflags="-nologo -TP -std:c++20 -wd4003 -DSTC_IMPLEMENT -Di_import"

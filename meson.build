@@ -3,14 +3,14 @@ project(
   'c',
   version: '5.0-dev',
   license: 'MIT',
-  default_options: ['c_std=c11', 'warning_level=2', 'default_library=static']
+  default_options: ['c_std=c99', 'warning_level=3', 'default_library=static']
 )
 
 stcversion = 5
 cc = meson.get_compiler('c')
 
 if cc.get_id() == 'gcc'
-  add_project_arguments('-Wno-missing-field-initializers', '-Wno-stringop-overflow', language: ['c', 'cpp'])
+  add_project_arguments('-Wno-missing-field-initializers', '-Wno-stringop-overflow', '-Wno-clobbered', language: ['c', 'cpp'])
 elif cc.get_id() == 'clang'
   add_project_arguments('-Wno-missing-field-initializers', language: ['c', 'cpp'])
 elif cc.get_id() == 'msvc'

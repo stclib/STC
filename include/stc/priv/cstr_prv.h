@@ -179,11 +179,11 @@ STC_INLINE const char* cstr_str(const cstr* self)
 STC_INLINE const char* cstr_toraw(const cstr* self)
     { return SSO_CALL(self, data(self)); }
 
-STC_INLINE bool cstr_is_empty(const cstr* self)
-    { return cstr_s_size(self) == 0; }
-
 STC_INLINE isize cstr_size(const cstr* self)
     { return SSO_CALL(self, size(self)); }
+
+STC_INLINE bool cstr_is_empty(const cstr* self)
+    { return cstr_size(self) == 0; }
 
 STC_INLINE isize cstr_capacity(const cstr* self)
     { return cstr_is_long(self) ? cstr_l_cap(self) : (isize)cstr_s_cap; }
