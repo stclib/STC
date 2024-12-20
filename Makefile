@@ -1,15 +1,19 @@
-# Makefile for STC. Linux/Mac + Windows
+# GNU Makefile for STC. Linux/Mac + Windows
 # On Windows, the makefile requires mkdir, rm, and printf
 # which are all found in C:\Program Files\Git\usr\bin
 
-CC        ?= gcc
+ifeq ($(origin CC),default)
+	CC := gcc
+endif
+ifeq ($(origin CXX),default)
+	CXX := g++
+endif
 CFLAGS 	  ?= -Iinclude -MMD -O2 -std=c11 -Wpedantic -Wall -Wextra -Werror -Wno-missing-field-initializers
-CXX       ?= g++
 CXXFLAGS  ?= -std=c++20 -O2 -MMD -Iinclude
 LDFLAGS   ?=
-AR_RCS    := ar rcs
-MKDIR_P   := mkdir -p
-RM_F      := rm -f
+AR_RCS    ?= ar rcs
+MKDIR_P   ?= mkdir -p
+RM_F      ?= rm -f
 
 ifeq ($(OS),Windows_NT)
 	EXE := .exe
