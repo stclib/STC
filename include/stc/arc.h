@@ -99,7 +99,7 @@ typedef i_keyraw _m_raw;
   #define _i_atomic_inc(v)          (void)(++*(v))
   #define _i_atomic_dec_and_test(v) !(--*(v))
 #endif
-#ifndef i_is_forward
+#ifndef i_declared
 _c_DEFTYPES(_c_arc_types, Self, i_key);
 #endif
 struct _c_MEMB(_rep_) { struct _arc_metadata metadata; i_key value; };

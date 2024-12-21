@@ -36,7 +36,7 @@
 #endif
 #include "priv/template.h"
 
-#ifndef i_is_forward
+#ifndef i_declared
 #ifdef i_capacity
   #define i_no_clone
   _c_DEFTYPES(_c_stack_fixed, Self, i_key, i_capacity);
@@ -47,7 +47,7 @@
 typedef i_keyraw _m_raw;
 
 STC_INLINE Self _c_MEMB(_init)(void)
-    { return (Self){0}; }
+    { Self s={0}; return s; }
 
 #ifdef i_capacity
 STC_INLINE Self _c_MEMB(_move)(Self *self)

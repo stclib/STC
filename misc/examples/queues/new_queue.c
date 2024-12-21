@@ -1,13 +1,12 @@
-#include "stc/random.h"
-#include "stc/types.h"
 #include <stdio.h>
 #include <time.h>
-
-forward_queue(queue_pnt, struct Point);
+#include "stc/random.h"
+#include "stc/types.h"
+declare_queue(queue_pnt, struct Point);
 
 typedef struct Point { int x, y; } Point;
 #define i_type queue_pnt,Point
-#define i_is_forward
+#define i_declared
 #include "stc/queue.h"
 
 #define i_type IntQ,int

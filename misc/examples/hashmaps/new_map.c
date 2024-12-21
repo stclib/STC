@@ -1,7 +1,7 @@
 #include "stc/cstr.h"
 #include "stc/types.h"
 
-forward_hmap(hmap_pnt, struct Point, int);
+declare_hmap(hmap_pnt, struct Point, int);
 
 typedef struct MyStruct {
     hmap_pnt pntmap;
@@ -18,7 +18,7 @@ typedef struct Point { int x, y; } Point;
 // Point => int map, uses default hash function
 #define i_type hmap_pnt, struct Point, int
 #define i_eq c_memcmp_eq
-#define i_is_forward
+#define i_declared
 #include "stc/hmap.h"
 
 // cstr => cstr map

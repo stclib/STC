@@ -74,7 +74,7 @@ STC_INLINE zsview zsview_from_position(zsview zs, isize pos) {
 STC_INLINE csview zsview_subview(const zsview zs, isize pos, isize len) {
     c_assert(((size_t)pos <= (size_t)zs.size) & (len >= 0));
     if (pos + len > zs.size) len = zs.size - pos;
-    return (csview){zs.str + pos, len};
+    return c_literal(csview){zs.str + pos, len};
 }
 
 STC_INLINE zsview zsview_tail(zsview zs, isize len) {

@@ -439,7 +439,7 @@ as function macros instead of referring to C function names.
     are not relevant for the mapped type).
 
 Properties:
-- `i_opt` *Flags* - Boolean properties: may combine *c_no_clone*, *c_no_atomic*, *c_is_forward*, *c_static*,
+- `i_opt` *Flags* - Boolean properties: may combine *c_no_clone*, *c_no_atomic*, *c_declared*, *c_static*,
 *c_header* with the *|* separator.
 
 **Notes**:
@@ -579,61 +579,17 @@ MyVec_push(&vec, 42);
 <summary>Forward declarations</summary>
 
 ## Forward declarations
+Pre-declare templated containers in header files. The container can then e.g. be a "private"
+member of a struct defined in a header file.
 
-There are two ways to pre-declare templated containers in header files:
-
-1. Include the templated container type instance as a header file. This also exposes all container
-functions, which can be used by client code. It requires that the element type is complete.
-2. Or, pre-declare the container type only. In this case, the container can be a "private" member of a
-user struct (the container functions will not be available to the user).
-
-### 1. Include as a header file
-
-Create a dedicated header for the container type instance:
-```c++
-#ifndef PointVec_H_
-#define PointVec_H_
-// Do not to include user defined headers here if they use templated containers themselves
-
-// NB! struct Point must be complete at this point!
-#define i_type PointVec, struct Point
-#define i_header    // Do not implement, only expose API
-#include "stc/vec.h"
-
-#endif
-```
-Usage from e.g. other headers is trivial:
-```c++
-#ifndef Dataset_H_
-#define Dataset_H_
-#include "Point.h"         // include element type separately
-#include "PointVec.h"
-
-typedef struct Dataset {
-    PointVec vertices;
-    PointVec colors;
-} Dataset;
-...
-#endif
-```
-
-Implement PointVec in a c-file:
-```c++
-#include "Point.h"
-#define i_implement        // define immediately before PointVec.h
-#include "PointVec.h"
-...
-```
-
-### 2. Forward declare only
 ```c++
 // Dataset.h
 #ifndef Dataset_H_
 #define Dataset_H_
 #include "stc/types.h"   // include various container data structure templates
 
-// declare PointVec. Note: struct Point may be an incomplete/undeclared type.
-forward_vec(PointVec, struct Point);
+// declare PointVec as a vec. Note: also struct Point may be an undeclared type.
+declare_vec(PointVec, struct Point);
 
 typedef struct Dataset {
     PointVec vertices;
@@ -644,15 +600,16 @@ void Dataset_drop(Dataset* self);
 ...
 #endif
 ```
-Define and use the "private" container in the c-file:
+
+Define and use the "private" containers in the c-file:
 ```c++
 // Dataset.c
 #include "Dataset.h"
-#include "Point.h"          // struct Point must be defined here.
+#include "Point.h"      // struct Point must be defined here.
 
 #define i_type PointVec, struct Point
-#define i_is_forward        // flag that the container was forward declared.
-#include "stc/vec.h"        // Implements PointVec with static linking by default
+#define i_declared      // must flag that the container was pre-declared.
+#include "stc/vec.h"    // Implements PointVec with static linking by default
 ...
 ```
 </details>

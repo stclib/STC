@@ -73,7 +73,7 @@ int main(void) {
 #include "priv/template.h"
 typedef i_keyraw _m_raw;
 
-#ifndef i_is_forward
+#ifndef i_declared
 _c_DEFTYPES(_c_box_types, Self, i_key);
 #endif
 

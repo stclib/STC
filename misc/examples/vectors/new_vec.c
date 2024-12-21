@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include "stc/types.h"
 
-forward_vec(vec_i32, int);
-forward_vec(vec_pnt, struct Point);
+declare_vec(vec_i32, int);
+declare_vec(vec_pnt, struct Point);
 
 typedef struct MyStruct {
     vec_i32 intvec;
@@ -10,7 +10,7 @@ typedef struct MyStruct {
 } MyStruct;
 
 #define i_type vec_i32, int
-#define i_is_forward
+#define i_declared
 #include "stc/vec.h"
 
 typedef struct Point { int x, y; } Point;
@@ -18,7 +18,7 @@ typedef struct Point { int x, y; } Point;
 #define i_type vec_pnt, Point
 #define i_less(a, b) a->x < b->x || (a->x == b->x && a->y < b->y)
 #define i_eq(a, b) a->x == b->x && a->y == b->y
-#define i_is_forward
+#define i_declared
 #include "stc/vec.h"
 
 int main(void)

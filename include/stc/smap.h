@@ -73,7 +73,7 @@ int main(void) {
 #endif
 #define _i_sorted
 #include "priv/template.h"
-#ifndef i_is_forward
+#ifndef i_declared
   _c_DEFTYPES(_c_aatree_types, Self, i_key, i_val, _i_MAP_ONLY, _i_SET_ONLY);
 #endif
 

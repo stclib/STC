@@ -148,7 +148,7 @@ int main(void) {
     break; default:
 
 #define c_variant(Tag, ...) \
-    ((Tag##_sumtype){.Tag={.tag=Tag, .var=__VA_ARGS__}})
+    (c_literal(Tag##_sumtype){.Tag={.tag=Tag, .var=__VA_ARGS__}})
 
 #define c_tag_index(var) \
     ((var)->_any_.tag)

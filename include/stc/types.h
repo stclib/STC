@@ -33,18 +33,18 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#define forward_arc(C, VAL) _c_arc_types(C, VAL)
-#define forward_box(C, VAL) _c_box_types(C, VAL)
-#define forward_deq(C, VAL) _c_deque_types(C, VAL)
-#define forward_list(C, VAL) _c_list_types(C, VAL)
-#define forward_hmap(C, KEY, VAL) _c_htable_types(C, KEY, VAL, c_true, c_false)
-#define forward_hset(C, KEY) _c_htable_types(C, cset, KEY, KEY, c_false, c_true)
-#define forward_smap(C, KEY, VAL) _c_aatree_types(C, KEY, VAL, c_true, c_false)
-#define forward_sset(C, KEY) _c_aatree_types(C, KEY, KEY, c_false, c_true)
-#define forward_stack(C, VAL) _c_stack_types(C, VAL)
-#define forward_pqueue(C, VAL) _c_pqueue_types(C, VAL)
-#define forward_queue(C, VAL) _c_deque_types(C, VAL)
-#define forward_vec(C, VAL) _c_vec_types(C, VAL)
+#define declare_arc(C, VAL) _c_arc_types(C, VAL)
+#define declare_box(C, VAL) _c_box_types(C, VAL)
+#define declare_deq(C, VAL) _c_deque_types(C, VAL)
+#define declare_list(C, VAL) _c_list_types(C, VAL)
+#define declare_hmap(C, KEY, VAL) _c_htable_types(C, KEY, VAL, c_true, c_false)
+#define declare_hset(C, KEY) _c_htable_types(C, cset, KEY, KEY, c_false, c_true)
+#define declare_smap(C, KEY, VAL) _c_aatree_types(C, KEY, VAL, c_true, c_false)
+#define declare_sset(C, KEY) _c_aatree_types(C, KEY, KEY, c_false, c_true)
+#define declare_stack(C, VAL) _c_stack_types(C, VAL)
+#define declare_pqueue(C, VAL) _c_pqueue_types(C, VAL)
+#define declare_queue(C, VAL) _c_deque_types(C, VAL)
+#define declare_vec(C, VAL) _c_vec_types(C, VAL)
 
 // csview : non-null terminated string view
 typedef const char csview_value;

@@ -27,7 +27,7 @@
 #ifndef STC_TEMPLATE_H_INCLUDED
 #define STC_TEMPLATE_H_INCLUDED
   #define c_option(flag)  ((i_opt) & (flag))
-  #define c_is_forward    (1<<0)
+  #define c_declared      (1<<0)
   #define c_no_atomic     (1<<1)
   #define c_no_clone      (1<<2)
   #define c_no_hash       (1<<4)
@@ -70,12 +70,12 @@
 #if defined i_type && !(defined i_key || defined i_keyclass || \
                         defined i_keypro || defined i_rawclass)
   #if defined _i_is_map && !defined i_val
-    #define Self c_SELECT(_c_SEL31, i_type)
-    #define i_key c_SELECT(_c_SEL32, i_type)
-    #define i_val c_SELECT(_c_SEL33, i_type)
+    #define Self c_SELECT(c_ARG_1, i_type)
+    #define i_key c_SELECT(c_ARG_2, i_type)
+    #define i_val c_SELECT(c_ARG_3, i_type)
   #else
-    #define Self c_SELECT(_c_SEL21, i_type)
-    #define i_key c_SELECT(_c_SEL22, i_type)
+    #define Self c_SELECT(c_ARG_1, i_type)
+    #define i_key c_SELECT(c_ARG_2, i_type)
   #endif
 #elif !defined Self && defined i_type
   #define Self i_type
@@ -96,8 +96,8 @@
 
 #define i_no_emplace
 
-#if c_option(c_is_forward)
-  #define i_is_forward
+#if c_option(c_declared)
+  #define i_declared
 #endif
 #if c_option(c_no_hash)
   #define i_no_hash

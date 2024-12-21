@@ -198,14 +198,14 @@ STC_INLINE csview cstr_subview(const cstr* self, isize pos, isize len) {
     csview sv = cstr_sv(self);
     c_assert(((size_t)pos <= (size_t)sv.size) & (len >= 0));
     if (pos + len > sv.size) len = sv.size - pos;
-    return (csview){sv.buf + pos, len};
+    return c_literal(csview){sv.buf + pos, len};
 }
 
 STC_INLINE zsview cstr_tail(const cstr* self, isize len) {
     c_assert(len >= 0);
     csview sv = cstr_sv(self);
     if (len > sv.size) len = sv.size;
-    return (zsview){&sv.buf[sv.size - len], len};
+    return c_literal(zsview){&sv.buf[sv.size - len], len};
 }
 
 // BEGIN utf8 functions =====
@@ -224,7 +224,7 @@ STC_INLINE zsview cstr_u8_tail(const cstr* self, isize u8len) {
     const char* p = &sv.buf[sv.size];
     while (u8len && p != sv.buf)
         u8len -= (*--p & 0xC0) != 0x80;
-    return (zsview){p, sv.size - (p - sv.buf)};
+    return c_literal(zsview){p, sv.size - (p - sv.buf)};
 }
 
 STC_INLINE csview cstr_u8_subview(const cstr* self, isize u8pos, isize u8len)

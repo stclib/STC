@@ -102,11 +102,11 @@ typedef isize _isize_triple[3];
         return s; \
     } \
     STC_INLINE Self##_iter Self##_begin(const Self* self) { \
-        return (Self##_iter){.ref=self->data, ._s=self}; \
+        return c_literal(Self##_iter){.ref=self->data, ._s=self}; \
     } \
     STC_INLINE Self##_iter Self##_end(const Self* self) { \
         (void)self; \
-        return (Self##_iter){0}; \
+        return c_literal(Self##_iter){0}; \
     } \
     STC_INLINE void Self##_next(Self##_iter* it) { \
         int done; \
@@ -148,7 +148,7 @@ using_cspan_tuple(7); using_cspan_tuple(8);
 #define cspan_make(Span, ...) \
     (c_literal(Span){.data=c_make_array(Span##_value, __VA_ARGS__), \
                      .shape={sizeof((Span##_value[])__VA_ARGS__)/sizeof(Span##_value)}, \
-                     .stride=(cspan_tuple1){.d={1}}})
+                     .stride=c_literal(cspan_tuple1){.d={1}}})
 
 // cspan_from* a pointer+size, c-array, or a cvec/cstack container
 //
@@ -219,31 +219,31 @@ typedef enum {c_ROWMAJOR, c_COLMAJOR} cspan_layout;
 #define cspan_submd2(self, x) \
     {.data=cspan_at(self, x, 0), \
      .shape={(self)->shape[1]}, \
-     .stride=(cspan_tuple1){.d={(self)->stride.d[1]}}}
+     .stride=c_literal(cspan_tuple1){.d={(self)->stride.d[1]}}}
 
 #define cspan_submd3(...) c_MACRO_OVERLOAD(cspan_submd3, __VA_ARGS__)
 #define cspan_submd3_2(self, x) \
     {.data=cspan_at(self, x, 0, 0), \
      .shape={(self)->shape[1], (self)->shape[2]}, \
-     .stride=(cspan_tuple2){.d={(self)->stride.d[1], (self)->stride.d[2]}}}
+     .stride=c_literal(cspan_tuple2){.d={(self)->stride.d[1], (self)->stride.d[2]}}}
 #define cspan_submd3_3(self, x, y) \
     {.data=cspan_at(self, x, y, 0), \
      .shape={(self)->shape[2]}, \
-     .stride=(cspan_tuple1){.d={(self)->stride.d[2]}}}
+     .stride=c_literal(cspan_tuple1){.d={(self)->stride.d[2]}}}
 
 #define cspan_submd4(...) c_MACRO_OVERLOAD(cspan_submd4, __VA_ARGS__)
 #define cspan_submd4_2(self, x) \
     {.data=cspan_at(self, x, 0, 0, 0), \
      .shape={(self)->shape[1], (self)->shape[2], (self)->shape[3]}, \
-     .stride=(cspan_tuple3){.d={(self)->stride.d[1], (self)->stride.d[2], (self)->stride.d[3]}}}
+     .stride=c_literal(cspan_tuple3){.d={(self)->stride.d[1], (self)->stride.d[2], (self)->stride.d[3]}}}
 #define cspan_submd4_3(self, x, y) \
     {.data=cspan_at(self, x, y, 0, 0), \
      .shape={(self)->shape[2], (self)->shape[3]}, \
-     .stride=(cspan_tuple2){.d={(self)->stride.d[2], (self)->stride.d[3]}}}
+     .stride=c_literal(cspan_tuple2){.d={(self)->stride.d[2], (self)->stride.d[3]}}}
 #define cspan_submd4_4(self, x, y, z) \
     {.data=cspan_at(self, x, y, z, 0), \
      .shape={(self)->shape[3]}, \
-     .stride=(cspan_tuple1){.d={(self)->stride.d[3]}}}
+     .stride=c_literal(cspan_tuple1){.d={(self)->stride.d[3]}}}
 
 #define cspan_print(...) c_MACRO_OVERLOAD(cspan_print, __VA_ARGS__)
 #if 0

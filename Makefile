@@ -8,10 +8,17 @@ endif
 ifeq ($(origin CXX),default)
 	CXX := g++
 endif
-CFLAGS 	  ?= -Iinclude -MMD -O2 -std=c11 -Wpedantic -Wall -Wextra -Werror -Wno-missing-field-initializers
-CXXFLAGS  ?= -std=c++20 -O2 -MMD -Iinclude
-LDFLAGS   ?=
-AR_RCS    ?= ar rcs
+ifeq ($(CC),cl)
+	CFLAGS 	  ?= -nologo -std:c11 -Iinclude -MD -O2 -W3 -wd4003
+	CXXFLAGS  ?= -nologo -std:c++20 -EHsc -Iinclude -O2 -MD
+	LDFLAGS   ?=
+	AR_RCS    ?=
+else
+	CFLAGS 	  ?= -std=c11 -Iinclude -MMD -O3 -Wpedantic -Wall -Wextra -Werror -Wno-missing-field-initializers
+	CXXFLAGS  ?= -std=c++20 -Iinclude -O3 -MMD -Wall
+	LDFLAGS   ?=
+	AR_RCS    ?= ar rcs
+endif
 MKDIR_P   ?= mkdir -p
 RM_F      ?= rm -f
 

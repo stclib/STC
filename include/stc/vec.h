@@ -26,7 +26,7 @@
 #include "stc/cstr.h"
 #include "stc/types.h"
 
-forward_vec(vec_i32, int);
+declare_vec(vec_i32, int);
 
 typedef struct MyStruct {
     vec_i32 int_vec;
@@ -40,7 +40,7 @@ typedef struct MyStruct {
 #include "stc/vec.h"
 
 #define i_type vec_i32,int32_t
-#define i_is_forward
+#define i_declared
 #include "stc/vec.h"
 
 int main(void) {
@@ -74,7 +74,7 @@ int main(void) {
 #endif
 #include "priv/template.h"
 
-#ifndef i_is_forward
+#ifndef i_declared
    _c_DEFTYPES(_c_vec_types, Self, i_key);
 #endif
 typedef i_keyraw _m_raw;

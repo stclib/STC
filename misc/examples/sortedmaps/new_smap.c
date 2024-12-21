@@ -1,7 +1,7 @@
 #include "stc/cstr.h"
 #include "stc/types.h"
 
-forward_smap(PMap, struct Point, int);
+declare_smap(PMap, struct Point, int);
 
 // Use forward declared PMap in struct
 typedef struct {
@@ -18,7 +18,7 @@ int point_cmp(const Point* a, const Point* b) {
 
 #define i_type PMap,Point,int
 #define i_cmp point_cmp
-#define i_is_forward
+#define i_declared
 #include "stc/smap.h"
 
 // cstr => cstr map

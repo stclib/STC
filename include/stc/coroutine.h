@@ -270,7 +270,7 @@ int cco_taskrunner(struct cco_taskrunner* co) {
 #endif
 
 #define cco_make_taskrunner(task, ctx) \
-    ((struct cco_taskrunner){.rt = {.current = cco_cast_task(task), .context = ctx}})
+    (c_literal(struct cco_taskrunner){.rt = {.current = cco_cast_task(task), .context = ctx}})
 
 #define cco_run_task(...) c_MACRO_OVERLOAD(cco_run_task, __VA_ARGS__)
 #define cco_run_task_1(task) cco_run_task_3(task, NULL, _runner)
@@ -342,7 +342,7 @@ int cco_taskrunner(struct cco_taskrunner* co) {
 
 typedef struct { ptrdiff_t count; } cco_semaphore;
 
-#define cco_make_semaphore(value) ((cco_semaphore){value})
+#define cco_make_semaphore(value) (c_literal(cco_semaphore){value})
 #define cco_set_semaphore(sem, value) ((sem)->count = value)
 #define cco_acquire_semaphore(sem) (--(sem)->count)
 #define cco_release_semaphore(sem) (++(sem)->count)

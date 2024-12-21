@@ -70,7 +70,7 @@ struct hmap_meta { uint8_t hashx; };
 #endif
 #define _i_is_hash
 #include "stc/priv/template.h"
-#ifndef i_is_forward
+#ifndef i_declared
   _c_DEFTYPES(_c_htable_types, Self, i_key, i_val, _i_MAP_ONLY, _i_SET_ONLY);
 #endif
 
@@ -479,4 +479,3 @@ _c_MEMB(_erase_entry)(Self* self, _m_value* _val) {
 #undef _i_SET_ONLY
 #include "stc/priv/linkage2.h"
 #include "stc/priv/template2.h"
-
