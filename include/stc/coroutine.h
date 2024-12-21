@@ -189,8 +189,12 @@ typedef struct {
 cco_task_struct(cco_task) { cco_task_state cco; };
 typedef struct cco_task cco_task;
 
-#define cco_cast_task(task) \
-    ((cco_task *)(task) + (1 ? 0 : sizeof((task)->cco.func(task, (cco_runtime*)0))))
+#define cco_cast_task(...) \
+    ((cco_task *)(__VA_ARGS__) + (1 ? 0 : sizeof((__VA_ARGS__)->cco.func(__VA_ARGS__, (cco_runtime*)0))))
+
+/* Assumes defined: int taskname(struct taskname* co, cco_runtime* rt); */
+#define cco_new_task(taskname, ...) \
+    cco_cast_task(c_new(struct taskname, {{taskname}, __VA_ARGS__}))
 
 #define cco_resume_task(task, rt) \
     do { \
