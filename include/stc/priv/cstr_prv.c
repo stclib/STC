@@ -157,7 +157,7 @@ void cstr_shrink_to_fit(cstr* self) {
 
 // ------------------- STC_CSTR_IO --------------------
 #if !defined STC_CSTR_IO_C_INCLUDED && \
-    (defined i_import || defined STC_IMPLEMENT || defined STC_CSTR_IO)
+    (defined i_import || defined STC_CSTR_IO)
 #define STC_CSTR_IO_C_INCLUDED
 
 #include <stdarg.h>
@@ -229,8 +229,7 @@ isize cstr_printf(cstr* self, const char* fmt, ...) {
 
 // ------------------- STC_CSTR_UTF8 --------------------
 #if !defined STC_CSTR_UTF8_C_INCLUDED && \
-    (defined i_import || defined STC_IMPLEMENT || \
-     defined STC_CSTR_UTF8 || defined STC_UTF8_PRV_C_INCLUDED)
+    (defined i_import || defined STC_CSTR_UTF8 || defined STC_UTF8_PRV_C_INCLUDED)
 #define STC_CSTR_UTF8_C_INCLUDED
 
 #include <ctype.h>
