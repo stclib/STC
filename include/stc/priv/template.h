@@ -69,13 +69,10 @@
 
 #if defined i_type && !(defined i_key || defined i_keyclass || \
                         defined i_keypro || defined i_rawclass)
+  #define Self c_SELECT(c_ARG_1, i_type)
+  #define i_key c_SELECT(c_ARG_2, i_type)
   #if defined _i_is_map && !defined i_val
-    #define Self c_SELECT(c_ARG_1, i_type)
-    #define i_key c_SELECT(c_ARG_2, i_type)
     #define i_val c_SELECT(c_ARG_3, i_type)
-  #else
-    #define Self c_SELECT(c_ARG_1, i_type)
-    #define i_key c_SELECT(c_ARG_2, i_type)
   #endif
 #elif !defined Self && defined i_type
   #define Self i_type

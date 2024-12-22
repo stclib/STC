@@ -85,8 +85,8 @@ int main(void) {
 #define _c_LOOP0(f,T,x,...) _c_CALL(f,T,c_EXPAND x) _c_LOOP_INDIRECTION _c_EMPTY()()(f,T,__VA_ARGS__)
 #define _c_LOOP1(...)
 #define _c_TUPLE_AT_1(x,y,...) y
-#define _c_MACRO2(a1,a2,x,...) x
-#define _c_CHECK(x,...) _c_TUPLE_AT_1(__VA_ARGS__,x,)
+#define _c_APPLY_TUPPLE_AT_1(args) c_EXPAND(_c_TUPLE_AT_1 args)
+#define _c_CHECK(x,...) _c_APPLY_TUPPLE_AT_1((__VA_ARGS__,x,))
 #define _c_E0(...) __VA_ARGS__
 #define _c_E1(...) _c_E0(_c_E0(_c_E0(_c_E0(_c_E0(__VA_ARGS__)))))
 #define _c_E2(...) _c_E1(_c_E1(_c_E1(_c_E1(_c_E1(__VA_ARGS__)))))
@@ -137,7 +137,7 @@ int main(void) {
                 for (Tag##_type *x = &_var->Tag.var; x; x = NULL)
 #endif
 
-#define c_is(...) _c_MACRO2(__VA_ARGS__,c_is_2,c_is_1)(__VA_ARGS__)
+#define c_is(...) c_MACRO_OVERLOAD(c_is, __VA_ARGS__)
 #define c_is_1(Tag) \
     break; case Tag:
 

@@ -15,15 +15,10 @@ cco_task_struct (Scheduler) {
 
 cco_task_struct (TaskA) {
     TaskA_state cco;
-    int value_a;
+    bool dummy;
 };
 
-cco_task_struct (TaskB) {
-    TaskB_state cco;
-    double value_b;
-};
-
-int scheduler(struct Scheduler* sc, cco_runtime* rt) {
+int Scheduler(struct Scheduler* sc, cco_runtime* rt) {
     cco_routine (sc) {
         while (!Tasks_is_empty(&sc->tasks)) {
             sc->pulled = Tasks_pull(&sc->tasks);
@@ -44,7 +39,7 @@ int scheduler(struct Scheduler* sc, cco_runtime* rt) {
     return 0;
 }
 
-static int taskA(struct TaskA* task, cco_runtime* rt) {
+static int TaskA(struct TaskA* task, cco_runtime* rt) {
     (void)rt;
     cco_routine (task) {
         puts("Hello, from task A");
@@ -61,7 +56,7 @@ static int taskA(struct TaskA* task, cco_runtime* rt) {
     return 0;
 }
 
-static int taskB(struct TaskB* task, cco_runtime* rt) {
+static int TaskB(struct cco_task* task, cco_runtime* rt) {
     (void)rt;
     cco_routine (task) {
         puts("Hello, from task B");
@@ -78,10 +73,10 @@ static int taskB(struct TaskB* task, cco_runtime* rt) {
 
 int main(void) {
     struct Scheduler schedule = {
-        .cco={scheduler},
+        .cco={Scheduler},
         .tasks = c_make(Tasks, {
-            cco_cast_task(c_new(struct TaskA, {{taskA}})),
-            cco_cast_task(c_new(struct TaskB, {{taskB}})),
+            (cco_task*)c_new(struct TaskA, {{TaskA}}),
+                       c_new(struct cco_task, {{TaskB}}),
         })
     };
 
