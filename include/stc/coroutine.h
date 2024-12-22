@@ -192,23 +192,17 @@ typedef struct cco_task cco_task;
 #define cco_cast_task(...) \
     ((cco_task *)(__VA_ARGS__) + (1 ? 0 : sizeof((__VA_ARGS__)->cco.func(__VA_ARGS__, (cco_runtime*)0))))
 
-/* Assumes defined: int taskname(struct taskname* co, cco_runtime* rt); */
-#define cco_new_task(taskname, ...) \
-    cco_cast_task(c_new(struct taskname, {{taskname}, __VA_ARGS__}))
-
 #define cco_resume_task(task, rt) \
-    do { \
-        cco_task* _resume_task = cco_cast_task(task); \
-        (rt)->result = (_resume_task)->cco.func(_resume_task, rt); \
-    } while (0)
+    _cco_resume_task(cco_cast_task(task), rt)
 
 /* Stop and immediate cleanup */
 #define cco_cancel_task(task, rt) \
-    do { \
-        cco_task* _cancel_task = cco_cast_task(task); \
-        cco_stop(_cancel_task); \
-        (rt)->result = (_cancel_task)->cco.func(_cancel_task, rt); \
-    } while (0)
+    _cco_cancel_task(cco_cast_task(task), rt)
+
+static inline int _cco_resume_task(cco_task* task, cco_runtime* rt)
+    { return task->cco.func(task, rt); }
+static inline int _cco_cancel_task(cco_task* task, cco_runtime* rt)
+    { cco_stop(task); return task->cco.func(task, rt); }
 
 /* Asymmetric coroutine await/call */
 #define cco_await_task(...) c_MACRO_OVERLOAD(cco_await_task, __VA_ARGS__)
@@ -241,15 +235,15 @@ extern int cco_taskrunner(struct cco_taskrunner* co);
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined i_implement || defined STC_IMPLEMENT
 #include <stdio.h>
-// Coroutine task runner
+
 int cco_taskrunner(struct cco_taskrunner* co) {
     cco_runtime* rt = &co->rt;
     cco_routine (co) {
         while (1) {
-            cco_resume_task(rt->current, rt);
+            rt->result = cco_resume_task(rt->current, rt);
             if (rt->error != 0) {
                 do {
-                    cco_cancel_task(rt->current, rt);
+                    rt->result = cco_cancel_task(rt->current, rt);
                 } while ((rt->error != 0) &&
                          (rt->current = rt->current->cco.parent) != NULL);
                 if (rt->current == NULL) break;
