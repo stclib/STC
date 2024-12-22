@@ -224,19 +224,19 @@ static inline int _cco_cancel_task(cco_task* task, cco_runtime* rt)
         cco_yield_v(CCO_NOOP); \
     } while (0)
 
-/* Task dispatcher coroutine */
-struct cco_taskrunner {
+/* Task dispatcher task */
+cco_task_struct (cco_taskrunner) {
+    cco_taskrunner_state cco;
     cco_runtime rt;
-    cco_state cco;
 };
 
-extern int cco_taskrunner(struct cco_taskrunner* co);
+extern int cco_taskrunner(struct cco_taskrunner* co, cco_runtime* rrt);
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined i_implement || defined STC_IMPLEMENT
 #include <stdio.h>
 
-int cco_taskrunner(struct cco_taskrunner* co) {
+int cco_taskrunner(struct cco_taskrunner* co, cco_runtime* rrt) {
     cco_runtime* rt = &co->rt;
     cco_routine (co) {
         while (1) {
@@ -257,9 +257,13 @@ int cco_taskrunner(struct cco_taskrunner* co) {
 
         cco_finally:
         if (rt->error != 0) {
-            fprintf(stderr, __FILE__ ":%d: error: unhandled error '%d' in a coroutine task at line %d.\n",
-                            __LINE__, rt->error, rt->error_line);
-            exit(rt->error);
+            if (rrt) {
+                rrt->error = rt->error; rrt->error_line = rt->error_line;
+            } else {
+                fprintf(stderr, __FILE__ ":%d: error: unhandled error '%d' in a coroutine task at line %d.\n",
+                                __LINE__, rt->error, rt->error_line);
+                exit(rt->error);
+            }
         }
     }
     return 0;
@@ -268,15 +272,16 @@ int cco_taskrunner(struct cco_taskrunner* co) {
 #endif
 
 #define cco_make_taskrunner(task, ctx) \
-    (c_literal(struct cco_taskrunner){.rt = {.current = cco_cast_task(task), .context = ctx}})
+    (c_literal(struct cco_taskrunner){.cco = {cco_taskrunner}, \
+                                      .rt = {.current = cco_cast_task(task), \
+                                             .context = ctx}})
 
 #define cco_run_task(...) c_MACRO_OVERLOAD(cco_run_task, __VA_ARGS__)
 #define cco_run_task_1(task) cco_run_task_3(task, NULL, _runner)
 #define cco_run_task_2(task, ctx) cco_run_task_3(task, ctx, _runner)
 #define cco_run_task_3(task, ctx, runner) \
     for (struct cco_taskrunner runner = cco_make_taskrunner(task, ctx) \
-         ; cco_taskrunner(&runner) != CCO_DONE \
-         ; )
+         ; cco_taskrunner(&runner, NULL) != CCO_DONE ; )
 
 /* // Iterators for coroutine generators
  *
