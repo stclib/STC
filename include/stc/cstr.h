@@ -44,7 +44,7 @@
   #include "priv/cstr_prv.c"
 #endif // i_implement
 
-#if defined i_import || defined STC_IMPLEMENT
+#if defined i_import || defined STC_CSTR_UTF8
   #include "priv/utf8_prv.c"
 #endif
 
