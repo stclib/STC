@@ -390,11 +390,11 @@ STC_INLINE char* cstr_append_s(cstr* self, cstr s)
 STC_INLINE void cstr_replace_sv(cstr* self, csview search, csview repl, int32_t count)
     { cstr_take(self, cstr_from_replace(cstr_sv(self), search, repl, count)); }
 
-STC_INLINE void cstr_replace_count(cstr* self, const char* search, const char* repl, int32_t count)
+STC_INLINE void cstr_replace_nfirst(cstr* self, const char* search, const char* repl, int32_t count)
     { cstr_replace_sv(self, c_sv(search, c_strlen(search)), c_sv(repl, c_strlen(repl)), count); }
 
 STC_INLINE void cstr_replace(cstr* self, const char* search, const char* repl)
-    { cstr_replace_count(self, search, repl, INT32_MAX); }
+    { cstr_replace_nfirst(self, search, repl, INT32_MAX); }
 
 
 STC_INLINE void cstr_replace_at_sv(cstr* self, isize pos, isize len, const csview repl) {
