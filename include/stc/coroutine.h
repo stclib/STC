@@ -169,10 +169,10 @@ typedef struct {
 
 struct cco_task;
 typedef struct {
-    int result;
-    uint16_t error, error_line;
     struct cco_task* current;
     void* context;
+    int result;
+    uint16_t error, error_line;
 } cco_runtime;
 
 /* Define a Task struct */
@@ -224,20 +224,33 @@ static inline int _cco_cancel_task(cco_task* task, cco_runtime* rt)
         cco_yield_v(CCO_NOOP); \
     } while (0)
 
-/* Task dispatcher task */
-cco_task_struct (cco_taskrunner) {
-    cco_taskrunner_state cco;
-    cco_runtime rt;
+/*
+ * Taskrunner
+ */
+struct cco_taskrunner {
+    cco_runtime runtime;
+    cco_state cco;
 };
 
-extern int cco_taskrunner(struct cco_taskrunner* co, cco_runtime* rrt);
+extern int cco_taskrunner(struct cco_taskrunner* co);
+
+#define cco_make_taskrunner(task, ctx) \
+    (c_literal(struct cco_taskrunner){.runtime = { \
+        .current = cco_cast_task(task), .context = ctx \
+    }})
+
+#define cco_run_task(...) c_MACRO_OVERLOAD(cco_run_task, __VA_ARGS__)
+#define cco_run_task_1(task) cco_run_task_2(task, NULL)
+#define cco_run_task_2(task, ctx) \
+    for (struct cco_taskrunner _runner = cco_make_taskrunner(task, ctx) \
+         ; cco_taskrunner(&_runner) != CCO_DONE ; )
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined i_implement || defined STC_IMPLEMENT
 #include <stdio.h>
 
-int cco_taskrunner(struct cco_taskrunner* co, cco_runtime* rrt) {
-    cco_runtime* rt = &co->rt;
+int cco_taskrunner(struct cco_taskrunner* co) {
+    cco_runtime* rt = &co->runtime;
     cco_routine (co) {
         while (1) {
             rt->result = cco_resume_task(rt->current, rt);
@@ -257,31 +270,15 @@ int cco_taskrunner(struct cco_taskrunner* co, cco_runtime* rrt) {
 
         cco_finally:
         if (rt->error != 0) {
-            if (rrt) {
-                rrt->error = rt->error; rrt->error_line = rt->error_line;
-            } else {
-                fprintf(stderr, __FILE__ ":%d: error: unhandled error '%d' in a coroutine task at line %d.\n",
-                                __LINE__, rt->error, rt->error_line);
-                exit(rt->error);
-            }
+            fprintf(stderr, __FILE__ ":%d: error: unhandled error '%d' in a coroutine task at line %d.\n",
+                            __LINE__, rt->error, rt->error_line);
+            exit(rt->error);
         }
     }
     return 0;
 }
 #undef i_implement
 #endif
-
-#define cco_make_taskrunner(task, ctx) \
-    (c_literal(struct cco_taskrunner){.cco = {cco_taskrunner}, \
-                                      .rt = {.current = cco_cast_task(task), \
-                                             .context = ctx}})
-
-#define cco_run_task(...) c_MACRO_OVERLOAD(cco_run_task, __VA_ARGS__)
-#define cco_run_task_1(task) cco_run_task_3(task, NULL, _runner)
-#define cco_run_task_2(task, ctx) cco_run_task_3(task, ctx, _runner)
-#define cco_run_task_3(task, ctx, runner) \
-    for (struct cco_taskrunner runner = cco_make_taskrunner(task, ctx) \
-         ; cco_taskrunner(&runner, NULL) != CCO_DONE ; )
 
 /* // Iterators for coroutine generators
  *
