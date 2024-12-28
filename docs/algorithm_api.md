@@ -217,15 +217,106 @@ int main(void)
 ```
 </details>
 
-## Generic algorithms
-
+## Sum types
 
 <details>
-<summary><b>Variant</b> - automated tagged union</summary>
+<summary><b>Sum types</b> - aka <i>variants</i> or <i>tagged unions</i></summary>
 
-### Variant
+This is a tiny, robust and fully typesafe implementation of sum types. They work similarly to how
+Zig, Odin and Rust implements them, and is just as easy and safe to use.
 
+```c++
+c_sumtype (Tree,
+    (Empty, _Bool),
+    (Leaf, int),
+    (Node, struct {int value; Tree *left, *right;})
+);
+
+int max(int a, int b) {
+    return a > b ? a : b;
+}
+
+int depth(Tree* t) {
+    c_match (t) {
+        c_is(Empty) return 0;
+        c_is(Leaf) return 1;
+        c_is(Node, n) return 1 + max(depth(n->left), depth(n->right));
+    }
+    return -1;
+}
+
+int value(Tree* t) {
+    c_match (t) {
+        c_is(Empty) return 0;
+        c_is(Leaf, v) return *v;
+        c_is(Node, n) return n->value + value(n->left) + value(n->right);
+    }
+    return -1;
+}
+
+int main() {
+    Tree* tree = &c_variant(Node, {1, &c_variant(Leaf, 2), &c_variant(Leaf, 3)});
+    printf("sum = %d\n", value(tree));
+    printf("depth = %d\n", depth(tree));
+}
+```
+
+### Example
+This example has two sum types. Each tuple/parentesized field is an enum with an associated data type,
+called a *variant* of the sum type. The sum type itself is a **union**.
+The `MessageChangeColour` variant uses the `Color` sum type as its data type. View the similarities
+with the linked Rust code. Because C does not have namespaces, it is recommended to prefix the variants
+with the sum type name like in the example.
+
+### Example 2
+```c++
+// https://doc.rust-lang.org/book/ch18-03-pattern-syntax.html#destructuring-enums
+#include <stdio.h>
+#include <stc/algorithm.h>
+
+c_sumtype (Color,
+    (ColorRgb, struct {int32 r, g, b;}),
+    (ColorHsv, struct {int32 h, s, v;})
+);
+
+c_sumtype (Message,
+    (MessageQuit, _Bool),
+    (MessageMove, struct {int32 x, y;}),
+    (MessageWrite, const char*),
+    (MessageChangeColor, Color)
+);
+
+
+int main(void) {
+    Message msg[] = {
+        c_variant(MessageMove, {42, 314}),
+        c_variant(MessageChangeColor, c_variant(ColorHsv, {0, 160, 255})),
+    };
+
+    c_forrange (i, c_arraylen(msg))
+    c_match (&msg[i]) {
+        c_is(MessageQuit) {
+            printf("The Quit variant has no data to destructure.\n");
+        }
+        c_is(MessageMove, p) {
+            printf("Move %d in the x direction and %d in the y direction\n", p->x, p->y);
+        }
+        c_is(MessageWrite, text) {
+            printf("Text message: %s\n", *text);
+        }
+        c_is(MessageChangeColor, cc) c_match (cc) {
+            c_is(ColorRgb, c)
+                printf("Change color to red %d, green %d, and blue %d\n", c->r, c->g, c->b);
+            c_is(ColorHsv, c)
+                printf("Change color to hue %d, saturation %d, value %d\n", c->h, c->s, c->v);
+        }
+    }
+}
+```
 </details>
+
+
+## Generic algorithms
 
 <details>
 <summary><b>c_func</b> - Function with on-the-fly defined return type</summary>
