@@ -15,8 +15,8 @@ int main(void)
     printf("ends_with: %d\n", cstr_ends_with(&ss, ".JPG"));
 
     cstr s1 = cstr_lit("hell😀 w😀rl🐨");
-    csview ch1 = cstr_u8_chr(&s1, 7);
-    csview ch2 = cstr_u8_chr(&s1, 10);
+    csview ch1 = cstr_u8_at(&s1, 7).chr;
+    csview ch2 = cstr_u8_at(&s1, 10).chr;
     printf("%s\nsize: %" c_ZI ", %" c_ZI "\n", cstr_str(&s1), cstr_u8_size(&s1), cstr_size(&s1));
     printf("ch1: " c_svfmt "\n", c_svarg(ch1));
     printf("ch2: " c_svfmt "\n", c_svarg(ch2));

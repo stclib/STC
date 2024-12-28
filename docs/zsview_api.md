@@ -23,14 +23,14 @@ All zsview definitions and prototypes are available by including a single header
 ```c++
 zsview          c_zv(const char literal_only[]);                    // create from string literal only
 zsview          zsview_from(const char* str);                       // construct from const char*
-zsview          zsview_from_position(zsview zv, isize pos);         // subview starting from index pos
+zsview          zsview_from_pos(zsview zv, isize pos);              // subview starting from index pos
 
 isize           zsview_size(zsview zv);
 bool            zsview_is_empty(zsview zv);                         // check if size == 0
 void            zsview_clear(zsview* self);
 
 csview          zsview_sv(zsview zv);                               // convert to csview type
-csview          zsview_subview(zsview zv, isize pos, isize len);    // convert to csview type
+csview          zsview_subview(zsview zv, isize pos, isize len);    // return as csview span
 zsview          zsview_tail(zsview zv, isize len);                  // subview of the trailing n bytes
 
 bool            zsview_equals(zsview zv, const char* str);
@@ -42,9 +42,9 @@ bool            zsview_ends_with(zsview zv, const char* str);
 
 #### UTF8 methods
 ```c++
-zsview          zsview_u8_from_position(zsview zv, isize u8pos);    // subview starting from rune u8pos
+zsview          zsview_u8_from_pos(zsview zv, isize u8pos);         // subview starting from rune u8pos
 isize           zsview_u8_size(zsview zv);                          // number of utf8 runes
-csview          zsview_u8_chr(zsview zv, isize u8pos);              // get rune at rune position
+zsview_iter     zsview_u8_at(zsview zv, isize u8pos);               // get rune at rune position
 csview          zsview_u8_subview(zsview zs, isize u8pos, isize u8len);
 zsview          zsview_u8_tail(zsview zv, isize u8len);             // subview of the last u8len runes
 bool            zsview_u8_valid(zsview zv);                         // check utf8 validity of zv

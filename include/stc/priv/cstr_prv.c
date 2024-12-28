@@ -236,7 +236,7 @@ isize cstr_printf(cstr* self, const char* fmt, ...) {
 
 void cstr_u8_erase(cstr* self, const isize u8pos, const isize u8len) {
     csview r = cstr_sv(self);
-    csview span = utf8_span(r.buf, u8pos, u8len);
+    csview span = utf8_subview(r.buf, u8pos, u8len);
     c_memmove((void *)&span.buf[0], &span.buf[span.size], r.size - span.size - (span.buf - r.buf));
     _cstr_set_size(self, r.size - span.size);
 }

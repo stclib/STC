@@ -228,13 +228,14 @@ STC_INLINE zsview cstr_u8_tail(const cstr* self, isize u8len) {
 }
 
 STC_INLINE csview cstr_u8_subview(const cstr* self, isize u8pos, isize u8len)
-    { return utf8_span(cstr_str(self), u8pos, u8len); }
+    { return utf8_subview(cstr_str(self), u8pos, u8len); }
 
-STC_INLINE csview cstr_u8_chr(const cstr* self, isize u8pos) {
+STC_INLINE cstr_iter cstr_u8_at(const cstr* self, isize u8pos) {
     csview sv;
     sv.buf = utf8_at(cstr_str(self), u8pos);
     sv.size = utf8_chr_size(sv.buf);
-    return sv;
+    c_assert(sv.size);
+    return c_literal(cstr_iter){.chr = sv};
 }
 
 // utf8 iterator
@@ -405,7 +406,7 @@ STC_INLINE void cstr_replace_at(cstr* self, isize pos, isize len, const char* re
     { cstr_replace_at_sv(self, pos, len, c_sv(repl, c_strlen(repl))); }
 
 STC_INLINE void cstr_u8_replace(cstr* self, isize u8pos, isize u8len, const char* repl) {
-    const char* s = cstr_str(self); csview span = utf8_span(s, u8pos, u8len);
+    const char* s = cstr_str(self); csview span = utf8_subview(s, u8pos, u8len);
     cstr_replace_at(self, span.buf - s, span.size, repl);
 }
 

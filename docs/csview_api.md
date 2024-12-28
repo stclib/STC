@@ -50,14 +50,12 @@ bool            csview_ends_with(csview sv, const char* str);
 
 csview          csview_subview(csview sv, isize pos, isize len);
 csview          csview_slice(csview sv, isize pos1, isize pos2);
-csview          csview_tail(csview sv, isize len);                      // subview of the trailing len bytes
+csview          csview_tail(csview sv, isize len);                      // span of the trailing len bytes
 csview          csview_trim(csview sv);                                 // trim whitespace and ctrl-chars on both ends
 csview          csview_trim_start(csview sv);                           // trim from start of view
 csview          csview_trim_end(csview sv);                             // trim from end of view
-const char*     csview_at(csview sv, isize index);
 
-csview          csview_subview_ex(csview sv, isize pos, isize len);     // negative pos count from end
-csview          csview_slice_ex(csview sv, isize pos1, isize pos2);     // negative pos1, pos2 count from end
+csview          csview_subview_pro(csview sv, isize pos, isize len);    // negative pos count from end
 csview          csview_token(csview sv, const char* sep, isize* start); // *start > sv.size after last token
 ```
 
@@ -65,9 +63,9 @@ csview          csview_token(csview sv, const char* sep, isize* start); // *star
 ```c++
 csview          csview_u8_from(const char* str, isize u8pos, isize u8len); // construct csview with u8len runes
 isize           csview_u8_size(csview sv);                              // number of utf8 runes
-csview          csview_u8_chr(csview sv, isize u8pos);                  // get rune at rune position
-csview          csview_u8_subview(csview sv, isize u8pos, isize u8len); // utf8 subview
-csview          csview_u8_tail(csview sv, isize u8len);                 // subview of the trailing u8len runes.
+csview_iter     csview_u8_at(csview sv, isize u8pos);                   // get rune at rune position
+csview          csview_u8_subview(csview sv, isize u8pos, isize u8len); // utf8 span
+csview          csview_u8_tail(csview sv, isize u8len);                 // span of the trailing u8len runes.
 bool            csview_u8_valid(csview sv);                             // check utf8 validity of sv
 
 bool            csview_iequals(csview sv, const char* str);             // utf8 case-insensitive comparison
@@ -120,23 +118,24 @@ bool            csview_ieq(const csview* x, const csview* y);
 #include "stc/cstr.h"
 #include "stc/csview.h"
 
+
 int main(void)
 {
-    cstr str1 = cstr_lit("We think in generalities, but we live in details.");
-                                                        // (quoting Alfred N. Whitehead)
+    cstr str = cstr_lit("We think in generalities, but we live in details.");
+    csview sv = cstr_sv(&str);
+    csview sv1 = csview_subview(sv, 3, 5);                 // "think"
+    isize pos = csview_find(sv, "live");                   // position of "live"
+    csview sv2 = csview_subview(sv, pos, 4);               // "live"
+    csview sv3 = csview_subview_pro(sv, -8, 7);            // "details"
+    printf(c_svfmt ", " c_svfmt ", " c_svfmt "\n",
+           c_svarg(sv1), c_svarg(sv2), c_svarg(sv3));
 
-    csview ss1 = cstr_subview_ex(&str1, 3, 5);           // "think"
-    isize pos = cstr_find(&str1, "live");            // position of "live" in str1
-    csview ss2 = cstr_subview_ex(&str1, pos, 4);         // get "live"
-    csview ss3 = cstr_slice_ex(&str1, -8, -1);          // get "details"
-    printf(c_svfmt " " c_svfmt " " c_svfmt "\n",
-           c_svarg(ss1), c_svarg(ss2), c_svarg(ss3));
-    cstr s1 = cstr_lit("Apples are red");
-    cstr s2 = cstr_from_sv(cstr_subview_ex(&s1, -3, 3)); // "red"
-    cstr s3 = cstr_from_sv(cstr_subview_ex(&s1, 0, 6));  // "Apples"
-    printf("%s %s\n", cstr_str(&s2), cstr_str(&s3));
+    cstr_assign(&str, "apples are green or red");
+    sv = cstr_sv(&str);
+    cstr s2 = cstr_from_sv(csview_subview_pro(sv, -3, 3)); // "red"
+    cstr s3 = cstr_from_sv(csview_subview(sv, 0, 6));      // "apples"
 
-    c_drop(cstr, &str1, &s1, &s2, &s3);
+    c_drop(cstr, &str, &s2, &s3);
 }
 ```
 Output:

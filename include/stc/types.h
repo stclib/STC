@@ -90,8 +90,8 @@ typedef union cstr {
 } cstr;
 
 typedef union {
-    const cstr_value* ref;
     csview chr; // utf8 character/codepoint
+    const cstr_value* ref;
 } cstr_iter;
 
 #define c_true(...) __VA_ARGS__

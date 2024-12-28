@@ -70,7 +70,7 @@ STC_INLINE const char* utf8_offset(const char* s, isize u8pos) {
 STC_INLINE isize utf8_to_index(const char* s, isize u8pos)
     { return utf8_at(s, u8pos) - s; }
 
-STC_INLINE csview utf8_span(const char *s, isize u8pos, isize u8len) {
+STC_INLINE csview utf8_subview(const char *s, isize u8pos, isize u8len) {
     csview span;
     span.buf = utf8_at(s, u8pos);
     span.size = utf8_to_index(span.buf, u8len);

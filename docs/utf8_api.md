@@ -18,7 +18,7 @@ isize           utf8_count_n(const char *s, isize nbytes);      // number of utf
 isize           utf8_to_index(const char* s, isize u8pos);      // from utf8 pos to byte index
 int             utf8_chr_size(const char* s);                   // utf8 character size: 1-4
 const char*     utf8_at(const char *s, isize u8pos);            // return the char* at u8pos
-csview          utf8_span(const char* s, isize u8pos, isize u8len); // return a csview as the span
+csview          utf8_subview(const char* s, isize u8pos, isize u8len); // return a csview as the span
 
 bool            utf8_valid(const char* s);
 bool            utf8_valid_n(const char* s, isize nbytes);
