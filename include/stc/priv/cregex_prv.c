@@ -1198,7 +1198,7 @@ _regexec(const _Reprog *progp,    /* program to run */
     j.starts = bol;
     j.eol = NULL;
 
-    if (mp && mp[0].size) {
+    if (mp && mp[0].buf) {
         if (mflags & CREG_STARTEND)
             j.starts = mp[0].buf, j.eol = mp[0].buf + mp[0].size;
         else if (mflags & CREG_NEXT)
@@ -1273,7 +1273,7 @@ _build_subst(const char* replace, int nmatch, const csview match[],
  */
 
 int
-cregex_compile_ex(cregex *self, const char* pattern, int cflags) {
+cregex_compile_3(cregex *self, const char* pattern, int cflags) {
     _Parser par;
     self->prog = _regcomp1(self->prog, &par, pattern, cflags);
     return self->error = par.error;
@@ -1285,7 +1285,7 @@ cregex_captures(const cregex* self) {
 }
 
 int
-cregex_find_ex(const cregex* re, const char* input, csview match[], int mflags) {
+cregex_match_4(const cregex* re, const char* input, csview match[], int mflags) {
     int res = _regexec(re->prog, input, cregex_captures(re) + 1, match, mflags);
     switch (res) {
         case 1: return CREG_OK;
@@ -1295,18 +1295,16 @@ cregex_find_ex(const cregex* re, const char* input, csview match[], int mflags) 
 }
 
 int
-cregex_find_pattern_ex(const char* pattern, const char* input,
-                       csview match[], int cmflags) {
-    cregex re = {0};
-    int res = cregex_compile_ex(&re, pattern, cmflags);
-    if (res != CREG_OK) return res;
-    res = cregex_find_ex(&re, input, match, cmflags);
+cregex_match_pattern(const char* pattern, const char* input, csview match[]) {
+    cregex re = cregex_from_2(pattern, CREG_DEFAULT);
+    if (re.error != CREG_OK) return re.error;
+    int res = cregex_match_4(&re, input, match, CREG_DEFAULT);
     cregex_drop(&re);
     return res;
 }
 
 cstr
-cregex_replace_ex(const cregex* re, csview input, const char* replace,
+cregex_replace_sv(const cregex* re, csview input, const char* replace,
                   int count, bool(*transform)(int, csview, cstr*), int rflags) {
     cstr out = {0};
     cstr subst = {0};
@@ -1314,7 +1312,7 @@ cregex_replace_ex(const cregex* re, csview input, const char* replace,
     int nmatch = cregex_captures(re) + 1;
     bool copy = !(rflags & CREG_STRIP);
 
-    while (count-- && cregex_find_sv(re, input, match) == CREG_OK) {
+    while (count-- && cregex_match_sv(re, input, match) == CREG_OK) {
         _build_subst(replace, nmatch, match, transform, &subst);
         const isize mpos = (match[0].buf - input.buf);
         if (copy & (mpos > 0)) cstr_append_n(&out, input.buf, mpos);
@@ -1328,12 +1326,12 @@ cregex_replace_ex(const cregex* re, csview input, const char* replace,
 }
 
 cstr
-cregex_replace_pattern_ex(const char* pattern, csview input, const char* replace,
+cregex_replace_pattern_sv(const char* pattern, csview input, const char* replace,
                           int count, bool(*transform)(int, csview, cstr*), int crflags) {
     cregex re = {0};
-    if (cregex_compile_ex(&re, pattern, crflags) != CREG_OK)
+    if (cregex_compile_3(&re, pattern, crflags) != CREG_OK)
         assert(0);
-    cstr out = cregex_replace_ex(&re, input, replace, count, transform, crflags);
+    cstr out = cregex_replace_sv(&re, input, replace, count, transform, crflags);
     cregex_drop(&re);
     return out;
 }
