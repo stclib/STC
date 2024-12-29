@@ -227,37 +227,23 @@ Zig, Odin and Rust implements them, and is just as easy and safe to use.
 
 ```c++
 c_sumtype (Tree,
-    (Empty, _Bool),
-    (Leaf, int),
-    (Node, struct {int value; Tree *left, *right;})
+    (TreeEmpty, _Bool),
+    (TreeLeaf, int),
+    (TreeNode, struct {int value; Tree *left, *right;})
 );
 
-int max(int a, int b) {
-    return a > b ? a : b;
-}
-
-int depth(Tree* t) {
+int tree_sum(Tree* t) {
     c_match (t) {
-        c_is(Empty) return 0;
-        c_is(Leaf) return 1;
-        c_is(Node, n) return 1 + max(depth(n->left), depth(n->right));
+        c_is(TreeEmpty) return 0;
+        c_is(TreeLeaf, v) return *v;
+        c_is(TreeNode, n) return n->value + value(n->left) + value(n->right);
     }
     return -1;
 }
 
-int value(Tree* t) {
-    c_match (t) {
-        c_is(Empty) return 0;
-        c_is(Leaf, v) return *v;
-        c_is(Node, n) return n->value + value(n->left) + value(n->right);
-    }
-    return -1;
-}
-
-int main() {
-    Tree* tree = &c_variant(Node, {1, &c_variant(Leaf, 2), &c_variant(Leaf, 3)});
-    printf("sum = %d\n", value(tree));
-    printf("depth = %d\n", depth(tree));
+int main(void) {
+    Tree* tree = &c_variant(TreeNode, {1, &c_variant(TreeLeaf, 2), &c_variant(TreeLeaf, 3)});
+    printf("sum = %d\n", tree_sum(tree));
 }
 ```
 
