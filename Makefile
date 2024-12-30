@@ -24,9 +24,9 @@ RM_F      ?= rm -f
 
 ifeq ($(OS),Windows_NT)
 	EXE := .exe
-	BUILDDIR := build/Windows
+	BUILDDIR := build_Windows
 else
-	BUILDDIR := build/$(shell uname)
+	BUILDDIR := build_$(shell uname)
 endif
 
 OBJ_DIR   := $(BUILDDIR)
@@ -38,7 +38,7 @@ LIB_OBJS  := $(LIB_SRCS:%.c=$(OBJ_DIR)/%.o)
 LIB_DEPS  := $(LIB_SRCS:%.c=$(OBJ_DIR)/%.d)
 LIB_PATH  := $(BUILDDIR)/lib$(LIB_NAME).a
 
-EX_SRCS   := $(wildcard misc/examples/*/*.c)
+EX_SRCS   := $(wildcard examples/*/*.c)
 EX_OBJS   := $(EX_SRCS:%.c=$(OBJ_DIR)/%.o)
 EX_DEPS   := $(EX_SRCS:%.c=$(OBJ_DIR)/%.d)
 EX_EXES   := $(EX_SRCS:%.c=$(OBJ_DIR)/%$(EXE))

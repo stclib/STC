@@ -757,7 +757,7 @@ Major changes:
 - Algorithms:
     - [crange](docs/algorithm_api.md#crange) - similar to [boost::irange](https://www.boost.org/doc/libs/release/libs/range/doc/html/range/reference/ranges/irange.html) integer range generator.
     - [c_forfilter](docs/algorithm_api.md#c_forfilter) - ranges-like view filtering.
-    - [quicksort](include/stc/sort.h) - fast quicksort with [custom inline comparison](misc/benchmarks/various/quicksort_bench.c).
+    - [quicksort](include/stc/sort.h) - fast quicksort with custom inline comparison.
 - Renamed `c_ARGSV()` => `c_svarg()`: **csview** print arg. Note `c_sv()` is shorthand for *csview_from()*.
 - Support for [uppercase flow-control](include/stc/priv/altnames.h) macro names in common.h.
 - Some API changes in **cregex** and **cstr**.

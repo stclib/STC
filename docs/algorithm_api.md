@@ -575,7 +575,7 @@ isize           X_binary_search_range(const X* self, i_key key, isize start, isi
 ##### Performance
 The *X_sort()*, *X_sort_lowhigh()* functions are about twice as fast as *qsort()* and comparable in
 speed with *std::sort()**. Both *X_binary_seach()* and *X_lower_bound()* are about 30% faster than
-c++ *std::lower_bound()*. There is a [benchmark/test file here](../misc/benchmarks/various/quicksort_bench.c).
+c++ *std::lower_bound()*.
 ##### Usage examples
 ```c++
 #define i_key int // sort a regular c-array of ints

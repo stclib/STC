@@ -1,3 +1,4 @@
+root = not meson.is_subproject()
 examples = get_option('examples').enable_auto_if(root)
 
 if examples.enabled()

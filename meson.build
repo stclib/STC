@@ -3,7 +3,7 @@ project(
   'c',
   version: '5.0-dev',
   license: 'MIT',
-  default_options: ['c_std=c99', 'warning_level=3', 'default_library=static']
+  default_options: ['c_std=c11', 'warning_level=3', 'default_library=static']
 )
 
 stcversion = 5
@@ -127,7 +127,8 @@ if flex_exe.found()
   meson.override_find_program('checkscoped', checkscoped_exe)
 endif
 
-subdir('misc')
+subdir('tests')
+subdir('examples')
 
 datadir = get_option('datadir')
 
