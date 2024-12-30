@@ -222,39 +222,76 @@ int main(void)
 <details>
 <summary><b>Sum types</b> - aka <i>variants</i> or <i>tagged unions</i></summary>
 
-This is a tiny, robust and fully typesafe implementation of sum types. They work similarly to how
-Zig, Odin and Rust implements them, and is just as easy and safe to use.
+This is a tiny, robust and fully typesafe implementation of sum types. They work similarly
+as in Zig, Odin and Rust, and is just as easy and safe to use.
 
+Synopsis:
 ```c++
+// Define a sum type
+c_sumtype (SumType,
+    (VariantEnum1, VariantType1),
+    ...
+    (VariantEnumN, VariantTypeN)
+);
+
+// Sum type variant constructor
+SumType c_variant(VariantEnum tag, VariantType value);
+
+// Use a sum type (1)
+c_match (SumType*) {
+    c_is(VariantEnum1, VariantType1* v) <body>;
+    c_is(VariantEnumX) c_or_is(VariantEnumY) <body>;
+    ...
+    c_is(VariantEnumN, VariantTypeN* v) <body>;
+    c_otherwise <body>;
+}
+
+// Use a sum type (2)
+c_if_is (SumType*, VariantEnum, VariantType* v) <body>;
+```
+### Example 1
+
+[ [Run this code](https://godbolt.org/z/4TY44Kh3v) ]
+```c++
+#include <stdio.h>
+#include "stc/algorithm.h"
+
 c_sumtype (Tree,
-    (TreeEmpty, _Bool),
-    (TreeLeaf, int),
-    (TreeNode, struct {int value; Tree *left, *right;})
+    (Empty, _Bool),
+    (Leaf, int),
+    (Node, struct {int value; Tree *left, *right;})
 );
 
 int tree_sum(Tree* t) {
     c_match (t) {
-        c_is(TreeEmpty) return 0;
-        c_is(TreeLeaf, v) return *v;
-        c_is(TreeNode, n) return n->value + value(n->left) + value(n->right);
+        c_is(Empty) return 0;
+        c_is(Leaf, v) return *v;
+        c_is(Node, n) return n->value + tree_sum(n->left) + tree_sum(n->right);
     }
     return -1;
 }
 
 int main(void) {
-    Tree* tree = &c_variant(TreeNode, {1, &c_variant(TreeLeaf, 2), &c_variant(TreeLeaf, 3)});
+    Tree* tree =
+    &c_variant(Node, {1,
+        &c_variant(Node, {2,
+            &c_variant(Leaf, 3),
+            &c_variant(Leaf, 4)
+        }),
+        &c_variant(Leaf, 5)
+    });
+
     printf("sum = %d\n", tree_sum(tree));
 }
 ```
 
-### Example
+### Example 2
 This example has two sum types. Each tuple/parentesized field is an enum with an associated data type,
 called a *variant* of the sum type. The sum type itself is a **union**.
-The `MessageChangeColour` variant uses the `Color` sum type as its data type. View the similarities
-with the linked Rust code. Because C does not have namespaces, it is recommended to prefix the variants
-with the sum type name like in the example.
+The `MessageChangeColor` variant uses the `Color` sum type as its data type. Because C does not have
+namespaces, it is recommended to prefix the variant names with the sum type name, like in this example.
 
-### Example 2
+[ [Run this code](https://godbolt.org/z/zWo48nhnc) ]
 ```c++
 // https://doc.rust-lang.org/book/ch18-03-pattern-syntax.html#destructuring-enums
 #include <stdio.h>
