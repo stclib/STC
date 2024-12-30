@@ -36,13 +36,13 @@ c_sumtype (Action,
 );
 
 void Action_drop(Action* self) {
-    c_match (self) {
+    c_when (self) {
         c_is(ActionSpeak, x) cstr_drop(x);
     }
 }
 
 void action(Action* action) {
-    c_match (action) {
+    c_when (action) {
         c_is(ActionSpeak, s) {
             printf("Asked to speak: %s\n", cstr_str(s));
         }
@@ -106,7 +106,7 @@ int main(void) {
     }
 
 #if defined __GNUC__ || defined __clang__ || defined __TINYC__ || _MSC_VER >= 1939
-    #define c_match(var) \
+    #define c_when(var) \
         for (__typeof__(var) _match = (var); _match; _match = NULL) \
         switch (_match->_any_.tag)
 
@@ -120,7 +120,7 @@ int main(void) {
                 for (__typeof__(_var->Tag.var) *x = &_var->Tag.var; x; x = NULL)
 #else
     typedef union { struct { uint8_t tag; } _any_; } _c_any_variant;
-    #define c_match(var) \
+    #define c_when(var) \
         for (_c_any_variant* _match = (_c_any_variant *)(var) + 0*sizeof((var)->_any_.tag); \
              _match; _match = NULL) \
             switch (_match->_any_.tag)

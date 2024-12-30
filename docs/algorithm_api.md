@@ -238,7 +238,7 @@ c_sumtype (SumType,
 SumType c_variant(VariantEnum tag, VariantType value);
 
 // Use a sum type (1)
-c_match (SumType*) {
+c_when (SumType*) {
     c_is(VariantEnum1, VariantType1* v) <body>;
     c_is(VariantEnumX) c_or_is(VariantEnumY) <body>;
     ...
@@ -263,7 +263,7 @@ c_sumtype (Tree,
 );
 
 int tree_sum(Tree* t) {
-    c_match (t) {
+    c_when (t) {
         c_is(Empty) return 0;
         c_is(Leaf, v) return *v;
         c_is(Node, n) return n->value + tree_sum(n->left) + tree_sum(n->right);
@@ -317,7 +317,7 @@ int main(void) {
     };
 
     c_forrange (i, c_arraylen(msg))
-    c_match (&msg[i]) {
+    c_when (&msg[i]) {
         c_is(MessageQuit) {
             printf("The Quit variant has no data to destructure.\n");
         }
@@ -327,7 +327,7 @@ int main(void) {
         c_is(MessageWrite, text) {
             printf("Text message: %s\n", *text);
         }
-        c_is(MessageChangeColor, cc) c_match (cc) {
+        c_is(MessageChangeColor, cc) c_when (cc) {
             c_is(ColorRgb, c)
                 printf("Change color to red %d, green %d, and blue %d\n", c->r, c->g, c->b);
             c_is(ColorHsv, c)
