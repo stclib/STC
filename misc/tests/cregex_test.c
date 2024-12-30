@@ -13,7 +13,7 @@ TEST(cregex, ISO8601_parse_result)
     const char* pattern = "(\\d\\d\\d\\d)-(\\d\\d)-(\\d\\d)";
     const char* input = "2024-02-28";
     csview match[4];
-    EXPECT_EQ(cregex_match_pattern(pattern, input, match), CREG_OK);
+    EXPECT_EQ(cregex_match_aio(pattern, input, match), CREG_OK);
     EXPECT_TRUE(csview_equals(match[1], "2024"));
     EXPECT_TRUE(csview_equals(match[2], "02"));
     EXPECT_TRUE(csview_equals(match[3], "28"));
@@ -26,7 +26,7 @@ TEST(cregex, compile_match_char)
     EXPECT_EQ(re.error, 0);
 
     csview match;
-    EXPECT_EQ(cregex_match_4(&re, input="äsdf", &match, CREG_FULLMATCH), CREG_OK);
+    EXPECT_EQ(cregex_match_pro(&re, input="äsdf", &match, CREG_FULLMATCH), CREG_OK);
     EXPECT_EQ(M_START(match), 0);
     EXPECT_EQ(M_END(match), 5); // ä is two bytes wide
 
@@ -269,20 +269,20 @@ TEST(cregex, replace)
         cstr_drop(&str), cregex_drop(&re)
     ){
         // replace with a fixed string, extended all-in-one call:
-        cstr_take(&str, cregex_replace_pattern(pattern, input, "YYYY-MM-DD"));
+        cstr_take(&str, cregex_replace_aio(pattern, input, "YYYY-MM-DD"));
         EXPECT_STREQ(cstr_str(&str), "start date: YYYY-MM-DD, end date: YYYY-MM-DD");
 
         // US date format, and add 10 years to dates:
-        cstr_take(&str, cregex_replace_pattern_sv(pattern, csview_from(input), "$1/$3/$2",
-                                                  INT32_MAX, add_10_years, CREG_DEFAULT));
+        cstr_take(&str, cregex_replace_aio_pro(pattern, csview_from(input), "$1/$3/$2",
+                                               INT32_MAX, add_10_years, CREG_DEFAULT));
         EXPECT_STREQ(cstr_str(&str), "start date: 2025/31/12, end date: 2032/28/02");
 
         // Wrap first date inside []:
-        cstr_take(&str, cregex_replace_pattern_sv(pattern, csview_from(input), "[$0]", 1, NULL, CREG_DEFAULT));
+        cstr_take(&str, cregex_replace_aio_pro(pattern, csview_from(input), "[$0]", 1, NULL, CREG_DEFAULT));
         EXPECT_STREQ(cstr_str(&str), "start date: [2015-12-31], end date: 2022-02-28");
 
         // Wrap all words in ${}
-        cstr_take(&str, cregex_replace_pattern("[a-z]+", "52 apples and 31 mangoes", "$${$0}"));
+        cstr_take(&str, cregex_replace_aio("[a-z]+", "52 apples and 31 mangoes", "$${$0}"));
         EXPECT_STREQ(cstr_str(&str), "52 ${apples} ${and} 31 ${mangoes}");
 
         // Compile RE separately
@@ -294,8 +294,8 @@ TEST(cregex, replace)
         EXPECT_STREQ(cstr_str(&str), "start date: 31.12.2015, end date: 28.02.2022");
 
         // Strip out everything but the matches
-        cstr_take(&str, cregex_replace_sv(&re, csview_from(input), "$3.$2.$1;",
-                                          INT32_MAX, NULL, CREG_STRIP));
+        cstr_take(&str, cregex_replace_pro(&re, csview_from(input), "$3.$2.$1;",
+                                           INT32_MAX, NULL, CREG_STRIP));
         EXPECT_STREQ(cstr_str(&str), "31.12.2015;28.02.2022;");
     }
 }

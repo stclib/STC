@@ -21,19 +21,19 @@ The API is simple and includes powerful string pattern matches and replace funct
 ## Methods
 ```c++
 cregex          cregex_from(const char* pattern);
-cregex          cregex_from(const char* pattern, int cflags);
+cregex          cregex_make(const char* pattern, int cflags);
 
                 // return CREG_OK, or negative error code on failure
 int             cregex_compile(cregex *self, const char* pattern);
-int             cregex_compile(cregex *self, const char* pattern, int cflags);
+int             cregex_compile_pro(cregex *self, const char* pattern, int cflags);
 
                 // num. of capture groups in regex, excluding the 0th group which is the full match
 int             cregex_captures(const cregex* self);
 
                 // Match RE. Return CREG_OK, CREG_NOMATCH, or CREG_MATCHERROR
 int             cregex_match(const cregex* re, const char* input, csview match[]);
-int             cregex_match(const cregex* re, const char* input, csview match[], int mflags);
 int             cregex_match_sv(const cregex* re, csview input, csview match[]);
+int             cregex_match_pro(const cregex* re, const char* input, csview match[], int mflags);
 
                 // Check if there are matches in input
 bool            cregex_is_match(const cregex* re, const char* input);
@@ -43,18 +43,18 @@ int             cregex_match_next(const cregex* re, const char* input, csview ma
 int             cregex_match_next_sv(const cregex* re, csview input, csview match[]);
 
                 // All-in-one single match (compile + match + drop)
-int             cregex_match_pattern(const char* pattern, const char* input, csview match[]);
+int             cregex_match_aio(const char* pattern, const char* input, csview match[]);
 
                 // Replace all matched instances
 cstr            cregex_replace(const cregex* re, const char* input, const char* replace);
                 // String view input and transform up to count replacements
-cstr            cregex_replace_sv(const cregex* re, csview input, const char* replace, int count,
-                                  bool(*transform)(int group, csview match, cstr* result), int rflags);
+cstr            cregex_replace_pro(const cregex* re, csview input, const char* replace, int count,
+                                   bool(*transform)(int group, csview match, cstr* result), int rflags);
 
                 // All-in-one replacement (compile + match/replace + drop)
-cstr            cregex_replace_pattern(const char* pattern, const char* input, const char* replace);
-cstr            cregex_replace_pattern_sv(const char* pattern, csview input, const char* replace, int count,
-                                          bool(*transform)(int group, csview match, cstr* result), int crflags);
+cstr            cregex_replace_aio(const char* pattern, const char* input, const char* replace);
+cstr            cregex_replace_aio_pro(const char* pattern, csview input, const char* replace, int count,
+                                       bool(*transform)(int group, csview match, cstr* result), int crflags);
                 // destroy
 void            cregex_drop(cregex* self);
 ```
@@ -127,7 +127,7 @@ int main(void) {
 ```
 For a single match you may use the all-in-one function:
 ```c++
-if (cregex_match_pattern(pattern, input, match))
+if (cregex_match_aio(pattern, input, match))
     printf("Found date: " c_svfmt "\n", c_svarg(match[0]));
 ```
 
