@@ -99,7 +99,7 @@ If an error occurs ```cregex_compile``` returns a negative error code stored in 
 
 ### Getting the first match and making text replacements
 
-[ [Run this code](https://godbolt.org/z/9EovPvK5K) ]
+[ [Run this code](https://godbolt.org/z/811Yre96s) ]
 ```c++
 #include "stc/cregex.h"
 
@@ -130,9 +130,6 @@ For a single match you may use the all-in-one function:
 if (cregex_match_aio(pattern, input, match))
     printf("Found date: " c_svfmt "\n", c_svarg(match[0]));
 ```
-
-To use: `gcc first_match.c`.
-In order to use a callback function in the replace call, see `examples/regex_replace.c`.
 
 ### Iterate through regex matches, *c_formatch*
 

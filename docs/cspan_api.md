@@ -254,7 +254,7 @@ int main(void) {
 ## Example 3
 Slicing cspan without and with reducing the rank:
 
-[ [Run this code](https://godbolt.org/z/Y5xv57MoY   ) ]
+[ [Run this code](https://godbolt.org/z/Y5xv57MoY) ]
 ```c++
 #include <stdio.h>
 #include "stc/cspan.h"

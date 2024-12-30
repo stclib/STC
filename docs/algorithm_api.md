@@ -222,8 +222,10 @@ int main(void)
 <details>
 <summary><b>Sum types</b> - aka <i>variants</i> or <i>tagged unions</i></summary>
 
-This is a tiny, robust and fully typesafe implementation of sum types. They work similarly
-as in Zig, Odin and Rust, and is just as easy and safe to use.
+This is a tiny, robust and fully typesafe implementation of sum types. They work
+similarly as in Zig, Odin and Rust, and is just as easy and safe to use.
+Each tuple/parentesized field is an enum (tag) with an associated data type (payload),
+called a *variant* of the sum type. The sum type itself is a **union** type.
 
 Synopsis:
 ```c++
@@ -249,9 +251,13 @@ c_when (SumType*) {
 // Use a sum type (2)
 c_if_is (SumType*, VariantEnum, VariantType* v) <body>;
 ```
+The **c_when** statement is exhaustive. The compiler will give a warning if not all variants are
+covered by **c_is** (requires `-Wall` or `-Wswitch` gcc/clang compiler flag). Note also that the
+first enum value is deliberately set to 1 in order to easier detect non/zero-initialized variants.
+
 ### Example 1
 
-[ [Run this code](https://godbolt.org/z/4TY44Kh3v) ]
+[ [Run this code](https://godbolt.org/z/PEvjGff3E) ]
 ```c++
 #include <stdio.h>
 #include "stc/algorithm.h"
@@ -286,12 +292,10 @@ int main(void) {
 ```
 
 ### Example 2
-This example has two sum types. Each tuple/parentesized field is an enum with an associated data type,
-called a *variant* of the sum type. The sum type itself is a **union**.
-The `MessageChangeColor` variant uses the `Color` sum type as its data type. Because C does not have
-namespaces, it is recommended to prefix the variant names with the sum type name, like in this example.
+This example has two sum types. The `MessageChangeColor` variant uses the `Color` sum type as
+its data type (payload). Because C does not have namespaces, it is recommended to prefix the variant names with the sum type name, as with regular enums.
 
-[ [Run this code](https://godbolt.org/z/zWo48nhnc) ]
+[ [Run this code](https://godbolt.org/z/846bbjzGG) ]
 ```c++
 // https://doc.rust-lang.org/book/ch18-03-pattern-syntax.html#destructuring-enums
 #include <stdio.h>

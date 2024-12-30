@@ -127,7 +127,7 @@ bool            c_memcmp_eq(const i_keyraw* a, const i_keyraw* b);    // !memcmp
 
 ## Examples
 
-[ [Run this code](https://godbolt.org/z/zocez8x1c) ]
+[ [Run this code](https://godbolt.org/z/b57994EEf) ]
 ```c++
 #include "stc/cstr.h"
 
@@ -192,7 +192,7 @@ int main(void)
 ### Example 3
 Inverse: Demonstrate hmap with plain-old-data key type Vec3i and int as mapped type: hmap<Vec3i, int>.
 
-[ [Run this code](https://godbolt.org/z/x1vn36joc) ]
+[ [Run this code](https://godbolt.org/z/xxTjqndPY) ]
 ```c++
 #include <stdio.h>
 typedef struct { int x, y, z; } Vec3i;
@@ -221,7 +221,7 @@ int main(void)
 ### Example 4: Advanced
 Key type is struct. Based on https://doc.rust-lang.org/std/collections/struct.HashMap.html
 
-[ [Run this code](https://godbolt.org/z/jhTv4x1e4) ]
+[ [Run this code](https://godbolt.org/z/GhYKP9fzo) ]
 ```c++
 #include <stc/cstr.h>
 

@@ -164,7 +164,7 @@ Translate a
 [C++ example using *insert* and *emplace*](https://en.cppreference.com/w/cpp/container/map/try_emplace)
  to STC:
 
-[ [Run this code](https://godbolt.org/z/3Kfrax43r) ]
+[ [Run this code](https://godbolt.org/z/1asTWeaYK) ]
 ```c++
 #include "stc/cstr.h"
 #define i_type strmap
