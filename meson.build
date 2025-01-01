@@ -85,9 +85,15 @@ install_headers(
 )
 
 install_headers(
-  'include/stc/priv/crange.h',
+  'include/stc/sys/crange.h',
+  'include/stc/sys/filter.h',
+  'include/stc/sys/sumtype.h',
+  'include/stc/sys/utility.h',
+  subdir: 'stc/sys',
+)
+
+install_headers(
   'include/stc/priv/cstr_prv.h',
-  'include/stc/priv/filter.h',
   'include/stc/priv/linkage.h',
   'include/stc/priv/linkage2.h',
   'include/stc/priv/queue_prv.h',
@@ -95,8 +101,6 @@ install_headers(
   'include/stc/priv/template.h',
   'include/stc/priv/template2.h',
   'include/stc/priv/utf8_prv.h',
-  'include/stc/priv/utility.h',
-  'include/stc/priv/variant.h',
   subdir: 'stc/priv',
 )
 

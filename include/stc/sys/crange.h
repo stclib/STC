@@ -43,7 +43,7 @@ int main(void)
 #ifndef STC_CRANGE_H_INCLUDED
 #define STC_CRANGE_H_INCLUDED
 
-#include "linkage.h"
+#include "../priv/linkage.h"
 #include "../common.h"
 
 // crange: isize range -----
@@ -114,5 +114,5 @@ STC_INLINE crange32_iter crange32_advance(crange32_iter it, uint32_t n) {
     return it;
 }
 
-#include "linkage2.h"
+#include "../priv/linkage2.h"
 #endif // STC_CRANGE_H_INCLUDE

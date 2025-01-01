@@ -73,10 +73,10 @@ int main(void) {
     c_drop(Action, &act1, &act2, &act3);
 }
 */
-#ifndef STC_VARIANT_H_INCLUDED
-#define STC_VARIANT_H_INCLUDED
+#ifndef STC_SUMTYPE_H_INCLUDED
+#define STC_SUMTYPE_H_INCLUDED
 
-#include "stc/common.h"
+#include "../common.h"
 
 #define _c_EMPTY()
 #define _c_LOOP_INDIRECTION() c_LOOP
@@ -149,10 +149,13 @@ int main(void) {
 #define c_variant(Tag, ...) \
     (c_literal(Tag##_sumtype){.Tag={.tag=Tag, .var=__VA_ARGS__}})
 
-#define c_tag_index(var) \
-    ((var)->_any_.tag)
+#define c_get(Tag, var_ptr) \
+    (c_assert((var_ptr)->Tag.tag == Tag), &(var_ptr)->Tag.var)
 
-#define c_holds(var, Tag) \
-    (c_tag_index(var) == Tag)
+#define c_tag_index(var_ptr) \
+    ((var_ptr)->_any_.tag)
 
-#endif // STC_VARIANT_H_INCLUDED
+#define c_holds(var_ptr, Tag) \
+    (c_tag_index(var_ptr) == Tag)
+
+#endif // STC_SUMTYPE_H_INCLUDED

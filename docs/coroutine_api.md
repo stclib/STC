@@ -1,16 +1,16 @@
 # STC [Coroutines](../include/stc/coroutine.h)
 ![Coroutine](pics/coroutine.png)
 
-This is small and portable implementation of coroutines, losely inspired by [Adam Dunkel's photothreads](https://dunkels.com/adam/pt).
+This is small and portable implementation of coroutines.
 
-* Stackfull, typesafe coroutines. Allows both asymmetric coroutine calls and symmetric transfer of control.
+* Stackful, typesafe coroutines. Allows both asymmetric coroutine calls and symmetric transfer of control.
 * Great ergonomics and minimal boilerplate code. No awkward macros.
 * Tiny memory usage, very efficient context switching, and no allocation required by default.
 * Coroutines are to be cleaned up at the `cco_finally:` label. Will also happen on errors and cancelation.
 * Allows "throwing" errors. To be handled in a `cco_finally:` during the immediate unwinding of the call stack.
 Unhandled errors will exit program with an error message including the offendig throw's line number.
 
-Because these coroutines are stackfull, all variables used within the coroutine scope (where usage crosses `cco_yield*` or `cco_await*`) must be stored in a struct which is passed as pointer to the coroutine. This has the advantages that they become extremely lightweight and therefore useful on severely memory constrained systems like small microcontrollers where other solutions are impractical.
+Because these coroutines are stackful, all variables used within the coroutine scope (where usage crosses `cco_yield*` or `cco_await*`) must be stored in a struct which is passed as pointer to the coroutine. This has the advantages that they become extremely lightweight and therefore useful on severely memory constrained systems like small microcontrollers where other solutions are impractical.
 
 ## Methods and statements
 
@@ -109,14 +109,13 @@ Both asymmetric and symmetric coroutine control flow transfer are supported when
 (closures/functors), and they may be combined.
 
 This implementation is not limited to support only a certain set of coroutine types,
-like generators. They operate like stackfull coroutines, i.e. tasks can efficiently yield
+like generators. They operate like stackful coroutines, i.e. tasks can efficiently yield
 or await from a deeply nested coroutine call by utilizing extended `cco_task` structs described below.
 
 ----
 ### Generators
 
-There are no specific framework support for generator coroutines, still a minimal generator is trivial
-to write:
+Generator are among the simplest types of coroutines and is easy to write:
 
 [ [Run this code](https://godbolt.org/z/xMf3d44Gz) ]
 ```c++
@@ -304,82 +303,91 @@ int main(void)
 </details>
 
 ----
-### Task coroutines (function objects) and error handling
-Tasks are coroutine objects which contains a typesafe function pointer. A task can await another task
-(asymmetric call). This allows for proper error handling, i.e. an error can be thrown, which will unwind
-the call stack where the error can be catched (handled).
+### Tasks
+A task is a coroutine functor/enclosure. The base task type `cco_task`, contains a typesafe function pointer.
+
+Tasks allows for scheduling coroutines and more efficient deep nesting of coroutine calls/awaits.
+Also, tasks have an excellent error handling mechanism, i.e. an error can be thrown, which will unwind the "call stack",
+and errors may be handled and recoveded higher up in the call tree in a simple, structured manner.
 
 <details>
 <summary>Implementation of nested awaiting coroutines with error handling</summary>
 
-- Coroutine `start`  await `A` => `A` await `B` => `B` await `C` => `C` throws error => unwind => `A` catches error.
-- `cco_runtime` type has an opaque `context` pointer, where A, B, C tasks are stored.
+The following example shows a task `start` which awaits `TaskA`, => awaits `TaskB`, => awaits `TaskC`. `TaskC` throws an error,
+which causes unwinding of the call stack. The error is finally handled in `TaskA`'s `cco_finally:` block and recovered
+using `cco_recover_task()`:
 
 [ [Run this code](https://godbolt.org/z/4es95Eh74) ]
 ```c++
 #include <stdio.h>
 #include "stc/coroutine.h"
 
-cco_task_struct (A) { A_state cco; };
-cco_task_struct (B) { B_state cco; };
-cco_task_struct (C) { C_state cco; };
-typedef struct { struct A A; struct B B; struct C C; } MyCtx;
+cco_task_struct (TaskA) { TaskA_state cco; int a; };
+cco_task_struct (TaskB) { TaskB_state cco; double d; };
+cco_task_struct (TaskC) { TaskC_state cco; struct {float x, y;}; };
 
-int C(struct C* self, cco_runtime* rt) {
+typedef struct {
+    struct TaskA A;
+    struct TaskB B;
+    struct TaskC C;
+} Subtasks;
+
+int taskC(struct TaskC* self, cco_runtime* rt) {
     cco_routine (self) {
-        puts("C start");
-        if (true) {
-            // try commenting out next line...
-            cco_throw_error(42, rt);
-        }
-        puts("C work");
+        printf("TaskC start: {%g, %g}\n", self->x, self->y);
+
+        // assume there is an error...
+        cco_throw_error(99, rt);
+
+        puts("TaskC work");
         cco_yield;
-        puts("C more work");
+        puts("TaskC more work");
 
         cco_finally:
         if (rt->error) {
-            puts("C has error, pass it on");
+            puts("TaskC has error, pass it on");
         }
-        puts("C done");
+        puts("TaskC done");
     }
     return 0;
 }
 
-int B(struct B* self, cco_runtime* rt) {
-    MyCtx* ctx = (MyCtx*)rt->context; // NB before cco_routine
+int taskB(struct TaskB* self, cco_runtime* rt) {
+    Subtasks* sub = rt->context; // NB before cco_routine
     cco_routine (self) {
-        puts("B start");
-        cco_await_task(&ctx->C, rt);
-        puts("B work");
+        printf("TaskB start: %g\n", self->d);
+        cco_await_task(&sub->C, rt);
+        puts("TaskB work");
 
         cco_finally:
-        puts("B done");
+        puts("TaskB done");
     }
     return 0;
 }
 
-int A(struct A* self, cco_runtime* rt) {
-    MyCtx* ctx = (MyCtx*)rt->context;
+int taskA(struct TaskA* self, cco_runtime* rt) {
+    Subtasks* sub = rt->context;
     cco_routine (self) {
-        puts("A start");
-        cco_await_task(&ctx->B, rt);
+        printf("TaskA start: %d\n", self->a);
+        cco_await_task(&sub->B, rt);
+        puts("TaskA work");
 
         cco_finally:
-        if (rt->error == 42) {
-            // try uncommenting next two lines to see 'unhandled error'...
-            printf("A recovered error '42' thrown on line %d\n", rt->error_line);
-            rt->error = 0;
+        if (rt->error == 99) {
+            // if error not handled, will cause 'unhandled error'...
+            printf("TaskA recovered error '99' thrown on line %d\n", rt->error_line);
+            cco_recover_task(self, rt);
         }
-        puts("A done");
+        puts("TaskA done");
     }
     return 0;
 }
 
 int start(cco_task* self, cco_runtime* rt) {
-    MyCtx* ctx = (MyCtx*)rt->context;
+    Subtasks* sub = rt->context;
     cco_routine (self) {
         puts("start");
-        cco_await_task(&ctx->A, rt);
+        cco_await_task(&sub->A, rt);
 
         cco_finally:
         puts("done");
@@ -389,20 +397,29 @@ int start(cco_task* self, cco_runtime* rt) {
 
 int main(void)
 {
-    MyCtx context = {.A={{A}}, .B={{B}}, .C={{C}}};
+    Subtasks context = {
+        {{taskA}, 42},
+        {{taskB}, 3.1415},
+        {{taskC}, {1.2f, 3.4f}},
+    };
     cco_task task = {{start}};
-    cco_run_task(&task, &context);
+
+    int count = 0;
+    cco_run_task(&task, &context) { ++count; }
+    printf("resumes: %d\n", count);
 }
 ```
 </details>
 
 ----
-### Producer-consumer pattern (asymmetric coroutines)
+### Producer-consumer pattern (symmetric coroutines) tasks
 Tasks must be executed using an *executor*, which is easy to do via the ***cco_run_task()*** macro.
-Coroutines may await or "call" other coroutines with ***cco_await_task()*** as we have seen.
-But a coroutine X may also transfer control directly to a coroutine Y using ***cco_yield_to()***.
-In this case, control will not be returned back to X after Y is finished or suspended. This is useful when
-two or more coroutines cooperate like in the producer-consumer pattern:
+Coroutines may await other coroutines with ***cco_await_task()***, in which case the awaited coroutine will give control
+back to the caller whenever it finishes or reaches a `cco_yield` suspension point in the code (referred to as asymmetric call).
+
+A coroutine may also transfer control directly to another coroutine using ***cco_yield_to()***.
+In this case, control will not be returned back to caller after it finishes or is suspended (symmetric call).
+This is useful when two or more coroutines cooperate like in the producer-consumer pattern used in the following example:
 
 <details>
 <summary>Producer-consumer coroutine implementation</summary>

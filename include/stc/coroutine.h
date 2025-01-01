@@ -167,11 +167,10 @@ typedef struct {
  * Tasks: typesafe coroutine function objects
  */
 
-struct cco_task;
 typedef struct {
-    struct cco_task* current;
+    struct cco_task *current, *parent;
     void* context;
-    int result;
+    int recover_state, awaitbits, result;
     uint16_t error, error_line;
 } cco_runtime;
 
@@ -199,6 +198,15 @@ typedef struct cco_task cco_task;
 #define cco_cancel_task(task, rt) \
     _cco_cancel_task(cco_cast_task(task), rt)
 
+#define cco_recover_task(task, rt) \
+    do { \
+        int* _state = &(task)->cco.state; \
+        c_assert(*_state == CCO_STATE_FINALLY); \
+        *_state = (rt)->recover_state; \
+        (rt)->error = 0; \
+        goto _resume; \
+    } while (0)
+
 static inline int _cco_resume_task(cco_task* task, cco_runtime* rt)
     { return task->cco.func(task, rt); }
 static inline int _cco_cancel_task(cco_task* task, cco_runtime* rt)
@@ -223,6 +231,10 @@ static inline int _cco_cancel_task(cco_task* task, cco_runtime* rt)
         (rt)->current = _to_task;} \
         cco_yield_v(CCO_NOOP); \
     } while (0)
+
+/* Create and push a sumtype variant task into a container, return the task ptr (not the sumtype) */
+#define cco_push_variant(TaskContainerType, containerPtr, TaskTag, ...) \
+    &TaskContainerType##_push(containerPtr, c_variant(TaskTag, __VA_ARGS__))->TaskTag.var
 
 /*
  * Taskrunner
@@ -253,18 +265,19 @@ int cco_taskrunner(struct cco_taskrunner* co) {
     cco_runtime* rt = &co->runtime;
     cco_routine (co) {
         while (1) {
+            rt->parent = rt->current->cco.parent;
+            rt->awaitbits = rt->current->cco.awaitbits;
             rt->result = cco_resume_task(rt->current, rt);
-            if (rt->error != 0) {
-                do {
-                    rt->result = cco_cancel_task(rt->current, rt);
-                } while ((rt->error != 0) &&
-                         (rt->current = rt->current->cco.parent) != NULL);
-                if (rt->current == NULL) break;
+            if (rt->error) {
+                rt->current = rt->parent;
+                if (rt->current == NULL)
+                    break;
+                rt->recover_state = rt->current->cco.state;
+                cco_stop(rt->current);
+                continue;
             }
-            if (!((rt->result & ~rt->current->cco.awaitbits) ||
-                  (rt->current = rt->current->cco.parent) != NULL)) {
+            if (!((rt->result & ~rt->awaitbits) || (rt->current = rt->parent) != NULL))
                 break;
-            }
             cco_yield_v(CCO_NOOP);
         }
 
@@ -272,7 +285,7 @@ int cco_taskrunner(struct cco_taskrunner* co) {
         if (rt->error != 0) {
             fprintf(stderr, __FILE__ ":%d: error: unhandled error '%d' in a coroutine task at line %d.\n",
                             __LINE__, rt->error, rt->error_line);
-            exit(rt->error);
+            abort();
         }
     }
     return 0;
