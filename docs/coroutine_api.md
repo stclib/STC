@@ -317,14 +317,14 @@ The following example shows a task `start` which awaits `TaskA`, => awaits `Task
 which causes unwinding of the call stack. The error is finally handled in `TaskA`'s `cco_finally:` block and recovered
 using `cco_recover_task()`:
 
-[ [Run this code](https://godbolt.org/z/4es95Eh74) ]
+[ [Run this code](https://godbolt.org/z/T8qPx5WjE) ]
 ```c++
 #include <stdio.h>
 #include "stc/coroutine.h"
 
 cco_task_struct (TaskA) { TaskA_state cco; int a; };
 cco_task_struct (TaskB) { TaskB_state cco; double d; };
-cco_task_struct (TaskC) { TaskC_state cco; struct {float x, y;}; };
+cco_task_struct (TaskC) { TaskC_state cco; float x, y; };
 
 typedef struct {
     struct TaskA A;
@@ -400,7 +400,7 @@ int main(void)
     Subtasks context = {
         {{taskA}, 42},
         {{taskB}, 3.1415},
-        {{taskC}, {1.2f, 3.4f}},
+        {{taskC}, 1.2f, 3.4f},
     };
     cco_task task = {{start}};
 
