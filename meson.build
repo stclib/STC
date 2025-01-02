@@ -131,13 +131,16 @@ if flex_exe.found()
   meson.override_find_program('checkscoped', checkscoped_exe)
 endif
 
+root = not meson.is_subproject()
 subdir('tests')
 subdir('examples')
 
-datadir = get_option('datadir')
+if root
+  datadir = get_option('datadir')
 
-install_subdir(
-  'docs',
-  install_dir: datadir / 'doc' / meson.project_name(),
-  strip_directory: true,
-)
+  install_subdir(
+    'docs',
+    install_dir: datadir / 'doc' / meson.project_name(),
+    strip_directory: true,
+  )
+endif
