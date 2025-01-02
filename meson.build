@@ -149,10 +149,14 @@ subdir('examples')
 
 if root
   datadir = get_option('datadir')
+  docdir = get_option('docdir')
+  if docdir == ''
+    docdir = datadir / 'doc' / meson.project_name()
+  endif
 
   install_subdir(
     'docs',
-    install_dir: datadir / 'doc' / meson.project_name(),
+    install_dir: docdir,
     strip_directory: true,
   )
 endif
