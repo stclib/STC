@@ -120,7 +120,7 @@ int main(void) {
             if (c_holds(_var, Tag)) \
                 for (__typeof__(_var->Tag.var) *x = &_var->Tag.var; x; x = NULL)
 #else
-    typedef union { struct { uint8_t tag; } _any_; } _c_any_variant;
+    typedef union { struct { int tag; } _any_; } _c_any_variant;
     #define c_when(var) \
         for (_c_any_variant* _match = (_c_any_variant *)(var) + 0*sizeof((var)->_any_.tag); \
              _match; _match = NULL) \
