@@ -81,7 +81,7 @@ typedef struct {
 #define cco_done(co) ((co)->cco.state == CCO_STATE_DONE)
 #define cco_active(co) ((co)->cco.state != CCO_STATE_DONE)
 
-#if defined __GNUC__ || defined __clang__ || defined __TINYC__ || _MSC_VER >= 1939
+#ifdef STC_HAS_TYPEOF
   #define _cco_check_task_struct(co) \
     c_static_assert(/* error: co->cco not first member in task struct */ \
                     sizeof((co)->cco) == sizeof(cco_state) || \

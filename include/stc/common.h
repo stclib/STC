@@ -43,6 +43,10 @@ typedef ptrdiff_t       isize;
     typedef int64_t     int64;
     typedef uint64_t    uint64;
 #endif
+#if defined __GNUC__ || defined __clang__ || \
+    defined __TINYC__ || _MSC_FULL_VER >= 193933428
+    #define STC_HAS_TYPEOF 1
+#endif
 #if defined __GNUC__ || defined __clang__
     #define STC_INLINE static inline __attribute((unused))
 #else
