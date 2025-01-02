@@ -39,13 +39,14 @@ void            cco_await_task(cco_task* task, cco_runtime* rt);    // Await for
 void            cco_await_task(cco_task* task, cco_runtime* rt, int awaitbits); // Await until task's suspend/return value
                                                                                 // to be in (awaitbits | CCO_DONE).
 void            cco_yield_to(cco_task* task, cco_runtime* rt);      // Yield to task (symmetric control transfer).
-void            cco_throw_error(uint16_t error, cco_runtime* rt);   // Throw an error and unwind call stack at the cco_finally: point.
+void            cco_throw_error(uint16_t error, cco_runtime* rt);   // Throw an error and unwind call stack at the cco_finally point.
                                                                     // Error accessible as `rt->error` and `rt->error_line`.
+void            cco_recover_error(cco_runtime* rt);                 // Reset error, and jump to original resume point in current task.
 void            cco_resume_task(cco_task* task, cco_runtime* rt);   // Resume suspended task, return value in `rt->result`.
                 cco_run_task(cco_task* task) {}                     // Run blocking until task is finished.
-                cco_run_task(cco_task* task, <Context> *ctx) {}     // Run blocking with context data
-                cco_run_task(cco_task* task, <Context> *ctx, runnername) {} // Run blocking with context data and
-                                                                            // name of the cco_taskrunner.
+                cco_run_task(cco_task* task, <Environment> *env) {} // Run blocking with env data
+                cco_run_task(cco_task* task, <Environment> *env, runnername) {} // Run blocking with env data and
+                                                                                // name of the cco_taskrunner.
 ```
 #### Timers and time functions
 ```c++
@@ -306,6 +307,7 @@ int main(void)
 ### Tasks
 A task is a coroutine functor/enclosure. The base task type `cco_task`, contains a typesafe function pointer.
 
+#### Error handling with tasks
 Tasks allows for scheduling coroutines and more efficient deep nesting of coroutine calls/awaits.
 Also, tasks have an excellent error handling mechanism, i.e. an error can be thrown, which will unwind the "call stack",
 and errors may be handled and recoveded higher up in the call tree in a simple, structured manner.
@@ -313,11 +315,13 @@ and errors may be handled and recoveded higher up in the call tree in a simple, 
 <details>
 <summary>Implementation of nested awaiting coroutines with error handling</summary>
 
-The following example shows a task `start` which awaits `TaskA`, => awaits `TaskB`, => awaits `TaskC`. `TaskC` throws an error,
-which causes unwinding of the call stack. The error is finally handled in `TaskA`'s `cco_finally:` block and recovered
-using `cco_recover_task()`:
+The following example shows a task `start` which awaits `TaskA`, => awaits `TaskB`, => awaits `TaskC`. `TaskC` throws
+an error, which causes unwinding of the call stack. The error is finally handled in `TaskA`'s `cco_finally:` block
+and recovered using `cco_recover_error()`. This call will resume control back to the original suspension point in the
+current task. Because the "call-tree" is fixed, the coroutine frames to be called may be pre-allocated on the stack,
+which is very fast.
 
-[ [Run this code](https://godbolt.org/z/T8qPx5WjE) ]
+[ [Run this code](https://godbolt.org/z/z1WWPhsan) ]
 ```c++
 #include <stdio.h>
 #include "stc/coroutine.h"
@@ -345,7 +349,7 @@ int taskC(struct TaskC* self, cco_runtime* rt) {
 
         cco_finally:
         if (rt->error) {
-            puts("TaskC has error, pass it on");
+            puts("TaskC has error, ignored");
         }
         puts("TaskC done");
     }
@@ -353,9 +357,9 @@ int taskC(struct TaskC* self, cco_runtime* rt) {
 }
 
 int taskB(struct TaskB* self, cco_runtime* rt) {
-    Subtasks* sub = rt->context; // NB before cco_routine
     cco_routine (self) {
         printf("TaskB start: %g\n", self->d);
+        Subtasks* sub = rt->env;
         cco_await_task(&sub->C, rt);
         puts("TaskB work");
 
@@ -366,9 +370,9 @@ int taskB(struct TaskB* self, cco_runtime* rt) {
 }
 
 int taskA(struct TaskA* self, cco_runtime* rt) {
-    Subtasks* sub = rt->context;
     cco_routine (self) {
         printf("TaskA start: %d\n", self->a);
+        Subtasks* sub = rt->env;
         cco_await_task(&sub->B, rt);
         puts("TaskA work");
 
@@ -376,7 +380,7 @@ int taskA(struct TaskA* self, cco_runtime* rt) {
         if (rt->error == 99) {
             // if error not handled, will cause 'unhandled error'...
             printf("TaskA recovered error '99' thrown on line %d\n", rt->error_line);
-            cco_recover_task(self, rt);
+            cco_recover_error(rt);
         }
         puts("TaskA done");
     }
@@ -384,9 +388,9 @@ int taskA(struct TaskA* self, cco_runtime* rt) {
 }
 
 int start(cco_task* self, cco_runtime* rt) {
-    Subtasks* sub = rt->context;
     cco_routine (self) {
         puts("start");
+        Subtasks* sub = rt->env;
         cco_await_task(&sub->A, rt);
 
         cco_finally:
@@ -397,7 +401,7 @@ int start(cco_task* self, cco_runtime* rt) {
 
 int main(void)
 {
-    Subtasks context = {
+    Subtasks env = {
         {{taskA}, 42},
         {{taskB}, 3.1415},
         {{taskC}, 1.2f, 3.4f},
@@ -405,7 +409,112 @@ int main(void)
     cco_task task = {{start}};
 
     int count = 0;
-    cco_run_task(&task, &context) { ++count; }
+    cco_run_task(&task, &env) { ++count; }
+    printf("resumes: %d\n", count);
+}
+```
+</details>
+
+#### Heap allocated task frames
+
+Sometimes the call-tree is dynamic or more complex, then we can dynamically allocate the coroutine frames before
+they are awaited. This is somewhat more general and simpler, but requires heap allocation. Note that the coroutine
+frames are now freed at the end of the coroutine functions (after any cleanup at cco_finally). Example is based on
+the previous, but also shows how to use the env field in `cco_runtime` to return a value from the coroutine
+call/await:
+
+<details>
+<summary>Implementation of heap allocated task frames</summary>
+
+[ [Run this code](https://godbolt.org/z/TbWYsbaaq) ]
+```c++
+#include <stdio.h>
+#include "stc/coroutine.h"
+
+cco_task_struct (TaskA) { TaskA_state cco; int a; };
+cco_task_struct (TaskB) { TaskB_state cco; double d; };
+cco_task_struct (TaskC) { TaskC_state cco; float x, y; };
+
+typedef struct { double value; int error; } Result;
+
+int taskC(struct TaskC* self, cco_runtime* rt) {
+    cco_routine (self) {
+        printf("TaskC start: {%g, %g}\n", self->x, self->y);
+
+        // assume there is an error...
+        cco_throw_error(99, rt);
+
+        puts("TaskC work");
+        cco_yield;
+        puts("TaskC more work");
+        // initial return value
+        ((Result *)rt->env)->value = self->x * self->y;
+
+        cco_finally:
+        if (rt->error) {
+            puts("TaskC has error, ignored");
+        }
+        puts("TaskC done");
+    }
+    free(self);
+    return 0;
+}
+
+int taskB(struct TaskB* self, cco_runtime* rt) {
+    cco_routine (self) {
+        printf("TaskB start: %g\n", self->d);
+        cco_await_task(c_new(struct TaskC, {{taskC}, 1.2f, 3.4f}), rt);
+        puts("TaskB work");
+        ((Result *)rt->env)->value += self->d;
+
+        cco_finally:
+        puts("TaskB done");
+    }
+    free(self);
+    return 0;
+}
+
+int taskA(struct TaskA* self, cco_runtime* rt) {
+    cco_routine (self) {
+        printf("TaskA start: %d\n", self->a);
+        cco_await_task(c_new(struct TaskB, {{taskB}, 3.1415}), rt);
+        puts("TaskA work");
+        ((Result *)rt->env)->value += self->a; // final return value;
+
+        cco_finally:
+        if (rt->error == 99) {
+            // if error not handled, will cause 'unhandled error'...
+            printf("TaskA recovered error '99' thrown on line %d\n", rt->error_line);
+            ((Result *)rt->env)->error = rt->error; // set error in output
+            cco_recover_error(rt); // reset error to 0 and jump to after the await call.
+        }
+        puts("TaskA done");
+    }
+    free(self);
+    return 0;
+}
+
+int start(cco_task* self, cco_runtime* rt) {
+    cco_routine (self) {
+        puts("start");
+        cco_await_task(c_new(struct TaskA, {{taskA}, 42}), rt);
+
+        cco_finally:
+        puts("done");
+    }
+    free(self);
+    return 0;
+}
+
+int main(void)
+{
+    cco_task* task = c_new(cco_task, {{start}});
+
+    int count = 0;
+    Result result = {0};
+    cco_run_task(task, &result) { ++count; }
+
+    printf("\nresult: %g, error: %d\n", result.value, result.error);
     printf("resumes: %d\n", count);
 }
 ```
@@ -413,13 +522,15 @@ int main(void)
 
 ----
 ### Producer-consumer pattern (symmetric coroutines) tasks
-Tasks must be executed using an *executor*, which is easy to do via the ***cco_run_task()*** macro.
-Coroutines may await other coroutines with ***cco_await_task()***, in which case the awaited coroutine will give control
-back to the caller whenever it finishes or reaches a `cco_yield` suspension point in the code (referred to as asymmetric call).
+Tasks are executed using an *executor*, which is easy to do via the ***cco_run_task()*** macro.
+Coroutines awaits (or "calls") other coroutines with ***cco_await_task()***, in which case the awaited coroutine will give
+control back to the caller whenever it finishes or reaches a `cco_yield` or another `cco_await*` suspension point in the
+code. This is knows as asymmetric calls.
 
-A coroutine may also transfer control directly to another coroutine using ***cco_yield_to()***.
-In this case, control will not be returned back to caller after it finishes or is suspended (symmetric call).
-This is useful when two or more coroutines cooperate like in the producer-consumer pattern used in the following example:
+However, coroutines may also transfer control directly to another coroutine using ***cco_yield_to()***.
+In this case, control will not be returned back to caller after it finishes or is suspended, known as a symmetric call.
+This is useful when two or more coroutines cooperate like in the simple case of the producer-consumer pattern used in
+the following example:
 
 <details>
 <summary>Producer-consumer coroutine implementation</summary>
@@ -529,13 +640,14 @@ to the end of the queue, and resumes the coroutine in the front.
 Note that the scheduler awaits the next CCO_YIELD to be returned, not *only* the default CCO_DONE
 (in the code below, `| CCO_DONE` is redundant and only to show how to await for multiple/custom bit-values).
 
-This example allocates the coroutine frames and the queue on the heap, so it may be executed in
-another thread/scope which outlives the scope that it was created.
+The example heap allocates the coroutine frames on a queue, so that the scheduler can pick the next coroutine to
+execute from a pool of coroutines. This also allows it to run on a different thread/scope that may outlive
+the scope in that it was created.
 
 <details>
 <summary>Scheduled coroutines implementation</summary>
 
-[ [Run this code](https://godbolt.org/z/6xffYoPaT) ]
+[ [Run this code](https://godbolt.org/z/aT6YKaM9q) ]
 ```c++
 // Based on https://www.youtube.com/watch?v=8sEe-4tig_A
 #include <stdio.h>
@@ -605,7 +717,7 @@ static int taskA(struct TaskA* self, cco_runtime* rt) {
         puts("A is back doing work");
         cco_yield;
         puts("A adds task C");
-        Tasks *_tasks = (Tasks *)rt->context; // local var only alive until cco_yield.
+        Tasks *_tasks = rt->env; // local var only alive until cco_yield.
         Tasks_push(_tasks, cco_cast_task(c_new(struct TaskX, {.cco={taskX}, .id='C'})));
         cco_yield;
         puts("A is back doing more work");

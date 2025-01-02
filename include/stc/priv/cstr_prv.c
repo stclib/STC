@@ -244,13 +244,17 @@ void cstr_u8_erase(cstr* self, const isize u8pos, const isize u8len) {
 bool cstr_u8_valid(const cstr* self)
     { return utf8_valid(cstr_str(self)); }
 
+static int toLower(int c)
+    { return c >= 'A' && c <= 'Z' ? c + 32 : c; }
+static int toUpper(int c)
+    { return c >= 'a' && c <= 'z' ? c - 32 : c; }
 static struct {
     int      (*conv_asc)(int);
     uint32_t (*conv_utf)(uint32_t);
 }
-fn_tocase[] = {{tolower, utf8_casefold},
-               {tolower, utf8_tolower},
-               {toupper, utf8_toupper}};
+fn_tocase[] = {{toLower, utf8_casefold},
+               {toLower, utf8_tolower},
+               {toUpper, utf8_toupper}};
 
 cstr cstr_tocase_sv(csview sv, int k) {
     cstr out = {0};

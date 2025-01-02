@@ -43,8 +43,8 @@ typedef ptrdiff_t       isize;
     typedef int64_t     int64;
     typedef uint64_t    uint64;
 #endif
-#if defined __GNUC__ || defined __clang__ || \
-    defined __TINYC__ || _MSC_FULL_VER >= 193933428
+#if !defined STC_HAS_TYPEOF && (_MSC_FULL_VER >= 193933428 || \
+    defined __GNUC__ || defined __clang__ || defined __TINYC__)
     #define STC_HAS_TYPEOF 1
 #endif
 #if defined __GNUC__ || defined __clang__
@@ -188,13 +188,13 @@ typedef const char* cstr_raw;
 #define c_forrange_t(...) c_MACRO_OVERLOAD(c_forrange_t, __VA_ARGS__)
 #define c_forrange_t_3(T, i, stop) c_forrange_t_4(T, i, 0, stop)
 #define c_forrange_t_4(T, i, start, stop) \
-    for (T i=start, _c_end=stop; i < _c_end; ++i)
+    for (T i=start, _c_end_##i=stop; i < _c_end_##i; ++i)
 #define c_forrange_t_5(T, i, start, stop, step) \
-    for (T i=start, _c_inc=step, _c_end=(stop) - (_c_inc > 0) \
-         ; (_c_inc > 0) == (i <= _c_end); i += _c_inc)
+    for (T i=start, _c_inc_##i=step, _c_end_##i=(stop) - (_c_inc_##i > 0) \
+         ; (_c_inc_##i > 0) == (i <= _c_end_##i); i += _c_inc_##i)
 
 #define c_forrange(...) c_MACRO_OVERLOAD(c_forrange, __VA_ARGS__)
-#define c_forrange_1(stop) c_forrange_t_4(isize, _c_i, 0, stop)
+#define c_forrange_1(stop) c_forrange_t_4(isize, _c_i1, 0, stop)
 #define c_forrange_2(i, stop) c_forrange_t_4(isize, i, 0, stop)
 #define c_forrange_3(i, start, stop) c_forrange_t_4(isize, i, start, stop)
 #define c_forrange_4(i, start, stop, step) c_forrange_t_5(isize, i, start, stop, step)
@@ -219,7 +219,7 @@ typedef const char* cstr_raw;
 
 // drop multiple containers of same type
 #define c_drop(C, ...) \
-    do { c_foritems (_c_i, C*, {__VA_ARGS__}) C##_drop(*_c_i.ref); } while(0)
+    do { c_foritems (_c_i2, C*, {__VA_ARGS__}) C##_drop(*_c_i2.ref); } while(0)
 
 // define function with "on-the-fly" defined return type (e.g. variant, optional)
 #define c_func(name, args, RIGHTARROW, ...) \
@@ -227,13 +227,13 @@ typedef const char* cstr_raw;
 
 // RAII scopes
 #define c_defer(...) \
-    for (int _c_i = 0; _c_i++ == 0; __VA_ARGS__)
+    for (int _c_i3 = 0; _c_i3++ == 0; __VA_ARGS__)
 
 #define c_with(...) c_MACRO_OVERLOAD(c_with, __VA_ARGS__)
 #define c_with_2(init, deinit) \
-    for (int _c_i = 0; _c_i == 0; ) for (init; _c_i++ == 0; deinit)
+    for (int _c_i4 = 0; _c_i4 == 0; ) for (init; _c_i4++ == 0; deinit)
 #define c_with_3(init, condition, deinit) \
-    for (int _c_i = 0; _c_i == 0; ) for (init; _c_i++ == 0 && (condition); deinit)
+    for (int _c_i5 = 0; _c_i5 == 0; ) for (init; _c_i5++ == 0 && (condition); deinit)
 
 // General functions
 

@@ -81,13 +81,13 @@ typedef struct {
 #define cco_done(co) ((co)->cco.state == CCO_STATE_DONE)
 #define cco_active(co) ((co)->cco.state != CCO_STATE_DONE)
 
-#ifdef STC_HAS_TYPEOF
-  #define _cco_check_task_struct(co) \
+#if defined STC_HAS_TYPEOF && STC_HAS_TYPEOF
+    #define _cco_check_task_struct(co) \
     c_static_assert(/* error: co->cco not first member in task struct */ \
                     sizeof((co)->cco) == sizeof(cco_state) || \
                     offsetof(__typeof__(*(co)), cco) == 0)
 #else
-  #define _cco_check_task_struct(co) 0
+    #define _cco_check_task_struct(co) 0
 #endif
 
 #define cco_routine(co) \
@@ -103,13 +103,19 @@ typedef struct {
         cco_return; \
     } while (0)
 
+#define cco_recover_error(rt) \
+    do { \
+        c_assert(*_state == CCO_STATE_FINALLY); \
+        *_state = (rt)->recover_state; \
+        (rt)->error = 0; \
+        goto _resume; \
+    } while (0)
+
 #define cco_finally \
     *_state = CCO_STATE_FINALLY; /* FALLTHRU */ \
     case CCO_STATE_FINALLY
 
-#define cco_scope cco_routine   // [deprecated]
 #define cco_final cco_finally   // [deprecated]
-#define cco_cleanup cco_finally // [deprecated]
 
 #define cco_return \
     do { \
@@ -155,8 +161,8 @@ typedef struct {
 
 #define cco_stop(co) \
     do { \
-        int* _state = &(co)->cco.state; \
-        *_state = *_state >= CCO_STATE_INIT ? CCO_STATE_FINALLY : CCO_STATE_DONE; \
+        int* _st = &(co)->cco.state; \
+        *_st = *_st >= CCO_STATE_INIT ? CCO_STATE_FINALLY : CCO_STATE_DONE; \
     } while (0)
 
 #define cco_reset(co) \
@@ -168,8 +174,9 @@ typedef struct {
  */
 
 typedef struct {
-    struct cco_task *current, *parent;
-    void* context;
+    struct cco_task *current;
+    void* env;
+    struct cco_task *parent;
     int recover_state, awaitbits, result;
     uint16_t error, error_line;
 } cco_runtime;
@@ -197,15 +204,6 @@ typedef struct cco_task cco_task;
 /* Stop and immediate cleanup */
 #define cco_cancel_task(task, rt) \
     _cco_cancel_task(cco_cast_task(task), rt)
-
-#define cco_recover_task(task, rt) \
-    do { \
-        int* _state = &(task)->cco.state; \
-        c_assert(*_state == CCO_STATE_FINALLY); \
-        *_state = (rt)->recover_state; \
-        (rt)->error = 0; \
-        goto _resume; \
-    } while (0)
 
 static inline int _cco_resume_task(cco_task* task, cco_runtime* rt)
     { return task->cco.func(task, rt); }
@@ -246,15 +244,15 @@ struct cco_taskrunner {
 
 extern int cco_taskrunner(struct cco_taskrunner* co);
 
-#define cco_make_taskrunner(task, ctx) \
+#define cco_make_taskrunner(task, environment) \
     (c_literal(struct cco_taskrunner){.runtime = { \
-        .current = cco_cast_task(task), .context = ctx \
+        .current = cco_cast_task(task), .env = environment \
     }})
 
 #define cco_run_task(...) c_MACRO_OVERLOAD(cco_run_task, __VA_ARGS__)
 #define cco_run_task_1(task) cco_run_task_2(task, NULL)
-#define cco_run_task_2(task, ctx) \
-    for (struct cco_taskrunner _runner = cco_make_taskrunner(task, ctx) \
+#define cco_run_task_2(task, environment) \
+    for (struct cco_taskrunner _runner = cco_make_taskrunner(task, environment) \
          ; cco_taskrunner(&_runner) != CCO_DONE ; )
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
@@ -285,7 +283,7 @@ int cco_taskrunner(struct cco_taskrunner* co) {
         if (rt->error != 0) {
             fprintf(stderr, __FILE__ ":%d: error: unhandled error '%d' in a coroutine task at line %d.\n",
                             __LINE__, rt->error, rt->error_line);
-            abort();
+            exit(rt->error);
         }
     }
     return 0;
