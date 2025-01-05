@@ -230,10 +230,6 @@ static inline int _cco_cancel_task(cco_task* task, cco_runtime* rt)
         cco_yield_v(CCO_NOOP); \
     } while (0)
 
-/* Create and push a sumtype variant task into a container, return the task ptr (not the sumtype) */
-#define cco_push_variant(TaskContainerType, containerPtr, TaskTag, ...) \
-    &TaskContainerType##_push(containerPtr, c_variant(TaskTag, __VA_ARGS__))->TaskTag.var
-
 /*
  * Taskrunner
  */

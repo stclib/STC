@@ -285,7 +285,7 @@ In example 4 we needed to construct a lookup key which may allocate strings, and
 In this example we use keyraw feature to make it simpler to use and avoids the creation of a Viking object
 entirely when doing lookup.
 
-[ [Run this code](https://godbolt.org/z/18v5vYq4M) ]
+[ [Run this code](https://godbolt.org/z/Yx1Ybhxqv) ]
 ```c++
 #include "stc/cstr.h"
 
