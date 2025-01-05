@@ -3,18 +3,30 @@ project(
   'c',
   version: '5.0-dev',
   license: 'MIT',
-  default_options: ['c_std=c11', 'warning_level=3', 'default_library=static']
+  default_options: ['c_std=c11', 'warning_level=3', 'default_library=static'],
+  meson_version: '>=1.1',
 )
 
 stcversion = 5
 cc = meson.get_compiler('c')
 
-if cc.get_id() == 'gcc'
-  add_project_arguments('-Wno-missing-field-initializers', '-Wno-stringop-overflow', '-Wno-clobbered', language: ['c', 'cpp'])
-elif cc.get_id() == 'clang'
-  add_project_arguments('-Wno-missing-field-initializers', language: ['c', 'cpp'])
-elif cc.get_id() == 'msvc'
-  add_project_arguments('-wd4996', language: ['c', 'cpp']) # no "unsecure" funcs warnings
+if cc.get_argument_syntax() == 'gcc'
+  add_project_arguments(
+    cc.get_supported_arguments(
+      '-Wno-missing-field-initializers',
+      '-Wno-stringop-overflow',
+      '-Wno-clobbered',
+    ),
+    language: ['c', 'cpp'],
+  )
+elif cc.get_argument_syntax() == 'msvc'
+  # no "unsecure" funcs warnings
+  add_project_arguments(
+    cc.get_supported_arguments(
+      '-wd4996',
+    ),
+    language: ['c', 'cpp'],
+  )
 endif
 
 libsrc = files(
@@ -131,13 +143,20 @@ if flex_exe.found()
   meson.override_find_program('checkscoped', checkscoped_exe)
 endif
 
+root = not meson.is_subproject()
 subdir('tests')
 subdir('examples')
 
-datadir = get_option('datadir')
+if root
+  datadir = get_option('datadir')
+  docdir = get_option('docdir')
+  if docdir == ''
+    docdir = datadir / 'doc' / meson.project_name()
+  endif
 
-install_subdir(
-  'docs',
-  install_dir: datadir / 'doc' / meson.project_name(),
-  strip_directory: true,
-)
+  install_subdir(
+    'docs',
+    install_dir: docdir,
+    strip_directory: true,
+  )
+endif

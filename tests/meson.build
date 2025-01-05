@@ -1,4 +1,3 @@
-root = not meson.is_subproject()
 tests = get_option('tests').enable_auto_if(root)
 
 if tests.enabled()
