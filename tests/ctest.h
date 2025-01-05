@@ -516,7 +516,7 @@ static void sighandler(int signum)
      * so it can terminate as expected */
     signal(signum, SIG_DFL);
 #if !defined(_WIN32) || defined(__CYGWIN__)
-    kill(getpid(), signum);
+    //kill(getpid(), signum);
 #endif
 }
 #endif

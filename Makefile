@@ -1,6 +1,8 @@
-# GNU Makefile for STC. Linux/Mac + Windows
-# On Windows, the makefile requires mkdir, rm, and printf
-# which are all found in C:\Program Files\Git\usr\bin
+# GNU Makefile for STC. Linux/Mac + Windows for gcc, clang and tcc (TinyC).
+# On Windows, makefile requires mkdir, rm, and printf, which are all
+# found in the C:\Program Files\Git\usr\bin folder.
+# Use 'make CC=gcc' (or clang or tcc), or set CC in the environment.
+# Currently only release build.
 
 ifeq ($(origin CC),default)
 	CC := gcc
@@ -8,25 +10,25 @@ endif
 ifeq ($(origin CXX),default)
 	CXX := g++
 endif
-ifeq ($(CC),cl)
-	CFLAGS 	  ?= -nologo -std:c11 -Iinclude -MD -O2 -W3 -wd4003
-	CXXFLAGS  ?= -nologo -std:c++20 -EHsc -Iinclude -O2 -MD
-	LDFLAGS   ?=
-	AR_RCS    ?=
+
+CFLAGS 	  ?= -std=c11 -Iinclude -MMD -O3 -Wpedantic -Wall -Wextra -Werror -Wno-missing-field-initializers
+CXXFLAGS  ?= -std=c++20 -Iinclude -O3 -MMD -Wall
+LDFLAGS   ?=
+ifeq ($(CC:.exe=),tcc)
+  AR_RCS  ?= tcc -ar rcs
 else
-	CFLAGS 	  ?= -std=c11 -Iinclude -MMD -O3 -Wpedantic -Wall -Wextra -Werror -Wno-missing-field-initializers
-	CXXFLAGS  ?= -std=c++20 -Iinclude -O3 -MMD -Wall
-	LDFLAGS   ?=
-	AR_RCS    ?= ar rcs
+  AR_RCS  ?= ar rcs
 endif
 MKDIR_P   ?= mkdir -p
 RM_F      ?= rm -f
 
 ifeq ($(OS),Windows_NT)
-	EXE := .exe
-	BUILDDIR := build_Windows
+	DOTEXE := .exe
+	BUILDDIR := bld_Windows/$(CC:.exe=)
 else
-	BUILDDIR := build_$(shell uname)
+	BUILDDIR := bld_$(shell uname)/$(CC)
+	LDFLAGS += -lm
+	CFLAGS += -Wno-clobbered
 endif
 
 OBJ_DIR   := $(BUILDDIR)
@@ -41,17 +43,21 @@ LIB_PATH  := $(BUILDDIR)/lib$(LIB_NAME).a
 EX_SRCS   := $(wildcard examples/*/*.c)
 EX_OBJS   := $(EX_SRCS:%.c=$(OBJ_DIR)/%.o)
 EX_DEPS   := $(EX_SRCS:%.c=$(OBJ_DIR)/%.d)
-EX_EXES   := $(EX_SRCS:%.c=$(OBJ_DIR)/%$(EXE))
+EX_EXES   := $(EX_SRCS:%.c=$(OBJ_DIR)/%$(DOTEXE))
+
+TEST_SRCS   := $(wildcard tests/*_test.c) tests/main.c
+TEST_OBJS   := $(TEST_SRCS:%.c=$(OBJ_DIR)/%.o)
+TEST_DEPS   := $(TEST_SRCS:%.c=$(OBJ_DIR)/%.d)
+TEST_EXE    := $(OBJ_DIR)/tests/test_all$(DOTEXE)
 
 fast:
 	@$(MAKE) -j --no-print-directory all
 
-all: $(LIB_PATH) $(EX_EXES)
-	@echo
+all: $(LIB_PATH) $(EX_EXES) $(TEST_EXE)
 
 clean:
-	@$(RM_F) $(LIB_OBJS) $(EX_OBJS) $(LIB_DEPS) $(EX_DEPS) $(LIB_PATH) $(EX_EXES)
-	@echo Cleaned
+	@$(RM_F) $(LIB_OBJS) $(TEST_OBJS) $(EX_OBJS) $(LIB_DEPS) $(EX_DEPS) $(LIB_PATH) $(EX_EXES) $(TEST_EXE)
+	@echo "Cleaned"
 
 distclean:
 	$(RM_F) $(OBJ_DIR)
@@ -59,26 +65,31 @@ distclean:
 lib: $(LIB_PATH)
 
 $(LIB_PATH): $(LIB_OBJS)
-	@printf "\n%s" "$(AR_RCS) $@"
+	@printf "\r\e[2K%s\n" "$(AR_RCS) $@"
 	@$(AR_RCS) $@ $(LIB_OBJS)
-	@echo ""
+#	@echo ""
 
 $(OBJ_DIR)/%.o: %.c
 	@$(MKDIR_P) $(@D)
-	@printf "\r\e[2K%s" "$(CC) $< -o $@ -c"
-	@$(CC) $< -o $@ -c $(CFLAGS)
+	@printf "\r\e[2K%s" "$(CC) $< -c -o $@"
+	@$(CC) $< -c -o $@ $(CFLAGS)
 
 $(OBJ_DIR)/%.o: %.cpp
 	@$(MKDIR_P) $(@D)
-	@printf "\r\e[2K%s" "$(CXX) $< -c $(CXXFLAGS) -o $@"
-	@$(CXX) $< -o $@ -c $(CXXFLAGS)
+	@printf "\r\e[2K%s" "$(CXX) $< -c -o $@"
+	@$(CXX) $< -c -o $@ $(CXXFLAGS)
 
-$(OBJ_DIR)/%$(EXE): %.c $(LIB_PATH)
+$(OBJ_DIR)/%$(DOTEXE): %.c $(LIB_PATH)
 	@$(MKDIR_P) $(@D)
-	@printf "\r\e[2K%s" "$(CC) $< -o $(@F) -s $(LDFLAGS) -L$(BUILDDIR) -l$(LIB_NAME) -lm"
-	@$(CC) $< $(CFLAGS) -o $@ -s $(LDFLAGS) -L$(BUILDDIR) -l$(LIB_NAME) -lm
+	@printf "\r\e[2K%s" "$(CC) -o $(@F) $< -s $(LDFLAGS) -L$(BUILDDIR) -l$(LIB_NAME)"
+	@$(CC) -o $@ $(CFLAGS) -s $< $(LDFLAGS) -L$(BUILDDIR) -l$(LIB_NAME)
+
+$(TEST_EXE): $(TEST_OBJS)
+	@printf "\r\e[2K%s" "$(CC) -o $@ $(notdir $(TEST_OBJS))"
+	@$(CC) -o $@ $(TEST_OBJS) -s $(LDFLAGS) -L$(BUILDDIR) -l$(LIB_NAME)
+
 
 .SECONDARY: $(EX_OBJS) # Prevent deleting objs after building
-.PHONY: all clean distclean
+.PHONY: fast all clean distclean lib
 
 -include $(LIB_DEPS) $(EX_DEPS)

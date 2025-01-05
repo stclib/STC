@@ -236,24 +236,29 @@ c_sumtype (SumType,
     (VariantEnumN, VariantTypeN)
 );
 
-// Sum type variant constructor
-SumType c_variant(VariantEnum tag, VariantType value);
+SumType c_variant(VariantEnum tag, VariantType value); // Sum type constructor
+bool    c_holds(const SumType* obj, VariantEnum tag);  // does obj hold VariantType?
+int     c_tag_index(SumType* obj);                     // 1-based index (mostly for debug)
 
 // Use a sum type (1)
-c_when (SumType*) {
-    c_is(VariantEnum1, VariantType1* v) <body>;
-    c_is(VariantEnumX) c_or_is(VariantEnumY) <body>;
+c_when (SumType* obj) {
+    c_is(VariantEnum1, VariantType1* x) <body>;
+    c_is(VariantEnum2) c_or_is(VariantEnum3) <body>;
     ...
-    c_is(VariantEnumN, VariantTypeN* v) <body>;
     c_otherwise <body>;
 }
 
 // Use a sum type (2)
-c_if_is (SumType*, VariantEnum, VariantType* v) <body>;
+c_if_is(SumType* obj, VariantEnum1, VariantType1* x) <body>;
+...
+else <body>;
 ```
 The **c_when** statement is exhaustive. The compiler will give a warning if not all variants are
-covered by **c_is** (requires `-Wall` or `-Wswitch` gcc/clang compiler flag). Note also that the
-first enum value is deliberately set to 1 in order to easier detect non/zero-initialized variants.
+covered by **c_is** (requires `-Wall` or `-Wswitch` gcc/clang compiler flag). The first enum value
+is deliberately set to 1 in order to easier detect non/zero-initialized variants.
+
+* Note 1: The `x` variables in the synopsis are "auto" type declared/defined - see examples.
+* Note 2: Sum types will not work in coroutines (i.e. if `cco_yield..` or `cco_await..` are used within `c_when` / `c_if_is` blocks).
 
 ### Example 1
 

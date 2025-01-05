@@ -3,14 +3,48 @@
 
 # STC - Smart Template Containers
 
-### Version 5.0 RC5
-*This library is a tribute to the C language and its creator, Dennis M. Ritchie.*
-
+## Version 5.0 RC6
 STC is a *modern*, *typesafe* and *fast* templated general purpose container and algorithms
 library for C99. It aims to elevate C-programming to be even more fun, more productive, and
-substantially safer due to the encouragement of broad usage of loop abstractions, typesafe
-high-level generic datatypes and algorithms, and through consistent handling of
+substantially safer due to the encouragement of broad usage of loop abstractions,
+high-level generic datatypes, iterators and algorithms, and through a consistent handling of
 object ownership and lifetimes.
+
+<details>
+<summary><b>The big picture: Why we need a modern generic library for C</b></summary>
+C is still among the most popular programming languages, despite the fact that it was created
+as early as in 1972. It is a manifestation of how well the language was designed for its time,
+and still is. However, times are rapidly changing, and C among others is starting to lag
+behind many of the new system languages like Zig, Odin and Rust with regard to features in
+the standard library, but also when it comes to safety and vulnerabilities. Both those issues
+are addressed with the STC library.
+
+#### A. Missing features in the C standard library, which STC provides
+* Large set of high performance, generic/templated typesafe container types, including smart pointers and bitsets.
+* String type with utf8 support and short string optimization (sso), and two string-view types.
+* Typesafe and ergonomic **sum type** implementation, aka. tagged union or variant.
+* Flexible **coroutine** implementation with excellent ergonomics, error recovery and cleanup support.
+* Fast, modern **regular expressions** with full utf8 and a subset of unicode character classes support.
+* Ranges algorithms like *iota* and filter views like *take, skip, take-while, skip-while, map*.
+* Generic algorithms, iterators and loop abstactions. Blazing fast *sort, binary search* and *lower bound*.
+* Single/multi-dimensional generic **span view** with arbitrary array dimensions (numpy array-like slicing).
+
+#### B. Improved safety by using STC
+* Abstractions for raw loops, ranged iteration over containers, and generic ranges algorithms. All this
+reduces the chance of creating bugs, as user code with raw loops and ad-hoc implementation of
+common algorithms and containers is minimized/eliminated.
+* STC is inherently **type safe**. Essentially, there are no opaque pointers or casting away of type information.
+Only where neccesary, generic code will use some macros to do compile-time type-checking before types are casted.
+Examples are `c_static_assert`, `c_const_cast`, `c_safe_cast` and macros for safe integer type casting.
+* Containers and algorithms all use **signed integers** for indices and sizes, and it encourange to use
+signed integers for quantities in general (unsigned integers have valid usages as bitsets and in bit operations).
+This could remove a wide range of bugs related to mixed unsigned-signed calculations and comparisons, which
+intuitively gives the wrong answer in many cases.
+* Tagged unions in C are common, but normally unsafely implemented. Traditionally, it leaves the inactive payload
+data readily accesible to user code, and there is no general way to ensure that the payload is assigned along with
+the tag, or that they match. STC **sum type** is a typesafe version of tagged unions which eliminates all those
+safety concerns.
+</details>
 
 Containers
 ----------

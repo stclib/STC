@@ -106,34 +106,34 @@ int main(void) {
         c_EVAL(c_LOOP(_c_vartuple_var, T, __VA_ARGS__, (0),)) \
     }
 
-#if defined __GNUC__ || defined __clang__ || defined __TINYC__ || _MSC_VER >= 1939
-    #define c_when(var) \
-        for (__typeof__(var) _match = (var); _match; _match = NULL) \
-        switch (_match->_any_.tag)
+#if defined STC_HAS_TYPEOF && STC_HAS_TYPEOF
+    #define c_when(varptr) \
+        for (__typeof__(varptr) _vp1 = (varptr); _vp1; _vp1 = NULL) \
+        switch (_vp1->_any_.tag)
 
     #define c_is_2(Tag, x) \
         break; case Tag: \
-        for (__typeof__(_match->Tag.var)* x = &_match->Tag.var; x; x = NULL)
+        for (__typeof__(_vp1->Tag.var)* x = &_vp1->Tag.var; x; x = NULL)
 
-    #define c_if_is(v, Tag, x) \
-        for (__typeof__(v) _var = (v); _var; _var = NULL) \
-            if (c_holds(_var, Tag)) \
-                for (__typeof__(_var->Tag.var) *x = &_var->Tag.var; x; x = NULL)
+    #define c_if_is(varptr, Tag, x) \
+        for (__typeof__(varptr) _vp2 = (varptr); _vp2; _vp2 = NULL) \
+            if (c_holds(_vp2, Tag)) \
+                for (__typeof__(_vp2->Tag.var) *x = &_vp2->Tag.var; x; x = NULL)
 #else
     typedef union { struct { int tag; } _any_; } _c_any_variant;
-    #define c_when(var) \
-        for (_c_any_variant* _match = (_c_any_variant *)(var) + 0*sizeof((var)->_any_.tag); \
-             _match; _match = NULL) \
-            switch (_match->_any_.tag)
+    #define c_when(varptr) \
+        for (_c_any_variant* _vp1 = (_c_any_variant *)(varptr) + 0*sizeof((varptr)->_any_.tag); \
+             _vp1; _vp1 = NULL) \
+            switch (_vp1->_any_.tag)
 
     #define c_is_2(Tag, x) \
         break; case Tag: \
-        for (Tag##_type *x = &((Tag##_sumtype *)_match)->Tag.var; x; x = NULL)
+        for (Tag##_type *x = &((Tag##_sumtype *)_vp1)->Tag.var; x; x = NULL)
 
-    #define c_if_is(v, Tag, x) \
-        for (Tag##_sumtype* _var = c_const_cast(Tag##_sumtype*, v); _var; _var = NULL) \
-            if (c_holds(_var, Tag)) \
-                for (Tag##_type *x = &_var->Tag.var; x; x = NULL)
+    #define c_if_is(varptr, Tag, x) \
+        for (Tag##_sumtype* _vp2 = c_const_cast(Tag##_sumtype*, varptr); _vp2; _vp2 = NULL) \
+            if (c_holds(_vp2, Tag)) \
+                for (Tag##_type *x = &_vp2->Tag.var; x; x = NULL)
 #endif
 
 #define c_is(...) c_MACRO_OVERLOAD(c_is, __VA_ARGS__)
@@ -149,13 +149,10 @@ int main(void) {
 #define c_variant(Tag, ...) \
     (c_literal(Tag##_sumtype){.Tag={.tag=Tag, .var=__VA_ARGS__}})
 
-#define c_get(Tag, var_ptr) \
-    (c_assert((var_ptr)->Tag.tag == Tag), &(var_ptr)->Tag.var)
+#define c_tag_index(varptr) \
+    ((int)(varptr)->_any_.tag)
 
-#define c_tag_index(var_ptr) \
-    ((var_ptr)->_any_.tag)
-
-#define c_holds(var_ptr, Tag) \
-    (c_tag_index(var_ptr) == Tag)
+#define c_holds(varptr, Tag) \
+    ((varptr)->_any_.tag == Tag)
 
 #endif // STC_SUMTYPE_H_INCLUDED

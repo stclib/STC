@@ -10,7 +10,7 @@ This is small and portable implementation of coroutines.
 * Allows "throwing" errors. To be handled in a `cco_finally:` during the immediate unwinding of the call stack.
 Unhandled errors will exit program with an error message including the offendig throw's line number.
 
-Because these coroutines are stackful, all variables used within the coroutine scope (where usage crosses `cco_yield*` or `cco_await*`) must be stored in a struct which is passed as pointer to the coroutine. This has the advantages that they become extremely lightweight and therefore useful on severely memory constrained systems like small microcontrollers where other solutions are impractical.
+Because these coroutines are stackful, all variables used within the coroutine scope (where usage crosses `cco_yield..` or `cco_await..`) must be stored in a struct which is passed as pointer to the coroutine. This has the advantages that they become extremely lightweight and therefore useful on severely memory constrained systems like small microcontrollers where other solutions are impractical.
 
 ## Methods and statements
 
@@ -45,8 +45,6 @@ void            cco_recover_error(cco_runtime* rt);                 // Reset err
 void            cco_resume_task(cco_task* task, cco_runtime* rt);   // Resume suspended task, return value in `rt->result`.
                 cco_run_task(cco_task* task) {}                     // Run blocking until task is finished.
                 cco_run_task(cco_task* task, <Environment> *env) {} // Run blocking with env data
-                cco_run_task(cco_task* task, <Environment> *env, runnername) {} // Run blocking with env data and
-                                                                                // name of the cco_taskrunner.
 ```
 #### Timers and time functions
 ```c++
@@ -92,7 +90,7 @@ cco_semaphore   cco_make_semaphore(long value);                     // Create se
 |`cco_runtime`      | Struct type | Runtime object to manage cco_taskrunner states |
 
 ## Rules
-1. Avoid declaring local variables within a `cco_routine` scope. They are only alive until next `cco_yield*` or `cco_await*`
+1. Avoid declaring local variables within a `cco_routine` scope. They are only alive until next `cco_yield..` or `cco_await..`
 suspension point. Normally place them in the coroutine struct. Be particularly careful with control variables in loops.
 2. Do not call ***cco_yield\**** or ***cco_await\**** inside a `switch` statement within a
 `cco_routine` scope. In general, use `if-else-if` to avoid this trap.
@@ -103,7 +101,7 @@ A regular coroutine may have any signature, however this implementation has spec
 coroutines which returns `int`, indicating CCO_DONE, CCO_AWAIT, CCO_YIELD, or a custom value.
 It should take a struct pointer as one of the parameter which must contains a cco-state member named `cco`.
 The coroutine struct should normally store all *local* variables to be used within the coroutine
-(technically those which lifetime crosses a `cco_yield*` or `cco_await*()` statement), along with
+(technically those which lifetime crosses a `cco_yield..` or a `cco_await..` statement), along with
 *input* and *output* data for the coroutine.
 
 Both asymmetric and symmetric coroutine control flow transfer are supported when using ***tasks***
