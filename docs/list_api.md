@@ -131,7 +131,7 @@ void            list_X_value_drop(i_key* pval);
 
 Interleave *push_front()* / *push_back()* then *sort()*:
 
-[ [Run this code](https://godbolt.org/z/dqWqfWrMd) ]
+[ [Run this code](https://godbolt.org/z/6Wzz75KfP) ]
 ```c++
 #define i_type DList, double
 #define i_use_cmp
@@ -151,7 +151,7 @@ int main(void) {
     c_foreach (i, DList, list)
         printf(" %g", *i.ref);
 
-    DList_sort(&list); // mergesort O(n*log n)
+    DList_sort(&list); // uses quicksort
 
     printf("\nsorted: ");
     c_foreach (i, DList, list)
@@ -190,38 +190,37 @@ int main(void)
     IList_drop(&L);
 }
 ```
-Output:
-```
-mylist contains: 10 30
-```
 
 ### Example 3
+Splice {**30**, **40**} from *L2* into *L1* before **3**:
 
-Splice `[30, 40]` from *L2* into *L1* before `3`:
+[ [Run this code](https://godbolt.org/z/P1YjG43zd) ]
 ```c++
+#include <stdio.h>
 #define i_type IList, int
 #include "stc/list.h"
-#include <stdio.h>
 
 int main(void) {
     IList L1 = c_make(IList, {1, 2, 3, 4, 5});
     IList L2 = c_make(IList, {10, 20, 30, 40, 50});
 
+    c_foritems (k, IList, {L1, L2}) {
+        c_foreach (i, IList, *k.ref)
+            printf(" %d", *i.ref);
+        puts("");
+    }
+    puts("");
     IList_iter i = IList_advance(IList_begin(&L1), 2);
     IList_iter j1 = IList_advance(IList_begin(&L2), 2), j2 = IList_advance(j1, 2);
 
     IList_splice_range(&L1, i, &L2, j1, j2);
 
-    c_foreach (i, IList, L1)
-        printf(" %d", *i.ref); puts("");
-    c_foreach (i, IList, L2)
-        printf(" %d", *i.ref); puts("");
+    c_foritems (k, IList, {L1, L2}) {
+        c_foreach (i, IList, *k.ref)
+            printf(" %d", *i.ref);
+        puts("");
+    }
 
     c_drop(IList, &L1, &L2);
 }
-```
-Output:
-```
-1 2 30 40 3 4 5
-10 20 50
 ```
