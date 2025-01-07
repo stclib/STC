@@ -3,14 +3,23 @@
 
 This is small and portable implementation of coroutines.
 
-* Stackful, typesafe coroutines. Allows both asymmetric coroutine calls and symmetric transfer of control.
-* Great ergonomics and minimal boilerplate code. No awkward macros.
-* Tiny memory usage, very efficient context switching, and no allocation required by default.
-* Coroutines are to be cleaned up at the `cco_finally:` label. Will also happen on errors and cancelation.
-* Allows "throwing" errors. To be handled in a `cco_finally:` during the immediate unwinding of the call stack.
+* Stackful or stackless typesafe coroutines.
+* Supports both asymmetric coroutine calls (structured concurrency) and symmetric transfer of control.
+* Good ergonomics and minimal boilerplate code.
+* Supports "throwing" errors, handled in `cco_finally` during immediate unwinding of the call stack.
+* Recovery from errors mechanism.
+* Small memory usage and efficient context switching. No heap allocation required by default.
+* Coroutines may be cleaned up at the `cco_finally` label. Will also happen on errors and cancelation.
 Unhandled errors will exit program with an error message including the offendig throw's line number.
 
-Because these coroutines are stackful, all variables used within the coroutine scope (where usage crosses `cco_yield..` or `cco_await..`) must be stored in a struct which is passed as pointer to the coroutine. This has the advantages that they become extremely lightweight and therefore useful on severely memory constrained systems like small microcontrollers where other solutions are impractical.
+STC coroutines may behave stackless or stackful.
+- In stackless mode, the root coroutine object stores the call tree of coroutine objects (typically
+on the stack), which holds all variables used within their coroutine scopes. This has the advantages
+that they become extremely lightweight and therefore useful on severely memory constrained systems
+like microcontrollers with limited resources.
+- In stackful mode, the coroutine frames are allocated on the heap just before they await another
+coroutine. Examples below.
+
 
 ## Methods and statements
 
@@ -413,7 +422,7 @@ int main(void)
 ```
 </details>
 
-#### Heap allocated task frames
+#### Stackful coroutines allocated on the heap
 
 Sometimes the call-tree is dynamic or more complex, then we can dynamically allocate the coroutine frames before
 they are awaited. This is somewhat more general and simpler, but requires heap allocation. Note that the coroutine
@@ -422,7 +431,7 @@ the previous, but also shows how to use the env field in `cco_runtime` to return
 call/await:
 
 <details>
-<summary>Implementation of heap allocated task frames</summary>
+<summary>Implementation of stackful coroutines</summary>
 
 [ [Run this code](https://godbolt.org/z/TbWYsbaaq) ]
 ```c++

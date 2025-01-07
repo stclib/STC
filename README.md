@@ -11,7 +11,7 @@ high-level generic datatypes, iterators and algorithms, and through a consistent
 object ownership and lifetimes.
 
 <details>
-<summary><b>The big picture: Why we need a modern generic library for C</b></summary>
+<summary><b>Reasons why you may want to you use STC</b></summary>
 C is still among the most popular programming languages, despite the fact that it was created
 as early as in 1972. It is a manifestation of how well the language was designed for its time,
 and still is. However, times are rapidly changing, and C among others is starting to lag
@@ -20,8 +20,8 @@ the standard library, but also when it comes to safety and vulnerabilities. Both
 are addressed with the STC library.
 
 #### A. Missing features in the C standard library, which STC provides
-* Large set of high performance, generic/templated typesafe container types, including smart pointers and bitsets.
-* String type with utf8 support and short string optimization (sso), and two string-view types.
+* A wide set of high performance, generic/templated typesafe container types, including smart pointers and bitsets.
+* String type with utf8 support and short string optimization (sso), plus two string-view types.
 * Typesafe and ergonomic **sum type** implementation, aka. tagged union or variant.
 * Flexible **coroutine** implementation with excellent ergonomics, error recovery and cleanup support.
 * Fast, modern **regular expressions** with full utf8 and a subset of unicode character classes support.
