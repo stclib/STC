@@ -18,7 +18,7 @@ on the stack), which holds all variables used within their coroutine scopes. Thi
 that they become extremely lightweight and therefore useful on severely memory constrained systems
 like microcontrollers with limited resources.
 - In stackful mode, the coroutine frames are allocated on the heap just before they await another
-coroutine. Examples below.
+coroutine. See examples.
 
 
 ## Methods and statements
@@ -204,27 +204,28 @@ int main(void) {
 ### Actor models of concurrency in video games and simulations
 A common usage of coroutines is long-running concurrent tasks, often found in video games. An example of this is the
 [Dining philosopher's problem](https://en.wikipedia.org/wiki/Dining_philosophers_problem). The following
-implementation uses `cco_await*()` and `cco_yield`. It avoids deadlocks because it waits until both forks are
-available before aquiring them. It also avoids starvation as the neighbor's hunger increases for each "round".
+implementation uses `cco_await` and `cco_yield`. It avoids deadlocks by awaiting for both forks to be
+available before aquiring them. It also avoids starvation by increasing both neighbor's hunger when a philosopher
+starts eating (because they must be waiting).
 
 <details>
 <summary>The "Dining philosophers" C implementation</summary>
 
-[ [Run this code](https://godbolt.org/z/WoaMv6js5) ]
+[ [Run this code](https://godbolt.org/z/EK6zs6vbz) ]
 ```c++
 #include <stdio.h>
 #include <time.h>
 #include "stc/random.h"
 #include "stc/coroutine.h"
-// Define the number of philosophers
+
 enum {num_philosophers = 5};
-enum {ph_thinking, ph_eating, ph_hungry};
+enum PhState {ph_thinking, ph_hungry, ph_eating};
 
 // Philosopher coroutine
 struct Philosopher {
     int id;
     cco_timer tm;
-    int state;
+    enum PhState state;
     int hunger;
     struct Philosopher* left;
     struct Philosopher* right;
@@ -272,7 +273,7 @@ int Dining(struct Dining* self) {
         for (int i = 0; i < num_philosophers; ++i) {
             cco_reset(&self->philos[i]);
             self->philos[i].id = i + 1;
-            self->philos[i].left = &self->philos[i];
+            self->philos[i].left = &self->philos[(i - 1 + num_philosophers) % num_philosophers];
             self->philos[i].right = &self->philos[(i + 1) % num_philosophers];
         }
 

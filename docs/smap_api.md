@@ -117,6 +117,8 @@ void            smap_X_value_drop(i_key* pval);
 | `smap_X_iter`      | `struct { smap_X_value *ref; ... }`              | Iterator type                |
 
 ## Examples
+
+[ [Run this code](https://godbolt.org/z/qs1Gsv5zh) ]
 ```c++
 #include "stc/cstr.h"
 
@@ -149,15 +151,6 @@ int main(void)
     smap_cstr_drop(&colors);
 }
 ```
-Output:
-```
-Key:[BLUE] Value:[#0000FF]
-Key:[GREEN] Value:[#00FF00]
-Key:[RED] Value:[#FF0000]
-The HEX of color RED is:[#FF0000]
-The HEX of color BLACK is:[#000000]
-```
-
 
 ### Example 2
 Translate a
@@ -196,44 +189,44 @@ int main(void)
 ```
 
 ### Example 3
-This example uses a smap with cstr as mapped value.
+This example uses a smap with cstr as mapped value. Note the `i_valpro` usage.
+
+[ [Run this code](https://godbolt.org/z/M397fG7fM) ]
 ```c++
 #include "stc/cstr.h"
 
-#define i_type IDSMap, int
+#define i_type IdMap
+#define i_key int
 #define i_valpro cstr
 #include "stc/smap.h"
 
 int main(void)
 {
     uint32_t col = 0xcc7744ff;
-    IDSMap idnames = c_make(IDSMap, {{100, "Red"}, {110, "Blue"}});
+    IdMap idnames = c_make(IdMap, {{100, "Red"}, {110, "Blue"}});
 
     // Assign/overwrite an existing mapped value with a const char*
-    IDSMap_emplace_or_assign(&idnames, 110, "White");
+    IdMap_emplace_or_assign(&idnames, 110, "White");
 
     // Insert (or assign) a new cstr
-    IDSMap_insert_or_assign(&idnames, 120, cstr_from_fmt("#%08x", col));
+    IdMap_insert_or_assign(&idnames, 120, cstr_from_fmt("#%08x", col));
 
     // emplace() adds only when key does not already exist:
-    IDSMap_emplace(&idnames, 100, "Green"); // ignored
+    IdMap_emplace(&idnames, 100, "Green"); // ignored
 
-    c_foreach (i, IDSMap, idnames)
+    c_foreach (i, IdMap, idnames)
         printf("%d: %s\n", i.ref->first, cstr_str(&i.ref->second));
 
-    IDSMap_drop(&idnames);
+    IdMap_drop(&idnames);
 }
-```
-Output:
-```c++
-100: Red
-110: White
-120: #cc7744ff
 ```
 
 ### Example 4
 Demonstrate smap with plain-old-data key type Vec3i and int as mapped type: smap<Vec3i, int>.
+
+[ [Run this code](https://godbolt.org/z/KE8qEYsvY) ]
 ```c++
+#include <stdio.h>
 typedef struct { int x, y, z; } Vec3i;
 
 static int Vec3i_cmp(const Vec3i* a, const Vec3i* b) {
@@ -246,7 +239,6 @@ static int Vec3i_cmp(const Vec3i* a, const Vec3i* b) {
 #define i_type smap_vi, Vec3i, int
 #define i_cmp Vec3i_cmp
 #include "stc/smap.h"
-#include <stdio.h>
 
 int main(void)
 {
@@ -262,11 +254,4 @@ int main(void)
 
     smap_vi_drop(&vmap);
 }
-```
-Output:
-```c++
-{   0,   0, 100 }: 3
-{   0, 100,   0 }: 2
-{ 100,   0,   0 }: 1
-{ 100, 100, 100 }: 4
 ```

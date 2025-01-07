@@ -4,15 +4,14 @@
 #include "stc/random.h"
 #include "stc/coroutine.h"
 
-// Define the number of philosophers
 enum {num_philosophers = 5};
-enum {ph_thinking, ph_hungry, ph_eating};
+enum PhState {ph_thinking, ph_hungry, ph_eating};
 
 // Philosopher coroutine
 struct Philosopher {
     int id;
     cco_timer tm;
-    int state;
+    enum PhState state;
     int hunger;
     struct Philosopher* left;
     struct Philosopher* right;
@@ -60,7 +59,7 @@ int Dining(struct Dining* self) {
         for (int i = 0; i < num_philosophers; ++i) {
             cco_reset(&self->philos[i]);
             self->philos[i].id = i + 1;
-            self->philos[i].left = &self->philos[i];
+            self->philos[i].left = &self->philos[(i - 1 + num_philosophers) % num_philosophers];
             self->philos[i].right = &self->philos[(i + 1) % num_philosophers];
         }
 

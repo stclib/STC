@@ -117,17 +117,3 @@ int main(void)
     c_drop(Strings, &first, &second, &third, &fourth, &fifth);
 }
 ```
-Output:
-```
-fifth contains:
-
-red
-green
-flour
-orange
-blue
-pink
-yellow
-milk
-potatoes
-```
