@@ -335,7 +335,7 @@ STC_API _istride* _cspan_shape2stride(cspan_layout layout, _istride shape[], int
 #endif // STC_CSPAN_H_INCLUDED
 
 /* --------------------- IMPLEMENTATION --------------------- */
-#if defined i_implement  || defined i_static
+#if defined i_implement
 
 STC_DEF void _cspan_print_assist(_istride pos[], const _istride shape[], const int rank,
                                  char result[2][16], const char* brackets) {

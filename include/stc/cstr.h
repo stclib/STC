@@ -37,7 +37,7 @@
 
 #endif // STC_CSTR_H_INCLUDED
 
-#if defined i_implement || defined STC_IMPLEMENT || \
+#if defined i_implement || \
     defined STC_CSTR_CORE || \
     defined STC_CSTR_IO || \
     defined STC_CSTR_UTF8

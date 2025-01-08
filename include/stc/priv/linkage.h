@@ -23,12 +23,12 @@
 #undef STC_API
 #undef STC_DEF
 
-#if !defined i_static  && !defined STC_STATIC  && (defined i_header || defined STC_HEADER  || \
-                                                   defined i_implement || defined STC_IMPLEMENT)
+#if !defined i_static && !defined STC_STATIC  && (defined i_header || defined STC_HEADER  || \
+                                                  defined i_implement || defined STC_IMPLEMENT)
   #define STC_API extern
   #define STC_DEF
 #else
-  #define i_static
+  #define i_implement
   #if defined __GNUC__ || defined __clang__
     #define STC_API static __attribute__((unused))
   #else

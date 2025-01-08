@@ -259,7 +259,7 @@ STC_INLINE Self _c_MEMB(_with_n)(const _m_raw* raw, isize n)
     { Self cx = {0}; _c_MEMB(_put_n)(&cx, raw, n); return cx; }
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if defined(i_implement) || defined(i_static)
+#if defined i_implement
 
 STC_DEF void
 _c_MEMB(_next)(_m_iter *it) {

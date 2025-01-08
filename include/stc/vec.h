@@ -261,7 +261,7 @@ STC_INLINE bool _c_MEMB(_eq)(const Self* self, const Self* other) {
 #endif // _i_has_cmp
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if defined i_implement || defined i_static
+#if defined i_implement
 
 STC_DEF void
 _c_MEMB(_clear)(Self* self) {

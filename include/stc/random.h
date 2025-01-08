@@ -220,7 +220,7 @@ STC_INLINE int64_t crand32_uniform(crand32_uniform_dist* d)
 #endif // STC_RANDOM_H_INCLUDED
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if defined i_implement || defined i_static
+#if defined i_implement
 
 #ifndef STC_RANDOM_C_INCLUDED
 #define STC_RANDOM_C_INCLUDED

@@ -64,7 +64,7 @@ _c_MEMB(_binary_search)(const Self* self, const _m_raw raw)
 #endif
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if defined i_implement || defined i_static
+#if defined i_implement
 
 static void _c_MEMB(_insertsort_lowhigh)(Self* self, isize lo, isize hi) {
     for (isize j = lo, i = lo + 1; i <= hi; j = i, ++i) {

@@ -222,7 +222,7 @@ STC_INLINE bool _c_MEMB(_eq)(const Self* self, const Self* other) {
 #endif
 
 // -------------------------- IMPLEMENTATION -------------------------
-#if defined(i_implement) || defined(i_static)
+#if defined i_implement
 
 #if !defined i_no_clone
 STC_DEF Self

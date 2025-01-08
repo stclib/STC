@@ -65,9 +65,8 @@ distclean:
 lib: $(LIB_PATH)
 
 $(LIB_PATH): $(LIB_OBJS)
-	@printf "\r\e[2K%s\n" "$(AR_RCS) $@"
+	@printf "\r\e[2K%s" "$(AR_RCS) $@"
 	@$(AR_RCS) $@ $(LIB_OBJS)
-#	@echo ""
 
 $(OBJ_DIR)/%.o: %.c
 	@$(MKDIR_P) $(@D)
@@ -85,7 +84,7 @@ $(OBJ_DIR)/%$(DOTEXE): %.c $(LIB_PATH)
 	@$(CC) -o $@ $(CFLAGS) -s $< $(LDFLAGS) -L$(BUILDDIR) -l$(LIB_NAME)
 
 $(TEST_EXE): $(TEST_OBJS)
-	@printf "\r\e[2K%s" "$(CC) -o $@ $(notdir $(TEST_OBJS))"
+	@printf "\r\e[2K%s" "$(CC) -o $@"
 	@$(CC) -o $@ $(TEST_OBJS) -s $(LDFLAGS) -L$(BUILDDIR) -l$(LIB_NAME)
 
 

@@ -124,7 +124,7 @@ _c_MEMB(_find)(const Self* self, _m_raw raw) {
 #endif // _i_has_cmp
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if defined(i_implement) || defined(i_static)
+#if defined i_implement
 
 STC_DEF _m_value*
 _c_MEMB(_push_front)(Self* self, _m_value value) {

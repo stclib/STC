@@ -130,7 +130,7 @@ STC_INLINE void _c_MEMB(_emplace)(Self* self, _m_raw raw)
 #endif // !i_no_emplace
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if defined(i_implement) || defined(i_static)
+#if defined i_implement
 
 STC_DEF void
 _c_MEMB(_sift_down_)(Self* self, const isize idx, const isize n) {

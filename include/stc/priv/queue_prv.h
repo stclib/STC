@@ -150,7 +150,7 @@ STC_INLINE void _c_MEMB(_adjust_end_)(Self* self, isize n)
     { self->end = (self->end + n) & self->capmask; }
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if defined i_implement || defined i_static
+#if defined i_implement
 
 STC_DEF _m_iter _c_MEMB(_advance)(_m_iter it, isize n) {
     isize len = _c_MEMB(_size)(it._s);

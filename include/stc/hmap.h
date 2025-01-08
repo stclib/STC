@@ -292,7 +292,7 @@ _c_MEMB(_eq)(const Self* self, const Self* other) {
 }
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if defined(i_implement) || defined(i_static)
+#if defined i_implement
 
 STC_DEF _m_iter _c_MEMB(_begin)(const Self* self) {
     _m_iter it = {self->table, self->table, self->meta};

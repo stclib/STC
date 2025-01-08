@@ -237,11 +237,19 @@ typedef const char* cstr_raw;
 
 // General functions
 
-// substring in substring?
-char* c_strnstrn(const char *str, isize slen, const char *needle, isize nlen);
-
-// hashing
-size_t c_basehash_n(const void* key, isize len);
+STC_INLINE size_t c_basehash_n(const void* key, isize len) {
+    size_t block = 0, hash = 0x811c9dc5;
+    const uint8_t* msg = (const uint8_t*)key;
+    while (len >= c_sizeof(size_t)) {
+        memcpy(&block, msg, sizeof(size_t));
+        hash = (hash ^ block) * (size_t)0x89bb179901000193;
+        msg += c_sizeof(size_t);
+        len -= c_sizeof(size_t);
+    }
+    c_memcpy(&block, msg, len);
+    hash = (hash ^ block) * (size_t)0xb0340f4501000193;
+    return hash ^ (hash >> 3);
+}
 
 STC_INLINE size_t c_hash_n(const void* key, isize len) {
     uint64_t b8; uint32_t b4;
@@ -255,12 +263,13 @@ STC_INLINE size_t c_hash_n(const void* key, isize len) {
 STC_INLINE size_t c_hash_str(const char *str)
     { return c_basehash_n(str, c_strlen(str)); }
 
+#define c_hash_mix(...) /* non-commutative hash combine! */ \
+    _chash_mix(c_make_array(size_t, {__VA_ARGS__}), c_NUMARGS(__VA_ARGS__))
+
 STC_INLINE size_t _chash_mix(size_t h[], int n) {
     for (int i = 1; i < n; ++i) h[0] += h[0] ^ h[i];
     return h[0];
 }
-#define c_hash_mix(...) /* non-commutative hash combine! */ \
-    _chash_mix(c_make_array(size_t, {__VA_ARGS__}), c_NUMARGS(__VA_ARGS__))
 
 // generic typesafe swap
 #define c_swap(xp, yp) do { \
@@ -283,12 +292,8 @@ STC_INLINE isize c_next_pow2(isize n) {
     #endif
     return n + 1;
 }
-#endif // STC_COMMON_H_INCLUDED
 
-#if !defined STC_COMMON_C_INCLUDED && defined STC_IMPLEMENT
-#define STC_COMMON_C_INCLUDED
-
-char* c_strnstrn(const char *str, isize slen, const char *needle, isize nlen) {
+STC_INLINE char* c_strnstrn(const char *str, isize slen, const char *needle, isize nlen) {
     if (nlen == 0) return (char *)str;
     if (nlen > slen) return NULL;
     slen -= nlen;
@@ -299,18 +304,4 @@ char* c_strnstrn(const char *str, isize slen, const char *needle, isize nlen) {
     } while (slen--);
     return NULL;
 }
-
-size_t c_basehash_n(const void* key, isize len) {
-    size_t block = 0, hash = 0x811c9dc5;
-    const uint8_t* msg = (const uint8_t*)key;
-    while (len >= c_sizeof(size_t)) {
-        memcpy(&block, msg, sizeof(size_t));
-        hash = (hash ^ block) * (size_t)0x89bb179901000193;
-        msg += c_sizeof(size_t);
-        len -= c_sizeof(size_t);
-    }
-    c_memcpy(&block, msg, len);
-    hash = (hash ^ block) * (size_t)0xb0340f4501000193;
-    return hash ^ (hash >> 3);
-}
-#endif // STC_COMMON_C_INCLUDED
+#endif // STC_COMMON_H_INCLUDED
