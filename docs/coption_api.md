@@ -6,7 +6,7 @@ See [getopt_long](https://www.freebsd.org/cgi/man.cgi?getopt_long(3)) for a simi
 
 ## Types
 
-```c
+```c++
 typedef enum {
     coption_no_argument,
     coption_required_argument,
@@ -30,7 +30,7 @@ typedef struct {
 
 ## Methods
 
-```c
+```c++
 coption         coption_init(void);
 int             coption_get(coption *opt, int argc, char *argv[],
                             const char *shortopts, const coption_long *longopts);
@@ -38,7 +38,7 @@ int             coption_get(coption *opt, int argc, char *argv[],
 
 ## Example
 
-```c
+```c++
 #include <stdio.h>
 #include "stc/coption.h"
 

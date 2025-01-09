@@ -1,6 +1,6 @@
 /* MIT License
  *
- * Copyright (c) 2023 Tyge Løvset
+ * Copyright (c) 2024 Tyge Løvset
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,22 +25,22 @@
 /*
 #include <stdio.h>
 
-#define i_TYPE sset_i,int
+#define i_type Intset,int
 #include "stc/sset.h" // sorted set of int
 
 int main(void) {
-    sset_i s = {0};
-    sset_i_insert(&s, 5);
-    sset_i_insert(&s, 8);
-    sset_i_insert(&s, 3);
-    sset_i_insert(&s, 5);
+    Intset s = {0};
+    Intset_insert(&s, 5);
+    Intset_insert(&s, 8);
+    Intset_insert(&s, 3);
+    Intset_insert(&s, 5);
 
-    c_foreach (k, sset_i, s)
+    c_foreach (k, Intset, s)
         printf("set %d\n", *k.ref);
-    sset_i_drop(&s);
+    Intset_drop(&s);
 }
 */
 
 #define _i_prefix sset_
-#define _i_isset
+#define _i_is_set
 #include "smap.h"

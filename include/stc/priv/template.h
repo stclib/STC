@@ -1,6 +1,6 @@
 /* MIT License
  *
- * Copyright (c) 2023 Tyge Løvset
+ * Copyright (c) 2024 Tyge Løvset
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,22 +20,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+// IWYU pragma: private
 #ifndef _i_template
 #define _i_template
 
 #ifndef STC_TEMPLATE_H_INCLUDED
 #define STC_TEMPLATE_H_INCLUDED
   #define c_option(flag)  ((i_opt) & (flag))
-  #define c_is_forward    (1<<0)
+  #define c_declared      (1<<0)
   #define c_no_atomic     (1<<1)
   #define c_no_clone      (1<<2)
-  #define c_no_emplace    (1<<3)
   #define c_no_hash       (1<<4)
   #define c_use_cmp       (1<<5)
   #define c_use_eq        (1<<6)
-  #define c_more          (1<<7)
 
-  #define _c_MEMB(name) c_JOIN(i_type, name)
+  #define _c_MEMB(name) c_JOIN(Self, name)
   #define _c_DEFTYPES(macro, SELF, ...) c_EXPAND(macro(SELF, __VA_ARGS__))
   #define _m_value _c_MEMB(_value)
   #define _m_key _c_MEMB(_key)
@@ -48,71 +47,57 @@
   #define _m_node _c_MEMB(_node)
 #endif
 
-#if defined i_TYPE && defined _i_ismap
-  #define i_type _c_SEL(_c_SEL31, i_TYPE)
-  #define i_key _c_SEL(_c_SEL32, i_TYPE)
-  #define i_val _c_SEL(_c_SEL33, i_TYPE)
-#elif defined i_TYPE
-  #define i_type _c_SEL(_c_SEL21, i_TYPE)
-  #define i_key _c_SEL(_c_SEL22, i_TYPE)
+#if defined i_key_arcbox // [deprecated]
+  #define i_keypro i_key_arcbox
+#elif defined i_key_cstr // [deprecated]
+  #define i_keypro cstr
+#elif defined i_key_str  // [deprecated]
+  #define i_keypro cstr
+  #define i_tag str
 #endif
-#ifndef i_type
-  #define i_type c_JOIN(_i_prefix, i_tag)
+#if defined i_val_arcbox // [deprecated]
+  #define i_valpro i_val_arcbox
+#elif defined i_val_cstr // [deprecated]
+  #define i_valpro cstr
+#elif defined i_val_str  // [deprecated]
+  #define i_valpro cstr
+  #define i_tag str
+#endif
+#ifdef i_TYPE            // [deprecated]
+  #define i_type i_TYPE
 #endif
 
-#if defined i_keyclass || defined i_valclass || defined i_rawclass || \
-    defined i_keyboxed || defined i_valboxed
-  #error "i_keyclass, i_valclass, i_rawclass, i_keyboxed, i_valboxed is not supported. " \
-         "Use: i_key_class, i_val_class, i_raw_class, i_key_arcbox, i_val_arcbox."
+#if defined i_type && !(defined i_key || defined i_keyclass || \
+                        defined i_keypro || defined i_rawclass)
+  #define Self c_SELECT(c_ARG_1, i_type)
+  #define i_key c_SELECT(c_ARG_2, i_type)
+  #if defined _i_is_map && !defined i_val
+    #define i_val c_SELECT(c_ARG_3, i_type)
+  #endif
+#elif !defined Self && defined i_type
+  #define Self i_type
+#elif !defined Self
+  #define Self c_JOIN(_i_prefix, i_tag)
 #endif
 
-#if !(defined i_key || \
-      defined i_key_str || defined i_key_ssv || \
-      defined i_key_class || defined i_key_arcbox)
-  #if defined _i_ismap
-    #error "i_key* must be defined for maps"
+#if defined i_rawclass
+  #if defined _i_is_arc || defined _i_is_box
+    #define i_use_cmp
+    #define i_use_eq
   #endif
-
-  #if defined i_val_str
-    #define i_key_str i_val_str
-  #endif
-  #if defined i_val_ssv
-    #define i_key_ssv i_val_ssv
-  #endif
-  #if defined i_val_arcbox
-    #define i_key_arcbox i_val_arcbox
-  #endif
-  #if defined i_val_class
-    #define i_key_class i_val_class
-  #endif
-  #if defined i_val
-    #define i_key i_val
-  #endif
-  #if defined i_valraw
-    #define i_keyraw i_valraw
-  #endif
-  #if defined i_valclone
-    #define i_keyclone i_valclone
-  #endif
-  #if defined i_valfrom
-    #define i_keyfrom i_valfrom
-  #endif
-  #if defined i_valto
-    #define i_keyto i_valto
-  #endif
-  #if defined i_valdrop
-    #define i_keydrop i_valdrop
+  #if !(defined i_key || defined i_keyclass)
+    #define i_key i_rawclass
+    #define i_keytoraw c_default_toraw
   #endif
 #endif
 
-#if c_option(c_is_forward)
-  #define i_is_forward
+#define i_no_emplace
+
+#if c_option(c_declared)
+  #define i_declared
 #endif
 #if c_option(c_no_hash)
   #define i_no_hash
-#endif
-#if c_option(c_no_emplace)
-  #define i_no_emplace
 #endif
 #if c_option(c_use_cmp)
   #define i_use_cmp
@@ -120,58 +105,40 @@
 #if c_option(c_use_eq)
   #define i_use_eq
 #endif
-#if c_option(c_no_clone) || defined _i_carc
+#if c_option(c_no_clone) || defined _i_is_arc
   #define i_no_clone
-#endif
-#if c_option(c_more)
-  #define i_more
 #endif
 
 // Handle predefined element-types with lookup convertion types:
-// cstr(const char*), cstr(csview), arc_T(T) / box_T(T)
-#if defined i_key_str
-  #define i_key_class cstr
-  #define i_raw_class ccharptr
-  #define i_use_cmp
-  #ifndef i_tag
-    #define i_tag str
-  #endif
-#elif defined i_key_ssv
-  #define i_key_class cstr
-  #define i_raw_class csview
-  #define i_use_cmp
-  #define i_keyfrom cstr_from_sv
-  #define i_keyto cstr_sv
-  #ifndef i_tag
-    #define i_tag ssv
-  #endif
-#elif defined i_key_arcbox
-  #define i_key_class i_key_arcbox
-  #define i_raw_class c_JOIN(i_key_arcbox, _raw)
+// cstr_from(const char*) and arc_T_from(T) / box_T_from(T)
+#if defined i_keypro
+  #define i_keyclass i_keypro
+  #define i_rawclass c_JOIN(i_keypro, _raw)
 #endif
 
-// Check for i_key_class and i_raw_class, and fill in missing defs:
-// Element "class" type with possible assoc. convertion type and "member" functions.
-#if defined i_raw_class
-  #define i_keyraw i_raw_class
-#elif defined i_key_class && !defined i_keyraw
-  #define i_raw_class i_key
+// Check for keyclass and rawclass, and fill in missing defs.
+#if defined i_rawclass
+  #define i_keyraw i_rawclass
+#elif defined i_keyclass && !defined i_keyraw
+  #define i_rawclass i_key
 #endif
 
 // Bind to i_key "class members": _clone, _drop, _from and _toraw (when conditions are met).
-#if defined i_key_class
-  #define i_key i_key_class
-  #ifndef i_keyclone
-    #define i_keyclone c_JOIN(i_key, _clone)
+#if defined i_keyclass
+  #define i_key i_keyclass
+  #if !defined i_keyclone && !defined i_no_clone
+    #define i_keyclone c_JOIN(i_keyclass, _clone)
   #endif
   #ifndef i_keydrop
-    #define i_keydrop c_JOIN(i_key, _drop)
+    #define i_keydrop c_JOIN(i_keyclass, _drop)
   #endif
   #if !defined i_keyfrom && defined i_keyraw
-    #define i_keyfrom c_JOIN(i_key, _from)
+    #define i_keyfrom c_JOIN(i_keyclass, _from)
+  #elif !defined i_keyfrom && !defined i_no_clone
+    #define i_keyfrom c_JOIN(i_keyclass, _clone)
   #endif
-  #if !defined i_keyto && defined i_keyraw
-    #define i_keyto c_JOIN(i_key, _toraw)
+  #if !defined i_keytoraw && defined i_keyraw
+    #define i_keytoraw c_JOIN(i_keyclass, _toraw)
   #endif
 #endif
 
@@ -184,41 +151,41 @@
 #endif
 
 // Bind to i_keyraw "class members": _cmp, _eq and _hash (when conditions are met).
-#if defined i_raw_class
-  #if !(defined i_cmp || defined i_less) && (defined i_use_cmp || defined _i_sorted || defined _i_ispque)
-    #define i_cmp c_JOIN(i_keyraw, _cmp)
+#if defined i_rawclass // => i_keyraw
+  #if !(defined i_cmp || defined i_less) && (defined i_use_cmp || defined _i_sorted || defined _i_is_pqueue)
+    #define i_cmp c_JOIN(i_rawclass, _cmp)
   #endif
-  #if !defined i_eq && (defined i_use_eq || defined i_hash || defined _i_ishash)
-    #define i_eq c_JOIN(i_keyraw, _eq)
+  #if !defined i_eq && (defined i_use_eq || defined i_hash || defined _i_is_hash)
+    #define i_eq c_JOIN(i_rawclass, _eq)
   #endif
   #if !(defined i_hash || defined i_no_hash)
-    #define i_hash c_JOIN(i_keyraw, _hash)
+    #define i_hash c_JOIN(i_rawclass, _hash)
   #endif
 #endif
 
 #if !defined i_key
-  #error "No i_key or i_val defined"
-#elif defined i_keyraw ^ defined i_keyto
-  #error "Both i_keyraw/i_valraw and i_keyto/i_valto must be defined, if any"
+  #error "No i_key defined"
+#elif defined i_keyraw && !defined i_keytoraw
+  #error "If i_keyraw/i_valraw is defined, i_keytoraw/i_valtoraw must be defined too"
 #elif !defined i_no_clone && (defined i_keyclone ^ defined i_keydrop)
   #error "Both i_keyclone/i_valclone and i_keydrop/i_valdrop must be defined, if any (unless i_no_clone defined)."
 #elif defined i_from || defined i_drop
-  #error "i_from / i_drop not supported. Define i_keyfrom/i_valfrom and/or i_keydrop/i_valdrop instead"
-#elif defined i_keyraw && defined _i_ishash && !(defined i_hash && (defined _i_has_cmp || defined i_eq))
-  #error "For hmap/hset, both i_hash and i_eq (or i_cmp) must be defined when i_keyraw is defined."
+  #error "i_from / i_drop not supported. Use i_keyfrom/i_keydrop ; i_valfrom/i_valdrop"
+#elif defined i_keyto || defined i_valto
+  #error i_keyto/i_valto not supported. Use i_keytoraw/i_valtoraw
 #elif defined i_keyraw && defined i_use_cmp && !defined _i_has_cmp
-  #error "For smap/sset/pque, i_cmp or i_less must be defined when i_keyraw is defined."
+  #error "For smap/sset/pqueue, i_cmp or i_less must be defined when i_keyraw is defined."
 #endif
 
 // Fill in missing i_eq, i_less, i_cmp functions with defaults.
 #if !defined i_eq && defined i_cmp
   #define i_eq(x, y) (i_cmp(x, y)) == 0
-#elif !defined i_eq && !defined i_keyraw
+#elif !defined i_eq
   #define i_eq(x, y) *x == *y // works for integral types
 #endif
 #if !defined i_less && defined i_cmp
   #define i_less(x, y) (i_cmp(x, y)) < 0
-#elif !defined i_less && !defined i_keyraw
+#elif !defined i_less
   #define i_less(x, y) *x < *y // works for integral types
 #endif
 #if !defined i_cmp && defined i_less
@@ -231,16 +198,18 @@
 #ifndef i_tag
   #define i_tag i_key
 #endif
+#if !defined i_keyfrom && defined i_keyclone && !defined i_keyraw
+  #define i_keyfrom i_keyclone
+#elif !defined i_keyfrom
+  #define i_keyfrom c_default_clone
+#else
+  #undef i_no_emplace
+#endif
 #ifndef i_keyraw
   #define i_keyraw i_key
 #endif
-#ifndef i_keyfrom
-  #define i_keyfrom c_default_clone
-#else
-  #define i_has_emplace
-#endif
-#ifndef i_keyto
-  #define i_keyto c_default_toraw
+#ifndef i_keytoraw
+  #define i_keytoraw c_default_toraw
 #endif
 #ifndef i_keyclone
   #define i_keyclone c_default_clone
@@ -249,55 +218,51 @@
   #define i_keydrop c_default_drop
 #endif
 
-#if defined _i_ismap // ---- process hmap/smap value i_val, ... ----
+#if defined _i_is_map // ---- process hmap/smap value i_val, ... ----
 
-#ifdef i_val_str
-  #define i_val_class cstr
-  #define i_valraw const char*
-#elif defined i_val_ssv
-  #define i_val_class cstr
-  #define i_valraw csview
-  #define i_valfrom cstr_from_sv
-  #define i_valto cstr_sv
-#elif defined i_val_arcbox
-  #define i_val_class i_val_arcbox
-  #define i_valraw c_JOIN(i_val_arcbox, _raw)
+#if defined i_valpro
+  #define i_valclass i_valpro
+  #define i_valraw c_JOIN(i_valpro, _raw)
 #endif
 
-#ifdef i_val_class
-  #define i_val i_val_class
-  #ifndef i_valclone
-    #define i_valclone c_JOIN(i_val, _clone)
+#ifdef i_valclass
+  #define i_val i_valclass
+  #if !defined i_valclone && !defined i_no_clone
+    #define i_valclone c_JOIN(i_valclass, _clone)
   #endif
   #ifndef i_valdrop
-    #define i_valdrop c_JOIN(i_val, _drop)
+    #define i_valdrop c_JOIN(i_valclass, _drop)
   #endif
   #if !defined i_valfrom && defined i_valraw
-    #define i_valfrom c_JOIN(i_val, _from)
+    #define i_valfrom c_JOIN(i_valclass, _from)
+  #elif !defined i_valfrom && !defined i_no_clone
+    #define i_valfrom c_JOIN(i_valclass, _clone)
   #endif
-  #if !defined i_valto && defined i_valraw
-    #define i_valto c_JOIN(i_val, _toraw)
+  #if !defined i_valtoraw && defined i_valraw
+    #define i_valtoraw c_JOIN(i_valclass, _toraw)
   #endif
 #endif
 
 #ifndef i_val
   #error "i_val* must be defined for maps"
-#elif defined i_valraw ^ defined i_valto
-  #error "Both i_valraw and i_valto must be defined, if any"
+#elif defined i_valraw && !defined i_valtoraw
+  #error "If i_valraw is defined, i_valtoraw must be defined too"
 #elif !defined i_no_clone && (defined i_valclone ^ defined i_valdrop)
   #error "Both i_valclone and i_valdrop must be defined, if any"
 #endif
 
+#if !defined i_valfrom && defined i_valclone && !defined i_valraw
+  #define i_valfrom i_valclone
+#elif !defined i_valfrom
+  #define i_valfrom c_default_clone
+#else
+  #undef i_no_emplace
+#endif
 #ifndef i_valraw
   #define i_valraw i_val
 #endif
-#ifndef i_valfrom
-  #define i_valfrom c_default_clone
-#else
-  #define i_has_emplace
-#endif
-#ifndef i_valto
-  #define i_valto c_default_toraw
+#ifndef i_valtoraw
+  #define i_valtoraw c_default_toraw
 #endif
 #ifndef i_valclone
   #define i_valclone c_default_clone
@@ -306,7 +271,7 @@
   #define i_valdrop c_default_drop
 #endif
 
-#endif // !_i_ismap
+#endif // !_i_is_map
 
 #ifndef i_val
   #define i_val i_key
@@ -314,7 +279,4 @@
 #ifndef i_valraw
   #define i_valraw i_keyraw
 #endif
-#ifndef i_has_emplace
-  #define i_no_emplace
 #endif // STC_TEMPLATE_H_INCLUDED
-#endif

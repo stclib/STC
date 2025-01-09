@@ -21,87 +21,100 @@ See the c++ class [std::list](https://en.cppreference.com/w/cpp/container/list) 
 
 ## Header file and declaration
 
-```c
-#define i_TYPE <ct>,<kt> // shorthand to define i_type,i_key
+```c++
+#define i_type <ct>,<kt> // shorthand for defining i_type, i_key
 #define i_type <t>       // list container type name (default: list_{i_key})
-#define i_key <t>        // element type: REQUIRED. Note: i_val* may be specified instead of i_key*.
-#define i_cmp <f>        // three-way compare two i_keyraw*
+// One of the following:
+#define i_key <t>        // key type
+#define i_keyclass <t>   // key type, and bind <t>_clone() and <t>_drop() function names
+#define i_keypro <t>     // key "pro" type, use for cstr, arc, box types
+
+#define i_keydrop <fn>   // destroy value func - defaults to empty destruct
+#define i_keyclone <fn>  // REQUIRED IF i_keydrop defined
+
 #define i_use_cmp        // may be defined instead of i_cmp when i_key is an integral/native-type.
-#define i_keydrop <f>    // destroy value func - defaults to empty destruct
-#define i_keyclone <f>   // REQUIRED IF i_keydrop defined
+#define i_cmp <fn>       // three-way compare two i_keyraw*
+#define i_less <fn>      // less comparison. Alternative to i_cmp
+#define i_eq <fn>        // equality comparison. Implicitly defined with i_cmp, but not i_less.
 
 #define i_keyraw <t>     // convertion "raw" type (default: {i_key})
-#define i_keyto <f>      // convertion func i_key* => i_keyraw
-#define i_keyfrom <f>    // convertion func i_keyraw => i_key
-#define i_tag <s>        // alternative typename: pque_{i_tag}. i_tag defaults to i_key
+#define i_rawclass <t>   // convertion "raw class". binds <t>_cmp(),  <t>_eq(),  <t>_hash()
+#define i_keytoraw <fn>  // convertion func i_key* => i_keyraw
+#define i_keyfrom <fn>   // convertion func i_keyraw => i_key
 #include "stc/list.h"
 ```
-
-`X` should be replaced by the value of `i_tag` in all of the following documentation.
+- Defining either `i_use_cmp`, `i_less` or `i_cmp` will enable sorting
+- **emplace**-functions are only available when `i_keyraw` is implicitly or explicitly defined.
+- In the following, `X` is the value of `i_key` unless `i_type` is defined.
 
 ## Methods
 
-```c
-list_X              list_X_init(void);
-list_X              list_X_clone(list_X list);
+```c++
+list_X          list_X_init(void);
 
-void                list_X_clear(list_X* self);
-void                list_X_copy(list_X* self, const list_X* other);
-void                list_X_drop(list_X* self);                                        // destructor
+list_X          list_X_clone(list_X list);
+void            list_X_copy(list_X* self, const list_X* other);
+void            list_X_take(list_X* self, list_X unowned);                        // take ownership of unowned
+list_X          list_X_move(list_X* self);                                        // move
+void            list_X_drop(list_X* self);                                        // destructor
 
-bool                list_X_empty(const list_X* list);
-intptr_t            list_X_count(const list_X* list);                                 // size() in O(n) time
+void            list_X_clear(list_X* self);
 
-list_X_value*       list_X_back(const list_X* self);
-list_X_value*       list_X_front(const list_X* self);
+bool            list_X_is_empty(const list_X* list);
+isize           list_X_count(const list_X* list);                                 // size() in O(n) time
 
-void                list_X_push_back(list_X* self, i_key value);                      // note: no pop_back()
-void                list_X_push_front(list_X* self, i_key value);
-void                list_X_push(list_X* self, i_key value);                           // alias for push_back()
+list_X_iter     list_X_find(const list_X* self, i_keyraw raw);
+list_X_iter     list_X_find_in(list_X_iter it1, list_X_iter it2, i_keyraw raw);
 
-void                list_X_emplace_back(list_X* self, i_keyraw raw);
-void                list_X_emplace_front(list_X* self, i_keyraw raw);
-void                list_X_emplace(list_X* self, i_keyraw raw);                       // alias for emplace_back()
+const i_key*    list_X_back(const list_X* self);
+const i_key*    list_X_front(const list_X* self);
 
-list_X_iter         list_X_insert_at(list_X* self, list_X_iter it, i_key value);      // return iter to new elem
-list_X_iter         list_X_emplace_at(list_X* self, list_X_iter it, i_keyraw raw);
+i_key*          list_X_back_mut(list_X* self);
+i_key*          list_X_front_mut(list_X* self);
 
-void                list_X_pop_front(list_X* self);
-list_X_iter         list_X_erase_at(list_X* self, list_X_iter it);                    // return iter after it
-list_X_iter         list_X_erase_range(list_X* self, list_X_iter it1, list_X_iter it2);
-intptr_t            list_X_remove(list_X* self, i_keyraw raw);                        // removes all matches
+void            list_X_push_back(list_X* self, i_key value);                      // note: no pop_back()
+void            list_X_push_front(list_X* self, i_key value);
+void            list_X_push(list_X* self, i_key value);                           // alias for push_back()
 
-list_X              list_X_split_off(list_X* self, list_X_iter i1, list_X_iter i2);   // split off [i1, i2)
-list_X_iter         list_X_splice(list_X* self, list_X_iter it, list_X* other);       // return updated valid it
-list_X_iter         list_X_splice_range(list_X* self, list_X_iter it,                 // return updated valid it
-                                        list_X* other, list_X_iter it1, list_X_iter it2);
+void            list_X_emplace_back(list_X* self, i_keyraw raw);
+void            list_X_emplace_front(list_X* self, i_keyraw raw);
+void            list_X_emplace(list_X* self, i_keyraw raw);                       // alias for emplace_back()
 
-list_X_iter         list_X_find(const list_X* self, i_keyraw raw);
-list_X_iter         list_X_find_in(list_X_iter it1, list_X_iter it2, i_keyraw raw);
-const i_key*        list_X_get(const list_X* self, i_keyraw raw);
-i_key*              list_X_get_mut(list_X* self, i_keyraw raw);
+list_X_iter     list_X_insert_at(list_X* self, list_X_iter it, i_key value);      // return iter to new elem
+list_X_iter     list_X_emplace_at(list_X* self, list_X_iter it, i_keyraw raw);
 
-void                list_X_reverse(list_X* self);
-void                list_X_sort(list_X* self);
-void                list_X_sort_with(list_X* self, int(*cmp)(const list_X_value*, const list_X_value*));
+void            list_X_pop_front(list_X* self);
+list_X_iter     list_X_erase_at(list_X* self, list_X_iter it);                    // return iter after it
+list_X_iter     list_X_erase_range(list_X* self, list_X_iter it1, list_X_iter it2);
+isize           list_X_remove(list_X* self, i_keyraw raw);                        // removes all matches
+
+list_X          list_X_split_off(list_X* self, list_X_iter i1, list_X_iter i2);   // split off [i1, i2)
+list_X_iter     list_X_splice(list_X* self, list_X_iter it, list_X* other);       // return updated valid it
+list_X_iter     list_X_splice_range(list_X* self, list_X_iter it,                 // return updated valid it
+                                    list_X* other, list_X_iter it1, li
+                                    st_X_iter it2);
+
+void            list_X_reverse(list_X* self);
+void            list_X_sort(list_X* self);
+void            list_X_sort_with(list_X* self, int(*cmp)(const i_key*, const i_key*));
 
 // Node API
-list_X_node*        list_X_get_node(list_X_value* val);                               // get enclosing node
-list_X_value*       list_X_push_back_node(list_X* self, list_X_node* node);
-list_X_value*       list_X_insert_after_node(list_X* self, list_X_node* ref, list_X_node* node);
-list_X_node*        list_X_unlink_after_node(list_X* self, list_X_node* ref);         // return unlinked node
-list_X_node*        list_X_unlink_front_node(list_X* self);                           // return unlinked node
-void                list_X_erase_after_node(list_X* self, list_X_node* node);
+list_X_node*    list_X_get_node(i_key* val);                                      // get the enclosing node
+i_key*          list_X_push_back_node(list_X* self, list_X_node* node);
+i_key*          list_X_insert_after_node(list_X* self, list_X_node* ref, list_X_node* node);
+list_X_node*    list_X_unlink_after_node(list_X* self, list_X_node* ref);         // return unlinked node
+list_X_node*    list_X_unlink_front_node(list_X* self);                           // return unlinked node
+void            list_X_erase_after_node(list_X* self, list_X_node* node);
 
-list_X_iter         list_X_begin(const list_X* self);
-list_X_iter         list_X_end(const list_X* self);
-void                list_X_next(list_X_iter* it);
-list_X_iter         list_X_advance(list_X_iter it, size_t n);                        // return n elements ahead.
+list_X_iter     list_X_begin(const list_X* self);
+list_X_iter     list_X_end(const list_X* self);
+void            list_X_next(list_X_iter* it);
+list_X_iter     list_X_advance(list_X_iter it, size_t n);                        // return n elements ahead.
 
-bool                list_X_eq(const list_X* c1, const list_X* c2);                   // equality test
-list_X_value        list_X_value_clone(list_X_value val);
-list_X_raw          list_X_value_toraw(const list_X_value* pval);
-void                list_X_value_drop(list_X_value* pval);
+bool            list_X_eq(const list_X* c1, const list_X* c2);                   // equality test
+i_key           list_X_value_clone(i_key val);
+list_X_raw      list_X_value_toraw(const i_key* pval);
+void            list_X_value_drop(i_key* pval);
 ```
 
 ## Types
@@ -117,14 +130,17 @@ void                list_X_value_drop(list_X_value* pval);
 ## Example
 
 Interleave *push_front()* / *push_back()* then *sort()*:
-```c
-#define i_TYPE DList,double
+
+[ [Run this code](https://godbolt.org/z/6Wzz75KfP) ]
+```c++
+#define i_type DList, double
+#define i_use_cmp
 #include "stc/list.h"
 
 #include <stdio.h>
 
 int main(void) {
-    DList list = c_init(DList, {10., 20., 30., 40., 50., 60., 70., 80., 90.});
+    DList list = c_make(DList, {10., 20., 30., 40., 50., 60., 70., 80., 90.});
 
     c_forrange (i, 1, 10) {
         if (i & 1) DList_push_front(&list, (double) i);
@@ -135,7 +151,7 @@ int main(void) {
     c_foreach (i, DList, list)
         printf(" %g", *i.ref);
 
-    DList_sort(&list); // mergesort O(n*log n)
+    DList_sort(&list); // uses quicksort
 
     printf("\nsorted: ");
     c_foreach (i, DList, list)
@@ -144,32 +160,28 @@ int main(void) {
     DList_drop(&list);
 }
 ```
-Output:
-```
-initial:  9 7 5 3 1 10 20 30 40 50 60 70 80 90 2 4 6 8
-sorted:  1 2 3 4 5 6 7 8 9 10 20 30 40 50 60 70 80 90
-```
-### Example 2
 
+### Example 2
 Use of *erase_at()* and *erase_range()*:
-```c
-// erasing from list
-#define i_TYPE IList,int
-#include "stc/list.h"
+
+[ [Run this code](https://godbolt.org/z/G6qPv4nrh) ]
+```c++
 #include <stdio.h>
+#define i_type IList, int
+#include "stc/list.h"
 
 int main(void)
 {
-    IList L = c_init(IList, {10, 20, 30, 40, 50});
-                                                // 10 20 30 40 50
+    IList L = c_make(IList, {10, 20, 30, 40, 50});
+                                            // 10 20 30 40 50
     IList_iter it = IList_begin(&L);        // ^
     IList_next(&it);
-    it = IList_erase_at(&L, it);              // 10 30 40 50
-                                                //    ^
+    it = IList_erase_at(&L, it);            // 10 30 40 50
+                                            //    ^
     IList_iter end = IList_end(&L);         //
     IList_next(&it);
-    it = IList_erase_range(&L, it, end);      // 10 30
-                                                //       ^
+    it = IList_erase_range(&L, it, end);    // 10 30
+                                            //       ^
     printf("mylist contains:");
     c_foreach (x, IList, L)
         printf(" %d", *x.ref);
@@ -178,38 +190,37 @@ int main(void)
     IList_drop(&L);
 }
 ```
-Output:
-```
-mylist contains: 10 30
-```
 
 ### Example 3
+Splice {**30**, **40**} from *L2* into *L1* before **3**:
 
-Splice `[30, 40]` from *L2* into *L1* before `3`:
-```c
-#define i_TYPE IList,int
-#include "stc/list.h"
+[ [Run this code](https://godbolt.org/z/P1YjG43zd) ]
+```c++
 #include <stdio.h>
+#define i_type IList, int
+#include "stc/list.h"
 
 int main(void) {
-    IList L1 = c_init(IList, {1, 2, 3, 4, 5});
-    IList L2 = c_init(IList, {10, 20, 30, 40, 50});
+    IList L1 = c_make(IList, {1, 2, 3, 4, 5});
+    IList L2 = c_make(IList, {10, 20, 30, 40, 50});
 
+    c_foritems (k, IList, {L1, L2}) {
+        c_foreach (i, IList, *k.ref)
+            printf(" %d", *i.ref);
+        puts("");
+    }
+    puts("");
     IList_iter i = IList_advance(IList_begin(&L1), 2);
     IList_iter j1 = IList_advance(IList_begin(&L2), 2), j2 = IList_advance(j1, 2);
 
     IList_splice_range(&L1, i, &L2, j1, j2);
 
-    c_foreach (i, IList, L1)
-        printf(" %d", *i.ref); puts("");
-    c_foreach (i, IList, L2)
-        printf(" %d", *i.ref); puts("");
+    c_foritems (k, IList, {L1, L2}) {
+        c_foreach (i, IList, *k.ref)
+            printf(" %d", *i.ref);
+        puts("");
+    }
 
     c_drop(IList, &L1, &L2);
 }
-```
-Output:
-```
-1 2 30 40 3 4 5
-10 20 50
 ```

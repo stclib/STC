@@ -1,6 +1,6 @@
 /* MIT License
  *
- * Copyright (c) 2023 Tyge Løvset
+ * Copyright (c) 2024 Tyge Løvset
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,16 +23,16 @@
 #undef STC_API
 #undef STC_DEF
 
-#if !defined i_static  && !defined STC_STATIC  && (defined i_header || defined STC_HEADER  || \
-                                                   defined i_implement || defined STC_IMPLEMENT)
+#if !defined i_static && !defined STC_STATIC  && (defined i_header || defined STC_HEADER  || \
+                                                  defined i_implement || defined STC_IMPLEMENT)
   #define STC_API extern
   #define STC_DEF
 #else
-  #define i_static
-  #if defined __GNUC__ || defined __clang__
+  #define i_implement
+  #if defined __GNUC__ || defined __clang__ || defined __INTEL_LLVM_COMPILER
     #define STC_API static __attribute__((unused))
   #else
-    #define STC_API static
+    #define STC_API static inline
   #endif
   #define STC_DEF static
 #endif
@@ -52,13 +52,18 @@
   #define i_free c_JOIN(i_allocator, _free)
 #endif
 
+#ifdef i_aux
+  #define _i_aux_struct struct { i_aux } aux;
+#else
+  #define _i_aux_struct
+#endif
+
 #if defined __clang__ && !defined __cplusplus
   #pragma clang diagnostic push
   #pragma clang diagnostic warning "-Wall"
   #pragma clang diagnostic warning "-Wextra"
   #pragma clang diagnostic warning "-Wpedantic"
   #pragma clang diagnostic warning "-Wconversion"
-  #pragma clang diagnostic warning "-Wdouble-promotion"
   #pragma clang diagnostic warning "-Wwrite-strings"
   // ignored
   #pragma clang diagnostic ignored "-Wmissing-field-initializers"
@@ -68,8 +73,10 @@
   #pragma GCC diagnostic warning "-Wextra"
   #pragma GCC diagnostic warning "-Wpedantic"
   #pragma GCC diagnostic warning "-Wconversion"
-  #pragma GCC diagnostic warning "-Wdouble-promotion"
   #pragma GCC diagnostic warning "-Wwrite-strings"
   // ignored
+  #pragma GCC diagnostic ignored "-Wclobbered"
+  #pragma GCC diagnostic ignored "-Wimplicit-fallthrough=3"
+  #pragma GCC diagnostic ignored "-Wstringop-overflow="
   #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
 #endif

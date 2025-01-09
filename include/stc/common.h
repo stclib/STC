@@ -1,6 +1,6 @@
 /* MIT License
  *
- * Copyright (c) 2023 Tyge Løvset
+ * Copyright (c) 2024 Tyge Løvset
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,53 +32,74 @@
 #include <string.h>
 #include <assert.h>
 
-#define c_NPOS INTPTR_MAX
-#define c_ZI PRIiPTR
-#define c_ZU PRIuPTR
-
+typedef ptrdiff_t       isize;
+#ifndef STC_NO_INT_DEFS
+    typedef int8_t      int8;
+    typedef uint8_t     uint8;
+    typedef int16_t     int16;
+    typedef uint16_t    uint16;
+    typedef int32_t     int32;
+    typedef uint32_t    uint32;
+    typedef int64_t     int64;
+    typedef uint64_t    uint64;
+#endif
+#if !defined STC_HAS_TYPEOF && (_MSC_FULL_VER >= 193933428 || \
+    defined __GNUC__ || defined __clang__ || defined __TINYC__)
+    #define STC_HAS_TYPEOF 1
+#endif
 #if defined __GNUC__ || defined __clang__
     #define STC_INLINE static inline __attribute((unused))
 #else
     #define STC_INLINE static inline
 #endif
+#define c_ZI PRIiPTR
+#define c_ZU PRIuPTR
+#define c_NPOS INTPTR_MAX
 
-/* Macro overloading feature support based on: https://rextester.com/ONP80107 */
+// Macro overloading feature support based on: https://rextester.com/ONP80107
 #define c_MACRO_OVERLOAD(name, ...) \
     c_JOIN(c_JOIN0(name,_),c_NUMARGS(__VA_ARGS__))(__VA_ARGS__)
 #define c_JOIN0(a, b) a ## b
 #define c_JOIN(a, b) c_JOIN0(a, b)
 #define c_EXPAND(...) __VA_ARGS__
+// This is the way to make c_NUMARGS work also for MSVC++ and MSVC pre -std:c11
 #define c_NUMARGS(...) _c_APPLY_ARG_N((__VA_ARGS__, _c_RSEQ_N))
 #define _c_APPLY_ARG_N(args) c_EXPAND(_c_ARG_N args)
-#define _c_RSEQ_N 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
-#define _c_ARG_N(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, \
-                 _14, _15, _16, N, ...) N
+#define _c_RSEQ_N 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1,
+#define _c_ARG_N(_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,_12,_13,_14,_15,_16,N,...) N
 
-#define _c_SEL21(a, b) a
-#define _c_SEL22(a, b) b
-#define _c_SEL31(a, b, c) a
-#define _c_SEL32(a, b, c) b
-#define _c_SEL33(a, b, c) c
-#define _c_SEL(S, ...) S(__VA_ARGS__)
+// Select arg, e.g. for #define i_type A,B then c_SELECT(c_ARG_2, i_type) is B
+#define c_SELECT(X, ...) c_EXPAND(X(__VA_ARGS__,,)) // need c_EXPAND for MSVC
+#define c_ARG_1(a, ...) a
+#define c_ARG_2(a, b, ...) b
+#define c_ARG_3(a, b, c, ...) c
 
+#define _i_malloc(T, n)     ((T*)i_malloc((n)*c_sizeof(T)))
+#define _i_calloc(T, n)     ((T*)i_calloc((n), c_sizeof(T)))
 #ifndef __cplusplus
-    #define _i_alloc(T)         ((T*)i_malloc(c_sizeof(T)))
-    #define _i_new(T, ...)      ((T*)memcpy(_i_alloc(T), ((T[]){__VA_ARGS__}), sizeof(T)))
     #define c_new(T, ...)       ((T*)memcpy(malloc(sizeof(T)), ((T[]){__VA_ARGS__}), sizeof(T)))
-    #define c_LITERAL(T)        (T)
+    #define c_literal(T)        (T)
+    #define c_make_array(T, ...) ((T[])__VA_ARGS__)
+    #define c_make_array2d(T, N, ...) ((T[][N])__VA_ARGS__)
 #else
     #include <new>
-    #define _i_alloc(T)         static_cast<T*>(i_malloc(c_sizeof(T)))
-    #define _i_new(T, ...)      new (_i_alloc(T)) T(__VA_ARGS__)
     #define c_new(T, ...)       new (malloc(sizeof(T))) T(__VA_ARGS__)
-    #define c_LITERAL(T)        T
+    #define c_literal(T)        T
+    template<typename T, int M, int N> struct _c_Array { T data[M][N]; };
+    #define c_make_array(T, ...) (_c_Array<T, 1, sizeof((T[])__VA_ARGS__)/sizeof(T)>{{__VA_ARGS__}}.data[0])
+    #define c_make_array2d(T, N, ...) (_c_Array<T, sizeof((T[][N])__VA_ARGS__)/sizeof(T[N]), N>{__VA_ARGS__}.data)
 #endif
-#define c_new_n(T, n)           ((T*)malloc(sizeof(T)*c_i2u_size(n)))
-#define c_malloc(sz)            malloc(c_i2u_size(sz))
-#define c_calloc(n, sz)         calloc(c_i2u_size(n), c_i2u_size(sz))
-#define c_realloc(p, old_sz, sz) realloc(p, c_i2u_size(1 ? (sz) : (old_sz)))
-#define c_free(p, sz)           do { (void)(sz); free(p); } while(0)
-#define c_delete(T, ptr)        do { T *_tp = ptr; T##_drop(_tp); free(_tp); } while (0)
+#ifndef c_malloc
+    #define c_malloc(sz)        malloc(c_i2u_size(sz))
+    #define c_calloc(n, sz)     calloc(c_i2u_size(n), c_i2u_size(sz))
+    #define c_realloc(ptr, old_sz, sz) realloc(ptr, c_i2u_size(1 ? (sz) : (old_sz)))
+    #define c_free(ptr, sz)     do { (void)(sz); free(ptr); } while(0)
+#endif
+#define c_new_n(T, n)           ((T*)c_calloc(n, c_sizeof(T)))
+#define c_delete(T, ptr)        do { T* _tp = ptr; T##_drop(_tp); c_free(_tp, c_sizeof(T)); } while (0)
+#define c_delete_n(T, ptr, n)   do { T* _tp = ptr; isize _n = n, _m = _n; \
+                                     while (_n--) T##_drop((_tp + _n)); \
+                                     c_free(_tp, _m*c_sizeof(T)); } while (0)
 
 #define c_static_assert(expr)   (1 ? 0 : (int)sizeof(int[(expr) ? 1 : -1]))
 #if defined STC_NDEBUG || defined NDEBUG
@@ -88,89 +109,180 @@
 #endif
 #define c_container_of(p, C, m) ((C*)((char*)(1 ? (p) : &((C*)0)->m) - offsetof(C, m)))
 #define c_const_cast(Tp, p)     ((Tp)(1 ? (p) : (Tp)0))
-#define c_safe_cast(T, F, x)    ((T)(1 ? (x) : (F){0}))
-#define c_swap(T, xp, yp)       do { T *_xp = xp, *_yp = yp, \
-                                    _tv = *_xp; *_xp = *_yp; *_yp = _tv; } while (0)
-// use with gcc -Wconversion
-#define c_sizeof                (intptr_t)sizeof
-#define c_strlen(s)             (intptr_t)strlen(s)
+#define c_litstrlen(literal)    (c_sizeof("" literal) - 1)
+#define c_arraylen(a)           (isize)(sizeof(a)/sizeof 0[a])
+
+// expect signed ints to/from these (use with gcc -Wconversion)
+#define c_sizeof                (isize)sizeof
+#define c_strlen(s)             (isize)strlen(s)
 #define c_strncmp(a, b, ilen)   strncmp(a, b, c_i2u_size(ilen))
 #define c_memcpy(d, s, ilen)    memcpy(d, s, c_i2u_size(ilen))
 #define c_memmove(d, s, ilen)   memmove(d, s, c_i2u_size(ilen))
 #define c_memset(d, val, ilen)  memset(d, val, c_i2u_size(ilen))
 #define c_memcmp(a, b, ilen)    memcmp(a, b, c_i2u_size(ilen))
-#define c_u2i_size(u)           (intptr_t)(1 ? (u) : (size_t)1)
-#define c_i2u_size(i)           (size_t)(1 ? (i) : -1)
+// library internal, but may be useful in user code:
+#define c_u2i_size(u)           (isize)(1 ? (u) : (size_t)1) // warns if u is signed
+#define c_i2u_size(i)           (size_t)(1 ? (i) : -1)       // warns if i is unsigned
 #define c_uless(a, b)           ((size_t)(a) < (size_t)(b))
+#define c_safe_cast(T, From, x) ((T)(1 ? (x) : (From){0}))
 
-// x and y are i_keyraw* type, defaults to i_key*:
+// x, y are i_keyraw* type, which defaults to i_key*:
 #define c_memcmp_eq(x, y)       (memcmp(x, y, sizeof *(x)) == 0)
-#define c_default_cmp(x, y)     (c_default_less(y, x) - c_default_less(x, y))
-#define c_default_less(x, y)    (*(x) < *(y))
 #define c_default_eq(x, y)      (*(x) == *(y))
-#define c_default_hash          c_hash_pod
-
+#define c_default_less(x, y)    (*(x) < *(y))
+#define c_default_cmp(x, y)     (c_default_less(y, x) - c_default_less(x, y))
+#define c_default_hash(p)       c_hash_n(p, sizeof *(p))
 #define c_default_clone(v)      (v)
 #define c_default_toraw(vp)     (*(vp))
 #define c_default_drop(vp)      ((void) (vp))
 
-/* Function macros and others */
+// non-owning c-string "class"
+typedef const char* cstr_raw;
+#define cstr_raw_cmp(xp, yp) strcmp(*(xp), *(yp))
+#define cstr_raw_eq(xp, yp) (cstr_raw_cmp(xp, yp) == 0)
+#define cstr_raw_hash(p) c_hash_str(*(p))
+#define cstr_raw_clone(s) (s)
+#define cstr_raw_drop(p) ((void)p)
 
-#define c_litstrlen(literal) (c_sizeof("" literal) - 1)
-#define c_arraylen(a) (intptr_t)(sizeof(a)/sizeof 0[a])
+// Control block macros
 
-// Non-owning c-string "class"
-typedef const char* ccharptr;
-#define ccharptr_cmp(xp, yp) strcmp(*(xp), *(yp))
-#define ccharptr_eq(xp, yp) (ccharptr_cmp(xp, yp) == 0)
-#define ccharptr_hash(p) c_hash_str(*(p))
-#define ccharptr_clone(s) (s)
-#define ccharptr_drop(p) ((void)p)
+#define c_foreach(...) c_MACRO_OVERLOAD(c_foreach, __VA_ARGS__)
+#define c_foreach_3(it, C, cnt) \
+    for (C##_iter it = C##_begin(&cnt); it.ref; C##_next(&it))
+#define c_foreach_4(it, C, start, end) \
+    _c_foreach(it, C, start, (end).ref, _)
 
-#define c_ROTL(x, k) (x << (k) | x >> (8*sizeof(x) - (k)))
+#define c_foreach_n(it, C, cnt, n) \
+    for (isize it##_index=0, _c_n=n; _c_n; _c_n=0) \
+    for (C##_iter it = C##_begin(&cnt); it.ref && it##_index < _c_n; C##_next(&it), ++it##_index)
 
-STC_INLINE uint64_t c_hash_n(const void* key, intptr_t len) {
-    uint32_t u4; uint64_t u8;
-    switch (len) {
-        case 8: memcpy(&u8, key, 8); return u8*0xc6a4a7935bd1e99d;
-        case 4: memcpy(&u4, key, 4); return u4*0xc6a4a7935bd1e99d;
-        case 0: return 1;
+#define c_foreach_reverse(...) c_MACRO_OVERLOAD(c_foreach_reverse, __VA_ARGS__)
+#define c_foreach_reverse_3(it, C, cnt) /* works for stack, vec, queue, deque */ \
+    for (C##_iter it = C##_rbegin(&cnt); it.ref; C##_rnext(&it))
+#define c_foreach_reverse_4(it, C, start, end) \
+    _c_foreach(it, C, start, (end).ref, _r)
+
+#define _c_foreach(it, C, start, endref, rev) /* private */ \
+    for (C##_iter it = (start), *_endref = c_safe_cast(C##_iter*, C##_value*, endref) \
+         ; it.ref != (C##_value*)_endref; C##rev##next(&it))
+
+#define c_foreach_kv(...) c_MACRO_OVERLOAD(c_foreach_kv, __VA_ARGS__)
+#define c_foreach_kv_4(key, val, C, cnt) /* structured binding for maps */ \
+    _c_foreach_kv(key, val, C, C##_begin(&cnt), NULL)
+#define c_foreach_kv_5(key, val, C, start, end) \
+    _c_foreach_kv(key, val, C, start, (end).ref)
+
+#define _c_foreach_kv(key, val, C, start, endref) /* private */ \
+    for (const C##_key *key, **_c_k = &key; _c_k; ) \
+    for (C##_mapped *val; _c_k; _c_k = NULL) \
+    for (C##_iter _it = start, *_endref = c_safe_cast(C##_iter*, C##_value*, endref) ; \
+         _it.ref != (C##_value*)_endref && (key = &_it.ref->first, val = &_it.ref->second); \
+         C##_next(&_it))
+
+#define c_foritems(it, T, ...) \
+    for (struct {T* ref; int size, index;} \
+         it = {.ref=c_make_array(T, __VA_ARGS__), .size=(int)(sizeof((T[])__VA_ARGS__)/sizeof(T))} \
+         ; it.index < it.size; ++it.ref, ++it.index)
+
+// c_forrange, c_forrange32: python-like int range iteration
+#define c_forrange_t(...) c_MACRO_OVERLOAD(c_forrange_t, __VA_ARGS__)
+#define c_forrange_t_3(T, i, stop) c_forrange_t_4(T, i, 0, stop)
+#define c_forrange_t_4(T, i, start, stop) \
+    for (T i=start, _c_end_##i=stop; i < _c_end_##i; ++i)
+#define c_forrange_t_5(T, i, start, stop, step) \
+    for (T i=start, _c_inc_##i=step, _c_end_##i=(stop) - (_c_inc_##i > 0) \
+         ; (_c_inc_##i > 0) == (i <= _c_end_##i); i += _c_inc_##i)
+
+#define c_forrange(...) c_MACRO_OVERLOAD(c_forrange, __VA_ARGS__)
+#define c_forrange_1(stop) c_forrange_t_4(isize, _c_i1, 0, stop)
+#define c_forrange_2(i, stop) c_forrange_t_4(isize, i, 0, stop)
+#define c_forrange_3(i, start, stop) c_forrange_t_4(isize, i, start, stop)
+#define c_forrange_4(i, start, stop, step) c_forrange_t_5(isize, i, start, stop, step)
+
+#define c_forrange32(...) c_MACRO_OVERLOAD(c_forrange32, __VA_ARGS__)
+#define c_forrange32_2(i, stop) c_forrange_t_4(int32_t, i, 0, stop)
+#define c_forrange32_3(i, start, stop) c_forrange_t_4(int32_t, i, start, stop)
+#define c_forrange32_4(i, start, stop, step) c_forrange_t_5(int32_t, i, start, stop, step)
+
+// deprecated/removed:
+#define c_init(C, ...) c_make(C, __VA_ARGS__)                      // [deprecated]
+#define c_forlist(...) c_foritems(_VA_ARGS__)                      // [deprecated]
+#define c_forpair(...) 'c_forpair not_supported. Use c_foreach_kv' // [removed]
+
+// make container from a literal list, and drop multiple containers of same type
+#define c_make(C, ...) \
+    C##_with_n(c_make_array(C##_raw, __VA_ARGS__), c_sizeof((C##_raw[])__VA_ARGS__)/c_sizeof(C##_raw))
+
+// push multiple elements from a literal list into a container
+#define c_push(C, cnt, ...) \
+    C##_put_n(cnt, c_make_array(C##_raw, __VA_ARGS__), c_sizeof((C##_raw[])__VA_ARGS__)/c_sizeof(C##_raw))
+
+// drop multiple containers of same type
+#define c_drop(C, ...) \
+    do { c_foritems (_c_i2, C*, {__VA_ARGS__}) C##_drop(*_c_i2.ref); } while(0)
+
+// define function with "on-the-fly" defined return type (e.g. variant, optional)
+#define c_func(name, args, RIGHTARROW, ...) \
+    typedef __VA_ARGS__ name##_result; name##_result name args
+
+// RAII scopes
+#define c_defer(...) \
+    for (int _c_i3 = 0; _c_i3++ == 0; __VA_ARGS__)
+
+#define c_with(...) c_MACRO_OVERLOAD(c_with, __VA_ARGS__)
+#define c_with_2(init, deinit) \
+    for (int _c_i4 = 0; _c_i4 == 0; ) for (init; _c_i4++ == 0; deinit)
+#define c_with_3(init, condition, deinit) \
+    for (int _c_i5 = 0; _c_i5 == 0; ) for (init; _c_i5++ == 0 && (condition); deinit)
+
+// General functions
+
+STC_INLINE size_t c_basehash_n(const void* key, isize len) {
+    size_t block = 0, hash = 0x811c9dc5;
+    const uint8_t* msg = (const uint8_t*)key;
+    while (len >= c_sizeof(size_t)) {
+        memcpy(&block, msg, sizeof(size_t));
+        hash = (hash ^ block) * (size_t)0x89bb179901000193;
+        msg += c_sizeof(size_t);
+        len -= c_sizeof(size_t);
     }
-    const uint8_t *x = (const uint8_t*)key;
-    uint64_t h = (uint64_t)*x << 7, n = (uint64_t)len >> 3;
-    len &= 7;
-    while (n--) {
-        memcpy(&u8, x, 8), x += 8;
-        h = (h ^ u8)*0xc6a4a7935bd1e99d;
-    }
-    while (len--) h = (h ^ *x++)*0x100000001b3;
-    return h ^ c_ROTL(h, 26);
+    c_memcpy(&block, msg, len);
+    hash = (hash ^ block) * (size_t)0xb0340f4501000193;
+    return hash ^ (hash >> 3);
 }
 
-#define c_hash_pod(pod) c_hash_n(pod, sizeof *(pod))
+STC_INLINE size_t c_hash_n(const void* key, isize len) {
+    uint64_t b8; uint32_t b4;
+    switch (len) {
+        case 8: memcpy(&b8, key, 8); return (size_t)(b8 * 0xc6a4a7935bd1e99d);
+        case 4: memcpy(&b4, key, 4); return b4 * (size_t)0xa2ffeb2f01000193;
+        default: return c_basehash_n(key, len);
+    }
+}
 
-STC_INLINE uint64_t c_hash_str(const char *str)
-    { return c_hash_n(str, c_strlen(str)); }
+STC_INLINE size_t c_hash_str(const char *str)
+    { return c_basehash_n(str, c_strlen(str)); }
 
-STC_INLINE uint64_t _c_hash_mix(uint64_t h[], int n) { // n > 0
-    for (int i = 1; i < n; ++i) h[0] ^= h[0] + h[i]; // non-commutative!
+#define c_hash_mix(...) /* non-commutative hash combine! */ \
+    _chash_mix(c_make_array(size_t, {__VA_ARGS__}), c_NUMARGS(__VA_ARGS__))
+
+STC_INLINE size_t _chash_mix(size_t h[], int n) {
+    for (int i = 1; i < n; ++i) h[0] += h[0] ^ h[i];
     return h[0];
 }
 
-STC_INLINE char* c_strnstrn(const char *str, intptr_t slen,
-                              const char *needle, intptr_t nlen) {
-    if (!nlen) return (char *)str;
-    if (nlen > slen) return NULL;
-    slen -= nlen;
-    do {
-        if (*str == *needle && !c_memcmp(str, needle, nlen))
-            return (char *)str;
-        ++str;
-    } while (slen--);
-    return NULL;
-}
+// generic typesafe swap
+#define c_swap(xp, yp) do { \
+    (void)sizeof((xp) == (yp)); \
+    char _tv[sizeof *(xp)]; \
+    void *_xp = xp, *_yp = yp; \
+    memcpy(_tv, _xp, sizeof _tv); \
+    memcpy(_xp, _yp, sizeof _tv); \
+    memcpy(_yp, _tv, sizeof _tv); \
+} while (0)
 
-STC_INLINE intptr_t c_next_pow2(intptr_t n) {
+// get next power of two
+STC_INLINE isize c_next_pow2(isize n) {
     n--;
     n |= n >> 1, n |= n >> 2;
     n |= n >> 4, n |= n >> 8;
@@ -180,92 +292,16 @@ STC_INLINE intptr_t c_next_pow2(intptr_t n) {
     #endif
     return n + 1;
 }
-/* Control block macros */
 
-#define c_foreach(...) c_MACRO_OVERLOAD(c_foreach, __VA_ARGS__)
-#define c_foreach_3(it, C, cnt) \
-    for (C##_iter it = C##_begin(&cnt); it.ref; C##_next(&it))
-#define c_foreach_4(it, C, start, finish) \
-    for (C##_iter it = (start), *_endref = c_safe_cast(C##_iter*, C##_value*, (finish).ref) \
-         ; it.ref != (C##_value*)_endref; C##_next(&it))
-
-#define c_forpair(key, val, C, cnt) /* structured binding */ \
-    for (struct {C##_iter iter; const C##_key* key; C##_mapped* val;} _ = {.iter=C##_begin(&cnt)} \
-         ; _.iter.ref && (_.key = &_.iter.ref->first, _.val = &_.iter.ref->second) \
-         ; C##_next(&_.iter))
-
-#define c_foreach_rev(it, C, cnt) /* reverse: works only for stack and vec */ \
-    for (C##_iter _start = C##_begin(&cnt), it = {.ref=_start.ref ? _start.end - 1 : NULL, .end=_start.ref - 1} \
-         ; it.ref ; --it.ref == it.end ? it.ref = NULL : NULL)
-
-#define c_foreach_n(it, C, cnt, N) /* iterate up to N items */ \
-    for (struct {C##_iter iter; C##_value* ref; intptr_t index, n;} it = {.iter=C##_begin(&cnt), .n=N} \
-         ; (it.ref = it.iter.ref) && it.index < it.n; C##_next(&it.iter), ++it.index)
-
-#define c_foreach_it(existing_iter, C, cnt) \
-    for (existing_iter = C##_begin(&cnt); (existing_iter).ref; C##_next(&existing_iter))
-
-#define c_forrange(...) c_MACRO_OVERLOAD(c_forrange, __VA_ARGS__)
-#define c_forrange_1(stop) c_forrange_3(_i, 0, stop)
-#define c_forrange_2(i, stop) c_forrange_3(i, 0, stop)
-#define c_forrange_3(i, start, stop) \
-    for (intptr_t i=start, _end=stop; i < _end; ++i)
-#define c_forrange_4(i, start, stop, step) \
-    for (intptr_t i=start, _inc=step, _end=(intptr_t)(stop) - (_inc > 0) \
-         ; (_inc > 0) ^ (i > _end); i += _inc)
-
-#ifndef __cplusplus
-    #define c_init(C, ...) \
-        C##_from_n((C##_raw[])__VA_ARGS__, c_sizeof((C##_raw[])__VA_ARGS__)/c_sizeof(C##_raw))
-    #define c_forlist(it, T, ...) \
-        for (struct {T* ref; int size, index;} \
-             it = {.ref=(T[])__VA_ARGS__, .size=(int)(sizeof((T[])__VA_ARGS__)/sizeof(T))} \
-             ; it.index < it.size; ++it.ref, ++it.index)
-    #define c_hash_mix(...) \
-        _c_hash_mix((uint64_t[]){__VA_ARGS__}, c_NUMARGS(__VA_ARGS__))
-#else
-    #include <initializer_list>
-    #include <array>
-    template <class C, class T>
-    inline C _from_n(C (*func)(const T[], intptr_t), std::initializer_list<T> il)
-        { return func(&*il.begin(), il.size()); }
-    #define c_init(C, ...) _from_n<C,C##_raw>(C##_from_n, __VA_ARGS__)
-    #define c_forlist(it, T, ...) \
-        for (struct {std::initializer_list<T> _il; std::initializer_list<T>::iterator ref; size_t size, index;} \
-             it = {._il=__VA_ARGS__, .ref=it._il.begin(), .size=it._il.size()} \
-             ; it.index < it.size; ++it.ref, ++it.index)
-    #define c_hash_mix(...) \
-        _c_hash_mix(std::array<uint64_t, c_NUMARGS(__VA_ARGS__)>{__VA_ARGS__}.data(), c_NUMARGS(__VA_ARGS__))
-#endif
-
-#define c_defer(...) \
-    for (int _i = 1; _i; _i = 0, __VA_ARGS__)
-
-#define c_with(...) c_MACRO_OVERLOAD(c_with, __VA_ARGS__)
-#define c_with_2(declvar, drop) \
-    for (declvar, *_i, **_ip = &_i; _ip; _ip = 0, drop)
-#define c_with_3(declvar, pred, drop) \
-    for (declvar, *_i, **_ip = &_i; _ip && (pred); _ip = 0, drop)
-
-#define c_scope(...) c_MACRO_OVERLOAD(c_scope, __VA_ARGS__)
-#define c_scope_2(init, drop) \
-    for (int _i = (init, 1); _i; _i = 0, drop)
-#define c_scope_3(init, pred, drop) \
-    for (int _i = (init, 1); _i && (pred); _i = 0, drop)
-
-#define c_drop(C, ...) \
-    do { c_forlist (_i, C*, {__VA_ARGS__}) C##_drop(*_i.ref); } while(0)
-
-#if defined(__SIZEOF_INT128__)
-    #define c_umul128(a, b, lo, hi) \
-        do { __uint128_t _z = (__uint128_t)(a)*(b); \
-             *(lo) = (uint64_t)_z, *(hi) = (uint64_t)(_z >> 64U); } while(0)
-#elif defined(_MSC_VER) && defined(_WIN64)
-    #include <intrin.h>
-    #define c_umul128(a, b, lo, hi) ((void)(*(lo) = _umul128(a, b, hi)))
-#elif defined(__x86_64__)
-    #define c_umul128(a, b, lo, hi) \
-        asm("mulq %3" : "=a"(*(lo)), "=d"(*(hi)) : "a"(a), "rm"(b))
-#endif
-
+STC_INLINE char* c_strnstrn(const char *str, isize slen, const char *needle, isize nlen) {
+    if (nlen == 0) return (char *)str;
+    if (nlen > slen) return NULL;
+    slen -= nlen;
+    do {
+        if (*str == *needle && !c_memcmp(str, needle, nlen))
+            return (char *)str;
+        ++str;
+    } while (slen--);
+    return NULL;
+}
 #endif // STC_COMMON_H_INCLUDED

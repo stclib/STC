@@ -11,86 +11,102 @@ See the c++ class [std::vector](https://en.cppreference.com/w/cpp/container/vect
 
 ## Header file and declaration
 
-```c
-#define i_TYPE <ct>,<kt> // shorthand to define i_type,i_key
+```c++
+#define i_type <ct>,<kt> // shorthand for defining i_type, i_key
 #define i_type <t>       // container type name (default: vec_{i_key})
-#define i_key <t>        // element type: REQUIRED. Defines vec_X_value
-#define i_cmp <f>        // three-way compare two i_keyraw*
-#define i_use_cmp        // may be defined instead of i_cmp when i_key is an integral/native-type.
-#define i_keydrop <f>    // destroy value func - defaults to empty destruct
-#define i_keyclone <f>   // REQUIRED IF i_keydrop defined
+// One of the following:
+#define i_key <t>        // key type
+#define i_keyclass <t>   // key type, and bind <t>_clone() and <t>_drop() function names
+#define i_keypro <t>     // key "pro" type, use for cstr, arc, box types
+
+#define i_keydrop <fn>   // destroy value func - defaults to empty destruct
+#define i_keyclone <fn>  // REQUIRED IF i_keydrop defined
+
+#define i_use_cmp        // enable sorting, binary_search and lower_bound
+#define i_cmp <fn>       // three-way compare two i_keyraw*
+#define i_less <fn>      // less comparison. Alternative to i_cmp
+#define i_eq <fn>        // equality comparison. Implicitly defined with i_cmp, but not i_less.
 
 #define i_keyraw <t>     // convertion "raw" type - defaults to i_key
-#define i_keyfrom <f>    // convertion func i_keyraw => i_key
-#define i_keyto <f>      // convertion func i_key* => i_keyraw
+#define i_rawclass <t>   // convertion "raw class". binds <t>_cmp(),  <t>_eq(),  <t>_hash()
+#define i_keyfrom <fn>   // convertion func i_keyraw => i_key
+#define i_keytoraw <fn>  // convertion func i_key* => i_keyraw
 
-#define i_tag <s>        // alternative typename: vec_{i_tag}. i_tag defaults to i_key
 #include "stc/vec.h"
 ```
-`X` should be replaced by the value of `i_tag` in all of the following documentation.
+- Defining either `i_use_cmp`, `i_less` or `i_cmp` will enable sorting, binary_search and lower_bound
+- **emplace**-functions are only available when `i_keyraw` is implicitly or explicitly defined.
+- In the following, `X` is the value of `i_key` unless `i_type` is defined.
 
 ## Methods
 
-```c
-vec_X               vec_X_init(void);
-vec_X               vec_X_with_size(intptr_t size, i_key null);
-vec_X               vec_X_with_capacity(intptr_t size);
-vec_X               vec_X_clone(vec_X vec);
+```c++
+vec_X           vec_X_init(void);
+vec_X           vec_X_with_size(isize size, i_key null);
+vec_X           vec_X_with_capacity(isize size);
+vec_X           vec_X_clone(vec_X vec);
 
-void                vec_X_clear(vec_X* self);
-void                vec_X_copy(vec_X* self, const vec_X* other);
-vec_X_iter          vec_X_copy_n(vec_X* self, intptr_t idx, const i_key* arr, intptr_t n);
-bool                vec_X_reserve(vec_X* self, intptr_t cap);
-bool                vec_X_resize(vec_X* self, intptr_t size, i_key null);
-void                vec_X_shrink_to_fit(vec_X* self);
-void                vec_X_drop(vec_X* self);                              // destructor
+void            vec_X_copy(vec_X* self, const vec_X* other);
+vec_X_iter      vec_X_copy_n(vec_X* self, isize idx, const i_key* arr, isize n);
+vec_X           vec_X_move(vec_X* self);                                    // move
+void            vec_X_take(vec_X* self, vec_X unowned);                     // take ownership of unowned
+void            vec_X_drop(vec_X* self);                                    // destructor
 
-bool                vec_X_empty(const vec_X* self);
-intptr_t            vec_X_size(const vec_X* self);
-intptr_t            vec_X_capacity(const vec_X* self);
+void            vec_X_clear(vec_X* self);
+bool            vec_X_reserve(vec_X* self, isize cap);
+bool            vec_X_resize(vec_X* self, isize size, i_key null);
+void            vec_X_shrink_to_fit(vec_X* self);
 
-const vec_X_value*  vec_X_at(const vec_X* self, intptr_t idx);
-const vec_X_value*  vec_X_get(const vec_X* self, i_keyraw raw);           // return NULL if not found
-vec_X_value*        vec_X_at_mut(vec_X* self, intptr_t idx);              // return mutable at idx
-vec_X_value*        vec_X_get_mut(vec_X* self, i_keyraw raw);             // find mutable value
-vec_X_iter          vec_X_find(const vec_X* self, i_keyraw raw);
-vec_X_iter          vec_X_find_in(vec_X_iter i1, vec_X_iter i2, i_keyraw raw); // return vec_X_end() if not found
-void                vec_X_sort(vec_X* self);                              // qsort() from stdlib.h
-vec_X_value*        vec_X_bsearch(const vec_X* self, i_key value);        // bsearch() wrapper.
+bool            vec_X_is_empty(const vec_X* self);
+isize           vec_X_size(const vec_X* self);
+isize           vec_X_capacity(const vec_X* self);
 
-vec_X_value*        vec_X_front(const vec_X* self);
-vec_X_value*        vec_X_back(const vec_X* self);
+vec_X_iter      vec_X_find(const vec_X* self, i_keyraw raw);
+vec_X_iter      vec_X_find_in(vec_X_iter i1, vec_X_iter i2, i_keyraw raw);  // return vec_X_end() if not found
 
-vec_X_value*        vec_X_push(vec_X* self, i_key value);
-vec_X_value*        vec_X_emplace(vec_X* self, i_keyraw raw);
-vec_X_value*        vec_X_push_back(vec_X* self, i_key value);            // alias for push
-vec_X_value*        vec_X_emplace_back(vec_X* self, i_keyraw raw);        // alias for emplace
+const i_key*    vec_X_at(const vec_X* self, isize idx);
+const i_key*    vec_X_front(const vec_X* self);
+const i_key*    vec_X_back(const vec_X* self);
 
-void                vec_X_pop(vec_X* self);                               // destroy last element
-void                vec_X_pop_back(vec_X* self);                          // alias for pop
-vec_X_value         vec_X_pull(vec_X* self);                              // move out last element
+i_key*          vec_X_at_mut(vec_X* self, isize idx);                       // return mutable at idx
+i_key*          vec_X_front_mut(vec_X* self);
+i_key*          vec_X_back_mut(vec_X* self);
 
-vec_X_iter          vec_X_insert_n(vec_X* self, intptr_t idx, const i_key arr[], intptr_t n); // move values
-vec_X_iter          vec_X_insert_at(vec_X* self, vec_X_iter it, i_key value);  // move value
-vec_X_iter          vec_X_insert_uninit(vec_X* self, intptr_t idx, intptr_t n); // return iter at idx
+                // Requires either i_use_cmp, i_cmp or i_less defined:
+void            vec_X_sort(vec_X* self);                                    // quicksort from sort.h
+isize           vec_X_lower_bound(const vec_X* self, const i_keyraw raw);   // return c_NPOS if not found
+isize           vec_X_binary_search(const vec_X* self, const i_keyraw raw); // return c_NPOS if not found
 
-vec_X_iter          vec_X_emplace_n(vec_X* self, intptr_t idx, const i_keyraw raw[], intptr_t n);
-vec_X_iter          vec_X_emplace_at(vec_X* self, vec_X_iter it, i_keyraw raw);
+i_key*          vec_X_push(vec_X* self, i_key value);
+i_key*          vec_X_push_back(vec_X* self, i_key value);                  // alias for push
+i_key*          vec_X_emplace(vec_X* self, i_keyraw raw);
+i_key*          vec_X_emplace_back(vec_X* self, i_keyraw raw);              // alias for emplace
 
-vec_X_iter          vec_X_erase_n(vec_X* self, intptr_t idx, intptr_t n);
-vec_X_iter          vec_X_erase_at(vec_X* self, vec_X_iter it);
-vec_X_iter          vec_X_erase_range(vec_X* self, vec_X_iter it1, vec_X_iter it2);
+void            vec_X_pop(vec_X* self);                                     // destroy last element
+void            vec_X_pop_back(vec_X* self);                                // alias for pop
+i_key           vec_X_pull(vec_X* self);                                    // move out last element
+
+vec_X_iter      vec_X_insert_n(vec_X* self, isize idx, const i_key arr[], isize n); // move values
+vec_X_iter      vec_X_insert_at(vec_X* self, vec_X_iter it, i_key value);   // move value
+vec_X_iter      vec_X_insert_uninit(vec_X* self, isize idx, isize n);       // return iter at idx
+
+vec_X_iter      vec_X_emplace_n(vec_X* self, isize idx, const i_keyraw raw[], isize n);
+vec_X_iter      vec_X_emplace_at(vec_X* self, vec_X_iter it, i_keyraw raw);
+
+vec_X_iter      vec_X_erase_n(vec_X* self, isize idx, isize n);
+vec_X_iter      vec_X_erase_at(vec_X* self, vec_X_iter it);
+vec_X_iter      vec_X_erase_range(vec_X* self, vec_X_iter it1, vec_X_iter it2);
 
 
-vec_X_iter          vec_X_begin(const vec_X* self);
-vec_X_iter          vec_X_end(const vec_X* self);
-void                vec_X_next(vec_X_iter* iter);
-vec_X_iter          vec_X_advance(vec_X_iter it, size_t n);
+vec_X_iter      vec_X_begin(const vec_X* self);
+vec_X_iter      vec_X_end(const vec_X* self);
+void            vec_X_next(vec_X_iter* iter);
+vec_X_iter      vec_X_advance(vec_X_iter it, size_t n);
 
-bool                vec_X_eq(const vec_X* c1, const vec_X* c2); // equality comp.
-vec_X_value         vec_X_value_clone(vec_X_value val);
-vec_X_raw           vec_X_value_toraw(const vec_X_value* pval);
-vec_X_raw           vec_X_value_drop(vec_X_value* pval);
+bool            vec_X_eq(const vec_X* c1, const vec_X* c2); // equality comp.
+vec_X_value     vec_X_value_clone(vec_X_value val);
+vec_X_raw       vec_X_value_toraw(const vec_X_value* pval);
+vec_X_raw       vec_X_value_drop(vec_X_value* pval);
 ```
 
 ## Types
@@ -103,7 +119,7 @@ vec_X_raw           vec_X_value_drop(vec_X_value* pval);
 | `vec_X_iter`      | `struct { vec_X_value* ref; }`   | The iterator type     |
 
 ## Examples
-```c
+```c++
 #define i_key int
 #define i_use_cmp // enable sorting/searching using default <, == operators
 #include "stc/vec.h"
@@ -120,7 +136,7 @@ int main(void)
     vec_int_push(&vec, 13);
 
     // Append a set of numbers
-    c_forlist (i, int, {7, 5, 16, 8})
+    c_foritems (i, int, {7, 5, 16, 8})
         vec_int_push(&vec, *i.ref);
 
     printf("initial:");
@@ -144,31 +160,30 @@ initial: 25 13 7 5 16 8
 sorted: 5 7 8 13 16 25
 ```
 ### Example 2
-```c
-#define i_implement
+```c++
 #include "stc/cstr.h"
 
-#define i_key_str
+#define i_keypro cstr
 #include "stc/vec.h"
 
 int main(void) {
-    vec_str names = {0};
+    vec_cstr names = {0};
 
-    vec_str_emplace(&names, "Mary");
-    vec_str_emplace(&names, "Joe");
+    vec_cstr_emplace(&names, "Mary");
+    vec_cstr_emplace(&names, "Joe");
     cstr_assign(&names.data[1], "Jake"); // replace "Joe".
 
-    cstr tmp = cstr_from_fmt("%d elements so far", vec_str_size(names));
+    cstr tmp = cstr_from_fmt("%d elements so far", vec_cstr_size(names));
 
-    // vec_str_emplace() only accept const char*, so use push():
-    vec_str_push(&names, tmp); // tmp is "moved" to names (must not be dropped).
+    // vec_cstr_emplace() only accept const char*, so use push():
+    vec_cstr_push(&names, tmp); // tmp is "moved" to names (must not be dropped).
 
     printf("%s\n", cstr_str(&names.data[1])); // Access second element
 
-    c_foreach (i, vec_str, names)
+    c_foreach (i, vec_cstr, names)
         printf("item: %s\n", cstr_str(i.ref));
 
-    vec_str_drop(&names);
+    vec_cstr_drop(&names);
 }
 ```
 Output:
@@ -181,8 +196,7 @@ item: 2 elements so far
 ### Example 3
 
 Container with elements of structs:
-```c
-#define i_implement
+```c++
 #include "stc/cstr.h"
 
 typedef struct {
@@ -206,9 +220,9 @@ void User_drop(User* self) {
 
 // Declare a managed, clonable vector of users.
 #define i_type Users
-#define i_key_class User // User is a "class" and binds the _clone, _drop, and _cmp functions.
+#define i_keyclass User  // User is a "class" and binds the _clone, _drop, and _cmp functions.
 #define i_use_cmp        // Sorting/searching a vec is only enabled by either directly specifying an i_cmp function
-                         // or by defining i_use_cmp (i_cmp is then indirectly specified through i_key_class,
+                         // or by defining i_use_cmp (i_cmp is then indirectly specified through i_keyclass,
                          // or it is assumed that i_key is a built-in type that works with < and == operators).
 #include "stc/vec.h"
 

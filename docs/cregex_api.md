@@ -7,54 +7,56 @@
 
 The API is simple and includes powerful string pattern matches and replace functions. See example below and in the example folder.
 
+## Constants
+- compile-flags
+    - CREG_DOTALL     - dot matches newline too: can be set/overridden by (?s) and (?-s) in the RE
+    - CREG_ICASE      - ignore case mode: can be set/overridden by (?i) and (?-i) in the RE
+- match-flags
+    - CREG_FULLMATCH  - like start-, end-of-line anchors were in pattern: "^ ... $"
+    - CREG_NEXT       - use end of previous match[0] as start of input
+    - CREG_STARTEND   - use match[0] as start + end of input
+- replace-flags
+    - CREG_STRIP      - only keep the replaced matches, strip the rest
+
 ## Methods
+```c++
+cregex          cregex_from(const char* pattern);
+cregex          cregex_make(const char* pattern, int cflags);
 
-```c
-enum {
-    // compile-flags
-    CREG_DOTALL = 1<<0,    // dot matches newline too: can be set/overridden by (?s) and (?-s) in RE
-    CREG_ICASE = 1<<1,     // ignore case mode: can be set/overridden by (?i) and (?-i) in RE
+                // return CREG_OK, or negative error code on failure
+int             cregex_compile(cregex *self, const char* pattern);
+int             cregex_compile_pro(cregex *self, const char* pattern, int cflags);
 
-    // match-flags
-    CREG_FULLMATCH = 1<<2, // like start-, end-of-line anchors were in pattern: "^ ... $"
-    CREG_NEXT = 1<<3,      // use end of previous match[0] as start of input
-    CREG_STARTEND = 1<<4,  // use match[0] as start+end of input
+                // num. of capture groups in regex, excluding the 0th group which is the full match
+int             cregex_captures(const cregex* self);
 
-    // replace-flags
-    CREG_STRIP = 1<<5,     // only keep the replaced matches, strip the rest
-};
+                // Match RE. Return CREG_OK, CREG_NOMATCH, or CREG_MATCHERROR
+int             cregex_match(const cregex* re, const char* input, csview match[]);
+int             cregex_match_sv(const cregex* re, csview input, csview match[]);
+int             cregex_match_pro(const cregex* re, const char* input, csview match[], int mflags);
 
-cregex      cregex_init(void);
-cregex      cregex_from(const char* pattern, int cflags = CREG_DEFAULT);
-            // return CREG_OK, or negative error code on failure
-int         cregex_compile(cregex *self, const char* pattern, int cflags = CREG_DEFAULT);
+                // Check if there are matches in input
+bool            cregex_is_match(const cregex* re, const char* input);
 
-            // num. of capture groups in regex, excluding the 0th group which is the full match
-int         cregex_captures(const cregex* self);
+                // Match next after previous match position
+int             cregex_match_next(const cregex* re, const char* input, csview match[]);
+int             cregex_match_next_sv(const cregex* re, csview input, csview match[]);
 
-            // return CREG_OK, CREG_NOMATCH, or CREG_MATCHERROR
-int         cregex_find(const cregex* re, const char* input, csview match[], int mflags = CREG_DEFAULT);
-            // Search inside input string-view only
-int         cregex_find_sv(const cregex* re, csview input, csview match[]);
-            // All-in-one search (compile + find + drop)
-int         cregex_find_pattern(const char* pattern, const char* input, csview match[], int cmflags = CREG_DEFAULT);
+                // All-in-one single match (compile + match + drop)
+int             cregex_match_aio(const char* pattern, const char* input, csview match[]);
 
-            // Check if there are matches in input
-bool        cregex_is_match(const cregex* re, const char* input);
-
-            // Replace all matches in input
-cstr        cregex_replace(const cregex* re, const char* input, const char* replace, int count = INT_MAX);
-            // Replace count matches in input string-view. Optionally transform replacement.
-cstr        cregex_replace_sv(const cregex* re, csview input, const char* replace, int count = INT_MAX);
-cstr        cregex_replace_sv(const cregex* re, csview input, const char* replace, int count,
-                              bool(*transform)(int group, csview match, cstr* result), int rflags);
-
-            // All-in-one replacement (compile + find/replace + drop)
-cstr        cregex_replace_pattern(const char* pattern, const char* input, const char* replace, int count = INT_MAX);
-cstr        cregex_replace_pattern(const char* pattern, const char* input, const char* replace, int count,
+                // Replace all matched instances
+cstr            cregex_replace(const cregex* re, const char* input, const char* replace);
+                // String view input and transform up to count replacements
+cstr            cregex_replace_pro(const cregex* re, csview input, const char* replace, int count,
                                    bool(*transform)(int group, csview match, cstr* result), int rflags);
-            // destroy
-void        cregex_drop(cregex* self);
+
+                // All-in-one replacement (compile + match/replace + drop)
+cstr            cregex_replace_aio(const char* pattern, const char* input, const char* replace);
+cstr            cregex_replace_aio_pro(const char* pattern, csview input, const char* replace, int count,
+                                       bool(*transform)(int group, csview match, cstr* result), int crflags);
+                // destroy
+void            cregex_drop(cregex* self);
 ```
 
 ### Error codes
@@ -80,7 +82,7 @@ void        cregex_drop(cregex* self);
 ## Usage
 
 ### Compiling a regular expression
-```c
+```c++
 cregex re1 = {0};
 int result = cregex_compile(&re1, "[0-9]+");
 if (result < 0) return result;
@@ -97,9 +99,8 @@ If an error occurs ```cregex_compile``` returns a negative error code stored in 
 
 ### Getting the first match and making text replacements
 
-[ [Run this code](https://godbolt.org/z/c8as3oxj7) ]
-```c
-#define i_import // include dependent cstr, utf8 and cregex function definitions.
+[ [Run this code](https://godbolt.org/z/811Yre96s) ]
+```c++
 #include "stc/cregex.h"
 
 int main(void) {
@@ -110,10 +111,10 @@ int main(void) {
 
     // Lets find the first date in the string:
     csview match[4]; // full-match, year, month, date.
-    if (cregex_find(&re, input, match) == CREG_OK)
-        printf("Found date: %.*s\n", c_SV(match[0]));
+    if (cregex_match(&re, input, match) == CREG_OK)
+        printf("Found date: " c_svfmt "\n", c_svarg(match[0]));
     else
-        printf("Could not find any date\n");
+        printf("Could not match any date\n");
 
     // Lets change all dates into US date format MM/DD/YYYY:
     cstr us_input = cregex_replace(&re, input, "$2/$3/$1");
@@ -125,33 +126,26 @@ int main(void) {
 }
 ```
 For a single match you may use the all-in-one function:
-```c
-if (cregex_find_pattern(pattern, input, match))
-    printf("Found date: %.*s\n", c_SV(match[0]));
+```c++
+if (cregex_match_aio(pattern, input, match))
+    printf("Found date: " c_svfmt "\n", c_svarg(match[0]));
 ```
-
-To use: `gcc first_match.c`.
-In order to use a callback function in the replace call, see `examples/regex_replace.c`.
 
 ### Iterate through regex matches, *c_formatch*
 
 To iterate multiple matches in an input string, you may use
-```c
+```c++
 csview match[5] = {0};
-while (cregex_find(&re, input, match, CREG_NEXT) == CREG_OK)
+while (cregex_match_next(&re, input, match) == CREG_OK)
     for (int k = 1; i <= cregex_captures(&re); ++k)
-        printf("submatch %d: %.*s\n", k, c_SV(match[k]));
+        printf("submatch %d: " c_svfmt "\n", k, c_svarg(match[k]));
 ```
-There is also a for-loop macro to simplify it:
-```c
+There is also a `c_formatch` macro which simplifies this:
+```c++
 c_formatch (it, &re, input)
     for (int k = 1; i <= cregex_captures(&re); ++k)
-        printf("submatch %d: %.*s\n", k, c_SV(it.match[k]));
+        printf("submatch %d: " c_svfmt "\n", k, c_svarg(it.match[k]));
 ```
-
-## Using cregex in a project
-
-The easiest is to `#define i_import` before `#include "stc/cregex.h"`. Make sure to do that in one translation unit only.
 
 ## Regex Cheatsheet
 
@@ -203,12 +197,17 @@ The easiest is to `#define i_import` before `#include "stc/cregex.h"`. Make sure
 | \p{Space} | Match UTF8 whitespace: (Zs \t\r\n\v\f] | * |
 | \p{Word} | Match UTF8 word character: (Alnum Pc) | * |
 | \p{XDigit} | Match hex number | * |
-| \p{Arabic} | Language class | * |
-| \p{Cyrillic} | Language class | * |
-| \p{Devanagari} | Language class | * |
-| \p{Greek} | Language class | * |
-| \p{Han} | Language class | * |
-| \p{Latin} | Language class | * |
+| \p{Arabic} | Unicode script | * |
+| \p{Bengali} | Unicode script | * |
+| \p{Cyrillic} | Unicode script | * |
+| \p{Devanagari} | Unicode script | * |
+| \p{Georgian} | Unicode script | * |
+| \p{Greek} | Unicode script | * |
+| \p{Han} | Unicode script | * |
+| \p{Hiragani} | Unicode script | * |
+| \p{Katakani} | Unicode script | * |
+| \p{Latin} | Unicode script | * |
+| \p{Thai} | Unicode script | * |
 | \P{***Class***} | Do not match the classes described above | * |
 | [:alnum:] [:alpha:] [:ascii:] | Match ASCII character class. NB: only to be used inside [] brackets | * |
 | [:blank:] [:cntrl:] [:digit:] | " | * |
@@ -221,10 +220,16 @@ The easiest is to `#define i_import` before `#include "stc/cregex.h"`. Make sure
 
 ## Limitations
 
-The main goal of **cregex** is to be small and fast with limited but useful unicode support. In order to reach these goals, **cregex** currently does not support the following features (non-exhaustive list):
-- In order to limit table sizes, most general UTF8 character classes are missing, like \p{L}, \p{S}, and most specific scripts like \p{Tibetan}. Some/all of these may be added in the future as an alternative source file with unicode tables to link with. Currently, only characters from from the Basic Multilingual Plane (BMP) are supported, which contains most commonly used characters (i.e. none of the "supplementary planes").
+The main goal of **cregex** is to be small and fast with limited but useful unicode support. In order to
+reach these goals, **cregex** currently does not support the following features (non-exhaustive list):
+- In order to limit table sizes, most general UTF8 character classes are missing, like \p{L}, \p{S},
+and most specific scripts like \p{Tibetan}. Some/all of these may be added in the future as an
+alternative source file with unicode tables to link with. Currently, only characters from from the
+Basic Multilingual Plane (BMP) are supported, which contains most commonly used characters
+(i.e. none of the "supplementary planes").
 - {n, m} syntax for repeating previous token min-max times.
 - Non-capturing groups
 - Lookaround and backreferences (cannot be implemented efficiently).
 
-If you need a more feature complete, but bigger library, use [RE2 with C-wrapper](https://github.com/google/re2) which uses the same type of regex engine as **cregex**, or use [PCRE2](https://www.pcre.org/).
+If you need a more feature complete, but bigger library, use [RE2 with C-wrapper](https://github.com/google/re2)
+which uses the same type of regex engine as **cregex**, or use [PCRE2](https://www.pcre.org/).

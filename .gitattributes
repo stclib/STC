@@ -1,3 +1,4 @@
-misc/benchmarks/external/* linguist-vendored
+* text=auto
+
 *.h linguist-language=C
 *.c linguist-language=C

@@ -1,6 +1,6 @@
 /* MIT License
  *
- * Copyright (c) 2023 Tyge Løvset
+ * Copyright (c) 2024 Tyge Løvset
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -47,8 +47,8 @@ int main(int argc, char *argv[])
     coption opt = coption_init();
     while ((c = coption_get(&opt, argc, argv, optstr, longopts)) != -1) {
         switch (c) {
-            case '?': printf("error: unknown option: %s\n", opt.optstr); break;
-            case ':': printf("error: missing argument for %s (%c)\n", opt.optstr, opt.opt); break;
+            case '?': printf("error: unknown option: %s\n", opt.optstr); return 1;
+            case ':': printf("error: missing argument for %s (%c)\n", opt.optstr, opt.opt); return 2;
             default:  printf("option: %c [%s]\n", opt.opt, opt.arg ? opt.arg : ""); break;
         }
     }

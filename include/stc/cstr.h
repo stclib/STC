@@ -1,6 +1,6 @@
 /* MIT License
  *
- * Copyright (c) 2023 Tyge Løvset
+ * Copyright (c) 2024 Tyge Løvset
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -37,11 +37,14 @@
 
 #endif // STC_CSTR_H_INCLUDED
 
-#if defined i_implement || defined i_static
+#if defined i_implement || \
+    defined STC_CSTR_CORE || \
+    defined STC_CSTR_IO || \
+    defined STC_CSTR_UTF8
   #include "priv/cstr_prv.c"
 #endif // i_implement
 
-#if defined i_import
+#if defined i_import || defined STC_CSTR_UTF8
   #include "priv/utf8_prv.c"
 #endif
 

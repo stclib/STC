@@ -1,6 +1,6 @@
 /* MIT License
  *
- * Copyright (c) 2023 Tyge Løvset
+ * Copyright (c) 2024 Tyge Løvset
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,23 +21,23 @@
  * SOFTWARE.
  */
 
-// Unordered set - implemented as closed hashing with linear probing and no tombstones.
+// Unordered set - implemented with the robin-hood hashing scheme.
 /*
-#define i_type hset_i,int
+#define i_type iset,int
 #include "stc/hset.h"
 #include <stdio.h>
 
 int main(void) {
-    hset_i s = {0};
-    hset_i_insert(&s, 5);
-    hset_i_insert(&s, 8);
+    iset set = {0};
+    iset_insert(&set, 5);
+    iset_insert(&set, 8);
 
-    c_foreach (i, hset_i, s)
+    c_foreach (i, iset, set)
         printf("set %d\n", *i.ref);
-    hset_i_drop(&s);
+    iset_drop(&set);
 }
 */
 
 #define _i_prefix hset_
-#define _i_isset
+#define _i_is_set
 #include "hmap.h"

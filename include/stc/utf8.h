@@ -1,6 +1,6 @@
 /* MIT License
  *
- * Copyright (c) 2023 Tyge Løvset
+ * Copyright (c) 2024 Tyge Løvset
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,9 +25,9 @@
 #ifndef STC_UTF8_H_INCLUDED
 #define STC_UTF8_H_INCLUDED
 
-#include "common.h"
+#include "common.h" // IWYU pragma: keep
 #include "types.h"
-#include "priv/utf8_prv.h"
+#include "priv/utf8_prv.h" // IWYU pragma: keep
 
 #endif // STC_UTF8_H_INCLUDED
 

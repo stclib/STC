@@ -1,4 +1,3 @@
-#include <stdint.h>
 
 struct CaseMapping { uint16_t c1, c2, m2; };
 

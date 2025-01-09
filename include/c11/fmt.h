@@ -1,11 +1,11 @@
 #ifndef FMT_H_INCLUDED
 #define FMT_H_INCLUDED
 /*
-VER 2.2: NEW API:
+VER 2.3 API:
 void        fmt_print(fmt, ...);
 void        fmt_println(fmt, ...);
 void        fmt_printd(dst, fmt, ...);
-const char* fmt_tm(fmt, struct tm* tp);
+const char* fmt_time(fmt, const struct tm* tm, char *buf, int len);
 void        fmt_close(fmt_stream* ss);
 
   dst - destination, one of:
@@ -24,11 +24,11 @@ void        fmt_close(fmt_stream* ss);
     {{  }}  %       Print the '{', '}', and '%' characters.
 
 * C11 or higher required.
-* MAX 255 chars fmt string by default. MAX 12 arguments after fmt string.
+* MAX 127 chars fmt string by default. MAX 12 arguments after fmt string.
 * Define FMT_IMPLEMENT, STC_IMPLEMENT or i_implement prior to #include in one translation unit.
 * (c) operamint, 2022, MIT License.
 -----------------------------------------------------------------------------------
-#define FMT_IMPLEMENT
+#define i_implement
 #include "c11/fmt.h"
 
 int main(void) {
@@ -60,28 +60,17 @@ int main(void) {
 
     time_t now = time(NULL);
     struct tm t1 = *localtime(&now), t2 = t1;
-    t2.tm_year += 2;
-    // NB! max 2 fmt_tm() calls per fmt_print()!
-    fmt_print("Dates: {} and {}\n", fmt_tm("%Y-%m-%d %X %Z", &t1),
-                                    fmt_tm("%Y-%m-%d %X %Z", &t2));
+    t2.tm_hour += 48;
+    mktime(&t2);
+    char ts[2][64];
+    fmt_print("Dates: {} and {}\n", fmt_time("%Y-%m-%d %X %Z", &t1, ts[0], 63),
+                                    fmt_time("%Y-%m-%d %X %Z", &t2, ts[1], 63));
 }
 */
-#include <stdio.h>
-#include <stdint.h>
+#include <stdio.h> // IWYU pragma: keep
 #include <stddef.h>
 #include <assert.h>
-
-#define fmt_OVERLOAD(name, ...) \
-    fmt_JOIN(name, fmt_NUMARGS(__VA_ARGS__))(__VA_ARGS__)
-#define fmt_CONCAT(a, b) a ## b
-#define fmt_JOIN(a, b) fmt_CONCAT(a, b)
-#define fmt_EXPAND(...) __VA_ARGS__
-#define fmt_NUMARGS(...) _fmt_APPLY_ARG_N((__VA_ARGS__, _fmt_RSEQ_N))
-
-#define _fmt_APPLY_ARG_N(args) fmt_EXPAND(_fmt_ARG_N args)
-#define _fmt_RSEQ_N 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
-#define _fmt_ARG_N(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, \
-                   _14, _15, _16, N, ...) N
+#include "../stc/common.h"
 
 #if defined FMT_NDEBUG || defined STC_NDEBUG || defined NDEBUG
 #  define fmt_OK(exp) (void)(exp)
@@ -105,8 +94,8 @@ typedef struct {
   #define FMT_API
 #endif
 
-struct tm;  /* Max 2 usages. Buffer = 64 chars. */
-FMT_API const char* fmt_tm(const char *fmt, const struct tm *tp);
+struct tm;
+FMT_API const char* fmt_time(const char *fmt, const struct tm* tm, char* buf, int len);
 FMT_API void        fmt_close(fmt_stream* ss);
 FMT_API int        _fmt_parse(char* p, int nargs, const char *fmt, ...);
 FMT_API void       _fmt_sprint(fmt_stream*, const char* fmt, ...);
@@ -117,53 +106,55 @@ FMT_API void       _fmt_sprint(fmt_stream*, const char* fmt, ...);
 
 #define fmt_print(...) fmt_printd(stdout, __VA_ARGS__)
 #define fmt_println(...) fmt_printd((fmt_stream*)0, __VA_ARGS__)
-#define fmt_printd(...) fmt_OVERLOAD(fmt_printd, __VA_ARGS__)
+#define fmt_printd(...) c_MACRO_OVERLOAD(fmt_printd, __VA_ARGS__)
+#define fmt_sv "{:.*s}"
+#define fmt_svarg(sv) (int)(sv).size, (sv).buf
 
 /* Primary function. */
-#define fmt_printd2(to, fmt) \
+#define fmt_printd_2(to, fmt) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 0, fmt); \
-        fmt_OK(_n == 0); _fmt_fn(to)(to, fmt); } while (0)
-#define fmt_printd3(to, fmt, c) \
+         fmt_OK(_n == 0); _fmt_fn(to)(to, fmt); } while (0)
+#define fmt_printd_3(to, fmt, c) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 1, fmt, _fc(c)); \
-        fmt_OK(_n == 1); _fmt_fn(to)(to, _fs, c); } while (0)
-#define fmt_printd4(to, fmt, c, d) \
+         fmt_OK(_n == 1); _fmt_fn(to)(to, _fs, c); } while (0)
+#define fmt_printd_4(to, fmt, c, d) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 2, fmt, _fc(c), _fc(d)); \
-        fmt_OK(_n == 2); _fmt_fn(to)(to, _fs, c, d); } while (0)
-#define fmt_printd5(to, fmt, c, d, e) \
+         fmt_OK(_n == 2); _fmt_fn(to)(to, _fs, c, d); } while (0)
+#define fmt_printd_5(to, fmt, c, d, e) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 3, fmt, _fc(c), _fc(d), _fc(e)); \
-        fmt_OK(_n == 3); _fmt_fn(to)(to, _fs, c, d, e); } while (0)
-#define fmt_printd6(to, fmt, c, d, e, f) \
+         fmt_OK(_n == 3); _fmt_fn(to)(to, _fs, c, d, e); } while (0)
+#define fmt_printd_6(to, fmt, c, d, e, f) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 4, fmt, _fc(c), _fc(d), _fc(e), _fc(f)); \
-        fmt_OK(_n == 4); _fmt_fn(to)(to, _fs, c, d, e, f); } while (0)
-#define fmt_printd7(to, fmt, c, d, e, f, g) \
+         fmt_OK(_n == 4); _fmt_fn(to)(to, _fs, c, d, e, f); } while (0)
+#define fmt_printd_7(to, fmt, c, d, e, f, g) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 5, fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g)); \
-        fmt_OK(_n == 5); _fmt_fn(to)(to, _fs, c, d, e, f, g); } while (0)
-#define fmt_printd8(to, fmt, c, d, e, f, g, h) \
+         fmt_OK(_n == 5); _fmt_fn(to)(to, _fs, c, d, e, f, g); } while (0)
+#define fmt_printd_8(to, fmt, c, d, e, f, g, h) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 6, fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h)); \
-        fmt_OK(_n == 6); _fmt_fn(to)(to, _fs, c, d, e, f, g, h); } while (0)
-#define fmt_printd9(to, fmt, c, d, e, f, g, h, i) \
+         fmt_OK(_n == 6); _fmt_fn(to)(to, _fs, c, d, e, f, g, h); } while (0)
+#define fmt_printd_9(to, fmt, c, d, e, f, g, h, i) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 7, fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h), _fc(i)); \
-        fmt_OK(_n == 7); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i); } while (0)
-#define fmt_printd10(to, fmt, c, d, e, f, g, h, i, j) \
+         fmt_OK(_n == 7); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i); } while (0)
+#define fmt_printd_10(to, fmt, c, d, e, f, g, h, i, j) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 8, fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h), \
                                                                      _fc(i), _fc(j)); \
-        fmt_OK(_n == 8); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i, j); } while (0)
-#define fmt_printd11(to, fmt, c, d, e, f, g, h, i, j, k) \
+         fmt_OK(_n == 8); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i, j); } while (0)
+#define fmt_printd_11(to, fmt, c, d, e, f, g, h, i, j, k) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 9, fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h), \
                                                                      _fc(i), _fc(j), _fc(k)); \
-        fmt_OK(_n == 9); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i, j, k); } while (0)
-#define fmt_printd12(to, fmt, c, d, e, f, g, h, i, j, k, m) \
+         fmt_OK(_n == 9); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i, j, k); } while (0)
+#define fmt_printd_12(to, fmt, c, d, e, f, g, h, i, j, k, m) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 10, fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h), \
                                                                       _fc(i), _fc(j), _fc(k), _fc(m)); \
-        fmt_OK(_n == 10); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i, j, k, m); } while (0)
-#define fmt_printd13(to, fmt, c, d, e, f, g, h, i, j, k, m, n) \
+         fmt_OK(_n == 10); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i, j, k, m); } while (0)
+#define fmt_printd_13(to, fmt, c, d, e, f, g, h, i, j, k, m, n) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 11, fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h), \
                                                                       _fc(i), _fc(j), _fc(k), _fc(m), _fc(n)); \
-        fmt_OK(_n == 11); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i, j, k, m, n); } while (0)
-#define fmt_printd14(to, fmt, c, d, e, f, g, h, i, j, k, m, n, o) \
+         fmt_OK(_n == 11); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i, j, k, m, n); } while (0)
+#define fmt_printd_14(to, fmt, c, d, e, f, g, h, i, j, k, m, n, o) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 12, fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h), \
                                                                       _fc(i), _fc(j), _fc(k), _fc(m), _fc(n), _fc(o)); \
-        fmt_OK(_n == 12); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i, j, k, m, n, o); } while (0)
+         fmt_OK(_n == 12); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i, j, k, m, n, o); } while (0)
 
 #define _fmt_fn(x) _Generic ((x), \
     FILE*: fprintf, \
@@ -173,7 +164,7 @@ FMT_API void       _fmt_sprint(fmt_stream*, const char* fmt, ...);
 #if defined(_MSC_VER) && !defined(__clang__)
   #define _signed_char_hhd
 #else
-  #define _signed_char_hhd signed char: "hhd",
+  #define _signed_char_hhd signed char: "c",
 #endif
 
 #if defined(__GNUC__) || defined(__clang__) || defined(__INTEL_LLVM_COMPILER)
@@ -186,7 +177,7 @@ FMT_API void       _fmt_sprint(fmt_stream*, const char* fmt, ...);
     _Bool: "d", \
     unsigned char: "hhu", \
     _signed_char_hhd \
-    char: "hhd", \
+    char: "c", \
     short: "hd", \
     unsigned short: "hu", \
     int: "d", \
@@ -216,11 +207,10 @@ FMT_DEF FMT_UNUSED void fmt_close(fmt_stream* ss) {
     free(ss->data);
 }
 
-FMT_DEF FMT_UNUSED const char* fmt_tm(const char *fmt, const struct tm *tp) {
-    static char buf[2][64];
-    static int i;
-    strftime(buf[(i = !i)], sizeof(buf[0]) - 1, fmt, tp);
-    return buf[i];
+FMT_DEF FMT_UNUSED
+const char* fmt_time(const char *fmt, const struct tm* tm, char* buf, int len) {
+    strftime(buf, (size_t)len, fmt, tm);
+    return buf;
 }
 
 FMT_DEF void _fmt_sprint(fmt_stream* ss, const char* fmt, ...) {
@@ -239,7 +229,7 @@ FMT_DEF void _fmt_sprint(fmt_stream* ss, const char* fmt, ...) {
         ss->cap = ss->len + ss->cap/2;
         ss->data = (char*)realloc(ss->data, (size_t)ss->cap + 1U);
     }
-    vsprintf(ss->data + pos, fmt, args2);
+    vsnprintf(ss->data + pos, (size_t)n+1, fmt, args2);
     done2: va_end(args2);
     done1: va_end(args);
 }
@@ -267,12 +257,12 @@ FMT_DEF int _fmt_parse(char* p, int nargs, const char *fmt, ...) {
             arg = va_arg(args, char *);
             *p++ = '%', p0 = p;
             while (1) switch (*fmt) {
-                case '\0': n = 99; /* fall through */
+                case '\0': n = 99; /* FALLTHRU */
                 case '}': goto done;
                 case '<': *p++ = '-', ++fmt; break;
-                case '>': p0 = NULL; /* fall through */
+                case '>': p0 = NULL; /* FALLTHRU */
                 case '-': ++fmt; break;
-                case '*': if (++n <= nargs) arg = va_arg(args, char *); /* fall through */
+                case '*': if (++n <= nargs) arg = va_arg(args, char *); /* FALLTHRU */
                 default: *p++ = *fmt++;
             }
             done:
@@ -280,7 +270,7 @@ FMT_DEF int _fmt_parse(char* p, int nargs, const char *fmt, ...) {
             case 'g': if (empty) memcpy(p, ".8", 2), p += 2; break;
             case '@': ++arg; if (empty) memcpy(p, ".16", 3), p += 3; break;
             }
-            if (!strchr("csdioxXufFeEaAgGnp", fmt[-1]))
+            if (strchr("csdioxXufFeEaAgGnp", fmt[-1]) == NULL)
                 while (*arg) *p++ = *arg++;
             if (p0 && (p[-1] == 's' || p[-1] == 'c')) /* left-align str */
                 memmove(p0 + 1, p0, (size_t)(p++ - p0)), *p0 = '-';

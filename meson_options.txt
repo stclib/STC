@@ -1,0 +1,20 @@
+option(
+  'checkscoped',
+  type: 'feature',
+  value: 'auto',
+  description: 'Build checkscoped tool for c_guard* blocks',
+)
+option(
+  'tests',
+  type: 'feature',
+  value: 'auto',
+  description: 'Build tests and ctest',
+)
+option(
+  'examples',
+  type: 'feature',
+  value: 'auto',
+  description: 'Build examples',
+)
+
+option('docdir', type: 'string', description: 'documentation directory')

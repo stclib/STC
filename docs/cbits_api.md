@@ -1,58 +1,67 @@
 # STC [cbits](../include/stc/cbits.h): Bitset
 ![Bitset](pics/bitset.jpg)
 
-A **cbits** represents either a fixed or a dynamically sized sequence of bits. It provides accesses to the value of individual bits via *cbits_test()* and provides the bitwise operators that one can apply to builtin integers. The number of bits in the set is specified at runtime via a parameter to the constructor *cbits_with_size()* or by *cbits_resize()*. A **cbits** bitset can be manipulated by standard logic operators and converted to and from strings.
+A **cbits** represents either a dynamically sized sequence of bits, or a compile-time fixed sized bitset. It provides accesses to the value of individual bits via *cbits_test()* (or *cbits_at()*) and provides the bitwise operators that one can apply to builtin integers.
+
+For the dynamic The number of bits in the set is specified at runtime via a parameter to the constructor *cbits_with_size()* or by *cbits_resize()*. A **cbits** bitset can be manipulated by standard logic operators and converted to and from strings.
 
 See the c++ class [std::bitset](https://en.cppreference.com/w/cpp/utility/bitset) or
 [boost::dynamic_bitset](https://www.boost.org/doc/libs/release/libs/dynamic_bitset/dynamic_bitset.html)
 for a functional description.
 
 ## Header file
-
 All cbits definitions and prototypes are available by including a single header file.
 
-```c
-#define i_len N        // if defined, the bitset will be fixed-size of N bits on the stack.
-#define i_type name    // optional, specifies the name of the bitset type. Default to cbits or cbitsN
+```c++
+// if i_type is defined, the bitset will be fixed-size of N bits on the stack, and with the given type name.
+#define i_type MyBits, MY_MAX_BITS
+#include "stc/cbits.h"
+
+// otherwise, just include the header. The type name is cbits, data will be dynamically allocated.
 #include "stc/cbits.h"
 ```
 ## Methods
 
-```c
-cbits       cbits_init(void);
-cbits       cbits_from(const char* str);
-cbits       cbits_with_size(int64_t size, bool value);              // size must be <= N if N is defined
-cbits       cbits_with_pattern(int64_t size, uint64_t pattern);
-cbits       cbits_clone(cbits other);
+```c++
+cbits           cbits_from(const char* str);
+cbits           cbits_with_size(isize size, bool value);                // size must be <= N if N is defined
+cbits           cbits_with_pattern(isize size, size_t pattern);
+cbits           cbits_clone(cbits other);
 
-void        cbits_clear(cbits* self);
-cbits*      cbits_copy(cbits* self, const cbits* other);
-void        cbits_resize(cbits* self, int64_t size, bool value);    // only if i_len is not defined
-void        cbits_drop(cbits* self);
+void            cbits_clear(cbits* self);
+cbits*          cbits_copy(cbits* self, const cbits* other);
+bool            cbits_resize(cbits* self, isize size, bool value);      // NB! only for dynamic bitsets!
+void            cbits_drop(cbits* self);
 
-cbits*      cbits_take(cbits* self, const cbits* other);            // give other to self
-cbits       cbits_move(cbits* self);                                // transfer self to caller
+cbits*          cbits_take(cbits* self, const cbits* other);            // give other to self
+cbits           cbits_move(cbits* self);                                // transfer self to caller
 
-int64_t     cbits_size(const cbits* self);
-int64_t     cbits_count(const cbits* self);                         // count number of bits set
+isize           cbits_size(const cbits* self);
+isize           cbits_count(const cbits* self);                         // count number of bits set
 
-bool        cbits_test(const cbits* self, int64_t i);
-bool        cbits_at(const cbits* self, int64_t i);                 // same as cbits_test()
-bool        cbits_subset_of(const cbits* self, const cbits* other); // is set a subset of other?
-bool        cbits_disjoint(const cbits* self, const cbits* other);  // no common bits
-char*       cbits_to_str(const cbits* self, char* str, int64_t start, int64_t stop);
+bool            cbits_test(const cbits* self, isize i);
+bool            cbits_at(const cbits* self, isize i);                   // cbits_test() with bounds check.
+bool            cbits_subset_of(const cbits* self, const cbits* other); // is set a subset of other?
+bool            cbits_disjoint(const cbits* self, const cbits* other);  // no common bits
+char*           cbits_to_str(const cbits* self, char* str, isize start, isize stop);
 
-void        cbits_set(cbits* self, int64_t i);
-void        cbits_reset(cbits* self, int64_t i);
-void        cbits_set_value(cbits* self, int64_t i, bool value);
-void        cbits_set_all(cbits* self, bool value);
-void        cbits_set_pattern(cbits* self, uint64_t pattern);
-void        cbits_flip_all(cbits* self);
-void        cbits_flip(cbits* self, int64_t i);
+void            cbits_print(const cbits* self);
+void            cbits_print(const cbits* self, FILE* fp);
+void            cbits_print(const cbits* self, FILE* fp, isize start, isize stop);
+void            cbits_print(TYPE Bits, const Bits* self, FILE* fp);     // for fixed size bitsets
+void            cbits_print(TYPE Bits, const Bits* self, FILE* fp, isize start, isize stop);
 
-void        cbits_intersect(cbits* self, const cbits* other);
-void        cbits_union(cbits* self, const cbits* other);
-void        cbits_xor(cbits* self, const cbits* other);             // set of disjoint bits
+void            cbits_set(cbits* self, isize i);
+void            cbits_reset(cbits* self, isize i);
+void            cbits_set_value(cbits* self, isize i, bool value);
+void            cbits_set_all(cbits* self, bool value);
+void            cbits_set_pattern(cbits* self, size_t pattern);
+void            cbits_flip_all(cbits* self);
+void            cbits_flip(cbits* self, isize i);
+
+void            cbits_intersect(cbits* self, const cbits* other);
+void            cbits_union(cbits* self, const cbits* other);
+void            cbits_xor(cbits* self, const cbits* other);             // set of disjoint bits
 ```
 
 ## Types
@@ -63,46 +72,45 @@ void        cbits_xor(cbits* self, const cbits* other);             // set of di
 | `cbits_iter`        | `struct { ... }`          | The cbits iterator type      |
 
 ## Example
-```c
-#define i_implement // force shared implementation of some cbits functionn.
+```c++
 #include "stc/cbits.h"
 #include <stdio.h>
 #include <math.h>
 #include <time.h>
 
-cbits sieveOfEratosthenes(int64_t n)
+cbits sieveOfEratosthenes(isize n)
 {
-    cbits bits = cbits_with_size(n>>1, true);
-    int64_t q = (int64_t) sqrt(n);
+    cbits bits = cbits_with_size(n/2, true);
+    isize q = (isize)sqrt(n);
 
-    for (int64_t i = 3; i <= q; i += 2) {
-        for (int64_t j = i; j < n; j += 2) {
-            if (cbits_test(&bits, j>>1)) {
+    for (isize i = 3; i <= q; i += 2) {
+        for (isize j = i; j < n; j += 2) {
+            if (cbits_test(&bits, j/2)) {
                 i = j;
                 break;
             }
         }
-        for (int64_t j = i*i; j < n; j += i*2)
-            cbits_reset(&bits, j>>1);
+        for (isize j = i*i; j < n; j += i*2)
+            cbits_reset(&bits, j/2);
     }
     return bits;
 }
 
 int main(void)
 {
-    int64_t n = 100000000;
+    isize n = 100000000;
     printf("computing prime numbers up to %" c_ZI "\n", n);
 
     clock_t t1 = clock();
     cbits primes = sieveOfEratosthenes(n + 1);
-    int64_t nprimes = cbits_count(&primes);
-    clock_t t2 = clock();
+    isize nprimes = cbits_count(&primes);
+    t1 = clock() - t1;
 
-    printf("number of primes: %" c_ZI ", time: %f\n", nprimes, (float)(t2 - t1)/CLOCKS_PER_SEC);
+    printf("number of primes: %" c_ZI ", time: %f\n", nprimes, (float)t1/CLOCKS_PER_SEC);
 
     printf(" 2");
-    for (int64_t i = 3; i < 1000; i += 2)
-       if (cbits_test(&primes, i>>1)) printf(" %" c_ZI, i);
+    for (isize i = 3; i < 1000; i += 2)
+       if (cbits_test(&primes, i/2)) printf(" %" c_ZI, i);
     puts("");
 
     cbits_drop(&primes);

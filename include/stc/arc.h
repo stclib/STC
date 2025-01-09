@@ -1,6 +1,6 @@
 /* MIT License
  *
- * Copyright (c) 2023 Tyge Løvset
+ * Copyright (c) 2024 Tyge Løvset
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,6 @@
  */
 
 /* carc: atomic reference counted shared_ptr
-#define i_implement
 #include "stc/cstr.h"
 
 typedef struct { cstr name, last; } Person;
@@ -42,7 +41,7 @@ void Person_drop(Person* p) {
 }
 
 #define i_type ArcPers
-#define i_val_class Person    // clone, drop, cmp, hash
+#define i_valclass Person    // clone, drop, cmp, hash
 #include "stc/arc.h"
 
 int main(void) {
@@ -61,6 +60,11 @@ int main(void) {
 #include "types.h"
 #include <stdlib.h>
 
+#if defined __GNUC__ || defined __clang__ || defined _MSC_VER || defined i_no_atomic
+    typedef long catomic_long;
+#else // try with C11
+    typedef _Atomic(long) catomic_long;
+#endif
 #if defined _MSC_VER
     #include <intrin.h>
     #define c_atomic_inc(v) (void)_InterlockedIncrement(v)
@@ -68,19 +72,20 @@ int main(void) {
 #elif defined __GNUC__ || defined __clang__
     #define c_atomic_inc(v) (void)__atomic_add_fetch(v, 1, __ATOMIC_SEQ_CST)
     #define c_atomic_dec_and_test(v) !__atomic_sub_fetch(v, 1, __ATOMIC_SEQ_CST)
-#else
+#else // try with C11
     #include <stdatomic.h>
     #define c_atomic_inc(v) (void)atomic_fetch_add(v, 1)
     #define c_atomic_dec_and_test(v) (atomic_fetch_sub(v, 1) == 1)
 #endif
 
-#define carc_null {0}
+// @wmww: Now fixed rare memleak by adding 4 bytes when allocating the counter alone.
+struct _arc_metadata { catomic_long counter; };
 #endif // STC_ARC_H_INCLUDED
 
 #ifndef _i_prefix
   #define _i_prefix arc_
 #endif
-#define _i_carc
+#define _i_is_arc
 #include "priv/template.h"
 typedef i_keyraw _m_raw;
 
@@ -94,140 +99,109 @@ typedef i_keyraw _m_raw;
   #define _i_atomic_inc(v)          (void)(++*(v))
   #define _i_atomic_dec_and_test(v) !(--*(v))
 #endif
-#ifndef i_is_forward
-_c_DEFTYPES(_c_arc_types, i_type, i_key);
+#ifndef i_declared
+_c_DEFTYPES(_c_arc_types, Self, i_key);
 #endif
-struct _c_MEMB(_metadata_) { catomic_long counter; bool value_included; };
-struct _c_MEMB(_rep_) { struct _c_MEMB(_metadata_) metadata; i_key value; };
+struct _c_MEMB(_rep_) { struct _arc_metadata metadata; i_key value; };
 
-STC_INLINE i_type _c_MEMB(_init)(void)
-    { return c_LITERAL(i_type){NULL, NULL}; }
+STC_INLINE Self _c_MEMB(_init)(void)
+    { return c_literal(Self){NULL, NULL}; }
 
-STC_INLINE long _c_MEMB(_use_count)(const i_type* self)
+STC_INLINE long _c_MEMB(_use_count)(const Self* self)
     { return self->use_count ? *self->use_count : 0; }
 
-STC_INLINE i_type _c_MEMB(_from_ptr)(_m_value* p) {
-    i_type arc = {p};
-    if (p) {
-        struct _c_MEMB(_metadata_)* metadata = _i_alloc(struct _c_MEMB(_metadata_));
-        metadata->value_included = false;
-        *(arc.use_count = &metadata->counter) = 1;
-    }
-    return arc;
-}
 
 // c++: std::make_shared<_m_value>(val)
-STC_INLINE i_type _c_MEMB(_make)(_m_value val) {
-    i_type arc;
-    struct _c_MEMB(_rep_)* rep = _i_alloc(struct _c_MEMB(_rep_));
-    rep->metadata.value_included = true;
-    *(arc.use_count = &rep->metadata.counter) = 1;
-    *(arc.get = &rep->value) = val;
-    return arc;
+STC_INLINE Self _c_MEMB(_make)(_m_value val) {
+    Self unowned;
+    struct _c_MEMB(_rep_)* rep = _i_malloc(struct _c_MEMB(_rep_), 1);
+    *(unowned.use_count = &rep->metadata.counter) = 1;
+    *(unowned.get = &rep->value) = val; // (.use_count, .get) are OFFSET bytes apart.
+    return unowned;
 }
 
-STC_INLINE _m_raw _c_MEMB(_toraw)(const i_type* self)
-    { return i_keyto(self->get); }
-
-STC_INLINE i_type _c_MEMB(_move)(i_type* self) {
-    i_type arc = *self;
-    self->get = NULL, self->use_count = NULL;
-    return arc;
+STC_INLINE Self _c_MEMB(_from_ptr)(_m_value* ptr) {
+    enum {OFFSET = offsetof(struct _c_MEMB(_rep_), value)};
+    Self unowned = {ptr};
+    if (ptr) {
+        // Adds 4 dummy bytes to ensure that the if-test in _drop() is safe.
+        struct _arc_metadata* meta = (struct _arc_metadata*)i_malloc(OFFSET + 4);
+        *(unowned.use_count = &meta->counter) = 1;
+    }
+    return unowned;
 }
 
-STC_INLINE void _c_MEMB(_drop)(const i_type* cself) {
-    i_type* self = (i_type*)cself;
+STC_INLINE Self _c_MEMB(_from)(_m_raw raw)
+    { return _c_MEMB(_make)(i_keyfrom(raw)); }
+
+STC_INLINE _m_raw _c_MEMB(_toraw)(const Self* self)
+    { return i_keytoraw(self->get); }
+
+// destructor
+STC_INLINE void _c_MEMB(_drop)(const Self* self) {
     if (self->use_count && _i_atomic_dec_and_test(self->use_count)) {
+        enum {OFFSET = offsetof(struct _c_MEMB(_rep_), value)};
         i_keydrop(self->get);
-        if (!c_container_of(self->use_count, struct _c_MEMB(_metadata_), counter)->value_included) {
+
+        if ((char*)self->use_count + OFFSET == (char*)self->get) {
+            i_free((void*)self->use_count, c_sizeof(struct _c_MEMB(_rep_))); // _make()
+        } else {
+            i_free((void*)self->use_count, OFFSET + 4); // _from_ptr()
             i_free(self->get, c_sizeof *self->get);
-            i_free(self->use_count, c_sizeof(long));
-        } else { // allocated combined counter+value with _make()
-            i_free(self->use_count, c_sizeof(struct _c_MEMB(_rep_)));
         }
     }
 }
 
-STC_INLINE void _c_MEMB(_reset)(i_type* self) {
+// move ownership to receiving arc
+STC_INLINE Self _c_MEMB(_move)(Self* self) {
+    Self arc = *self;
+    memset(self, 0, sizeof *self);
+    return arc; // now unowned
+}
+
+// take ownership of pointer p
+STC_INLINE void _c_MEMB(_reset_to)(Self* self, _m_value* ptr) {
     _c_MEMB(_drop)(self);
-    self->use_count = NULL, self->get = NULL;
+    *self = _c_MEMB(_from_ptr)(ptr);
 }
 
-STC_INLINE void _c_MEMB(_reset_to)(i_type* self, _m_value* p) {
-    _c_MEMB(_drop)(self);
-    *self = _c_MEMB(_from_ptr)(p);
-}
-
-#ifndef i_no_emplace
-STC_INLINE i_type _c_MEMB(_from)(_m_raw raw)
-    { return _c_MEMB(_make)(i_keyfrom(raw)); }
-#else
-STC_INLINE i_type _c_MEMB(_from)(_m_value val)
-    { return _c_MEMB(_make)(val); }
-#endif
-
-// does not use i_keyclone, so OK to always define.
-STC_INLINE i_type _c_MEMB(_clone)(i_type arc) {
-    if (arc.use_count)
-        _i_atomic_inc(arc.use_count);
-    return arc;
-}
-
-// take ownership of unowned
-STC_INLINE void _c_MEMB(_take)(i_type* self, i_type unowned) {
+// take ownership of unowned arc
+STC_INLINE void _c_MEMB(_take)(Self* self, Self unowned) {
     _c_MEMB(_drop)(self);
     *self = unowned;
 }
-// share ownership with arc
-STC_INLINE void _c_MEMB(_assign)(i_type* self, i_type arc) {
-    if (arc.use_count)
-        _i_atomic_inc(arc.use_count);
+
+// make shared ownership with owned arc
+STC_INLINE void _c_MEMB(_assign)(Self* self, const Self* owned) {
+    if (owned->use_count) _i_atomic_inc(owned->use_count);
     _c_MEMB(_drop)(self);
-    *self = arc;
+    *self = *owned;
+}
+
+// clone by sharing. Does not use i_keyclone, so OK to always define.
+STC_INLINE Self _c_MEMB(_clone)(Self owned) {
+    if (owned.use_count) _i_atomic_inc(owned.use_count);
+    return owned;
 }
 
 #if defined _i_has_cmp
     STC_INLINE int _c_MEMB(_raw_cmp)(const _m_raw* rx, const _m_raw* ry)
         { return i_cmp(rx, ry); }
-
-    STC_INLINE int _c_MEMB(_cmp)(const i_type* self, const i_type* other) {
-        _m_raw rx = i_keyto(self->get), ry = i_keyto(other->get);
-        return i_cmp((&rx), (&ry));
-    }
-#else
-    STC_INLINE int _c_MEMB(_cmp)(const i_type* self, const i_type* other)
-        { return c_default_cmp(&self->get, &other->get); }
 #endif
 
 #if defined _i_has_eq
     STC_INLINE bool _c_MEMB(_raw_eq)(const _m_raw* rx, const _m_raw* ry)
         { return i_eq(rx, ry); }
-
-    STC_INLINE bool _c_MEMB(_eq)(const i_type* self, const i_type* other) {
-        _m_raw rx = i_keyto(self->get), ry = i_keyto(other->get);
-        return i_eq((&rx), (&ry));
-    }
-#else
-    STC_INLINE bool _c_MEMB(_eq)(const i_type* self, const i_type* other)
-        { return self->get == other->get; }
 #endif
 
-#ifndef i_no_hash
-    STC_INLINE uint64_t _c_MEMB(_raw_hash)(const _m_raw* rx)
+#if !defined i_no_hash && defined _i_has_eq
+    STC_INLINE size_t _c_MEMB(_raw_hash)(const _m_raw* rx)
         { return i_hash(rx); }
-
-    STC_INLINE uint64_t _c_MEMB(_hash)(const i_type* self) {
-        _m_raw rx = i_keyto(self->get);
-        return i_hash((&rx));
-    }
-#else
-    STC_INLINE uint64_t _c_MEMB(_hash)(const i_type* self)
-        { return c_default_hash(&self->get); }
 #endif // i_no_hash
 
 #undef i_no_atomic
 #undef _i_atomic_inc
 #undef _i_atomic_dec_and_test
-#undef _i_carc
-#include "priv/template2.h"
+#undef _i_is_arc
 #include "priv/linkage2.h"
+#include "priv/template2.h"

@@ -1,6 +1,6 @@
 /* MIT License
  *
- * Copyright (c) 2023 Tyge Løvset
+ * Copyright (c) 2024 Tyge Løvset
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+// Queue. Implemented as a ring buffer.
 #include "priv/linkage.h"
 
 #ifndef STC_QUEUE_H_INCLUDED
@@ -27,7 +29,6 @@
 #include "common.h"
 #include "types.h"
 #include <stdlib.h>
-#include <string.h>
 #endif // STC_QUEUE_H_INCLUDED
 
 #ifndef _i_prefix
@@ -35,10 +36,5 @@
 #endif
 #include "priv/template.h"
 #include "priv/queue_prv.h"
-
-/* -------------------------- IMPLEMENTATION ------------------------- */
-#if defined i_implement || defined i_static
-#include "priv/queue_prv.c"
-#endif // IMPLEMENTATION
-#include "priv/template2.h"
 #include "priv/linkage2.h"
+#include "priv/template2.h"

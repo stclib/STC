@@ -30,10 +30,8 @@ THE SOFTWARE.
  * This is a extended version of regexp9, supporting UTF8 input, common
  * shorthand character classes, ++.
  */
-#include <stdbool.h>
-#include <string.h>
-#include "types.h" // csview, cstr types
 #include "common.h"
+#include "types.h" // csview, cstr types
 
 enum {
     CREG_DEFAULT = 0,
@@ -78,93 +76,95 @@ typedef struct {
 } cregex;
 
 typedef struct {
-    const cregex* re;
-    const char* input;
+    const cregex* regex;
+    csview input;
     csview match[CREG_MAX_CAPTURES];
 } cregex_iter;
 
-#define c_formatch(it, Re, Input) \
-    for (cregex_iter it = {Re, Input, {{0}}}; \
-         cregex_find_4(it.re, it.input, it.match, CREG_NEXT) == CREG_OK; )
+#define c_formatch(it, re, str) \
+    for (cregex_iter it = {.regex=re, .input={str}, .match={{0}}}; \
+         cregex_match_next(it.regex, it.input.buf, it.match) == CREG_OK && it.match[0].size; )
 
-STC_INLINE cregex cregex_init(void) {
+#define c_formatch_sv(it, re, strview) \
+    for (cregex_iter it = {.regex=re, .input=strview, .match={{0}}}; \
+         cregex_match_next_sv(it.regex, it.input, it.match) == CREG_OK && it.match[0].size; )
+
+/* compile a regex from a pattern. return CREG_OK, or negative error code on failure. */
+int cregex_compile_pro(cregex *re, const char* pattern, int cflags);
+
+STC_INLINE int cregex_compile(cregex* re, const char* pattern)
+    { return cregex_compile_pro(re, pattern, CREG_DEFAULT); }
+
+/* construct and return a regex from a pattern. return CREG_OK, or negative error code on failure. */
+STC_INLINE cregex cregex_make(const char* pattern, int cflags) {
     cregex re = {0};
+    cregex_compile_pro(&re, pattern, cflags);
     return re;
 }
+STC_INLINE cregex cregex_from(const char* pattern)
+    { return cregex_make(pattern, CREG_DEFAULT); }
 
-/* return CREG_OK, or negative error code on failure. */
-#define cregex_compile(...) c_MACRO_OVERLOAD(cregex_compile, __VA_ARGS__)
-#define cregex_compile_2(re, pattern) cregex_compile_3(re, pattern, CREG_DEFAULT)
-int cregex_compile_3(cregex *re, const char* pattern, int cflags);
-
-/* construct and return a regex from a pattern. */
-#define cregex_from(...) c_MACRO_OVERLOAD(cregex_from, __VA_ARGS__)
-#define cregex_from_1(pattern) cregex_from_2(pattern, CREG_DEFAULT)
-
-STC_INLINE cregex cregex_from_2(const char* pattern, int cflags) {
-    cregex re = {0};
-    cregex_compile_3(&re, pattern, cflags);
-    return re;
-}
 
 /* number of capture groups in a regex pattern, excluding the full match capture (0) */
 int cregex_captures(const cregex* re);
 
-/* return CREG_OK, CREG_NOMATCH or CREG_MATCHERROR. */
-#define cregex_find(...) c_MACRO_OVERLOAD(cregex_find, __VA_ARGS__)
-#define cregex_find_3(re, input, match) cregex_find_4(re, input, match, CREG_DEFAULT)
-int cregex_find_4(const cregex* re, const char* input, csview match[], int mflags);
 
-/* find with csview as input. */
-STC_INLINE int cregex_find_sv(const cregex* re, csview input, csview match[]) {
-    csview *mp = NULL;
-    if (match) { match[0] = input; mp = match; }
-    return cregex_find(re, input.buf, mp, CREG_STARTEND);
+/* return CREG_OK, CREG_NOMATCH or CREG_MATCHERROR. */
+int cregex_match_pro(const cregex* re, const char* input, csview match[], int mflags);
+
+STC_INLINE int cregex_match_sv(const cregex* re, csview input, csview match[]) {
+    match[0] = input;
+    return cregex_match_pro(re, input.buf, match, CREG_STARTEND);
+}
+
+STC_INLINE int cregex_match(const cregex* re, const char* input, csview match[])
+    { return cregex_match_pro(re, input, match, CREG_DEFAULT); }
+
+STC_INLINE bool cregex_is_match(const cregex* re, const char* input)
+    { return cregex_match_pro(re, input, NULL, CREG_DEFAULT) == CREG_OK; }
+
+STC_INLINE int cregex_match_next_sv(const cregex* re, csview input, csview match[]) {
+    if (match[0].buf) {
+        match[0].buf += match[0].size;
+        match[0].size = input.buf + input.size - match[0].buf;
+    }
+    return cregex_match_pro(re, input.buf, match, CREG_STARTEND);
+}
+
+STC_INLINE int cregex_match_next(const cregex* re, const char* input, csview match[]) {
+    return cregex_match_pro(re, input, match, CREG_NEXT);
 }
 
 /* match + compile RE pattern */
-#define cregex_find_pattern(...) c_MACRO_OVERLOAD(cregex_find_pattern, __VA_ARGS__)
-#define cregex_find_pattern_3(pattern, input, match) \
-    cregex_find_pattern_4(pattern, input, match, CREG_DEFAULT)
-int cregex_find_pattern_4(const char* pattern, const char* input,
-                          csview match[], int cmflags);
+int cregex_match_aio(const char* pattern, const char* input, csview match[]);
 
-STC_INLINE bool cregex_is_match(const cregex* re, const char* input)
-    { return cregex_find_4(re, input, NULL, CREG_DEFAULT) == CREG_OK; }
 
 /* replace csview input with replace using regular expression pattern */
-#define cregex_replace_sv(...) c_MACRO_OVERLOAD(cregex_replace_sv, __VA_ARGS__)
-#define cregex_replace_sv_3(pattern, input, replace) \
-    cregex_replace_sv_4(pattern, input, replace, INT32_MAX)
-#define cregex_replace_sv_4(pattern, input, replace, count) \
-    cregex_replace_sv_6(pattern, input, replace, count, NULL, CREG_DEFAULT)
-cstr cregex_replace_sv_6(const cregex* re, csview input, const char* replace, int count,
-                         bool (*transform)(int group, csview match, cstr* result), int rflags);
+cstr cregex_replace_pro(const cregex* re, csview input, const char* replace, int count,
+                        bool(*transform)(int group, csview match, cstr* result), int rflags);
 
-/* replace input with replace using regular expression */
-#define cregex_replace(...) c_MACRO_OVERLOAD(cregex_replace, __VA_ARGS__)
-#define cregex_replace_3(re, input, replace) cregex_replace_4(re, input, replace, INT32_MAX)
-
-STC_INLINE cstr cregex_replace_4(const cregex* re, const char* input, const char* replace, int count) {
+/* replace const char* input with replace using regular expression pattern */
+STC_INLINE cstr cregex_replace(const cregex* re, const char* input, const char* replace) {
     csview sv = {input, c_strlen(input)};
-    return cregex_replace_sv_4(re, sv, replace, count);
+    return cregex_replace_pro(re, sv, replace, INT32_MAX, NULL, CREG_DEFAULT);
 }
 
+
 /* replace + compile RE pattern, and extra arguments */
-#define cregex_replace_pattern(...) c_MACRO_OVERLOAD(cregex_replace_pattern, __VA_ARGS__)
-#define cregex_replace_pattern_3(pattern, input, replace) \
-    cregex_replace_pattern_4(pattern, input, replace, INT32_MAX)
-#define cregex_replace_pattern_4(pattern, input, replace, count) \
-    cregex_replace_pattern_6(pattern, input, replace, count, NULL, CREG_DEFAULT)
-cstr cregex_replace_pattern_6(const char* pattern, const char* input, const char* replace, int count,
-                              bool (*transform)(int group, csview match, cstr* result), int crflags);
+cstr cregex_replace_aio_pro(const char* pattern, csview input, const char* replace, int count,
+                            bool(*transform)(int group, csview match, cstr* result), int crflags);
+
+STC_INLINE cstr cregex_replace_aio(const char* pattern, const char* input, const char* replace) {
+    csview sv = {input, c_strlen(input)};
+    return cregex_replace_aio_pro(pattern, sv, replace, INT32_MAX, NULL, CREG_DEFAULT);
+}
 
 /* destroy regex */
 void cregex_drop(cregex* re);
 
 #endif // STC_CREGEX_H_INCLUDED
 
-#if defined i_implement || defined i_import
+#if defined STC_IMPLEMENT || defined i_implement || defined i_import
   #include "priv/linkage.h"
   #include "priv/cregex_prv.c"
   #if defined i_import

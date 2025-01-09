@@ -1,7 +1,7 @@
 
 /* MIT License
  *
- * Copyright (c) 2023 Tyge Løvset
+ * Copyright (c) 2024 Tyge Løvset
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,6 @@
  */
 
 /* cbox: heap allocated boxed type
-#define i_implement
 #include "stc/cstr.h"
 
 typedef struct { cstr name, email; } Person;
@@ -42,7 +41,7 @@ void Person_drop(Person* p) {
 }
 
 #define i_type PBox
-#define i_val_class Person // bind Person clone+drop fn's
+#define i_valclass Person // bind Person clone+drop fn's
 #include "stc/box.h"
 
 int main(void) {
@@ -63,7 +62,6 @@ int main(void) {
 #include "common.h"
 #include "types.h"
 #include <stdlib.h>
-#include <string.h>
 
 #define cbox_null {0}
 #endif // STC_BOX_H_INCLUDED
@@ -71,134 +69,102 @@ int main(void) {
 #ifndef _i_prefix
   #define _i_prefix box_
 #endif
-#define _i_cbox
+#define _i_is_box
 #include "priv/template.h"
 typedef i_keyraw _m_raw;
 
-#ifndef i_is_forward
-_c_DEFTYPES(_c_box_types, i_type, i_key);
+#ifndef i_declared
+_c_DEFTYPES(_c_box_types, Self, i_key);
 #endif
 
 // constructors (take ownership)
-STC_INLINE i_type _c_MEMB(_init)(void)
-    { return c_LITERAL(i_type){NULL}; }
+STC_INLINE Self _c_MEMB(_init)(void)
+    { return c_literal(Self){NULL}; }
 
-STC_INLINE long _c_MEMB(_use_count)(const i_type* self)
+STC_INLINE long _c_MEMB(_use_count)(const Self* self)
     { return (long)(self->get != NULL); }
 
-STC_INLINE i_type _c_MEMB(_from_ptr)(_m_value* p)
-    { return c_LITERAL(i_type){p}; }
 
 // c++: std::make_unique<i_key>(val)
-STC_INLINE i_type _c_MEMB(_make)(_m_value val) {
-    i_type box = {_i_alloc(_m_value)};
+STC_INLINE Self _c_MEMB(_make)(_m_value val) {
+    Self box = {_i_malloc(_m_value, 1)};
     *box.get = val;
     return box;
 }
 
-STC_INLINE _m_raw _c_MEMB(_toraw)(const i_type* self)
-    { return i_keyto(self->get); }
+STC_INLINE Self _c_MEMB(_from_ptr)(_m_value* p)
+    { return c_literal(Self){p}; }
+
+STC_INLINE Self _c_MEMB(_from)(_m_raw raw)
+    { return _c_MEMB(_make)(i_keyfrom(raw)); }
+
+STC_INLINE _m_raw _c_MEMB(_toraw)(const Self* self)
+    { return i_keytoraw(self->get); }
 
 // destructor
-STC_INLINE void _c_MEMB(_drop)(const i_type* cself) {
-    i_type* self = (i_type*)cself;
+STC_INLINE void _c_MEMB(_drop)(const Self* self) {
     if (self->get) {
         i_keydrop(self->get);
         i_free(self->get, c_sizeof *self->get);
     }
 }
 
-STC_INLINE i_type _c_MEMB(_move)(i_type* self) {
-    i_type box = *self;
+// move ownership to receiving box
+STC_INLINE Self _c_MEMB(_move)(Self* self) {
+    Self box = *self;
     self->get = NULL;
     return box;
 }
 
-STC_INLINE _m_value* _c_MEMB(_release)(i_type* self)
+// release owned pointer, must be manually freed by receiver
+STC_INLINE _m_value* _c_MEMB(_release)(Self* self)
     { return _c_MEMB(_move)(self).get; }
 
-STC_INLINE void _c_MEMB(_reset)(i_type* self) {
-    _c_MEMB(_drop)(self);
-    self->get = NULL;
-}
-
-// take ownership of p
-STC_INLINE void _c_MEMB(_reset_to)(i_type* self, _m_value* p) {
+// take ownership of pointer p
+STC_INLINE void _c_MEMB(_reset_to)(Self* self, _m_value* p) {
     _c_MEMB(_drop)(self);
     self->get = p;
 }
 
-#ifndef i_no_emplace
-STC_INLINE i_type _c_MEMB(_from)(_m_raw raw)
-    { return _c_MEMB(_make)(i_keyfrom(raw)); }
-#else
-STC_INLINE i_type _c_MEMB(_from)(_m_value val)
-    { return _c_MEMB(_make)(val); }
-#endif
+// take ownership of unowned box
+STC_INLINE void _c_MEMB(_take)(Self* self, Self unowned) {
+    _c_MEMB(_drop)(self);
+    *self = unowned;
+}
+
+// transfer ownership from other; set other to NULL
+STC_INLINE void _c_MEMB(_assign)(Self* self, Self* owned) {
+    if (owned->get == self->get)
+        return;
+    _c_MEMB(_drop)(self);
+    *self = *owned;
+    owned->get = NULL;
+}
 
 #if !defined i_no_clone
-    STC_INLINE i_type _c_MEMB(_clone)(i_type other) {
-        if (!other.get)
-            return other;
-        i_type out = {_i_alloc(_m_value)};
+    STC_INLINE Self _c_MEMB(_clone)(Self other) {
+        if (other.get == NULL) return other;
+        Self out = {_i_malloc(_m_value, 1)};
         *out.get = i_keyclone((*other.get));
         return out;
     }
 #endif // !i_no_clone
 
-// take ownership of unowned
-STC_INLINE void _c_MEMB(_take)(i_type* self, i_type unowned) {
-    _c_MEMB(_drop)(self);
-    *self = unowned;
-}
-// transfer ownership from moved; set moved to NULL
-STC_INLINE void _c_MEMB(_assign)(i_type* self, i_type* moved) {
-    if (moved->get == self->get)
-        return;
-    _c_MEMB(_drop)(self);
-    *self = *moved;
-    moved->get = NULL;
-}
 
 #if defined _i_has_cmp
     STC_INLINE int _c_MEMB(_raw_cmp)(const _m_raw* rx, const _m_raw* ry)
         { return i_cmp(rx, ry); }
-
-    STC_INLINE int _c_MEMB(_cmp)(const i_type* self, const i_type* other) {
-        _m_raw rx = i_keyto(self->get), ry = i_keyto(other->get);
-        return i_cmp((&rx), (&ry));
-    }
-#else
-    STC_INLINE int _c_MEMB(_cmp)(const i_type* self, const i_type* other)
-        { return c_default_cmp(&self->get, &other->get); }
 #endif
 
 #if defined _i_has_eq
     STC_INLINE bool _c_MEMB(_raw_eq)(const _m_raw* rx, const _m_raw* ry)
         { return i_eq(rx, ry); }
-
-    STC_INLINE bool _c_MEMB(_eq)(const i_type* self, const i_type* other) {
-        _m_raw rx = i_keyto(self->get), ry = i_keyto(other->get);
-        return i_eq((&rx), (&ry));
-    }
-#else
-    STC_INLINE bool _c_MEMB(_eq)(const i_type* self, const i_type* other)
-        { return self->get == other->get; }
 #endif
 
-#ifndef i_no_hash
-    STC_INLINE uint64_t _c_MEMB(_raw_hash)(const _m_raw* rx)
+#if !defined i_no_hash && defined _i_has_eq
+    STC_INLINE size_t _c_MEMB(_raw_hash)(const _m_raw* rx)
         { return i_hash(rx); }
-
-    STC_INLINE uint64_t _c_MEMB(_hash)(const i_type* self) {
-        _m_raw rx = i_keyto(self->get);
-        return i_hash((&rx));
-    }
-#else
-    STC_INLINE uint64_t _c_MEMB(_hash)(const i_type* self)
-        { return c_default_hash(&self->get); }
 #endif // i_no_hash
-
-#undef _i_cbox
-#include "priv/template2.h"
+#undef _i_is_box
 #include "priv/linkage2.h"
+#include "priv/template2.h"
