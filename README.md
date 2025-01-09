@@ -3,11 +3,9 @@
 
 # STC - Smart Template Containers
 
-## Release 5.0
-STC is a *modern*, *typesafe* and *fast* templated general purpose container and algorithms
-library for C99. It aims to make C-programming even more fun, more productive, and safer
-by encouraging usage of loop abstractions, high-level generic datatypes, iterators and
-algorithms, and through a consistent handling of object ownership and lifetimes.
+## Pre-release 5.0
+STC is a comprehensive, modern, typesafe and fast templated general purpose container and algorithms
+library for C99. It aims to make C-programming even more fun, more productive and safer.
 
 <details>
 <summary><b>Version 5.0 NEWS</b></summary>
