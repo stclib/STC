@@ -27,7 +27,7 @@ descriptive and reduces chances of making mistakes. It is generally easier to re
 #define i_type IMap, int, int
 #include "stc/smap.h"
 // ...
-IMap map = c_make(IMap, {{23,1}, {3,2}, {7,3}, {5,4}, {12,5}});
+IMap map = c_make(IMap, { {23,1}, {3,2}, {7,3}, {5,4}, {12,5} });
 
 c_foreach (i, IMap, map)
     printf(" %d", i.ref->first);
