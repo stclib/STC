@@ -286,6 +286,7 @@ In this example we use keyraw feature to make it simpler to use and avoids the c
 entirely when doing lookup.
 
 [ [Run this code](https://godbolt.org/z/Yx1Ybhxqv) ]
+<!--{%raw%}-->
 ```c++
 #include "stc/cstr.h"
 
@@ -340,9 +341,9 @@ Viking_raw Viking_toraw(const Viking* vp) {
 int main(void)
 {
     Vikings vikings = c_make(Vikings, {
-        { {"Einar", "Norway"}, 25},
-        { {"Olaf", "Denmark"}, 24},
-        { {"Harald", "Iceland"}, 12},
+        {{"Einar", "Norway"}, 25},
+        {{"Olaf", "Denmark"}, 24},
+        {{"Harald", "Iceland"}, 12},
     });
 
     // Now lookup is using Viking_raw, not Viking:
@@ -355,3 +356,4 @@ int main(void)
     Vikings_drop(&vikings);
 }
 ```
+<!--{%endraw%}-->

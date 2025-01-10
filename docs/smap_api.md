@@ -192,6 +192,7 @@ int main(void)
 This example uses a smap with cstr as mapped value. Note the `i_valpro` usage.
 
 [ [Run this code](https://godbolt.org/z/M397fG7fM) ]
+<!--{%raw%}-->
 ```c++
 #include "stc/cstr.h"
 
@@ -203,7 +204,7 @@ This example uses a smap with cstr as mapped value. Note the `i_valpro` usage.
 int main(void)
 {
     uint32_t col = 0xcc7744ff;
-    IdMap idnames = c_make(IdMap, { {100, "Red"}, {110, "Blue"}});
+    IdMap idnames = c_make(IdMap, {{100, "Red"}, {110, "Blue"}});
 
     // Assign/overwrite an existing mapped value with a const char*
     IdMap_emplace_or_assign(&idnames, 110, "White");
@@ -220,6 +221,7 @@ int main(void)
     IdMap_drop(&idnames);
 }
 ```
+<!--{%endraw%}-->
 
 ### Example 4
 Demonstrate smap with plain-old-data key type Vec3i and int as mapped type: smap<Vec3i, int>.

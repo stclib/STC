@@ -22,12 +22,12 @@ descriptive and reduces chances of making mistakes. It is generally easier to re
 | `c_foreach_reverse (it, ctype, it1, it2)`| Iteratate range [it1, it2) elements in reverse. |
 | `c_foreach_n (it, ctype, container, n)`| Iteratate `n` first elements. Index variable is `{it}_index`. |
 | `c_foreach_kv (key, val, ctype, container)` | Iterate maps with "structured binding" |
-
+<!--{%raw%}-->
 ```c++
 #define i_type IMap, int, int
 #include "stc/smap.h"
 // ...
-IMap map = c_make(IMap, { {23,1}, {3,2}, {7,3}, {5,4}, {12,5}});
+IMap map = c_make(IMap, {{23,1}, {3,2}, {7,3}, {5,4}, {12,5}});
 
 c_foreach (i, IMap, map)
     printf(" %d", i.ref->first);
@@ -52,25 +52,28 @@ c_foreach_n (i, IMap, map, 3)
 c_foreach_kv (id, count, IMap, map)
     printf(" (%d %d)", *id, *count);
 ```
+<!--{%endraw%}-->
 </details>
 <details>
 <summary><b>c_foritems</b> - Literal list iteration</summary>
 
 ### c_foritems
 Iterate compound literal array elements. In addition to `i.ref`, you can access `i.index` and `i.size`.
+<!--{%raw%}-->
 ```c++
 // apply multiple push_backs
 c_foritems (i, int, {4, 5, 6, 7})
     list_i_push_back(&lst, *i.ref);
 
 // insert in existing map
-c_foritems (i, hmap_ii_value, { {4, 5}, {6, 7}})
+c_foritems (i, hmap_ii_value, {{4, 5}, {6, 7}})
     hmap_ii_insert(&map, i.ref->first, i.ref->second);
 
 // string literals pushed to a stack of cstr elements:
 c_foritems (i, const char*, {"Hello", "crazy", "world"})
     stack_cstr_emplace(&stk, *i.ref);
 ```
+<!--{%endraw%}-->
 </details>
 
 ## Integer range loops
@@ -405,6 +408,7 @@ These work on any container. *c_make()* may also be used for **cspan** views.
 - **c_drop** - drop (destroy) multiple containers of the same type
 
 [ [Run this code](https://godbolt.org/z/K9Y5EMGxM) ]
+<!--{%raw%}-->
 ```c++
 #include <stdio.h>
 #define i_type Vec, int
@@ -424,10 +428,10 @@ c_func (split_map,(Map map), ->, struct {Vec keys, values;}) {
 
 int main(void) {
     Vec vec = c_make(Vec, {1, 2, 3, 4, 5, 6});
-    Map map = c_make(Map, { {1, 2}, {3, 4}, {5, 6}});
+    Map map = c_make(Map, {{1, 2}, {3, 4}, {5, 6}});
 
     c_push(Vec, &vec, {7, 8, 9, 10, 11, 12});
-    c_push(Map, &map, { {7, 8}, {9, 10}, {11, 12}});
+    c_push(Map, &map, {{7, 8}, {9, 10}, {11, 12}});
 
     c_foreach (i, Vec, vec)
         printf("%d ", *i.ref);
@@ -447,6 +451,7 @@ int main(void) {
     c_drop(Map, &map);
 }
 ```
+<!--{%endraw%}-->
 </details>
 <details>
 <summary><b>c_find, c_copy, c_erase</b> - Container operations with custom predicate</summary>
@@ -474,6 +479,7 @@ Copy linearily in containers using a predicate. `value` is a pointer to each ele
 Erase linearily in containers using a predicate. `value` is a pointer to each element in predicate.
 - `c_erase_if(CntType, cnt_ptr, pred)`. Use with **list**, **hmap**, **hset**, **smap**, and **sset**.
 - `c_eraseremove_if(CntType, cnt_ptr, pred)`. Use with **stack**, **vec**, **deque**, and **queue** only.
+<!--{%raw%}-->
 ```c++
 #include <stdio.h>
 #include "stc/cstr.h"
@@ -521,7 +527,7 @@ int main(void)
     puts("");
 
     // Search a sorted map from it1, for the first string containing "hello" and erase it:
-    Map map = c_make(Map, { {"yes",1}, {"no",2}, {"say hello from me",3}, {"goodbye",4}});
+    Map map = c_make(Map, {{"yes",1}, {"no",2}, {"say hello from me",3}, {"goodbye",4}});
     Map_iter res, it1 = Map_begin(&map);
 
     c_find_if(Map, it1, Map_end(&map), &res, cstr_contains(&value->first, "hello"));
@@ -536,6 +542,7 @@ int main(void)
     Map_drop(&map);
 }
 ```
+<!--{%endraw%}-->
 </details>
 <details>
 <summary><b>c_all_of, c_any_of, c_none_of</b> - Boolean container operations</summary>

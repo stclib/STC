@@ -295,6 +295,7 @@ int main(void)
 This example uses four different container types:
 
 [ [Run this code](https://godbolt.org/z/n1z16bdTr) ]
+<!--{%raw%}-->
 ```c++
 #include <stdio.h>
 
@@ -329,8 +330,8 @@ int main(void)
     ){
         enum{N = 5};
         int nums[N] = {10, 20, 30, 40, 50};
-        struct Point pts[N] = { {10, 1}, {20, 2}, {30, 3}, {40, 4}, {50, 5}};
-        int pairs[N][2] = { {20, 2}, {10, 1}, {30, 3}, {40, 4}, {50, 5}};
+        struct Point pts[N] = {{10, 1}, {20, 2}, {30, 3}, {40, 4}, {50, 5}};
+        int pairs[N][2] = {{20, 2}, {10, 1}, {30, 3}, {40, 4}, {50, 5}};
 
         // Add some elements to each container
         for (int i = 0; i < N; ++i) {
@@ -375,7 +376,7 @@ int main(void)
     }
 }
 ```
-
+<!--{%endraw%}-->
 Output
 ```
 Found: 20, (20, 2), 20, [20: 2]
