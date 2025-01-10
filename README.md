@@ -440,6 +440,7 @@ The container template parameters are specified with a `#define i_xxxx` statemen
 strictly required. Each templated type instantiation requires an `#include` statement, even if the
 same container base type was included earlier. Possible template parameters are:
 
+### Basic template parameters
 - `i_type` *ContType*, *KeyType*[, *ValType*] is a shorthand for defining ***i_type***, ***i_key*** (and ***i_val***)
  individually, as described next.
 - `i_type` *ContType* - Custom container type name.
@@ -462,13 +463,14 @@ Key (element / lookup type):
 Val (mapped value type - for maps):
 - These are analogues to the Key parameters, i.e. `i_valdrop`, `i_valclone`, `i_valraw`, etc.
 
+### Meta template parameters
 The following meta-template parameters can be specified instead of ***i_key***, ***i_val***, and ***i_keyraw***.
 These parameters make types into "classes" in the sense that they bind associated function names to the primary
-template parameters described above. This reduces boiler-plate code, clutter, and simplifies the management
+template parameters described above. This reduces boiler-plate code and simplifies the management
 of non-trivial container elements. Note that many basic template parameters will defined when defining the
 following parameters, but the user may override them when needed. E.g. defining the template parameters directly
 as function macros instead of referring to C function names.
-- Key parameters:
+- Key meta parameters:
     - `i_rawclass` *RawType* - Defines ***i_keyraw*** and binds *RawType_cmp()*, *RawType_eq()*, *RawType_hash()*
       to ***i_cmp***, ***i_eq***, and ***i_hash***.
         - If neither ***i_key*** nor ***i_keyclass*** are defined, ***i_key*** is defined as *RawType*.
@@ -482,7 +484,7 @@ as function macros instead of referring to C function names.
         - ***i_rawclass*** *KeyType*_***raw***.
         - ***i_keyclass*** *KeyType*
         - I.e. `i_key`, `i_keyclone`, `i_keydrop`, `i_keyraw`, `i_keyfrom`, `i_keytoraw`, `i_cmp`, `i_eq`, `i_hash` will all be defined/bound.
-- Val (mapped) parameters:
+- Val (mapped) meta parameters:
     - `i_valclass` *MappedType* - Analogous to the ***i_keyclass*** parameter.
     - `i_valpro` *MappedType* - Comparison functions are not relevant for the mapped type, so this defines
         - ***i_valraw*** *MappedType*_***raw***
