@@ -203,7 +203,7 @@ This example uses a smap with cstr as mapped value. Note the `i_valpro` usage.
 int main(void)
 {
     uint32_t col = 0xcc7744ff;
-    IdMap idnames = c_make(IdMap, {{100, "Red"}, {110, "Blue"}});
+    IdMap idnames = c_make(IdMap, { {100, "Red"}, {110, "Blue"}});
 
     // Assign/overwrite an existing mapped value with a const char*
     IdMap_emplace_or_assign(&idnames, 110, "White");

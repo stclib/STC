@@ -410,11 +410,11 @@ int start(cco_task* self, cco_runtime* rt) {
 int main(void)
 {
     Subtasks env = {
-        {{taskA}, 42},
-        {{taskB}, 3.1415},
-        {{taskC}, 1.2f, 3.4f},
+        { {taskA}, 42},
+        { {taskB}, 3.1415},
+        { {taskC}, 1.2f, 3.4f},
     };
-    cco_task task = {{start}};
+    cco_task task = { {start}};
 
     int count = 0;
     cco_run_task(&task, &env) { ++count; }
@@ -471,7 +471,7 @@ int taskC(struct TaskC* self, cco_runtime* rt) {
 int taskB(struct TaskB* self, cco_runtime* rt) {
     cco_routine (self) {
         printf("TaskB start: %g\n", self->d);
-        cco_await_task(c_new(struct TaskC, {{taskC}, 1.2f, 3.4f}), rt);
+        cco_await_task(c_new(struct TaskC, { {taskC}, 1.2f, 3.4f}), rt);
         puts("TaskB work");
         ((Result *)rt->env)->value += self->d;
 
@@ -485,7 +485,7 @@ int taskB(struct TaskB* self, cco_runtime* rt) {
 int taskA(struct TaskA* self, cco_runtime* rt) {
     cco_routine (self) {
         printf("TaskA start: %d\n", self->a);
-        cco_await_task(c_new(struct TaskB, {{taskB}, 3.1415}), rt);
+        cco_await_task(c_new(struct TaskB, { {taskB}, 3.1415}), rt);
         puts("TaskA work");
         ((Result *)rt->env)->value += self->a; // final return value;
 
@@ -505,7 +505,7 @@ int taskA(struct TaskA* self, cco_runtime* rt) {
 int start(cco_task* self, cco_runtime* rt) {
     cco_routine (self) {
         puts("start");
-        cco_await_task(c_new(struct TaskA, {{taskA}, 42}), rt);
+        cco_await_task(c_new(struct TaskA, { {taskA}, 42}), rt);
 
         cco_finally:
         puts("done");
@@ -516,7 +516,7 @@ int start(cco_task* self, cco_runtime* rt) {
 
 int main(void)
 {
-    cco_task* task = c_new(cco_task, {{start}});
+    cco_task* task = c_new(cco_task, { {start}});
 
     int count = 0;
     Result result = {0};

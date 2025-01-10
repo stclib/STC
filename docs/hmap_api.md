@@ -340,9 +340,9 @@ Viking_raw Viking_toraw(const Viking* vp) {
 int main(void)
 {
     Vikings vikings = c_make(Vikings, {
-        {{"Einar", "Norway"}, 25},
-        {{"Olaf", "Denmark"}, 24},
-        {{"Harald", "Iceland"}, 12},
+        { {"Einar", "Norway"}, 25},
+        { {"Olaf", "Denmark"}, 24},
+        { {"Harald", "Iceland"}, 12},
     });
 
     // Now lookup is using Viking_raw, not Viking:

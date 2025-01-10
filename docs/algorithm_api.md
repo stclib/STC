@@ -27,7 +27,7 @@ descriptive and reduces chances of making mistakes. It is generally easier to re
 #define i_type IMap, int, int
 #include "stc/smap.h"
 // ...
-IMap map = c_make(IMap, { {23,1}, {3,2}, {7,3}, {5,4}, {12,5} });
+IMap map = c_make(IMap, { {23,1}, {3,2}, {7,3}, {5,4}, {12,5}});
 
 c_foreach (i, IMap, map)
     printf(" %d", i.ref->first);
@@ -64,7 +64,7 @@ c_foritems (i, int, {4, 5, 6, 7})
     list_i_push_back(&lst, *i.ref);
 
 // insert in existing map
-c_foritems (i, hmap_ii_value, {{4, 5}, {6, 7}})
+c_foritems (i, hmap_ii_value, { {4, 5}, {6, 7}})
     hmap_ii_insert(&map, i.ref->first, i.ref->second);
 
 // string literals pushed to a stack of cstr elements:
@@ -424,10 +424,10 @@ c_func (split_map,(Map map), ->, struct {Vec keys, values;}) {
 
 int main(void) {
     Vec vec = c_make(Vec, {1, 2, 3, 4, 5, 6});
-    Map map = c_make(Map, {{1, 2}, {3, 4}, {5, 6}});
+    Map map = c_make(Map, { {1, 2}, {3, 4}, {5, 6}});
 
     c_push(Vec, &vec, {7, 8, 9, 10, 11, 12});
-    c_push(Map, &map, {{7, 8}, {9, 10}, {11, 12}});
+    c_push(Map, &map, { {7, 8}, {9, 10}, {11, 12}});
 
     c_foreach (i, Vec, vec)
         printf("%d ", *i.ref);
@@ -521,7 +521,7 @@ int main(void)
     puts("");
 
     // Search a sorted map from it1, for the first string containing "hello" and erase it:
-    Map map = c_make(Map, {{"yes",1}, {"no",2}, {"say hello from me",3}, {"goodbye",4}});
+    Map map = c_make(Map, { {"yes",1}, {"no",2}, {"say hello from me",3}, {"goodbye",4}});
     Map_iter res, it1 = Map_begin(&map);
 
     c_find_if(Map, it1, Map_end(&map), &res, cstr_contains(&value->first, "hello"));
