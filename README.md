@@ -28,10 +28,10 @@ See also [version history](#version-history) for breaking changes in V5.0.
 <summary><b>Reasons why you want to you use STC</b></summary>
 C is still among the most popular programming languages, despite the fact that it was created
 as early as in 1972. That is a manifestation of how well the language was designed for its time,
-and still is. However, times are changing, and C is starting to lag behind many of the
-new upcoming system languages like Zig, Odin and Rust with regard to features in
-the standard library, but also when it comes to safety and vulnerabilities. STC aims to bridge
-some of that gap, to let us have common modern features and added safety, while we still can write C.
+and still is. However, times are changing, and C is starting to lag behind many of the new upcoming
+system languages like Zig, Odin and Rust with regard to features in the standard library, but also
+when it comes to safety and vulnerabilities. STC aims to bridge some of that gap, to let us have
+common modern features and added safety, while we still can enjoy writing C.
 
 #### A. Missing features in the C standard library, which STC provides
 * A wide set of high performance, generic/templated typesafe container types, including smart pointers and bitsets.
@@ -106,88 +106,53 @@ Algorithms
 - **Dual mode compilation** - By default it is a header-only library with inline and static methods, but you can easily switch to create a shared library without changing existing source files. Non-generic types, like (utf8) strings are compiled with external linking. one See the [installation section](#installation).
 - **No callback functions** - All passed template argument functions/macros are directly called from the implementation, no slow callbacks which requires storage.
 - **Compiles with C++ and C99** - C code can be compiled with C++ (container element types must be POD).
-- **Forward declaration** - Templated containers may be [forward declared](#forward-declarations) without including the full API/implementation.
+- **Pre-declaration** - Templated containers may be [pre-declared](#pre-declarations) without including the full API/implementation.
 - **Extendable containers** - STC provides a mechanism to wrap containers inside a struct with [custom data per instance](#per-container-instance-customization).
 
 </details>
 <details>
-<summary>Unique features of STC</summary>
+<summary>Installation</summary>
 
-## Unique features of STC
+## Installation
 
-1. ***Centralized analysis of template parameters***. The analyser assigns values to all
-non-specified template parameters using meta-programming. You may specify a set of "standard"
-template parameters for each container, but as a minimum *only one is required*: `i_type` or
-`i_key` (+ `i_val` for maps). In this case, STC assumes that the elements are of basic types.
-For non-trivial types, additional template parameters must be given.
-2. ***Alternative lookup and insert type***. Specify an alternative type to use for
-lookup in containers. E.g., containers with STC string elements (**cstr**) uses `const char*`
-as lookup type. Therefore it is not needed to construct (or destroy) a `cstr` in order
-to lookup a **cstr** object. Also, one may pass a c-string literal to one of the
-***emplace***-functions to implicitly insert a cstr object, i.e. `vec_cstr_emplace(&vec, "Hello")`
-as an alternative to `vec_cstr_push(&vec, cstr_from("Hello"))`.
-3. ***Standardized container iterators***. All containers can be iterated in the same manner, and all use the
-same element access syntax. The following works for single-element type containers, e.g a linked list:
-```c++
-#define i_type MyInts, int
-#include "stc/list.h"
-...
-MyInts ints = c_make(MyInts, {3, 5, 9, 7, 2});
-c_foreach (it, MyInts, ints) *it.ref += 42;
+STC uses meson build system. Make sure to have meson and ninja installed, e.g. as a python pip package from a bash shell:
+```bash
+pip install meson ninja
+export LIBRARY_PATH=$LIBRARY_PATH:~/.local/lib
+export CPATH=$CPATH:~/.local/include
+export CC=gcc
 ```
-</details>
-<details>
-<summary>Performance</summary>
-
-## Performance
-
-STC is a fast and memory efficient library, and code compiles fast:
-
-![Benchmark](docs/pics/Figure_1.png)
-
-Benchmark notes:
-- The barchart shows average test times over three compilers: **Mingw64 13.1.0, Win-Clang 16.0.5, VC-19-36**. CPU: **Ryzen 7 5700X**.
-- Containers uses value types `uint64_t` and pairs of `uint64_t` for the maps.
-- Black bars indicates performance variation between various platforms/compilers.
-- Iterations and access are repeated 4 times over n elements.
-- access: no entryfor *forward_list*, *deque*, and *vector* because these c++ containers does not have native *find()*.
-- **deque**: *insert*: n/3 push_front(), n/3 push_back()+pop_front(), n/3 push_back().
-- **map and unordered map**: *insert*: n/2 random numbers, n/2 sequential numbers. *erase*: n/2 keys in the map, n/2 random keys.
-</details>
-<details>
-<summary>Naming rules</summary>
-
-## Naming rules
-
-- Naming conventions
-    - Non-templated container names are prefixed by `c`, e.g. `cstr`, `cbits`, `cregex`.
-    - Public STC macros and "keywords" are prefixed by `c_`, e.g. `c_foreach`, `c_make`.
-    - Template parameter macros are prefixed by `i_`, e.g. `i_key`, `i_type`.
-    - All owning containers can be initialized with `{0}` (also `cstr`), i.e. no heap allocation initially.
-
-- Common types for any container type Cont:
-    - Cont
-    - Cont_value
-    - Cont_raw
-    - Cont_iter
-
-- Functions available for most all containers:
-    - Cont_init()
-    - Cont_with_n(rawvals[], n)
-    - Cont_reserve(Cont*, capacity)
-    - Cont_clone(Cont)
-    - Cont_drop(Cont*)
-    - Cont_size(Cont*)
-    - Cont_is_empty(Cont*)
-    - Cont_push(Cont*, value)
-    - Cont_put_n(Cont*, rawvals[], n)
-    - Cont_erase_at(Cont*, Cont_iter)
-    - Cont_front(Cont*)
-    - Cont_back(Cont*)
-    - Cont_begin(Cont*)
-    - Cont_end(Cont*)
-    - Cont_next(Cont_iter*)
-    - Cont_advance(Cont_iter, n)
+To create a build folder and to set the install folder to e.g. ~/.local:
+```bash
+meson setup --buildtype debug build --prefix ~/.local
+cd build
+ninja
+ninja install
+```
+STC is mixed *"headers-only"* / traditional library, i.e the templated container headers (and the *sort*/*lower_bound*
+algorithms) can simply be included - they have no library dependencies. By default, all templated functions are
+static (many inlined). This is often optimal for both performance and compiled binary size. However, for frequently
+used container type instances (more than 2-3 TUs), consider creating a separate header file for them, e.g.:
+```c++
+// intvec.h
+#ifndef INTVEC_H_
+#define INTVEC_H_
+#define i_header // header definitions only
+#define i_type intvec, int
+#include "stc/vec.h"
+#endif
+```
+So anyone may use the shared vec-type. Implement the shared functions in one C file (if several containers are shared,
+you may define STC_IMPLEMENT on top of the file once instead).
+```c++
+// shared.c
+#define i_implement // implement the shared intvec.
+#include "intvec.h"
+```
+The non-templated types  **cstr**, **csview**, **cregex**, **cspan** and **random**, are built as a library (libstc),
+and is using the ***meson*** build system. However, the most common functions in **csview** and **random** are inlined.
+The bitset **cbits**, the zero-terminated string view **zsview** and **algorthm** are all fully inlined and need no
+linking with the stc-library.
 </details>
 <details>
 <summary>Usage</summary>
@@ -377,59 +342,85 @@ int main(void)
 }
 ```
 <!--{%endraw%}-->
-Output
-```
-Found: 20, (20, 2), 20, [20: 2]
-After erasing the elements found:
- set: 40 10 30 50
- vec: (10, 1) (30, 3) (40, 4) (50, 5)
- lst: 10 30 40 50
- map: [10: 1] [30: 3] [40: 4] [50: 5]
+</details>
+<details>
+<summary>Performance</summary>
+
+## Performance
+
+STC is a fast and memory efficient library, and code compiles fast:
+
+![Benchmark](docs/pics/Figure_1.png)
+
+Benchmark notes:
+- The barchart shows average test times over three compilers: **Mingw64 13.1.0, Win-Clang 16.0.5, VC-19-36**. CPU: **Ryzen 7 5700X**.
+- Containers uses value types `uint64_t` and pairs of `uint64_t` for the maps.
+- Black bars indicates performance variation between various platforms/compilers.
+- Iterations and access are repeated 4 times over n elements.
+- access: no entryfor *forward_list*, *deque*, and *vector* because these c++ containers does not have native *find()*.
+- **deque**: *insert*: n/3 push_front(), n/3 push_back()+pop_front(), n/3 push_back().
+- **map and unordered map**: *insert*: n/2 random numbers, n/2 sequential numbers. *erase*: n/2 keys in the map, n/2 random keys.
+</details>
+<details>
+<summary>Some unique features of STC</summary>
+
+## Some unique features of STC
+
+1. ***Centralized analysis of template parameters***. The analyser assigns values to all
+non-specified template parameters using meta-programming. You may specify a set of "standard"
+template parameters for each container, but as a minimum *only one is required*: `i_type` or
+`i_key` (+ `i_val` for maps). In this case, STC assumes that the elements are of basic types.
+For non-trivial types, additional template parameters must be given.
+2. ***Alternative lookup and insert type***. Specify an alternative type to use for
+lookup in containers. E.g., containers with STC string elements (**cstr**) uses `const char*`
+as lookup type. Therefore it is not needed to construct (or destroy) a `cstr` in order
+to lookup a **cstr** object. Also, one may pass a c-string literal to one of the
+***emplace***-functions to implicitly insert a cstr object, i.e. `vec_cstr_emplace(&vec, "Hello")`
+as an alternative to `vec_cstr_push(&vec, cstr_from("Hello"))`.
+3. ***Standardized container iterators***. All containers can be iterated in the same manner, and all use the
+same element access syntax. The following works for single-element type containers, e.g a linked list:
+```c++
+#define i_type MyInts, int
+#include "stc/list.h"
+...
+MyInts ints = c_make(MyInts, {3, 5, 9, 7, 2});
+c_foreach (it, MyInts, ints) *it.ref += 42;
 ```
 </details>
 <details>
-<summary>Installation</summary>
+<summary>Naming rules</summary>
 
-## Installation
+## Naming rules
 
-STC uses meson build system. Make sure to have meson and ninja installed, e.g. as a python pip package from a bash shell:
-```bash
-pip install meson ninja
-export LIBRARY_PATH=$LIBRARY_PATH:~/.local/lib
-export CPATH=$CPATH:~/.local/include
-export CC=gcc
-```
-To create a build folder and to set the install folder to e.g. ~/.local:
-```bash
-meson setup --buildtype debug build --prefix ~/.local
-cd build
-ninja
-ninja install
-```
-STC is mixed *"headers-only"* / traditional library, i.e the templated container headers (and the *sort*/*lower_bound*
-algorithms) can simply be included - they have no library dependencies. By default, all templated functions are
-static (many inlined). This is often optimal for both performance and compiled binary size. However, for frequently
-used container type instances (more than 2-3 TUs), consider creating a separate header file for them, e.g.:
-```c++
-// intvec.h
-#ifndef INTVEC_H_
-#define INTVEC_H_
-#define i_header // header definitions only
-#define i_type intvec, int
-#include "stc/vec.h"
-#endif
-```
-So anyone may use the shared vec-type. Implement the shared functions in one C file (if several containers are shared,
-you may define STC_IMPLEMENT on top of the file once instead).
-```c++
-// shared.c
-#define i_implement // implement the shared intvec.
-#include "intvec.h"
-```
-The non-templated types  **cstr**, **csview**, **cregex**, **cspan** and **random**, are built as a library (libstc),
-and is using the ***meson*** build system. However, the most common functions in **csview** and **random** are inlined.
-The bitset **cbits**, the zero-terminated string view **zsview** and **algorthm** are all fully inlined and need no
-linking with the stc-library.
+- Naming conventions
+    - Non-templated container names are prefixed by `c`, e.g. `cstr`, `cbits`, `cregex`.
+    - Public STC macros and "keywords" are prefixed by `c_`, e.g. `c_foreach`, `c_make`.
+    - Template parameter macros are prefixed by `i_`, e.g. `i_key`, `i_type`.
+    - All owning containers can be initialized with `{0}` (also `cstr`), i.e. no heap allocation initially.
+
+- Common types for any container type Cont:
+    - Cont
+    - Cont_value
+    - Cont_raw
+    - Cont_iter
+
+- Functions available for most all containers:
+    - Cont_init()
+    - Cont_with_n(rawvals[], n)
+    - Cont_reserve(Cont*, capacity)
+    - Cont_clone(Cont)
+    - Cont_drop(Cont*)
+    - Cont_size(Cont*)
+    - Cont_is_empty(Cont*)
+    - Cont_push(Cont*, value)
+    - Cont_put_n(Cont*, rawvals[], n)
+    - Cont_erase_at(Cont*, Cont_iter)
+    - Cont_front(Cont*)
+    - Cont_back(Cont*)
+    - Cont_begin(Cont*)
+    - Cont_end(Cont*)
+    - Cont_next(Cont_iter*)
+    - Cont_advance(Cont_iter, n)
 </details>
 <details>
 <summary>Defining template parameters</summary>
@@ -452,7 +443,7 @@ same container base type was included earlier. Possible template parameters are:
 - `i_hash` *Func* - Hash function taking *i_keyraw*\* - defaults to *c_default_hash*. **[required for]**
 ***hmap/hset*** with non-POD *i_keyraw* elements.
 
-Key (element / lookup type):
+#### Key (element lookup type):
 - `i_keydrop` *Func* - Destroy key - defaults to empty destructor.
 - `i_keyclone` *Func* - **[required if]** *i_keydrop* is defined (exception for **arc**, as it shares).
 - Advanced, convertion between an alternative input type:
@@ -460,43 +451,47 @@ Key (element / lookup type):
     - `i_keyfrom` *Func* - Convertion func from *i_keyraw* to *i_key*.
     - `i_keytoraw` *Func*  - Convertion func to *i_keyraw* from *i_key*. **[required if]** *i_keyraw* is defined
 
-Val (mapped value type - for maps):
+#### Val (mapped value type for maps):
 - These are analogues to the Key parameters, i.e. `i_valdrop`, `i_valclone`, `i_valraw`, etc.
+
+---
 
 ### Meta template parameters
 The following meta-template parameters can be specified instead of ***i_key***, ***i_val***, and ***i_keyraw***.
-These parameters make types into "classes" in the sense that they bind associated function names to the primary
+These parameters make types into "classes" in the sense that they bind associated function names to the basic
 template parameters described above. This reduces boiler-plate code and simplifies the management
-of non-trivial container elements. Note that many basic template parameters will defined when defining the
-following parameters, but the user may override them when needed. E.g. defining the template parameters directly
-as function macros instead of referring to C function names.
-- Key meta parameters:
-    - `i_rawclass` *RawType* - Defines ***i_keyraw*** and binds *RawType_cmp()*, *RawType_eq()*, *RawType_hash()*
-      to ***i_cmp***, ***i_eq***, and ***i_hash***.
-        - If neither ***i_key*** nor ***i_keyclass*** are defined, ***i_key*** is defined as *RawType*.
-        - Useful for containers of views (like csview).
-    - `i_keyclass` *KeyType* - Defines ***i_key*** and binds standard named functions *KeyType_clone()* and
-    *KeyType_drop()* to ***i_keyclone*** / ***i_keydrop***. If `i_keyraw` is also specified, *KeyType_from()*
-    and *KeyType_toraw()* are bound to ***i_keyfrom*** / ***i_keytoraw***.
-        - Use with container of containers, or in general when the element type has *_clone()* and *_drop()* "member" functions.
-    - `i_keypro` *KeyType* - Use with "pro"-element types, i.e. library types like **cstr**, **box** and **arc**.
-    It combines all the ***i_keyclass*** and ***i_rawclass*** properties. Defining ***i_keypro*** is like defining
-        - ***i_rawclass*** *KeyType*_***raw***.
-        - ***i_keyclass*** *KeyType*
-        - I.e. `i_key`, `i_keyclone`, `i_keydrop`, `i_keyraw`, `i_keyfrom`, `i_keytoraw`, `i_cmp`, `i_eq`, `i_hash` will all be defined/bound.
-- Val (mapped) meta parameters:
-    - `i_valclass` *MappedType* - Analogous to the ***i_keyclass*** parameter.
-    - `i_valpro` *MappedType* - Comparison functions are not relevant for the mapped type, so this defines
-        - ***i_valraw*** *MappedType*_***raw***
-        - ***i_valclass*** *MappedType*
-        - I.e. `i_val`, `i_valclone`, `i_valdrop`, `i_valraw`, `i_valfrom`, `i_valtoraw` will all be defined/bound.
+of non-trivial container elements. Note that many basic template parameters will be defined when defining the
+following parameters, but the user may override those when needed. E.g. by defining the template parameters
+directly as macro functions or with macros that refer to the C function names.
 
-Properties:
+#### Key meta parameters:
+- `i_rawclass` *RawType* - Defines ***i_keyraw*** and binds *RawType_cmp()*, *RawType_eq()*, *RawType_hash()*
+    to ***i_cmp***, ***i_eq***, and ***i_hash***.
+    - If neither ***i_key*** nor ***i_keyclass*** are defined, ***i_key*** is defined as *RawType*.
+    - Useful for containers of views (like csview).
+- `i_keyclass` *KeyType* - Defines ***i_key*** and binds standard named functions *KeyType_clone()* and
+*KeyType_drop()* to ***i_keyclone*** / ***i_keydrop***. If `i_keyraw` is also specified, *KeyType_from()*
+and *KeyType_toraw()* are bound to ***i_keyfrom*** / ***i_keytoraw***.
+    - Use with container of containers, or in general when the element type has *_clone()* and *_drop()* "member" functions.
+- `i_keypro` *KeyType* - Use with "pro"-element types, i.e. library types like **cstr**, **box** and **arc**.
+It combines all the ***i_keyclass*** and ***i_rawclass*** properties. Defining ***i_keypro*** is like defining
+    - ***i_rawclass*** *KeyType*_***raw***.
+    - ***i_keyclass*** *KeyType*
+    - I.e. `i_key`, `i_keyclone`, `i_keydrop`, `i_keyraw`, `i_keyfrom`, `i_keytoraw`, `i_cmp`, `i_eq`, `i_hash` will all be defined/bound.
+
+#### Val (mapped) meta parameters:
+- `i_valclass` *MappedType* - Analogous to the ***i_keyclass*** parameter.
+- `i_valpro` *MappedType* - Comparison functions are not relevant for the mapped type, so this defines
+    - ***i_valraw*** *MappedType*_***raw***
+    - ***i_valclass*** *MappedType*
+    - I.e. `i_val`, `i_valclone`, `i_valdrop`, `i_valraw`, `i_valfrom`, `i_valtoraw` will all be defined/bound.
+
+Option flags:
 - `i_opt` *Flags* - Boolean properties: may combine *c_no_clone*, *c_no_atomic*, *c_declared*, *c_static*,
 *c_header* with the `|` separator.
 
 **Notes**:
-- You can define `i_no_clone` or `i_opt c_no_clone | c_... | ...` to disable *clone* functionality.
+- Define `i_no_clone` or `i_opt c_no_clone | c_... | ...` to disable *clone* functionality.
 - If ***i_keyraw*** and ***i_keyfrom*** are defined, the *emplace*-functions are enabled. The *_cmp()*, *_less()*,
 *_eq()*, and *_hash()* functions takes pointers to parameter type ***i_keyraw***.
 - Specify `i_has_cmp` instead of the comparison parameters to enable searching / sorting for integral
@@ -629,10 +624,10 @@ MyVec_push(&vec, 42);
 ```
 </details>
 <details>
-<summary>Forward declarations</summary>
+<summary>Pre-declarations</summary>
 
-## Forward declarations
-Pre-declare templated containers in header files. The container can then e.g. be a "private"
+## Pre-declarations
+Pre-declare templated container in header file. The container can then e.g. be a "private"
 member of a struct defined in a header file.
 
 ```c++
@@ -641,7 +636,7 @@ member of a struct defined in a header file.
 #define Dataset_H_
 #include "stc/types.h"   // include various container data structure templates
 
-// declare PointVec as a vec. Note: also struct Point may be an undeclared type.
+// declare PointVec as a vec. Also struct Point may be incomplete/undeclared.
 declare_vec(PointVec, struct Point);
 
 typedef struct Dataset {
@@ -654,7 +649,7 @@ void Dataset_drop(Dataset* self);
 #endif
 ```
 
-Define and use the "private" containers in the c-file:
+Define and use the "private" container in the c-file:
 ```c++
 // Dataset.c
 #include "Dataset.h"
@@ -743,20 +738,19 @@ STC is generally very memory efficient. Memory usage for the different container
 
 ## Version 5.0 changes
 - This is a major new version, with serveral breaking changes compared to 4.3
-    - Changed API in `random` numbers.
     - Some API changes in `cregex`.
     - Some API changes in `cstr` and `csview`.
     - Renamed czsview type to `zsview`, some API changes.
+    - Renamed all member Container_empty() functions to `Container_is_empty()`.
+    - Changed API in `random` numbers.
     - c_init renamed to `c_make`
     - c_forlist renamed to `c_foritems`
     - c_forpair *replaced by* `c_foreach_kv` (changed API).
-    - Renamed functions stc_xxxxx() to `c_xxxxx()` in common.h.
+    - Renamed all functions stc_\<xxxx\>() to `c_<xxxx>()` in common.h.
     - c_SVFMT(sv) renamed tp `c_svfmt(sv)`
     - c_SVARG(sv) renamed tp `c_svarg(sv)`
-    - Renamed coroutine cco_yield() renamed to "statement" `cco_yield`.
+    - Renamed coroutine cco_yield() to "keyword" `cco_yield`.
     - Swapped 2nd and 3rd argument in `c_fortoken()` to make it consistent with all other `c_for*()`, i.e, input object is third last.
-    - Renamed all member Cont_empty() functions to `Cont_is_empty()`.
-    - And some "smaller" changes in the API...
     - New header `vec.h` renamed from cvec.h
     - New header `deque.h` renamed from cdeq.h
     - New header `list.h` renamed from clist.h
