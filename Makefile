@@ -14,7 +14,7 @@ endif
 CFLAGS 	  ?= -std=c11 -Iinclude -MMD -O3 -Wpedantic -Wall -Wextra -Werror -Wno-missing-field-initializers
 CXXFLAGS  ?= -std=c++20 -Iinclude -O3 -MMD -Wall
 LDFLAGS   ?=
-ifeq ($(CC:.exe=),tcc)
+ifeq ($(CC),tcc)
   AR_RCS  ?= tcc -ar rcs
 else
   AR_RCS  ?= ar rcs
@@ -24,11 +24,14 @@ RM_F      ?= rm -f
 
 ifeq ($(OS),Windows_NT)
 	DOTEXE := .exe
-	BUILDDIR := bld_Windows/$(CC:.exe=)
+	BUILDDIR := bld_Windows/$(CC)
 else
+#	CC_VER := $(shell $(CC) -dumpversion | cut -f1 -d.)
 	BUILDDIR := bld_$(shell uname)/$(CC)
 	LDFLAGS += -lm
-	CFLAGS += -Wno-clobbered
+	ifneq ($(CC),clang)
+	  CFLAGS += -Wno-clobbered
+	endif
 endif
 
 OBJ_DIR   := $(BUILDDIR)
@@ -50,10 +53,15 @@ TEST_OBJS   := $(TEST_SRCS:%.c=$(OBJ_DIR)/%.o)
 TEST_DEPS   := $(TEST_SRCS:%.c=$(OBJ_DIR)/%.d)
 TEST_EXE    := $(OBJ_DIR)/tests/test_all$(DOTEXE)
 
+PROGRAMS	:= $(EX_EXES) $(TEST_EXE)
+
 fast:
 	@$(MAKE) -j --no-print-directory all
 
-all: $(LIB_PATH) $(EX_EXES) $(TEST_EXE)
+all: $(PROGRAMS)
+	@echo
+
+$(PROGRAMS): $(LIB_PATH)
 
 clean:
 	@$(RM_F) $(LIB_OBJS) $(TEST_OBJS) $(EX_OBJS) $(LIB_DEPS) $(EX_DEPS) $(LIB_PATH) $(EX_EXES) $(TEST_EXE)
@@ -85,6 +93,7 @@ $(OBJ_DIR)/%$(DOTEXE): %.c $(LIB_PATH)
 
 $(TEST_EXE): $(TEST_OBJS)
 	@printf "\r\e[2K%s" "$(CC) -o $@"
+	@echo
 	@$(CC) -o $@ $(TEST_OBJS) -s $(LDFLAGS) -L$(BUILDDIR) -l$(LIB_NAME)
 
 

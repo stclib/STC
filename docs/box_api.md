@@ -6,8 +6,8 @@ and `i_keydrop` macros specified. Use *box_X_clone(p)* to make a deep copy, whic
 `i_keyclone` macro if defined. Note that a box set to NULL is consider uninitialized, and
 cannot be e.g. cloned or dropped.
 
-When declaring a container of **box** values, define `i_keypro` with the
-box type instead of defining `i_key`. This will auto-set `i_keydrop`, `i_keyclone`, and `i_cmp` using
+When declaring a container of **box** elements, define `i_keypro` with the
+box type instead of defining `i_key`. This will auto-define `i_keydrop`, `i_keyclone`, and `i_cmp` using
 functions defined by the specified **box**.
 
 See similar c++ class [std::unique_ptr](https://en.cppreference.com/w/cpp/memory/unique_ptr) for a functional reference, or Rust [std::boxed::Box](https://doc.rust-lang.org/std/boxed/struct.Box.html)
@@ -37,8 +37,6 @@ See similar c++ class [std::unique_ptr](https://en.cppreference.com/w/cpp/memory
 #define i_keyfrom <fn>   // from-raw func.
 #include "stc/box.h"
 ```
-When defining a container with **box** elements, specify `#define i_keypro <box-type>` instead of `i_key`.
-
 In the following, `X` is the value of `i_key` unless `i_type` is defined.
 Unless `c_use_cmp` is defined, comparison between i_key's is not needed/available. Will then
 compare the pointer addresses when used. Additionally, `c_no_clone` or `i_is_fwd` may be defined.

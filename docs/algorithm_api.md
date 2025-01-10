@@ -257,8 +257,12 @@ The **c_when** statement is exhaustive. The compiler will give a warning if not 
 covered by **c_is** (requires `-Wall` or `-Wswitch` gcc/clang compiler flag). The first enum value
 is deliberately set to 1 in order to easier detect non/zero-initialized variants.
 
-* Note 1: The `x` variables in the synopsis are "auto" type declared/defined - see examples.
-* Note 2: Sum types will not work in coroutines (i.e. if `cco_yield..` or `cco_await..` are used within `c_when` / `c_if_is` blocks).
+* Note: The `x` variables in the synopsis are "auto" type declared/defined - see examples.
+* Caveat 1: The use of `continue` inside a `c_when` (or `c_if_is`) block, when `c_when` is inside a loop will
+not work as expected. It will only break out of the `c_when`-block. Instead, use `goto` to jump to the
+end of the loop. `break` will break out of `c_when`, i.e. it behaves like `switch`.
+* Caveat 2: Sum types will generally not work in coroutines because the `x` variable is local and therefore
+will not be preserved across `cco_yield..` / `cco_await..`.
 
 ### Example 1
 
