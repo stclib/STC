@@ -460,7 +460,7 @@ Key (element / lookup type):
     - `i_keytoraw` *Func*  - Convertion func to *i_keyraw* from *i_key*. **[required if]** *i_keyraw* is defined
 
 Val (mapped value type - for maps):
-- These are analogues to the Key parameters, i.e. `i_valdrop`, `i_valclone`, etc.
+- These are analogues to the Key parameters, i.e. `i_valdrop`, `i_valclone`, `i_valraw`, etc.
 
 The following meta-template parameters can be specified instead of ***i_key***, ***i_val***, and ***i_keyraw***.
 These parameters make types into "classes" in the sense that they bind associated function names to the primary
@@ -468,29 +468,30 @@ template parameters described above. This reduces boiler-plate code, clutter, an
 of non-trivial container elements. Note that many basic template parameters will defined when defining the
 following parameters, but the user may override them when needed. E.g. defining the template parameters directly
 as function macros instead of referring to C function names.
-- Key-meta parameters:
-    - `i_rawclass` *RawType* - Defines ***i_keyraw*** and binds *RawType_cmp()*, *RawType_eq()*, *RawType_hash()* to
-    their associated template key parameters.
-        - If neither ***i_key*** nor ***i_keyclass*** are defined, ***i_key*** will be defined as *RawType*.
+- Key parameters:
+    - `i_rawclass` *RawType* - Defines ***i_keyraw*** and binds *RawType_cmp()*, *RawType_eq()*, *RawType_hash()*
+      to ***i_cmp***, ***i_eq***, and ***i_hash***.
+        - If neither ***i_key*** nor ***i_keyclass*** are defined, ***i_key*** is defined as *RawType*.
         - Useful for containers of views (like csview).
     - `i_keyclass` *KeyType* - Defines ***i_key*** and binds standard named functions *KeyType_clone()* and
-    *KeyType_drop()* to ***i_keyclone*** and ***i_keydrop***.
+    *KeyType_drop()* to ***i_keyclone*** / ***i_keydrop***. If `i_keyraw` is also specified, *KeyType_from()*
+    and *KeyType_toraw()* are bound to ***i_keyfrom*** / ***i_keytoraw***.
         - Use with container of containers, or in general when the element type has *_clone()* and *_drop()* "member" functions.
-        - If ***i_rawclass*** is defined, *KeyType_from()* and *KeyType_toraw()* will be name-bound to ***i_keyfrom*** and ***i_keytoraw***.
-        - Otherwise, ***i_rawclass*** will be defined as *KeyType*
-        - In both cases ***i_rawclass*** is defined, so also the comparison functions will be name-bound to template parameters.
-    - `i_keypro` *KeyType* - Use with "pro" types, i.e. library types like **cstr**, **box** and **arc**.
-    It combines all the ***i_keyclass*** and ***i_rawclass*** features. Defining ***i_keypro*** is like defining
-        - ***i_keyclass*** *KeyType*
+    - `i_keypro` *KeyType* - Use with "pro"-element types, i.e. library types like **cstr**, **box** and **arc**.
+    It combines all the ***i_keyclass*** and ***i_rawclass*** properties. Defining ***i_keypro*** is like defining
         - ***i_rawclass*** *KeyType*_***raw***.
-- Val-meta (mapped) parameters:
+        - ***i_keyclass*** *KeyType*
+        - I.e. `i_key`, `i_keyclone`, `i_keydrop`, `i_keyraw`, `i_keyfrom`, `i_keytoraw`, `i_cmp`, `i_eq`, `i_hash` will all be defined/bound.
+- Val (mapped) parameters:
     - `i_valclass` *MappedType* - Analogous to the ***i_keyclass*** parameter.
-    - `i_valpro` *MappedType* - Defines ***i_keyraw*** and combines the ***i_valclass*** features (comparison functions
-    are not relevant for the mapped type).
+    - `i_valpro` *MappedType* - Comparison functions are not relevant for the mapped type, so this defines
+        - ***i_valraw*** *MappedType*_***raw***
+        - ***i_valclass*** *MappedType*
+        - I.e. `i_val`, `i_valclone`, `i_valdrop`, `i_valraw`, `i_valfrom`, `i_valtoraw` will all be defined/bound.
 
 Properties:
 - `i_opt` *Flags* - Boolean properties: may combine *c_no_clone*, *c_no_atomic*, *c_declared*, *c_static*,
-*c_header* with the *|* separator.
+*c_header* with the `|` separator.
 
 **Notes**:
 - You can define `i_no_clone` or `i_opt c_no_clone | c_... | ...` to disable *clone* functionality.
