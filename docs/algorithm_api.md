@@ -23,6 +23,7 @@ descriptive and reduces chances of making mistakes. It is generally easier to re
 | `c_foreach_n (it, ctype, container, n)`| Iteratate `n` first elements. Index variable is `{it}_index`. |
 | `c_foreach_kv (key, val, ctype, container)` | Iterate maps with "structured binding" |
 <!--{%raw%}-->
+[ [Run this code](https://godbolt.org/z/r8eWG4Txa) ]
 ```c++
 #define i_type IMap, int, int
 #include "stc/smap.h"
@@ -133,6 +134,8 @@ crange&     c_iota(start, stop);            // l-value; otherwise like crange_ma
 crange&     c_iota(start, stop, step);      // l-value; otherwise like crange_make(start, stop, step)
 ```
  The **crange_value** type is *isize*. Variables *start*, *stop*, and *step* are of type *crange_value*.
+
+[ [Run this code](https://godbolt.org/z/6aaq6qTro) ]
 ```c++
 // 1. All primes less than 32: See below for c_filter() and is_prime()
 crange r1 = crange_make(3, 32, 2);
@@ -145,10 +148,10 @@ c_filter(crange, r1, true
 
 // 2. The first 11 primes:
 // c_iota() can be used as argument to c_filter.
-printf("2");
+printf("2"); // first prime
 c_filter(crange, c_iota(3), true
     && is_prime(*value)
-    && (printf(" %zi", *value), c_flt_take(10))
+    && (c_flt_take(10), printf(" %zi", *value))
 );
 // 2 3 5 7 11 13 17 19 23 29 31
 ```
@@ -365,6 +368,7 @@ int main(void) {
 A macro for conveniently defining functions with multiple return values. This is for encouraging
 to write functions that returns extra error context when error occurs, or just multiple return values.
 
+[ [Run this code](https://godbolt.org/z/MsYG75Eae) ]
 ```c++
 Vec get_data(void) {
     return c_make(Vec, {1, 2, 3, 4, 5, 6});
@@ -475,6 +479,8 @@ Append linearily in containers using a predicate. `value` is a pointer to each e
 Erase linearily in containers using a predicate. `value` is a pointer to each element in predicate.
 - `c_erase_if(CntType, cnt_ptr, pred)`. Use with **list**, **hmap**, **hset**, **smap**, and **sset**.
 - `c_eraseremove_if(CntType, cnt_ptr, pred)`. Use with **stack**, **vec**, **deque**, and **queue** only.
+
+[ [Run this code](https://godbolt.org/z/5WWGf4dbd) ]
 <!--{%raw%}-->
 ```c++
 #include <stdio.h>
@@ -483,7 +489,7 @@ Erase linearily in containers using a predicate. `value` is a pointer to each el
 
 #define i_type Vec, int
 #define i_use_cmp
-#include "stc/vec.h"
+#include "stc/stack.h"
 
 #define i_type List, int
 #define i_use_cmp
@@ -506,7 +512,6 @@ int main(void)
 
     // Search vec for first value > 20.
     Vec_iter result;
-
     c_find_if(Vec, vec, &result, *value > 20);
     if (result.ref) printf("found %d\n", *result.ref);
 
@@ -589,18 +594,19 @@ The *X_sort()*, *X_sort_lowhigh()* functions are about twice as fast as *qsort()
 speed with *std::sort()**. Both *X_binary_seach()* and *X_lower_bound()* are about 30% faster than
 c++ *std::lower_bound()*.
 ##### Usage examples
+
+[ [Run this code](https://godbolt.org/z/rr1xvjcGG) ]
 ```c++
 #define i_key int // sort a regular c-array of ints
 #include "stc/sort.h"
 #include <stdio.h>
 
 int main(void) {
-    int nums[] = {5, 3, 5, 9, 7, 4, 7, 2, 4, 9, 3, 1, 2, 6, 4};
-    ints_sort(nums, c_arraylen(nums)); // `ints` derived from the `i_key` name
+    int arr[] = {5, 3, 5, 9, 7, 4, 7, 2, 4, 9, 3, 1, 2, 6, 4};
+    ints_sort(arr, c_arraylen(arr)); // `ints` derived from the `i_key` name
     c_forrange (i, c_arraylen(arr)) printf(" %d", arr[i]);
 }
 ```
-
 ```c++
 #define i_type MyDeq, int
 #define i_use_cmp      // enable sorting

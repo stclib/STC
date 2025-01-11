@@ -221,7 +221,7 @@ int main(void)
 ### Example 4: Advanced
 Key type is struct. Based on https://doc.rust-lang.org/std/collections/struct.HashMap.html
 
-[ [Run this code](https://godbolt.org/z/GhYKP9fzo) ]
+[ [Run this code](https://godbolt.org/z/K3MG6cn37) ]
 ```c++
 #include <stc/cstr.h>
 
@@ -230,25 +230,25 @@ typedef struct {
     cstr country;
 } Viking;
 
-static inline Viking Viking_make(cstr_raw name, cstr_raw country) {
+Viking Viking_make(cstr_raw name, cstr_raw country) {
     return (Viking){.name = cstr_from(name), .country = cstr_from(country)};
 }
 
-static inline bool Viking_eq(const Viking* a, const Viking* b) {
+bool Viking_eq(const Viking* a, const Viking* b) {
     return cstr_eq(&a->name, &b->name) && cstr_eq(&a->country, &b->country);
 }
 
-static inline size_t Viking_hash(const Viking* a) {
+size_t Viking_hash(const Viking* a) {
     return cstr_hash(&a->name) ^ cstr_hash(&a->country);
 }
 
-static inline Viking Viking_clone(Viking v) {
+Viking Viking_clone(Viking v) {
     v.name = cstr_clone(v.name);
     v.country = cstr_clone(v.country);
     return v;
 }
 
-static inline void Viking_drop(Viking* vp) {
+void Viking_drop(Viking* vp) {
     cstr_drop(&vp->name);
     cstr_drop(&vp->country);
 }
@@ -285,7 +285,7 @@ In example 4 we needed to construct a lookup key which may allocate strings, and
 In this example we use keyraw feature to make it simpler to use and avoids the creation of a Viking object
 entirely when doing lookup.
 
-[ [Run this code](https://godbolt.org/z/Yx1Ybhxqv) ]
+[ [Run this code](https://godbolt.org/z/zY3j5zGo9) ]
 <!--{%raw%}-->
 ```c++
 #include "stc/cstr.h"
