@@ -84,43 +84,28 @@
     C##_adjust_end_(_cnt, -_n); \
 } while (0)
 
-// ------------------------------------
-// c_copy, c_copy_if, c_copy_reverse_if
-// ------------------------------------
+// --------------------------------
+// c_append, c_append_if
+// --------------------------------
 
-#define c_copy(...) c_MACRO_OVERLOAD(c_copy, __VA_ARGS__)
-#define c_copy_3(C, cnt, outcnt_ptr) \
-    _c_copy_if(C, cnt, _, C, outcnt_ptr, true)
+#define c_append(...) c_MACRO_OVERLOAD(c_append, __VA_ARGS__)
+#define c_append_3(C, outcnt_ptr, cnt) \
+    _c_append_if(C, outcnt_ptr, _, C, cnt, true)
 
-#define c_copy_4(C, cnt, C_out, outcnt_ptr) \
-    _c_copy_if(C, cnt, _, C_out, outcnt_ptr, true)
+#define c_append_4(C_out, outcnt_ptr, C, cnt) \
+    _c_append_if(C_out, outcnt_ptr, _, C, cnt, true)
 
-#define c_copy_reverse(...) c_MACRO_OVERLOAD(c_copy_reverse, __VA_ARGS__)
-#define c_copy_reverse_3(C, cnt, outcnt_ptr) \
-    _c_copy_if(C, cnt, _r, C, outcnt_ptr, true)
+#define c_append_if(...) c_MACRO_OVERLOAD(c_append_if, __VA_ARGS__)
+#define c_append_if_4(C, outcnt_ptr, cnt, pred) \
+    _c_append_if(C, outcnt_ptr, _, C, cnt, pred)
 
-#define c_copy_reverse_4(C, cnt, C_out, outcnt_ptr) \
-    _c_copy_if(C, cnt, _r, C_out, outcnt_ptr, true)
-
-
-#define c_copy_if(...) c_MACRO_OVERLOAD(c_copy_if, __VA_ARGS__)
-#define c_copy_if_4(C, cnt, outcnt_ptr, pred) \
-    _c_copy_if(C, cnt, _, C, outcnt_ptr, pred)
-
-#define c_copy_if_5(C, cnt, C_out, outcnt_ptr, pred) \
-    _c_copy_if(C, cnt, _, C_out, outcnt_ptr, pred)
-
-#define c_copy_reverse_if(...) c_MACRO_OVERLOAD(c_copy_reverse_if, __VA_ARGS__)
-#define c_copy_reverse_if_4(C, cnt, outcnt_ptr, pred) \
-    _c_copy_if(C, cnt, _r, C, outcnt_ptr, pred)
-
-#define c_copy_reverse_if_5(C, cnt, C_out, outcnt_ptr, pred) \
-    _c_copy_if(C, cnt, _r, C_out, outcnt_ptr, pred)
+#define c_append_if_5(C, cnt, C_out, outcnt_ptr, pred) \
+    _c_append_if(C_out, outcnt_ptr, _, C, cnt, pred)
 
 // private
-#define _c_copy_if(C, cnt, rev, C_out, outcnt_ptr, pred) do { \
-    C _cnt = cnt; \
+#define _c_append_if(C_out, outcnt_ptr, rev, C, cnt, pred) do { \
     C_out *_out = outcnt_ptr; \
+    C _cnt = cnt; \
     const C##_value* value; \
     for (C##_iter _it = C##rev##begin(&_cnt); (value = _it.ref); C##rev##next(&_it)) \
         if (pred) C_out##_push(_out, C##_value_clone(*_it.ref)); \

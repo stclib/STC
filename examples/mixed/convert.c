@@ -40,14 +40,15 @@ int main(void)
             printf("  %s: %s\n", cstr_str(&value->first), cstr_str(&value->second)));
 
         puts("\nCOPY MAP TO VECS:");
-        c_filter(hmap_cstr, mclone, (vec_cstr_push(&keys, cstr_clone(value->first)),
-                                     vec_cstr_push(&values, cstr_clone(value->second))));
+        c_filter(hmap_cstr, mclone,
+            (vec_cstr_push(&keys, cstr_clone(value->first)),
+             vec_cstr_push(&values, cstr_clone(value->second))));
         // print both keys and values zipped
         c_filter_zip(vec_cstr, keys, values,
             printf("  %s: %s\n", cstr_str(value1), cstr_str(value2)));
 
         puts("\nCOPY VEC TO LIST:");
-        c_copy(vec_cstr, keys, list_cstr, &list);
+        c_append(list_cstr, &list, vec_cstr, keys);
         // print
         c_filter(list_cstr, list, printf("  %s\n", cstr_str(value)));
 

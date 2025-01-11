@@ -64,7 +64,7 @@ void example3(void)
 
     SongSet set2 = {0};
     // Share all entries in set1 with set2. Copy arc => share.
-    c_copy(SongSet, set1, &set2);
+    c_append(SongSet, &set2, set1);
 
     // Add a few more SongArcs to set2.
     SongSet_emplace(&set2, (SongView){"Bob Dylan", "The Times They Are A Changing"});

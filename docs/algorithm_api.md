@@ -454,7 +454,7 @@ int main(void) {
 <!--{%endraw%}-->
 </details>
 <details>
-<summary><b>c_find, c_copy, c_erase</b> - Container operations with custom predicate</summary>
+<summary><b>c_find, c_append, c_erase</b> - Container operations with custom predicate</summary>
 
 ### c_find_if, c_find_reverse_if
 Find linearily in containers using a predicate. `value` is a pointer to each element in predicate.
@@ -464,16 +464,12 @@ Find linearily in containers using a predicate. `value` is a pointer to each ele
 - `c_find_reverse_if(CntType, cnt, outiter_ptr, pred)`
 - `c_find_reverse_if(CntType, startiter, enditer, outiter_ptr, pred)`
 
-### c_copy, c_copy_reverse, c_copy_if, c_copy_reverse_if
-Copy linearily in containers using a predicate. `value` is a pointer to each element in predicate.
-- `c_copy(CntType, cnt, outcnt_ptr)`
-- `c_copy(CntType, cnt, OutCnt, outcnt_ptr)`
-- `c_copy_reverse(CntType, cnt, outcnt_ptr)`
-- `c_copy_reverse(CntType, cnt, OutCnt, outcnt_ptr)`
-- `c_copy_if(CntType, cnt, outcnt_ptr, pred)`
-- `c_copy_if(CntType, cnt, OutCnt, outcnt_ptr, pred)`
-- `c_copy_reverse_if(CntType, cnt, outcnt_ptr, pred)`
-- `c_copy_reverse_if(CntType, cnt, OutCnt, outcnt_ptr, pred)`
+### c_append, c_append_if
+Append linearily in containers using a predicate. `value` is a pointer to each element in predicate.
+- `c_append(CntType, outcnt_ptr, cnt)`
+- `c_append(OutCnt, outcnt_ptr, CntType, cnt)`
+- `c_append_if(CntType, outcnt_ptr, cnt, pred)`
+- `c_append_if(OutCnt, outcnt_ptr, CntType, cnt, pred)`
 
 ### c_erase_if, c_eraseremove_if
 Erase linearily in containers using a predicate. `value` is a pointer to each element in predicate.
@@ -504,7 +500,7 @@ int main(void)
     Vec vec = c_make(Vec, {2, 30, 21, 5, 9, 11});
     Vec outvec = {0};
 
-    c_copy_if(Vec, vec, &outvec, *value > 10);
+    c_append_if(Vec, &outvec, vec, *value > 10);
     c_foreach (i, Vec, outvec) printf(" %d", *i.ref);
     puts("");
 
