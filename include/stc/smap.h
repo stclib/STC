@@ -162,11 +162,11 @@ STC_INLINE _m_value _c_MEMB(_value_clone)(_m_value _val) {
     return _val;
 }
 
-STC_INLINE void _c_MEMB(_copy)(Self *self, const Self* other) {
-    if (self->nodes == other->nodes)
+STC_INLINE void _c_MEMB(_copy)(Self *self, const Self other) {
+    if (self->nodes == other.nodes)
         return;
     _c_MEMB(_drop)(self);
-    *self = _c_MEMB(_clone)(*other);
+    *self = _c_MEMB(_clone)(other);
 }
 
 STC_INLINE void _c_MEMB(_shrink_to_fit)(Self *self) {

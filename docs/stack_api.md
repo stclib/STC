@@ -43,7 +43,7 @@ stack_X         stack_X_with_capacity(isize cap);
 stack_X         stack_X_with_size(isize size, i_key fill);
 
 stack_X         stack_X_clone(stack_X st);
-void            stack_X_copy(stack_X* self, const stack_X* other);
+void            stack_X_copy(stack_X* self, stack_X other);
 stack_X         stack_X_move(stack_X* self);                                    // move
 void            stack_X_take(stack_X* self, stack_X unowned);                   // take ownership of unowned
 void            stack_X_drop(stack_X* self);                                    // destructor

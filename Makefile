@@ -93,7 +93,6 @@ $(OBJ_DIR)/%$(DOTEXE): %.c $(LIB_PATH)
 
 $(TEST_EXE): $(TEST_OBJS)
 	@printf "\r\e[2K%s" "$(CC) -o $@"
-	@echo
 	@$(CC) -o $@ $(TEST_OBJS) -s $(LDFLAGS) -L$(BUILDDIR) -l$(LIB_NAME)
 
 

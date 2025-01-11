@@ -35,7 +35,7 @@ deq_X              deq_X_with_capacity(intptr_t size);
 deq_X              deq_X_clone(deq_X deq);
 
 void               deq_X_clear(deq_X* self);
-void               deq_X_copy(deq_X* self, const deq_X* other);
+void               deq_X_copy(deq_X* self, deq_X other);
 bool               deq_X_reserve(deq_X* self, intptr_t cap);
 void               deq_X_shrink_to_fit(deq_X* self);
 void               deq_X_drop(deq_X* self);                                      // destructor

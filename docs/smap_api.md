@@ -56,7 +56,7 @@ smap_X          smap_X_init(void);
 sset_X          smap_X_with_capacity(isize cap);
 
 smap_X          smap_X_clone(smap_x map);
-void            smap_X_copy(smap_X* self, const smap_X* other);
+void            smap_X_copy(smap_X* self, smap_X other);
 void            smap_X_take(smap_X* self, smap_X unowned);                               // take ownership of unowned
 smap_X          smap_X_move(smap_X* self);                                               // move
 void            smap_X_drop(smap_X* self);                                               // destructor

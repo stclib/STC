@@ -39,7 +39,7 @@ pqueue_X        pqueue_X_with_capacity(isize cap);
 pqueue_X        pqueue_X_with_size(isize size, i_key null);
 
 pqueue_X        pqueue_X_clone(pqueue_X pq);
-void            pqueue_X_copy(pqueue_X* self, const pqueue_X* other);
+void            pqueue_X_copy(pqueue_X* self, pqueue_X other);
 void            pqueue_X_take(pqueue_X* self, pqueue_X unowned);    // take ownership of unowned
 pqueue_X        pqueue_X_move(pqueue_X* self);                      // move
 void            pqueue_X_drop(pqueue_X* self);                      // destructor
