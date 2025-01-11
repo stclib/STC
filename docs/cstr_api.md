@@ -33,10 +33,6 @@ cstr            cstr_from_replace(csview sv, csview search, csview repl, int32_t
 cstr            cstr_with_n(const char* str, isize n);                  // construct from first n bytes of str
 cstr            cstr_with_capacity(isize cap);                          // make empty string with pre-allocated capacity.
 cstr            cstr_with_size(isize len, char fill);                   // make string with fill characters
-cstr            cstr_join_vec(const char* sep, Vec* vec);               // construct by joining vec/stack of cstrs with separator
-cstr            cstr_join_s(const char* sep, {cstr s1, ...});           // construct by joining cstrs with separator
-cstr            cstr_join_array(const char* sep, const char* arr[], isize n); // join c-string array with separator
-cstr            cstr_join_array_s(const char* sep, cstr arr[], isize n); // join cstr array with separator
 
 cstr            cstr_clone(cstr s);
 cstr*           cstr_take(cstr* self, cstr s);                          // take ownership of s, i.e. don't drop s.
@@ -75,6 +71,12 @@ char*           cstr_append_s(cstr* self, cstr str);
 int             cstr_append_fmt(cstr* self, const char* fmt, ...);      // printf() formatting
 char*           cstr_append_uninit(cstr* self, isize len);              // return ptr to start of uninited data
 
+void            cstr_append_join(cstr* self, const char* sep,           // join and append c-strings with separator
+                                 {const char* s1, ...});
+void            cstr_append_join_n(cstr* self, const char* sep,         // join and append c-string array
+                                   const char* arr[], isize n);
+void            cstr_append_join_s(cstr* self, const char* sep,         // join and append vec/stack of cstrs
+                                   vec_cstr* vec);
 
 void            cstr_push(cstr* self, const char* chr);                 // append one utf8 char
 void            cstr_pop(cstr* self);                                   // pop one utf8 char

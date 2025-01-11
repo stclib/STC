@@ -62,10 +62,6 @@ extern  char* _cstr_internal_move(cstr* self, isize pos1, isize pos2);
 
 #define             cstr_init() (c_literal(cstr){0})
 #define             cstr_lit(literal) cstr_with_n(literal, c_litstrlen(literal))
-#define             cstr_join_vec(sep, vecp) \
-                        cstr_join_array_s(sep, (vecp)->data, (vecp)->size)
-#define             cstr_join_s(sep, ...) \
-                        cstr_join_array_s(sep, c_make_array(cstr, __VA_ARGS__), c_NUMARGS(__VA_ARGS__))
 
 extern  cstr        cstr_from_replace(csview sv, csview search, csview repl, int32_t count);
 extern  cstr        cstr_from_fmt(const char* fmt, ...);
@@ -109,17 +105,6 @@ STC_INLINE cstr cstr_with_n(const char* str, const isize len) {
 
 STC_INLINE cstr cstr_from(const char* str)
     { return cstr_with_n(str, c_strlen(str)); }
-
-STC_INLINE cstr cstr_join_array(const char* sep, const char* arr[], isize n) {
-    cstr s = {0}; const char* _sep = "";
-    while (n--) { cstr_append(&s, _sep); cstr_append(&s, *arr++); _sep = sep; }
-    return s;
-}
-STC_INLINE cstr cstr_join_array_s(const char* sep, cstr arr[], isize n) {
-    cstr s = {0}; const char* _sep = "";
-    while (n--) { cstr_append(&s, _sep); cstr_append_s(&s, *arr++); _sep = sep; }
-    return s;
-}
 
 STC_INLINE cstr cstr_from_sv(csview sv)
     { return cstr_with_n(sv.buf, sv.size); }
@@ -386,6 +371,20 @@ STC_INLINE char* cstr_append_sv(cstr* self, csview sv)
 
 STC_INLINE char* cstr_append_s(cstr* self, cstr s)
     { return cstr_append_sv(self, cstr_sv(&s)); }
+
+#define cstr_append_join(self, sep, ...) \
+    cstr_append_join_n(self, sep, c_make_array(const char*, __VA_ARGS__), c_NUMARGS(__VA_ARGS__))
+#define cstr_append_join_s(self, sep, vecptr) \
+    cstr_append_join_sn(self, sep, (vecptr)->data, (vecptr)->size)
+
+STC_INLINE void cstr_append_join_n(cstr* self, const char* sep, const char* arr[], isize n) {
+    const char* _sep = cstr_is_empty(self) ? "" : sep;
+    while (n--) { cstr_append(self, _sep); cstr_append(self, *arr++); _sep = sep; }
+}
+STC_INLINE void cstr_append_join_sn(cstr* self, const char* sep, const cstr arr[], isize n) {
+    const char* _sep = cstr_is_empty(self) ? "" : sep;
+    while (n--) { cstr_append(self, _sep); cstr_append_s(self, *arr++); _sep = sep; }
+}
 
 
 STC_INLINE void cstr_replace_sv(cstr* self, csview search, csview repl, int32_t count)
