@@ -71,12 +71,9 @@ char*           cstr_append_s(cstr* self, cstr str);
 int             cstr_append_fmt(cstr* self, const char* fmt, ...);      // printf() formatting
 char*           cstr_append_uninit(cstr* self, isize len);              // return ptr to start of uninited data
 
-void            cstr_append_join(cstr* self, const char* sep,           // join and append c-strings with separator
-                                 {const char* s1, ...});
-void            cstr_append_join_n(cstr* self, const char* sep,         // join and append c-string array
-                                   const char* arr[], isize n);
-void            cstr_append_join_s(cstr* self, const char* sep,         // join and append vec/stack of cstrs
-                                   vec_cstr* vec);
+void            cstr_join(cstr* self, const char* sep, cstr-vec vec);   // join and append vec/stack of cstrs
+void            cstr_join_n(cstr* self, const char* sep, const char* arr[], isize n); // join and append c-strings
+void            cstr_join_items(cstr* self, const char* sep, {const char* s1,...});   // join and append c-strings
 
 void            cstr_push(cstr* self, const char* chr);                 // append one utf8 char
 void            cstr_pop(cstr* self);                                   // pop one utf8 char

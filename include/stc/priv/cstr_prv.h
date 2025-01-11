@@ -372,16 +372,21 @@ STC_INLINE char* cstr_append_sv(cstr* self, csview sv)
 STC_INLINE char* cstr_append_s(cstr* self, cstr s)
     { return cstr_append_sv(self, cstr_sv(&s)); }
 
-#define cstr_append_join(self, sep, ...) \
-    cstr_append_join_n(self, sep, c_make_array(const char*, __VA_ARGS__), c_NUMARGS(__VA_ARGS__))
-#define cstr_append_join_s(self, sep, vecptr) \
-    cstr_append_join_sn(self, sep, (vecptr)->data, (vecptr)->size)
+#define cstr_join(self, sep, vec) do { \
+    struct _vec_s { cstr* data; ptrdiff_t size; } \
+          *_vec = (struct _vec_s*)&(vec); \
+    (void)sizeof((vec).data == _vec->data && &(vec).size == &_vec->size); \
+    cstr_join_sn(self, sep, _vec->data, _vec->size); \
+} while (0);
 
-STC_INLINE void cstr_append_join_n(cstr* self, const char* sep, const char* arr[], isize n) {
+#define cstr_join_items(self, sep, ...) \
+    cstr_join_n(self, sep, c_make_array(const char*, __VA_ARGS__), c_NUMARGS(__VA_ARGS__))
+
+STC_INLINE void cstr_join_n(cstr* self, const char* sep, const char* arr[], isize n) {
     const char* _sep = cstr_is_empty(self) ? "" : sep;
     while (n--) { cstr_append(self, _sep); cstr_append(self, *arr++); _sep = sep; }
 }
-STC_INLINE void cstr_append_join_sn(cstr* self, const char* sep, const cstr arr[], isize n) {
+STC_INLINE void cstr_join_sn(cstr* self, const char* sep, const cstr arr[], isize n) {
     const char* _sep = cstr_is_empty(self) ? "" : sep;
     while (n--) { cstr_append(self, _sep); cstr_append_s(self, *arr++); _sep = sep; }
 }
