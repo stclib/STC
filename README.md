@@ -3,7 +3,7 @@
 
 # STC - Smart Template Containers
 
-## Pre-release 5.0
+## Release 5.0
 STC is a comprehensive, modern, typesafe and fast templated general purpose container and algorithms
 library for C99. It aims to make C-programming even more fun, more productive and safer.
 
@@ -143,7 +143,7 @@ used container type instances (more than 2-3 TUs), consider creating a separate 
 #endif
 ```
 So anyone may use the shared vec-type. Implement the shared functions in one C file (if several containers are shared,
-you may define STC_IMPLEMENT on top of the file once instead).
+you may define STC_IMPLEMENT on top of the file once instead):
 ```c++
 // shared.c
 #define i_implement // implement the shared intvec.
