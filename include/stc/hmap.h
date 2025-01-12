@@ -452,11 +452,11 @@ _c_MEMB(_bucket_insert_)(const Self* self, const _m_keyraw* rkeyptr) {
 STC_DEF bool
 _c_MEMB(_reserve)(Self* self, const isize _newcap) {
     const isize _oldbucks = self->bucket_count;
-    if (_newcap != self->size && _newcap <= _oldbucks)
-        return true;
     isize _newbucks = (isize)((float)_newcap / (i_max_load_factor)) + 4;
     _newbucks = c_next_pow2(_newbucks);
 
+    if (_newcap < self->size || _newbucks == _oldbucks)
+        return true;
     Self map = {
         _i_malloc(_m_value, _newbucks),
         _i_calloc(struct hmap_meta, _newbucks + 1),

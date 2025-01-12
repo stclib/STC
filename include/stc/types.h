@@ -199,18 +199,9 @@ typedef union {
     typedef struct { SELF##_value *ref, *end; } SELF##_iter; \
     typedef struct SELF { SELF##_value data[CAP]; ptrdiff_t size; } SELF
 
-#define _c_stack_types(SELF, VAL) \
-    typedef VAL SELF##_value; \
-    typedef struct { SELF##_value *ref, *end; } SELF##_iter; \
-    typedef struct SELF { SELF##_value* data; ptrdiff_t size, capacity; _i_aux_struct } SELF
-
 #define _c_vec_types(SELF, VAL) \
     typedef VAL SELF##_value; \
     typedef struct { SELF##_value *ref, *end; } SELF##_iter; \
     typedef struct SELF { SELF##_value *data; ptrdiff_t size, capacity; _i_aux_struct } SELF
-
-#define _c_pqueue_types(SELF, VAL) \
-    typedef VAL SELF##_value; \
-    typedef struct SELF { SELF##_value* data; ptrdiff_t size, capacity; _i_aux_struct } SELF
 
 #endif // STC_TYPES_H_INCLUDED

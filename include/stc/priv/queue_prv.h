@@ -27,8 +27,8 @@ _c_DEFTYPES(_c_deque_types, Self, i_key);
 #endif
 typedef i_keyraw _m_raw;
 
-STC_API Self            _c_MEMB(_with_capacity)(const isize n);
-STC_API bool            _c_MEMB(_reserve)(Self* self, const isize n);
+STC_API Self            _c_MEMB(_with_capacity)(const isize cap);
+STC_API bool            _c_MEMB(_reserve)(Self* self, const isize cap);
 STC_API void            _c_MEMB(_clear)(Self* self);
 STC_API void            _c_MEMB(_drop)(const Self* cself);
 STC_API _m_value*       _c_MEMB(_push)(Self* self, _m_value value); // push_back
@@ -176,17 +176,17 @@ _c_MEMB(_drop)(const Self* cself) {
 }
 
 STC_DEF Self
-_c_MEMB(_with_capacity)(const isize n) {
+_c_MEMB(_with_capacity)(const isize cap) {
     Self cx = {0};
-    _c_MEMB(_reserve)(&cx, n);
+    _c_MEMB(_reserve)(&cx, cap);
     return cx;
 }
 
 STC_DEF bool
-_c_MEMB(_reserve)(Self* self, const isize n) {
-    if (n <= self->capmask)
+_c_MEMB(_reserve)(Self* self, const isize cap) {
+    isize oldpow2 = self->capmask + 1, newpow2 = c_next_pow2(cap + 1);
+    if (newpow2 <= oldpow2)
         return true;
-    isize oldpow2 = self->capmask + 1, newpow2 = c_next_pow2(n + 1);
     _m_value* d = (_m_value *)i_realloc(self->cbuf, oldpow2*c_sizeof *d, newpow2*c_sizeof *d);
     if (d == NULL)
         return false;

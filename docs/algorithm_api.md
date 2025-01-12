@@ -469,7 +469,9 @@ Find linearily in containers using a predicate. `value` is a pointer to each ele
 - `c_find_reverse_if(CntType, startiter, enditer, outiter_ptr, pred)`
 
 ### c_append, c_append_if
-Append linearily in containers using a predicate. `value` is a pointer to each element in predicate.
+Clones any container onto an arbitrary container type, optionally using a predicate to filter out elements.
+Requires only that the element types are equal for the two containers.
+`value` is the pointer to each element in predicate. See example below for usage.
 - `c_append(CntType, outcnt_ptr, cnt)`
 - `c_append(OutCnt, outcnt_ptr, CntType, cnt)`
 - `c_append_if(CntType, outcnt_ptr, cnt, pred)`
@@ -502,10 +504,10 @@ Erase linearily in containers using a predicate. `value` is a pointer to each el
 
 int main(void)
 {
-    // Clone all *value > 10 to outvec. Note: `value` is a pointer to current element
     Vec vec = c_make(Vec, {2, 30, 21, 5, 9, 11});
     Vec outvec = {0};
 
+    // Clone all *value > 10 to outvec. Note: `value` is a pointer to current element
     c_append_if(Vec, &outvec, vec, *value > 10);
     c_foreach (i, Vec, outvec) printf(" %d", *i.ref);
     puts("");
