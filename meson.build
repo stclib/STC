@@ -65,6 +65,13 @@ else
     include_directories: inc,
     install: true,
   )
+
+  import('pkgconfig').generate(
+    stc_lib,
+    name: 'Smart Template Containers',
+    description: 'A modern, user friendly, generic, type-safe and fast C99 container library.',
+    url: 'https://github.com/stclib/STC',
+  )
 endif
 
 install_headers(
