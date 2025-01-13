@@ -18,7 +18,7 @@ void print_elem(smap_istr_raw p) {
     void print_collection_##CX(const CX* t) { \
         printf("%" c_ZI " elements: ", CX##_size(t)); \
     \
-        c_foreach (p, CX, *t) { \
+        for (c_each(p, CX, *t)) { \
             print_elem(CX##_value_toraw(p.ref)); \
         } \
         puts(""); \

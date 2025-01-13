@@ -33,7 +33,7 @@ int main(void)
 {
     const int data[] = {1,8,5,6,3,4,0,9,7,2}, n = c_arraylen(data);
     printf("data: \t");
-    c_forrange (i, n) printf("%d ", data[i]);
+    for (c_range(i, n)) printf("%d ", data[i]);
     puts("");
 
     // Max priority queue

@@ -10,7 +10,7 @@
 
 int main(void)
 {
-    puts("c_forrange:");
+    puts("for c_range:");
     for (c_range(30)) printf(" xx");
     puts("");
 

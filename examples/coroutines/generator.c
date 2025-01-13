@@ -50,7 +50,7 @@ int main(void)
 {
     Triple triple = {.max_triples = INT32_MAX};
 
-    puts("Pythagorean triples.\nGet all triples with c < 40, using c_foreach:");
+    puts("Pythagorean triples.\nGet all triples with c < 40, using for c_each:");
     for (c_each(i, Triple, triple)) {
         if (i.ref->c < 40)
             printf("%u: (%d, %d, %d)\n", i.count, i.ref->a, i.ref->b, i.ref->c);

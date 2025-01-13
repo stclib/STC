@@ -50,10 +50,10 @@ int main(void)
     Arcvec_pop_back(&vec);
 
     printf("vec:");
-    c_foreach (i, Arcvec, vec) printf(" %d", *i.ref->get);
+    for (c_each(i, Arcvec, vec)) printf(" %d", *i.ref->get);
 
     printf("\nset:");
-    c_foreach (i, Arcset, set) printf(" %d", *i.ref->get);
+    for (c_each(i, Arcset, set)) printf(" %d", *i.ref->get);
 
     Arc p = Arc_clone(vec.data[0]);
     printf("\n%d is now owned by %ld objects\n", *p.get, *p.use_count);

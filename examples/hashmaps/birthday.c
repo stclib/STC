@@ -44,7 +44,7 @@ void test_distribution(void)
     }
 
     uint64_t sum = 0;
-    c_foreach (i, hmap_uu, map) sum += i.ref->second;
+    for (c_each(i, hmap_uu, map)) sum += i.ref->second;
     sum /= (uint64_t)map.size;
 
     for (c_each(i, hmap_uu, map)) {

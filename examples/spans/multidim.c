@@ -25,7 +25,7 @@ int main(void)
     cspan_print(ISpan3, ss3, "%d");
 
     puts("\nIterate ss3 flat:");
-    c_foreach (i, ISpan3, ss3) printf(" %d", *i.ref);
+    for (c_each(i, ISpan3, ss3)) printf(" %d", *i.ref);
     puts("");
 
     // submd3 span reduces rank depending on number of arguments
@@ -40,7 +40,7 @@ int main(void)
     cspan_print(ISpan2, ms2, "%d");
 
     puts("\nOriginal s1 span with updated data:");
-    c_foreach (i, ISpan, ms1) printf(" %d", *i.ref);
+    for (c_each(i, ISpan, ms1)) printf(" %d", *i.ref);
     puts("");
 
     puts("\nOriginal ms3 span with updated data:");
@@ -48,7 +48,7 @@ int main(void)
 
     puts("\ncol = ms3[1, :, 2]");
     ISpan col = cspan_slice(ISpan, &ms3, {1}, {c_ALL}, {2});
-    c_foreach (i, ISpan, col) printf(" %d", *i.ref);
+    for (c_each(i, ISpan, col)) printf(" %d", *i.ref);
     puts("");
 
     stack_int_drop(&v);

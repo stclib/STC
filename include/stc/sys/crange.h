@@ -27,7 +27,7 @@
 int main(void)
 {
     crange r1 = crange_make(80, 90);
-    c_foreach (i, crange, r1)
+    for (c_each(i, crange, r1))
         printf(" %d", *i.ref);
     puts("");
 

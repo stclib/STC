@@ -4,7 +4,7 @@
 
 int main(void)
 {
-    puts("Split with c_fortoken():");
+    puts("Split with c_token():");
 
     for (c_token(i, " ", "Hello World C99!"))
         printf("'" c_svfmt "'\n", c_svarg(i.token));

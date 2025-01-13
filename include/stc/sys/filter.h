@@ -112,13 +112,13 @@ int main(void)
       (void)(pred); \
 } while (0)
 
-// ------- c_forfilter --------
-// c_forfilter allows to execute imperative statements for each element
-// as it is a for-loop, e.g., calling nested generic statements instead
+// ------- c_ffilter --------
+// c_ffilter allows to execute imperative statements for each element
+// in a for-loop, e.g., calling nested generic statements instead
 // of defining a function/expression for it:
 /*
     Vec vec = ..., vec2 = ...;
-    for (c_filter(i, Vec, vec, true
+    for (c_ffilter(i, Vec, vec, true
         && c_fflt_skipwhile(i, *i.ref < 3)  // skip leading values < 3
         && (*i.ref & 1) == 1                // then use odd values only
         && c_fflt_map(i, *i.ref * 2)        // multiply by 2

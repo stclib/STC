@@ -78,10 +78,10 @@ void            csview_next(csview_iter* it);                           // next 
 csview_iter     csview_advance(csview_iter it, isize u8pos);            // advance +/- codepoints
 ```
 
-#### Iterate tokens with *c_fortoken*
+#### Iterate tokens with *c_token*
 
 Iterate tokens in an input string split by a separator string:
-- `c_fortoken_sv (it, const char* separator, csview input_sv);`
+- `for (c_token_sv(it, const char* separator, csview input_sv)) ...;`
 - `it.token` is a csview of the current token.
 
 ```c++

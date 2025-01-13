@@ -16,7 +16,7 @@ static cstr to_roman(int value)
     cstr result = {0};
     struct roman { int d; const char* r; };
 
-    c_foritems (i, struct roman, {
+    for (c_items(i, struct roman, {
         {1000, "M"}, {900, "CM"},
         {500, "D"}, {400, "CD"},
         {100, "C"}, {90, "XC"},
@@ -24,7 +24,7 @@ static cstr to_roman(int value)
         {10, "X"}, {9, "IX"},
         {5, "V"}, {4, "IV"},
         {1, "I"}
-    }){
+    })){
         while (value >= i.ref->d) {
             cstr_append(&result, i.ref->r);
             value -= i.ref->d;

@@ -126,7 +126,7 @@ int main(void)
         int n = (int)((double)i.ref->second * dist.stddev * scale * 2.5 / N);
         if (n > 0) {
             printf("%4d ", i.ref->first);
-            c_forrange(n) printf("*");
+            for (c_range(n)) printf("*");
             puts("");
         }
     }

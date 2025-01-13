@@ -16,7 +16,7 @@ int main(void) {
 
     // Push or pop on the queue ten million times
     printf("%d\n", n);
-    c_forrange (n) { // forrange uses initial n only.
+    for (c_range(n)) { // forrange uses initial n only.
         int r = (int)crand64_uint() & ((1 << 20) - 1);
         if (r & 1)
             ++n, queue_i_push(&queue, r);
