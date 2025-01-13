@@ -136,11 +136,11 @@ int main(void)
     vec_int_push(&vec, 13);
 
     // Append a set of numbers
-    c_foritems (i, int, {7, 5, 16, 8})
+    for (c_items(i, int, {7, 5, 16, 8}))
         vec_int_push(&vec, *i.ref);
 
     printf("initial:");
-    c_foreach (k, vec_int, vec) {
+    for (c_each(k, vec_int, vec)) {
         printf(" %d", *k.ref);
     }
 
@@ -148,7 +148,7 @@ int main(void)
     vec_int_sort(&vec);
 
     printf("\nsorted:");
-    c_foreach (k, vec_int, vec) {
+    for (c_each(k, vec_int, vec)) {
         printf(" %d", *k.ref);
     }
     vec_int_drop(&vec);
@@ -180,7 +180,7 @@ int main(void) {
 
     printf("%s\n", cstr_str(&names.data[1])); // Access second element
 
-    c_foreach (i, vec_cstr, names)
+    for (c_each(i, vec_cstr, names))
         printf("item: %s\n", cstr_str(i.ref));
 
     vec_cstr_drop(&names);
@@ -235,7 +235,7 @@ int main(void) {
     Users users2 = Users_clone(users);
     Users_sort(&users2);
 
-    c_foreach (i, Users, users2)
+    for (c_each(i, Users, users2))
         printf("%s: %d\n", cstr_str(&i.ref->name), i.ref->id);
 
     c_drop(Users, &users, &users2); // cleanup

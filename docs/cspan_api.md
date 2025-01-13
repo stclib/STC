@@ -138,7 +138,7 @@ using_cspan(intspan, int);
 
 void printMe(intspan container) {
     printf("%d:", (int)cspan_size(&container));
-    c_foreach (e, intspan, container)
+    for (c_each(e, intspan, container))
         printf(" %d", *e.ref);
     puts("");
 }
@@ -244,9 +244,9 @@ int main(void) {
     puts("b:");
     cspan_print(myspan2, b, "%d");
     puts("\na flat:");
-    c_foreach (i, myspan2, a) printf(" %d,", *i.ref);
+    for (c_each(i, myspan2, a)) printf(" %d,", *i.ref);
     puts("\nb flat:");
-    c_foreach (i, myspan2, b) printf(" %d,", *i.ref);
+    for (c_each(i, myspan2, b)) printf(" %d,", *i.ref);
     puts("");
 }
 ```

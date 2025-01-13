@@ -130,13 +130,15 @@ STC_INLINE isize csview_u8_size(csview sv)
 STC_INLINE bool csview_u8_valid(csview sv) // requires linking with utf8 symbols
     { return utf8_valid_n(sv.buf, sv.size); }
 
-#define c_fortoken_sv(it, separator, sv) \
-    for (struct { csview input, token; const char* sep; isize pos; } \
-         it = {.input=sv, .sep=separator} ; \
-         it.pos <= it.input.size && (it.token = csview_token(it.input, it.sep, &it.pos)).buf ; )
+#define c_fortoken(...) for (c_token(__VA_ARGS__)) // [deprecated]
 
-#define c_fortoken(it, separator, str) \
-    c_fortoken_sv(it, separator, csview_from(str))
+#define c_token_sv(it, separator, sv) \
+    struct { csview input, token; const char* sep; isize pos; } \
+    it = {.input=sv, .sep=separator} ; \
+    it.pos <= it.input.size && (it.token = csview_token(it.input, it.sep, &it.pos)).buf ;
+
+#define c_token(it, separator, str) \
+    c_token_sv(it, separator, csview_from(str))
 
 /* ---- Container helper functions ---- */
 

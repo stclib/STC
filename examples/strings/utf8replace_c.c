@@ -20,7 +20,7 @@ int main(void)
     cstr_u8_replace(&hello, 9, 1, "😀");
     printf("%s, %d:%d\n", cstr_str(&hello), (int)cstr_u8_size(&hello), (int)cstr_size(&hello));
 
-    c_foreach (c, cstr, hello)
+    for (c_each(c, cstr, hello))
         printf(c_svfmt ",", c_svarg(c.chr));
 
     cstr str = cstr_lit("scooby, dooby doo");

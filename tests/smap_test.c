@@ -121,7 +121,7 @@ TEST(smap, insert)
     vec_ii_push(&v, (ipair){44, 311});
 
     // Inserting the following vector data into m2:
-    c_foreach (e, vec_ii, v)
+    for (c_each(e, vec_ii, v))
         smap_ii_insert_or_assign(&m2, e.ref->first, e.ref->second);
 
     // The modified key and mapped values of m2 are:

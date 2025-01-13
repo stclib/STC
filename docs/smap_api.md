@@ -136,7 +136,7 @@ int main(void)
     });
 
     // Iterate and print keys and values of sorted map
-    c_foreach (i, smap_cstr, colors) {
+    for (c_each(i, smap_cstr, colors)) {
         printf("Key:[%s] Value:[%s]\n", cstr_str(&i.ref->first), cstr_str(&i.ref->second));
     }
 
@@ -183,7 +183,7 @@ int main(void)
     print_result( strmap_insert(&m, cstr_lit("c"), cstr_with_size(10, 'c') ) );
     print_result( strmap_emplace(&m, "c", "Won't be inserted") );
 
-    c_foreach (p, strmap, m) { print_node(p.ref); }
+    for (c_each(p, strmap, m)) { print_node(p.ref); }
     strmap_drop(&m);
 }
 ```
@@ -215,7 +215,7 @@ int main(void)
     // emplace() adds only when key does not already exist:
     IdMap_emplace(&idnames, 100, "Green"); // ignored
 
-    c_foreach (i, IdMap, idnames)
+    for (c_each(i, IdMap, idnames))
         printf("%d: %s\n", i.ref->first, cstr_str(&i.ref->second));
 
     IdMap_drop(&idnames);
@@ -251,7 +251,7 @@ int main(void)
     smap_vi_insert(&vmap, (Vec3i){0, 0, 100}, 3);
     smap_vi_insert(&vmap, (Vec3i){100, 100, 100}, 4);
 
-    c_foreach_kv (v, n, smap_vi, vmap)
+    for (c_each_kv(v, n, smap_vi, vmap))
         printf("{ %3d, %3d, %3d }: %d\n", v->x, v->y, v->z, *n);
 
     smap_vi_drop(&vmap);

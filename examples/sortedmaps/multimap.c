@@ -85,14 +85,14 @@ int main(void)
     }
 
     // Sort locations by year for each country.
-    c_foreach (country, smap_OL, multimap)
+    for (c_each(country, smap_OL, multimap))
         list_OL_sort(&country.ref->second);
 
     // Print the multimap:
-    c_foreach (country, smap_OL, multimap)
+    for (c_each(country, smap_OL, multimap))
     {
         // Loop the locations for a country sorted by year
-        c_foreach (loc, list_OL, country.ref->second)
+        for (c_each(loc, list_OL, country.ref->second))
             printf("%s: %d, %s, %s\n", cstr_str(&country.ref->first),
                                                     loc.ref->year,
                                         cstr_str(&loc.ref->city),

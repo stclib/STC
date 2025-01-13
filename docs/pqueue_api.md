@@ -87,19 +87,19 @@ int main(void)
     PriorityQ numbers = {0};
 
     // Push ten million random numbers to priority queue.
-    c_forrange (N/2)
+    for (c_range(N/2))
         PriorityQ_push(&numbers, (int32)(crand32_uint() >> 6));
 
     // Add some negative ones.
     int32 nums[] = {-231, -32, -873, -4, -343};
-    c_forrange (i, c_arraylen(nums))
+    for (c_range(i, c_arraylen(nums)))
         PriorityQ_push(&numbers, nums[i]);
 
-    c_forrange (N/2)
+    for (c_range(N/2))
         PriorityQ_push(&numbers, (int32)(crand32_uint() >> 6));
 
     // Extract and display the fifty smallest.
-    c_forrange (50) {
+    for (c_range(50)) {
         printf("%d ", *PriorityQ_top(&numbers));
         PriorityQ_pop(&numbers);
     }

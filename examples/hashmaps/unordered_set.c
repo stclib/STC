@@ -38,7 +38,7 @@ int main(void)
         // now iterating over whole set and printing its
         // content
         printf("All elements :\n");
-        c_foreach (itr, hset_cstr, stringSet)
+        for (c_each(itr, hset_cstr, stringSet))
             printf("%s\n", cstr_str(itr.ref));
     }
 }

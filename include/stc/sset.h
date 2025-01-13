@@ -35,7 +35,7 @@ int main(void) {
     Intset_insert(&s, 3);
     Intset_insert(&s, 5);
 
-    c_foreach (k, Intset, s)
+    for (c_each(k, Intset, s))
         printf("set %d\n", *k.ref);
     Intset_drop(&s);
 }

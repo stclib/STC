@@ -97,21 +97,21 @@ int main(void)
     Strings first = c_make(Strings, {"red", "green", "blue"});
     Strings second={0}, third={0}, fourth={0}, fifth={0};
 
-    c_foritems (i, const char*, {"orange", "pink", "yellow"})
+    for (c_items(i, const char*, {"orange", "pink", "yellow"}))
         Strings_emplace(&third, *i.ref);
 
-    c_foreach (i, Strings, third)
+    for (c_each(i, Strings, third))
         Strings_insert(&fifth, cstr_clone(*i.ref));
 
     Strings_emplace(&fourth, "potatoes");
     Strings_emplace(&fourth, "milk");
     Strings_emplace(&fourth, "flour");
 
-    c_foreach (i, Strings, fourth)
+    for (c_each(i, Strings, fourth))
         Strings_emplace(&fifth, cstr_str(i.ref));
 
     printf("fifth contains:\n\n");
-    c_foreach (i, Strings, fifth)
+    for (c_each(i, Strings, fifth))
         printf("%s\n", cstr_str(i.ref));
 
     c_drop(Strings, &first, &second, &third, &fourth, &fifth);

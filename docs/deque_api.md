@@ -125,14 +125,14 @@ void            deque_X_value_drop(i_key* pval);
 int main(void) {
     Deque q = {0};
     Deque_push_front(&q, 10);
-    c_foreach (i, Deque, q)
+    for (c_each(i, Deque, q))
         printf(" %d", *i.ref);
     puts("");
 
-    c_foritems (i, int, {1, 4, 5, 22, 33, 2})
+    for (c_items(i, int, {1, 4, 5, 22, 33, 2}))
         Deque_push_back(&q, *i.ref);
 
-    c_foreach (i, Deque, q)
+    for (c_each(i, Deque, q))
         printf(" %d", *i.ref);
     puts("");
 
@@ -141,7 +141,7 @@ int main(void) {
     Deque_push_back(&q, 11);
     Deque_push_front(&q, 8);
 
-    c_foreach (i, Deque, q)
+    for (c_each(i, Deque, q))
         printf(" %d", *i.ref);
     puts("");
     Deque_drop(&q);

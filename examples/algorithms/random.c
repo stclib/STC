@@ -13,7 +13,7 @@ int main(void)
     printf("Compare speed of full and unbiased ranged random numbers...\n");
     long long sum = 0;
     t = clock();
-    c_forrange (N)  {
+    for (c_range(N))  {
         sum += (int32_t)crand64_uint_r(&rng, 1);
     }
     t = clock() - t;
@@ -23,7 +23,7 @@ int main(void)
     sum = 0;
     rng = crand64_from(seed);
     t = clock();
-    c_forrange (N)  {
+    for (c_range(N))  {
         sum += (int32_t)crand64_uint_r(&rng, 1) % (range + 1); // biased
     }
     t = clock() - t;

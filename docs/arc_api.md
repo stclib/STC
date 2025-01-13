@@ -133,9 +133,9 @@ int main(void)
     Stack_push(&s2, Arc_clone(s1.data[1]));
 
     puts("S2 is now");
-    c_foreach (i, Stack, s2) {
+    for (c_each(i, Stack, s2)) {
         Map m = Stack_value_toraw(i.ref);
-        c_foreach_kv (name, year, Map, m)
+        for (c_each_kv(name, year, Map, m))
             printf("  %s:%d\n", cstr_str(name), *year);
         puts("");
     }

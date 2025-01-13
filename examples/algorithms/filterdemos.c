@@ -54,7 +54,7 @@ void demo2(void)
             IVec_push(&vector, (int)*value),  // Populate output IVec
             c_flt_take(5))               // Only take five numbers
     );
-    c_foreach (i, IVec, vector)
+    for (c_each(i, IVec, vector))
         printf(" %d", *i.ref);           // Print result
     puts("");
     IVec_drop(&vector);
@@ -90,7 +90,7 @@ void demo3(void)
         && csview_contains(*value, "i")
         && SVec_push(&words_containing_i, *value)
     );
-    c_foreach (w, SVec, words_containing_i)
+    for (c_each(w, SVec, words_containing_i))
         printf(" " c_svfmt, c_svarg(*w.ref));
     puts("");
 

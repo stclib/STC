@@ -86,13 +86,13 @@ int main(void) {
     queue Q = {0};
 
     // push() and pop() a few.
-    c_forrange (i, 20)
+    for (c_range(i, 20))
         queue_push(&Q, i);
 
-    c_forrange (5)
+    for (c_range(5))
         queue_pop(&Q);
 
-    c_foreach (i, queue, Q)
+    for (c_each(i, queue, Q))
         printf(" %d", *i.ref);
 
     queue_drop(&Q);

@@ -23,17 +23,17 @@ int main(void)
 
         // printing map gquiz1
         printf("\nThe map gquiz1 is :\n\tKEY\tELEMENT\n");
-        c_foreach (itr, smap_int, gquiz1)
+        for (c_each(itr, smap_int, gquiz1))
             printf("\t%d\t%d\n", itr.ref->first, itr.ref->second);
         printf("\n");
 
         // assigning the elements from gquiz1 to gquiz2
-        c_foreach (i, smap_int, gquiz1)
+        for (c_each(i, smap_int, gquiz1))
             smap_int_insert(&gquiz2, i.ref->first, i.ref->second);
 
         // print all elements of the map gquiz2
         printf("\nThe map gquiz2 is :\n\tKEY\tELEMENT\n");
-        c_foreach (itr, smap_int, gquiz2)
+        for (c_each(itr, smap_int, gquiz2))
             printf("\t%d\t%d\n", itr.ref->first, itr.ref->second);
         printf("\n");
 
@@ -42,7 +42,7 @@ int main(void)
         printf("\tKEY\tELEMENT\n");
         smap_int_erase_range(&gquiz2, smap_int_begin(&gquiz2),
                                        smap_int_find(&gquiz2, 3));
-        c_foreach (itr, smap_int, gquiz2)
+        for (c_each(itr, smap_int, gquiz2))
             printf("\t%d\t%d\n", itr.ref->first, itr.ref->second);
         printf("\n");
 
@@ -50,7 +50,7 @@ int main(void)
         int num = smap_int_erase(&gquiz2, 4);
         printf("\ngquiz2.erase(4) : %d removed\n", num);
         printf("\tKEY\tELEMENT\n");
-        c_foreach (itr, smap_int, gquiz2)
+        for (c_each(itr, smap_int, gquiz2))
             printf("\t%d\t%d\n", itr.ref->first, itr.ref->second);
         printf("\n");
 

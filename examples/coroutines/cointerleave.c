@@ -13,7 +13,7 @@ struct GenValue {
 static long get_value(struct GenValue* g)
 {
     cco_routine (g) {
-        cco_foreach (g->it, IVec, *g->v)
+        for (cco_each(g->it, IVec, *g->v))
             cco_yield_v(*g->it.ref);
     }
     return 1L<<31;

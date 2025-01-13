@@ -43,7 +43,7 @@ int main(void) {
     SMap_emplace_or_assign(&m, "Testing three", 1000.0); // update
     SMap_erase(&m, "Testing two");
 
-    c_foreach (i, SMap, m)
+    for (c_each(i, SMap, m))
         printf("map %s: %g\n", cstr_str(&i.ref->first), i.ref->second);
 
     SMap_drop(&m);

@@ -32,7 +32,7 @@ int main(void) {
     cbits_resize(&bset, 43, false);
 
     printf("%4d: ", (int)cbits_size(&bset));
-    c_forrange (i, cbits_size(&bset))
+    for (c_range(i, cbits_size(&bset)))
         printf("%d", cbits_at(&bset, i));
     puts("");
     cbits_set(&bset, 28);
@@ -42,7 +42,7 @@ int main(void) {
     cbits_set_value(&bset, 99, false);
 
     printf("%4d: ", (int)cbits_size(&bset));
-    c_forrange (i, cbits_size(&bset))
+    for (c_range(i, cbits_size(&bset)))
         printf("%d", cbits_at(&bset, i));
     puts("");
 
@@ -95,7 +95,7 @@ int main(void) {
     const SetType* _cb_set = self; \
     isize _cb_start = start, _cb_end = end; \
     if (_cb_end == -1) _cb_end = SetType##_size(_cb_set); \
-    c_forrange_3 (_cb_i, _cb_start, _cb_end) \
+    for (c_range_3(_cb_i, _cb_start, _cb_end)) \
         fputc(SetType##_test(_cb_set, _cb_i) ? '1' : '0', stream); \
 } while (0)
 

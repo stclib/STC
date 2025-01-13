@@ -62,7 +62,7 @@ int main(void) {
 
     IDeq_sort(&nums);
 
-    c_foreach (i, IDeq, nums)
+    for (c_each (i, IDeq, nums))
         printf(" %d", *i.ref);
     puts("");
 

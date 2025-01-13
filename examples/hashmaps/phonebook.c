@@ -31,7 +31,7 @@
 
 void print_phone_book(hmap_cstr phone_book)
 {
-    c_foreach (i, hmap_cstr, phone_book)
+    for (c_each(i, hmap_cstr, phone_book))
         printf("%s\t- %s\n", cstr_str(&i.ref->first), cstr_str(&i.ref->second));
 }
 

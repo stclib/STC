@@ -20,10 +20,10 @@ int main(void)
     printf("%d: %s\n", res, num_pattern);
 
     // extract and convert all numbers in str to floats
-    c_formatch (i, &re, str)
+    for (c_match(i, &re, str))
         Fvec_push(&vec, (float)atof(i.match[0].buf));
 
-    c_foreach (i, Fvec, vec)
+    for (c_each(i, Fvec, vec))
         printf("  %g\n", (double)*i.ref);
 
     // extracts the numbers only to a comma separated string.

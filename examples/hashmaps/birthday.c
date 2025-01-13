@@ -18,7 +18,7 @@ static void test_repeats(void)
     crand64 rng = crand64_from(seed);
 
     hmap_ui m = hmap_ui_with_capacity(N);
-    c_forrange (i, N) {
+    for (c_range(i, N)) {
         uint64_t k = crand64_uint_r(&rng, 1) & mask;
         int v = hmap_ui_insert(&m, k, 0).ref->second += 1;
         if (v > 1) printf("repeated value %" PRIu64 " (%d) at 2^%d\n",
@@ -38,7 +38,7 @@ void test_distribution(void)
     const isize N = (isize)(1ull << BITS);
 
     hmap_uu map = {0};
-    c_forrange (N) {
+    for (c_range(N)) {
         uint64_t k = crand64_uint_r(&rng, 1);
         hmap_uu_insert(&map, k & 0xf, 0).ref->second += 1;
     }
@@ -47,7 +47,7 @@ void test_distribution(void)
     c_foreach (i, hmap_uu, map) sum += i.ref->second;
     sum /= (uint64_t)map.size;
 
-    c_foreach (i, hmap_uu, map) {
+    for (c_each(i, hmap_uu, map)) {
         printf("%4" PRIu32 ": %" PRIu64 " - %" PRIu64 ": %11.8f\n",
                 i.ref->first, i.ref->second, sum,
                 (1.0 - (double)i.ref->second / (double)sum));

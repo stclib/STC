@@ -99,7 +99,7 @@ int main(void)
     SSet second = c_make(SSet, {"red", "green", "blue"});
     SSet third={0}, fourth={0}, fifth={0};
 
-    c_foritems (i, const char*, {"orange", "pink", "yellow"})
+    for (c_items(i, const char*, {"orange", "pink", "yellow"}))
         SSet_emplace(&third, *i.ref);
 
     SSet_emplace(&fourth, "potatoes");
@@ -110,14 +110,14 @@ int main(void)
 
     fifth = SSet_clone(second);
 
-    c_foreach (i, SSet, third)
+    for (c_each(i, SSet, third))
         SSet_emplace(&fifth, cstr_str(i.ref));
 
-    c_foreach (i, SSet, fourth)
+    for (c_each(i, SSet, fourth))
         SSet_emplace(&fifth, cstr_str(i.ref));
 
     printf("fifth contains:\n\n");
-    c_foreach (i, SSet, fifth)
+    for (c_each(i, SSet, fifth))
         printf("%s\n", cstr_str(i.ref));
 
     c_drop(SSet, &second, &third, &fourth, &fifth);

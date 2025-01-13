@@ -24,7 +24,7 @@ int main(void)
     Boxmap_emplace(&map, "Test3", 3);
     Boxmap_emplace(&map, "Test4", 4);
 
-    c_foreach_kv (name, number, Boxmap, map)
+    for (c_each_kv(name, number, Boxmap, map))
         printf("%s: %ld\n", cstr_str(name), *number->get);
     puts("");
 

@@ -62,7 +62,7 @@ int main(void)
     Vikings_value* vv = Vikings_get_mut(&vikings, c_literal(RawVik){"Einar", "Norway"});
     if (vv) vv->second += 3; // add 3 hp points to Einar
 
-    c_foreach (i, Vikings, vikings) {
+    for (c_each(i, Vikings, vikings)) {
         RawVik rv = Viking_toraw(&i.ref->first);
         printf("%s of %s has %d hp\n", rv.name, rv.country, i.ref->second);
     }

@@ -9,9 +9,9 @@ TEST(deque, basics) {
     IDeq d = c_make(IDeq, {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12});
     EXPECT_EQ(12, IDeq_size(&d));
 
-    c_forrange (5)
+    for (c_range(5))
         IDeq_pop_front(&d);
-    c_forrange32 (i, 2, 9)
+    for (c_range32(i, 2, 9))
         IDeq_push_back(&d, i*10);
 
     IDeq res1 = c_make(IDeq, {6, 7, 8, 9, 10, 11, 12, 20, 30, 40, 50, 60, 70, 80});

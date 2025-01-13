@@ -22,19 +22,19 @@ int main(void)
     Bits_reset(&s2, 66);
     Bits_reset(&s2, 67);
     printf(" s2: ");
-    c_forrange (i, Bits_size(&s2))
+    for (c_range(i, Bits_size(&s2)))
         printf("%d", Bits_test(&s2, i));
     puts("");
 
     printf("xor: ");
     Bits_xor(&s1, &s2);
-    c_forrange (i, Bits_size(&s1))
+    for (c_range(i, Bits_size(&s1)))
         printf("%d", Bits_test(&s1, i));
     puts("");
 
     printf("all: ");
     Bits_set_pattern(&s1, 0x3333333333333333);
-    c_forrange (i, Bits_size(&s1))
+    for (c_range(i, Bits_size(&s1)))
         printf("%d", Bits_test(&s1, i));
     puts("");
 }

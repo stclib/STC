@@ -35,7 +35,7 @@ int main(void)
     const float nums[] = {4.0f, 2.0f, 5.0f, 3.0f, 1.0f};
 
     // PRIORITY QUEUE
-    c_forrange (i, c_arraylen(nums))
+    for (c_range(i, c_arraylen(nums)))
         pqueue_flt_push(&floats, nums[i]);
 
     puts("\npop and show high priorites first:");
@@ -54,7 +54,7 @@ int main(void)
     hmap_id_insert(&idnames, 110, cstr_lit("World"));
     hmap_id_insert(&idnames, 120, cstr_from_fmt("Howdy, -%d-", year));
 
-    c_foreach (i, hmap_id, idnames)
+    for (c_each(i, hmap_id, idnames))
         printf("%d: %s\n", i.ref->first, cstr_str(&i.ref->second));
     puts("");
     hmap_id_drop(&idnames);
@@ -76,7 +76,7 @@ int main(void)
     hmap_nat_emplace(&countries, "Norway", 0).ref->second += 20;
     hmap_nat_emplace(&countries, "Finland", 0).ref->second += 20;
 
-    c_foreach_kv (country, health, hmap_nat, countries)
+    for (c_each_kv(country, health, hmap_nat, countries))
         printf("%s: %d\n", cstr_str(country), *health);
     puts("");
     hmap_nat_drop(&countries);
@@ -86,7 +86,7 @@ int main(void)
     vec_ip pairs1 = c_make(vec_ip, {{5, 6}, {3, 4}, {1, 2}, {7, 8}});
     vec_ip_sort(&pairs1);
 
-    c_foreach (i, vec_ip, pairs1)
+    for (c_each(i, vec_ip, pairs1))
         printf("(%d %d) ", i.ref->x, i.ref->y);
     puts("");
     vec_ip_drop(&pairs1);
@@ -96,7 +96,7 @@ int main(void)
     list_ip pairs2 = c_make(list_ip, {{5, 6}, {3, 4}, {1, 2}, {7, 8}});
     list_ip_sort(&pairs2);
 
-    c_foreach (i, list_ip, pairs2)
+    for (c_each(i, list_ip, pairs2))
         printf("(%d %d) ", i.ref->x, i.ref->y);
     puts("");
     list_ip_drop(&pairs2);

@@ -14,18 +14,18 @@ int main(void) {
 
     // Push ten million random numbers to priority queue
     printf("Push %d numbers\n", N);
-    c_forrange (N)
+    for (c_range(N))
         PQueue_push(&heap, crand64_uint_r(&rng, 1) & ((1<<20) - 1));
 
     // push some negative numbers too.
-    c_foritems (i, int, {-231, -32, -873, -4, -343})
+    for (c_items(i, int, {-231, -32, -873, -4, -343}))
         PQueue_push(&heap, *i.ref);
 
-    c_forrange (N)
+    for (c_range(N))
         PQueue_push(&heap, crand64_uint_r(&rng, 1) & ((1<<20) - 1));
 
     puts("Extract the hundred smallest.");
-    c_forrange (100) {
+    for (c_range(100)) {
         printf("%d ", PQueue_pull(&heap));
     }
 

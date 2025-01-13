@@ -81,13 +81,15 @@ typedef struct {
     csview match[CREG_MAX_CAPTURES];
 } cregex_iter;
 
-#define c_formatch(it, re, str) \
-    for (cregex_iter it = {.regex=re, .input={str}, .match={{0}}}; \
-         cregex_match_next(it.regex, it.input.buf, it.match) == CREG_OK && it.match[0].size; )
+#define c_formatch(...) for (c_match(__VA_ARGS__))  // [deprecated]
 
-#define c_formatch_sv(it, re, strview) \
-    for (cregex_iter it = {.regex=re, .input=strview, .match={{0}}}; \
-         cregex_match_next_sv(it.regex, it.input, it.match) == CREG_OK && it.match[0].size; )
+#define c_match(it, re, str) \
+    cregex_iter it = {.regex=re, .input={str}, .match={{0}}}; \
+    cregex_match_next(it.regex, it.input.buf, it.match) == CREG_OK && it.match[0].size;
+
+#define c_match_sv(it, re, strview) \
+    cregex_iter it = {.regex=re, .input=strview, .match={{0}}}; \
+    cregex_match_next_sv(it.regex, it.input, it.match) == CREG_OK && it.match[0].size;
 
 /* compile a regex from a pattern. return CREG_OK, or negative error code on failure. */
 int cregex_compile_pro(cregex *re, const char* pattern, int cflags);

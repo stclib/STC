@@ -27,7 +27,7 @@ int main(void)
     const int years[] = {2021, 2012, 2022, 2015};
 
     Arcvec vec = {0};
-    c_forrange (i, c_arraylen(years)) {
+    for (c_range(i, c_arraylen(years))) {
         Arcvec_emplace(&vec, years[i]);
         // Arcvec_push(&vec, Arc_from(years[i])); // alt.
     }
@@ -35,13 +35,13 @@ int main(void)
     Arcvec_sort(&vec);
 
     printf("vec:");
-    c_foreach (i, Arcvec, vec)
+    for (c_each(i, Arcvec, vec))
         printf(" %d", *i.ref->get);
     puts("");
 
     // add odd numbers from vec to set
     Arcset set = {0};
-    c_foreach (i, Arcvec, vec)
+    for (c_each(i, Arcvec, vec))
         if (*i.ref->get & 1)
             Arcset_insert(&set, Arc_clone(*i.ref)); // copy shared pointer => increments counter.
 

@@ -159,7 +159,7 @@ main(void)
     int width = (int)cstr_find(&maze, "\n") + 1;
     deque_pnt ret_path = astar(&maze, width);
 
-    c_foreach (it, deque_pnt, ret_path)
+    for (c_each(it, deque_pnt, ret_path))
         cstr_data(&maze)[point_index(it.ref)] = 'x';
 
     printf("%s", cstr_str(&maze));

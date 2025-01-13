@@ -16,8 +16,8 @@
 void print(const char* lbl, const Multimap mmap)
 {
     printf("%s ", lbl);
-    c_foreach (e, Multimap, mmap) {
-        c_foreach (s, list_cstr, e.ref->second)
+    for (c_each(e, Multimap, mmap)) {
+        for (c_each(s, list_cstr, e.ref->second))
             printf("{%d,%s} ", e.ref->first, cstr_str(s.ref));
     }
     puts("");
@@ -35,7 +35,7 @@ int main(void)
 
     // list-initialize
     struct pair {int a; const char* b;};
-    c_foritems (i, struct pair, {{2, "foo"}, {2, "bar"}, {3, "baz"}, {1, "abc"}, {5, "def"}})
+    for (c_items(i, struct pair, {{2, "foo"}, {2, "bar"}, {3, "baz"}, {1, "abc"}, {5, "def"}}))
         insert(&mmap, i.ref->a, i.ref->b);
     print("#1", mmap);
 
@@ -51,7 +51,7 @@ int main(void)
     print("#4", mmap);
 
     // insert using initialization_list
-    c_foritems (i, struct pair, {{5, "one"}, {5, "two"}})
+    for (c_items(i, struct pair, {{5, "one"}, {5, "two"}}))
         insert(&mmap, i.ref->a, i.ref->b);
     print("#5", mmap);
 

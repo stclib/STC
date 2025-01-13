@@ -3,7 +3,7 @@
 
 # STC - Smart Template Containers
 
-## Release 5.0
+## Version 5.0.1
 STC is a comprehensive, modern, typesafe and fast templated general purpose container and algorithms
 library for C99. It aims to make C-programming even more fun, more productive and safer.
 
@@ -177,7 +177,7 @@ int main(void)
     for (int i = 0; i < Floats_size(&nums); ++i)
         printf(" %g", nums.data[i]);
 
-    c_foreach (i, Floats, nums)     // Alternative and recommended way to iterate.
+    for (c_each(i, Floats, nums))     // Alternative and recommended way to iterate.
         printf(" %g", *i.ref);      // i.ref is a pointer to the current element.
 
     Floats_drop(&nums); // cleanup memory
@@ -199,7 +199,7 @@ int main(void)
     Floats_push(&nums, 20.f);
 
     // print the numbers (sorted)
-    c_foreach (i, Floats, nums)
+    for (c_each(i, Floats, nums))
         printf(" %g", *i.ref);
 
     Floats_drop(&nums);
@@ -250,8 +250,8 @@ int main(void)
 
     Vec2D clone = Vec2D_clone(vec_a);   // Make a deep-copy of vec
 
-    c_foreach (i, Vec2D, clone)         // Loop through the cloned vector
-        c_foreach (j, Vec, *i.ref)
+    for (c_each(i, Vec2D, clone))         // Loop through the cloned vector
+        for (c_each(j, Vec, *i.ref))
             printf(" %g", *j.ref);
 
     c_drop(Vec2D, &vec_a, &vec_b, &clone);  // Free all 9 vectors.
@@ -324,19 +324,19 @@ int main(void)
 
         printf("After erasing the elements found:");
         printf("\n set:");
-        c_foreach (i, hset_int, set)
+        for (c_each(i, hset_int, set))
             printf(" %d", *i.ref);
 
         printf("\n vec:");
-        c_foreach (i, vec_pnt, vec)
+        for (c_each(i, vec_pnt, vec))
             printf(" (%g, %g)", i.ref->x, i.ref->y);
 
         printf("\n lst:");
-        c_foreach (i, list_int, lst)
+        for (c_each(i, list_int, lst))
             printf(" %d", *i.ref);
 
         printf("\n map:");
-        c_foreach (i, smap_int, map)
+        for (c_each(i, smap_int, map))
             printf(" [%d: %d]", i.ref->first, i.ref->second);
     }
 }
@@ -384,7 +384,7 @@ same element access syntax. The following works for single-element type containe
 #include "stc/list.h"
 ...
 MyInts ints = c_make(MyInts, {3, 5, 9, 7, 2});
-c_foreach (it, MyInts, ints) *it.ref += 42;
+for (c_each(it, MyInts, ints)) *it.ref += 42;
 ```
 </details>
 <details>
@@ -394,7 +394,7 @@ c_foreach (it, MyInts, ints) *it.ref += 42;
 
 - Naming conventions
     - Non-templated container names are prefixed by `c`, e.g. `cstr`, `cbits`, `cregex`.
-    - Public STC macros and "keywords" are prefixed by `c_`, e.g. `c_foreach`, `c_make`.
+    - Public STC macros and "keywords" are prefixed by `c_`, e.g. `c_each`, `c_make`.
     - Template parameter macros are prefixed by `i_`, e.g. `i_key`, `i_type`.
     - All owning containers can be initialized with `{0}` (also `cstr`), i.e. no heap allocation initially.
 
@@ -704,10 +704,10 @@ Usage is straight forward:
 void maptest()
 {
     IMap map = {.aux={CurrentMemoryContext}};
-    c_forrange (i, 1, 16)
+    for (c_range(i, 1, 16))
         IMap_insert(&map, i*i, i); // uses pgs_malloc
 
-    c_foreach (i, IMap, map)
+    for (c_each(i, IMap, map))
         printf("%d:%d ", i.ref->first, i.ref->second);
 
     IMap_drop(&map);
@@ -745,7 +745,7 @@ STC is generally very memory efficient. Memory usage for the different container
     - Changed API in `random` numbers.
     - c_init renamed to `c_make`
     - c_forlist renamed to `c_foritems`
-    - c_forpair *replaced by* `c_foreach_kv` (changed API).
+    - c_forpair *replaced by* `c_each_kv` (changed API).
     - Renamed all functions stc_\<xxxx\>() to `c_<xxxx>()` in common.h.
     - c_SVFMT(sv) renamed tp `c_svfmt(sv)`
     - c_SVARG(sv) renamed tp `c_svarg(sv)`

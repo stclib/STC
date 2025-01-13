@@ -142,19 +142,19 @@ Interleave *push_front()* / *push_back()* then *sort()*:
 int main(void) {
     DList list = c_make(DList, {10., 20., 30., 40., 50., 60., 70., 80., 90.});
 
-    c_forrange (i, 1, 10) {
+    for (c_range(i, 1, 10)) {
         if (i & 1) DList_push_front(&list, (double) i);
         else       DList_push_back(&list, (double) i);
     }
 
     printf("initial: ");
-    c_foreach (i, DList, list)
+    for (c_each(i, DList, list))
         printf(" %g", *i.ref);
 
     DList_sort(&list); // uses quicksort
 
     printf("\nsorted: ");
-    c_foreach (i, DList, list)
+    for (c_each(i, DList, list))
         printf(" %g", *i.ref);
 
     DList_drop(&list);
@@ -183,7 +183,7 @@ int main(void)
     it = IList_erase_range(&L, it, end);    // 10 30
                                             //       ^
     printf("mylist contains:");
-    c_foreach (x, IList, L)
+    for (c_each(x, IList, L))
         printf(" %d", *x.ref);
     puts("");
 
@@ -204,8 +204,8 @@ int main(void) {
     IList L1 = c_make(IList, {1, 2, 3, 4, 5});
     IList L2 = c_make(IList, {10, 20, 30, 40, 50});
 
-    c_foritems (k, IList, {L1, L2}) {
-        c_foreach (i, IList, *k.ref)
+    for (c_items(k, IList, {L1, L2})) {
+        for (c_each(i, IList, *k.ref))
             printf(" %d", *i.ref);
         puts("");
     }
@@ -215,8 +215,8 @@ int main(void) {
 
     IList_splice_range(&L1, i, &L2, j1, j2);
 
-    c_foritems (k, IList, {L1, L2}) {
-        c_foreach (i, IList, *k.ref)
+    for (c_items(k, IList, {L1, L2})) {
+        for (c_each(i, IList, *k.ref))
             printf(" %d", *i.ref);
         puts("");
     }

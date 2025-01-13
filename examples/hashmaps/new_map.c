@@ -35,7 +35,7 @@ int main(void)
 {
     hmap_pnt pmap = c_make(hmap_pnt, {{{42, 14}, 1}, {{32, 94}, 2}, {{62, 81}, 3}});
 
-    c_foreach (i, hmap_pnt, pmap)
+    for (c_each(i, hmap_pnt, pmap))
         printf(" (%d, %d: %d)", i.ref->first.x, i.ref->first.y, i.ref->second);
     puts("");
 
@@ -55,7 +55,7 @@ int main(void)
     hmap_int_insert(&map, 456, 654);
     hmap_int_insert(&map, 789, 987);
 
-    c_foreach (i, hset_cstr, sset)
+    for (c_each(i, hset_cstr, sset))
         printf(" %s\n", cstr_str(i.ref));
 
     hmap_int_drop(&map);

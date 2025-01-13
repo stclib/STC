@@ -32,14 +32,16 @@ int Philosopher(struct Philosopher* self) {
             self->state = ph_hungry;
             cco_await(self->hunger >= self->left->hunger &&
                       self->hunger >= self->right->hunger);
-            self->left->hunger++; // don't starve the neighbours
-            self->right->hunger++;
 
             duration = 0.5 + crand64_real();
             printf("Philosopher %d is eating for %.0f minutes...\n", self->id, duration*10);
-            self->hunger = INT32_MAX;
+            self->hunger = 3;
             self->state = ph_eating;
             cco_await_timer_sec(&self->tm, duration);
+
+            // increase the neighbours hunger only if they are already hungry.
+            if (self->left->state == ph_hungry) ++self->left->hunger;
+            if (self->right->state == ph_hungry) ++self->right->hunger;
         }
 
         cco_finally:

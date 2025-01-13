@@ -40,7 +40,7 @@ int main(void) {
     hmap_cstr_erase(&contacts, "Ashley");
 
     puts("");
-    c_foreach_kv (contact, number, hmap_cstr, contacts) {
+    for (c_each_kv(contact, number, hmap_cstr, contacts)) {
         printf("Calling %s: %s\n", cstr_str(contact), call(cstr_str(number)));
     }
     puts("");

@@ -21,7 +21,7 @@ int main(void)
         printf(" str: %s\n", cbits_to_str(&set, buf, 0, 255));
 
         printf("%4d: ", (int)cbits_size(&set));
-        c_forrange (i, cbits_size(&set))
+        for (c_range(i, cbits_size(&set)))
             printf("%d", cbits_test(&set, i));
         puts("");
 
@@ -31,12 +31,12 @@ int main(void)
         cbits_resize(&set, 102, true);
         cbits_set_value(&set, 99, false);
         printf("%4d: ", (int)cbits_size(&set));
-        c_forrange (i, cbits_size(&set))
+        for (c_range(i, cbits_size(&set)))
             printf("%d", cbits_test(&set, i));
 
         puts("\nIterate:");
         printf("%4d: ", (int)cbits_size(&set));
-        c_forrange (i, cbits_size(&set))
+        for (c_range(i, cbits_size(&set)))
             printf("%d", cbits_test(&set, i));
         puts("");
 
@@ -47,19 +47,19 @@ int main(void)
         cbits_set(&s2, 17);
         cbits_set(&s2, 18);
         printf(" new: ");
-        c_forrange (i, cbits_size(&s2))
+        for (c_range(i, cbits_size(&s2)))
             printf("%d", cbits_test(&s2, i));
         puts("");
 
         printf(" xor: ");
         cbits_xor(&set, &s2);
-        c_forrange (i, cbits_size(&set))
+        for (c_range(i, cbits_size(&set)))
             printf("%d", cbits_test(&set, i));
         puts("");
 
         cbits_set_all(&set, false);
         printf("%4d: ", (int)cbits_size(&set));
-        c_forrange (i, cbits_size(&set))
+        for (c_range(i, cbits_size(&set)))
             printf("%d", cbits_test(&set, i));
         puts("");
     }

@@ -47,11 +47,11 @@ int main(void)
     });
     SSet sset = {0};
 
-    c_foreach_kv (p, i, PMap, pmap)
+    for (c_each_kv(p, i, PMap, pmap))
         printf(" (%d,%d: %d)", p->x, p->y, *i);
     puts("");
 
-    c_foreach_kv (i, j, SMap, smap)
+    for (c_each_kv(i, j, SMap, smap))
         printf(" (%s: %s)\n", cstr_str(i), cstr_str(j));
 
     SSet_emplace(&sset, "Hello, friend");

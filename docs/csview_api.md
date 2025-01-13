@@ -85,7 +85,7 @@ Iterate tokens in an input string split by a separator string:
 - `it.token` is a csview of the current token.
 
 ```c++
-c_fortoken (i, ", ", "hello, one, two, three")
+for (c_token(i, ", ", "hello, one, two, three"))
     printf("'" c_svfmt "' ", c_svarg(i.token));
 // 'hello' 'one' 'two' 'three'
 ```
@@ -155,7 +155,7 @@ int main(void)
     cstr_u8_replace(&s1, 7, 1, "ø");
     printf("%s\n", cstr_str(&s1));
 
-    c_foreach (i, cstr, s1)
+    for (c_each(i, cstr, s1))
         printf(c_svfmt ",", c_svarg(i.chr));
 
     cstr_drop(&s1);
@@ -176,7 +176,7 @@ and does not depend on zero-terminated strings. *string_split()* function return
 
 void print_split(csview input, const char* sep)
 {
-    c_fortoken_sv (i, sep, input)
+    for (c_token_sv(i, sep, input))
         printf("[" c_svfmt "]\n", c_svarg(i.token));
     puts("");
 }
@@ -188,7 +188,7 @@ stack_cstr string_split(csview input, const char* sep)
 {
     stack_cstr out = {0};
 
-    c_fortoken (i, sep, input)
+    for (c_token(i, sep, input))
         stack_cstr_push(&out, cstr_from_sv(i.token));
 
     return out;
@@ -201,7 +201,7 @@ int main(void)
 
     stack_cstr s = string_split(c_sv("Split,this,,string,now,"), ",");
 
-    c_foreach (i, stack_cstr, s)
+    for (c_each(i, stack_cstr, s))
         printf("[%s]\n", cstr_str(i.ref));
     puts("");
 

@@ -108,7 +108,7 @@ static void Polygon_draw(const Shape* shape)
 {
     const Polygon* self = DYN_CAST(Polygon, shape);
     printf("Polygon  :");
-    c_foreach (i, PointVec, self->points)
+    for (c_each(i, PointVec, self->points))
         printf(" (%g,%g)", (double)i.ref->x, (double)i.ref->y);
     puts("");
 }
@@ -140,17 +140,17 @@ int main(void)
     Polygon* pol1 = c_new(Polygon, Polygon_init());
     Polygon* pol2 = c_new(Polygon, Polygon_init());
 
-    c_foritems (i, Point, {{50, 72}, {123, 73}, {127, 201}, {828, 333}})
+    for (c_items(i, Point, {{50, 72}, {123, 73}, {127, 201}, {828, 333}}))
         Polygon_addPoint(pol1, *i.ref);
 
-    c_foritems (i, Point, {{5, 7}, {12, 7}, {12, 20}, {82, 33}, {17, 56}})
+    for (c_items(i, Point, {{5, 7}, {12, 7}, {12, 20}, {82, 33}, {17, 56}}))
         Polygon_addPoint(pol2, *i.ref);
 
     Shapes_push(&shapes, &tri1->shape);
     Shapes_push(&shapes, &pol1->shape);
     Shapes_push(&shapes, &pol2->shape);
 
-    c_foreach (i, Shapes, shapes)
+    for (c_each(i, Shapes, shapes))
         testShape(*i.ref);
 
     Shapes_drop(&shapes);

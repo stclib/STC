@@ -19,13 +19,13 @@ int main(void) {
     IntQ Q = {0};
 
     // Push 50'000'000 random numbers onto the queue.
-    c_forrange (n)
+    for (c_range(n))
         IntQ_push(&Q, crand64_uint_r(&rng, 1) & ((1<<24) - 1));
 
     // Push or pop on the queue 50 million times
     printf("befor: size %" c_ZI ", capacity %" c_ZI "\n", IntQ_size(&Q), IntQ_capacity(&Q));
 
-    c_forrange (n) {
+    for (c_range(n)) {
         int r = crand64_uint_r(&rng, 1) & ((1<<24) - 1);
         if (r & 3)
             IntQ_push(&Q, r);

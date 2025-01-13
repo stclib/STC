@@ -39,7 +39,7 @@ int main(void) {
     icmap_emplace_or_assign(&m, 5, 'd');  // update
     icmap_erase(&m, 8);
 
-    c_foreach (i, icmap, m)
+    for (c_each(i, icmap, m))
         printf("map %d: %c\n", i.ref->first, i.ref->second);
 
     icmap_drop(&m);

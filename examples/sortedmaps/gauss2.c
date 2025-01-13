@@ -25,13 +25,13 @@ int main(void)
     // Create and init histogram map with defered destruct
     SortedMap hist = {0};
 
-    c_forrange (N) {
+    for (c_range(N)) {
         int index = (int)round(crand64_normal(&d));
         SortedMap_insert(&hist, index, 0).ref->second += 1;
     }
 
     // Print the gaussian bar chart
-    c_foreach_kv (index, count, SortedMap, hist) {
+    for (c_each_kv(index, count, SortedMap, hist)) {
         int n = (int)round(2.5 * Scale * StdDev * (*count) / (isize)N);
         if (n > 0) {
             printf("%4d ", *index);

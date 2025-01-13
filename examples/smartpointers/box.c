@@ -53,7 +53,7 @@ int main(void)
     Persons_push(&vec, PBox_clone(p));
     Persons_push(&vec, PBox_clone(q));
 
-    c_foreach (i, Persons, vec)
+    for (c_each(i, Persons, vec))
         printf("%s %s\n", cstr_str(&i.ref->get->name), cstr_str(&i.ref->get->last));
     puts("");
 

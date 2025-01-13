@@ -9,7 +9,7 @@ int main(void)
     hmap_cstr_emplace(&m, "Test short", "This is a short string");
     hmap_cstr_emplace(&m, "Test long ", "This is a longer string");
 
-    c_foreach_kv (k, v, hmap_cstr, m)
+    for (c_each_kv(k, v, hmap_cstr, m))
         printf("%s: '%s' Len=%d, Is long: %s\n",
                 cstr_str(k), cstr_str(v), (int)cstr_size(v),
                 cstr_is_long(v) ? "true" : "false");

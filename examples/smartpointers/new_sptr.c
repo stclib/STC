@@ -7,7 +7,7 @@ void Person_drop(Person* p);
 int Person_cmp(const Person* a, const Person* b);
 size_t Person_hash(const Person* p);
 
-#define i_type PersonArc 
+#define i_type PersonArc
 #define i_keyclass Person // "class" binds _clone(), _drop()
 #define i_use_cmp         // binds _cmp(), _hash()
 #include "stc/arc.h"
@@ -67,7 +67,7 @@ int main(void) {
     IPStack_push(&vec, IPtr_clone(*IPStack_back(&vec)));
     IPStack_push(&vec, IPtr_clone(*IPStack_front(&vec)));
 
-    c_foreach (i, IPStack, vec)
+    for (c_each(i, IPStack, vec))
         printf(" (%d: refs %ld)", *i.ref->get, *i.ref->use_count);
     puts("");
     IPStack_drop(&vec);

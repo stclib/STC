@@ -12,7 +12,7 @@ using_cspan(intspan, const int);
 
 void printMe(intspan container) {
     printf("%d:", (int)cspan_size(&container));
-    c_foreach (e, intspan, container)
+    for (c_each(e, intspan, container))
         printf(" %d", *e.ref);
     puts("");
 }

@@ -36,7 +36,7 @@ int main(void)
 
     puts("Show all the primes in the range [2, 1000):");
     printf("2");
-    c_forrange (i, 3, 1000, 2)
+    for (c_range(i, 3, 1000, 2))
         if (cbits_test(&primes, i/2)) printf(" %d", (int)i);
     puts("\n");
 

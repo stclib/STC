@@ -10,7 +10,7 @@ TEST(vec, basics) {
     EXPECT_EQ(12, IVec_size(&d));
 
     IVec_erase_n(&d, 0, 5);
-    c_forrange32 (i, 2, 9)
+    for (c_range32(i, 2, 9))
         IVec_push_back(&d, i*10);
 
     IVec res = c_make(IVec, {6, 7, 8, 9, 10, 11, 12, 20, 30, 40, 50, 60, 70, 80});

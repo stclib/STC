@@ -40,7 +40,7 @@
             List_push_back(&list, crand64_uint() & (1<<24) - 1;
 
         int n = 0;
-        c_foreach (i, List, list)
+        for (c_each(i, List, list))
             if (++n % 100000 == 0) printf("%8d: %10zu\n", n, *i.ref);
 
         // Sort them...
@@ -48,7 +48,7 @@
 
         n = 0;
         puts("sorted");
-        c_foreach (i, List, list)
+        for (c_each(i, List, list))
             if (++n % 100000 == 0) printf("%8d: %10zu\n", n, *i.ref);
 
         List_drop(&list);
@@ -228,7 +228,7 @@ STC_INLINE bool _c_MEMB(_eq)(const Self* self, const Self* other) {
 STC_DEF Self
 _c_MEMB(_clone)(Self lst) {
     Self tmp = {0};
-    c_foreach (it, Self, lst)
+    for (c_each(it, Self, lst))
         _c_MEMB(_push_back)(&tmp, i_keyclone((*it.ref)));
     lst.last = tmp.last;
     return lst;
@@ -362,7 +362,7 @@ _c_MEMB(_split_off)(Self* self, _m_iter it1, _m_iter it2) {
 #if defined _i_has_eq
 STC_DEF _m_iter
 _c_MEMB(_find_in)(_m_iter it1, _m_iter it2, _m_raw val) {
-    c_foreach (it, Self, it1, it2) {
+    for (c_each(it, Self, it1, it2)) {
         _m_raw r = i_keytoraw(it.ref);
         if (i_eq((&r), (&val)))
             return it;
@@ -394,7 +394,7 @@ STC_DEF bool _c_MEMB(_sort)(Self* self) {
     isize len = 0, cap = 0;
     _m_value *arr = NULL, *p = NULL;
     _m_node* keep;
-    c_foreach (i, Self, *self) {
+    for (c_each(i, Self, *self)) {
         if (len == cap) {
             isize cap_n = cap + cap/2 + 8;
             if ((p = (_m_value *)i_realloc(arr, cap*c_sizeof *p, cap_n*c_sizeof *p)) == NULL)
@@ -407,7 +407,7 @@ STC_DEF bool _c_MEMB(_sort)(Self* self) {
     self->last = (_m_node *)arr;
     _c_MEMB(_sort_lowhigh)(self, 0, len - 1);
     self->last = keep;
-    c_foreach (i, Self, *self)
+    for (c_each(i, Self, *self))
         *i.ref = *p++;
     done: i_free(arr, cap*c_sizeof *arr);
     return p != NULL;

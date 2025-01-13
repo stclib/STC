@@ -58,7 +58,7 @@ int main(void)
         if (it2.ref)
             printf("Sorted Set %d: find       : %d\n", key, *it2.ref); // 600
 
-        c_foreach (i, ISet, it1, it2)
+        for (c_each(i, ISet, it1, it2))
             printf("  %d\n", *i.ref);
 
         ISet_drop(&set);

@@ -8,7 +8,7 @@ int main(void)
 {
     IList L = c_make(IList, {10, 20, 30, 40, 50});
 
-    c_foreach (x, IList, L)
+    for (c_each(x, IList, L))
         printf("%d ", *x.ref);
     puts("");
                                           // 10 20 30 40 50
@@ -21,7 +21,7 @@ int main(void)
     it = IList_erase_range(&L, it, end);  // 10 30
                                           //       ^
     printf("list contains:");
-    c_foreach (x, IList, L)
+    for (c_each(x, IList, L))
         printf(" %d", *x.ref);
     puts("");
 

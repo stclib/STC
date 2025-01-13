@@ -131,7 +131,7 @@ if (cregex_match_aio(pattern, input, match))
     printf("Found date: " c_svfmt "\n", c_svarg(match[0]));
 ```
 
-### Iterate through regex matches, *c_formatch*
+### Iterate through regex matches, for (*c_match()*)
 
 To iterate multiple matches in an input string, you may use
 ```c++
@@ -140,9 +140,9 @@ while (cregex_match_next(&re, input, match) == CREG_OK)
     for (int k = 1; i <= cregex_captures(&re); ++k)
         printf("submatch %d: " c_svfmt "\n", k, c_svarg(match[k]));
 ```
-There is also a `c_formatch` macro which simplifies this:
+There is also a `c_match` macro which simplifies this:
 ```c++
-c_formatch (it, &re, input)
+for (c_match(it, &re, input))
     for (int k = 1; i <= cregex_captures(&re); ++k)
         printf("submatch %d: " c_svfmt "\n", k, c_svarg(it.match[k]));
 ```

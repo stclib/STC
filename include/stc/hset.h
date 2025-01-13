@@ -32,7 +32,7 @@ int main(void) {
     iset_insert(&set, 5);
     iset_insert(&set, 8);
 
-    c_foreach (i, iset, set)
+    for (c_each(i, iset, set))
         printf("set %d\n", *i.ref);
     iset_drop(&set);
 }

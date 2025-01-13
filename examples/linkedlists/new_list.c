@@ -50,7 +50,7 @@ int main(void)
     list_pnt plist = c_make(list_pnt, {{42, 14}, {32, 94}, {62, 81}});
     list_pnt_sort(&plist);
 
-    c_foreach (i, list_pnt, plist)
+    for (c_each(i, list_pnt, plist))
         printf(" (%d %d)", i.ref->x, i.ref->y);
     puts("");
     list_pnt_drop(&plist);
@@ -59,7 +59,7 @@ int main(void)
     list_float flist = c_make(list_float, {123.3f, 321.2f, -32.2f, 78.2f});
     list_float_sort(&flist);
 
-    c_foreach (i, list_float, flist)
+    for (c_each(i, list_float, flist))
         printf(" %g", (double)*i.ref);
 
     puts("");

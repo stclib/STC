@@ -320,18 +320,18 @@ int cco_taskrunner(struct cco_taskrunner* co) {
  * }
  *
  * ...
- * c_foreach (i, Gen, gen)
+ * for (c_each(i, Gen, gen))
  *     printf("%d ", *i.ref);
  */
 
 /*
  * Iterate containers with already defined iterator (prefer to use in coroutines only):
  */
-#define cco_foreach(existing_it, C, cnt) \
-    for (existing_it = C##_begin(&cnt); (existing_it).ref; C##_next(&existing_it))
+#define cco_each(existing_it, C, cnt) \
+    existing_it = C##_begin(&cnt); (existing_it).ref; C##_next(&existing_it)
 
-#define cco_foreach_reverse(existing_it, C, cnt) \
-    for (existing_it = C##_rbegin(&cnt); (existing_it).ref; C##_rnext(&existing_it))
+#define cco_each_reverse(existing_it, C, cnt) \
+    existing_it = C##_rbegin(&cnt); (existing_it).ref; C##_rnext(&existing_it)
 
 /*
  * Using c_filter with coroutine iterators:

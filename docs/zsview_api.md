@@ -86,7 +86,7 @@ int main(void)
     zsview say = c_zv("Liberté, égalité, fraternité.");
     printf("%s\n", zs.str);
 
-    c_foreach (i, zsview, say)
+    for (c_each(i, zsview, say))
         printf(c_svfmt " ", c_svarg(i.chr));
     puts("");
 

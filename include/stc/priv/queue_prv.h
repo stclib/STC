@@ -163,7 +163,7 @@ STC_DEF _m_iter _c_MEMB(_advance)(_m_iter it, isize n) {
 
 STC_DEF void
 _c_MEMB(_clear)(Self* self) {
-    c_foreach (i, Self, *self)
+    for (c_each(i, Self, *self))
         { i_keydrop(i.ref); }
     self->start = 0, self->end = 0;
 }
@@ -226,7 +226,7 @@ _c_MEMB(_shrink_to_fit)(Self *self) {
     Self out = _c_MEMB(_with_capacity)(sz);
     if (out.cbuf == NULL)
         return;
-    c_foreach (i, Self, *self)
+    for (c_each(i, Self, *self))
         out.cbuf[j++] = *i.ref;
     out.end = sz;
     i_free(self->cbuf, (self->capmask + 1)*c_sizeof(*self->cbuf));
@@ -239,7 +239,7 @@ _c_MEMB(_clone)(Self q) {
     isize sz = _c_MEMB(_size)(&q), j = 0;
     Self tmp = _c_MEMB(_with_capacity)(sz);
     if (tmp.cbuf)
-        c_foreach (i, Self, q)
+        for (c_each(i, Self, q))
             tmp.cbuf[j++] = i_keyclone((*i.ref));
     q.cbuf = tmp.cbuf;
     q.capmask = tmp.capmask;

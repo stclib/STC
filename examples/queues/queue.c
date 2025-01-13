@@ -11,7 +11,7 @@ int main(void) {
     queue_i queue = {0};
 
     // Push ten million random numbers onto the queue.
-    c_forrange (n)
+    for (c_range(n))
         queue_i_push(&queue, crand64_uint() & ((1 << 20) - 1));
 
     // Push or pop on the queue ten million times

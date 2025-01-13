@@ -145,7 +145,7 @@ int main(void)
     });
 
     // Iterate and print keys and values of unordered map
-    c_foreach (n, hmap_cstr, umap) {
+    for (c_each(n, hmap_cstr, umap)) {
         hmap_cstr_raw v = hmap_cstr_value_toraw(n.ref);
         printf("Key:[%s] Value:[%s]\n", v.first, v.second);
     }
@@ -182,7 +182,7 @@ int main(void)
     hmap_iv_insert(&vecs, 3, (Vec3i){  0,   0, 100});
     hmap_iv_insert(&vecs, 4, (Vec3i){100, 100, 100});
 
-    c_foreach_kv (num, v3, hmap_iv, vecs)
+    for (c_each_kv(num, v3, hmap_iv, vecs))
         printf("%d: { %3d, %3d, %3d }\n", *num, v3->x, v3->y, v3->z);
 
     hmap_iv_drop(&vecs);
@@ -211,7 +211,7 @@ int main(void)
     hmap_vi_insert(&vecs, (Vec3i){  0,   0, 100}, 3);
     hmap_vi_insert(&vecs, (Vec3i){100, 100, 100}, 4);
 
-    c_foreach_kv (v3, num, hmap_vi, vecs)
+    for (c_each_kv(v3, num, hmap_vi, vecs))
         printf("{ %3d, %3d, %3d }: %d\n", v3->x, v3->y, v3->z, *num);
 
     hmap_vi_drop(&vecs);
@@ -272,7 +272,7 @@ int main(void)
     Viking_drop(&lookup);
 
     // Print the status of the vikings.
-    c_foreach_kv (viking, health, Vikings, vikings) {
+    for (c_each_kv(viking, health, Vikings, vikings)) {
         printf("%s of %s has %d hp\n", cstr_str(&viking->name),
                                        cstr_str(&viking->country), *health);
     }
@@ -349,7 +349,7 @@ int main(void)
     // Now lookup is using Viking_raw, not Viking:
     printf("Lookup: Olaf of Denmark has %d hp\n\n", *Vikings_at(&vikings, (Viking_raw){"Olaf", "Denmark"}));
 
-    c_foreach (v, Vikings, vikings) {
+    for (c_each(v, Vikings, vikings)) {
         Vikings_raw r = Vikings_value_toraw(v.ref);
         printf("%s of %s has %d hp\n", r.first.name, r.first.country, r.second);
     }

@@ -11,23 +11,23 @@
 int main(void)
 {
     puts("c_forrange:");
-    c_forrange (30) printf(" xx");
+    for (c_range(30)) printf(" xx");
     puts("");
 
-    c_forrange (i, 30) printf(" %d", (int)i);
+    for (c_range(i, 30)) printf(" %d", (int)i);
     puts("");
 
-    c_forrange (i, 30, 60) printf(" %d", (int)i);
+    for (c_range(i, 30, 60)) printf(" %d", (int)i);
     puts("");
 
-    c_forrange (i, 30, 90, 2) printf(" %d", (int)i);
+    for (c_range(i, 30, 90, 2)) printf(" %d", (int)i);
 
     puts("\n\nc_forlist:");
-    c_foritems (i, int, {12, 23, 453, 65, 676})
+    for (c_items(i, int, {12, 23, 453, 65, 676}))
         printf(" %d", *i.ref);
     puts("");
 
-    c_foritems (i, const char*, {"12", "23", "453", "65", "676"})
+    for (c_items(i, const char*, {"12", "23", "453", "65", "676"}))
         printf(" %s", *i.ref);
     puts("");
 
@@ -35,15 +35,15 @@ int main(void)
     IMap map = c_make(IMap, {{12, 23}, {453, 65}, {676, 123}, {34, 67}});
 
     puts("\n\nc_foreach:");
-    c_foreach (i, IVec, vec)
+    for (c_each(i, IVec, vec))
         printf(" %d", *i.ref);
 
     puts("\n\nc_foreach in map:");
-    c_foreach (i, IMap, map)
+    for (c_each(i, IMap, map))
         printf(" (%d %d)", i.ref->first, i.ref->second);
 
     puts("\n\nc_forpair:");
-    c_foreach_kv (key, val, IMap, map)
+    for (c_each_kv(key, val, IMap, map))
         printf(" (%d %d)", *key, *val);
 
     #define f_isOdd() (*value & 1)

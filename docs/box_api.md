@@ -111,11 +111,11 @@ int main(void)
     ISet set = {0};
 
     printf("vec:");
-    c_foreach (i, IVec, vec)
+    for (c_each(i, IVec, vec))
         printf(" %d", *i.ref->get);
 
     // add odd numbers from vec to set
-    c_foreach (i, IVec, vec) {
+    for (c_each(i, IVec, vec)) {
         if (*i.ref->get & 1) {
             ISet_insert(&set, IBox_clone(*i.ref));
         }
@@ -124,11 +124,11 @@ int main(void)
     IVec_pop(&vec);
     IVec_pop(&vec);
     printf("\nvec:");
-    c_foreach (i, IVec, vec)
+    for (c_each(i, IVec, vec))
         printf(" %d", *i.ref->get);
 
     printf("\nset:");
-    c_foreach (i, ISet, set)
+    for (c_each(i, ISet, set))
         printf(" %d", *i.ref->get);
 
     IVec_drop(&vec);

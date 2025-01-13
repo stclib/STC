@@ -6,22 +6,22 @@ descriptive and reduces chances of making mistakes. It is generally easier to re
 
 ## Ranged for-loops
 <details>
-<summary><b>c_foreach</b> - Container / range iteration</summary>
+<summary><b>c_each</b> - Container / range iteration</summary>
 "No raw loops" - Sean Parent
 
-### c_foreach, c_foreach_reverse, c_foreach_n, c_foreach_kv
+### c_each, c_each_reverse, c_each_n, c_each_kv
 ```c++
 #include "stc/common.h"
 ```
 
-| Usage                                    | Description                               |
-|:-----------------------------------------|:------------------------------------------|
-| `c_foreach (it, ctype, container)`       | Iteratate all elements                    |
-| `c_foreach (it, ctype, it1, it2)`        | Iterate the range [it1, it2)              |
-| `c_foreach_reverse (it, ctype, container)`| Iteratate elements in reverse: *vec, deque, queue, stack* |
-| `c_foreach_reverse (it, ctype, it1, it2)`| Iteratate range [it1, it2) elements in reverse. |
-| `c_foreach_n (it, ctype, container, n)`| Iteratate `n` first elements. Index variable is `{it}_index`. |
-| `c_foreach_kv (key, val, ctype, container)` | Iterate maps with "structured binding" |
+| Usage                                       | Description                               |
+|:--------------------------------------------|:------------------------------------------|
+| `for (c_each(it, ctype, container))`        | Iteratate all elements                    |
+| `for (c_each(it, ctype, it1, it2))`         | Iterate the range [it1, it2)              |
+| `for (c_each_reverse(it, ctype, container))`| Iteratate elements in reverse: *vec, deque, queue, stack* |
+| `for (c_each_reverse(it, ctype, it1, it2))` | Iteratate range [it1, it2) elements in reverse. |
+| `for (c_each_n(it, ctype, container, n))`   | Iteratate `n` first elements. Index variable is `{it}_index`. |
+| `for (c_each_kv(key, val, ctype, container))`| Iterate maps with "structured binding" |
 <!--{%raw%}-->
 [ [Run this code](https://godbolt.org/z/r8eWG4Txa) ]
 ```c++
@@ -30,7 +30,7 @@ descriptive and reduces chances of making mistakes. It is generally easier to re
 // ...
 IMap map = c_make(IMap, {{23,1}, {3,2}, {7,3}, {5,4}, {12,5}});
 
-c_foreach (i, IMap, map)
+for (c_each(i, IMap, map))
     printf(" %d", i.ref->first);
 // 3 5 7 12 23
 
@@ -40,38 +40,38 @@ for (IMap_iter i = IMap_begin(&map); i.ref; IMap_next(&i))
 
 // iterate from iter to end
 IMap_iter iter = IMap_find(&map, 7);
-c_foreach (i, IMap, iter, IMap_end(&map))
+for (c_each(i, IMap, iter, IMap_end(&map)))
     printf(" %d", i.ref->first);
 // 7 12 23
 
 // iterate first 3 with an index count enumeration
-c_foreach_n (i, IMap, map, 3)
+for (c_each_n(i, IMap, map, 3))
     printf(" %zd:(%d %d)", i_index, i.ref->first, i.ref->second);
 // 0:(3 2) 1:(5 4) 2:(7 3)
 
 // iterate a map using "structured binding" of the key and val pair:
-c_foreach_kv (id, count, IMap, map)
+for (c_each_kv(id, count, IMap, map))
     printf(" (%d %d)", *id, *count);
 ```
 <!--{%endraw%}-->
 </details>
 <details>
-<summary><b>c_foritems</b> - Literal list iteration</summary>
+<summary><b>c_items</b> - Literal list iteration</summary>
 
-### c_foritems
+### c_items
 Iterate compound literal array elements. In addition to `i.ref`, you can access `i.index` and `i.size`.
 <!--{%raw%}-->
 ```c++
 // apply multiple push_backs
-c_foritems (i, int, {4, 5, 6, 7})
+for (c_items(i, int, {4, 5, 6, 7}))
     list_i_push_back(&lst, *i.ref);
 
 // insert in existing map
-c_foritems (i, hmap_ii_value, {{4, 5}, {6, 7}})
+for (c_items(i, hmap_ii_value, {{4, 5}, {6, 7}}))
     hmap_ii_insert(&map, i.ref->first, i.ref->second);
 
 // string literals pushed to a stack of cstr elements:
-c_foritems (i, const char*, {"Hello", "crazy", "world"})
+for (c_items(i, const char*, {"Hello", "crazy", "world"}))
     stack_cstr_emplace(&stk, *i.ref);
 ```
 <!--{%endraw%}-->
@@ -80,34 +80,34 @@ c_foritems (i, const char*, {"Hello", "crazy", "world"})
 ## Integer range loops
 
 <details>
-<summary><b>c_forrange</b> - For-loop abstraction</summary>
+<summary><b>c_range</b> - For-loop abstraction</summary>
 
-### c_forrange, c_forrange32, c_forrange_t
-- `c_forrange`: abstraction for iterating sequence of integers. Like python's **for** *i* **in** *range()* loop. Uses `isize` (*ptrdiff_t*) as control variable.
-- `c_forrange32` is like *c_forrange*, but uses `int32` as control variable.
-- `c_forrange_t` is like *c_forrange*, but takes an additional ***type*** for the control variable as first argument.
+### c_range, c_range32, c_range_t
+- `c_range`: abstraction for iterating sequence of integers. Like python's **for** *i* **in** *range()* loop. Uses `isize` (*ptrdiff_t*) as control variable.
+- `c_range32` is like *c_range*, but uses `int32` as control variable.
+- `c_range_t` is like *c_range*, but takes an additional ***type*** for the control variable as first argument.
 
 | Usage                                | Python equivalent                    |
 |:-------------------------------------|:-------------------------------------|
-| `c_forrange (stop)`                  | `for _ in range(stop):`              |
-| `c_forrange (i, stop)`               | `for i in range(stop):`              |
-| `c_forrange (i, start, stop)`        | `for i in range(start, stop):`       |
-| `c_forrange (i, start, stop, step)`  | `for i in range(start, stop, step):` |
+| `for (c_range(stop))`                | `for _ in range(stop):`              |
+| `for (c_range(i, stop))`             | `for i in range(stop):`              |
+| `for (c_range(i, start, stop))`      | `for i in range(start, stop):`       |
+| `for (c_range(i, start, stop, step))`| `for i in range(start, stop, step):` |
 
-| Usage                                          |
-|:-----------------------------------------------|
-| `c_forrange_t(IntType, i, stop)`               |
-| `c_forrange_t(IntType, i, start, stop)`        |
-| `c_forrange_t(IntType, i, start, stop, step)`  |
+| Usage                                           |
+|:------------------------------------------------|
+| `for (c_range_t(IntType, i, stop))`             |
+| `for (c_range_t(IntType, i, start, stop))`      |
+| `for (c_range_t(IntType, i, start, stop, step))`|
 
 ```c++
-c_forrange (5) printf("x");
+for (c_range(5)) printf("x");
 // xxxxx
-c_forrange (i, 5) printf(" %lld", i);
+for (c_range(i, 5)) printf(" %lld", i);
 // 0 1 2 3 4
-c_forrange (i, -3, 3) printf(" %lld", i);
+for (c_range(i, -3, 3)) printf(" %lld", i);
 // -3 -2 -1 0 1 2
-c_forrange (i, 30, 0, -5) printf(" %lld", i);
+for (c_range(i, 30, 0, -5)) printf(" %lld", i);
 // 30 25 20 15 10 5
 ```
 </details>
@@ -160,12 +160,12 @@ c_filter(crange, c_iota(3), true
 <details>
 <summary><b>c_filter</b> - Range filtering</summary>
 
-### c_filter, c_filter_zip, c_filter_pairwise, c_forfilter
+### c_filter, c_filter_zip, c_filter_pairwise, for (c_ffilter(...))
 Functional programming with chained `&&` filtering. `value` is the pointer to current value.
 It enables a subset of functional programming like in other popular languages.
 
 - **Note 1**: The **_reverse** variants only works with *vec, deque, stack, queue* containers.
-- **Note 2**: There is also a `c_forfilter` loop variant of `c_filter`. It uses the filter namings
+- **Note 2**: There is also a `c_ffilter` loop variant of `c_filter`. It uses the filter namings
 `c_fflt_skip(it, numItems)`, etc.
 
 | Usage                                | Description                       |
@@ -255,7 +255,7 @@ c_when (SumType* obj) {
 }
 
 // Use a sum type (2)
-c_if_is(SumType* obj, VariantEnum1, VariantType1* x) <body>;
+if (c_is(SumType* obj, VariantEnum1, VariantType1* x)) <body>;
 ...
 else <body>;
 ```
@@ -264,7 +264,7 @@ covered by **c_is** (requires `-Wall` or `-Wswitch` gcc/clang compiler flag). Th
 is deliberately set to 1 in order to easier detect non/zero-initialized variants.
 
 * Note: The `x` variables in the synopsis are "auto" type declared/defined - see examples.
-* Caveat 1: The use of `continue` inside a `c_when` (or `c_if_is`) block, when `c_when` is inside a loop will
+* Caveat 1: The use of `continue` in a `c_when` or `if (c_is())` block, while `c_when` is inside a loop will
 not work as expected. It will only break out of the `c_when`-block. Instead, use `goto` to jump to the
 end of the loop. `break` will break out of `c_when`, i.e. it behaves like `switch`.
 * Caveat 2: Sum types will generally not work in coroutines because the `x` variable is local and therefore
@@ -335,7 +335,7 @@ int main(void) {
         c_variant(MessageChangeColor, c_variant(ColorHsv, {0, 160, 255})),
     };
 
-    c_forrange (i, c_arraylen(msg))
+    for (c_range(i, c_arraylen(msg)))
     c_when (&msg[i]) {
         c_is(MessageQuit) {
             printf("The Quit variant has no data to destructure.\n");
@@ -423,7 +423,7 @@ These work on any container. *c_make()* may also be used for **cspan** views.
 
 c_func (split_map,(Map map), ->, struct {Vec keys, values;}) {
     split_map_result out = {0};
-    c_foreach_kv (k, v, Map, map) {
+    for (c_each_kv(k, v, Map, map)) {
         Vec_push(&out.keys, *k);
         Vec_push(&out.values, *v);
     }
@@ -437,17 +437,17 @@ int main(void) {
     c_push(Vec, &vec, {7, 8, 9, 10, 11, 12});
     c_push(Map, &map, {{7, 8}, {9, 10}, {11, 12}});
 
-    c_foreach (i, Vec, vec)
+    for (c_each(i, Vec, vec))
         printf("%d ", *i.ref);
     puts("");
 
-    c_foreach_kv(k, v, Map, map)
+    for (c_each_kv(k, v, Map, map))
         printf("[%d %d] ", *k, *v);
     puts("");
 
     split_map_result res = split_map(map);
 
-    c_foreach (i, Vec, res.values)
+    for (c_each(i, Vec, res.values))
         printf("%d ", *i.ref);
     puts("");
 
@@ -509,7 +509,7 @@ int main(void)
 
     // Clone all *value > 10 to outvec. Note: `value` is a pointer to current element
     c_append_if(Vec, &outvec, vec, *value > 10);
-    c_foreach (i, Vec, outvec) printf(" %d", *i.ref);
+    for (c_each(i, Vec, outvec)) printf(" %d", *i.ref);
     puts("");
 
     // Search vec for first value > 20.
@@ -519,14 +519,14 @@ int main(void)
 
     // Erase values between 20 and 25 in vec:
     c_eraseremove_if(Vec, &vec, 20 < *value && *value < 25);
-    c_foreach (i, Vec, vec) printf(" %d", *i.ref);
+    for (c_each(i, Vec, vec)) printf(" %d", *i.ref);
     puts("");
 
     // Erase all values > 20 in a linked list:
     List list = c_make(List, {2, 30, 21, 5, 9, 11});
 
     c_erase_if(List, &list, *value > 20);
-    c_foreach (i, List, list) printf(" %d", *i.ref);
+    for (c_each(i, List, list)) printf(" %d", *i.ref);
     puts("");
 
     // Search a sorted map from it1, for the first string containing "hello" and erase it:
@@ -538,7 +538,7 @@ int main(void)
 
     // Erase all strings containing "good" in the sorted map:
     c_erase_if(Map, &map, cstr_contains(&value->first, "good"));
-    c_foreach (i, Map, map) printf("%s, ", cstr_str(&i.ref->first));
+    for (c_each(i, Map, map)) printf("%s, ", cstr_str(&i.ref->first));
 
     c_drop(Vec, &vec, &outvec);
     List_drop(&list);
@@ -606,7 +606,7 @@ c++ *std::lower_bound()*.
 int main(void) {
     int arr[] = {5, 3, 5, 9, 7, 4, 7, 2, 4, 9, 3, 1, 2, 6, 4};
     ints_sort(arr, c_arraylen(arr)); // `ints` derived from the `i_key` name
-    c_forrange (i, c_arraylen(arr)) printf(" %d", arr[i]);
+    for (c_range(i, c_arraylen(arr))) printf(" %d", arr[i]);
 }
 ```
 ```c++
@@ -619,7 +619,7 @@ int main(void) {
     MyDeq deq = c_make(MyDeq, {5, 3, 5, 9, 7, 4, 7});
 
     MyDeq_sort(&deq);
-    c_foreach (i, MyDeq, deq) printf(" %d", *i.ref); puts("");
+    for (c_each(i, MyDeq, deq)) printf(" %d", *i.ref); puts("");
     MyDeq_drop(&deq);
 }
 ```
@@ -755,7 +755,7 @@ vec_cstr readFile(const char* name)
 int main(void)
 {
     c_with (vec_cstr vec = readFile(__FILE__), vec_cstr_drop(&vec))
-        c_foreach (i, vec_cstr, vec)
+        for (c_each(i, vec_cstr, vec))
             printf("| %s\n", cstr_str(i.ref));
 }
 ```

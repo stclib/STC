@@ -23,7 +23,7 @@ int main(void)
     Vec_emplace(&vec, *vec.data[2].get);     // => deep-copy vec.data[2]
 
     printf("vec before erase :");
-    c_foreach (i, Vec, vec)
+    for (c_each(i, Vec, vec))
         printf(" %d", *i.ref->get);
 
     printf("\nerase vec.data[2]; or first matching value depending on compare.\n");
@@ -38,12 +38,12 @@ int main(void)
         Vec_erase_at(&vec, it);
 
     printf("vec after erase  :");
-    c_foreach (i, Vec, vec)
+    for (c_each(i, Vec, vec))
         printf(" %d", *i.ref->get);
 
     Vec_sort(&vec);
     printf("\nvec after sort   :");
-    c_foreach (i, Vec, vec)
+    for (c_each(i, Vec, vec))
         printf(" %d", *i.ref->get);
 
     puts("\nDone");

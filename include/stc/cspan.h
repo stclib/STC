@@ -43,7 +43,7 @@ int demo2() {
     int array[] = {10, 20, 30, 23, 22, 21};
     Intspan span = cspan_from_array(array);
 
-    c_foreach (i, Intspan, span)
+    for (c_each(i, Intspan, span))
         printf(" %d", *i.ref);
     puts("");
 
@@ -269,11 +269,11 @@ typedef enum {c_ROWMAJOR, c_COLMAJOR} cspan_layout;
     FILE* _fp = fp; \
     int _w, _max = 0; \
     char _res[2][16], _fld[128]; \
-    c_foreach_3 (_it, Span, _s) { \
+    for (c_each_3(_it, Span, _s)) { \
         _w = snprintf(NULL, 0ULL, _f, field(_it.ref[0])); \
         if (_w > _max) _max = _w; \
     } \
-    c_foreach_3 (_it, Span, _s) { \
+    for (c_each_3(_it, Span, _s)) { \
         _cspan_print_assist(_it.pos, _s.shape, cspan_rank(&_s), _res, _b); \
         _w = _max + (_it.pos[cspan_rank(&_s) - 1] > 0); \
         sprintf(_fld, _f, field(_it.ref[0])); \

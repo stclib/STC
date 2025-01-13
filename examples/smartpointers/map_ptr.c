@@ -24,7 +24,7 @@ int main(void)
     Ptrmap_emplace(&map, "Test3", 3);
     Ptrmap_emplace(&map, "Test4", 4);
 
-    c_foreach_kv (name, number, Ptrmap, map)
+    for (c_each_kv(name, number, Ptrmap, map))
         printf("%s: %ld\n", cstr_str(name), **number);
     puts("");
 

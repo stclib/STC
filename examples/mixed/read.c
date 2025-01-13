@@ -18,7 +18,7 @@ int main(void)
 {
     int n = 0;
     c_with (vec_cstr vec = read_file(__FILE__), vec_cstr_drop(&vec))
-        c_foreach (i, vec_cstr, vec)
+        for (c_each(i, vec_cstr, vec))
             printf("%5d: %s\n", ++n, cstr_str(i.ref));
 
     if (errno)

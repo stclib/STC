@@ -61,10 +61,10 @@ int main(void)
         Persons_emplace(&vec, Person_make("Dale", "Cooper"));
 
         // Clone/share p and q to the vector
-        c_foritems (i, PSPtr, {p, q})
+        for (c_items(i, PSPtr, {p, q}))
             Persons_push(&vec, PSPtr_clone(*i.ref));
 
-        c_foreach (i, Persons, vec)
+        for (c_each(i, Persons, vec))
             printf("%s %s\n", cstr_str(&i.ref->get->name), cstr_str(&i.ref->get->last));
         puts("");
 

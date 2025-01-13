@@ -57,7 +57,7 @@ int main(void)
     puts("Inserting the following vector data into m1:");
     print_collection_vec_istr(&v);
 
-    c_foreach (i, vec_istr, vec_istr_begin(&v), vec_istr_end(&v))
+    for (c_each(i, vec_istr, vec_istr_begin(&v), vec_istr_end(&v)))
         smap_istr_emplace(&m1, i.ref->first, i.ref->second);
 
     puts("The modified map m1 is (key, value):");

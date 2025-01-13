@@ -118,12 +118,12 @@ int main(void)
 // of defining a function/expression for it:
 /*
     Vec vec = ..., vec2 = ...;
-    c_forfilter (i, Vec, vec, true
+    for (c_filter(i, Vec, vec, true
         && c_fflt_skipwhile(i, *i.ref < 3)  // skip leading values < 3
         && (*i.ref & 1) == 1                // then use odd values only
         && c_fflt_map(i, *i.ref * 2)        // multiply by 2
         && c_fflt_takewhile(i, *i.ref < 20) // stop if mapped *i.ref >= 20
-    ){
+    )){
         c_eraseremove_if(Vec, &vec2, *value == *i.ref);
     }
 */
@@ -136,23 +136,28 @@ int main(void)
 #define c_fflt_map(i, expr) (i.mapped = (expr), i.ref = &i.mapped)
 #define c_fflt_src(i) i.iter.ref
 
-#define c_forfilter(i, C, cnt, pred) \
-    _c_forfilter(i, C, C##_begin(&cnt), _, pred)
+#define c_forfilter(...) for (c_ffilter(__VA_ARGS__))
+#define c_forfilter_from(...) for (c_ffilter_from(__VA_ARGS__))
+#define c_forfilter_reverse(...) for (c_ffilter_reverse(__VA_ARGS__))
+#define c_forfilter_reverse_from(...) for (c_ffilter_reverse_from(__VA_ARGS__))
 
-#define c_forfilter_reverse(i, C, cnt,pred) \
-    _c_forfilter(i, C, C##_rbegin(&cnt), _r, pred)
+#define c_ffilter(i, C, cnt, pred) \
+    _c_ffilter(i, C, C##_begin(&cnt), _, pred)
 
-#define c_forfilter_from(i, C, start, pred) \
-    _c_forfilter(i, C, start, _, pred)
+#define c_ffilter_from(i, C, start, pred) \
+    _c_ffilter(i, C, start, _, pred)
 
-#define c_forfilter_reverse_from(i, C, start, pred) \
-    _c_forfilter(i, C, start, _r, pred)
+#define c_ffilter_reverse(i, C, cnt,pred) \
+    _c_ffilter(i, C, C##_rbegin(&cnt), _r, pred)
 
-#define _c_forfilter(i, C, start, rev, pred) \
-    for (struct {C##_iter iter; C##_value *ref, mapped; struct _flt_base base;} \
-         i = {.iter=start, .ref=i.iter.ref} ; !i.base.done & (i.iter.ref != NULL) ; \
-         C##rev##next(&i.iter), i.ref = i.iter.ref, i.base.sn_top=0, i.base.sb_top=0) \
-      if (!(pred)) ; else
+#define c_ffilter_reverse_from(i, C, start, pred) \
+    _c_ffilter(i, C, start, _r, pred)
+
+#define _c_ffilter(i, C, start, rev, pred) \
+    struct {C##_iter iter; C##_value *ref, mapped; struct _flt_base base;} \
+    i = {.iter=start, .ref=i.iter.ref} ; !i.base.done & (i.iter.ref != NULL) ; \
+    C##rev##next(&i.iter), i.ref = i.iter.ref, i.base.sn_top=0, i.base.sb_top=0) \
+      if (!(pred)) ; else if (1
 
 // ------------------------ private -------------------------
 #ifndef c_NFILTERS

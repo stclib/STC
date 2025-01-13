@@ -6,7 +6,7 @@
 void print_IList(const char* s, IList list)
 {
     printf("%s", s);
-    c_foreach (i, IList, list) {
+    for (c_each(i, IList, list)) {
         printf(" %d", *i.ref);
     }
     puts("");

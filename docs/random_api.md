@@ -115,14 +115,14 @@ int main(void)
 
     // Create histogram map
     SortedMap mhist = {0};
-    c_forrange (N) {
+    for (c_range(N)) {
         int index = (int)round(crand64_normal(&dist));
         SortedMap_insert(&mhist, index, 0).ref->second += 1;
     }
 
     // Print the gaussian bar chart
     const double scale = 50;
-    c_foreach (i, SortedMap, mhist) {
+    for (c_each(i, SortedMap, mhist)) {
         int n = (int)((double)i.ref->second * dist.stddev * scale * 2.5 / N);
         if (n > 0) {
             printf("%4d ", i.ref->first);

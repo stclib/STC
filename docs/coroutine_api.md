@@ -79,8 +79,8 @@ cco_semaphore   cco_make_semaphore(long value);                     // Create se
 #### Interoperability with iterators and filters
 ```c++
                 // Container iteration within coroutines
-                cco_foreach (iter_name, ctype, cnt);                // Use an existing iterator (stored in coroutine object)
-                cco_foreach_reverse (iter_name, ctype, cnt);        // Iterate in reverse order
+                for (cco_each(iter_name, ctype, cnt)) ...;          // Use an existing iterator (stored in coroutine object)
+                for (cco_each_reverse(iter_name, ctype, cnt)) ...;  // Iterate in reverse order
 
                 // c_filter() interoperability with coroutine iterators
                 cco_flt_take(int num);                              // Use instead of *c_flt_take(num)* to ensure cleanup
@@ -192,7 +192,7 @@ int Gen_next(Gen_iter* it) {
 int main(void) {
     Gen gen = {.start=10, .end=20};
 
-    c_foreach (i, Gen, gen) {
+    for (c_each(i, Gen, gen)) {
         printf("%d, ", *i.ref);
     }
 }
@@ -578,13 +578,13 @@ int produce(struct produce* self, cco_runtime* rt) {
                     cco_return; // cleanup and finish
             }
             else if (Inventory_size(&self->inventory) < self->limit) {
-                c_forrange (self->batch)
+                for (c_range(self->batch))
                     Inventory_push(&self->inventory, ++self->serial);
 
                 printf("produced %d items, Inventory has now %d items:\n",
                        self->batch, (int)Inventory_size(&self->inventory));
 
-                c_foreach (i, Inventory, self->inventory)
+                for (c_each(i, Inventory, self->inventory))
                     printf(" %2d", *i.ref);
                 puts("");
             }
@@ -608,7 +608,7 @@ int consume(struct consume* self, cco_runtime* rt) {
             sz = (int)Inventory_size(&self->producer->inventory);
             if (n > sz) n = sz;
 
-            c_forrange (n)
+            for (c_range(n))
                 Inventory_pop(&self->producer->inventory);
             printf("consumed %d items\n", n);
 

@@ -65,7 +65,7 @@ void vectordemo2(void)
 
     vec_cstr_sort(&names);               // Sort the array
 
-    c_foreach (i, vec_cstr, names)
+    for (c_each(i, vec_cstr, names))
         printf("sorted: %s\n", cstr_str(i.ref));
 
     vec_cstr_drop(&names);
@@ -85,7 +85,7 @@ void listdemo1(void)
 
     /* splice nums2 to front of nums */
     list_int_splice(&nums, list_int_begin(&nums), &nums2);
-    c_foreach (i, list_int, nums)
+    for (c_each(i, list_int, nums))
         printf("spliced: %d\n", *i.ref);
     puts("");
 
@@ -97,7 +97,7 @@ void listdemo1(void)
     list_int_push_back(&nums, -99);
     list_int_sort(&nums);
 
-    c_foreach (i, list_int, nums)
+    for (c_each(i, list_int, nums))
         printf("sorted: %d\n", *i.ref);
 
     c_drop(list_int, &nums, &nums2);
@@ -112,7 +112,7 @@ void setdemo1(void)
     hset_int_insert(&nums, 8);
     hset_int_insert(&nums, 11);
 
-    c_foreach (i, hset_int, nums)
+    for (c_each(i, hset_int, nums))
         printf("set: %d\n", *i.ref);
     hset_int_drop(&nums);
 }
@@ -146,7 +146,7 @@ void mapdemo2(void)
         printf("long: %s: %d\n", cstr_str(&i.ref->first), i.ref->second);
 
     // or rather use the short form:
-    c_foreach (i, hmap_si, nums)
+    for (c_each(i, hmap_si, nums))
         printf("short: %s: %d\n", cstr_str(&i.ref->first), i.ref->second);
 
     hmap_si_drop(&nums);
@@ -163,14 +163,14 @@ void mapdemo3(void)
     hmap_cstr_emplace(&table, "Make", "my");
     hmap_cstr_emplace(&table, "Sunny", "day");
     hmap_cstr_iter it = hmap_cstr_find(&table, "Make");
-    c_foreach (i, hmap_cstr, table)
+    for (c_each(i, hmap_cstr, table))
         printf("entry: %s: %s\n", cstr_str(&i.ref->first), cstr_str(&i.ref->second));
     printf("size %d: remove: Make: %s\n", (int)hmap_cstr_size(&table), cstr_str(&it.ref->second));
     //hmap_cstr_erase(&table, "Make");
     hmap_cstr_erase_at(&table, it);
 
     printf("size %d\n", (int)hmap_cstr_size(&table));
-    c_foreach (i, hmap_cstr, table)
+    for (c_each(i, hmap_cstr, table))
         printf("entry: %s: %s\n", cstr_str(&i.ref->first), cstr_str(&i.ref->second));
 
     hmap_cstr_drop(&table); // frees key and value cstrs, and hash table.

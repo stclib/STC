@@ -27,13 +27,13 @@ int produce(struct produce* co, cco_runtime* rt) {
                     cco_return; // cleanup and finish
             }
             else if (Inventory_size(&co->inv) < co->limit) {
-                c_forrange (co->batch)
+                for (c_range(co->batch))
                     Inventory_push(&co->inv, ++co->serial);
 
                 printf("produced %d items, Inventory has now %d items:\n",
                        co->batch, (int)Inventory_size(&co->inv));
 
-                c_foreach (i, Inventory, co->inv)
+                for (c_each(i, Inventory, co->inv))
                     printf(" %2d", *i.ref);
                 puts("");
             }
@@ -57,7 +57,7 @@ int consume(struct consume* co, cco_runtime* rt) {
             sz = (int)Inventory_size(&co->producer->inv);
             if (n > sz) n = sz;
 
-            c_forrange (n)
+            for (c_range(n))
                 Inventory_pop(&co->producer->inv);
             printf("consumed %d items\n", n);
 

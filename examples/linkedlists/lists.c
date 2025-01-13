@@ -13,7 +13,7 @@ int main(void) {
 
     crand64_seed(1234567);
     int m = 0;
-    c_forrange (n)
+    for (c_range(n))
         DList_push_back(&list, crand64_real()*n + 100), ++m;
 
     printf("sum of %d: ", m);
@@ -37,7 +37,7 @@ int main(void) {
     list = c_make(DList, {10, 20, 30, 40, 30, 50});
 
     printf("List: ");
-    c_foreach (i, DList, list)
+    for (c_each(i, DList, list))
         printf(" %g", *i.ref);
     puts("");
 
@@ -50,13 +50,13 @@ int main(void) {
     DList_push_back(&list, 2024);
 
     printf("Full: ");
-    c_foreach (i, DList, list)
+    for (c_each(i, DList, list))
         printf(" %g", *i.ref);
 
     printf("\nTail: ");
     DList_iter it = DList_begin(&list);
 
-    c_foreach (i, DList, DList_advance(it, 4), DList_end(&list))
+    for (c_each(i, DList, DList_advance(it, 4), DList_end(&list)))
         printf(" %g", *i.ref);
     puts("");
 
