@@ -115,10 +115,10 @@ int main(void) {
         break; case Tag: \
         for (__typeof__(_vp1->Tag.var)* x = &_vp1->Tag.var; x; x = NULL)
 
-    #define c_if_is(varptr, Tag, x) \
-        for (__typeof__(varptr) _vp2 = (varptr); _vp2; _vp2 = NULL) \
+    #define c_is_3(varptr, Tag, x) \
+        true) for (__typeof__(varptr) _vp2 = (varptr); _vp2; _vp2 = NULL) \
             if (c_holds(_vp2, Tag)) \
-                for (__typeof__(_vp2->Tag.var) *x = &_vp2->Tag.var; x; x = NULL)
+                for (__typeof__(_vp2->Tag.var) *x = &_vp2->Tag.var; x; x = NULL
 #else
     typedef union { struct { int tag; } _any_; } _c_any_variant;
     #define c_when(varptr) \
@@ -130,11 +130,13 @@ int main(void) {
         break; case Tag: \
         for (Tag##_type *x = &((Tag##_sumtype *)_vp1)->Tag.var; x; x = NULL)
 
-    #define c_if_is(varptr, Tag, x) \
-        for (Tag##_sumtype* _vp2 = c_const_cast(Tag##_sumtype*, varptr); _vp2; _vp2 = NULL) \
+    #define c_is_3(varptr, Tag, x) \
+        true) for (Tag##_sumtype* _vp2 = c_const_cast(Tag##_sumtype*, varptr); _vp2; _vp2 = NULL) \
             if (c_holds(_vp2, Tag)) \
-                for (Tag##_type *x = &_vp2->Tag.var; x; x = NULL)
+                for (Tag##_type *x = &_vp2->Tag.var; x; x = NULL
 #endif
+
+#define c_if_is(...) if (c_is_3(__VA_ARGS__)) // [deprecated]
 
 #define c_is(...) c_MACRO_OVERLOAD(c_is, __VA_ARGS__)
 #define c_is_1(Tag) \
