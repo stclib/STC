@@ -136,7 +136,7 @@ stc_dep = declare_dependency(
 
 meson.override_dependency('stc', stc_dep)
 
-flex_exe = find_program('flex', required: get_option('checkscoped'))
+flex_exe = find_program('flex', 'win_flex', required: get_option('checkscoped'))
 if flex_exe.found()
   lex_src = custom_target(
     'checkscoped_lex',
