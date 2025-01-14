@@ -36,9 +36,8 @@ c_sumtype (Action,
 );
 
 void Action_drop(Action* self) {
-    c_when (self) {
-        c_is(ActionSpeak, x) cstr_drop(x);
-    }
+    if (c_is(self, ActionSpeak, x))
+        cstr_drop(x);
 }
 
 void action(Action* action) {
@@ -116,7 +115,7 @@ int main(void) {
         for (__typeof__(_vp1->Tag.var)* x = &_vp1->Tag.var; x; x = NULL)
 
     #define c_is_3(varptr, Tag, x) \
-        true) for (__typeof__(varptr) _vp2 = (varptr); _vp2; _vp2 = NULL) \
+        false) ; else for (__typeof__(varptr) _vp2 = (varptr); _vp2; _vp2 = NULL) \
             if (c_holds(_vp2, Tag)) \
                 for (__typeof__(_vp2->Tag.var) *x = &_vp2->Tag.var; x; x = NULL
 #else
@@ -131,7 +130,7 @@ int main(void) {
         for (Tag##_type *x = &((Tag##_sumtype *)_vp1)->Tag.var; x; x = NULL)
 
     #define c_is_3(varptr, Tag, x) \
-        true) for (Tag##_sumtype* _vp2 = c_const_cast(Tag##_sumtype*, varptr); _vp2; _vp2 = NULL) \
+        false) ; else for (Tag##_sumtype* _vp2 = c_const_cast(Tag##_sumtype*, varptr); _vp2; _vp2 = NULL) \
             if (c_holds(_vp2, Tag)) \
                 for (Tag##_type *x = &_vp2->Tag.var; x; x = NULL
 #endif
