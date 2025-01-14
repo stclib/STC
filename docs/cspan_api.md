@@ -125,7 +125,7 @@ void            SpanTypeN_next(SpanTypeN_iter* it);
 
 ## Example 1
 
-[ [Run this code](https://godbolt.org/z/d6Pv7dM4b) ]
+[ [Run this code](https://godbolt.org/z/sdc45vrsh) ]
 ```c++
 #include <stdio.h>
 #define i_key int
@@ -221,7 +221,7 @@ b flat:
 ```
 Multi-dimension slicing (STC cspan):
 
-[ [Run this code](https://godbolt.org/z/vhh9vhMfM) ]
+[ [Run this code](https://godbolt.org/z/7ca8PqMEY) ]
 ```c++
 #include <stdio.h>
 #include "stc/cspan.h"
@@ -239,14 +239,20 @@ int main(void) {
     cspan_print(myspan3, ss3, "%d");
     puts("\nms3[1]:");
     cspan_print(myspan2, ((myspan2)cspan_submd3(&ms3, 1)), "%d");
+
     puts("\na:");
     cspan_print(myspan2, a, "%d");
+
     puts("b:");
     cspan_print(myspan2, b, "%d");
+
     puts("\na flat:");
-    for (c_each(i, myspan2, a)) printf(" %d,", *i.ref);
+    for (c_each(i, myspan2, a))
+        printf(" %d,", *i.ref);
+
     puts("\nb flat:");
-    for (c_each(i, myspan2, b)) printf(" %d,", *i.ref);
+    for (c_each(i, myspan2, b))
+        printf(" %d,", *i.ref);
     puts("");
 }
 ```
@@ -254,7 +260,7 @@ int main(void) {
 ## Example 3
 Slicing cspan without and with reducing the rank:
 
-[ [Run this code](https://godbolt.org/z/Y5xv57MoY) ]
+[ [Run this code](https://godbolt.org/z/YKx8K1hsn) ]
 ```c++
 #include <stdio.h>
 #include "stc/cspan.h"

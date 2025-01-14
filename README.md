@@ -185,7 +185,7 @@ int main(void)
 ```
 Switching to a different container type, e.g. a sorted set (sset):
 <!-- https://raw.githubusercontent.com/stclib/stcsingle/main/ -->
-[ [Run this code](https://godbolt.org/z/cedobWETq) ]
+[ [Run this code](https://godbolt.org/z/6KhzdMafd) ]
 ```c++
 #define i_type Floats, float
 #include "stc/sset.h" // Use a sorted set instead
@@ -216,7 +216,7 @@ If an element destructor `i_keydrop` is defined, `i_keyclone` function is requir
 
 Let's make a vector of vectors, which can be cloned. All of its element vectors will be destroyed when destroying the Vec2D.
 
-[ [Run this code](https://godbolt.org/z/PW3vso45G) ]
+[ [Run this code](https://godbolt.org/z/36PWz51sn) ]
 ```c++
 #include <stdio.h>
 #include "stc/algorithm.h"
@@ -259,7 +259,7 @@ int main(void)
 ```
 This example uses four different container types:
 
-[ [Run this code](https://godbolt.org/z/n1z16bdTr) ]
+[ [Run this code](https://godbolt.org/z/3h7WaxoGb) ]
 <!--{%raw%}-->
 ```c++
 #include <stdio.h>

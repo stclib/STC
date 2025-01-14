@@ -547,7 +547,7 @@ the following example:
 <details>
 <summary>Producer-consumer coroutine implementation</summary>
 
-[ [Run this code](https://godbolt.org/z/5cGnG4WcT) ]
+[ [Run this code](https://godbolt.org/z/jeTvTdEcW) ]
 ```c++
 #include <time.h>
 #include <stdio.h>

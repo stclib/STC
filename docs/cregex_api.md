@@ -143,7 +143,7 @@ while (cregex_match_next(&re, input, match) == CREG_OK)
 There is also a `c_match` macro which simplifies this:
 ```c++
 for (c_match(it, &re, input))
-    for (int k = 1; i <= cregex_captures(&re); ++k)
+    for (c_range(k, 1, cregex_captures(&re) + 1))
         printf("submatch %d: " c_svfmt "\n", k, c_svarg(it.match[k]));
 ```
 

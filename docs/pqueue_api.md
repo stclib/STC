@@ -72,7 +72,7 @@ i_key           pqueue_X_value_clone(i_key value);
 
 ## Example
 
-[ [Run this code](https://godbolt.org/z/cMhWYc9cb) ]
+[ [Run this code](https://godbolt.org/z/5rYPEaavW) ]
 ```c++
 #include <stdio.h>
 #include "stc/random.h"

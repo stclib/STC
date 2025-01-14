@@ -23,7 +23,7 @@ descriptive and reduces chances of making mistakes. It is generally easier to re
 | `for (c_each_n(it, ctype, container, n))`   | Iteratate `n` first elements. Index variable is `{it}_index`. |
 | `for (c_each_kv(key, val, ctype, container))`| Iterate maps with "structured binding" |
 <!--{%raw%}-->
-[ [Run this code](https://godbolt.org/z/r8eWG4Txa) ]
+[ [Run this code](https://godbolt.org/z/cYhTEr1vM) ]
 ```c++
 #define i_type IMap, int, int
 #include "stc/smap.h"
@@ -198,7 +198,7 @@ It enables a subset of functional programming like in other popular languages.
 | `c_flt_src1, c_flt_src2`     | Pointer variables to current unmapped source values |
 | `value1, value2`             | Pointer variables to (possible mapped) values |
 
-[ [Run this example](https://godbolt.org/z/MhW7xz5sn) ]
+[ [Run this example](https://godbolt.org/z/W87fTdvYd) ]
 ```c++
 #include <stdio.h>
 #define i_type Vec, int
@@ -401,17 +401,17 @@ c_func (load_data,(const char* fname), ->, struct {Vec vec; int err;}) {
 ```
 </details>
 <details>
-<summary><b>c_make, c_push, c_drop</b> - Generic container operations</summary>
+<summary><b>c_make, c_push_items, c_drop</b> - Generic container operations</summary>
 
 These work on any container. *c_make()* may also be used for **cspan** views.
 
-### c_make, c_push, c_drop
+### c_make, c_push_items, c_drop
 
 - **c_make** - construct any container from an initializer list
-- **c_push** - push values onto any container from an initializer list
+- **c_push_items** - push values onto any container from an initializer list
 - **c_drop** - drop (destroy) multiple containers of the same type
 
-[ [Run this code](https://godbolt.org/z/K9Y5EMGxM) ]
+[ [Run this code](https://godbolt.org/z/e4G4hW5n6) ]
 <!--{%raw%}-->
 ```c++
 #include <stdio.h>
@@ -434,8 +434,8 @@ int main(void) {
     Vec vec = c_make(Vec, {1, 2, 3, 4, 5, 6});
     Map map = c_make(Map, {{1, 2}, {3, 4}, {5, 6}});
 
-    c_push(Vec, &vec, {7, 8, 9, 10, 11, 12});
-    c_push(Map, &map, {{7, 8}, {9, 10}, {11, 12}});
+    c_push_items(Vec, &vec, {7, 8, 9, 10, 11, 12});
+    c_push_items(Map, &map, {{7, 8}, {9, 10}, {11, 12}});
 
     for (c_each(i, Vec, vec))
         printf("%d ", *i.ref);
@@ -482,7 +482,7 @@ Erase linearily in containers using a predicate. `value` is a pointer to each el
 - `c_erase_if(CntType, cnt_ptr, pred)`. Use with **list**, **hmap**, **hset**, **smap**, and **sset**.
 - `c_eraseremove_if(CntType, cnt_ptr, pred)`. Use with **stack**, **vec**, **deque**, and **queue** only.
 
-[ [Run this code](https://godbolt.org/z/5WWGf4dbd) ]
+[ [Run this code](https://godbolt.org/z/n7c641WhE) ]
 <!--{%raw%}-->
 ```c++
 #include <stdio.h>
@@ -597,7 +597,7 @@ speed with *std::sort()**. Both *X_binary_seach()* and *X_lower_bound()* are abo
 c++ *std::lower_bound()*.
 ##### Usage examples
 
-[ [Run this code](https://godbolt.org/z/rr1xvjcGG) ]
+[ [Run this code](https://godbolt.org/z/v3ncM66az) ]
 ```c++
 #define i_key int // sort a regular c-array of ints
 #include "stc/sort.h"
@@ -606,7 +606,9 @@ c++ *std::lower_bound()*.
 int main(void) {
     int arr[] = {5, 3, 5, 9, 7, 4, 7, 2, 4, 9, 3, 1, 2, 6, 4};
     ints_sort(arr, c_arraylen(arr)); // `ints` derived from the `i_key` name
-    for (c_range(i, c_arraylen(arr))) printf(" %d", arr[i]);
+
+    for (c_range(i, c_arraylen(arr)))
+        printf(" %d", arr[i]);
 }
 ```
 ```c++
@@ -619,7 +621,11 @@ int main(void) {
     MyDeq deq = c_make(MyDeq, {5, 3, 5, 9, 7, 4, 7});
 
     MyDeq_sort(&deq);
-    for (c_each(i, MyDeq, deq)) printf(" %d", *i.ref); puts("");
+
+    for (c_each(i, MyDeq, deq))
+        printf(" %d", *i.ref);
+    puts("");
+
     MyDeq_drop(&deq);
 }
 ```

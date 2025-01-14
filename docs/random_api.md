@@ -94,7 +94,7 @@ int32_t              crand32_uniform_r(crand32* rng, uint32_t strm, crand32_unif
 
 ## Example
 
-[ [Run this code](https://godbolt.org/z/sWa3ea1cr) ]
+[ [Run this code](https://godbolt.org/z/3PGadv5zz) ]
 ```c++
 #include <stdio.h>
 #include <time.h>

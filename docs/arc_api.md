@@ -89,7 +89,7 @@ bool            arc_X_value_eq(const i_key* x, const i_key* y);
 
 ## Example
 
-[ [Run this code](https://godbolt.org/z/bjrf47qbv) ]
+[ [Run this code](https://godbolt.org/z/jEf4oqzen) ]
 <!--{%raw%}-->
 ```c++
 // Create two stacks with arcs to maps.
@@ -118,15 +118,15 @@ int main(void)
 
     // POPULATE s1 with shared pointers to Map:
     map = Stack_push(&s1, Arc_from(Map_init()))->get; // push empty map to s1.
-    c_push(Map, map, {{"Joey", 1990}, {"Mary", 1995},
-                      {"Mary", 1996}, {"Joanna", 1992}});
+    c_push_items(Map, map, {{"Joey", 1990}, {"Mary", 1995},
+                            {"Mary", 1996}, {"Joanna", 1992}});
 
     map = Stack_emplace(&s1, Map_init())->get; // emplace will make the Arc
-    c_push(Map, map, {{"Rosanna", 2001}, {"Brad", 1999}, {"Jack", 1980}});
+    c_push_items(Map, map, {{"Rosanna", 2001}, {"Brad", 1999}, {"Jack", 1980}});
 
     // POPULATE s2:
     map = Stack_emplace(&s2, Map_init())->get;
-    c_push(Map, map, {{"Steve", 1979}, {"Rick", 1974}, {"Tracy", 2003}});
+    c_push_items(Map, map, {{"Steve", 1979}, {"Rick", 1974}, {"Tracy", 2003}});
 
 
     // Share Arc 1 from s1 with s2 by cloning(=sharing):
