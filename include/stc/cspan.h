@@ -70,6 +70,10 @@ typedef isize _isize_triple[3];
     using_cspan_3(Self, T, 1); \
     STC_INLINE Self Self##_with_n(Self##_value* values, isize n) \
         { return (Self)cspan_with_n(values, n); } \
+    STC_INLINE const Self##_value* Self##_at(const Self* self, isize idx) \
+        { return cspan_at(self, idx); } \
+    STC_INLINE Self##_value* Self##_at_mut(Self* self, isize idx) \
+        { return cspan_at(self, idx); } \
     struct stc_nostruct
 
 #define using_cspan_with_eq(...) c_MACRO_OVERLOAD(using_cspan_with_eq, __VA_ARGS__)
@@ -113,6 +117,8 @@ typedef isize _isize_triple[3];
         it->ref += _cspan_next##RANK(it->pos, it->_s->shape, it->_s->stride.d, RANK, &done); \
         if (done) it->ref = NULL; \
     } \
+    STC_INLINE isize Self##_size(const Self* self) \
+        { return cspan_size(self); } \
     STC_INLINE Self Self##_transpose(Self sp) \
         { _cspan_transpose(sp.shape, sp.stride.d, cspan_rank(&sp)); return sp; } \
     struct stc_nostruct

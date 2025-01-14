@@ -52,6 +52,24 @@
 } while (0)
 
 // --------------------------------
+// c_reverse
+// --------------------------------
+
+#define c_reverse_array(array, n) do { \
+    typedef struct { char d[sizeof 0[array]]; } _etype; \
+    _etype* _arr = (_etype *)(array); \
+    for (isize _i = 0, _j = (n) - 1; _i < _j; ++_i, --_j) \
+        c_swap(_arr + _i, _arr + _j); \
+} while (0)
+
+// Compiles with vec, stack, and deque, and cspan container types:
+#define c_reverse(CntType, self) do { \
+    CntType* _self = self; \
+    for (isize _i = 0, _j = CntType##_size(_self) - 1; _i < _j; ++_i, --_j) \
+        c_swap(CntType##_at_mut(_self, _i), CntType##_at_mut(_self, _j)); \
+} while (0)
+
+// --------------------------------
 // c_erase_if
 // --------------------------------
 

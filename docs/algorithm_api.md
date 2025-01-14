@@ -458,29 +458,34 @@ int main(void) {
 <!--{%endraw%}-->
 </details>
 <details>
-<summary><b>c_find, c_append, c_erase</b> - Container operations with custom predicate</summary>
+<summary><b>c_find, c_reverse, c_append, c_erase</b> - Container/array operations</summary>
 
 ### c_find_if, c_find_reverse_if
 Find linearily in containers using a predicate. `value` is a pointer to each element in predicate.
 ***outiter_ptr*** must be defined prior to call.
-- `c_find_if(CntType, cnt, outiter_ptr, pred)`.
-- `c_find_if(CntType, startiter, enditer, outiter_ptr, pred)`
-- `c_find_reverse_if(CntType, cnt, outiter_ptr, pred)`
-- `c_find_reverse_if(CntType, startiter, enditer, outiter_ptr, pred)`
+- void `c_find_if`(**CntType**, cnt, outiter_ptr, pred).
+- void `c_find_if`(**CntType**, startiter, enditer, outiter_ptr, pred)
+- void `c_find_reverse_if`(**CntType**, cnt, outiter_ptr, pred)
+- void `c_find_reverse_if`(**CntType**, startiter, enditer, outiter_ptr, pred)
+
+### c_reverse, c_reverse_array
+
+- void `c_reverse`(**CntType**, cnt);   // reverse a cspan, vec, stack, queue or deque type.
+- void `c_reverse_array`(array, len);   // reverse an array of elements.
 
 ### c_append, c_append_if
 Clones any container onto an arbitrary container type, optionally using a predicate to filter out elements.
 Requires only that the element types are equal for the two containers.
 `value` is the pointer to each element in predicate. See example below for usage.
-- `c_append(CntType, outcnt_ptr, cnt)`
-- `c_append(OutCnt, outcnt_ptr, CntType, cnt)`
-- `c_append_if(CntType, outcnt_ptr, cnt, pred)`
-- `c_append_if(OutCnt, outcnt_ptr, CntType, cnt, pred)`
+- void `c_append`(**CntType**, outcnt_ptr, cnt)
+- void `c_append`(**OutCnt**, outcnt_ptr, **CntType**, cnt)
+- void `c_append_if`(**CntType**, outcnt_ptr, cnt, pred)
+- void `c_append_if`(**OutCnt**, outcnt_ptr, **CntType**, cnt, pred)
 
 ### c_erase_if, c_eraseremove_if
 Erase linearily in containers using a predicate. `value` is a pointer to each element in predicate.
-- `c_erase_if(CntType, cnt_ptr, pred)`. Use with **list**, **hmap**, **hset**, **smap**, and **sset**.
-- `c_eraseremove_if(CntType, cnt_ptr, pred)`. Use with **stack**, **vec**, **deque**, and **queue** only.
+- void `c_erase_if`(**CntType**, cnt_ptr, pred)`. Use with ***list**, ***hmap***, ***hset***, ***smap***, and ***sset***.
+- void `c_eraseremove_if`(**CntType**, cnt_ptr, pred)`. Use with ***stack***, ***vec***, ***deque***, and ***queue*** only.
 
 [ [Run this code](https://godbolt.org/z/n7c641WhE) ]
 <!--{%raw%}-->
@@ -552,9 +557,9 @@ int main(void)
 
 ### c_all_of, c_any_of, c_none_of
 Test a container/range using a predicate. ***result*** is output and must be declared prior to call.
-- `void c_all_of(CntType, cnt, bool* result, pred)`
-- `void c_any_of(CntType, cnt, bool* result, pred)`
-- `void c_none_of(CntType, cnt, bool* result, pred)`
+- void `c_all_of`(**CntType**, cnt, bool* result, pred)
+- void `c_any_of`(**CntType**, cnt, bool* result, pred)
+- void `c_none_of`(**CntType**, cnt, bool* result, pred)
 ```c++
 #define DivisibleBy(n) (*value % (n) == 0) // `value` refers to the current element
 
@@ -636,10 +641,10 @@ int main(void) {
 
 ### c_new, c_delete
 
-- `c_new(Type, value)` - Allocate *and initialize* a new object on the heap with *value*.
-- `c_new_n(Type, n)` - Allocate an array of ***n*** new objects on the heap, initialized to zero.
-- `c_delete(Type, ptr)` - *Type_drop(ptr)* and *c_free(ptr, ..)* allocated on the heap. NULL is OK.
-- `c_delete_n(Type, arr, n)` - *Type_drop(&arr[i])* and *c_free(arr, ..)* of ***n*** objects allocated on the heap. (NULL, 0) is OK.
+- Type\* `c_new`(**Type**, value) - Allocate *and initialize* a new object on the heap with *value*.
+- Type\* `c_new_n`(**Type**, n) - Allocate an array of ***n*** new objects on the heap, initialized to zero.
+- void `c_delete`(**Type**, ptr) - *Type_drop(ptr)* and *c_free(ptr, ..)* allocated on the heap. NULL is OK.
+- void `c_delete_n`(**Type**, arr, n) - *Type_drop(&arr[i])* and *c_free(arr, ..)* of ***n*** objects allocated on the heap. (NULL, 0) is OK.
 ```c++
 #include "stc/cstr.h"
 
@@ -653,10 +658,10 @@ Memory allocator wrappers which uses signed sizes. Note that the signatures for
 *c_realloc()* and *c_free()* have an extra size parameter. These will be used as
 default in containers unless `i_malloc`, `i_calloc`, `i_realloc`, and `i_free` are user defined. See
 [Per container-instance customization](../README.md#per-container-instance-customization)
-- `void* c_malloc(isize sz)`
-- `void* c_calloc(isize n, isize sz)`
-- `void* c_realloc(void* old_p, isize old_sz, isize new_sz)`
-- `void c_free(void* p, isize sz)`
+- void* `c_malloc`(isize sz)
+- void* `c_calloc`(isize n, isize sz)
+- void* `c_realloc`(void* old_p, isize old_sz, isize new_sz)
+- void  `c_free`(void* p, isize sz)
 
 </details>
 <details>
