@@ -1,7 +1,6 @@
 foreach sample : [
   'gauss2',
   'listmap',
-  'mapmap',
   'multimap',
   'new_smap',
   'smap_erase',

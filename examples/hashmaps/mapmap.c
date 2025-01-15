@@ -48,9 +48,9 @@ int main(void)
     add(&map, "Dennis Kay", "Dennis@mail.com", "Marketing");
     add(&map, "Anne Dickens", "Anne@myplace.com", "Development");
 
-    for (c_each(i, Departments, map))
-        for (c_each_kv(name, email, People, i.ref->second))
-            printf("%s: %s - %s\n", cstr_str(&i.ref->first), cstr_str(name), cstr_str(email));
+    for (c_each_kv(dep, people, Departments, map))
+        for (c_each_kv(name, email, People, *people))
+            printf("%s: %s - %s\n", cstr_str(dep), cstr_str(name), cstr_str(email));
     puts("");
 
     printf("found Nick Denton: %d\n", contains(&map, "Nick Denton"));

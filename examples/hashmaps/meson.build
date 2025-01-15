@@ -2,6 +2,7 @@ foreach sample : [
   'birthday',
   'books',
   'hashmap',
+  'mapmap',
   'new_map',
   'phonebook',
   'unordered_set',
