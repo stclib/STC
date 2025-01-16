@@ -79,8 +79,8 @@ cco_semaphore   cco_make_semaphore(long value);                     // Create se
 #### Interoperability with iterators and filters
 ```c++
                 // Container iteration within coroutines
-                for (cco_each(iter_name, ctype, cnt)) ...;          // Use an existing iterator (stored in coroutine object)
-                for (cco_each_reverse(iter_name, ctype, cnt)) ...;  // Iterate in reverse order
+                for (cco_each(iter_name, CntType, cnt)) ...;          // Use an existing iterator (stored in coroutine object)
+                for (cco_each_reverse(iter_name, CntType, cnt)) ...;  // Iterate in reverse order
 
                 // c_filter() interoperability with coroutine iterators
                 cco_flt_take(int num);                              // Use instead of *c_flt_take(num)* to ensure cleanup

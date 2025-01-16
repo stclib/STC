@@ -82,9 +82,10 @@ Containers
 
 Algorithms
 ----------
-- [***Coroutines*** - ergonomic portable coroutines](docs/coroutine_api.md)
+- [***Ranged for-loop control blocks***](docs/algorithm_api.md#ranged-for-loop-control-blocks)
+- [***Generic algorithms***](docs/algorithm_api.md#generic-algorithms)
 - [***Sum types*** - a.k.a. variants or tagged unions](docs/algorithm_api.md#sum-types)
-- [***Generic algorithms***](docs/algorithm_api.md#stc-algorithms)
+- [***Coroutines*** - ergonomic portable coroutines](docs/coroutine_api.md)
 - [***Regular expressions*** - Rob Pike's Plan 9 regexp modernized!](docs/cregex_api.md)
 - [***Random numbers*** - a very fast *PRNG* based on *SFC64*](docs/random_api.md)
 - [***Command line argument parser*** - similar to *getopt()*](docs/coption_api.md)

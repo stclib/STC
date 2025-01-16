@@ -4,24 +4,24 @@ STC contains many generic algorithms and loop abstactions. Raw loops are one of 
 sources for errors in C and C++ code. By using the loop abstractions below, your code becomes more
 descriptive and reduces chances of making mistakes. It is generally easier to read and write too.
 
-## Ranged for-loops
+## Ranged for-loop control blocks
+*"No raw loops"* - Sean Parent
 <details>
-<summary><b>c_each</b> - Container / range iteration</summary>
-"No raw loops" - Sean Parent
+<summary><b>c_each</b> - Ranged sequence iteration</summary>
 
 ### c_each, c_each_reverse, c_each_n, c_each_kv
 ```c++
 #include "stc/common.h"
 ```
 
-| Usage                                       | Description                               |
-|:--------------------------------------------|:------------------------------------------|
-| `for (c_each(it, ctype, container))`        | Iteratate all elements                    |
-| `for (c_each(it, ctype, it1, it2))`         | Iterate the range [it1, it2)              |
-| `for (c_each_reverse(it, ctype, container))`| Iteratate elements in reverse: *vec, deque, queue, stack* |
-| `for (c_each_reverse(it, ctype, it1, it2))` | Iteratate range [it1, it2) elements in reverse. |
-| `for (c_each_n(it, ctype, container, n))`   | Iteratate `n` first elements. Index variable is `{it}_index`. |
-| `for (c_each_kv(key, val, ctype, container))`| Iterate maps with "structured binding" |
+| Usage                                              | Description                               |
+|:---------------------------------------------------|:------------------------------------------|
+| for (`c_each`(it, **CntType**, container))         | Iteratate all elements                    |
+| for (`c_each`(it, **CntType**, it1, it2))          | Iterate the range [it1, it2)              |
+| for (`c_each_reverse`(it, **CntType**, container)) | Iteratate elements in reverse: *vec, deque, queue, stack* |
+| for (`c_each_reverse`(it, **CntType**, it1, it2))` | Iteratate range [it1, it2) elements in reverse. |
+| for (`c_each_n`(it, **CntType**, container, n))    | Iteratate `n` first elements. Index variable is `{it}_index`. |
+| for (`c_each_kv`(key, val, **CntType**, container))| Iterate maps with "structured binding" |
 <!--{%raw%}-->
 [ [Run this code](https://godbolt.org/z/cYhTEr1vM) ]
 ```c++
@@ -56,7 +56,7 @@ for (c_each_kv(id, count, IMap, map))
 <!--{%endraw%}-->
 </details>
 <details>
-<summary><b>c_items</b> - Literal list iteration</summary>
+<summary><b>c_items</b> - Literal list element iteration</summary>
 
 ### c_items
 Iterate compound literal array elements. In addition to `i.ref`, you can access `i.index` and `i.size`.
@@ -76,29 +76,26 @@ for (c_items(i, const char*, {"Hello", "crazy", "world"}))
 ```
 <!--{%endraw%}-->
 </details>
-
-## Integer range loops
-
 <details>
-<summary><b>c_range</b> - For-loop abstraction</summary>
+<summary><b>c_range</b> - Integer range iteration</summary>
 
 ### c_range, c_range32, c_range_t
 - `c_range`: abstraction for iterating sequence of integers. Like python's **for** *i* **in** *range()* loop. Uses `isize` (*ptrdiff_t*) as control variable.
-- `c_range32` is like *c_range*, but uses `int32` as control variable.
+- `c_range32` is like *c_range*, but uses `int32_t` as control variable.
 - `c_range_t` is like *c_range*, but takes an additional ***type*** for the control variable as first argument.
 
-| Usage                                | Python equivalent                    |
-|:-------------------------------------|:-------------------------------------|
-| `for (c_range(stop))`                | `for _ in range(stop):`              |
-| `for (c_range(i, stop))`             | `for i in range(stop):`              |
-| `for (c_range(i, start, stop))`      | `for i in range(start, stop):`       |
-| `for (c_range(i, start, stop, step))`| `for i in range(start, stop, step):` |
+| Usage                                 | Python equivalent                    |
+|:--------------------------------------|:-------------------------------------|
+| for (`c_range`(stop))                 | for _ in `range`(stop):              |
+| for (`c_range`(i, stop))              | for i in `range`(stop):              |
+| for (`c_range`(i, start, stop))       | for i in `range`(start, stop):       |
+| for (`c_range`(i, start, stop, step)) | for i in `range`(start, stop, step): |
 
-| Usage                                           |
-|:------------------------------------------------|
-| `for (c_range_t(IntType, i, stop))`             |
-| `for (c_range_t(IntType, i, start, stop))`      |
-| `for (c_range_t(IntType, i, start, stop, step))`|
+| Usage                                                |
+|:-----------------------------------------------------|
+| for (`c_range_t`(**IntType**, i, stop))              |
+| for (`c_range_t`(**IntType**, i, start, stop))       |
+| for (`c_range_t`(**IntType**, i, start, stop, step)) |
 
 ```c++
 for (c_range(5)) printf("x");
@@ -112,126 +109,49 @@ for (c_range(i, 30, 0, -5)) printf(" %lld", i);
 ```
 </details>
 <details>
-<summary><b>c_range, c_iota</b> - Integer range objects</summary>
+<summary><b>c_ffilter</b> - Filtered range iteration</summary>
 
-### crange, crange32, c_iota
-An integer sequence generator type, similar to [boost::irange](https://www.boost.org/doc/libs/release/libs/range/doc/html/range/reference/ranges/irange.html).
-
-- `crange` uses `isize` (ptrdiff_t) as control variable
-- `crange32` is like *crange*, but uses `int32` as control variable, which may be faster.
-
-```c++
-crange      crange_make(stop);              // 0, 1, ... stop-1
-crange      crange_make(start, stop);       // start, start+1, ... stop-1
-crange      crange_make(start, stop, step); // start, start+step, ... upto-not-including stop,
-                                            // step may be negative.
-crange_iter crange_begin(crange* self);
-void        crange_next(crange_iter* it);
-
-
-crange&     c_iota(start);                  // l-value; NB! otherwise like crange_make(start, INTPTR_MAX)
-crange&     c_iota(start, stop);            // l-value; otherwise like crange_make(start, stop)
-crange&     c_iota(start, stop, step);      // l-value; otherwise like crange_make(start, stop, step)
-```
- The **crange_value** type is *isize*. Variables *start*, *stop*, and *step* are of type *crange_value*.
-
-[ [Run this code](https://godbolt.org/z/6aaq6qTro) ]
-```c++
-// 1. All primes less than 32: See below for c_filter() and is_prime()
-crange r1 = crange_make(3, 32, 2);
-printf("2"); // first prime
-c_filter(crange, r1, true
-    && is_prime(*value)
-    && printf(" %zi", *value)
-);
-// 2 3 5 7 11 13 17 19 23 29 31
-
-// 2. The first 11 primes:
-// c_iota() can be used as argument to c_filter.
-printf("2"); // first prime
-c_filter(crange, c_iota(3), true
-    && is_prime(*value)
-    && (c_flt_take(10), printf(" %zi", *value))
-);
-// 2 3 5 7 11 13 17 19 23 29 31
-```
-
-</details>
-<details>
-<summary><b>c_filter</b> - Range filtering</summary>
-
-### c_filter, c_filter_zip, c_filter_pairwise, for (c_ffilter(...))
-Functional programming with chained `&&` filtering. `value` is the pointer to current value.
-It enables a subset of functional programming like in other popular languages.
-
-- **Note 1**: The **_reverse** variants only works with *vec, deque, stack, queue* containers.
-- **Note 2**: There is also a `c_ffilter` loop variant of `c_filter`. It uses the filter namings
-`c_fflt_skip(it, numItems)`, etc.
-
-| Usage                                | Description                       |
-|:-------------------------------------|:----------------------------------|
-| `c_filter(CType, container, filters)` | Filter items in chain with the && operator |
-| `c_filter_from(CType, start, filters)` | Filter from start iterator |
-| `c_filter_reverse(CType, cnt, filters)` | Filter items in reverse order  |
-| `c_filter_reverse_from(CType, rstart, filters)` | Filter reverse from rstart iterator |
-| *c_filter_zip*, *c_filter_pairwise*: ||
-| `c_filter_zip(CType, cnt1, cnt2, filters)` | Filter (cnt1, cnt2) items |
-| `c_filter_zip(CType1, cnt1, CType2, cnt2, filters)` | May use different types for cnt1, cnt2 |
-| `c_filter_reverse_zip(CType, cnt1, cnt2, filters)` | Filter (cnt1, cnt2) items in reverse order  |
-| `c_filter_reverse_zip(CType1, cnt1, CType2, cnt2, filters)` | May use different types for cnt1, cnt2 |
-| `c_filter_pairwise(CType, cnt, filters)` | Filter items pairwise as value1, value2 |
-
-| Built-in filter              | Description                                |
-|:-----------------------------|:-------------------------------------------|
-| `c_flt_skip(numItems)`       | Skip numItems (increments count)           |
-| `c_flt_take(numItems)`       | Take numItems only (increments count)      |
-| `c_flt_skipwhile(predicate)` | Skip items until predicate is false        |
-| `c_flt_takewhile(predicate)` | Take items until predicate is false        |
-| `c_flt_counter()`            | Increment count and return it              |
-| `c_flt_getcount()`           | Number of items passed skip/take/counter   |
-| `c_flt_map(expr)`            | Map expr to current value. Input unchanged |
-| `c_flt_src`                  | Pointer variable to current unmapped source value |
-| `value`                      | Pointer variable to (possible mapped) value |
-| For *c_filter_zip*, *c_filter_pairwise*: ||
-| `c_flt_map1(expr)`           | Map expr to value1. Input unchanged |
-| `c_flt_map2(expr)`           | Map expr to value2. Input unchanged |
-| `c_flt_src1, c_flt_src2`     | Pointer variables to current unmapped source values |
-| `value1, value2`             | Pointer variables to (possible mapped) values |
-
-[ [Run this example](https://godbolt.org/z/W87fTdvYd) ]
+### c_ffilter
+For-loop variant of `c_filter`in generic algorithms.
 ```c++
 #include <stdio.h>
-#define i_type Vec, int
-#include "stc/stack.h"
 #include "stc/algorithm.h"
+#define i_type IVec,int
+#include "stc/stack.h"
 
-int main(void)
-{
-    Vec vec = c_make(Vec, {1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 9, 10, 11, 12, 5});
+int main(void) {
+    IVec vec = c_make(IVec, {0, 1, 2, 3, 4, 5, 80, 6, 7, 80, 8, 9, 80,
+                             10, 11, 12, 13, 14, 15, 80, 16, 17});
+	#define ff_skipValue(i, x) (*i.ref != (x))
+	#define ff_isEven(i) ((*i.ref & 1) == 0)
+	#define ff_square(i) (*i.ref * *i.ref)
 
-    c_filter(Vec, vec, true
-        && c_flt_skipwhile(*value < 3)  // skip leading values < 3
-        && (*value & 1) == 1            // then use odd values only
-        && c_flt_map(*value * 2)        // multiply by 2
-        && c_flt_takewhile(*value < 20) // stop if mapped *value >= 20
-        && printf(" %d", *value)        // print value
-    );
-    //  6 10 14 2 6 18
-    puts("");
-    Vec_drop(&vec);
+    int sum = 0;
+    for (c_ffilter(i, IVec, vec, true
+        && c_fflt_skipwhile(i, *i.ref != 80)
+        && c_fflt_skip(i, 1)
+        && ff_isEven(i)
+        && ff_skipValue(i, 80)
+        && c_fflt_map(i, ff_square(i))
+        && c_fflt_take(i, 5)
+    )){
+        sum += *i.ref;
+    }
+    printf("sum: %d\n", sum);
+    IVec_drop(&vec);
 }
 ```
 </details>
 
 ## Sum types
 
-<details>
-<summary><b>Sum types</b> - aka <i>variants</i> or <i>tagged unions</i></summary>
-
 This is a tiny, robust and fully typesafe implementation of sum types. They work
 similarly as in Zig, Odin and Rust, and is just as easy and safe to use.
 Each tuple/parentesized field is an enum (tag) with an associated data type (payload),
 called a *variant* of the sum type. The sum type itself is a **union** type.
+
+<details>
+<summary><b>Sum types</b> - aka <i>variants</i> or <i>tagged unions</i></summary>
 
 Synopsis:
 ```c++
@@ -255,9 +175,8 @@ c_when (SumType* obj) {
 }
 
 // Use a sum type (2)
-if (c_is(SumType* obj, VariantEnum1, VariantType1* x)) <body>;
-...
-else <body>;
+if (c_is(SumType* obj, VariantEnum1, VariantType1* x))
+    <body>;
 ```
 The **c_when** statement is exhaustive. The compiler will give a warning if not all variants are
 covered by **c_is** (requires `-Wall` or `-Wswitch` gcc/clang compiler flag). The first enum value
@@ -269,6 +188,7 @@ not work as expected. It will only break out of the `c_when`-block. Instead, use
 end of the loop. `break` will break out of `c_when`, i.e. it behaves like `switch`.
 * Caveat 2: Sum types will generally not work in coroutines because the `x` variable is local and therefore
 will not be preserved across `cco_yield..` / `cco_await..`.
+* Caveat 3: In the second (2) usage, `c_is(obj,VE,x)` combined with `&&` or `||` will not compile.
 
 ### Example 1
 
@@ -310,11 +230,12 @@ int main(void) {
 This example has two sum types. The `MessageChangeColor` variant uses the `Color` sum type as
 its data type (payload). Because C does not have namespaces, it is recommended to prefix the variant names with the sum type name, as with regular enums.
 
-[ [Run this code](https://godbolt.org/z/846bbjzGG) ]
+[ [Run this code](https://godbolt.org/z/b5dG1vrGY) ]
 ```c++
 // https://doc.rust-lang.org/book/ch18-03-pattern-syntax.html#destructuring-enums
 #include <stdio.h>
 #include <stc/algorithm.h>
+#include <stc/cstr.h>
 
 c_sumtype (Color,
     (ColorRgb, struct {int32 r, g, b;}),
@@ -324,14 +245,18 @@ c_sumtype (Color,
 c_sumtype (Message,
     (MessageQuit, _Bool),
     (MessageMove, struct {int32 x, y;}),
-    (MessageWrite, const char*),
+    (MessageWrite, cstr),
     (MessageChangeColor, Color)
 );
 
+void Message_drop(Message* m) {
+    if (c_is(m, MessageWrite, s)) cstr_drop(s);
+}
 
 int main(void) {
     Message msg[] = {
         c_variant(MessageMove, {42, 314}),
+        c_variant(MessageWrite, cstr_from("Attack!")),
         c_variant(MessageChangeColor, c_variant(ColorHsv, {0, 160, 255})),
     };
 
@@ -344,7 +269,7 @@ int main(void) {
             printf("Move %d in the x direction and %d in the y direction\n", p->x, p->y);
         }
         c_is(MessageWrite, text) {
-            printf("Text message: %s\n", *text);
+            printf("Text message: %s\n", cstr_str(text));
         }
         c_is(MessageChangeColor, cc) c_when (cc) {
             c_is(ColorRgb, c)
@@ -352,54 +277,14 @@ int main(void) {
             c_is(ColorHsv, c)
                 printf("Change color to hue %d, saturation %d, value %d\n", c->h, c->s, c->v);
         }
+        Message_drop(&msg[i]);
     }
 }
 ```
 </details>
 
-
 ## Generic algorithms
 
-<details>
-<summary><b>c_func</b> - Function with on-the-fly defined return type</summary>
-
-### c_func
-
-A macro for conveniently defining functions with multiple return values. This is for encouraging
-to write functions that returns extra error context when error occurs, or just multiple return values.
-
-[ [Run this code](https://godbolt.org/z/MsYG75Eae) ]
-```c++
-Vec get_data(void) {
-    return c_make(Vec, {1, 2, 3, 4, 5, 6});
-}
-
-// same as get_data(), but with the c_func macro "syntax".
-c_func (get_data1,(void), ->, Vec) {
-    return c_make(Vec, {1, 2, 3, 4, 5, 6});
-}
-
-// return two Vec types "on-the-fly".
-c_func (get_data2,(void), ->, struct {Vec v1, v2;}) {
-    return (get_data2_result){
-        .v1 = c_make(Vec, {1, 2, 3, 4, 5, 6}),
-        .v2 = c_make(Vec, {7, 8, 9, 10, 11})
-    };
-}
-
-// return a Vec, and an err code which is 0 if OK.
-c_func (load_data,(const char* fname), ->, struct {Vec vec; int err;}) {
-    FILE* fp = fopen(fname, "rb");
-    if (fp == 0)
-        return (load_data_result){.err = 1};
-
-    load_data_result out = {Vec_with_size(1024, '\0')};
-    fread(out.vec.data, sizeof(out.vec.data[0]), 1024, fp);
-    fclose(fp);
-    return out;
-}
-```
-</details>
 <details>
 <summary><b>c_make, c_push_items, c_drop</b> - Generic container operations</summary>
 
@@ -553,6 +438,71 @@ int main(void)
 <!--{%endraw%}-->
 </details>
 <details>
+<summary><b>c_filter, c_filter_zip, c_filter_pairwise</b> - Ranged filtering</summary>
+
+### c_filter, c_filter_zip, c_filter_pairwise
+Functional programming with chained `&&` filtering. `value` is the pointer to current value.
+It enables a subset of functional programming like in other popular languages.
+
+- **Note 1**: The **_reverse** variants only works with ***vec***, ***deque***, ***stack***, ***queue*** containers.
+- **Note 2**: There is also a `c_ffilter` loop variant of `c_filter`. It uses the filter namings
+`c_fflt_skip(it, numItems)`, etc.
+
+| Usage                                | Description                       |
+|:-------------------------------------|:----------------------------------|
+| void `c_filter`(**CntType**, container, filters) | Filter items in chain with the && operator |
+| void `c_filter_from`(**CntType**, start, filters) | Filter from start iterator |
+| void `c_filter_reverse`(**CntType**, cnt, filters) | Filter items in reverse order  |
+| void `c_filter_reverse_from`(**CntType**, rstart, filters) | Filter reverse from rstart iterator |
+| *c_filter_zip*, *c_filter_pairwise*: ||
+| void `c_filter_zip`(**CntType**, cnt1, cnt2, filters)` | Filter (cnt1, cnt2) items |
+| void `c_filter_zip`(**CntType1**, cnt1, **CntType2**, cnt2, filters)` | May use different types for cnt1, cnt2 |
+| void `c_filter_reverse_zip`(**CntType**, cnt1, cnt2, filters)` | Filter (cnt1, cnt2) items in reverse order  |
+| void `c_filter_reverse_zip`(**CntType1**, cnt1, **CntType2**, cnt2, filters)` | May use different types for cnt1, cnt2 |
+| void `c_filter_pairwise`(**CntType**, cnt, filters)` | Filter items pairwise as value1, value2 |
+
+| Built-in filter                   | Description                                |
+|:----------------------------------|:-------------------------------------------|
+| void `c_flt_skip`(numItems)       | Skip numItems (increments count)           |
+| void `c_flt_take`(numItems)       | Take numItems only (increments count)      |
+| void `c_flt_skipwhile`(predicate) | Skip items until predicate is false        |
+| void `c_flt_takewhile`(predicate) | Take items until predicate is false        |
+| int  `c_flt_counter`()            | Increment count and return it              |
+| int  `c_flt_getcount`()           | Number of items passed skip/take/counter   |
+| **Type** `c_flt_map`(expr)        | Map expr to current value. Input unchanged |
+| **Type** `c_flt_src`              | Pointer variable to current unmapped source value |
+| **Type** `value`                  | Pointer variable to (possible mapped) value |
+| For *c_filter_zip*, *c_filter_pairwise*: ||
+| **Type** `c_flt_map1`(expr)        | Map expr to value1. Input unchanged |
+| **Type** `c_flt_map2`(expr)        | Map expr to value2. Input unchanged |
+| **Type** `c_flt_src1`, `c_flt_src2`| Pointer variables to current unmapped source values |
+| **Type** `value1`, `value2`        | Pointer variables to (possible mapped) values |
+
+[ [Run this example](https://godbolt.org/z/W87fTdvYd) ]
+```c++
+#include <stdio.h>
+#define i_type Vec, int
+#include "stc/stack.h"
+#include "stc/algorithm.h"
+
+int main(void)
+{
+    Vec vec = c_make(Vec, {1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 9, 10, 11, 12, 5});
+
+    c_filter(Vec, vec, true
+        && c_flt_skipwhile(*value < 3)  // skip leading values < 3
+        && (*value & 1) == 1            // then use odd values only
+        && c_flt_map(*value * 2)        // multiply by 2
+        && c_flt_takewhile(*value < 20) // stop if mapped *value >= 20
+        && printf(" %d", *value)        // print value
+    );
+    //  6 10 14 2 6 18
+    puts("");
+    Vec_drop(&vec);
+}
+```
+</details>
+<details>
 <summary><b>c_all_of, c_any_of, c_none_of</b> - Boolean container operations</summary>
 
 ### c_all_of, c_any_of, c_none_of
@@ -634,85 +584,7 @@ int main(void) {
     MyDeq_drop(&deq);
 }
 ```
-
 </details>
-<details>
-<summary><b>c_new, c_delete, c_malloc, etc.</b> - Allocation helpers</summary>
-
-### c_new, c_delete
-
-- Type\* `c_new`(**Type**, value) - Allocate *and initialize* a new object on the heap with *value*.
-- Type\* `c_new_n`(**Type**, n) - Allocate an array of ***n*** new objects on the heap, initialized to zero.
-- void `c_delete`(**Type**, ptr) - *Type_drop(ptr)* and *c_free(ptr, ..)* allocated on the heap. NULL is OK.
-- void `c_delete_n`(**Type**, arr, n) - *Type_drop(&arr[i])* and *c_free(arr, ..)* of ***n*** objects allocated on the heap. (NULL, 0) is OK.
-```c++
-#include "stc/cstr.h"
-
-cstr* stringptr = c_new (cstr, cstr_from("Hello"));
-printf("%s\n", cstr_str(stringp));
-c_delete(cstr, stringptr);
-```
-
-### c_malloc, c_calloc, c_realloc, c_free
-Memory allocator wrappers which uses signed sizes. Note that the signatures for
-*c_realloc()* and *c_free()* have an extra size parameter. These will be used as
-default in containers unless `i_malloc`, `i_calloc`, `i_realloc`, and `i_free` are user defined. See
-[Per container-instance customization](../README.md#per-container-instance-customization)
-- void* `c_malloc`(isize sz)
-- void* `c_calloc`(isize n, isize sz)
-- void* `c_realloc`(void* old_p, isize old_sz, isize new_sz)
-- void  `c_free`(void* p, isize sz)
-
-</details>
-<details>
-<summary>Miscellaneous macros</summary>
-
-### c_arraylen
-Return number of elements in an array. array must not be a pointer!
-```c++
-int array[] = {1, 2, 3, 4};
-isize n = c_arraylen(array);
-```
-
-### c_swap, c_const_cast
-```c++
-// Side effect- and typesafe macro for swapping internals of two objects of same type:
-c_swap(&map1, &map2);
-
-// Type-safe casting a from const (pointer):
-const char cs[] = "Hello";
-char* s = c_const_cast(char*, cs); // OK
-int* ip = c_const_cast(int*, cs);  // issues a warning!
-
-// Type safe casting:
-#define tofloat(d) c_safe_cast(float, double, d)
-```
-</details>
-<!--
-<details>
-<summary>Predefined template parameter functions</summary>
-### Predefined template parameter functions
-
-**cstr_raw** - Non-owning `const char*` "class" element type: `#define i_keyclass cstr_raw`
-```c++
-typedef         const char* cstr_raw;
-int             cstr_raw_cmp(const cstr_raw* x, const cstr_raw* y);
-size_t          cstr_raw_hash(const cstr_raw* x);
-cstr_raw        cstr_raw_clone(cstr_raw sp);
-void            cstr_raw_drop(cstr_raw* x);
-```
-Default implementations
-```c++
-int             c_default_cmp(const Type*, const Type*);    // <=>
-bool            c_default_less(const Type*, const Type*);   // <
-bool            c_default_eq(const Type*, const Type*);     // ==
-size_t          c_default_hash(const Type*);
-Type            c_default_clone(Type val);                  // return val
-Type            c_default_toraw(const Type* p);             // return *p
-void            c_default_drop(Type* p);                    // does nothing
-```
-</details>
--->
 <details>
 <summary><b>c_defer, c_with</b> - RAII macros</summary>
 
@@ -771,5 +643,173 @@ int main(void)
 }
 ```
 </details>
+
+## Miscellaneous
+
+<details>
+<summary><b>crange, c_iota</b> - Integer range objects</summary>
+
+### crange, crange32, c_iota
+An integer sequence generator type, similar to [boost::irange](https://www.boost.org/doc/libs/release/libs/range/doc/html/range/reference/ranges/irange.html).
+
+- `crange` uses `isize` (ptrdiff_t) as control variable
+- `crange32` is like *crange*, but uses `int32_t` as control variable, which may be faster.
+
+```c++
+crange      crange_make(stop);              // 0, 1, ... stop-1
+crange      crange_make(start, stop);       // start, start+1, ... stop-1
+crange      crange_make(start, stop, step); // start, start+step, ... upto-not-including stop,
+                                            // step may be negative.
+crange_iter crange_begin(crange* self);
+void        crange_next(crange_iter* it);
+
+
+crange&     c_iota(start);                  // l-value; NB! otherwise like crange_make(start, INTPTR_MAX)
+crange&     c_iota(start, stop);            // l-value; otherwise like crange_make(start, stop)
+crange&     c_iota(start, stop, step);      // l-value; otherwise like crange_make(start, stop, step)
+```
+ The **crange_value** type is *isize*. Variables *start*, *stop*, and *step* are of type *crange_value*.
+
+[ [Run this code](https://godbolt.org/z/6aaq6qTro) ]
+```c++
+// 1. All primes less than 32: See below for c_filter() and is_prime()
+crange r1 = crange_make(3, 32, 2);
+printf("2"); // first prime
+c_filter(crange, r1, true
+    && is_prime(*value)
+    && printf(" %zi", *value)
+);
+// 2 3 5 7 11 13 17 19 23 29 31
+
+// 2. The first 11 primes:
+// c_iota() can be used as argument to c_filter.
+printf("2"); // first prime
+c_filter(crange, c_iota(3), true
+    && is_prime(*value)
+    && (c_flt_take(10), printf(" %zi", *value))
+);
+// 2 3 5 7 11 13 17 19 23 29 31
+```
+</details>
+<details>
+<summary><b>c_func</b> - Function with on-the-fly defined return type</summary>
+
+### c_func
+
+A macro for conveniently defining functions with multiple return values. This is for encouraging
+to write functions that returns extra error context when error occurs, or just multiple return values.
+
+[ [Run this code](https://godbolt.org/z/MsYG75Eae) ]
+```c++
+Vec get_data(void) {
+    return c_make(Vec, {1, 2, 3, 4, 5, 6});
+}
+
+// same as get_data(), but with the c_func macro "syntax".
+c_func (get_data1,(void), ->, Vec) {
+    return c_make(Vec, {1, 2, 3, 4, 5, 6});
+}
+
+// return two Vec types "on-the-fly".
+c_func (get_data2,(void), ->, struct {Vec v1, v2;}) {
+    return (get_data2_result){
+        .v1 = c_make(Vec, {1, 2, 3, 4, 5, 6}),
+        .v2 = c_make(Vec, {7, 8, 9, 10, 11})
+    };
+}
+
+// return a Vec, and an err code which is 0 if OK.
+c_func (load_data,(const char* fname), ->, struct {Vec vec; int err;}) {
+    FILE* fp = fopen(fname, "rb");
+    if (fp == 0)
+        return (load_data_result){.err = 1};
+
+    load_data_result out = {Vec_with_size(1024, '\0')};
+    fread(out.vec.data, sizeof(out.vec.data[0]), 1024, fp);
+    fclose(fp);
+    return out;
+}
+```
+</details>
+<details>
+<summary><b>c_new, c_delete, c_malloc, etc.</b> - Allocation helpers</summary>
+
+### c_new, c_delete
+
+- Type\* `c_new`(**Type**, value) - Allocate *and initialize* a new object on the heap with *value*.
+- Type\* `c_new_n`(**Type**, n) - Allocate an array of ***n*** new objects on the heap, initialized to zero.
+- void `c_delete`(**Type**, ptr) - *Type_drop(ptr)* and *c_free(ptr, ..)* allocated on the heap. NULL is OK.
+- void `c_delete_n`(**Type**, arr, n) - *Type_drop(&arr[i])* and *c_free(arr, ..)* of ***n*** objects allocated on the heap. (NULL, 0) is OK.
+```c++
+#include "stc/cstr.h"
+
+cstr* stringptr = c_new (cstr, cstr_from("Hello"));
+printf("%s\n", cstr_str(stringp));
+c_delete(cstr, stringptr);
+```
+
+### c_malloc, c_calloc, c_realloc, c_free
+Memory allocator wrappers which uses signed sizes. Note that the signatures for
+*c_realloc()* and *c_free()* have an extra size parameter. These will be used as
+default in containers unless `i_malloc`, `i_calloc`, `i_realloc`, and `i_free` are user defined. See
+[Per container-instance customization](../README.md#per-container-instance-customization)
+- void* `c_malloc`(isize sz)
+- void* `c_calloc`(isize n, isize sz)
+- void* `c_realloc`(void* old_p, isize old_sz, isize new_sz)
+- void  `c_free`(void* p, isize sz)
+
+</details>
+<details>
+<summary><b>c_swap, c_arraylen, c_const_cast, c_safe_case</b></summary>
+
+### c_swap, c_arraylen, c_const_cast, c_safe_case
+Side effect- and typesafe macro for swapping internals of two objects of same type:
+```c++
+double x = 1.0, y = 2.0;
+c_swap(&x, &y);
+```
+
+Return number of elements in an array. array must not be a pointer!
+```c++
+int array[] = {1, 2, 3, 4};
+isize n = c_arraylen(array);
+```
+
+Type-safe casting a from const (pointer):
+```c++
+const char cs[] = "Hello";
+char* s = c_const_cast(char*, cs); // OK
+int* ip = c_const_cast(int*, cs);  // issues a warning!
+
+// Type safe casting:
+#define tofloat(d) c_safe_cast(float, double, d)
+```
+</details>
+
+<!--
+<details>
+<summary>Predefined template parameter functions</summary>
+### Predefined template parameter functions
+
+**cstr_raw** - Non-owning `const char*` "class" element type: `#define i_keyclass cstr_raw`
+```c++
+typedef         const char* cstr_raw;
+int             cstr_raw_cmp(const cstr_raw* x, const cstr_raw* y);
+size_t          cstr_raw_hash(const cstr_raw* x);
+cstr_raw        cstr_raw_clone(cstr_raw sp);
+void            cstr_raw_drop(cstr_raw* x);
+```
+Default implementations
+```c++
+int             c_default_cmp(const Type*, const Type*);    // <=>
+bool            c_default_less(const Type*, const Type*);   // <
+bool            c_default_eq(const Type*, const Type*);     // ==
+size_t          c_default_hash(const Type*);
+Type            c_default_clone(Type val);                  // return val
+Type            c_default_toraw(const Type* p);             // return *p
+void            c_default_drop(Type* p);                    // does nothing
+```
+</details>
+-->
 
 ---
