@@ -379,12 +379,10 @@ Erase linearily in containers using a predicate. `value` is a pointer to each el
 #include "stc/cstr.h"
 #include "stc/algorithm.h"
 
-#define i_type Vec, int
-#define i_use_cmp
+#define i_type Vec, int, c_use_eq
 #include "stc/stack.h"
 
-#define i_type List, int
-#define i_use_cmp
+#define i_type List, int, c_use_eq
 #include "stc/list.h"
 
 #define i_type Map
@@ -567,9 +565,8 @@ int main(void) {
 }
 ```
 ```c++
-#define i_type MyDeq, int
-#define i_use_cmp      // enable sorting
-#include "stc/deque.h" // can be swapped with any of the above
+#define i_type MyDeq, int, c_use_cmp // int elements, enable sorting
+#include "stc/deque.h"
 #include <stdio.h>
 
 int main(void) {

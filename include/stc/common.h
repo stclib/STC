@@ -68,8 +68,8 @@ typedef ptrdiff_t       isize;
 #define _c_RSEQ_N 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1,
 #define _c_ARG_N(_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,_12,_13,_14,_15,_16,N,...) N
 
-// Select arg, e.g. for #define i_type A,B then c_SELECT(c_ARG_2, i_type) is B
-#define c_SELECT(X, ...) c_EXPAND(X(__VA_ARGS__,,)) // need c_EXPAND for MSVC
+// Select arg, e.g. for #define i_type A,B then c_GETARG(2, i_type) is B
+#define c_GETARG(N, ...) c_EXPAND(c_ARG_##N(__VA_ARGS__,)) // need c_EXPAND for MSVC
 #define c_ARG_1(a, ...) a
 #define c_ARG_2(a, b, ...) b
 #define c_ARG_3(a, b, c, ...) c
@@ -103,7 +103,7 @@ typedef ptrdiff_t       isize;
 
 #define c_static_assert(expr)   (1 ? 0 : (int)sizeof(int[(expr) ? 1 : -1]))
 #if defined STC_NDEBUG || defined NDEBUG
-    #define c_assert(expr)      ((void)0)
+    #define c_assert(expr)      (void)sizeof(expr)
 #else
     #define c_assert(expr)      assert(expr)
 #endif

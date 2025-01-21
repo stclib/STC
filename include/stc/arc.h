@@ -89,7 +89,7 @@ struct _arc_metadata { catomic_long counter; };
 #include "priv/template.h"
 typedef i_keyraw _m_raw;
 
-#if c_option(c_no_atomic)
+#if c_OPTION(c_no_atomic)
   #define i_no_atomic
 #endif
 #if !defined i_no_atomic

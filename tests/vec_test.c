@@ -1,7 +1,6 @@
 #include "ctest.h"
 
-#define i_type IVec,int
-#define i_use_cmp
+#define i_type IVec, int, c_use_eq
 #include "stc/vec.h"
 
 

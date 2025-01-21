@@ -26,7 +26,7 @@
 
 #ifndef STC_TEMPLATE_H_INCLUDED
 #define STC_TEMPLATE_H_INCLUDED
-  #define c_option(flag)  ((i_opt) & (flag))
+  #define c_OPTION(flag)  ((i_opt) & (flag))
   #define c_declared      (1<<0)
   #define c_no_atomic     (1<<1)
   #define c_no_clone      (1<<2)
@@ -69,10 +69,14 @@
 
 #if defined i_type && !(defined i_key || defined i_keyclass || \
                         defined i_keypro || defined i_rawclass)
-  #define Self c_SELECT(c_ARG_1, i_type)
-  #define i_key c_SELECT(c_ARG_2, i_type)
-  #if defined _i_is_map && !defined i_val
-    #define i_val c_SELECT(c_ARG_3, i_type)
+  #define Self c_GETARG(1, i_type)
+  #define i_key c_GETARG(2, i_type)
+  #if c_NUMARGS(i_type) == 3
+    #if defined _i_is_map
+      #define i_val c_GETARG(3, i_type)
+    #else
+      #define i_opt c_GETARG(3, i_type)
+    #endif
   #endif
 #elif !defined Self && defined i_type
   #define Self i_type
@@ -93,19 +97,19 @@
 
 #define i_no_emplace
 
-#if c_option(c_declared)
+#if c_OPTION(c_declared)
   #define i_declared
 #endif
-#if c_option(c_no_hash)
+#if c_OPTION(c_no_hash)
   #define i_no_hash
 #endif
-#if c_option(c_use_cmp)
+#if c_OPTION(c_use_cmp)
   #define i_use_cmp
 #endif
-#if c_option(c_use_eq)
+#if c_OPTION(c_use_eq)
   #define i_use_eq
 #endif
-#if c_option(c_no_clone) || defined _i_is_arc
+#if c_OPTION(c_no_clone) || defined _i_is_arc
   #define i_no_clone
 #endif
 

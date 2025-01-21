@@ -24,10 +24,10 @@ RM_F      ?= rm -f
 
 ifeq ($(OS),Windows_NT)
 	DOTEXE := .exe
-	BUILDDIR := bld_Windows/$(CC)
+	BUILDDIR := build_Windows/$(CC)
 else
 #	CC_VER := $(shell $(CC) -dumpversion | cut -f1 -d.)
-	BUILDDIR := bld_$(shell uname)/$(CC)
+	BUILDDIR := build_$(shell uname)/$(CC)
 	LDFLAGS += -lm
 	ifneq ($(CC),clang)
 	  CFLAGS += -Wno-clobbered

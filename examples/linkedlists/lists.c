@@ -3,8 +3,7 @@
 #include "stc/algorithm.h"
 #include "stc/random.h"
 
-#define i_type DList,double
-#define i_use_cmp
+#define i_type DList, double, c_use_cmp
 #include "stc/list.h"
 
 int main(void) {

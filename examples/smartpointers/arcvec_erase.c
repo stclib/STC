@@ -2,9 +2,10 @@
 
 void show_drop(int* x) { printf("drop: %d\n", *x); }
 
-#define i_type Arc,int
+
+#define i_type Arc, int
 #define i_keydrop show_drop
-#define i_use_cmp           // enable sort/search for int type
+#define i_use_cmp           // enable sort/search for Arc int type
 #include "stc/arc.h"        // Shared pointer to int
 
 #define i_type Vec

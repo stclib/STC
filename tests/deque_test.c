@@ -1,7 +1,6 @@
 #include "ctest.h"
 
-#define i_type IDeq,int
-#define i_use_cmp
+#define i_type IDeq, int, c_use_cmp
 #include "stc/deque.h"
 
 
