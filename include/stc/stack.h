@@ -240,8 +240,21 @@ STC_INLINE void _c_MEMB(_adjust_end_)(Self* self, isize n)
 #endif // _i_has_cmp
 
 #if defined _i_has_eq
-STC_INLINE bool
-_c_MEMB(_eq)(const Self* self, const Self* other) {
+STC_INLINE _m_iter _c_MEMB(_find_in)(_m_iter i1, _m_iter i2, _m_raw raw) {
+    const _m_value* p2 = i2.ref ? i2.ref : i1.end;
+    for (; i1.ref != p2; ++i1.ref) {
+        const _m_raw r = i_keytoraw(i1.ref);
+        if (i_eq((&raw), (&r)))
+            return i1;
+    }
+    i2.ref = NULL;
+    return i2;
+}
+
+STC_INLINE _m_iter _c_MEMB(_find)(const Self* self, _m_raw raw)
+    { return _c_MEMB(_find_in)(_c_MEMB(_begin)(self), _c_MEMB(_end)(self), raw); }
+
+STC_INLINE bool _c_MEMB(_eq)(const Self* self, const Self* other) {
     if (self->size != other->size) return false;
     for (isize i = 0; i < self->size; ++i) {
         const _m_raw _rx = i_keytoraw((self->data+i)), _ry = i_keytoraw((other->data+i));
