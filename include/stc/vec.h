@@ -364,6 +364,7 @@ _c_MEMB(_emplace_n)(Self* self, const isize idx, const _m_raw raw[], isize n) {
 #if defined _i_has_eq
 STC_DEF _m_iter
 _c_MEMB(_find_in)(const Self* self, _m_iter i1, _m_iter i2, _m_raw raw) {
+    (void)self;
     const _m_value* p2 = _it2_ptr(i1, i2);
     for (; i1.ref != p2; ++i1.ref) {
         const _m_raw r = i_keytoraw(i1.ref);

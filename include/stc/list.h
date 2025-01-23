@@ -362,6 +362,7 @@ _c_MEMB(_split_off)(Self* self, _m_iter it1, _m_iter it2) {
 #if defined _i_has_eq
 STC_DEF _m_iter
 _c_MEMB(_find_in)(const Self* self, _m_iter it1, _m_iter it2, _m_raw val) {
+    (void)self;
     for (c_each(it, Self, it1, it2)) {
         _m_raw r = i_keytoraw(it.ref);
         if (i_eq((&r), (&val)))

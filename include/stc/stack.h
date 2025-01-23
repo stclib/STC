@@ -241,6 +241,7 @@ STC_INLINE void _c_MEMB(_adjust_end_)(Self* self, isize n)
 
 #if defined _i_has_eq
 STC_INLINE _m_iter _c_MEMB(_find_in)(const Self* self, _m_iter i1, _m_iter i2, _m_raw raw) {
+    (void)self;
     const _m_value* p2 = i2.ref ? i2.ref : i1.end;
     for (; i1.ref != p2; ++i1.ref) {
         const _m_raw r = i_keytoraw(i1.ref);
