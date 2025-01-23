@@ -85,7 +85,7 @@ STC_API bool            _c_MEMB(_resize)(Self* self, isize size, _m_value null);
 STC_API _m_iter         _c_MEMB(_erase_n)(Self* self, isize idx, isize n);
 STC_API _m_iter         _c_MEMB(_insert_uninit)(Self* self, isize idx, isize n);
 #if defined _i_has_eq
-STC_API _m_iter         _c_MEMB(_find_in)(_m_iter it1, _m_iter it2, _m_raw raw);
+STC_API _m_iter         _c_MEMB(_find_in)(const Self* self, _m_iter it1, _m_iter it2, _m_raw raw);
 #endif // _i_has_eq
 STC_INLINE Self         _c_MEMB(_init)(void) { return c_literal(Self){0}; }
 STC_INLINE void         _c_MEMB(_value_drop)(_m_value* val) { i_keydrop(val); }
@@ -243,7 +243,7 @@ STC_INLINE void _c_MEMB(_adjust_end_)(Self* self, isize n)
 
 #if defined _i_has_eq
 STC_INLINE _m_iter _c_MEMB(_find)(const Self* self, _m_raw raw) {
-    return _c_MEMB(_find_in)(_c_MEMB(_begin)(self), _c_MEMB(_end)(self), raw);
+    return _c_MEMB(_find_in)(self, _c_MEMB(_begin)(self), _c_MEMB(_end)(self), raw);
 }
 
 STC_INLINE bool _c_MEMB(_eq)(const Self* self, const Self* other) {
@@ -363,7 +363,7 @@ _c_MEMB(_emplace_n)(Self* self, const isize idx, const _m_raw raw[], isize n) {
 
 #if defined _i_has_eq
 STC_DEF _m_iter
-_c_MEMB(_find_in)(_m_iter i1, _m_iter i2, _m_raw raw) {
+_c_MEMB(_find_in)(const Self* self, _m_iter i1, _m_iter i2, _m_raw raw) {
     const _m_value* p2 = _it2_ptr(i1, i2);
     for (; i1.ref != p2; ++i1.ref) {
         const _m_raw r = i_keytoraw(i1.ref);

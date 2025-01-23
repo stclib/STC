@@ -111,11 +111,11 @@ _c_MEMB(_emplace_at)(Self* self, _m_iter it, const _m_raw raw)
 #endif
 
 #if defined _i_has_eq
-STC_API _m_iter _c_MEMB(_find_in)(_m_iter p1, _m_iter p2, _m_raw raw);
+STC_API _m_iter _c_MEMB(_find_in)(const Self* self, _m_iter p1, _m_iter p2, _m_raw raw);
 
 STC_INLINE _m_iter
 _c_MEMB(_find)(const Self* self, _m_raw raw) {
-    return _c_MEMB(_find_in)(_c_MEMB(_begin)(self), _c_MEMB(_end)(self), raw);
+    return _c_MEMB(_find_in)(self, _c_MEMB(_begin)(self), _c_MEMB(_end)(self), raw);
 }
 #endif // _i_has_eq
 
@@ -188,7 +188,7 @@ _c_MEMB(_emplace_n)(Self* self, const isize idx, const _m_raw* raw, const isize 
 
 #if defined _i_has_eq
 STC_DEF _m_iter
-_c_MEMB(_find_in)(_m_iter i1, _m_iter i2, _m_raw raw) {
+_c_MEMB(_find_in)(const Self* self, _m_iter i1, _m_iter i2, _m_raw raw) {
     for (; i1.pos != i2.pos; _c_MEMB(_next)(&i1)) {
         const _m_raw r = i_keytoraw(i1.ref);
         if (i_eq((&raw), (&r)))

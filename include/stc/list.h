@@ -100,7 +100,7 @@ STC_API _m_iter         _c_MEMB(_insert_at)(Self* self, _m_iter it, _m_value val
 STC_API _m_iter         _c_MEMB(_erase_at)(Self* self, _m_iter it);
 STC_API _m_iter         _c_MEMB(_erase_range)(Self* self, _m_iter it1, _m_iter it2);
 #if defined _i_has_eq
-STC_API _m_iter         _c_MEMB(_find_in)(_m_iter it1, _m_iter it2, _m_raw val);
+STC_API _m_iter         _c_MEMB(_find_in)(const Self* self, _m_iter it1, _m_iter it2, _m_raw val);
 STC_API isize           _c_MEMB(_remove)(Self* self, _m_raw val);
 #endif
 #if defined _i_has_cmp
@@ -208,7 +208,7 @@ _c_MEMB(_splice_range)(Self* self, _m_iter it,
 #if defined _i_has_eq
 STC_INLINE _m_iter
 _c_MEMB(_find)(const Self* self, _m_raw val) {
-    return _c_MEMB(_find_in)(_c_MEMB(_begin)(self), _c_MEMB(_end)(self), val);
+    return _c_MEMB(_find_in)(self, _c_MEMB(_begin)(self), _c_MEMB(_end)(self), val);
 }
 
 STC_INLINE bool _c_MEMB(_eq)(const Self* self, const Self* other) {
@@ -361,7 +361,7 @@ _c_MEMB(_split_off)(Self* self, _m_iter it1, _m_iter it2) {
 
 #if defined _i_has_eq
 STC_DEF _m_iter
-_c_MEMB(_find_in)(_m_iter it1, _m_iter it2, _m_raw val) {
+_c_MEMB(_find_in)(const Self* self, _m_iter it1, _m_iter it2, _m_raw val) {
     for (c_each(it, Self, it1, it2)) {
         _m_raw r = i_keytoraw(it.ref);
         if (i_eq((&r), (&val)))

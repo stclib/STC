@@ -3,18 +3,19 @@
 
 # STC - Smart Template Containers
 
-## Version 5.0.1
-STC is a comprehensive, modern, typesafe and fast templated general purpose container and algorithms
-library for C99. It aims to make C-programming even more fun, more productive and safer.
+## Version 5.0.2 RC
+STC is a comprehensive, high performance, typesafe and generic general purpose container and algorithms
+library for C99 with excellent ergonomics and ease of use.
 
 <details>
-<summary><b>Version 5.0 NEWS</b></summary>
+<summary><b>Version 5 NEWS</b></summary>
 
-- New main build system with Meson. Simple Makefile provided as well.
-- New **sum type** (tagged union), included via `algorithm.h`
-- New single/multi-dimensional generic **span** type, with numpy-like slicing.
-- Coroutines now support *structured concurrency* and *symmetric coroutines*.
-- Coroutines now support *error handling* and *error recovery*.
+- Added build system with Meson. Makefile provided as well.
+- Added **sum type** (tagged union), included via `algorithm.h`
+- Added single/multi-dimensional generic **span** type, with numpy-like slicing.
+- Updated coroutines support with *structured concurrency* and *symmetric coroutines*.
+- Updated coroutines support with proper *error handling* and *error recovery*.
+- Changed for-loop range-style macros to more natural C-syntax
 - Template parameter `i_type` lets you define `i_type`, `i_key`, and `i_val` all in one line (comma separated).
 - Template parameters `i_keyclass` and `i_valclass` to specify types with `_drop()` and `_clone()` functions defined.
 - Template parameters `i_keypro` and `i_valpro` to specify `cstr`, `box` and `arc` types (users may also define pro-types).
@@ -25,15 +26,9 @@ library for C99. It aims to make C-programming even more fun, more productive an
 See also [version history](#version-history) for breaking changes in V5.0.
 </details>
 <details>
-<summary><b>Reasons why you want to you use STC</b></summary>
-C is still among the most popular programming languages, despite the fact that it was created
-as early as in 1972. That is a manifestation of how well the language was designed for its time,
-and still is. However, times are changing, and C is starting to lag behind many of the new upcoming
-system languages like Zig, Odin and Rust with regard to features in the standard library, but also
-when it comes to safety and vulnerabilities. STC aims to bridge some of that gap, to let us have
-common modern features and added safety, while we still can enjoy writing C.
+<summary><b>Reasons why you may want to you use STC</b></summary>
 
-#### A. Missing features in the C standard library, which STC provides
+#### A. Supplementing features missing in the C standard library
 * A wide set of high performance, generic/templated typesafe container types, including smart pointers and bitsets.
 * String type with utf8 support and short string optimization (sso), plus two string-view types.
 * Typesafe and ergonomic **sum type** implementation, aka. tagged union or variant.
@@ -43,7 +38,7 @@ common modern features and added safety, while we still can enjoy writing C.
 * Generic algorithms, iterators and loop abstactions. Blazing fast *sort, binary search* and *lower bound*.
 * Single/multi-dimensional generic **span view** with arbitrary array dimensions (numpy array-like slicing).
 
-#### B. Improved safety by using STC
+#### B. Improved safety and increased productivity
 * Abstractions for raw loops, ranged iteration over containers, and generic ranges algorithms. All this
 reduces the chance of creating bugs, as user code with raw loops and ad-hoc implementation of
 common algorithms and containers is minimized/eliminated.
@@ -678,12 +673,11 @@ It adds a MemoryContext to each container by defining the `i_aux` template param
 Note that `pgs_realloc` and `pgs_free` is also passed the
 allocated size of the given pointer, unlike standard `realloc` and `free`.
 
-`i_aux` is accessible for customizing the following containers using template parameters:
+`self->aux` is accessible from the following template parameters / container combinations:
 - `i_malloc`, `i_calloc`, `i_realloc`, `i_free`: **all containers**
-- `i_cmp`: **smap** and **sset**
-- `i_hash`, `i_eq`: **hmap** and **hset**
-- `i_eq`: **vec**, **deque**, **list**
-- `i_less`: **pqueue**
+- `i_eq` : **all containers**
+- `i_cmp`, `i_less`: **all containers except hmap and hset**
+- `i_hash`: **hmap and hset**
 
 ```c++
 // stcpgs.h
@@ -714,6 +708,73 @@ void maptest()
     IMap_drop(&map);
 }
 ```
+Another example is to sort struct elements using an 'active' field:
+
+[ [Run this code](https://godbolt.org/z/K3h4dK5jv) ]
+```c++
+#include <stdio.h>
+#include <time.h>
+#include <stc/cstr.h>
+#include <c11/fmt.h>
+
+typedef struct {
+    cstr fileName;
+    cstr directory;
+    isize size;
+    time_t lastWriteTime;
+}  FileMetaData;
+
+enum FMDActive {FMD_fileName, FMD_directory, FMD_size, FMD_lastWriteTime};
+
+int FileMetaData_cmp(enum FMDActive active, const FileMetaData* a, const FileMetaData* b);
+void FileMetaData_drop(FileMetaData*);
+
+#define i_type FMDVector, FileMetaData
+#define i_aux enum FMDActive active; bool reverse;
+#define i_cmp(x, y) FileMetaData_cmp(self->aux.active, x, y)
+#define i_keydrop FileMetaData_drop
+#define i_no_clone
+#include <stc/stack.h>
+
+// --------------
+
+int FileMetaData_cmp(enum FMDActive active, const FileMetaData* a, const FileMetaData* b) {
+    switch (active) {
+        case FMD_fileName: return cstr_cmp(&a->fileName, &b->fileName);
+        case FMD_directory: return cstr_cmp(&a->directory, &b->directory);
+        case FMD_size: return c_default_cmp(&a->size, &b->size);
+        case FMD_lastWriteTime: return c_default_cmp(&a->lastWriteTime, &b->lastWriteTime);
+    }
+	return 0;
+}
+
+void FileMetaData_drop(FileMetaData* fmd) {
+	cstr_drop(&fmd->fileName);
+	cstr_drop(&fmd->directory);
+}
+
+int main(void) {
+	FMDVector vec = c_make(FMDVector, {
+        {cstr_from("WScript.cpp"), cstr_from("code/unix"), 3624, 123567},
+        {cstr_from("CanvasBackground.cpp"), cstr_from("code/unix/canvas"), 38273, 12398},
+        {cstr_from("Brush_test.cpp"), cstr_from("code/tests"), 67236, 7823},
+    });
+
+    for (c_range(active, FMD_lastWriteTime + 1)) {
+        vec.aux.active = (enum FMDActive)active;
+        FMDVector_sort(&vec);
+
+        for (c_each(i, FMDVector, vec)) {
+            fmt_println("{:30}{:30}{:10}{:10}",
+                        cstr_str(&i.ref->fileName), cstr_str(&i.ref->directory),
+                        i.ref->size, i.ref->lastWriteTime);
+        }
+        puts("");
+    }
+	FMDVector_drop(&vec);
+}
+```
+
 </details>
 <details>
 <summary>Memory efficiency</summary>
