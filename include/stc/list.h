@@ -55,11 +55,11 @@
     }
 */
 #include "priv/linkage.h"
+#include "types.h"
 
 #ifndef STC_LIST_H_INCLUDED
 #define STC_LIST_H_INCLUDED
 #include "common.h"
-#include "types.h"
 #include <stdlib.h>
 
 #define _c_list_complete_types(SELF, dummy) \

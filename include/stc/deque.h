@@ -23,11 +23,11 @@
 // Deque - double ended queue. Implemented as a ring buffer, extension of queue.
 
 #include "priv/linkage.h"
+#include "types.h"
 
 #ifndef STC_DEQUE_H_INCLUDED
 #define STC_DEQUE_H_INCLUDED
 #include "common.h"
-#include "types.h"
 #include <stdlib.h>
 #endif // STC_DEQUE_H_INCLUDED
 

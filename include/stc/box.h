@@ -56,11 +56,11 @@ int main(void) {
 }
 */
 #include "priv/linkage.h"
+#include "types.h"
 
 #ifndef STC_BOX_H_INCLUDED
 #define STC_BOX_H_INCLUDED
 #include "common.h"
-#include "types.h"
 #include <stdlib.h>
 
 #define cbox_null {0}

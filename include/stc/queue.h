@@ -23,11 +23,11 @@
 
 // Queue. Implemented as a ring buffer.
 #include "priv/linkage.h"
+#include "types.h"
 
 #ifndef STC_QUEUE_H_INCLUDED
 #define STC_QUEUE_H_INCLUDED
 #include "common.h"
-#include "types.h"
 #include <stdlib.h>
 #endif // STC_QUEUE_H_INCLUDED
 

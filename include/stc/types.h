@@ -22,7 +22,7 @@
  */
 
 #ifdef i_aux
-  #define _i_aux_struct struct { i_aux } aux;
+  #define _i_aux_struct struct c_JOIN(Self, _aux) i_aux aux;
 #else
   #define _i_aux_struct
 #endif

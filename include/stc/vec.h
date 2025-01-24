@@ -58,11 +58,11 @@ int main(void) {
 }
 */
 #include "priv/linkage.h"
+#include "types.h"
 
 #ifndef STC_VEC_H_INCLUDED
 #define STC_VEC_H_INCLUDED
 #include "common.h"
-#include "types.h"
 #include <stdlib.h>
 
 #define _it2_ptr(it1, it2) (it1.ref && !it2.ref ? it1.end : it2.ref)

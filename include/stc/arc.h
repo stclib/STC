@@ -53,11 +53,11 @@ int main(void) {
 }
 */
 #include "priv/linkage.h"
+#include "types.h"
 
 #ifndef STC_ARC_H_INCLUDED
 #define STC_ARC_H_INCLUDED
 #include "common.h"
-#include "types.h"
 #include <stdlib.h>
 
 #if defined __GNUC__ || defined __clang__ || defined _MSC_VER || defined i_no_atomic

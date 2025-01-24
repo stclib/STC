@@ -10,17 +10,18 @@ library for C99 with excellent ergonomics and ease of use.
 <details>
 <summary><b>Version 5 NEWS</b></summary>
 
-- Added build system with Meson. Makefile provided as well.
+- Added build system/CI with Meson. Makefile provided as well.
+- Added support for extending templated containers by `#define i_aux { ... }`.
+- Changed ranged for-loop macros to use more natural C-syntax (v5.0.2)
 - Added **sum type** (tagged union), included via `algorithm.h`
 - Added single/multi-dimensional generic **span** type, with numpy-like slicing.
 - Updated coroutines support with *structured concurrency* and *symmetric coroutines*.
 - Updated coroutines support with proper *error handling* and *error recovery*.
-- Changed for-loop range-style macros to more natural C-syntax
-- Template parameter `i_type` lets you define `i_type`, `i_key`, and `i_val` all in one line (comma separated).
+- Template parameter `i_type` lets you define container type plus `i_key` and `i_val` (or `i_opt`) all in one line.
 - Template parameters `i_keyclass` and `i_valclass` to specify types with `_drop()` and `_clone()` functions defined.
 - Template parameters `i_keypro` and `i_valpro` to specify `cstr`, `box` and `arc` types (users may also define pro-types).
 - **hmap** now uses *Robin Hood hashing* (very fast on clang compiler).
-- Several new algorithms added, e.g. `c_filter` (ranges-like).
+- Several new algorithms added, e.g. `c_filter` (ranges-like), `c_shuffle`, `c_reverse`.
 - A lot of improvements and bug fixes.
 
 See also [version history](#version-history) for breaking changes in V5.0.
@@ -32,11 +33,11 @@ See also [version history](#version-history) for breaking changes in V5.0.
 * A wide set of high performance, generic/templated typesafe container types, including smart pointers and bitsets.
 * String type with utf8 support and short string optimization (sso), plus two string-view types.
 * Typesafe and ergonomic **sum type** implementation, aka. tagged union or variant.
-* A **coroutine** implementation with excellent ergonomics, error recovery and cleanup support.
+* A **coroutine** implementation with good ergonomics, error handling/recovery and cleanup support.
 * Fast, modern **regular expressions** with full utf8 and a subset of unicode character classes support.
 * Ranges algorithms like *iota* and filter views like *take, skip, take-while, skip-while, map*.
 * Generic algorithms, iterators and loop abstactions. Blazing fast *sort, binary search* and *lower bound*.
-* Single/multi-dimensional generic **span view** with arbitrary array dimensions (numpy array-like slicing).
+* Single/multi-dimensional generic **span view** with arbitrary array dimensions and numpy array-like slicing.
 
 #### B. Improved safety and increased productivity
 * Abstractions for raw loops, ranged iteration over containers, and generic ranges algorithms. All this
@@ -686,7 +687,7 @@ allocated size of the given pointer, unlike standard `realloc` and `free`.
 #define pgs_realloc(p, old_sz, sz) (p ? repalloc(p, sz) : pgs_malloc(sz))
 #define pgs_free(p, sz) (p ? pfree(p) : (void)0) // pfree/repalloc does not accept NULL.
 
-#define i_aux MemoryContext memctx;
+#define i_aux { MemoryContext memctx; } // NB: enclose in curly braces!
 #define i_allocator pgs
 #define i_no_clone
 ```
@@ -708,9 +709,9 @@ void maptest()
     IMap_drop(&map);
 }
 ```
-Another example is to sort struct elements using an 'active' field:
+Another example is to sort struct elements by the *active field* and *reverse* flag:
 
-[ [Run this code](https://godbolt.org/z/K3h4dK5jv) ]
+[ [Run this code](https://godbolt.org/z/4WdT5ze1x) ]
 ```c++
 #include <stdio.h>
 #include <time.h>
@@ -726,42 +727,44 @@ typedef struct {
 
 enum FMDActive {FMD_fileName, FMD_directory, FMD_size, FMD_lastWriteTime};
 
-int FileMetaData_cmp(enum FMDActive active, const FileMetaData* a, const FileMetaData* b);
+struct FMDVector_aux; // defined when specifying i_aux
+int FileMetaData_cmp(const struct FMDVector_aux*, const FileMetaData*, const FileMetaData*);
 void FileMetaData_drop(FileMetaData*);
 
 #define i_type FMDVector, FileMetaData
-#define i_aux enum FMDActive active; bool reverse;
-#define i_cmp(x, y) FileMetaData_cmp(self->aux.active, x, y)
+#define i_aux { enum FMDActive activeField; bool reverse; }
+#define i_cmp(x, y) FileMetaData_cmp(&self->aux, x, y)
 #define i_keydrop FileMetaData_drop
 #define i_no_clone
 #include <stc/stack.h>
-
 // --------------
 
-int FileMetaData_cmp(enum FMDActive active, const FileMetaData* a, const FileMetaData* b) {
-    switch (active) {
-        case FMD_fileName: return cstr_cmp(&a->fileName, &b->fileName);
-        case FMD_directory: return cstr_cmp(&a->directory, &b->directory);
-        case FMD_size: return c_default_cmp(&a->size, &b->size);
-        case FMD_lastWriteTime: return c_default_cmp(&a->lastWriteTime, &b->lastWriteTime);
+int FileMetaData_cmp(const struct FMDVector_aux* aux, const FileMetaData* a, const FileMetaData* b) {
+    int dir = aux->reverse ? -1 : 1;
+    switch (aux->activeField) {
+        case FMD_fileName: return dir*cstr_cmp(&a->fileName, &b->fileName);
+        case FMD_directory: return dir*cstr_cmp(&a->directory, &b->directory);
+        case FMD_size: return dir*c_default_cmp(&a->size, &b->size);
+        case FMD_lastWriteTime: return dir*c_default_cmp(&a->lastWriteTime, &b->lastWriteTime);
     }
-	return 0;
+    return 0;
 }
 
 void FileMetaData_drop(FileMetaData* fmd) {
-	cstr_drop(&fmd->fileName);
-	cstr_drop(&fmd->directory);
+    cstr_drop(&fmd->fileName);
+    cstr_drop(&fmd->directory);
 }
 
 int main(void) {
-	FMDVector vec = c_make(FMDVector, {
+    FMDVector vec = c_make(FMDVector, {
         {cstr_from("WScript.cpp"), cstr_from("code/unix"), 3624, 123567},
         {cstr_from("CanvasBackground.cpp"), cstr_from("code/unix/canvas"), 38273, 12398},
         {cstr_from("Brush_test.cpp"), cstr_from("code/tests"), 67236, 7823},
     });
 
-    for (c_range(active, FMD_lastWriteTime + 1)) {
-        vec.aux.active = (enum FMDActive)active;
+    vec.aux.reverse = true;
+    for (c_range(activeField, FMD_lastWriteTime + 1)) {
+        vec.aux.activeField = (enum FMDActive)activeField;
         FMDVector_sort(&vec);
 
         for (c_each(i, FMDVector, vec)) {
@@ -771,7 +774,7 @@ int main(void) {
         }
         puts("");
     }
-	FMDVector_drop(&vec);
+    FMDVector_drop(&vec);
 }
 ```
 

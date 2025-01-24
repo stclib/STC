@@ -50,11 +50,11 @@ int main(void) {
 }
 */
 #include "priv/linkage.h"
+#include "types.h"
 
 #ifndef STC_SMAP_H_INCLUDED
 #define STC_SMAP_H_INCLUDED
 #include "common.h"
-#include "types.h"
 #include <stdlib.h>
 #endif // STC_SMAP_H_INCLUDED
 

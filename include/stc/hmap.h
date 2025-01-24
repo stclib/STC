@@ -46,11 +46,11 @@ int main(void) {
 }
 */
 #include "priv/linkage.h"
+#include "types.h"
 
 #ifndef STC_HMAP_H_INCLUDED
 #define STC_HMAP_H_INCLUDED
 #include "common.h"
-#include "types.h"
 #include <stdlib.h>
 #define _hashmask 0x3fU
 #define _distmask 0x3ffU
