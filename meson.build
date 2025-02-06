@@ -68,7 +68,7 @@ else
 
   import('pkgconfig').generate(
     stc_lib,
-    name: 'Smart Template Containers',
+    name: 'stc',
     description: 'A modern, user friendly, generic, type-safe and fast C99 container library.',
     url: 'https://github.com/stclib/STC',
   )
