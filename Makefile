@@ -61,7 +61,7 @@ fast:
 all: $(PROGRAMS)
 	@echo
 
-$(PROGRAMS): $(LIB_PATH)
+$(PROGRAMS): $(LIB_PATH) $(MAKEFILE)
 
 clean:
 	@$(RM_F) $(LIB_OBJS) $(TEST_OBJS) $(EX_OBJS) $(LIB_DEPS) $(EX_DEPS) $(LIB_PATH) $(EX_EXES) $(TEST_EXE)
@@ -78,17 +78,17 @@ $(LIB_PATH): $(LIB_OBJS)
 
 $(OBJ_DIR)/%.o: %.c
 	@$(MKDIR_P) $(@D)
-	@printf "\r\e[2K%s" "$(CC) $< -c -o $@"
+	@printf "\r\e[2K%s" "$(CC) $(<F) -o $@"
 	@$(CC) $< -c -o $@ $(CFLAGS)
 
 $(OBJ_DIR)/%.o: %.cpp
 	@$(MKDIR_P) $(@D)
-	@printf "\r\e[2K%s" "$(CXX) $< -c -o $@"
+	@printf "\r\e[2K%s" "$(CXX) $(<F) -o $@"
 	@$(CXX) $< -c -o $@ $(CXXFLAGS)
 
 $(OBJ_DIR)/%$(DOTEXE): %.c $(LIB_PATH)
 	@$(MKDIR_P) $(@D)
-	@printf "\r\e[2K%s" "$(CC) -o $(@F) $< -s $(LDFLAGS) -L$(BUILDDIR) -l$(LIB_NAME)"
+	@printf "\r\e[2K%s" "$(CC) $(<F) -o $@"
 	@$(CC) -o $@ $(CFLAGS) -s $< $(LDFLAGS) -L$(BUILDDIR) -l$(LIB_NAME)
 
 $(TEST_EXE): $(TEST_OBJS)

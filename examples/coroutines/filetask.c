@@ -14,10 +14,10 @@ cco_task_struct (file_read) {
 };
 
 
-int file_read(struct file_read* co, cco_runtime* rt)
+int file_read(struct file_read* co, cco_fiber* fb)
 {
     cco_routine (co) {
-        (void)rt;
+        (void)fb;
         co->fp = fopen(co->path, "r");
         co->line = cstr_init();
 
@@ -47,7 +47,7 @@ cco_task_struct (count_line) {
 };
 
 
-int count_line(struct count_line* co, cco_runtime* rt)
+int count_line(struct count_line* co, cco_fiber* fb)
 {
     cco_routine (co) {
         co->reader.cco.func = file_read;
@@ -55,8 +55,8 @@ int count_line(struct count_line* co, cco_runtime* rt)
 
         while (true) {
             // await for next CCO_YIELD (or CCO_DONE) in file_read()
-            cco_await_task(&co->reader, rt, CCO_YIELD);
-            if (rt->result == CCO_DONE) break;
+            cco_await_task(&co->reader, fb, CCO_YIELD);
+            if (fb->result == CCO_DONE) break;
             co->lineCount += 1;
             cco_yield;
         }

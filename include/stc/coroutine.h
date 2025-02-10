@@ -96,18 +96,18 @@ typedef struct {
         _resume: switch (*_state) case CCO_STATE_INIT: // thanks, @liigo!
 
 /* Throw an error "exception"; can be catched up in the cco_await_task call tree */
-#define cco_throw_error(error_code, rt) \
-    do { \
-        (rt)->error = error_code; \
-        (rt)->error_line = __LINE__; \
+#define cco_throw_error(error_code, fb) \
+    do {cco_fiber* _fb = fb; \
+        _fb->error = error_code; \
+        _fb->error_line = __LINE__; \
         cco_return; \
     } while (0)
 
-#define cco_recover_error(rt) \
-    do { \
+#define cco_recover_error(fb) \
+    do {cco_fiber* _fb = fb; \
         c_assert(*_state == CCO_STATE_FINALLY); \
-        *_state = (rt)->recover_state; \
-        (rt)->error = 0; \
+        *_state = _fb->recover_state; \
+        _fb->error = 0; \
         goto _resume; \
     } while (0)
 
@@ -170,24 +170,26 @@ typedef struct {
 
 
 /*
- * Tasks: typesafe coroutine function objects
+ * Tasks and Fibers
  */
 
-typedef struct {
-    struct cco_task *current;
+typedef struct cco_fiber {
+    struct cco_task* curr_task;
     void* env;
-    struct cco_task *parent;
+    struct cco_task* parent_task;
+    struct cco_fiber* next;
     int recover_state, awaitbits, result;
-    uint16_t error, error_line;
-} cco_runtime;
+    int error, error_line;
+    cco_state cco;
+} cco_fiber, cco_runtime; /* cco_runtime [deprecated] */
 
 /* Define a Task struct */
 #define cco_task_struct(Task) \
     struct Task; \
     typedef struct { \
-        int (*func)(struct Task*, cco_runtime*); \
+        int (*func)(struct Task*, cco_fiber*); \
         int state, awaitbits; \
-        struct cco_task* parent; \
+        struct cco_task* parent_task; \
     } Task##_state; \
     struct Task
 
@@ -196,93 +198,132 @@ cco_task_struct(cco_task) { cco_task_state cco; };
 typedef struct cco_task cco_task;
 
 #define cco_cast_task(...) \
-    ((cco_task *)(__VA_ARGS__) + (1 ? 0 : sizeof((__VA_ARGS__)->cco.func(__VA_ARGS__, (cco_runtime*)0))))
+    ((cco_task *)(__VA_ARGS__) + (1 ? 0 : sizeof((__VA_ARGS__)->cco.func(__VA_ARGS__, (cco_fiber*)0))))
 
-#define cco_resume_task(task, rt) \
-    _cco_resume_task(cco_cast_task(task), rt)
+#define cco_resume_task(task, fb) \
+    _cco_resume_task(cco_cast_task(task), fb)
 
 /* Stop and immediate cleanup */
-#define cco_cancel_task(task, rt) \
-    _cco_cancel_task(cco_cast_task(task), rt)
+#define cco_cancel_task(task, fb) \
+    _cco_cancel_task(cco_cast_task(task), fb)
 
-static inline int _cco_resume_task(cco_task* task, cco_runtime* rt)
-    { return task->cco.func(task, rt); }
-static inline int _cco_cancel_task(cco_task* task, cco_runtime* rt)
-    { cco_stop(task); return task->cco.func(task, rt); }
+static inline int _cco_resume_task(cco_task* task, cco_fiber* fb)
+    { return task->cco.func(task, fb); }
+static inline int _cco_cancel_task(cco_task* task, cco_fiber* fb)
+    { cco_stop(task); return task->cco.func(task, fb); }
 
 /* Asymmetric coroutine await/call */
 #define cco_await_task(...) c_MACRO_OVERLOAD(cco_await_task, __VA_ARGS__)
-#define cco_await_task_2(task, rt) cco_await_task_3(task, rt, CCO_DONE)
-#define cco_await_task_3(task, rt, _awaitbits) \
-    do {{cco_task* _await_task = cco_cast_task(task); \
+#define cco_await_task_2(task, fb) cco_await_task_3(task, fb, CCO_DONE)
+#define cco_await_task_3(task, fb, _awaitbits) do { \
+    {   cco_task* _await_task = cco_cast_task(task); \
+        cco_fiber* _fb = fb; \
         _await_task->cco.awaitbits = (_awaitbits); \
-        _await_task->cco.parent = (rt)->current; \
-        (rt)->current = _await_task;} \
-        cco_yield_v(CCO_NOOP); \
-    } while (0)
+        _await_task->cco.parent_task = _fb->curr_task; \
+        _fb->curr_task = _await_task; \
+    } \
+    cco_yield_v(CCO_NOOP); \
+} while (0)
 
 /* Symmetric coroutine flow of control transfer */
-#define cco_yield_to(task, rt) \
-    do {{cco_task* _to_task = cco_cast_task(task); \
-        _to_task->cco.awaitbits = (rt)->current->cco.awaitbits; \
-        _to_task->cco.parent = (rt)->current->cco.parent; \
-        (rt)->current = _to_task;} \
-        cco_yield_v(CCO_NOOP); \
-    } while (0)
+#define cco_yield_to(task, fb) do { \
+    {   cco_task* _to_task = cco_cast_task(task); \
+        cco_fiber* _fb = fb; \
+        _to_task->cco.awaitbits = _fb->curr_task->cco.awaitbits; \
+        _to_task->cco.parent_task = _fb->curr_task->cco.parent_task; \
+        _fb->curr_task = _to_task; \
+    } \
+    cco_yield_v(CCO_NOOP); \
+} while (0)
 
 /*
- * Taskrunner
+ * cco_run_task(): Run tasks in parallel branches
  */
-struct cco_taskrunner {
-    cco_runtime runtime;
-    cco_state cco;
-};
-
-extern int cco_taskrunner(struct cco_taskrunner* co);
-
-#define cco_make_taskrunner(task, environment) \
-    (c_literal(struct cco_taskrunner){.runtime = { \
-        .current = cco_cast_task(task), .env = environment \
-    }})
 
 #define cco_run_task(...) c_MACRO_OVERLOAD(cco_run_task, __VA_ARGS__)
 #define cco_run_task_1(task) cco_run_task_2(task, NULL)
-#define cco_run_task_2(task, environment) \
-    for (struct cco_taskrunner _runner = cco_make_taskrunner(task, environment) \
-         ; cco_taskrunner(&_runner) != CCO_DONE ; )
+#define cco_run_task_2(task, environment) cco_run_task_3(task, environment, _runner)
+#define cco_run_task_3(task, environment, runner) \
+    for (cco_fiber* runner = cco_new_runner(cco_cast_task(task), environment) \
+        ; (runner = cco_resume_runner(runner)) != NULL ; )
+
+#define cco_run_fiber(task, environment, runner) \
+    for (cco_fiber runner = {.curr_task=cco_cast_task(task), .env=environment} \
+        ; cco_resume_fiber(&runner) != CCO_DONE ; )
+
+#define cco_spawn(task, fb) \
+    _cco_spawn(cco_cast_task(task), fb)
+
+#define cco_new_task(Task, ...) \
+    ((cco_task*)c_new(struct Task, {{Task}, __VA_ARGS__}))
+
+#define cco_await_joined(fb) \
+    cco_await(cco_is_joined(fb))
+
+static inline bool cco_is_joined(const cco_fiber* fb)
+    { return fb == fb->next; }
+
+extern cco_fiber*   cco_new_runner(cco_task* task, void* env);
+extern cco_fiber*   cco_resume_runner(cco_fiber* prev);
+extern int          cco_resume_fiber(cco_fiber* co); /* coroutine */
+extern cco_fiber*   _cco_spawn(cco_task* task, cco_fiber* fb);
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined i_implement || defined STC_IMPLEMENT
 #include <stdio.h>
 
-int cco_taskrunner(struct cco_taskrunner* co) {
-    cco_runtime* rt = &co->runtime;
-    cco_routine (co) {
+int cco_resume_fiber(cco_fiber* fb) {
+    cco_routine (fb) {
         while (1) {
-            rt->parent = rt->current->cco.parent;
-            rt->awaitbits = rt->current->cco.awaitbits;
-            rt->result = cco_resume_task(rt->current, rt);
-            if (rt->error) {
-                rt->current = rt->parent;
-                if (rt->current == NULL)
+            fb->parent_task = fb->curr_task->cco.parent_task;
+            fb->awaitbits = fb->curr_task->cco.awaitbits;
+            fb->result = cco_resume_task(fb->curr_task, fb);
+            if (fb->error) {
+                fb->curr_task = fb->parent_task;
+                if (fb->curr_task == NULL)
                     break;
-                rt->recover_state = rt->current->cco.state;
-                cco_stop(rt->current);
+                fb->recover_state = fb->curr_task->cco.state;
+                cco_stop(fb->curr_task);
                 continue;
             }
-            if (!((rt->result & ~rt->awaitbits) || (rt->current = rt->parent) != NULL))
+            if (!((fb->result & ~fb->awaitbits) || (fb->curr_task = fb->parent_task) != NULL))
                 break;
             cco_yield_v(CCO_NOOP);
         }
 
         cco_finally:
-        if (rt->error != 0) {
+        if (fb->error != 0) {
             fprintf(stderr, __FILE__ ":%d: error: unhandled error '%d' in a coroutine task at line %d.\n",
-                            __LINE__, rt->error, rt->error_line);
-            exit(rt->error);
+                            __LINE__, fb->error, fb->error_line);
+            exit(fb->error);
         }
     }
     return 0;
+}
+
+cco_fiber* cco_new_runner(cco_task* task, void* env) {
+    cco_fiber* new_fb = c_new(cco_fiber, {.curr_task=task, .env=env});
+    new_fb->next = new_fb;
+    return new_fb;
+}
+
+cco_fiber* _cco_spawn(cco_task* task, cco_fiber* fb) {
+    cco_fiber* new_fb = cco_new_runner(task, fb->env);
+    new_fb->next = fb->next;
+    return (fb->next = new_fb);
+}
+
+cco_fiber* cco_resume_runner(cco_fiber* prev) {
+    cco_fiber *curr = prev->next, *unlink;
+    int ret = cco_resume_fiber(curr);
+
+    if (ret == CCO_DONE) {
+        unlink = curr;
+        curr = (curr == prev ? NULL : curr->next);
+        prev->next = curr;
+        free(unlink);
+    }
+    return curr;
 }
 #undef i_implement
 #endif

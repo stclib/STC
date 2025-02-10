@@ -119,12 +119,14 @@ vec_X_raw       vec_X_value_drop(vec_X_value* pval);
 | `vec_X_iter`      | `struct { vec_X_value* ref; }`   | The iterator type     |
 
 ## Examples
+
+https://godbolt.org/z/4fnchzxva
 ```c++
+#include <stdio.h>
+
 #define i_key int
 #define i_use_cmp // enable sorting/searching using default <, == operators
 #include "stc/vec.h"
-
-#include <stdio.h>
 
 int main(void)
 {
@@ -154,13 +156,11 @@ int main(void)
     vec_int_drop(&vec);
 }
 ```
-Output:
-```
-initial: 25 13 7 5 16 8
-sorted: 5 7 8 13 16 25
-```
 ### Example 2
+
+https://godbolt.org/z/c7e3q5v14
 ```c++
+#include <stdio.h>
 #include "stc/cstr.h"
 
 #define i_keypro cstr
@@ -173,7 +173,7 @@ int main(void) {
     vec_cstr_emplace(&names, "Joe");
     cstr_assign(&names.data[1], "Jake"); // replace "Joe".
 
-    cstr tmp = cstr_from_fmt("%d elements so far", vec_cstr_size(names));
+    cstr tmp = cstr_from_fmt("%d elements so far", vec_cstr_size(&names));
 
     // vec_cstr_emplace() only accept const char*, so use push():
     vec_cstr_push(&names, tmp); // tmp is "moved" to names (must not be dropped).
@@ -186,17 +186,12 @@ int main(void) {
     vec_cstr_drop(&names);
 }
 ```
-Output:
-```
-Jake
-item: Mary
-item: Jake
-item: 2 elements so far
-```
 ### Example 3
-
 Container with elements of structs:
+
+https://godbolt.org/z/haY3hqKe6
 ```c++
+#include <stdio.h>
 #include "stc/cstr.h"
 
 typedef struct {
@@ -221,9 +216,10 @@ void User_drop(User* self) {
 // Declare a managed, clonable vector of users.
 #define i_type Users
 #define i_keyclass User  // User is a "class" and binds the _clone, _drop, and _cmp functions.
-#define i_use_cmp        // Sorting/searching a vec is only enabled by either directly specifying an i_cmp function
-                         // or by defining i_use_cmp (i_cmp is then indirectly specified through i_keyclass,
-                         // or it is assumed that i_key is a built-in type that works with < and == operators).
+#define i_use_cmp        // Sorting/searching a vec is only enabled by either directly specifying an
+                         // i_cmp function or by defining i_use_cmp. In this case i_cmp is indirectly
+                         // bound to User_cmp because i_keyclass was used, otherwise it is assumed that
+                         // i_key is a built-in type that works with < and == operators).
 #include "stc/vec.h"
 
 int main(void) {

@@ -2,8 +2,12 @@
 #include <stdio.h>
 #include <stdint.h>
 
-// Demonstrate to call another coroutine from a coroutine:
-// First create prime generator, then call fibonacci sequence:
+// Demonstrate calling two coroutine from a coroutine:
+// First call them concurrently, then in parallel:
+
+
+// Suspend yield values
+enum { YIELD_PRM = 1<<0, YIELD_FIB = 1<<1};
 
 bool is_prime(long long i) {
     for (long long j=2; j*j <= i; ++j)
@@ -13,23 +17,20 @@ bool is_prime(long long i) {
 
 struct prime {
     int count;
-    long long value;
+    long long result;
     cco_state cco;
 };
 
-enum { YIELD_PRM = 1<<0, YIELD_FIB = 1<<1};
-
 int prime(struct prime* g) {
     cco_routine (g) {
-        if (g->value < 2)
-            g->value = 2;
-        if (g->value == 2) {
+        if (g->result <= 2) {
+            g->result = 2;
             if (g->count-- == 0)
                 cco_return;
             cco_yield_v(YIELD_PRM);
         }
-        for (g->value |= 1; g->count > 0; g->value += 2) {
-            if (is_prime(g->value)) {
+        for (g->result |= 1; g->count > 0; g->result += 2) {
+            if (is_prime(g->result)) {
                 --g->count;
                 cco_yield_v(YIELD_PRM);
             }
@@ -45,22 +46,21 @@ int prime(struct prime* g) {
 
 struct fibonacci {
     int count;
-    long long value, b;
+    long long result, b;
     cco_state cco;
 };
 
 int fibonacci(struct fibonacci* g) {
     assert(g->count < 94);
-    long long tmp;
     cco_routine (g) {
-        if (g->value == 0)
+        if (g->result == 0)
             g->b = 1;
         while (true) {
             if (g->count-- == 0)
                 cco_return;
             // NB! locals lasts only until next yield/await!
-            tmp = g->value;
-            g->value = g->b;
+            long long tmp = g->result;
+            g->result = g->b;
             g->b += tmp;
             cco_yield_v(YIELD_FIB);
         }
@@ -78,48 +78,32 @@ struct combined {
     cco_state cco;
 };
 
-int sequenced(struct combined* g) {
+int combined(struct combined* g) {
     cco_routine (g) {
+        puts("SEQUENCED:");
+        g->prm = (struct prime){.count = 8}, g->fib = (struct fibonacci){.count = 12};
         cco_await_coroutine( prime(&g->prm) );
         cco_await_coroutine( fibonacci(&g->fib) );
 
+        puts("\nPARALLEL, AWAIT ALL:");
+        g->prm = (struct prime){.count = 8}, g->fib = (struct fibonacci){.count = 12};
+        cco_await_coroutine( prime(&g->prm) |
+                             fibonacci(&g->fib) );
         cco_finally:
-        puts("DONE sequenced");
-    }
-    return 0;
-}
-
-int parallel(struct combined* g) {
-    cco_routine (g) {
-        cco_await_coroutine( prime(&g->prm) | fibonacci(&g->fib) );
-
-        cco_finally:
-        puts("DONE parallel");
+        puts("DONE prime and fib");
     }
     return 0;
 }
 
 
-
-int main(void)
-{
-    struct combined c = {.prm={.count=8}, .fib={.count=12}};
+int main(void) {
+    struct combined c = {0};
     int res;
 
-    puts("SEQUENCED");
-    cco_run_coroutine(res = sequenced(&c)) {
+    cco_run_coroutine(res = combined(&c)) {
         if (res & YIELD_PRM)
-            printf("Prime=%lld\n", c.prm.value);
+            printf("Prime=%lld\n", c.prm.result);
         if (res & YIELD_FIB)
-            printf("Fibon=%lld\n", c.fib.value);
-    }
-
-    c = (struct combined){.prm={.count=12}, .fib={.count=8}};
-    puts("PARALLEL");
-    cco_run_coroutine(res = parallel(&c)) {
-        if (res & YIELD_PRM)
-            printf("Prime=%lld\n", c.prm.value);
-        if (res & YIELD_FIB)
-            printf("Fibon=%lld\n", c.fib.value);
+            printf("Fibon=%lld\n", c.fib.result);
     }
 }

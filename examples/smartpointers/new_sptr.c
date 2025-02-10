@@ -12,9 +12,8 @@ size_t Person_hash(const Person* p);
 #define i_use_cmp         // binds _cmp(), _hash()
 #include "stc/arc.h"
 
-#define i_type IPtr,int
+#define i_type IPtr, int, c_use_cmp
 #define i_keydrop(x) printf("drop: %d\n", *x)
-#define i_use_cmp
 #include "stc/arc.h"
 
 #define i_type IPStack

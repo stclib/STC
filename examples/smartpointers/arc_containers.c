@@ -7,11 +7,8 @@
 #define i_keydrop(p) (printf("drop name: %s\n", cstr_str(p)), cstr_drop(p))
 #include "stc/smap.h"
 
-#define i_type Arc // (atomic) ref. counted type
-#define i_key Map
+#define i_type Arc, Map, c_no_atomic // non-atomic ref. counted type
 #define i_keydrop(p) (printf("drop Arc:\n"), Map_drop(p))
-// no need for atomic ref. count in single thread:
-#define i_opt c_no_atomic
 #include "stc/arc.h"
 
 #define i_type Vec
