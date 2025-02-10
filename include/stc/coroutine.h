@@ -248,8 +248,8 @@ static inline int _cco_cancel_task(cco_task* task, cco_fiber* fb)
         ; (runner = cco_resume_runner(runner)) != NULL ; )
 
 #define cco_run_fiber(task, environment, runner) \
-    for (cco_fiber runner = {.curr_task=cco_cast_task(task), .env=environment} \
-        ; cco_resume_fiber(&runner) != CCO_DONE ; )
+    for (cco_fiber runner[1] = {{.curr_task=cco_cast_task(task), .env=environment}} \
+        ; cco_resume_fiber(runner) != CCO_DONE ; )
 
 #define cco_spawn(task, fb) \
     _cco_spawn(cco_cast_task(task), fb)
