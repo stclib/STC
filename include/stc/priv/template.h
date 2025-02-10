@@ -77,6 +77,9 @@
     #else
       #define i_opt c_GETARG(3, i_type)
     #endif
+  #elif c_NUMARGS(i_type) == 4
+    #define i_val c_GETARG(3, i_type)
+    #define i_opt c_GETARG(4, i_type)
   #endif
 #elif !defined Self && defined i_type
   #define Self i_type

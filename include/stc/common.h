@@ -73,6 +73,7 @@ typedef ptrdiff_t       isize;
 #define c_ARG_1(a, ...) a
 #define c_ARG_2(a, b, ...) b
 #define c_ARG_3(a, b, c, ...) c
+#define c_ARG_4(a, b, c, d, ...) d
 
 #define _i_malloc(T, n)     ((T*)i_malloc((n)*c_sizeof(T)))
 #define _i_calloc(T, n)     ((T*)i_calloc((n), c_sizeof(T)))

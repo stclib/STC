@@ -53,7 +53,7 @@ void            cco_throw_error(int error, cco_fiber* fb);          // Throw an 
 void            cco_recover_error(cco_fiber* fb);                   // Reset error, and jump to original resume point in current task.
 void            cco_resume_task(cco_task* task, cco_fiber* fb);     // Resume suspended task, return value in `fb->result`.
 cco_fiber*      cco_spawn(cco_task* task, cco_fiber* fb);           // Spawn a task in a new returned fiber.
-void            cco_await_joined(cco_fiber* fb);                    // Await for all spawned parallel fibers to be joined.
+void            cco_await_spawned(cco_fiber* fb);                   // Await for all other spawned parallel fibers to finish.
                 cco_run_task(cco_task* task) {}                     // Run blocking until task is finished.
                 cco_run_task(cco_task* task, <Environment> *env) {} // Run blocking with env data
 ```
