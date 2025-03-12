@@ -399,26 +399,25 @@ _c_MEMB(_bucket_insert_)(const Self* self, const _m_keyraw* rkeyptr) {
         return res;
     res.ref = &self->table[res.idx];
     res.inserted = true;
-    struct hmap_meta snew = {.hashx=(uint16_t)(res.hashx & _hashmask),
+    struct hmap_meta mnew = {.hashx=(uint16_t)(res.hashx & _hashmask),
                              .dist=(uint16_t)(res.dist & _distmask)};
-    struct hmap_meta scur = self->meta[res.idx];
-    self->meta[res.idx] = snew;
+    struct hmap_meta mcur = self->meta[res.idx];
+    self->meta[res.idx] = mnew;
 
-    if (scur.dist != 0) { // collision, reorder buckets
-        struct hmap_meta *meta = self->meta;
+    if (mcur.dist != 0) { // collision, reorder buckets
         size_t mask = (size_t)self->bucket_count - 1;
         _m_value dcur = *res.ref;
         for (;;) {
             res.idx = (res.idx + 1) & mask;
-            ++scur.dist;
-            if (meta[res.idx].dist == 0)
+            ++mcur.dist;
+            if (self->meta[res.idx].dist == 0)
                 break;
-            if (meta[res.idx].dist < scur.dist) {
-                c_swap(&scur, &meta[res.idx]);
+            if (self->meta[res.idx].dist < mcur.dist) {
+                c_swap(&mcur, &self->meta[res.idx]);
                 c_swap(&dcur, &self->table[res.idx]);
             }
         }
-        meta[res.idx] = scur;
+        self->meta[res.idx] = mcur;
         self->table[res.idx] = dcur;
     }
     return res;

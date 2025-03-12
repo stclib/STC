@@ -11,7 +11,7 @@ int main(void)
     stack_int v = c_make(stack_int, {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24});
 
     // Create 1d span from a compatibel container
-    ISpan ms1 = cspan_from(&v);
+    ISpan ms1 = cspan_from_vec(&v);
 
     // Create a 3D mdspan 2 x 3 x 4
     ISpan3 ms3 = cspan_md(v.data, 2, 3, 4);

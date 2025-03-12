@@ -244,12 +244,8 @@ static inline int _cco_cancel_task(cco_task* task, cco_fiber* fb)
 #define cco_run_task_1(task) cco_run_task_2(task, NULL)
 #define cco_run_task_2(task, environment) cco_run_task_3(task, environment, _runner)
 #define cco_run_task_3(task, environment, runner) \
-    for (cco_fiber* runner = cco_new_runner(cco_cast_task(task), environment) \
-        ; (runner = cco_resume_runner(runner)) != NULL ; )
-
-#define cco_run_fiber(task, environment, runner) \
-    for (cco_fiber runner[1] = {{.curr_task=cco_cast_task(task), .env=environment}} \
-        ; cco_resume_fiber(runner) != CCO_DONE ; )
+    for (cco_fiber* runner = cco_new_executor(cco_cast_task(task), environment) \
+        ; (runner = cco_execute_next(runner)) != NULL ; )
 
 #define cco_spawn(task, fb) \
     _cco_spawn(cco_cast_task(task), fb)
@@ -263,16 +259,16 @@ static inline int _cco_cancel_task(cco_task* task, cco_fiber* fb)
 static inline bool cco_is_joined(const cco_fiber* fb)
     { return fb == fb->next; }
 
-extern cco_fiber*   cco_new_runner(cco_task* task, void* env);
-extern cco_fiber*   cco_resume_runner(cco_fiber* prev);
-extern int          cco_resume_fiber(cco_fiber* co); /* coroutine */
+extern cco_fiber*   cco_new_executor(cco_task* task, void* env);
+extern cco_fiber*   cco_execute_next(cco_fiber* prev);
+extern int          cco_execute_fiber(cco_fiber* co); /* coroutine */
 extern cco_fiber*   _cco_spawn(cco_task* task, cco_fiber* fb);
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined i_implement || defined STC_IMPLEMENT
 #include <stdio.h>
 
-int cco_resume_fiber(cco_fiber* fb) {
+int cco_execute_fiber(cco_fiber* fb) {
     cco_routine (fb) {
         while (1) {
             fb->parent_task = fb->curr_task->cco.parent_task;
@@ -301,21 +297,9 @@ int cco_resume_fiber(cco_fiber* fb) {
     return 0;
 }
 
-cco_fiber* cco_new_runner(cco_task* task, void* env) {
-    cco_fiber* new_fb = c_new(cco_fiber, {.curr_task=task, .env=env});
-    new_fb->next = new_fb;
-    return new_fb;
-}
-
-cco_fiber* _cco_spawn(cco_task* task, cco_fiber* fb) {
-    cco_fiber* new_fb = cco_new_runner(task, fb->env);
-    new_fb->next = fb->next;
-    return (fb->next = new_fb);
-}
-
-cco_fiber* cco_resume_runner(cco_fiber* prev) {
+cco_fiber* cco_execute_next(cco_fiber* prev) {
     cco_fiber *curr = prev->next, *unlink;
-    int ret = cco_resume_fiber(curr);
+    int ret = cco_execute_fiber(curr);
 
     if (ret == CCO_DONE) {
         unlink = curr;
@@ -325,6 +309,19 @@ cco_fiber* cco_resume_runner(cco_fiber* prev) {
     }
     return curr;
 }
+
+cco_fiber* cco_new_executor(cco_task* task, void* env) {
+    cco_fiber* new_fb = c_new(cco_fiber, {.curr_task=task, .env=env});
+    new_fb->next = new_fb;
+    return new_fb;
+}
+
+cco_fiber* _cco_spawn(cco_task* task, cco_fiber* fb) {
+    cco_fiber* new_fb = cco_new_executor(task, fb->env);
+    new_fb->next = fb->next;
+    return (fb->next = new_fb);
+}
+
 #undef i_implement
 #endif
 

@@ -39,11 +39,16 @@ All index arguments are side-effect safe, e.g. `*cspan_at(&ms3, i++, j++, k++)` 
 is an error, i.e. the *span* argument itself is not side-effect safe. If the number of arguments does not match the span rank,
 a compile error is issued. Runtime bounds checks are enabled by default (define `STC_NDEBUG` or `NDEBUG` to disable).
 ```c++
-SpanType        c_make(<TYPE> SpanType, {v1, v2, ...});             // make a 1-d cspan from value list
-SpanType        cspan_make(<TYPE> SpanType, {v1, v2, ...});         // make a static 1-d cspan from value list
-SpanType        cspan_with_n(ValueType* ptr, int32 n);              // make a 1-d cspan from a pointer and length
-SpanType        cspan_from_array(ValueType array[]);                // make a 1-d cspan from a C array
-SpanType        cspan_from(STCContainer* cnt);                      // make a 1-d cspan from a vec or stack
+SpanType        c_make(<SpanType>, {v1, v2, ...});                  // make a 1-d cspan from value list
+SpanType        cspan_make(<SpanType>, {v1, v2, ...});              // make a static 1-d cspan from value list
+SpanType        cspan_make_n(<SpanType>, int32 n);                  // make a 1-d cspan from value type and length
+SpanType        cspan_with_n(ValueType* ptr, int32 n);              // create a 1-d cspan from a pointer and length
+SpanType        cspan_from_array(ValueType array[]);                // create a 1-d cspan from a C array
+SpanType        cspan_from_vec(<VecType>* cnt);                     // create a 1-d cspan from a vec or stack
+
+                // ISpan m = {data, cspan_shape(3, 4), cspan_strides(4, 1)}; // like ISpan m = cspan_md(data, 3, 4);
+int32[N]        cspan_shape(xd, ...)                                // specify dimensions for SpanTypeN constructor
+cspan_tupleN    cspan_strides(xs, ...)                              // specify strides for SpanTypeN constructor
 
 int             cspan_rank(const SpanTypeN* self);                  // num dimensions; compile-time constant
 isize           cspan_size(const SpanTypeN* self);                  // return number of elements
@@ -151,10 +156,10 @@ int main(void)
     printMe( (intspan)cspan_from_array(arr) );
 
     vec_int vec = c_make(vec_int, {1, 2, 3, 4, 5, 6});
-    printMe( (intspan)cspan_from(&vec) );
+    printMe( (intspan)cspan_from_vec(&vec) );
 
     stack_int stk = c_make(stack_int, {1, 2, 3, 4, 5, 6, 7});
-    printMe( (intspan)cspan_from(&stk) );
+    printMe( (intspan)cspan_from_vec(&stk) );
 
     intspan spn = c_make(intspan, {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12});
     printMe( (intspan)cspan_subspan(&spn, 2, 8) );

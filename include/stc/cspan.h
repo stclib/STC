@@ -156,17 +156,20 @@ using_cspan_tuple(7); using_cspan_tuple(8);
                      .shape={sizeof((Span##_value[])__VA_ARGS__)/sizeof(Span##_value)}, \
                      .stride=c_literal(cspan_tuple1){.d={1}}})
 
-// cspan_from* a pointer+size, c-array, or a cvec/cstack container
+// cspan_from_* a pointer+size, c-array, or a cvec/cstack container
 //
 #define cspan_with_n(ptr, n) \
     {.data=(ptr), \
      .shape={(_istride)(n)}, \
      .stride=c_literal(cspan_tuple1){.d={1}}}
 
+#define cspan_make_n(Span, N) \
+    cspan_with_n((Span##_value[N]){0}, N)
+
 #define cspan_from_array(array) \
     cspan_with_n(array, c_arraylen(array))
 
-#define cspan_from(container) \
+#define cspan_from_vec(container) \
     cspan_with_n((container)->data, (container)->size)
 
 // cspan_subspan on 1d spans
@@ -196,6 +199,11 @@ typedef enum {c_ROWMAJOR, c_COLMAJOR} cspan_layout;
 
 #define cspan_md(array, ...) \
     cspan_md_layout(c_ROWMAJOR, array, __VA_ARGS__)
+#define cspan_md_left(array, ...) \
+    cspan_md_layout(c_COLMAJOR, array, __VA_ARGS__)
+
+#define cspan_shape(...) {__VA_ARGS__}
+#define cspan_strides(...) {.d={__VA_ARGS__}}
 
 #define cspan_md_layout(layout, array, ...) \
     {.data=array, \

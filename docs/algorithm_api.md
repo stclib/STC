@@ -250,7 +250,8 @@ c_sumtype (Message,
 );
 
 void Message_drop(Message* m) {
-    if (c_is(m, MessageWrite, s)) cstr_drop(s);
+    if (c_is(m, MessageWrite, s))
+        cstr_drop(s);
 }
 
 int main(void) {

@@ -26,10 +26,10 @@ int main(void)
     printMe( (intspan)cspan_from_array(arr) );
 
     vec_int vec = c_make(vec_int, {1, 2, 3, 4, 5, 6});
-    printMe( (intspan)cspan_from(&vec) );
+    printMe( (intspan)cspan_from_vec(&vec) );
 
     stack_int stk = c_make(stack_int, {1, 2, 3, 4, 5, 6, 7});
-    printMe( (intspan)cspan_from(&stk) );
+    printMe( (intspan)cspan_from_vec(&stk) );
 
     intspan spn = c_make(intspan, {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12});
     printMe( (intspan)cspan_subspan(&spn, 2, 8) );
