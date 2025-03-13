@@ -228,7 +228,7 @@ STC_INLINE void _c_MEMB(_put_n)(Self* self, const _m_raw* raw, isize n) {
         #endif
 }
 
-STC_INLINE Self _c_MEMB(_with_n)(const _m_raw* raw, isize n)
+STC_INLINE Self _c_MEMB(_from_n)(const _m_raw* raw, isize n)
     { Self cx = {0}; _c_MEMB(_put_n)(&cx, raw, n); return cx; }
 
 STC_API _m_iter _c_MEMB(_begin)(const Self* self);

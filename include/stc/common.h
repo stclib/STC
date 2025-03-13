@@ -220,7 +220,7 @@ typedef const char* cstr_raw;
 
 // make container from a literal list, and drop multiple containers of same type
 #define c_make(C, ...) \
-    C##_with_n(c_make_array(C##_raw, __VA_ARGS__), c_sizeof((C##_raw[])__VA_ARGS__)/c_sizeof(C##_raw))
+    C##_from_n(c_make_array(C##_raw, __VA_ARGS__), c_sizeof((C##_raw[])__VA_ARGS__)/c_sizeof(C##_raw))
 
 // push multiple elements from a literal list into a container
 #define c_push_items(C, cnt, ...) \

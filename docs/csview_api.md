@@ -35,7 +35,7 @@ All csview definitions and prototypes are available by including a single header
 csview          c_sv(const char literal_only[]);                        // from string literal only
 csview          c_sv(const char* str, isize n);                         // from a const char* and length n
 csview          csview_from(const char* str);                           // from const char* str
-csview          csview_with_n(const char* str, isize n);                // alias for c_sv(str, n)
+csview          csview_from_n(const char* str, isize n);                // alias for c_sv(str, n)
 
 isize           csview_size(csview sv);
 bool            csview_is_empty(csview sv);

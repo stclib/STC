@@ -403,7 +403,7 @@ for (c_each(it, MyInts, ints)) *it.ref += 42;
 
 - Functions available for most all containers:
     - Cont_init()
-    - Cont_with_n(rawvals[], n)
+    - Cont_from_n(rawvals[], n)
     - Cont_reserve(Cont*, capacity)
     - Cont_clone(Cont)
     - Cont_drop(Cont*)

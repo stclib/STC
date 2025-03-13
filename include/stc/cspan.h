@@ -68,8 +68,8 @@ typedef isize _isize_triple[3];
 #define using_cspan(...) c_MACRO_OVERLOAD(using_cspan, __VA_ARGS__)
 #define using_cspan_2(Self, T) \
     using_cspan_3(Self, T, 1); \
-    STC_INLINE Self Self##_with_n(Self##_value* values, isize n) \
-        { return (Self)cspan_with_n(values, n); } \
+    STC_INLINE Self Self##_from_n(Self##_value* values, isize n) \
+        { return (Self)cspan_from_n(values, n); } \
     STC_INLINE const Self##_value* Self##_at(const Self* self, isize idx) \
         { return cspan_at(self, idx); } \
     STC_INLINE Self##_value* Self##_at_mut(Self* self, isize idx) \
@@ -79,8 +79,8 @@ typedef isize _isize_triple[3];
 #define using_cspan_with_eq(...) c_MACRO_OVERLOAD(using_cspan_with_eq, __VA_ARGS__)
 #define using_cspan_with_eq_3(Self, T, i_eq) \
     using_cspan_with_eq_4(Self, T, i_eq, 1); \
-    STC_INLINE Self Self##_with_n(Self##_value* values, isize n) \
-        { return (Self)cspan_with_n(values, n); } \
+    STC_INLINE Self Self##_from_n(Self##_value* values, isize n) \
+        { return (Self)cspan_from_n(values, n); } \
     struct stc_nostruct
 
 #define using_cspan_3(Self, T, RANK) \
@@ -158,19 +158,19 @@ using_cspan_tuple(7); using_cspan_tuple(8);
 
 // cspan_from_* a pointer+size, c-array, or a cvec/cstack container
 //
-#define cspan_with_n(ptr, n) \
+#define cspan_from_n(ptr, n) \
     {.data=(ptr), \
      .shape={(_istride)(n)}, \
      .stride=c_literal(cspan_tuple1){.d={1}}}
 
 #define cspan_make_n(Span, N) \
-    cspan_with_n((Span##_value[N]){0}, N)
+    cspan_from_n((Span##_value[N]){0}, N)
 
 #define cspan_from_array(array) \
-    cspan_with_n(array, c_arraylen(array))
+    cspan_from_n(array, c_arraylen(array))
 
 #define cspan_from_vec(container) \
-    cspan_with_n((container)->data, (container)->size)
+    cspan_from_n((container)->data, (container)->size)
 
 // cspan_subspan on 1d spans
 //
@@ -183,9 +183,6 @@ using_cspan_tuple(7); using_cspan_tuple(8);
 //
 #define cspan_size(self) _cspan_size((self)->shape, cspan_rank(self))
 #define cspan_rank(self) c_arraylen((self)->shape) // constexpr
-#define cspan_is_colmajor(self) ((self)->stride.d[0] < (self)->stride.d[cspan_rank(self) - 1])
-#define cspan_is_rowmajor(self) (!cspan_is_colmajor(self))
-#define cspan_get_layout(self) (cspan_is_colmajor(self) ? c_COLMAJOR : c_ROWMAJOR)
 #define cspan_at(self, ...) ((self)->data + cspan_index(self, __VA_ARGS__))
 #define cspan_front(self) ((self)->data)
 #define cspan_back(self) ((self)->data + cspan_size(self) - 1)
@@ -195,12 +192,17 @@ using_cspan_tuple(7); using_cspan_tuple(8);
 
 // Multi-dimensional span constructors
 //
-typedef enum {c_ROWMAJOR, c_COLMAJOR} cspan_layout;
+typedef enum {c_ROWMAJOR, c_COLMAJOR, c_STRIDED} cspan_layout;
+
+#define cspan_is_colmajor(self) \
+    _cspan_is_layout(c_COLMAJOR, (self)->shape, (self)->stride.d, cspan_rank(self))
+#define cspan_is_rowmajor(self) \
+    _cspan_is_layout(c_ROWMAJOR, (self)->shape, (self)->stride.d, cspan_rank(self))
+#define cspan_get_layout(self) \
+    (cspan_is_rowmajor(self) ? c_ROWMAJOR : cspan_is_colmajor(self) ? c_COLMAJOR : c_STRIDED)
 
 #define cspan_md(array, ...) \
     cspan_md_layout(c_ROWMAJOR, array, __VA_ARGS__)
-#define cspan_md_left(array, ...) \
-    cspan_md_layout(c_COLMAJOR, array, __VA_ARGS__)
 
 #define cspan_shape(...) {__VA_ARGS__}
 #define cspan_strides(...) {.d={__VA_ARGS__}}
@@ -344,12 +346,19 @@ STC_API isize _cspan_next2(_istride pos[], const _istride shape[], const _istrid
 STC_API isize _cspan_slice(_istride oshape[], _istride ostride[], int* orank,
                            const _istride shape[], const _istride stride[],
                            const isize args[][3], int rank);
-
 STC_API _istride* _cspan_shape2stride(cspan_layout layout, _istride shape[], int rank);
+STC_API bool _cspan_is_layout(cspan_layout layout, const _istride shape[], const _istride strides[], int rank);
 #endif // STC_CSPAN_H_INCLUDED
 
 /* --------------------- IMPLEMENTATION --------------------- */
 #if defined i_implement
+
+STC_DEF bool _cspan_is_layout(cspan_layout layout, const _istride shape[], const _istride strides[], int rank) {
+    _istride tmpshape[8]; // 8 = "max" rank
+    size_t sz = (size_t)rank*sizeof(_istride);
+    memcpy(tmpshape, shape, sz);
+    return memcmp(strides, _cspan_shape2stride(layout, tmpshape, rank), sz) == 0;
+}
 
 STC_DEF void _cspan_print_assist(_istride pos[], const _istride shape[], const int rank,
                                  char result[2][16], const char* brackets) {

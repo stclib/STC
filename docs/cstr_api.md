@@ -30,7 +30,7 @@ cstr            cstr_from_sv(csview sv);                                // const
 cstr            cstr_from_zv(zsview zv);                                // construct from a zero-terminated zsview
 cstr            cstr_from_fmt(const char* fmt, ...);                    // construct from printf() formatting
 cstr            cstr_from_replace(csview sv, csview search, csview repl, int32_t count);
-cstr            cstr_with_n(const char* str, isize n);                  // construct from first n bytes of str
+cstr            cstr_from_n(const char* str, isize n);                  // construct from first n bytes of str
 cstr            cstr_with_capacity(isize cap);                          // make empty string with pre-allocated capacity.
 cstr            cstr_with_size(isize len, char fill);                   // make string with fill characters
 
