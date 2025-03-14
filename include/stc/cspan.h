@@ -163,7 +163,7 @@ using_cspan_tuple(7); using_cspan_tuple(8);
      .shape={(_istride)(n)}, \
      .stride=c_literal(cspan_tuple1){.d={1}}}
 
-#define cspan_make_n(Span, N) \
+#define cspan_with_size(Span, N) \
     cspan_from_n((Span##_value[N]){0}, N)
 
 #define cspan_from_array(array) \

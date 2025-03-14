@@ -41,12 +41,12 @@ a compile error is issued. Runtime bounds checks are enabled by default (define 
 ```c++
 SpanType        c_make(<SpanType>, {v1, v2, ...});                  // make a 1-d cspan from value list
 SpanType        cspan_make(<SpanType>, {v1, v2, ...});              // make a static 1-d cspan from value list
-SpanType        cspan_make_n(<SpanType>, int32 n);                  // make a 1-d cspan from value type and length
+SpanType        cspan_with_size(<SpanType>, int32 n);               // make a 1-d zero-inited cspan of length n
 SpanType        cspan_from_n(ValueType* ptr, int32 n);              // create a 1-d cspan from a pointer and length
 SpanType        cspan_from_array(ValueType array[]);                // create a 1-d cspan from a C array
 SpanType        cspan_from_vec(<VecType>* cnt);                     // create a 1-d cspan from a vec or stack
 
-                // ISpan m = {data, cspan_shape(3, 4), cspan_strides(4, 1)}; // like ISpan m = cspan_md(data, 3, 4);
+                // ISpan2 m = {data, cspan_shape(3, 4), cspan_strides(4, 1)}; // => ISpan2 m = cspan_md(data, 3, 4);
 int32[N]        cspan_shape(xd, ...)                                // specify dimensions for SpanTypeN constructor
 cspan_tupleN    cspan_strides(xs, ...)                              // specify strides for SpanTypeN constructor
 
@@ -124,7 +124,7 @@ void            SpanTypeN_next(SpanTypeN_iter* it);
 | SpanTypeN_value   | `ValueType`                                         | Element value type   |
 | SpanTypeN         | `struct { ValueType *data; cspan_istride shape[N]; .. }`| SpanType with rank N |
 | cspan_tupleN      | `struct { cspan_istride d[N]; }`                    | Strides for each rank |
-| `cspan_layout`    | `enum { c_ROWMAJOR, c_COLMAJOR }`                   | Multi-dim layout     |
+| `cspan_layout`    | `enum { c_ROWMAJOR, c_COLMAJOR, c_STRIDED }`        | Multi-dim layout     |
 | `c_ALL`           | `cspan_slice(&md, {1,3}, {c_ALL})`                  | Full extent          |
 | `c_END`           | `cspan_slice(&md, {1,c_END}, {2,c_END})`            | End of extent        |
 

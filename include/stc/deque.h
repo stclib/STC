@@ -47,12 +47,15 @@ STC_API _m_iter     _c_MEMB(_insert_uninit)(Self* self, isize idx, isize n);
 STC_API void        _c_MEMB(_erase_n)(Self* self, isize idx, isize n);
 
 STC_INLINE const _m_value*
-_c_MEMB(_at)(const Self* self, isize idx)
-    { return self->cbuf + _cbuf_topos(self, idx); }
+_c_MEMB(_at)(const Self* self, isize idx) {
+    const isize* m; bool b; (void)m, (void)b;
+    c_assert((m = &self->start, b = m[0] > m[1], (idx >= m[b] && idx < m[!b]) ^ b));
+    return self->cbuf + _cbuf_topos(self, idx);
+}
 
 STC_INLINE _m_value*
 _c_MEMB(_at_mut)(Self* self, isize idx)
-    { return self->cbuf + _cbuf_topos(self, idx); }
+    { return (_m_value*)_c_MEMB(_at)(self, idx); }
 
 STC_INLINE _m_value*
 _c_MEMB(_push_back)(Self* self, _m_value val)
