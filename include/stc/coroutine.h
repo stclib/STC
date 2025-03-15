@@ -253,9 +253,6 @@ static inline int _cco_cancel_task(cco_task* task, cco_fiber* fb)
 #define cco_new_task(Task, ...) \
     ((cco_task*)c_new(struct Task, {{Task}, __VA_ARGS__}))
 
-#define cco_await_spawned(fb) \
-    cco_await(cco_is_joined(fb))
-
 static inline bool cco_is_joined(const cco_fiber* fb)
     { return fb == fb->next; }
 

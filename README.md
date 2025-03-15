@@ -395,29 +395,39 @@ for (c_each(it, MyInts, ints)) *it.ref += 42;
     - Template parameter macros are prefixed by `i_`, e.g. `i_key`, `i_type`.
     - All owning containers can be initialized with `{0}` (also `cstr`), i.e. no heap allocation initially.
 
-- Common types for any container type Cont:
-    - Cont
-    - Cont_value
-    - Cont_raw
-    - Cont_iter
+- Common types defined for any container type Cnt:
+    - Cnt
+    - Cnt_value
+    - Cnt_raw
+    - Cnt_iter
 
-- Functions available for most all containers:
-    - Cont_init()
-    - Cont_from_n(rawvals[], n)
-    - Cont_reserve(Cont*, capacity)
-    - Cont_clone(Cont)
-    - Cont_drop(Cont*)
-    - Cont_size(Cont*)
-    - Cont_is_empty(Cont*)
-    - Cont_push(Cont*, value)
-    - Cont_put_n(Cont*, rawvals[], n)
-    - Cont_erase_at(Cont*, Cont_iter)
-    - Cont_front(Cont*)
-    - Cont_back(Cont*)
-    - Cont_begin(Cont*)
-    - Cont_end(Cont*)
-    - Cont_next(Cont_iter*)
-    - Cont_advance(Cont_iter, n)
+- Functions defined for most container types:
+    - Cnt_init() -> Cnt
+    - Cnt_with_capacity(isize capacity) -> Cnt
+    - Cnt_from_n(Cnt_value[], isize n) -> Cnt
+    - Cnt_reserve(Cnt*, isize capacity)
+    - Cnt_move(Cnt*) -> Cnt
+    - Cnt_take(Cnt*, Cnt unowned)
+    - Cnt_copy(Cnt*, Cnt other)
+    - Cnt_clone(Cnt other) -> Cnt
+    - Cnt_drop(Cnt*)
+    - Cnt_value_drop(Cnt_value*)
+    - Cnt_value_toraw(Cnt_value*) -> Cnt_raw
+    - Cnt_capacity(Cnt*) -> isize
+    - Cnt_size(Cnt*) -> isize
+    - Cnt_is_empty(Cnt*) -> bool
+    - Cnt_put_n(Cnt*, Cnt_value[], isize n)
+    - Cnt_push(Cnt*, Cnt_value)
+    - Cnt_emplace(Cnt*, Cnt_raw)
+    - Cnt_erase_at(Cnt*, Cnt_iter)
+    - Cnt_at(Cnt*, isize index OR Cnt_raw) -> Cnt_value*
+    - Cnt_find(Cnt*, Cnt_raw) -> Cnt_iter
+    - Cnt_front(Cnt*) -> Cnt_value*
+    - Cnt_back(Cnt*) -> Cnt_value*
+    - Cnt_begin(Cnt*) -> Cnt_iter
+    - Cnt_end(Cnt*) -> Cnt_iter
+    - Cnt_next(Cnt_iter*)
+    - Cnt_advance(Cnt_iter, isize n) -> Cnt_iter
 </details>
 <details>
 <summary>Defining template parameters</summary>
@@ -429,8 +439,8 @@ strictly required. Each templated type instantiation requires an `#include` stat
 same container base type was included earlier. Possible template parameters are:
 
 ### Basic template parameters
-- `i_type` *ContType* - Custom container type name.
-- `i_type` *ContType*, *KeyType*[, *ValType*] is a shorthand for defining ***i_type***, ***i_key*** (and ***i_val***) individually, as described below. ***NB!*** Do not use "pro-types" as KeyType/ValType, i.e. **cstr**, **arc** and **box** types.
+- `i_type` *CntType* - Custom container type name.
+- `i_type` *CntType*, *KeyType*[, *ValType*] is a shorthand for defining ***i_type***, ***i_key*** (and ***i_val***) individually, as described below. ***NB!*** Do not use "pro"-types as KeyType/ValType, i.e. **cstr**, **arc** and **box** types.
 - `i_key` *KeyType* - Element type.
 - `i_val` *MappedType* - Element type. **[required]** for **hmap** and **smap** containers.
 - `i_cmp` *Func* - Three-way comparison of two *i_keyraw* elements, given as pointers.
