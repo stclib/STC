@@ -299,3 +299,22 @@ TEST(cregex, replace)
         EXPECT_STREQ(cstr_str(&str), "31.12.2015;28.02.2022;");
     }
 }
+
+TEST(cregex, utf8_string)
+{
+    EXPECT_EQ(cregex_make("\\x{12", 0).error, CREG_UNMATCHEDRIGHTPARENTHESIS);
+
+    csview match[16];
+    EXPECT_EQ(cregex_match_aio("\xC8\x80", "\xC8\x80", match), CREG_OK);
+    EXPECT_EQ(cregex_match_aio("\xC8\x80", " \xC8\x80 ", match), CREG_OK);
+    EXPECT_EQ(cregex_match_aio("\xC8", "\xC8\x80", match), CREG_NOMATCH);
+    EXPECT_EQ(cregex_match_aio("\\x{C8}\\x{80}", "\xC8\x80", match), CREG_NOMATCH);
+    EXPECT_EQ(cregex_match_aio("\\x{0200}", "\xC8\x80", match), CREG_OK);
+    EXPECT_EQ(cregex_match_aio("[\\x{0100}-\\x{0200}]", "\xC8\x80", match), CREG_OK);
+    EXPECT_EQ(cregex_match_aio("[\\x{0100}-\\x{0200}]", "\xC8\x81", match), CREG_NOMATCH);
+
+    const char *bad = "this is bad \xE0\xC0 string";
+    EXPECT_EQ(cregex_match_aio("bad.*string", bad, match), CREG_OK);
+    EXPECT_EQ(cregex_match_aio("bad [\\x{C8}\\x{80}\\x{E0}\\x{C0}]+ string", bad, match), CREG_OK);
+    EXPECT_EQ(cregex_match_aio("bad [\xC8\x80\xE0\xC0]+ string", bad, match), CREG_OK);
+}
