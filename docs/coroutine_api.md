@@ -61,8 +61,8 @@ bool            cco_is_joined(const cco_fiber* fb);                 // True if t
                 cco_run_task(cco_task* task, void *env) {}          // Run blocking with env data
                 cco_run_task(cco_task* task, void *env, int* retval) {} // Run sblocking with env data and get return value from task.
 
-                cco_run_fiber(cco_fiber* fb) {}                     // Run fiber and its spawned fibers blocking.
-                cco_run_fiber(cco_fiber* fb, int* retval) {}        // Run fiber + spawned blocking and get return value from curr task.
+                cco_run_fibers(cco_fiber* fb) {}                     // Run fiber and its spawned fibers blocking.
+                cco_run_fibers(cco_fiber* fb, cco_fiber* fiber) {}   // Run fiber + spawned blocking and get return value from curr task.
 ```
 #### Timers and time functions
 ```c++

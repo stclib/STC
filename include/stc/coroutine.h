@@ -174,7 +174,7 @@ typedef struct {
  */
 
 typedef struct cco_fiber {
-    struct cco_task* curr_task;
+    struct cco_task* task;
     void* env;
     struct cco_task* parent_task;
     struct cco_fiber* next;
@@ -214,30 +214,30 @@ static inline int _cco_cancel_task(cco_task* task, cco_fiber* fb)
 
 /* Asymmetric coroutine await/call */
 #define cco_await_task(...) c_MACRO_OVERLOAD(cco_await_task, __VA_ARGS__)
-#define cco_await_task_2(task, fb) cco_await_task_3(task, fb, CCO_DONE)
-#define cco_await_task_3(task, fb, _awaitbits) do { \
-    {   cco_task* _await_task = cco_cast_task(task); \
+#define cco_await_task_2(_task, fb) cco_await_task_3(_task, fb, CCO_DONE)
+#define cco_await_task_3(_task, fb, _awaitbits) do { \
+    {   cco_task* _await_task = cco_cast_task(_task); \
         cco_fiber* _fb = fb; \
         _await_task->cco.awaitbits = (_awaitbits); \
-        _await_task->cco.parent_task = _fb->curr_task; \
-        _fb->curr_task = _await_task; \
+        _await_task->cco.parent_task = _fb->task; \
+        _fb->task = _await_task; \
     } \
     cco_yield_v(CCO_NOOP); \
 } while (0)
 
 /* Symmetric coroutine flow of control transfer */
-#define cco_yield_to(task, fb) do { \
-    {   cco_task* _to_task = cco_cast_task(task); \
+#define cco_yield_to(_task, fb) do { \
+    {   cco_task* _to_task = cco_cast_task(_task); \
         cco_fiber* _fb = fb; \
-        _to_task->cco.awaitbits = _fb->curr_task->cco.awaitbits; \
-        _to_task->cco.parent_task = _fb->curr_task->cco.parent_task; \
-        _fb->curr_task = _to_task; \
+        _to_task->cco.awaitbits = _fb->task->cco.awaitbits; \
+        _to_task->cco.parent_task = _fb->task->cco.parent_task; \
+        _fb->task = _to_task; \
     } \
     cco_yield_v(CCO_NOOP); \
 } while (0)
 
 /*
- * cco_run_fiber()/cco_run_task(): Run fibers/tasks in parallel
+ * cco_run_fibers()/cco_run_task(): Run fibers/tasks in parallel
  */
 #define cco_new_task(Task, ...) \
     ((cco_task*)c_new(struct Task, {{Task}, __VA_ARGS__}))
@@ -248,44 +248,41 @@ static inline int _cco_cancel_task(cco_task* task, cco_fiber* fb)
 
 #define cco_spawn(task, fb) _cco_spawn(cco_cast_task(task), fb)
 
-#define cco_run_fiber(...) c_MACRO_OVERLOAD(cco_run_fiber, __VA_ARGS__)
-#define cco_run_fiber_1(fb) \
-    for (cco_fiber* _fb = fb; (_fb = cco_execute_next(_fb)) != NULL; )
-#define cco_run_fiber_2(fb, result_intptr) \
-    for (cco_fiber* _fb = fb; (_fb = cco_execute_next(_fb)) != NULL && (*(result_intptr) = _fb->result, 1); )
+#define cco_run_fibers(fb, fibers) \
+    for (cco_fiber* fb = fibers; (fb = cco_resume_next(fb)) != NULL; )
 
 #define cco_run_task(...) c_MACRO_OVERLOAD(cco_run_task, __VA_ARGS__)
 #define cco_run_task_1(task) cco_run_task_2(task, NULL)
-#define cco_run_task_2(task, env) cco_run_fiber_1(cco_new_fiber_2(task, env))
-#define cco_run_task_3(task, env, result_intptr) cco_run_fiber_2(cco_new_fiber_2(task, env), result_intptr)
+#define cco_run_task_2(task, env) cco_run_fibers(_fb, cco_new_fiber_2(task, env))
+#define cco_run_task_3(fb, task, env) cco_run_fibers(fb, cco_new_fiber_2(task, env))
 
 static inline bool cco_is_joined(const cco_fiber* fb)
     { return fb == fb->next; }
 
-extern cco_fiber*   _cco_new_fiber(cco_task* task, void* env);
-extern cco_fiber*   _cco_spawn(cco_task* task, cco_fiber* fb);
-extern cco_fiber*   cco_execute_next(cco_fiber* prev);
-extern int          cco_execute_current(cco_fiber* co); /* coroutine */
+extern cco_fiber* _cco_new_fiber(cco_task* task, void* env);
+extern cco_fiber* _cco_spawn(cco_task* task, cco_fiber* fb);
+extern cco_fiber* cco_resume_next(cco_fiber* prev);
+extern int        cco_resume_current(cco_fiber* co); /* coroutine */
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined i_implement || defined STC_IMPLEMENT
 #include <stdio.h>
 
-int cco_execute_current(cco_fiber* fb) {
+int cco_resume_current(cco_fiber* fb) {
     cco_routine (fb) {
         while (1) {
-            fb->parent_task = fb->curr_task->cco.parent_task;
-            fb->awaitbits = fb->curr_task->cco.awaitbits;
-            fb->result = cco_resume_task(fb->curr_task, fb);
+            fb->parent_task = fb->task->cco.parent_task;
+            fb->awaitbits = fb->task->cco.awaitbits;
+            fb->result = cco_resume_task(fb->task, fb);
             if (fb->error) {
-                fb->curr_task = fb->parent_task;
-                if (fb->curr_task == NULL)
+                fb->task = fb->parent_task;
+                if (fb->task == NULL)
                     break;
-                fb->recover_state = fb->curr_task->cco.state;
-                cco_stop(fb->curr_task);
+                fb->recover_state = fb->task->cco.state;
+                cco_stop(fb->task);
                 continue;
             }
-            if (!((fb->result & ~fb->awaitbits) || (fb->curr_task = fb->parent_task) != NULL))
+            if (!((fb->result & ~fb->awaitbits) || (fb->task = fb->parent_task) != NULL))
                 break;
             cco_yield_v(CCO_NOOP);
         }
@@ -300,9 +297,9 @@ int cco_execute_current(cco_fiber* fb) {
     return 0;
 }
 
-cco_fiber* cco_execute_next(cco_fiber* prev) {
+cco_fiber* cco_resume_next(cco_fiber* prev) {
     cco_fiber *curr = prev->next, *unlink;
-    int ret = cco_execute_current(curr);
+    int ret = cco_resume_current(curr);
 
     if (ret == CCO_DONE) {
         unlink = curr;
@@ -313,13 +310,13 @@ cco_fiber* cco_execute_next(cco_fiber* prev) {
     return curr;
 }
 
-cco_fiber* _cco_new_fiber(cco_task* task, void* env) {
-    cco_fiber* new_fb = c_new(cco_fiber, {.curr_task=task, .env=env});
+cco_fiber* _cco_new_fiber(cco_task* _task, void* env) {
+    cco_fiber* new_fb = c_new(cco_fiber, {.task=_task, .env=env});
     return (new_fb->next = new_fb);
 }
 
-cco_fiber* _cco_spawn(cco_task* task, cco_fiber* fb) {
-    cco_fiber* new_fb = c_new(cco_fiber, {.curr_task=task, .env=fb->env, .next=fb->next});
+cco_fiber* _cco_spawn(cco_task* _task, cco_fiber* fb) {
+    cco_fiber* new_fb = c_new(cco_fiber, {.task=_task, .env=fb->env, .next=fb->next});
     return (fb->next = new_fb);
 }
 
