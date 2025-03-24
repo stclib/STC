@@ -41,7 +41,7 @@ void            cco_reset(Coroutine* co);                           // Reset sta
 void            cco_stop(Coroutine* co);                            // Next resume of coroutine enters `cco_finally:`.
                 cco_run_coroutine(coroutine(co)) {};                // Run blocking until coroutine is finished.
 ```
-#### Tasks (coroutine function-objects) and fibers (thread-like entity within a thread)
+#### Tasks (coroutine function-objects) and fibers (green thread-like entity within a thread)
 ```c++
                 cco_task_struct(name) { <name>_state cco; ... };    // A custom coroutine task struct; extends cco_task struct.
 void            cco_await_task(cco_task* task, cco_fiber* fb);      // Await for task to return CCO_DONE (asymmetric call).
@@ -52,10 +52,17 @@ void            cco_throw_error(int error, cco_fiber* fb);          // Throw an 
                                                                     // Error accessible as `fb->error` and `fb->error_line`.
 void            cco_recover_error(cco_fiber* fb);                   // Reset error, and jump to original resume point in current task.
 void            cco_resume_task(cco_task* task, cco_fiber* fb);     // Resume suspended task, return value in `fb->result`.
-cco_fiber*      cco_spawn(cco_task* task, cco_fiber* fb);           // Spawn a task in a new returned fiber.
+cco_fiber*      cco_new_fiber(cco_task* task);                      // Create an initial fiber from a task.
+cco_fiber*      cco_new_fiber(cco_task* task, void* env);           // Create an initial fiber from a task and env pointer.
+cco_fiber*      cco_spawn(cco_task* task, cco_fiber* fb);           // Spawn a task/fiber parallel to the given fiber.
 bool            cco_is_joined(const cco_fiber* fb);                 // True if there are no other parallel spawned fibers running.
-                cco_run_task(cco_task* task) {}                     // Run blocking until task is finished.
-                cco_run_task(cco_task* task, <Environment> *env) {} // Run blocking with env data
+
+                cco_run_task(cco_task* task) {}                     // Run blocking until task and its spawned fibers are finished.
+                cco_run_task(cco_task* task, void *env) {}          // Run blocking with env data
+                cco_run_task(cco_task* task, void *env, int* retval) {} // Run sblocking with env data and get return value from task.
+
+                cco_run_fiber(cco_fiber* fb) {}                     // Run fiber and its spawned fibers blocking.
+                cco_run_fiber(cco_fiber* fb, int* retval) {}        // Run fiber + spawned blocking and get return value from curr task.
 ```
 #### Timers and time functions
 ```c++
