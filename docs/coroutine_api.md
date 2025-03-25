@@ -57,12 +57,11 @@ cco_fiber*      cco_new_fiber(cco_task* task, void* env);           // Create an
 cco_fiber*      cco_spawn(cco_task* task, cco_fiber* fb);           // Spawn a task/fiber parallel to the given fiber.
 bool            cco_is_joined(const cco_fiber* fb);                 // True if there are no other parallel spawned fibers running.
 
-                cco_run_task(cco_task* task) {}                     // Run blocking until task and its spawned fibers are finished.
-                cco_run_task(cco_task* task, void *env) {}          // Run blocking with env data
-                cco_run_task(cco_task* task, void *env, int* retval) {} // Run sblocking with env data and get return value from task.
+                cco_run_task(cco_task* task) {}                     // Run task blocking until it and spawned fibers are finished.
+                cco_run_task(cco_task* task, void *env) {}          // Run task blocking with env data
+                cco_run_task(fbname, cco_task* task, void *env) {}  // Run task blocking. fbname is current fiber.
 
-                cco_run_fibers(cco_fiber* fb) {}                     // Run fiber and its spawned fibers blocking.
-                cco_run_fibers(cco_fiber* fb, cco_fiber* fiber) {}   // Run fiber + spawned blocking and get return value from curr task.
+                cco_run_fibers(fbname, cco_fiber* fiber) {}         // Run fiber(s) blocking, fbname is current fiber.
 ```
 #### Timers and time functions
 ```c++
