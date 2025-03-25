@@ -13,36 +13,31 @@ cco_task_struct (Scheduler) {
     Tasks tasks;
 };
 
-int Scheduler(struct Scheduler* sc, cco_fiber* fb) {
-    cco_routine (sc) {
-        while (!Tasks_is_empty(&sc->tasks)) {
-            sc->pulled = Tasks_pull(&sc->tasks);
+int Scheduler(struct Scheduler* co, cco_fiber* fb) {
+    cco_routine (co) {
+        while (!Tasks_is_empty(&co->tasks)) {
+            co->pulled = Tasks_pull(&co->tasks);
 
-            cco_await_task(sc->pulled, fb, CCO_YIELD);
+            cco_await_task(co->pulled, fb, CCO_YIELD);
 
             if (fb->result == CCO_YIELD) {
-                Tasks_push(&sc->tasks, sc->pulled);
+                Tasks_push(&co->tasks, co->pulled);
             } else {
-                Tasks_value_drop(&sc->pulled);
+                Tasks_value_drop(&co->pulled);
             }
         }
 
         cco_finally:
-        Tasks_drop(&sc->tasks);
+        Tasks_drop(&co->tasks);
         puts("Task queue dropped");
     }
     return 0;
 }
 
 
-cco_task_struct (TaskA) {
-    TaskA_state cco;
-    bool dummy;
-};
-
-static int TaskA(struct TaskA* task, cco_fiber* fb) {
+static int TaskA(struct cco_task* co, cco_fiber* fb) {
     (void)fb;
-    cco_routine (task) {
+    cco_routine (co) {
         puts("Hello, from task A");
         cco_yield;
         puts("A is back doing work");
@@ -58,13 +53,9 @@ static int TaskA(struct TaskA* task, cco_fiber* fb) {
 }
 
 
-cco_task_struct (TaskB) {
-    TaskB_state cco;
-};
-
-static int TaskB(struct TaskB* task, cco_fiber* fb) {
+static int TaskB(struct cco_task* co, cco_fiber* fb) {
     (void)fb;
-    cco_routine (task) {
+    cco_routine (co) {
         puts("Hello, from task B");
         cco_yield;
         puts("B is back doing work");
@@ -81,8 +72,8 @@ int main(void) {
     struct Scheduler schedule = {
         .cco={Scheduler},
         .tasks = c_make(Tasks, {
-            cco_new_task(TaskA,),
-            cco_new_task(TaskB,),
+            c_new(cco_task, {TaskA}),
+            c_new(cco_task, {TaskB}),
         })
     };
 
