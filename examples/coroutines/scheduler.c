@@ -72,8 +72,8 @@ int main(void) {
     struct Scheduler schedule = {
         .cco={Scheduler},
         .tasks = c_make(Tasks, {
-            c_new(cco_task, {TaskA}),
-            c_new(cco_task, {TaskB}),
+            c_new(cco_task, {.cco={TaskA}}),
+            c_new(cco_task, {.cco={TaskB}}),
         })
     };
 

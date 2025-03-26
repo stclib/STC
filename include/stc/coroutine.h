@@ -237,7 +237,7 @@ static inline int _cco_cancel_task(cco_task* task, cco_fiber* fiber)
 } while (0)
 
 /*
- * cco_run_fibers()/cco_run_task(): Run fibers/tasks in parallel
+ * cco_run_fiber()/cco_run_task(): Run fibers/tasks in parallel
  */
 #define cco_new_task(Task, ...) \
     ((cco_task*)c_new(struct Task, {{.func=Task}, __VA_ARGS__}))
@@ -248,13 +248,16 @@ static inline int _cco_cancel_task(cco_task* task, cco_fiber* fiber)
 
 #define cco_spawn(task, fiber) _cco_spawn(cco_cast_task(task), fiber)
 
-#define cco_run_fiber(it_fb, fiber) \
-    for (cco_fiber* it_fb = fiber; (it_fb = cco_resume_next(it_fb)) != NULL; )
+#define cco_run_fiber(...) c_MACRO_OVERLOAD(cco_run_fiber, __VA_ARGS__)
+#define cco_run_fiber_1(fiber_ref) \
+    cco_run_fiber_2(_it_fb, *(fiber_ref))
+#define cco_run_fiber_2(it_fiber, fiber) \
+    for (cco_fiber* it_fiber = fiber; (it_fiber = cco_resume_next(it_fiber)) != NULL; )
 
 #define cco_run_task(...) c_MACRO_OVERLOAD(cco_run_task, __VA_ARGS__)
 #define cco_run_task_1(task) cco_run_task_2(task, NULL)
-#define cco_run_task_2(task, env) cco_run_fiber(_it_fb, cco_new_fiber_2(task, env))
-#define cco_run_task_3(it_fb, task, env) cco_run_fiber(it_fb, cco_new_fiber_2(task, env))
+#define cco_run_task_2(task, env) cco_run_fiber_2(_it_fb, cco_new_fiber_2(task, env))
+#define cco_run_task_3(it_fiber, task, env) cco_run_fiber_2(it_fiber, cco_new_fiber_2(task, env))
 
 static inline bool cco_is_joined(const cco_fiber* fiber)
     { return fiber == fiber->next; }
