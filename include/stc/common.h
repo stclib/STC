@@ -167,8 +167,8 @@ typedef const char* cstr_raw;
     _c_each(it, C, start, (end).ref, _)
 
 #define c_each_n(it, C, cnt, n) \
-    isize it##_index = 0, _n_##it = n; _n_##it; _n_##it = 0) \
-    for (C##_iter it = C##_begin(&cnt); it.ref && it##_index < _n_##it; C##_next(&it), ++it##_index
+    struct {C##_iter iter; C##_value* ref; isize size, index;} \
+    it = {.iter=C##_begin(&cnt), .size=n}; (it.ref = it.iter.ref) && it.index < it.size; C##_next(&it.iter), ++it.index
 
 #define c_each_reverse(...) c_MACRO_OVERLOAD(c_each_reverse, __VA_ARGS__)
 #define c_each_reverse_3(it, C, cnt) /* works for stack, vec, queue, deque */ \

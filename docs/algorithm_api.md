@@ -46,7 +46,7 @@ for (c_each(i, IMap, iter, IMap_end(&map)))
 
 // iterate first 3 with an index count enumeration
 for (c_each_n(i, IMap, map, 3))
-    printf(" %zd:(%d %d)", i_index, i.ref->first, i.ref->second);
+    printf(" %zd:(%d %d)", i.index, i.ref->first, i.ref->second);
 // 0:(3 2) 1:(5 4) 2:(7 3)
 
 // iterate a map using "structured binding" of the key and val pair:
