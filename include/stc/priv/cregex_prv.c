@@ -210,7 +210,13 @@ chartorune(_Rune *rune, const char *s)
 {
     utf8_decode_t ctx = {.state=0};
     const uint8_t *b = (const uint8_t*)s;
-    do { utf8_decode(&ctx, *b++); } while (ctx.state);
+    do { utf8_decode(&ctx, *b++); } while (ctx.state && ctx.state != 12);
+    if (ctx.state == 12) {
+        // 12 is the trap state which means invalid utf8 sequence, to resume
+        // we skip the current byte.
+        *rune = (uint8_t)*s;
+        return 1;
+    }
     *rune = ctx.codep;
     return (int)((const char*)b - s);
 }
@@ -622,6 +628,12 @@ _nextc(_Parser *par, _Rune *rp)
                 par->litmode = true;
                 continue;
             }
+            if (*rp == 'x' && *par->exprp == '{') {
+                *rp = (_Rune)strtol(par->exprp + 1, (char **)&par->exprp, 16);
+                if (*par->exprp != '}')
+                    _rcerror(par, CREG_UNMATCHEDRIGHTPARENTHESIS);
+                par->exprp++;
+            }
             ret = 1;
         }
         break;
@@ -727,14 +739,6 @@ _lex(_Parser *par)
         case 'A': return TOK_BOS;
         case 'z': return TOK_EOS;
         case 'Z': return TOK_EOZ;
-        case 'x': /* hex number rune */
-            if (*par->exprp != '{') break;
-            sscanf(++par->exprp, "%x", &par->yyrune);
-            while (*par->exprp) if (*(par->exprp++) == '}') break;
-            if (par->exprp[-1] != '}')
-                _rcerror(par, CREG_UNMATCHEDRIGHTPARENTHESIS);
-            if (par->yyrune == 0) return TOK_END;
-            break;
         case 'p': case 'P':
             _lexutfclass(par, &par->yyrune);
             break;
@@ -1051,7 +1055,7 @@ _regexec1(const _Reprog *progp,  /* program to run */
                 break;
             }
         }
-        r = *(unsigned char*)s;
+        r = *(uint8_t*)s;
         n = r < 128 ? 1 : chartorune(&r, s);
 
         /* switch run lists */
