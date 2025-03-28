@@ -243,10 +243,12 @@ static inline int _cco_cancel_task(cco_task* task, cco_fiber* fiber)
     ((cco_task*)c_new(struct Task, {{.func=Task}, __VA_ARGS__}))
 
 #define cco_new_fiber(...) c_MACRO_OVERLOAD(cco_new_fiber, __VA_ARGS__)
-#define cco_new_fiber_1(task) _cco_new_fiber(cco_cast_task(task), NULL)
+#define cco_new_fiber_1(task) cco_new_fiber_2(task, NULL)
 #define cco_new_fiber_2(task, env) _cco_new_fiber(cco_cast_task(task), env)
 
-#define cco_spawn(task, fiber) _cco_spawn(cco_cast_task(task), fiber)
+#define cco_spawn(...) c_MACRO_OVERLOAD(cco_spawn, __VA_ARGS__)
+#define cco_spawn_2(task, fiber) cco_spawn_3(task, fiber, NULL)
+#define cco_spawn_3(task, fiber, env) _cco_spawn(cco_cast_task(task), fiber, env)
 
 #define cco_run_fiber(...) c_MACRO_OVERLOAD(cco_run_fiber, __VA_ARGS__)
 #define cco_run_fiber_1(fiber_ref) \
@@ -263,7 +265,7 @@ static inline bool cco_is_joined(const cco_fiber* fiber)
     { return fiber == fiber->next; }
 
 extern cco_fiber* _cco_new_fiber(cco_task* task, void* env);
-extern cco_fiber* _cco_spawn(cco_task* task, cco_fiber* fb);
+extern cco_fiber* _cco_spawn(cco_task* task, cco_fiber* fb, void* env);
 extern cco_fiber* cco_resume_next(cco_fiber* prev);
 extern int        cco_resume_current(cco_fiber* co); /* coroutine */
 
@@ -318,8 +320,8 @@ cco_fiber* _cco_new_fiber(cco_task* _task, void* env) {
     return (new_fb->next = new_fb);
 }
 
-cco_fiber* _cco_spawn(cco_task* _task, cco_fiber* fb) {
-    cco_fiber* new_fb = c_new(cco_fiber, {.task=_task, .env=fb->env, .next=fb->next});
+cco_fiber* _cco_spawn(cco_task* _task, cco_fiber* fb, void* env) {
+    cco_fiber* new_fb = c_new(cco_fiber, {.task=_task, .env=env ? env : fb->env, .next=fb->next});
     return (fb->next = new_fb);
 }
 

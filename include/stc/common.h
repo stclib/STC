@@ -127,23 +127,23 @@ typedef ptrdiff_t       isize;
 #define c_uless(a, b)           ((size_t)(a) < (size_t)(b))
 #define c_safe_cast(T, From, x) ((T)(1 ? (x) : (From){0}))
 
-// x, y are i_keyraw* type, which defaults to i_key*:
+// x, y are i_keyraw* type, which defaults to i_key*. vp is i_key* type.
 #define c_memcmp_eq(x, y)       (memcmp(x, y, sizeof *(x)) == 0)
 #define c_default_eq(x, y)      (*(x) == *(y))
 #define c_default_less(x, y)    (*(x) < *(y))
 #define c_default_cmp(x, y)     (c_default_less(y, x) - c_default_less(x, y))
-#define c_default_hash(p)       c_hash_n(p, sizeof *(p))
+#define c_default_hash(vp)      c_hash_n(vp, sizeof *(vp))
 #define c_default_clone(v)      (v)
 #define c_default_toraw(vp)     (*(vp))
 #define c_default_drop(vp)      ((void) (vp))
 
-// non-owning c-string "class"
+// non-owning char pointer
 typedef const char* cstr_raw;
-#define cstr_raw_cmp(xp, yp) strcmp(*(xp), *(yp))
-#define cstr_raw_eq(xp, yp) (cstr_raw_cmp(xp, yp) == 0)
-#define cstr_raw_hash(p) c_hash_str(*(p))
-#define cstr_raw_clone(s) (s)
-#define cstr_raw_drop(p) ((void)p)
+#define cstr_raw_cmp(x, y)      strcmp(*(x), *(y))
+#define cstr_raw_eq(x, y)       (cstr_raw_cmp(x, y) == 0)
+#define cstr_raw_hash(vp)       c_hash_str(*(vp))
+#define cstr_raw_clone(v)       (v)
+#define cstr_raw_drop(vp)       ((void)vp)
 
 // Control block macros
 
@@ -218,7 +218,7 @@ typedef const char* cstr_raw;
 #define c_range32_3(i, start, stop) c_range_t_4(int32_t, i, start, stop)
 #define c_range32_4(i, start, stop, step) c_range_t_5(int32_t, i, start, stop, step)
 
-// make container from a literal list, and drop multiple containers of same type
+// make container from a literal list
 #define c_make(C, ...) \
     C##_from_n(c_make_array(C##_raw, __VA_ARGS__), c_sizeof((C##_raw[])__VA_ARGS__)/c_sizeof(C##_raw))
 
