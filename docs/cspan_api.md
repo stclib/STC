@@ -70,10 +70,10 @@ cspan_layout    cspan_get_layout(const SpanTypeN* self);
 bool            cspan_is_rowmajor(const SpanTypeN* self);
 bool            cspan_is_colmajor(const SpanTypeN* self);
 
-                // Construct a 1d subspan. Like cspan_slice(Span, &ms, {offset, offset+count});
+                // Construct a 1d subspan. Like cspan_slice(&ms, Span, {offset, offset+count});
 SpanType1       cspan_subspan(const SpanType1* self, isize offset, int32 count);
 
-                // Construct submd span of lower rank. Like e.g. cspan_slice(Span2, &ms4, {i}, {j}, {c_ALL}, {c_ALL});
+                // Construct submd span of lower rank. Like e.g. cspan_slice(&ms4, Span2, {i}, {j}, {c_ALL}, {c_ALL});
 OutSpan1        cspan_submd2(const SpanType2* self, int32 i);
 
                 // Construct a 2d or 1d subspan from a 3d span.
@@ -91,7 +91,7 @@ OutSpan1        cspan_submd4(const SpanType4* self, int32 i, int32 j, int32 k);
                 //{i,j,step}: every step column (default step=1)
                 // {i,c_END}: from i to last.
                 //   {c_ALL}: full extent, like {0,c_END}.
-OutSpanM        cspan_slice(<TYPE> OutSpanM, const SpanTypeN* self, {x0,x1,xs}, {y0,y1,ys}.., {N0,N1,Ns});
+OutSpanM        cspan_slice(const SpanTypeN* self, <TYPE> OutSpanM, {x0,x1,xs}, {y0,y1,ys}.., {N0,N1,Ns});
 
                 // Print numpy style output.
                 //  fmt      : printf format specifier.
@@ -125,8 +125,8 @@ void            SpanTypeN_next(SpanTypeN_iter* it);
 | SpanTypeN         | `struct { ValueType *data; cspan_istride shape[N]; .. }`| SpanType with rank N |
 | cspan_tupleN      | `struct { cspan_istride d[N]; }`                    | Strides for each rank |
 | `cspan_layout`    | `enum { c_ROWMAJOR, c_COLMAJOR, c_STRIDED }`        | Multi-dim layout     |
-| `c_ALL`           | `cspan_slice(&md, {1,3}, {c_ALL})`                  | Full extent          |
-| `c_END`           | `cspan_slice(&md, {1,c_END}, {2,c_END})`            | End of extent        |
+| `c_ALL`           | `cspan_slice(&md, Mat, {1,3}, {c_ALL})`             | Full extent          |
+| `c_END`           | `cspan_slice(&md, Mat, {1,c_END}, {2,c_END})`       | End of extent        |
 
 ## Example 1
 
@@ -236,7 +236,7 @@ int main(void) {
     int arr[] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24};
 
     myspan3 ms3 = cspan_md(arr, 2, 3, 4); // row-major layout
-    myspan3 ss3 = cspan_slice(myspan3, &ms3, {c_ALL}, {0,3}, {2,c_END});
+    myspan3 ss3 = cspan_slice(&ms3, myspan3, {c_ALL}, {0,3}, {2,c_END});
     puts("ss3:");
     myspan2 a = cspan_submd3(&ss3, 1);
     myspan2 b = myspan2_transpose(a);
@@ -283,11 +283,11 @@ int main(void)
     cspan_print(Span3, span3, "%d");
 
     puts("\nspan3[:, 3:4, :]:");
-    Span3 ss3 = cspan_slice(Span3, &span3, {c_ALL}, {3,4}, {c_ALL});
+    Span3 ss3 = cspan_slice(&span3, Span3, {c_ALL}, {3,4}, {c_ALL});
     cspan_print(Span3, ss3, "%d");
 
     puts("\nspan3[:, 3, :]:");
-    Span2 ss2 = cspan_slice(Span2, &span3, {c_ALL}, {3}, {c_ALL});
+    Span2 ss2 = cspan_slice(&span3, Span2, {c_ALL}, {3}, {c_ALL});
     cspan_print(Span2, ss2, "%d");
 
     puts("\nspan3 swap axes to: [1, 2, 0]");

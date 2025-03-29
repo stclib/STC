@@ -20,7 +20,7 @@ int main(void)
     cspan_print(ISpan3, ms3, "%d");
 
     // Take a slice of md3
-    ISpan3 ss3 = cspan_slice(ISpan3, &ms3, {c_ALL}, {1,3}, {1,3});
+    ISpan3 ss3 = cspan_slice(&ms3, ISpan3, {c_ALL}, {1,3}, {1,3});
     puts("\nss3 = ms3[:, 1:3, 1:3]");
     cspan_print(ISpan3, ss3, "%d");
 
@@ -47,7 +47,7 @@ int main(void)
     cspan_print(ISpan3, ms3, "%d");
 
     puts("\ncol = ms3[1, :, 2]");
-    ISpan col = cspan_slice(ISpan, &ms3, {1}, {c_ALL}, {2});
+    ISpan col = cspan_slice(&ms3, ISpan, {1}, {c_ALL}, {2});
     for (c_each(i, ISpan, col)) printf(" %d", *i.ref);
     puts("");
 

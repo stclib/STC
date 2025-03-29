@@ -225,13 +225,18 @@ typedef enum {c_ROWMAJOR, c_COLMAJOR, c_STRIDED} cspan_layout;
 #define c_END (_istride)(((size_t)1 << (sizeof(_istride)*8 - 1)) - 1)
 #define c_ALL 0,c_END
 
-#define cspan_slice(OutSpan, self, ...) \
-    OutSpan##_slice_((self)->data, (self)->shape, (self)->stride.d, \
+#define cspan_slice(self, Outspan, ...) \
+    Outspan##_slice_((self)->data, (self)->shape, (self)->stride.d, \
                      c_make_array2d(const isize, 3, {__VA_ARGS__}), \
                      cspan_rank(self) + c_static_assert(cspan_rank(self) == sizeof((isize[][3]){__VA_ARGS__})/sizeof(isize[3])))
 
-// submd#(): # <= 4 optimized. Reduce rank, like e.g. cspan_slice(Span2, &ms3, {x}, {c_ALL}, {c_ALL});
-//
+// submd#(): Reduces rank, fully typesafe + range checked by default
+//           int ms3[N1][N2][N3];
+//           int (*ms2)[N3] = ms3[1]; // traditional, lose range test/info. VLA.
+//           Span3 ms3 = cspan_md(data, N1,N2,N3); // Use cspan_md instead.
+//           *cspan_at(&ms3, 1,1,1) = 42;
+//           Span2 ms2 = cspan_slice(&ms3, Span2, {1}, {c_ALL}, {c_ALL});
+//           Span2 ms2 = cspan_submd3(&ms3, 1); // Same as line above, optimized.
 #define cspan_submd2(self, x) \
     {.data=cspan_at(self, x, 0), \
      .shape={(self)->shape[1]}, \

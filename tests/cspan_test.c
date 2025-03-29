@@ -31,7 +31,7 @@ TEST(cspan, slice) {
         }
     }
 
-    Span2 m2 = cspan_slice(Span2, &m1, {c_ALL}, {2,4});
+    Span2 m2 = cspan_slice(&m1, Span2, {c_ALL}, {2,4});
 
     int sum2 = 0;
     for (c_range(i, m2.shape[0])) {
@@ -54,7 +54,7 @@ TEST(cspan, slice2) {
             Stack_push(&stack, i);
 
         Span3 ms3 = cspan_md(stack.data, 10, 20, 30);
-        ms3 = cspan_slice(Span3, &ms3, {1,4}, {3,7}, {20,24});
+        ms3 = cspan_slice(&ms3, Span3, {1,4}, {3,7}, {20,24});
 
         int sum = 0;
         for (c_range(i, ms3.shape[0])) {
@@ -92,19 +92,19 @@ TEST(cspan, equality) {
     });
     Span2 test2 = cspan_md(test.data, 3, 3);
 
-    //puts(""); cspan_print(Span2, cspan_slice(Span2, &base2, {0, 3}, {1, 4}), "%d");
+    //puts(""); cspan_print(Span2, cspan_slice(&base2, Span2, {0, 3}, {1, 4}), "%d");
 
     // Test every 3x3 subtile in base2 against the test2 tile.
     for (c_range(y, base2.shape[0] - 3 + 1)) {
         for (c_range(x, base2.shape[1] - 3 + 1)) {
             bool expect_eq = (y == 0 && x == 1) || (y == 3 && x == 2);
-            EXPECT_EQ(expect_eq, Span2_equals(test2, cspan_slice(Span2, &base2, {y, y+3}, {x, x+3})));
+            EXPECT_EQ(expect_eq, Span2_equals(test2, cspan_slice(&base2, Span2, {y, y+3}, {x, x+3})));
         }
     }
 
     // Check that the two 3x4 tiles are equal.
-    EXPECT_TRUE(Span2_equals(cspan_slice(Span2, &base2, {0, 3}, {0, 4}),
-                             cspan_slice(Span2, &base2, {3, 6}, {1, 5})));
+    EXPECT_TRUE(Span2_equals(cspan_slice(&base2, Span2, {0, 3}, {0, 4}),
+                             cspan_slice(&base2, Span2, {3, 6}, {1, 5})));
 }
 
 
@@ -131,7 +131,7 @@ TEST_SETUP(cspan_cube, fixt) {
     for (c_range(i, 0, ms3.shape[0], TSIZE)) {
         for (c_range(j, 0, ms3.shape[1], TSIZE)) {
             for (c_range(k, 0, ms3.shape[2], TSIZE)) {
-                Span3 tile = cspan_slice(Span3, &ms3, {i, i + TSIZE}, {j, j + TSIZE}, {k, k + TSIZE});
+                Span3 tile = cspan_slice(&ms3, Span3, {i, i + TSIZE}, {j, j + TSIZE}, {k, k + TSIZE});
                 Tiles_push(&fixt->tiles, tile);
             }
         }

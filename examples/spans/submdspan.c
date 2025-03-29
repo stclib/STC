@@ -18,12 +18,12 @@ void zero_2d(span2 grid2d) {
 
 void zero_surface(span3 grid3d) {
   (void)c_static_assert(cspan_rank(&grid3d) == 3);
-  zero_2d(cspan_slice(span2, &grid3d, {0}, {c_ALL}, {c_ALL}));
-  zero_2d(cspan_slice(span2, &grid3d, {c_ALL}, {0}, {c_ALL}));
-  zero_2d(cspan_slice(span2, &grid3d, {c_ALL}, {c_ALL}, {0}));
-  zero_2d(cspan_slice(span2, &grid3d, {grid3d.shape[0]-1}, {c_ALL}, {c_ALL}));
-  zero_2d(cspan_slice(span2, &grid3d, {c_ALL}, {grid3d.shape[1]-1}, {c_ALL}));
-  zero_2d(cspan_slice(span2, &grid3d, {c_ALL}, {c_ALL}, {grid3d.shape[2]-1}));
+  zero_2d(cspan_slice(&grid3d, span2, {0}, {c_ALL}, {c_ALL}));
+  zero_2d(cspan_slice(&grid3d, span2, {c_ALL}, {0}, {c_ALL}));
+  zero_2d(cspan_slice(&grid3d, span2, {c_ALL}, {c_ALL}, {0}));
+  zero_2d(cspan_slice(&grid3d, span2, {grid3d.shape[0]-1}, {c_ALL}, {c_ALL}));
+  zero_2d(cspan_slice(&grid3d, span2, {c_ALL}, {grid3d.shape[1]-1}, {c_ALL}));
+  zero_2d(cspan_slice(&grid3d, span2, {c_ALL}, {c_ALL}, {grid3d.shape[2]-1}));
 }
 
 int main(void) {
@@ -34,17 +34,6 @@ int main(void) {
 
   zero_surface(md);
 
-#if 0
-  for (int i = 0; i < md.shape[0]; i++) {
-    for (int j = 0; j < md.shape[1]; j++) {
-      for (int k = 0; k < md.shape[2]; k++)
-        printf(" %.2f", *cspan_at(&md, i,j,k));
-      puts("");
-    }
-    puts("");
-  }
-#else
   cspan_print(span3, md, "%.2f");
-#endif
   puts("done");
 }
