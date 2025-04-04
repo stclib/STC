@@ -313,7 +313,8 @@ _c_MEMB(_insert_uninit)(Self* self, const isize idx, const isize n) {
             return _c_MEMB(_end)(self);
 
     _m_value* pos = self->data + idx;
-    c_memmove(pos + n, pos, (self->size - idx)*c_sizeof *pos);
+    if (self->capacity)
+        c_memmove(pos + n, pos, (self->size - idx)*c_sizeof *pos);
     self->size += n;
     return c_literal(_m_iter){pos, self->data + self->size};
 }
