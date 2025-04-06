@@ -1,6 +1,6 @@
 // Example based on https://en.cppreference.com/w/cpp/container/mdspan
 #include <stdio.h>
-#define i_key int
+#define i_type Vec, int
 #include "stc/stack.h"
 #include "stc/cspan.h"
 
@@ -8,13 +8,13 @@ using_cspan3(ISpan, int); // define ISpan, ISpan2, ISpan3
 
 int main(void)
 {
-    stack_int v = c_make(stack_int, {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24});
+    Vec vec = c_make(Vec, {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24});
 
     // Create 1d span from a compatibel container
-    ISpan ms1 = cspan_from_vec(&v);
+    ISpan ms1 = cspan_from_vec(&vec);
 
     // Create a 3D mdspan 2 x 3 x 4
-    ISpan3 ms3 = cspan_md(v.data, 2, 3, 4);
+    ISpan3 ms3 = cspan_md(vec.data, 2, 3, 4);
 
     puts("ms3:");
     cspan_print(ISpan3, ms3, "%d");
@@ -25,7 +25,8 @@ int main(void)
     cspan_print(ISpan3, ss3, "%d");
 
     puts("\nIterate ss3 flat:");
-    for (c_each(i, ISpan3, ss3)) printf(" %d", *i.ref);
+    for (c_each(i, ISpan3, ss3))
+        printf(" %d", *i.ref);
     puts("");
 
     // submd3 span reduces rank depending on number of arguments
@@ -40,7 +41,8 @@ int main(void)
     cspan_print(ISpan2, ms2, "%d");
 
     puts("\nOriginal s1 span with updated data:");
-    for (c_each(i, ISpan, ms1)) printf(" %d", *i.ref);
+    for (c_each(i, ISpan, ms1))
+        printf(" %d", *i.ref);
     puts("");
 
     puts("\nOriginal ms3 span with updated data:");
@@ -48,8 +50,9 @@ int main(void)
 
     puts("\ncol = ms3[1, :, 2]");
     ISpan col = cspan_slice(&ms3, ISpan, {1}, {c_ALL}, {2});
-    for (c_each(i, ISpan, col)) printf(" %d", *i.ref);
+    for (c_each(i, ISpan, col))
+        printf(" %d", *i.ref);
     puts("");
 
-    stack_int_drop(&v);
+    Vec_drop(&vec);
 }
