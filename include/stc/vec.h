@@ -308,17 +308,12 @@ _c_MEMB(_resize)(Self* self, const isize len, _m_value null) {
 
 STC_DEF _m_iter
 _c_MEMB(_insert_uninit)(Self* self, const isize idx, const isize n) {
-    if (self->size + n > self->capacity)
-        if (!_c_MEMB(_reserve)(self, self->size*3/2 + n))
+    if (self->size + n >= self->capacity)
+        if (!_c_MEMB(_reserve)(self, self->size*3/2 + n + 2))
             return _c_MEMB(_end)(self);
 
-    _m_value *pos;
-    if (self->data == NULL)
-        pos = self->data;
-    else {
-        pos = self->data + idx;
-        c_memmove(pos + n, pos, (self->size - idx)*c_sizeof *pos);
-    }
+    _m_value *pos = self->data + idx;
+    c_memmove(pos + n, pos, (self->size - idx)*c_sizeof *pos);
     self->size += n;
     return c_literal(_m_iter){pos, self->data + self->size};
 }
