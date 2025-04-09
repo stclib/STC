@@ -110,17 +110,24 @@ STC_INLINE void _c_MEMB(_value_drop)(_m_value* val)
     { i_keydrop(val); }
 
 STC_INLINE bool _c_MEMB(_reserve)(Self* self, isize n) {
-    if (n < self->size) return true;
-#ifndef i_capacity
-    _m_value *d = (_m_value *)i_realloc(self->data, self->capacity*c_sizeof *d, n*c_sizeof *d);
-    if (d) { self->capacity = n, self->data = d; return true; }
+#ifdef i_capacity
+    return n <= i_capacity;
+#else
+    if (n > self->capacity || (n && n == self->size)) {
+        _m_value *d = (_m_value *)i_realloc(self->data, self->capacity*c_sizeof *d,
+                                            n*c_sizeof *d);
+        if (d == NULL)
+            return false;
+        self->data = d;
+        self->capacity = n;
+    }
+    return self->data != NULL;
 #endif
-    return false;
 }
 
 STC_INLINE _m_value* _c_MEMB(_append_uninit)(Self *self, isize n) {
     isize len = self->size;
-    if (len + n > _c_MEMB(_capacity)(self))
+    if (len + n >= _c_MEMB(_capacity)(self))
         if (!_c_MEMB(_reserve)(self, len*3/2 + n))
             return NULL;
     self->size += n;

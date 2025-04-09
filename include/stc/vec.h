@@ -141,6 +141,13 @@ STC_INLINE void         _c_MEMB(_copy)(Self* self, const Self other) {
                             _c_MEMB(_clear)(self);
                             _c_MEMB(_copy_n)(self, 0, other.data, other.size);
                         }
+
+STC_INLINE Self         _c_MEMB(_clone)(Self vec) {
+                            Self tmp = vec;
+                            vec.data = NULL; vec.size = vec.capacity = 0;
+                            _c_MEMB(_copy_n)(&vec, 0, tmp.data, tmp.size);
+                            return vec;
+                        }
 #endif // !i_no_clone
 
 STC_INLINE isize        _c_MEMB(_size)(const Self* self) { return self->size; }
@@ -290,7 +297,7 @@ _c_MEMB(_reserve)(Self* self, const isize cap) {
         self->data = d;
         self->capacity = cap;
     }
-    return true;
+    return self->data != NULL;
 }
 
 STC_DEF bool
@@ -309,7 +316,7 @@ _c_MEMB(_resize)(Self* self, const isize len, _m_value null) {
 STC_DEF _m_iter
 _c_MEMB(_insert_uninit)(Self* self, const isize idx, const isize n) {
     if (self->size + n >= self->capacity)
-        if (!_c_MEMB(_reserve)(self, self->size*3/2 + n + 2))
+        if (!_c_MEMB(_reserve)(self, self->size*3/2 + n))
             return _c_MEMB(_end)(self);
 
     _m_value *pos = self->data + idx;
@@ -330,15 +337,6 @@ _c_MEMB(_erase_n)(Self* self, const isize idx, const isize len) {
 }
 
 #if !defined i_no_clone
-STC_DEF Self
-_c_MEMB(_clone)(Self vec) {
-    Self tmp = {0};
-    _c_MEMB(_copy_n)(&tmp, 0, vec.data, vec.size);
-    vec.data = tmp.data;
-    vec.capacity = tmp.capacity;
-    return vec;
-}
-
 STC_DEF _m_iter
 _c_MEMB(_copy_n)(Self* self, const isize idx,
                  const _m_value arr[], const isize n) {
