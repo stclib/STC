@@ -32,7 +32,7 @@ static void test_repeats(void)
 
 void test_distribution(void)
 {
-    enum {BITS = 26};
+    enum {BITS = 24};
     printf("distribution test: 2^%d values\n", BITS);
     crand64 rng = crand64_from(seed);
     const isize N = (isize)(1ull << BITS);

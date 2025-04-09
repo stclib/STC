@@ -14,6 +14,7 @@ if cc.get_argument_syntax() == 'gcc'
   add_project_arguments(
     cc.get_supported_arguments(
       '-Wno-missing-field-initializers',
+      '-Wno-double-promotion',
       '-Wno-stringop-overflow',
       '-Wno-clobbered',
     ),

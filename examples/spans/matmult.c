@@ -8,7 +8,7 @@ using_cspan(Mat, float, 2);
 using_cspan(Mat3, float, 3);
 typedef Mat OutMat;
 
-enum {N = 9, D1 = 512, D2 = D1, D3 = D1};
+enum {N = 3, D1 = 512, D2 = D1, D3 = D1};
 
 void native_matrix_product(float (*A)[D2], float (*B)[D3], float (*C)[D3]) {
     for (int j = 0; j < D3; ++j) {
@@ -75,14 +75,15 @@ void recursive_matrix_product(Mat A, Mat B, OutMat C) {
 
 int main(void) {
     Data values = Data_with_size(D1*D2 + N*D2*D3, 0);
-    Data output = Data_with_size(D1*D3, 0);
     for (c_each(i, Data, values))
         *i.ref = (Data_value)((crand64_real() - 0.5)*8.0);
 
     Mat a = cspan_md(values.data, D1, D2);
     Mat3 bvec = cspan_md(values.data + D1*D2, N, D2, D3);
+
     static Data_value out[D1*D3];
     OutMat c = cspan_md(out, D1, D3);
+    //Data output = Data_with_size(D1*D3, 0);
     //OutMat c = cspan_md(output.data, D1, D3); // slower with malloced ram
 
     float sum = 0.0;
@@ -90,7 +91,7 @@ int main(void) {
 
     for (c_range(i, N)) {
         Mat b = cspan_submd3(&bvec, i);
-        memset(c.data, 0, Mat_size(&c)*sizeof *c.data);
+        memset(c.data, 0, (size_t)Mat_size(&c)*sizeof *c.data);
         recursive_matrix_product(a, b, c); // > gcc 2-3x faster
         //base_case_matrix_product(a, b, c);
         //native_matrix_product((float(*)[D2])a.data, (float(*)[D3])b.data, (float(*)[D3])c.data);
@@ -99,12 +100,11 @@ int main(void) {
 
     t = clock() - t;
 
-    puts("a 8x8 sub-matrix of input a");
-    cspan_print(Mat, cspan_slice(&a, Mat, {12,20}, {12,20}), "%.4f");
-    puts("\na 8x8 sub-matrix of result c");
+    puts("an 8x8 sub-matrix of result c");
     cspan_print(Mat, cspan_slice(&c, Mat, {12,20}, {12,20}), "%.4f");
 
     puts("checksum and time");
-    printf("%.16g: %f ms\n", sum, (double)t*1000.0/CLOCKS_PER_SEC);
-    c_drop(Data, &values, &output);
+    printf("%.16g: %f ms\n", (double)sum, (double)t*1000.0/CLOCKS_PER_SEC);
+    Data_drop(&values);
+    //Data_drop(&output);
 }
