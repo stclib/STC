@@ -308,7 +308,7 @@ _c_MEMB(_resize)(Self* self, const isize len, _m_value null) {
 
 STC_DEF _m_iter
 _c_MEMB(_insert_uninit)(Self* self, const isize idx, const isize n) {
-    if (self->size + n >= self->capacity)
+    if (self->size + n > self->capacity)
         if (!_c_MEMB(_reserve)(self, self->size*3/2 + n))
             return _c_MEMB(_end)(self);
 
