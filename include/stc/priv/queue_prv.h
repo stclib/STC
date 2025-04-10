@@ -194,8 +194,8 @@ _c_MEMB(_reserve)(Self* self, const isize cap) {
     if (self->start <= self->end)       // [..S########E....|................]
         ;
     else if (head < self->end) {        // [#######E.....S##|.............s!!]
+        c_memmove(d + newpow2 - head, d + self->start, head*c_sizeof *d);
         self->start = newpow2 - head;
-        c_memmove(d + self->start, d + oldpow2 - head, head*c_sizeof *d);
     } else {                            // [##E.....S#######|!!e.............]
         c_memmove(d + oldpow2, d, self->end*c_sizeof *d);
         self->end += oldpow2;
