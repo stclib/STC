@@ -130,7 +130,6 @@ STC_INLINE _m_iter _c_MEMB(_emplace_at)(Self* self, _m_iter it, _m_raw raw)
 #endif // !i_no_emplace
 
 #if !defined i_no_clone
-STC_API Self            _c_MEMB(_clone)(Self cx);
 STC_API _m_iter         _c_MEMB(_copy_n)(Self* self, isize idx, const _m_value arr[], isize n);
 
 STC_INLINE _m_value     _c_MEMB(_value_clone)(_m_value val)

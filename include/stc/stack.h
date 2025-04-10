@@ -111,6 +111,7 @@ STC_INLINE void _c_MEMB(_value_drop)(_m_value* val)
 
 STC_INLINE bool _c_MEMB(_reserve)(Self* self, isize n) {
 #ifdef i_capacity
+    (void)self;
     return n <= i_capacity;
 #else
     if (n > self->capacity || (n && n == self->size)) {

@@ -186,17 +186,17 @@ STC_DEF bool
 _c_MEMB(_reserve)(Self* self, const isize cap) {
     isize oldpow2 = self->capmask + 1, newpow2 = c_next_pow2(cap + 1);
     if (newpow2 <= oldpow2)
-        return true;
+        return self->cbuf != NULL;
     _m_value* d = (_m_value *)i_realloc(self->cbuf, oldpow2*c_sizeof *d, newpow2*c_sizeof *d);
     if (d == NULL)
         return false;
     isize head = oldpow2 - self->start;
-    if (self->start <= self->end)
+    if (self->start <= self->end)       // [..S########E....|................]
         ;
-    else if (head < self->end) {
+    else if (head < self->end) {        // [#######E.....S##|.............s!!]
         self->start = newpow2 - head;
         c_memmove(d + self->start, d + oldpow2 - head, head*c_sizeof *d);
-    } else {
+    } else {                            // [##E.....S#######|!!e.............]
         c_memmove(d + oldpow2, d, self->end*c_sizeof *d);
         self->end += oldpow2;
     }
@@ -209,7 +209,8 @@ STC_DEF _m_value*
 _c_MEMB(_push)(Self* self, _m_value value) { // push_back
     isize end = (self->end + 1) & self->capmask;
     if (end == self->start) { // full
-        _c_MEMB(_reserve)(self, self->capmask + 3); // => 2x expand
+        if (!_c_MEMB(_reserve)(self, self->capmask + 3)) // => 2x expand
+            return NULL;
         end = (self->end + 1) & self->capmask;
     }
     _m_value *v = self->cbuf + self->end;

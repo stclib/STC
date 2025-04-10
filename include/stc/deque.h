@@ -133,7 +133,8 @@ STC_DEF _m_value*
 _c_MEMB(_push_front)(Self* self, _m_value value) {
     isize start = (self->start - 1) & self->capmask;
     if (start == self->end) { // full
-        _c_MEMB(_reserve)(self, self->capmask + 3); // => 2x expand
+        if (!_c_MEMB(_reserve)(self, self->capmask + 3)) // => 2x expand
+            return NULL;
         start = (self->start - 1) & self->capmask;
     }
     _m_value *v = self->cbuf + start;
@@ -157,8 +158,8 @@ STC_DEF _m_iter
 _c_MEMB(_insert_uninit)(Self* self, const isize idx, const isize n) {
     const isize len = _c_MEMB(_size)(self);
     _m_iter it = {._s=self};
-    if (len + n > self->capmask)
-        if (!_c_MEMB(_reserve)(self, len + n + 3)) // minimum 2x expand
+    if (len + n >= self->capmask)
+        if (!_c_MEMB(_reserve)(self, len + n)) // minimum 2x expand
             return it;
     it.pos = _cbuf_topos(self, idx);
     it.ref = self->cbuf + it.pos;
