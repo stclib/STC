@@ -110,8 +110,9 @@ STC_INLINE uint32_t utf8_decode(utf8_decode_t* d, const uint32_t byte) {
 
 STC_INLINE uint32_t utf8_peek(const char* s) {
     utf8_decode_t d = {.state=0};
-    do { utf8_decode(&d, (uint8_t)*s++); } while (d.state);
-    return d.codep;
+    uint8_t c = (uint8_t)*s;
+    do { utf8_decode(&d, (uint8_t)*s++); } while (d.state && d.state != 12);
+    return d.state == 12 ? c : d.codep;
 }
 
 /* case-insensitive utf8 string comparison */
