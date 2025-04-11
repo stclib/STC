@@ -203,11 +203,11 @@ STC_INLINE _m_iter _c_MEMB(_erase_range)(Self* self, _m_iter i1, _m_iter i2) {
 }
 
 STC_INLINE const _m_value* _c_MEMB(_at)(const Self* self, const isize idx) {
-    c_assert(idx < self->size); return self->data + idx;
+    c_assert(c_uless(idx, self->size)); return self->data + idx;
 }
 
 STC_INLINE _m_value* _c_MEMB(_at_mut)(Self* self, const isize idx) {
-    c_assert(idx < self->size); return self->data + idx;
+    c_assert(c_uless(idx, self->size)); return self->data + idx;
 }
 
 // iteration

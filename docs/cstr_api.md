@@ -39,19 +39,18 @@ cstr*           cstr_take(cstr* self, cstr s);                          // take 
 cstr            cstr_move(cstr* self);                                  // move string to caller, leave self empty
 void            cstr_drop(cstr* self);                                  // destructor
 
-zsview          cstr_zv(const cstr* self);                              // to zero-terminated string view
-csview          cstr_sv(const cstr* self);                              // to csview string view
-zsview          cstr_tail(cstr* self, isize len);                       // zsview subview of the trailing len bytes
-csview          cstr_subview(const cstr* self, isize pos, isize len);   // csview subview from pos and length len
-
-const char*     cstr_str(const cstr* self);                             // to const char*
-char*           cstr_data(cstr* self);                                  // to mutable char*
-cstr_view       cstr_getview(cstr* self);                               // to mutable buffer struct (with capacity)
-
 isize           cstr_size(const cstr* self);
 isize           cstr_capacity(const cstr* self);
-isize           cstr_to_index(const cstr* self, cstr_iter it);          // get byte position at iter.
+isize           cstr_to_index(const cstr* self, cstr_iter it);          // to byte position at iter.
 bool            cstr_is_empty(const cstr* self);                        // test from empty string
+
+const char*     cstr_str(const cstr* self);                             // get const char*
+char*           cstr_data(cstr* self);                                  // get mutable char*
+cstr_buf        cstr_getbuf(cstr* self);                                // to mutable buffer struct (with capacity)
+zsview          cstr_zv(const cstr* self);                              // to zero-terminated string view
+csview          cstr_sv(const cstr* self);                              // to csview string view
+zsview          cstr_tail(cstr* self, isize len);                       // to zsview subview of the trailing len bytes
+csview          cstr_subview(const cstr* self, isize pos, isize len);   // to csview subview from pos and length len
 
 void            cstr_clear(cstr* self);
 char*           cstr_reserve(cstr* self, isize capacity);               // return pointer to buffer
@@ -158,7 +157,7 @@ char*           c_strnstrn(const char* str, isize slen, const char* needle, isiz
 | `cstr`          | `struct { ... }`                             | The string type      |
 | `cstr_value`    | `char`                                       | String element type  |
 | `cstr_iter`     | `union { cstr_value *ref; csview chr; }`     | String iterator      |
-| `cstr_view`     | `struct { char *data; isize size, cap; }` | String buffer type   |
+| `cstr_buf`      | `struct { char *data; isize size, cap; }` | String buffer type   |
 
 ## Constants and macros
 

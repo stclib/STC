@@ -1232,7 +1232,7 @@ _regexec(const _Reprog *progp,    /* program to run */
 static void
 _build_subst(const char* replace, int nmatch, const csview match[],
              bool(*transform)(int, csview, cstr*), cstr* subst) {
-    cstr_view buf = cstr_getview(subst);
+    cstr_buf buf = cstr_getbuf(subst);
     isize len = 0, cap = buf.cap;
     char* dst = buf.data;
     cstr mstr = {0};

@@ -48,8 +48,7 @@ STC_API void        _c_MEMB(_erase_n)(Self* self, isize idx, isize n);
 
 STC_INLINE const _m_value*
 _c_MEMB(_at)(const Self* self, isize idx) {
-    const isize* m; bool b; (void)m, (void)b;
-    c_assert((m = &self->start, b = m[0] > m[1], (idx >= m[b] && idx < m[!b]) ^ b));
+    c_assert(c_uless(idx, _c_MEMB(_size)(self)));
     return self->cbuf + _cbuf_topos(self, idx);
 }
 

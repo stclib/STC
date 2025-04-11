@@ -37,15 +37,15 @@ isize cstr_find_sv(const cstr* self, csview search) {
 }
 
 char* _cstr_internal_move(cstr* self, const isize pos1, const isize pos2) {
-    cstr_view r = cstr_getview(self);
+    cstr_buf b = cstr_getbuf(self);
     if (pos1 != pos2) {
-        const isize newlen = (r.size + pos2 - pos1);
-        if (newlen > r.cap)
-            r.data = cstr_reserve(self, r.size*3/2 + pos2 - pos1);
-        c_memmove(&r.data[pos2], &r.data[pos1], r.size - pos1);
+        const isize newlen = (b.size + pos2 - pos1);
+        if (newlen > b.cap)
+            b.data = cstr_reserve(self, b.size*3/2 + pos2 - pos1);
+        c_memmove(&b.data[pos2], &b.data[pos1], b.size - pos1);
         _cstr_set_size(self, newlen);
     }
-    return r.data;
+    return b.data;
 }
 
 char* _cstr_init(cstr* self, const isize len, const isize cap) {
@@ -82,14 +82,14 @@ char* cstr_reserve(cstr* self, const isize cap) {
 }
 
 char* cstr_resize(cstr* self, const isize size, const char value) {
-    cstr_view r = cstr_getview(self);
-    if (size > r.size) {
-        if (size > r.cap && (r.data = cstr_reserve(self, size)) == NULL)
+    cstr_buf b = cstr_getbuf(self);
+    if (size > b.size) {
+        if (size > b.cap && (b.data = cstr_reserve(self, size)) == NULL)
             return NULL;
-        c_memset(r.data + r.size, value, size - r.size);
+        c_memset(b.data + b.size, value, size - b.size);
     }
     _cstr_set_size(self, size);
-    return r.data;
+    return b.data;
 }
 
 isize cstr_find_at(const cstr* self, const isize pos, const char* search) {
@@ -106,16 +106,16 @@ char* cstr_assign_n(cstr* self, const char* str, const isize len) {
 }
 
 char* cstr_append_n(cstr* self, const char* str, const isize len) {
-    cstr_view r = cstr_getview(self);
-    if (r.size + len > r.cap) {
-        const size_t off = (size_t)(str - r.data);
-        r.data = cstr_reserve(self, r.size*3/2 + len);
-        if (r.data == NULL) return NULL;
-        if (off <= (size_t)r.size) str = r.data + off; /* handle self append */
+    cstr_buf b = cstr_getbuf(self);
+    if (b.size + len > b.cap) {
+        const size_t off = (size_t)(str - b.data);
+        b.data = cstr_reserve(self, b.size*3/2 + len);
+        if (b.data == NULL) return NULL;
+        if (off <= (size_t)b.size) str = b.data + off; /* handle self append */
     }
-    c_memcpy(r.data + r.size, str, len);
-    _cstr_set_size(self, r.size + len);
-    return r.data;
+    c_memcpy(b.data + b.size, str, len);
+    _cstr_set_size(self, b.size + len);
+    return b.data;
 }
 
 cstr cstr_from_replace(csview in, csview search, csview repl, int32_t count) {
@@ -134,23 +134,23 @@ cstr cstr_from_replace(csview in, csview search, csview repl, int32_t count) {
 }
 
 void cstr_erase(cstr* self, const isize pos, isize len) {
-    cstr_view r = cstr_getview(self);
-    if (len > r.size - pos) len = r.size - pos;
-    c_memmove(&r.data[pos], &r.data[pos + len], r.size - (pos + len));
-    _cstr_set_size(self, r.size - len);
+    cstr_buf b = cstr_getbuf(self);
+    if (len > b.size - pos) len = b.size - pos;
+    c_memmove(&b.data[pos], &b.data[pos + len], b.size - (pos + len));
+    _cstr_set_size(self, b.size - len);
 }
 
 void cstr_shrink_to_fit(cstr* self) {
-    cstr_view r = cstr_getview(self);
-    if (r.size == r.cap)
+    cstr_buf b = cstr_getbuf(self);
+    if (b.size == b.cap)
         return;
-    if (r.size > cstr_s_cap) {
-        self->lon.data = (char *)i_realloc(self->lon.data, cstr_l_cap(self) + 1, r.size + 1);
-        cstr_l_set_cap(self, r.size);
-    } else if (r.cap > cstr_s_cap) {
-        c_memcpy(self->sml.data, r.data, r.size + 1);
-        cstr_s_set_size(self, r.size);
-        i_free(r.data, r.cap + 1);
+    if (b.size > cstr_s_cap) {
+        self->lon.data = (char *)i_realloc(self->lon.data, cstr_l_cap(self) + 1, b.size + 1);
+        cstr_l_set_cap(self, b.size);
+    } else if (b.cap > cstr_s_cap) {
+        c_memcpy(self->sml.data, b.data, b.size + 1);
+        cstr_s_set_size(self, b.size);
+        i_free(b.data, b.cap + 1);
     }
 }
 #endif // STC_CSTR_CORE_C_INCLUDED
@@ -163,11 +163,11 @@ void cstr_shrink_to_fit(cstr* self) {
 #include <stdarg.h>
 
 char* cstr_append_uninit(cstr *self, isize len) {
-    cstr_view r = cstr_getview(self);
-    if (r.size + len > r.cap && (r.data = cstr_reserve(self, r.size*3/2 + len)) == NULL)
+    cstr_buf b = cstr_getbuf(self);
+    if (b.size + len > b.cap && (b.data = cstr_reserve(self, b.size*3/2 + len)) == NULL)
         return NULL;
-    _cstr_set_size(self, r.size + len);
-    return r.data + r.size;
+    _cstr_set_size(self, b.size + len);
+    return b.data + b.size;
 }
 
 bool cstr_getdelim(cstr *self, const int delim, FILE *fp) {
@@ -175,17 +175,18 @@ bool cstr_getdelim(cstr *self, const int delim, FILE *fp) {
     if (c == EOF)
         return false;
     isize pos = 0;
-    cstr_view r = cstr_getview(self);
+    cstr_buf b = cstr_getbuf(self);
     for (;;) {
         if (c == delim || c == EOF) {
             _cstr_set_size(self, pos);
             return true;
         }
-        if (pos == r.cap) {
+        if (pos == b.cap) {
             _cstr_set_size(self, pos);
-            r.data = cstr_reserve(self, (r.cap = r.cap*3/2 + 16));
+            char* data = cstr_reserve(self, (b.cap = b.cap*3/2 + 16));
+            b.data = data;
         }
-        r.data[pos++] = (char) c;
+        b.data[pos++] = (char) c;
         c = fgetc(fp);
     }
 }
@@ -235,10 +236,10 @@ isize cstr_printf(cstr* self, const char* fmt, ...) {
 #include <ctype.h>
 
 void cstr_u8_erase(cstr* self, const isize u8pos, const isize u8len) {
-    csview r = cstr_sv(self);
-    csview span = utf8_subview(r.buf, u8pos, u8len);
-    c_memmove((void *)&span.buf[0], &span.buf[span.size], r.size - span.size - (span.buf - r.buf));
-    _cstr_set_size(self, r.size - span.size);
+    csview b = cstr_sv(self);
+    csview span = utf8_subview(b.buf, u8pos, u8len);
+    c_memmove((void *)&span.buf[0], &span.buf[span.size], b.size - span.size - (span.buf - b.buf));
+    _cstr_set_size(self, b.size - span.size);
 }
 
 bool cstr_u8_valid(const cstr* self)

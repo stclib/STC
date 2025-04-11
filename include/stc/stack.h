@@ -174,10 +174,10 @@ STC_INLINE Self _c_MEMB(_from_n)(const _m_raw* raw, isize n)
     { Self cx = {0}; _c_MEMB(_put_n)(&cx, raw, n); return cx; }
 
 STC_INLINE const _m_value* _c_MEMB(_at)(const Self* self, isize idx)
-    { c_assert(idx < self->size); return self->data + idx; }
+    { c_assert(c_uless(idx, self->size)); return self->data + idx; }
 
 STC_INLINE _m_value* _c_MEMB(_at_mut)(Self* self, isize idx)
-    { c_assert(idx < self->size); return self->data + idx; }
+    { c_assert(c_uless(idx, self->size)); return self->data + idx; }
 
 #if !defined i_no_emplace
 STC_INLINE _m_value* _c_MEMB(_emplace)(Self* self, _m_raw raw)
