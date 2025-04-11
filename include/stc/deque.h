@@ -193,7 +193,7 @@ _c_MEMB(_emplace_n)(Self* self, const isize idx, const _m_raw* raw, const isize 
 STC_DEF _m_iter
 _c_MEMB(_find_in)(const Self* self, _m_iter i1, _m_iter i2, _m_raw raw) {
     (void)self;
-    for (; i1.pos != i2.pos; _c_MEMB(_next)(&i1)) {
+    for (; i1.ref != i2.ref; _c_MEMB(_next)(&i1)) {
         const _m_raw r = i_keytoraw(i1.ref);
         if (i_eq((&raw), (&r)))
             break;

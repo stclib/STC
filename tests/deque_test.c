@@ -27,6 +27,8 @@ TEST(deque, basics) {
 
     IDeq res3 = c_make(IDeq, {6, 7, 8, 9, 10, 11, 12, 200, 300, 400, 500, 60, 70, 80});
     EXPECT_TRUE(IDeq_eq(&res3, &d));
+    EXPECT_EQ(*IDeq_find(&res3, 400).ref, 400);
+    EXPECT_NULL(IDeq_find(&res3, 401).ref);
 
     EXPECT_EQ(14, IDeq_size(&d));
     EXPECT_EQ(200, *IDeq_at(&d, 7));
