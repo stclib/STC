@@ -413,8 +413,8 @@ typedef struct { ptrdiff_t count; } cco_semaphore;
       #define _c_LINKC __declspec(dllimport)
     #endif
     struct _FILETIME;
-    _c_LINKC void GetSystemTimeAsFileTime(struct _FILETIME*);
-    _c_LINKC void Sleep(unsigned long);
+    _c_LINKC void __stdcall GetSystemTimeAsFileTime(struct _FILETIME*);
+    _c_LINKC void __stdcall Sleep(unsigned long);
 
     static inline double cco_time(void) { /* seconds since epoch */
         unsigned long long quad;          /* 64-bit value representing 1/10th usecs since Jan 1 1601, 00:00 UTC */
