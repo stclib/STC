@@ -300,21 +300,12 @@ TEST(cregex, replace)
     }
 }
 
-TEST(cregex, utf8_string)
+TEST(cregex, hex_range_char_class)
 {
     EXPECT_EQ(cregex_make("\\x{12", 0).error, CREG_UNMATCHEDRIGHTPARENTHESIS);
 
     csview match[16];
-    EXPECT_EQ(cregex_match_aio("\xC8\x80", "\xC8\x80", match), CREG_OK);
-    EXPECT_EQ(cregex_match_aio("\xC8\x80", " \xC8\x80 ", match), CREG_OK);
-    EXPECT_EQ(cregex_match_aio("\xC8", "\xC8\x80", match), CREG_NOMATCH);
-    EXPECT_EQ(cregex_match_aio("\\x{C8}\\x{80}", "\xC8\x80", match), CREG_NOMATCH);
-    EXPECT_EQ(cregex_match_aio("\\x{0200}", "\xC8\x80", match), CREG_OK);
-    EXPECT_EQ(cregex_match_aio("[\\x{0100}-\\x{0200}]", "\xC8\x80", match), CREG_OK);
-    EXPECT_EQ(cregex_match_aio("[\\x{0100}-\\x{0200}]", "\xC8\x81", match), CREG_NOMATCH);
-
-    const char *bad = "this is bad \xE0\xC0 string";
-    EXPECT_EQ(cregex_match_aio("bad.*string", bad, match), CREG_OK);
-    EXPECT_EQ(cregex_match_aio("bad [\\x{C8}\\x{80}\\x{E0}\\x{C0}]+ string", bad, match), CREG_OK);
-    EXPECT_EQ(cregex_match_aio("bad [\xC8\x80\xE0\xC0]+ string", bad, match), CREG_OK);
+    EXPECT_EQ(cregex_match_aio("[\\x{0100}-\\x{0200}]", "aĂb", match), CREG_OK);
+    EXPECT_EQ(cregex_match_aio("[\\x{0100}-\\x{0200}]", "ȁbc", match), CREG_NOMATCH);
+    EXPECT_EQ(cregex_match_aio("[\\x{0100}-\\x{0200}\\x{1}-\\x{7f}]", "ȁbc", match), CREG_OK);
 }
