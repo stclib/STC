@@ -1,5 +1,6 @@
 # Folders
 stuff/*
+build_*/
 
 # Prerequisites
 *.d

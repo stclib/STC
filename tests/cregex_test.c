@@ -299,3 +299,13 @@ TEST(cregex, replace)
         EXPECT_STREQ(cstr_str(&str), "31.12.2015;28.02.2022;");
     }
 }
+
+TEST(cregex, hex_range_char_class)
+{
+    EXPECT_EQ(cregex_make("\\x{12", 0).error, CREG_UNMATCHEDRIGHTPARENTHESIS);
+
+    csview match[16];
+    EXPECT_EQ(cregex_match_aio("[\\x{0100}-\\x{0200}]", "aĂb", match), CREG_OK);
+    EXPECT_EQ(cregex_match_aio("[\\x{0100}-\\x{0200}]", "ȁbc", match), CREG_NOMATCH);
+    EXPECT_EQ(cregex_match_aio("[\\x{0100}-\\x{0200}\\x{1}-\\x{7f}]", "ȁbc", match), CREG_OK);
+}
