@@ -559,10 +559,10 @@ _optimize(_Parser *par, _Reprog *pp)
     if ((par->freep - pp->firstinst)*2 > par->instcap)
         return pp;
 
-    isize ipp = (isize)pp; // convert pointer to isize!
+    intptr_t ipp = (intptr_t)pp; // convert pointer to integer!
     isize new_allocsize = c_sizeof(_Reprog) + (par->freep - pp->firstinst)*c_sizeof(_Reinst);
     _Reprog *npp = (_Reprog *)i_realloc(pp, pp->allocsize, new_allocsize);
-    ptrdiff_t diff = (isize)npp - ipp;
+    isize diff = (intptr_t)npp - ipp;
 
     if ((npp == NULL) | (diff == 0))
         return (_Reprog *)ipp;
@@ -1230,40 +1230,39 @@ _regexec(const _Reprog *progp,    /* program to run */
 
 
 static void
-_build_subst(const char* replace, int nmatch, const csview match[],
-             bool(*transform)(int, csview, cstr*), cstr* subst) {
-    cstr_buf buf = cstr_getbuf(subst);
-    isize len = 0, cap = buf.cap;
-    char* dst = buf.data;
-    cstr mstr = {0};
+_build_substitution(const char* replace, int nmatch, const csview match[],
+                    bool(*transform)(int, csview, cstr*), cstr* subst) {
+    cstr_buf mbuf = cstr_getbuf(subst);
+    isize len = 0, cap = mbuf.cap;
+    char* dst = mbuf.data;
+    cstr tr_str = {0};
 
     while (*replace != '\0') {
         if (*replace == '$') {
-            const int arg = *++replace;
-            int g;
-            switch (arg) {
-            case '0': case '1': case '2': case '3': case '4':
-            case '5': case '6': case '7': case '8': case '9':
-                g = arg - '0';
-                if (replace[1] >= '0' && replace[1] <= '9' && replace[2] == ';')
-                    { g = g*10 + (replace[1] - '0'); replace += 2; }
-                if (g < nmatch) {
-                    csview m = transform && transform(g, match[g], &mstr) ? cstr_sv(&mstr) : match[g];
-                    if (len + m.size > cap)
-                        dst = cstr_reserve(subst, cap += cap/2 + m.size);
-                    for (int i = 0; i < m.size; ++i)
-                        dst[len++] = m.buf[i];
+            int arg = replace[1];
+            if (arg >= '0' && arg <= '9') {
+                arg -= '0';
+                if (replace[2] >= '0' && replace[2] <= '9' && replace[3] == ';')
+                    { arg = arg*10 + (replace[2] - '0'); replace += 2; }
+                replace += 2;
+                if (arg < nmatch) {
+                    csview tr_sv = transform && transform(arg, match[arg], &tr_str)
+                                 ? cstr_sv(&tr_str) : match[arg];
+                    if (len + tr_sv.size > cap)
+                        dst = cstr_reserve(subst, cap += cap/2 + tr_sv.size);
+                    for (int i = 0; i < tr_sv.size; ++i)
+                        dst[len++] = tr_sv.buf[i];
                 }
-                ++replace;
-            case '\0':
                 continue;
             }
+            if (arg == '$') // allow e.g. "$$3" => "$3"
+                ++replace;
         }
         if (len == cap)
             dst = cstr_reserve(subst, cap += cap/2 + 4);
         dst[len++] = *replace++;
     }
-    cstr_drop(&mstr);
+    cstr_drop(&tr_str);
     _cstr_set_size(subst, len);
 }
 
@@ -1313,7 +1312,7 @@ cregex_replace_pro(const cregex* re, csview input, const char* replace,
     bool copy = !(rflags & CREG_STRIP);
 
     while (count-- && cregex_match_sv(re, input, match) == CREG_OK) {
-        _build_subst(replace, nmatch, match, transform, &subst);
+        _build_substitution(replace, nmatch, match, transform, &subst);
         const isize mpos = (match[0].buf - input.buf);
         if (copy & (mpos > 0)) cstr_append_n(&out, input.buf, mpos);
         cstr_append_s(&out, subst);

@@ -2,8 +2,8 @@
 #include "stc/cstr.h"
 #include "stc/csview.h"
 
-bool add_10_years(int i, csview match, cstr* out) {
-    if (i == 1) { // group 1 matches year
+bool add_10_years(int group, csview match, cstr* out) {
+    if (group == 1) { // year match
         int year;
         sscanf(match.buf, "%4d", &year); // scan 4 chars only
         cstr_printf(out, "%04d", year + 10);

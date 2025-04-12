@@ -7,8 +7,8 @@ int main(void)
     const csview date = c_sv("2021/03/12");
     isize pos = 0;
     const csview year = csview_token(date, "/", &pos);
-    const csview month = csview_token(date, "/", &pos);
     const csview day = csview_token(date, "/", &pos);
+    const csview month = csview_token(date, "/", &pos);
 
     printf(c_svfmt ", " c_svfmt ", " c_svfmt "\n",
            c_svarg(year), c_svarg(month), c_svarg(day));
