@@ -78,8 +78,8 @@ typedef ptrdiff_t       isize;
 #define _i_malloc(T, n)     ((T*)i_malloc((n)*c_sizeof(T)))
 #define _i_calloc(T, n)     ((T*)i_calloc((n), c_sizeof(T)))
 #ifndef __cplusplus
-    #define c_new(T, ...)       ((T*)memcpy(malloc(sizeof(T)), ((T[]){__VA_ARGS__}), sizeof(T)))
-    #define c_literal(T)        (T)
+    #define c_new(T, ...)   ((T*)c_safe_memcpy(malloc(sizeof(T)), ((T[]){__VA_ARGS__}), c_sizeof(T)))
+    #define c_literal(T)    (T)
     #define c_make_array(T, ...) ((T[])__VA_ARGS__)
     #define c_make_array2d(T, N, ...) ((T[][N])__VA_ARGS__)
 #else
@@ -245,6 +245,9 @@ typedef const char* cstr_raw;
     for (int _c_i5 = 0; _c_i5 == 0; ) for (init; _c_i5++ == 0 && (condition); deinit)
 
 // General functions
+
+STC_INLINE void* c_safe_memcpy(void* dst, const void* src, isize size)
+    { return dst ? memcpy(dst, src, (size_t)size) : NULL; }
 
 STC_INLINE size_t c_basehash_n(const void* key, isize len) {
     size_t block = 0, hash = 0x811c9dc5;
