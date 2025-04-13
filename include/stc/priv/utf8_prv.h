@@ -98,11 +98,11 @@ STC_INLINE bool utf8_islower(uint32_t c)
 
 
 /* decode next utf8 codepoint. https://bjoern.hoehrmann.de/utf-8/decoder/dfa */
-typedef struct { uint32_t state, codep; } utf8_decode_t;
-extern const uint8_t utf8_dtab[]; /* utf8code.c */
+typedef struct { int32_t state; uint32_t codep; } utf8_decode_t;
+extern const int8_t utf8_dtab[]; /* utf8code.c */
 
-STC_INLINE uint32_t utf8_decode(utf8_decode_t* d, const uint32_t byte) {
-    const uint32_t type = utf8_dtab[byte];
+STC_INLINE int32_t utf8_decode(utf8_decode_t* d, const uint32_t byte) {
+    const int32_t type = utf8_dtab[byte];
     d->codep = d->state ? (byte & 0x3fu) | (d->codep << 6)
                         : (0xffU >> type) & byte;
     return d->state = utf8_dtab[256 + d->state + type];
@@ -110,7 +110,7 @@ STC_INLINE uint32_t utf8_decode(utf8_decode_t* d, const uint32_t byte) {
 
 STC_INLINE uint32_t utf8_peek(const char* s) {
     utf8_decode_t d = {.state=0};
-    do { utf8_decode(&d, (uint8_t)*s++); } while (d.state);
+    do { utf8_decode(&d, (uint8_t)*s++); } while (d.state > 0);
     return d.codep;
 }
 

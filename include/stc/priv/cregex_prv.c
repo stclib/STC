@@ -210,9 +210,17 @@ chartorune(_Rune *rune, const char *s)
 {
     utf8_decode_t ctx = {.state=0};
     const uint8_t *b = (const uint8_t*)s;
-    do { utf8_decode(&ctx, *b++); } while (ctx.state);
-    *rune = ctx.codep;
-    return (int)((const char*)b - s);
+    do { utf8_decode(&ctx, *b++); } while (ctx.state > 0);
+    return ctx.state == -1 ?
+        (*rune = 0xFFFD, 1) : (*rune = ctx.codep, (int)((const char*)b - s));
+}
+
+static uint32_t
+runepeek(const char *s)
+{
+    _Rune r;
+    chartorune(&r, s);
+    return r;
 }
 
 static const char*
@@ -1009,7 +1017,7 @@ _regexec1(const _Reprog *progp,  /* program to run */
     _Relist *tl, *nl;    /* This list, next list */
     _Relist *tle, *nle;  /* Ends of this and next list */
     const char *s, *p;
-    _Rune r, *rp, *ep;
+    _Rune r, *rp, *ep, prevr = 0xFFFD;
     int n, checkstart, match = 0;
     int i;
 
@@ -1106,8 +1114,8 @@ _regexec1(const _Reprog *progp,  /* program to run */
                 case TOK_NWBOUND:
                     ok = true; /* FALLTHRU */
                 case TOK_WBOUND:
-                    if (ok ^ (s == bol || s == j->eol || (utf8_isword(utf8_peek_at(s, -1))
-                                                        ^ utf8_isword(utf8_peek(s)))))
+                    if (ok ^ (s == bol || s == j->eol || (utf8_isword(prevr)
+                                                        ^ utf8_isword(runepeek(s)))))
                         continue;
                     break;
                 case TOK_NCCLASS:
@@ -1146,6 +1154,7 @@ _regexec1(const _Reprog *progp,  /* program to run */
             break;
         checkstart = j->starttype && nl->inst==NULL;
         s += n;
+        prevr = r;
     } while (r);
     return match;
 }
