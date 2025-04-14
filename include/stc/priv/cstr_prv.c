@@ -265,7 +265,7 @@ cstr cstr_tocase_sv(csview sv, int k) {
     utf8_decode_t d = {.state=0};
 
     while (sv.buf < end) {
-        do { utf8_decode(&d, (uint8_t)*sv.buf++); } while (d.state > 0);
+        do { utf8_decode(&d, (uint8_t)*sv.buf++); } while (d.state);
         if (d.codep < 128)
             buf[sz++] = (char)fn_tocase[k].conv_asc((int)d.codep);
         else {
