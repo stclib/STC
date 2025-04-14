@@ -82,8 +82,15 @@ STC_INLINE csview utf8_subview(const char *s, isize u8pos, isize u8len) {
 // To call them, either define i_import before including
 // one of cstr, csview, zsview, or link with src/libstc.o.
 
+/* decode next utf8 codepoint. https://bjoern.hoehrmann.de/utf-8/decoder/dfa */
+typedef struct { uint32_t state, codep; } utf8_decode_t;
+#define utf8_ACCEPT 0
+#define utf8_REJECT 12
+extern const uint8_t utf8_dtab[]; /* utf8code.c */
+
 extern bool     utf8_valid_n(const char* s, isize nbytes);
 extern int      utf8_encode(char *out, uint32_t c);
+extern int      utf8_decode_codepoint(utf8_decode_t* d, const char* s, const char* end);
 extern int      utf8_icompare(const csview s1, const csview s2);
 extern uint32_t utf8_peek_at(const char* s, isize u8offset);
 extern uint32_t utf8_casefold(uint32_t c);
@@ -96,11 +103,6 @@ STC_INLINE bool utf8_isupper(uint32_t c)
 STC_INLINE bool utf8_islower(uint32_t c)
     { return utf8_toupper(c) != c; }
 
-
-/* decode next utf8 codepoint. https://bjoern.hoehrmann.de/utf-8/decoder/dfa */
-typedef struct { uint32_t state, codep; } utf8_decode_t;
-extern const uint8_t utf8_dtab[]; /* utf8code.c */
-
 STC_INLINE uint32_t utf8_decode(utf8_decode_t* d, const uint32_t byte) {
     const uint32_t type = utf8_dtab[byte];
     d->codep = d->state ? (byte & 0x3fu) | (d->codep << 6)
@@ -110,8 +112,10 @@ STC_INLINE uint32_t utf8_decode(utf8_decode_t* d, const uint32_t byte) {
 
 STC_INLINE uint32_t utf8_peek(const char* s) {
     utf8_decode_t d = {.state=0};
-    do { utf8_decode(&d, (uint8_t)*s++); } while (d.state);
-    return d.codep;
+    do {
+        utf8_decode(&d, (uint8_t)*s++);
+    } while (d.state > utf8_REJECT);
+    return d.state == utf8_ACCEPT ? d.codep : 0xFFFD;
 }
 
 /* case-insensitive utf8 string comparison */
@@ -120,7 +124,9 @@ STC_INLINE int utf8_icmp(const char* s1, const char* s2) {
 }
 
 STC_INLINE bool utf8_valid(const char* s) {
-    return utf8_valid_n(s, INTPTR_MAX);
+    utf8_decode_t d = {.state=0};
+    while (utf8_decode(&d, (uint8_t)*s++) > utf8_REJECT) ;
+    return d.state == utf8_ACCEPT;
 }
 
 #endif // STC_UTF8_PRV_H_INCLUDED

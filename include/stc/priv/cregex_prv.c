@@ -208,39 +208,42 @@ typedef struct _Reljunk
 static int
 chartorune(_Rune *rune, const char *s)
 {
-    utf8_decode_t ctx = {.state=0};
-    const uint8_t *b = (const uint8_t*)s;
-    do { utf8_decode(&ctx, *b++); } while (ctx.state);
-    *rune = ctx.codep;
-    return (int)((const char*)b - s);
+    utf8_decode_t d = {.state=0};
+    int n = utf8_decode_codepoint(&d, s, NULL); // never hit end
+    *rune = d.codep;
+    return n;
 }
 
 static const char*
-utfrune(const char *s, _Rune c)
+utfrune(const char *s, _Rune c) // search
 {
-    if (c < 128)        /* ascii */
+    if (c < 0x80)        /* ascii */
         return strchr((char *)s, (int)c);
-    int n;
-    for (_Rune r = (uint32_t)*s; r; s += n, r = *(unsigned char*)s) {
-        if (r < 128) { n = 1; continue; }
-        n = chartorune(&r, s);
-        if (r == c) return s;
+
+    utf8_decode_t d = {.state=0};
+    while (*s != 0) {
+        int n = utf8_decode_codepoint(&d, s, NULL);
+        if (d.codep == c) return s;
+        s += n;
     }
     return NULL;
 }
 
 static const char*
-utfruneicase(const char *s, _Rune c)
-{
-    _Rune r = (uint32_t)*s;
-    int n;
-    if (c < 128) for (c = (_Rune)tolower((int)c); r; ++s, r = *(unsigned char*)s) {
-        if (r < 128 && (_Rune)tolower((int)r) == c) return s;
-    }
-    else for (c = utf8_casefold(c); r; s += n, r = *(unsigned char*)s) {
-        if (r < 128) { n = 1; continue; }
-        n = chartorune(&r, s);
-        if (utf8_casefold(r) == c) return s;
+utfruneicase(const char *s, _Rune c) {
+    if (c < 0x80) {
+        for (int low = tolower((int)c); *s != 0; ++s)
+            if ((_Rune)*s < 0x80 && tolower(*s) == low)
+                return s;
+    } else {
+        utf8_decode_t d = {.state=0};
+        c = utf8_casefold(c);
+        while (*s != 0) {
+            int n = utf8_decode_codepoint(&d, s, NULL);
+            if (utf8_casefold(d.codep) == c)
+                return s;
+            s += n;
+        }
     }
     return NULL;
 }

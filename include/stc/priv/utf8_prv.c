@@ -66,14 +66,15 @@ int utf8_encode(char *out, uint32_t c) {
     return 0;
 }
 
-uint32_t utf8_peek_at(const char* s, isize offset)
-    { return utf8_peek(utf8_offset(s, offset)); }
+uint32_t utf8_peek_at(const char* s, isize offset) {
+    return utf8_peek(utf8_offset(s, offset));
+}
 
 bool utf8_valid_n(const char* s, isize nbytes) {
     utf8_decode_t d = {.state=0};
-    while ((nbytes-- != 0) & (*s != 0))
-        utf8_decode(&d, (uint8_t)*s++);
-    return d.state == 0;
+    while (nbytes-- > 0 && utf8_decode(&d, (uint8_t)*s++) > utf8_REJECT)
+        ;
+    return d.state == utf8_ACCEPT;
 }
 
 uint32_t utf8_casefold(uint32_t c) {
@@ -115,12 +116,28 @@ uint32_t utf8_toupper(uint32_t c) {
     return c;
 }
 
+int utf8_decode_codepoint(utf8_decode_t* d, const char* s, const char* end) { // n >= 1
+    const char* start = s;
+    do switch (utf8_decode(d, (uint8_t)*s++)) {
+        case utf8_ACCEPT: return (int)(s - start);
+        case utf8_REJECT: goto recover;
+    } while (s != end);
+
+    recover: // non-complete utf8 is also treated as utf8_REJECT
+    d->state = utf8_ACCEPT;
+    d->codep = 0xFFFD;
+    int n = (int)(s - start);
+    return n >= 2 ? n - 1 : 1;
+}
+
 int utf8_icompare(const csview s1, const csview s2) {
     utf8_decode_t d1 = {.state=0}, d2 = {.state=0};
+    const char *e1 = s1.buf + s1.size, *e2 = s2.buf + s2.size;
     isize j1 = 0, j2 = 0;
     while ((j1 < s1.size) & (j2 < s2.size)) {
-        do { utf8_decode(&d1, (uint8_t)s1.buf[j1++]); } while (d1.state);
-        do { utf8_decode(&d2, (uint8_t)s2.buf[j2++]); } while (d2.state);
+        j1 += utf8_decode_codepoint(&d1, s1.buf + j1, e1);
+        j2 += utf8_decode_codepoint(&d2, s2.buf + j2, e2);
+
         int32_t c = (int32_t)utf8_casefold(d1.codep) - (int32_t)utf8_casefold(d2.codep);
         if (c || !s2.buf[j2 - 1]) // OK if s1.size and s2.size are npos
             return (int)c;
