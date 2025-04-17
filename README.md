@@ -3,7 +3,7 @@
 
 # STC - Smart Template Containers
 
-## Version 5.0.2 RC
+## Version 5.1 RC1
 STC is a comprehensive, high performance, typesafe and generic general purpose container and algorithms
 library for C99 with excellent ergonomics and ease of use.
 
@@ -22,6 +22,7 @@ library for C99 with excellent ergonomics and ease of use.
 - Template parameters `i_keypro` and `i_valpro` to specify `cstr`, `box` and `arc` types (users may also define pro-types).
 - **hmap** now uses *Robin Hood hashing* (very fast on clang compiler).
 - Several new algorithms added, e.g. `c_filter` (ranges-like), `c_shuffle`, `c_reverse`.
+- Updated **cregex** to handle invalid utf8 strings and fixed bugs.
 - A lot of improvements and bug fixes.
 
 See also [version history](#version-history) for breaking changes in V5.0.

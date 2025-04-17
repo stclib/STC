@@ -157,7 +157,7 @@ using_cspan_tuple(7); using_cspan_tuple(8);
      .stride=c_literal(cspan_tuple1){.d={1}}}
 
 // Make a fixed size, zeroed out 1d-span (in the local lexical scope).
-#define cspan_make_zeros(Span, FIXED_N) \
+#define cspan_zeros(Span, FIXED_N) \
     cspan_from_n((Span##_value[FIXED_N]){0}, FIXED_N)
 
 // May make a global scope 1d-span from initializer list, else like c_make(Span, ...).

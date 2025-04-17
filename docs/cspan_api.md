@@ -41,7 +41,7 @@ a compile error is issued. Runtime bounds checks are enabled by default (define 
 ```c++
 SpanType        c_make(<SpanType>, {v1, v2, ...});                  // make a local 1-d cspan from values (stack memory)
 SpanType        cspan_make(<SpanType>, {v1, v2, ...});              // make a local 1-d cspan  (stack/global memory)
-SpanType        cspan_make_zeros(<SpanType>, N);                    // make a local 1-d fixed size cspan (stack memory)
+SpanType        cspan_zeros(<SpanType>, N);                         // make a local 1-d fixed size cspan (stack memory)
 SpanType        cspan_from_n(ValueType* ptr, int32 n);              // create a 1-d cspan from a pointer and length
 SpanType        cspan_from_array(ValueType array[]);                // create a 1-d cspan from a C array
 SpanType        cspan_from_vec(<VecType>* cnt);                     // create a 1-d cspan from a vec or stack
