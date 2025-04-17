@@ -210,9 +210,12 @@ chartorune(_Rune *rune, const char *s)
 {
     utf8_decode_t ctx = {.state=0};
     const uint8_t *b = (const uint8_t*)s;
-    do { utf8_decode(&ctx, *b++); } while (ctx.state);
-    *rune = ctx.codep;
-    return (int)((const char*)b - s);
+    do { utf8_decode(&ctx, *b++); } while (ctx.state > UTF8_REJECT);
+    switch (ctx.state) {
+    case UTF8_ACCEPT: *rune = ctx.codep; return (int)((const char*)b - s);
+    case UTF8_REJECT: *rune = 0xFFFD; return 1;
+    default: return 0; // unreachable
+    }
 }
 
 static const char*

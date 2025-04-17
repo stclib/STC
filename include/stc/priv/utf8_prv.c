@@ -119,8 +119,8 @@ int utf8_icompare(const csview s1, const csview s2) {
     utf8_decode_t d1 = {.state=0}, d2 = {.state=0};
     isize j1 = 0, j2 = 0;
     while ((j1 < s1.size) & (j2 < s2.size)) {
-        do { utf8_decode(&d1, (uint8_t)s1.buf[j1++]); } while (d1.state);
-        do { utf8_decode(&d2, (uint8_t)s2.buf[j2++]); } while (d2.state);
+        do { utf8_decode(&d1, (uint8_t)s1.buf[j1++]); } while (d1.state > UTF8_REJECT);
+        do { utf8_decode(&d2, (uint8_t)s2.buf[j2++]); } while (d2.state > UTF8_REJECT);
         int32_t c = (int32_t)utf8_casefold(d1.codep) - (int32_t)utf8_casefold(d2.codep);
         if (c || !s2.buf[j2 - 1]) // OK if s1.size and s2.size are npos
             return (int)c;

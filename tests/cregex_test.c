@@ -309,3 +309,16 @@ TEST(cregex, hex_range_char_class)
     EXPECT_EQ(cregex_match_aio("[\\x{0100}-\\x{0200}]", "ȁbc", match), CREG_NOMATCH);
     EXPECT_EQ(cregex_match_aio("[\\x{0100}-\\x{0200}\\x{1}-\\x{7f}]", "ȁbc", match), CREG_OK);
 }
+
+TEST(cregex, utf8_bad_string)
+{
+    csview match[16];
+    const char *bad = "this is bad \xE0\xC0string";
+    EXPECT_EQ(cregex_match_aio("bad.*string", bad, match), CREG_OK);
+    EXPECT_EQ(cregex_match_aio("bad [\\x{FFFD}]+string", bad, match), CREG_OK);
+    EXPECT_EQ(cregex_match_aio("bad [\xC8\x80\xE0\xC0]+string", bad, match), CREG_OK);
+    EXPECT_EQ(cregex_match_aio("\\bstring", bad, match), CREG_OK);
+    EXPECT_EQ(cregex_match_aio("\\wstring", bad, match), CREG_NOMATCH);
+    bad = "\xE0\xC0string";
+    EXPECT_EQ(cregex_match_aio("\\x{FFFD}\\bstring", bad, match), CREG_OK);
+}
