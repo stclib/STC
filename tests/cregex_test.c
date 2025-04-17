@@ -3,6 +3,7 @@
 #include "stc/csview.h"
 #include "stc/algorithm.h"
 #include "ctest.h"
+#include <string.h>
 
 #define M_START(m) ((m).buf - input)
 #define M_END(m) (M_START(m) + (m).size)
@@ -319,6 +320,8 @@ TEST(cregex, utf8_bad_string)
     EXPECT_EQ(cregex_match_aio("bad [\xC8\x80\xE0\xC0]+string", bad, match), CREG_OK);
     EXPECT_EQ(cregex_match_aio("\\bstring", bad, match), CREG_OK);
     EXPECT_EQ(cregex_match_aio("\\wstring", bad, match), CREG_NOMATCH);
-    bad = "\xE0\xC0string";
     EXPECT_EQ(cregex_match_aio("\\x{FFFD}\\bstring", bad, match), CREG_OK);
+
+    EXPECT_EQ(0, utf8_icmp(bad, "tHiS iS bAd ��StRiNg"));
+    EXPECT_EQ(0, utf8_icmp("tHiS iS bAd ��StRiNg", bad));
 }

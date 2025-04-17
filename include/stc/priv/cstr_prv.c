@@ -260,16 +260,17 @@ fn_tocase[] = {{toLower, utf8_casefold},
 cstr cstr_tocase_sv(csview sv, int k) {
     cstr out = {0};
     char *buf = cstr_reserve(&out, sv.size*3/2);
-    const char *end = sv.buf + sv.size;
-    uint32_t cp; isize sz = 0;
+    isize sz = 0;
     utf8_decode_t d = {.state=0};
+    const char* end = sv.buf + sv.size;
 
     while (sv.buf < end) {
-        do { utf8_decode(&d, (uint8_t)*sv.buf++); } while (d.state);
-        if (d.codep < 128)
+        sv.buf += utf8_decode_codepoint(&d, sv.buf, end);
+
+        if (d.codep < 0x80)
             buf[sz++] = (char)fn_tocase[k].conv_asc((int)d.codep);
         else {
-            cp = fn_tocase[k].conv_utf(d.codep);
+            uint32_t cp = fn_tocase[k].conv_utf(d.codep);
             sz += utf8_encode(buf + sz, cp);
         }
     }
