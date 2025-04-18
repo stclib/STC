@@ -18,20 +18,20 @@ bool is_prime(long long i) {
 cco_task_struct (prime) {
     prime_state cco;
     int count;
-    long long result;
+    long long value;
 };
 
 int prime(struct prime* g, cco_fiber* fb) {
     (void)fb;
     cco_routine (g) {
-        if (g->result <= 2) {
-            g->result = 2;
+        if (g->value <= 2) {
+            g->value = 2;
             if (g->count-- == 0)
                 cco_return;
             cco_yield_v(YIELD_PRM);
         }
-        for (g->result |= 1; g->count > 0; g->result += 2) {
-            if (is_prime(g->result)) {
+        for (g->value |= 1; g->count > 0; g->value += 2) {
+            if (is_prime(g->value)) {
                 --g->count;
                 cco_yield_v(YIELD_PRM);
             }
@@ -48,21 +48,21 @@ int prime(struct prime* g, cco_fiber* fb) {
 cco_task_struct (fibonacci) {
     fibonacci_state cco;
     int count;
-    long long result, b;
+    long long value, b;
 };
 
 int fibonacci(struct fibonacci* g, cco_fiber* fb) {
     (void)fb;
     assert(g->count < 94);
     cco_routine (g) {
-        if (g->result == 0)
+        if (g->value == 0)
             g->b = 1;
         while (true) {
             if (g->count-- == 0)
                 cco_return;
             // NB! locals lasts only until next yield/await!
-            long long tmp = g->result;
-            g->result = g->b;
+            long long tmp = g->value;
+            g->value = g->b;
             g->b += tmp;
             cco_yield_v(YIELD_FIB);
         }
@@ -81,10 +81,10 @@ int main(void) {
     fib = (struct fibonacci){{fibonacci}, .count=12};
 
     cco_run_task(&prm) {
-        printf("  Prime=%lld\n", prm.result);
+        printf("  Prime=%lld\n", prm.value);
     }
     cco_run_task(&fib) {
-        printf("  Fibon=%lld\n", fib.result);
+        printf("  Fibon=%lld\n", fib.value);
     }
     puts("");
 
@@ -100,10 +100,10 @@ int main(void) {
     cco_run_fiber(run, fb) {
         switch (run->result) {
             case YIELD_PRM:
-                printf("  Prime=%lld\n", prm.result);
+                printf("  Prime=%lld\n", prm.value);
                 break;
             case YIELD_FIB:
-                printf("  Fibon=%lld\n", fib.result);
+                printf("  Fibon=%lld\n", fib.value);
                 break;
         }
     }
