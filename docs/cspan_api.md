@@ -102,12 +102,12 @@ OutSpanM        cspan_slice(const SpanTypeN* self, <OutSpanM>, {x0,x1,xs}, {y0,y
                 //  brackets : optional brackets and comma. Example "{},". Default "[]".
                 //  field    : optional args macro function, must match fmt args.
                 //             e.g.: #define complexfield(x) creal(x), cimag(x)
-                // Examples: cspan_print(Span2, Span2_transpose(sp2)), "%.3f");
-                //           cspan_print(Span2, cspan_submd(Span2, &sp3, 1), "%.3f");
-void            cspan_print(<SpanTypeN>, SpanTypeN span, const char* fmt, FILE* fp = stdout,
+                // Examples: cspan_print(Span2, "%.3f", Span2_transpose(sp2)));
+                //           cspan_print(Span2, "%.3f", (Span2)cspan_submd3(&sp3, 1));
+void            cspan_print(<SpanTypeN>, const char* fmt, SpanTypeN span, FILE* fp = stdout,
                             const char* brackets = "[]", field(x) = x);
                 // Print matrix with complex numbers. num_decimals applies both to real and imag parts.
-void            cspan_print_complex(<SpanTypeN>, SpanTypeN span, int num_decimals, FILE* fp);
+void            cspan_print_complex(<SpanTypeN>, int num_decimals, SpanTypeN span, FILE* fp);
 
 // Member functions
 
@@ -246,13 +246,13 @@ int main(void) {
 
     cspan_print(myspan3, ss3, "%d");
     puts("\nms3[1]:");
-    cspan_print(myspan2, ((myspan2)cspan_submd3(&ms3, 1)), "%d");
+    cspan_print(myspan2, "%d", ((myspan2)cspan_submd3(&ms3, 1)));
 
     puts("\na:");
-    cspan_print(myspan2, a, "%d");
+    cspan_print(myspan2, "%d", a);
 
     puts("b:");
-    cspan_print(myspan2, b, "%d");
+    cspan_print(myspan2, "%d", b);
 
     puts("\na flat:");
     for (c_each(i, myspan2, a))
@@ -283,20 +283,20 @@ int main(void)
 
     // numpy style printout
     puts("span3:");
-    cspan_print(Span3, span3, "%d");
+    cspan_print(Span3, "%d", span3);
 
     puts("\nspan3[:, 3:4, :]:");
     Span3 ss3 = cspan_slice(&span3, Span3, {c_ALL}, {3,4}, {c_ALL});
-    cspan_print(Span3, ss3, "%d");
+    cspan_print(Span3, "%d", ss3);
 
     puts("\nspan3[:, 3, :]:");
     Span2 ss2 = cspan_slice(&span3, Span2, {c_ALL}, {3}, {c_ALL});
-    cspan_print(Span2, ss2, "%d");
+    cspan_print(Span2, "%d", ss2);
 
     puts("\nspan3 swap axes to: [1, 2, 0]");
     Span3 swapped = span3;
     cspan_swap_axes(&swapped, 0, 1);
     cspan_swap_axes(&swapped, 1, 2);
-    cspan_print(Span3, swapped, "%d");
+    cspan_print(Span3, "%d", swapped);
 }
 ```

@@ -276,24 +276,17 @@ typedef enum {c_ROWMAJOR, c_COLMAJOR, c_STRIDED} cspan_layout;
      .stride=c_literal(cspan_tuple1){.d={(self)->stride.d[3]}}}
 
 #define cspan_print(...) c_MACRO_OVERLOAD(cspan_print, __VA_ARGS__)
-#if 0
-#define cspan_print_2(Span, span) /* c11 */ \
-    cspan_print_3(Span, span, _Generic(*(span).data, \
-        float:"%g", double:"%g", \
-        uint8_t:"%d", int8_t:"%d", int16_t:"%d", \
-        int32_t:"%" PRIi32, int64_t:"%" PRIi64))
-#endif
-#define cspan_print_3(Span, span, fmt) \
-    cspan_print_4(Span, span, fmt, stdout)
-#define cspan_print_4(Span, span, fmt, fp) \
-    cspan_print_5(Span, span, fmt, fp, "[]")
-#define cspan_print_5(Span, span, fmt, fp, brackets) \
-    cspan_print_6(Span, span, fmt, fp, brackets, c_EXPAND)
-#define cspan_print_complex(Span, span, prec, fp) \
-    cspan_print_6(Span, span, "%." #prec "f%+." #prec "fi", fp, "[]", cspan_CMPLX_FLD)
+#define cspan_print_3(Span, fmt, span) \
+    cspan_print_4(Span, fmt, span, stdout)
+#define cspan_print_4(Span, fmt, span, fp) \
+    cspan_print_5(Span, fmt, span, fp, "[]")
+#define cspan_print_5(Span, fmt, span, fp, brackets) \
+    cspan_print_6(Span, fmt, span, fp, brackets, c_EXPAND)
+#define cspan_print_complex(Span, prec, span, fp) \
+    cspan_print_6(Span, "%." #prec "f%+." #prec "fi", span, fp, "[]", cspan_CMPLX_FLD)
 #define cspan_CMPLX_FLD(x) creal(x), cimag(x)
 
-#define cspan_print_6(Span, span, fmt, fp, brackets, field) do { \
+#define cspan_print_6(Span, fmt, span, fp, brackets, field) do { \
     const Span _s = span; \
     const char *_f = fmt, *_b = brackets; \
     FILE* _fp = fp; \

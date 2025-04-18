@@ -101,7 +101,7 @@ int main(void) {
     t = clock() - t;
 
     puts("an 8x8 sub-matrix of result c");
-    cspan_print(Mat, cspan_slice(&c, Mat, {12,20}, {12,20}), "%.4f");
+    cspan_print(Mat, "%.4f", cspan_slice(&c, Mat, {12,20}, {12,20}));
 
     puts("checksum and time");
     printf("%.16g: %f ms\n", (double)sum, (double)t*1000.0/CLOCKS_PER_SEC);

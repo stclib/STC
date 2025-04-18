@@ -21,17 +21,17 @@ int main(void) {
     cspan_transpose(&ms);
 
     printf(", transposed:\n\n");
-    cspan_print(DSpan3, ms, "%.2f");
+    cspan_print(DSpan3, "%.2f", ms);
 
     puts("Slicing:");
     printf("ms[0, :, :]\n");
-    cspan_print(DSpan2, cspan_slice(&ms, DSpan2, {0}, {c_ALL}, {c_ALL}), "%g");
+    cspan_print(DSpan2, "%g", cspan_slice(&ms, DSpan2, {0}, {c_ALL}, {c_ALL}));
 
     printf("ms[:, 0, :]\n");
-    cspan_print(DSpan2, cspan_slice(&ms, DSpan2, {c_ALL}, {0}, {c_ALL}), "%g");
+    cspan_print(DSpan2, "%g", cspan_slice(&ms, DSpan2, {c_ALL}, {0}, {c_ALL}));
 
     printf("ms[:, :, 0]\n");
-    cspan_print(DSpan2, cspan_slice(&ms, DSpan2, {c_ALL}, {c_ALL}, {0}), "%g");
+    cspan_print(DSpan2, "%g", cspan_slice(&ms, DSpan2, {c_ALL}, {c_ALL}, {0}));
 
     free(data);
 }

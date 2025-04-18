@@ -34,6 +34,6 @@ int main(void) {
 
   zero_surface(md);
 
-  cspan_print(span3, md, "%.2f");
+  cspan_print(span3, "%.2f", md);
   puts("done");
 }
