@@ -158,12 +158,12 @@ using_cspan_tuple(7); using_cspan_tuple(8);
 
 // Make a fixed size, zeroed out 1d-span (in the local lexical scope).
 #define cspan_zeros(Span, FIXED_N) \
-    cspan_from_n((Span##_value[FIXED_N]){0}, FIXED_N)
+    ((Span)cspan_from_n((Span##_value[FIXED_N]){0}, FIXED_N))
 
 // May make a global scope 1d-span from initializer list, else like c_make(Span, ...).
 #define cspan_make(Span, ...) \
-    cspan_from_n(c_make_array(Span##_value, __VA_ARGS__), \
-                 sizeof((Span##_value[])__VA_ARGS__)/sizeof(Span##_value))
+    ((Span)cspan_from_n(c_make_array(Span##_value, __VA_ARGS__), \
+                 sizeof((Span##_value[])__VA_ARGS__)/sizeof(Span##_value)))
 
 // Make 1d-span from a c-array.
 #define cspan_from_array(array) \
@@ -204,6 +204,8 @@ typedef enum {c_ROWMAJOR, c_COLMAJOR, c_STRIDED} cspan_layout;
 #define cspan_md(dataptr, ...) \
     cspan_md_layout(c_ROWMAJOR, dataptr, __VA_ARGS__)
 
+// Span2 sp1 = cspan_md(data, 30, 50);
+// Span2 sp2 = {data, cspan_shape(15, 25), cspan_strides(50*2, 2)}; // every second in each dim
 #define cspan_shape(...) {__VA_ARGS__}
 #define cspan_strides(...) {.d={__VA_ARGS__}}
 
@@ -360,6 +362,7 @@ STC_API isize _cspan_slice(_istride oshape[], _istride ostride[], int* orank,
                            const isize args[][3], int rank);
 STC_API _istride* _cspan_shape2stride(cspan_layout layout, _istride shape[], int rank);
 STC_API bool _cspan_is_layout(cspan_layout layout, const _istride shape[], const _istride strides[], int rank);
+
 #endif // STC_CSPAN_H_INCLUDED
 
 /* --------------------- IMPLEMENTATION --------------------- */
