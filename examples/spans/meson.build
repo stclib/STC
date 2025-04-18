@@ -4,6 +4,7 @@ foreach sample : [
   'multidim',
   'printspan',
   'submdspan',
+  'span_demo',
 ]
   test(
     sample,
