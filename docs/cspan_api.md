@@ -19,12 +19,12 @@ This is different from other containers where template parameters are defined pr
 including each container. This works well mainly because cspan is a non-owning type.
 ```c++
 #include "stc/cspan.h"
-using_cspan(SpanType, ValueType);                       // Define a 1-d span with ValueType elements.
-using_cspan(SpanTypeN, ValueType, RANK);                // Define multi-dimensional span with RANK.
-                                                        // RANK is the number (constant) of dimensions
-                                                        // Has no equality test support.
-using_cspan_with_eq(SpanType, ValueType, eq);           // Define a 1-d span with equality function support
-using_cspan_with_eq(SpanTypeN, ValueType, eq, RANK);    // Define span with equality function support
+using_cspan(SpanType, ValueType);                      // Define a 1-d span with ValueType elements.
+using_cspan(SpanTypeN, ValueType, RANK);               // Define multi-dimensional span with RANK.
+                                                       // RANK is the number (constant) of dimensions
+                                                       // Has no equality test support.
+using_cspan_with_eq(SpanType, ValueType, eq);          // Define a 1-d span with equality function support
+using_cspan_with_eq(SpanTypeN, ValueType, eq, RANK);   // Define span with equality function support
 
 // Shorthands:
 using_cspan2(S, ValueType);                            // Define span types S, S2 with ranks 1, 2.
@@ -73,13 +73,15 @@ cspan_layout    cspan_get_layout(const SpanTypeN* self);
 bool            cspan_is_rowmajor(const SpanTypeN* self);
 bool            cspan_is_colmajor(const SpanTypeN* self);
 
-                // Construct a 1d sub-span. Faster but equal to cspan_slice(&ms, Span, {offset, offset+count});
+                // Construct a 1d subspan. Faster, but equal to:
+                // Span msub = cspan_slice(&ms, Span, {offset, offset+count});
 SpanType1       cspan_subspan(const SpanType1* self, isize offset, int32 count);
 
-                // Construct sub-md span of lower rank. Like e.g. cspan_slice(&ms4, Span2, {i}, {j}, {c_ALL}, {c_ALL});
+                // Construct a 1d subspan from a 2d span.
 OutSpan1        cspan_submd2(const SpanType2* self, int32 i);
 
-                // Construct a 2d or 1d subspan from a 3d span.
+                // Construct a lower rank submd. E.g. Span2 md2 = cspan_submd3(&md3, i);
+                // is equal to: Span2 md2 = cspan_slice(&md3, Span2, {i}, {c_ALL}, {c_ALL});
 OutSpan2        cspan_submd3(const SpanType3* self, int32 i);
 OutSpan1        cspan_submd3(const SpanType3* self, int32 i, int32 j);
 
@@ -91,7 +93,7 @@ OutSpan1        cspan_submd4(const SpanType4* self, int32 i, int32 j, int32 k);
                 // Multi-dim span slicing function.
                 //       {i}: select i'th column. reduces output rank by one.
                 //     {i,j}: from i to j-1.
-                //{i,j,step}: every step column (default step=1)
+                //{i,j,step}: step size (default step=1)
                 // {i,c_END}: from i to last.
                 //   {c_ALL}: full extent, like {0,c_END}.
 OutSpanM        cspan_slice(const SpanTypeN* self, <OutSpanM>, {x0,x1,xs}, {y0,y1,ys}.., {N0,N1,Ns});
@@ -244,7 +246,7 @@ int main(void) {
     myspan2 a = cspan_submd3(&ss3, 1);
     myspan2 b = myspan2_transpose(a);
 
-    cspan_print(myspan3, ss3, "%d");
+    cspan_print(myspan3, "%d", ss3);
     puts("\nms3[1]:");
     cspan_print(myspan2, "%d", ((myspan2)cspan_submd3(&ms3, 1)));
 

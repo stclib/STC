@@ -1,70 +1,56 @@
 // https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2023/p2642r2.html
-// C99:
+// https://vaibhaw-vipul.medium.com/matrix-multiplication-optimizing-the-code-from-6-hours-to-1-sec-70889d33dcfa
+// Compile with: gcc -O3 -march=native -fopenmp matmult.c -lstc  # Multiplies two 4K matrices in 0.5 seconds on a Ryzen 5700X CPU.
+#define NDEBUG
 #include <stdio.h>
 #include <time.h>
 #include "stc/cspan.h"
 
 using_cspan(Mat, float, 2);
-using_cspan(Mat3, float, 3);
 typedef Mat OutMat;
 
-enum {N = 3, D1 = 512, D2 = D1, D3 = D1};
-
-void native_matrix_product(float (*A)[D2], float (*B)[D3], float (*C)[D3]) {
-    for (int j = 0; j < D3; ++j) {
-        for (int i = 0; i < D1; ++i) {
-            Mat_value C_ij = 0;
-            for (int k = 0; k < D2; ++k) {
-                C_ij += A[i][k] * B[k][j];
-            }
-            C[i][j] += C_ij;
-        }
-    }
-}
-
-// Generic implementation
+// Default matrix multiplication
 void base_case_matrix_product(Mat A, Mat B, OutMat C) {
-    for (c_range(j, C.shape[1])) {
-        for (c_range(i, C.shape[0])) {
-            Mat_value C_ij = 0;
-            for (c_range(k, A.shape[1])) {
-                C_ij += *cspan_at(&A, i,k) * *cspan_at(&B, k,j);
+    #pragma omp parallel for schedule(runtime)
+    for (int i = 0; i < A.shape[0]; ++i) {
+        for (int k = 0; k < A.shape[1]; k++) {
+            for (int j = 0; j < B.shape[1]; j++) {
+                *cspan_at(&C, i,j) += *cspan_at(&A, i,k) * *cspan_at(&B, k,j);
             }
-            *cspan_at(&C, i,j) += C_ij;
         }
     }
 }
 
 // Recursive implementation
-typedef struct { Mat m00, m01, m10, m11; } Partition;
+typedef struct { Mat r00, r01, r10, r11; } Partition;
 
 Partition partition(Mat A) {
-    int M = A.shape[0];
-    int N = A.shape[1];
+    int m = A.shape[0];
+    int n = A.shape[1];
     return (Partition){
-        .m00 = cspan_slice(&A, Mat, {0, M/2}, {0, N/2}),
-        .m01 = cspan_slice(&A, Mat, {0, M/2}, {N/2, N}),
-        .m10 = cspan_slice(&A, Mat, {M/2, M}, {0, N/2}),
-        .m11 = cspan_slice(&A, Mat, {M/2, M}, {N/2, N}),
+        .r00 = cspan_slice(&A, Mat, {0, m/2}, {0, n/2}),
+        .r01 = cspan_slice(&A, Mat, {0, m/2}, {n/2, n}),
+        .r10 = cspan_slice(&A, Mat, {m/2, m}, {0, n/2}),
+        .r11 = cspan_slice(&A, Mat, {m/2, m}, {n/2, n}),
     };
 }
 
 void recursive_matrix_product(Mat A, Mat B, OutMat C) {
     // Some hardware-dependent constant
-    if (C.shape[0] <= 16) {
+    if (C.shape[0]*C.shape[1] <= 2048*2048) {
         base_case_matrix_product(A, B, C);
     } else {
         Partition c = partition(C),
                   a = partition(A),
                   b = partition(B);
-        recursive_matrix_product(a.m00, b.m00, c.m00);
-        recursive_matrix_product(a.m01, b.m10, c.m00);
-        recursive_matrix_product(a.m10, b.m00, c.m10);
-        recursive_matrix_product(a.m11, b.m10, c.m10);
-        recursive_matrix_product(a.m00, b.m01, c.m01);
-        recursive_matrix_product(a.m01, b.m11, c.m01);
-        recursive_matrix_product(a.m10, b.m01, c.m11);
-        recursive_matrix_product(a.m11, b.m11, c.m11);
+        recursive_matrix_product(a.r00, b.r00, c.r00);
+        recursive_matrix_product(a.r01, b.r10, c.r00);
+        recursive_matrix_product(a.r10, b.r00, c.r10);
+        recursive_matrix_product(a.r11, b.r10, c.r10);
+        recursive_matrix_product(a.r00, b.r01, c.r01);
+        recursive_matrix_product(a.r01, b.r11, c.r01);
+        recursive_matrix_product(a.r10, b.r01, c.r11);
+        recursive_matrix_product(a.r11, b.r11, c.r11);
     }
 }
 
@@ -73,38 +59,37 @@ void recursive_matrix_product(Mat A, Mat B, OutMat C) {
 #include "stc/stack.h"
 #include "stc/random.h"
 
-int main(void) {
-    Data values = Data_with_size(D1*D2 + N*D2*D3, 0);
-    for (c_each(i, Data, values))
-        *i.ref = (Data_value)((crand64_real() - 0.5)*8.0);
+int main(int argc, char* argv[]) {
+    int M = 4096, P, N;
+    if (argc > 1)
+        M = atoi(argv[1]);
+    if (argc > 3) {
+        P = atoi(argv[2]);
+        N = atoi(argv[3]);
+    } else
+        P = N = M;
 
-    Mat a = cspan_md(values.data, D1, D2);
-    Mat3 bvec = cspan_md(values.data + D1*D2, N, D2, D3);
+    printf("Recursive Matrix Multiplication (%dx%d * %dx%d)\n", M, P, P, N);
+    printf("Usage: %s [m [p n]]\n", argv[0]);
 
-    static Data_value out[D1*D3];
-    OutMat c = cspan_md(out, D1, D3);
-    //Data output = Data_with_size(D1*D3, 0);
-    //OutMat c = cspan_md(output.data, D1, D3); // slower with malloced ram
+    Data values = Data_with_size(M*P + P*N + M*N, 0);
+    for (c_each_n(i, Data, values, M*P + P*N))
+        *i.ref = (Data_value)((crand64_real() - 0.5)*10.0);
 
-    float sum = 0.0;
+    Mat a = cspan_md(values.data, M, P);
+    Mat b = cspan_md(values.data + M*P, P, N);
+    OutMat c = cspan_md(values.data + M*P + P*N, M, N);
+
     clock_t t = clock();
 
-    for (c_range(i, N)) {
-        Mat b = cspan_submd3(&bvec, i);
-        memset(c.data, 0, (size_t)Mat_size(&c)*sizeof *c.data);
-        recursive_matrix_product(a, b, c); // > gcc 2-3x faster
-        //base_case_matrix_product(a, b, c);
-        //native_matrix_product((float(*)[D2])a.data, (float(*)[D3])b.data, (float(*)[D3])c.data);
-        sum += *cspan_at(&c, i+1, i+1);
-    }
+    //base_case_matrix_product(a, b, c);
+    recursive_matrix_product(a, b, c); // > gcc 2x faster
 
     t = clock() - t;
 
     puts("an 8x8 sub-matrix of result c");
-    cspan_print(Mat, "%.4f", cspan_slice(&c, Mat, {12,20}, {12,20}));
+    cspan_print(Mat, "%.4f", cspan_slice(&c, Mat, {0, 8}, {0, 8}));
 
-    puts("checksum and time");
-    printf("%.16g: %f ms\n", (double)sum, (double)t*1000.0/CLOCKS_PER_SEC);
+    printf("\ntime %f ms\n", (double)t*1000.0/CLOCKS_PER_SEC);
     Data_drop(&values);
-    //Data_drop(&output);
 }

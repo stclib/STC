@@ -1,3 +1,5 @@
+omp = dependency('openmp')
+
 foreach sample : [
   'matmult',
   'mdspan',
@@ -11,7 +13,7 @@ foreach sample : [
     executable(
       sample,
       files(f'@sample@.c'),
-      dependencies: example_deps,
+      dependencies: [example_deps, omp],
       install: false,
     ),
     suite: 'cspan',

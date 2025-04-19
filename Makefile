@@ -13,7 +13,7 @@ endif
 
 CFLAGS 	  ?= -std=c11 -Iinclude -MMD -O3 -Wpedantic -Wall -Wextra -Werror -Wno-missing-field-initializers
 CXXFLAGS  ?= -std=c++20 -Iinclude -O3 -MMD -Wall
-LDFLAGS   ?=
+LDFLAGS   ?= -fopenmp
 ifeq ($(CC),tcc)
   AR_RCS  ?= tcc -ar rcs
 else
