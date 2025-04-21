@@ -11,7 +11,9 @@ typedef Mat OutMat;
 
 // Default matrix multiplication
 void base_case_matrix_product(Mat A, Mat B, OutMat C) {
-    #pragma omp parallel for schedule(runtime)
+    #ifdef __GNUC__
+      #pragma omp parallel for schedule(runtime)
+    #endif
     for (int i = 0; i < A.shape[0]; ++i) {
         for (int k = 0; k < A.shape[1]; k++) {
             for (int j = 0; j < B.shape[1]; j++) {
