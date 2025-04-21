@@ -7,7 +7,7 @@
 #include "stc/stack.h"
 #include "stc/cspan.h"
 
-using_cspan(intspan, const int);
+use_cspan(intspan, const int);
 
 
 void printMe(intspan container) {

@@ -6,7 +6,7 @@
 #include <time.h>
 #include "stc/cspan.h"
 
-using_cspan(Mat, float, 2);
+use_cspan(Mat, float, 2);
 typedef Mat OutMat;
 
 // Default matrix multiplication

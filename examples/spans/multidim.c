@@ -4,7 +4,7 @@
 #include "stc/stack.h"
 #include "stc/cspan.h"
 
-using_cspan3(ISpan, int); // define ISpan, ISpan2, ISpan3
+use_cspan3(ISpan, int); // define ISpan, ISpan2, ISpan3
 
 int main(void)
 {

@@ -12,7 +12,7 @@ void print_elem(smap_istr_raw p) {
     printf("(%d, %s) ", p.first, p.second);
 }
 
-#define using_print_collection(CX) \
+#define use_print_collection(CX) \
     void print_collection_##CX(const CX* t) { \
         printf("%" c_ZI " elements: ", CX##_size(t)); \
     \
@@ -22,8 +22,8 @@ void print_elem(smap_istr_raw p) {
         puts(""); \
     }
 
-using_print_collection(smap_istr)
-using_print_collection(vec_istr)
+use_print_collection(smap_istr)
+use_print_collection(vec_istr)
 
 void findit(smap_istr c, smap_istr_key val)
 {

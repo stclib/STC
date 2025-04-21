@@ -3,8 +3,8 @@
 #include <stdio.h>
 #include "stc/cspan.h"
 
-using_cspan(span2, double, 2);
-using_cspan(span3, double, 3);
+use_cspan(span2, double, 2);
+use_cspan(span3, double, 3);
 
 // Set all elements of a rank-2 mdspan to zero.
 void zero_2d(span2 grid2d) {

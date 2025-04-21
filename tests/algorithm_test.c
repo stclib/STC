@@ -6,7 +6,7 @@
 #include "stc/algorithm.h"
 #include "stc/cstr.h"
 #include "stc/cspan.h"
-using_cspan(ISpan, int);
+use_cspan(ISpan, int);
 
 #include "ctest.h"
 

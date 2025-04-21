@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include "stc/cspan.h"
-using_cspan3(Span, int);
+use_cspan3(Span, int);
 
 int main(void)
 {

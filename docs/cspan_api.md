@@ -7,31 +7,31 @@ capabilities similar to [python's numpy arrays](https://numpy.org/doc/stable/use
 Note that **cspan** stores indices as int32_t. Multi-dimensional spans can have up to INT32_MAX elements
 in the RANK-1 inner dimensions in total, and INT32_MAX in the outer dimension. Currently limited to 8
 dimensions due to ergonomics and optimization of one-dimensional spans. More dimensions can be added with
-the *using_cspan_tuple(N)* macro.
+the *use_cspan_tuple(N)* macro.
 
 See also C++
 [std::span](https://en.cppreference.com/w/cpp/container/span) /
 [std::mdspan](https://en.cppreference.com/w/cpp/container/mdspan) for similar functionality.
 
 ## Header file and declaration
-**cspan** types are defined by the *using_cspan()* macro after the header is included.
+**cspan** types are defined by the *use_cspan()* macro after the header is included.
 This is different from other containers where template parameters are defined prior to
 including each container. This works well mainly because cspan is a non-owning type.
 ```c++
 #include "stc/cspan.h"
-using_cspan(SpanType, ValueType);                      // Define a 1-d span with ValueType elements.
-using_cspan(SpanTypeN, ValueType, RANK);               // Define multi-dimensional span with RANK.
+use_cspan(SpanType, ValueType);                      // Define a 1-d span with ValueType elements.
+use_cspan(SpanTypeN, ValueType, RANK);               // Define multi-dimensional span with RANK.
                                                        // RANK is the number (constant) of dimensions
                                                        // Has no equality test support.
-using_cspan_with_eq(SpanType, ValueType, eq);          // Define a 1-d span with equality function support
-using_cspan_with_eq(SpanTypeN, ValueType, eq, RANK);   // Define span with equality function support
+use_cspan_with_eq(SpanType, ValueType, eq);          // Define a 1-d span with equality function support
+use_cspan_with_eq(SpanTypeN, ValueType, eq, RANK);   // Define span with equality function support
 
 // Shorthands:
-using_cspan2(S, ValueType);                            // Define span types S, S2 with ranks 1, 2.
-using_cspan3(S, ValueType);                            // Define span types S, S2, S3 with ranks 1, 2, 3.
+use_cspan2(S, ValueType);                            // Define span types S, S2 with ranks 1, 2.
+use_cspan3(S, ValueType);                            // Define span types S, S2, S3 with ranks 1, 2, 3.
 
-using_cspan2_with_eq(S, ValueType, eq);                // As above, but with equality function support
-using_cspan3_with_eq(S, ValueType, eq);                // Use c_default_eq for primary type elements.
+use_cspan2_with_eq(S, ValueType, eq);                // As above, but with equality function support
+use_cspan3_with_eq(S, ValueType, eq);                // Use c_default_eq for primary type elements.
 ```
 ## Methods
 
@@ -144,7 +144,7 @@ void            SpanTypeN_next(SpanTypeN_iter* it);
 #define i_key int
 #include "stc/stack.h"
 #include "stc/cspan.h"
-using_cspan(intspan, int);
+use_cspan(intspan, int);
 
 void printMe(intspan container) {
     printf("%d:", (int)cspan_size(&container));
@@ -235,7 +235,7 @@ Multi-dimension slicing (STC cspan):
 ```c++
 #include <stdio.h>
 #include "stc/cspan.h"
-using_cspan3(myspan, int); // define myspan, myspan2, myspan3.
+use_cspan3(myspan, int); // define myspan, myspan2, myspan3.
 
 int main(void) {
     int arr[] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24};
@@ -275,7 +275,7 @@ Slicing cspan without and with reducing the rank:
 #include <stdio.h>
 #include "stc/cspan.h"
 
-using_cspan3(Span, int); // Shorthand to define Span, Span2, and Span3
+use_cspan3(Span, int); // Shorthand to define Span, Span2, and Span3
 
 int main(void)
 {
