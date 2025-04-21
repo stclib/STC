@@ -22,7 +22,7 @@ See the c++ class [std::list](https://en.cppreference.com/w/cpp/container/list) 
 ## Header file and declaration
 
 ```c++
-#define i_type <ct>,<kt> // shorthand for defining i_type, i_key
+#define i_type <ct>,<kt>[,<op>] // shorthand for defining i_type, i_key, i_opt
 #define i_type <t>       // list container type name (default: list_{i_key})
 // One of the following:
 #define i_key <t>        // key type
@@ -37,10 +37,10 @@ See the c++ class [std::list](https://en.cppreference.com/w/cpp/container/list) 
 #define i_less <fn>      // less comparison. Alternative to i_cmp
 #define i_eq <fn>        // equality comparison. Implicitly defined with i_cmp, but not i_less.
 
-#define i_keyraw <t>     // convertion "raw" type (default: {i_key})
-#define i_rawclass <t>   // convertion "raw class". binds <t>_cmp(),  <t>_eq(),  <t>_hash()
-#define i_keytoraw <fn>  // convertion func i_key* => i_keyraw
-#define i_keyfrom <fn>   // convertion func i_keyraw => i_key
+#define i_keyraw <t>     // conversion "raw" type (default: {i_key})
+#define i_rawclass <t>   // conversion "raw class". binds <t>_cmp(),  <t>_eq(),  <t>_hash()
+#define i_keytoraw <fn>  // conversion func i_key* => i_keyraw
+#define i_keyfrom <fn>   // conversion func i_keyraw => i_key
 #include "stc/list.h"
 ```
 - Defining either `i_use_cmp`, `i_less` or `i_cmp` will enable sorting

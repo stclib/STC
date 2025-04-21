@@ -1,5 +1,3 @@
-// Advanced example: Hashmap with struct as key with rawtype,
-
 #include "stc/cstr.h"
 
 typedef struct Viking {
@@ -7,64 +5,61 @@ typedef struct Viking {
     cstr country;
 } Viking;
 
+Viking Viking_make(cstr_raw name, cstr_raw country) {
+    return (Viking){.name = cstr_from(name), .country = cstr_from(country)};
+}
+
 void Viking_drop(Viking* vk) {
     cstr_drop(&vk->name);
     cstr_drop(&vk->country);
 }
 
-Viking Viking_clone(Viking vk) {
-    vk.name = cstr_clone(vk.name);
-    vk.country = cstr_clone(vk.country);
-    return vk;
+Viking Viking_clone(Viking v) {
+    v.name = cstr_clone(v.name);
+    v.country = cstr_clone(v.country);
+    return v;
 }
 
-// Define RawVik lookup struct with hash, cmp, and convertion
-// functions between Viking and RawVik structs:
-
-typedef struct RawVik {
+// Define Viking_raw, a Viking lookup struct with eq, hash and conversion functions between them:
+typedef struct {
     const char* name;
     const char* country;
-} RawVik;
+} Viking_raw;
 
-static inline bool RawVik_eq(const RawVik* rx, const RawVik* ry) {
-    return strcmp(rx->name, ry->name) == 0 &&
-           strcmp(rx->country, ry->country) == 0;
+bool Viking_raw_eq(const Viking_raw* rx, const Viking_raw* ry) {
+    return strcmp(rx->name, ry->name)==0 && strcmp(rx->country, ry->country)==0;
 }
 
-static inline size_t RawVik_hash(const RawVik* rp) {
-    return c_hash_mix(c_hash_str(rp->name), c_hash_str(rp->country));
+size_t Viking_raw_hash(const Viking_raw* rv) {
+    return c_hash_mix(c_hash_str(rv->name), c_hash_str(rv->country));
 }
 
-static inline Viking Viking_from(RawVik raw) { // note: parameter is by value
+Viking Viking_from(Viking_raw raw) { // note: parameter is by value
     Viking v = {cstr_from(raw.name), cstr_from(raw.country)}; return v;
 }
 
-static inline RawVik Viking_toraw(const Viking* vp) {
-    RawVik rv = {cstr_str(&vp->name), cstr_str(&vp->country)}; return rv;
+Viking_raw Viking_toraw(const Viking* vp) {
+    Viking_raw rv = {cstr_str(&vp->name), cstr_str(&vp->country)}; return rv;
 }
 
-// With this in place, we define the Viking => int hash map type:
-// "keyclass" binds _drop, _clone, _from, _toraw
-#define i_type      Vikings, Viking, int, (c_keyclass)
-#define i_rawclass  RawVik  // bind RawVik_cmp, RawVik_eq, RawVik_hash
+// Define the map. Viking is now a "pro"-type:
+#define i_type Players, Viking, int, (c_keypro)
 #include "stc/hashmap.h"
-
 
 int main(void)
 {
-    Vikings vikings = {0};
-    Vikings_emplace(&vikings, c_literal(RawVik){"Einar", "Norway"}, 20);
-    Vikings_emplace(&vikings, c_literal(RawVik){"Olaf", "Denmark"}, 24);
-    Vikings_emplace(&vikings, c_literal(RawVik){"Harald", "Iceland"}, 12);
-    Vikings_emplace(&vikings, c_literal(RawVik){"Björn", "Sweden"}, 10);
+    Players vikings = c_make(Players, {
+        {{"Einar", "Norway"}, 25},
+        {{"Olaf", "Denmark"}, 24},
+        {{"Harald", "Iceland"}, 12},
+    });
 
-    Vikings_value* vv = Vikings_get_mut(&vikings, c_literal(RawVik){"Einar", "Norway"});
-    if (vv) vv->second += 3; // add 3 hp points to Einar
+    // Now lookup is using Viking_raw, not Viking:
+    printf("Lookup: Olaf of Denmark has %d hp\n\n", *Players_at(&vikings, (Viking_raw){"Olaf", "Denmark"}));
 
-    for (c_each(i, Vikings, vikings)) {
-        RawVik rv = Viking_toraw(&i.ref->first);
-        printf("%s of %s has %d hp\n", rv.name, rv.country, i.ref->second);
+    for (c_each(v, Players, vikings)) {
+        Players_raw r = Players_value_toraw(v.ref);
+        printf("%s of %s has %d hp\n", r.first.name, r.first.country, r.second);
     }
-
-    Vikings_drop(&vikings);
+    Players_drop(&vikings);
 }

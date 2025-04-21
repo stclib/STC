@@ -461,10 +461,10 @@ same container base type was included earlier. Possible template parameters are:
 #### Key (element lookup type):
 - `i_keydrop` *Func* - Destroy key - defaults to empty destructor.
 - `i_keyclone` *Func* - **[required if]** *i_keydrop* is defined (exception for **arc**, as it shares).
-- Advanced, convertion between an alternative input type:
+- Advanced, conversion between an alternative input type:
     - `i_keyraw` *RawType* - Lookup "raw" type. Defaults to *i_key*.
-    - `i_keyfrom` *Func* - Convertion func from a *i_keyraw* to return a *i_key* type.
-    - `i_keytoraw` *Func*  - Convertion func from a *i_key* pointer to a *i_keyraw* type. **[required]** if *i_keyraw* was defined. By default, it returns the dereferenced *i_key* value.
+    - `i_keyfrom` *Func* - Conversion func from a *i_keyraw* to return a *i_key* type.
+    - `i_keytoraw` *Func*  - Conversion func from a *i_key* pointer to a *i_keyraw* type. **[required]** if *i_keyraw* was defined. By default, it returns the dereferenced *i_key* value.
 
 #### Val (mapped value type for maps):
 - These are analogues to the Key parameters, i.e. `i_valdrop`, `i_valclone`, `i_valraw`, etc.
@@ -472,26 +472,33 @@ same container base type was included earlier. Possible template parameters are:
 ---
 
 ### Meta template parameters (advanced)
-The following meta-template parameters can be specified instead of ***i_key***, ***i_val***, and ***i_keyraw***.
+Note that all the following logic is resolved at compile time, so there is no associated runtime overhead.
+The following meta-template parameters can be specified instead of ***i_key***, ***i_val***, and ***i_keyraw***, etc.
 These parameters make types into "classes" in the sense that they bind associated function names to the basic
 template parameters described above. This reduces boiler-plate code and simplifies the management
-of non-trivial container elements. Note that many basic template parameters will be defined when defining the
-following parameters, but the user may override those when needed. E.g. by defining the template parameters
-directly as macro functions or with macros that refer to the C function names.
+of non-trivial container element types. Many basic template parameters are defined when specifying the
+following parameters, but the user may override those when needed. E.g. ***i_cmp*** can be overridden by defining
+it directly like `#define i_cmp(x, y) strcmp(x->name, y->name)`.
 
 #### Key meta parameters:
-- `i_rawclass` *RawType* - Defines ***i_keyraw*** and binds ***i_cmp***, ***i_eq***, and ***i_hash*** to *RawType_cmp()*, *RawType_eq()*, and *RawType_hash()* functions/macro names.
-    - If neither ***i_key*** nor ***i_keyclass*** are defined, ***i_key*** is defined as *RawType*.
-    - Useful for containers of views (like csview).
+- `i_rawclass` *RawType* - Defines ***i_keyraw*** and binds ***i_cmp***, ***i_eq***, and ***i_hash*** to
+*RawType_cmp()*, *RawType_eq()*, and *RawType_hash()* comparison functions/macro names. In addition
+***i_keyfrom***, ***i_keytoraw*** are bound to conversion functions *KeyType_from(RawType\*)* and *KeyType_toraw()*.
+    - If neither ***i_key*** nor ***i_keyclass*** are defined, ***i_key*** will be defined as *RawType*. See Notes.
+    - Useful alone for containers of views (like csview).
 - `i_keyclass` *KeyType*
-    - Defines ***i_key*** and binds ***i_keyclone***, ***i_keydrop*** to *KeyType_clone()* and *KeyType_drop()* function/macro names.
-    - If `i_keyraw` is also specified, ***i_keyfrom***, ***i_keytoraw*** are bound to *KeyType_from()* and *KeyType_toraw()* functions.
-    - Use with container of containers, or in general when the element type has *_clone()* and *_drop()* "member" functions.
+    - Defines ***i_key*** and binds ***i_keyclone***, ***i_keydrop*** to *KeyType_clone()* and *KeyType_drop()*
+    function/macro names.
+    - Unless `i_rawclass`/`i_keyraw` are also specified, the comparison functions mentioned with ***i_rawclass*** are
+    also expected to exist (for containers that requires them or when **i_use_cmp** is specified).
+    - Use with container of containers, or in general when the element type has *_clone()* and *_drop()*
+    "member" functions.
 - `i_keypro` *KeyType* - Use with "pro"-element types, i.e. library types like **cstr**, **box** and **arc**.
-It combines all the ***i_keyclass*** and ***i_rawclass*** properties. Defining ***i_keypro*** is like defining
+It combines all the ***i_keyclass*** and ***i_rawclass*** properties. Defining ***i_keypro*** is equal to defining
     - ***i_rawclass*** *KeyType_raw*.
     - ***i_keyclass*** *KeyType*
-    - I.e. `i_key`, `i_keyclone`, `i_keydrop`, `i_keyraw`, `i_keyfrom`, `i_keytoraw`, `i_cmp`, `i_eq`, `i_hash` will all be defined/bound.
+    - I.e. `i_key`, `i_keyclone`, `i_keydrop`, `i_keyraw`, `i_keyfrom`, `i_keytoraw`, `i_cmp`, `i_eq`, `i_hash`
+    will all be defined/bound.
 
 #### Val (mapped) meta parameters:
 - `i_valclass` *MappedType* - Analogous to the ***i_keyclass*** except for comparison and hash funcs.
@@ -501,16 +508,27 @@ It combines all the ***i_keyclass*** and ***i_rawclass*** properties. Defining *
     - I.e. `i_val`, `i_valclone`, `i_valdrop`, `i_valraw`, `i_valfrom`, `i_valtoraw` will all be defined/bound.
 
 Option flags:
-- `i_opt` *Flags* - Boolean properties: may combine *c_no_clone*, *c_no_atomic*, *c_declared*, *c_static*,
-*c_header* with the `|` separator.
+- `i_opt` *Flags* - Boolean properties: May be combined with the `|` operator. Note that these can be specified
+as the last comma-separated argument of a `i_type` template parameter, or be specified as separate parameter, e.g
+`#define i_no_clone` is equivalent to **c_no_clone** option.
+  - **c_declared** - container type was predeclared
+  - **c_no_atomic** - used with *arc* type, simple reference counting.
+  - **c_no_clone** - disable clone functionality in container
+  - **c_no_hash** - don't enable hash function when *c_rawclass* is specified.
+  - **c_use_cmp** - enable `<` comparison for integral types, and _cmp()/_less() for "pro/class" elements.
+  - **c_use_eq** - enable `==` for integral types, and _eq() for pro/class elements
+  - **c_keyclass** - indicate that `i_key` specified is a "class", i.e. has _clone(), _drop() members.
+  - **c_valclass** - like **c_keyclass**, but for mapped values in sortedmap / hashmap.
+  - **c_rawclass** - indicate that `i_key` specified is also "raw"-type and is expected to have _cmp(), _eq(), _hash() members.
+  - **c_keypro** - specifies that `i_key` is both a "keyclass" and a "rawclass".
+  - **c_valpro** - specifies that `i_val` is a "valclass".
 
 **Notes**:
-- Define `i_no_clone` or `i_opt c_no_clone | c_... | ...` to disable *clone* functionality.
-- If ***i_keyraw*** and ***i_keyfrom*** are defined, the *emplace*-functions are enabled. The *_cmp()*, *_less()*,
-*_eq()*, and *_hash()* functions takes pointers to parameter type ***i_keyraw***.
-- Specify `i_has_cmp` instead of the comparison parameters to enable searching / sorting for integral
-***i_keyraw*** types, or when comparison functions are implicitly bound via meta-template parameters.
-
+- When using **c_rawclass**, `i_key` and `i_keyraw` are equal, so no conversion functions are needed.
+- `i_use_cmp`/`i_use_eq` are only needed for **vec**, **stack**, **deque**, **list** as sorting and
+linear seach is not enabled by default. For integral types it uses `<` and `==` operators. For pro/class
+element types, _cmp()/_eq(),_hash() functions must be defined. For plain structs, `i_cmp`/`i_eq`
+macros must be defined.
 
 </details>
 <details>

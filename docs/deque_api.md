@@ -10,7 +10,7 @@ See the c++ class [std::deque](https://en.cppreference.com/w/cpp/container/deque
 ## Header file and declaration
 
 ```c++
-#define i_type <ct>,<kt> // shorthand for defining i_type, i_key
+#define i_type <ct>,<kt>[,<op>] // shorthand for defining i_type, i_key, i_opt
 #define i_type <t>       // deque container type name (default: deque_{i_key})
 // One of the following:
 #define i_key <t>        // key type
@@ -25,10 +25,10 @@ See the c++ class [std::deque](https://en.cppreference.com/w/cpp/container/deque
 #define i_less <fn>      // less comparison. Alternative to i_cmp
 #define i_eq <fn>        // equality comparison. Implicitly defined with i_cmp, but not i_less.
 
-#define i_keyraw <t>     // convertion "raw" type - defaults to i_key
-#define i_rawclass <t>   // convertion "raw class". binds <t>_cmp(),  <t>_eq(),  <t>_hash()
-#define i_keyfrom <fn>   // convertion func i_keyraw => i_key
-#define i_keytoraw <fn>  // convertion func i_key* => i_keyraw
+#define i_keyraw <t>     // conversion "raw" type - defaults to i_key
+#define i_rawclass <t>   // conversion "raw class". binds <t>_cmp(),  <t>_eq(),  <t>_hash()
+#define i_keyfrom <fn>   // conversion func i_keyraw => i_key
+#define i_keytoraw <fn>  // conversion func i_key* => i_keyraw
 
 #include "stc/deque.h"
 ```

@@ -21,7 +21,7 @@ See similar c++ class [std::shared_ptr](https://en.cppreference.com/w/cpp/memory
 ## Header file and declaration
 
 ```c++
-#define i_type <ct>,<kt> // shorthand for defining i_type, i_key
+#define i_type <ct>,<kt>[,<op>] // shorthand for defining i_type, i_key, i_opt
 #define i_type <t>       // arc container type name
 // One of the following:
 #define i_key <t>        // key type
@@ -38,8 +38,8 @@ See similar c++ class [std::shared_ptr](https://en.cppreference.com/w/cpp/memory
 #define i_keydrop <fn>   // destroy element func - defaults to empty destruct
 #define i_keyclone <fn>  // REQUIRED if i_keydrop is defined, unless 'i_opt c_no_clone' is defined.
 
-#define i_keyraw <t>     // convertion type (lookup): defaults to {i_key}
-#define i_keytoraw <fn>  // convertion func i_key* => i_keyraw: REQUIRED IF i_keyraw defined.
+#define i_keyraw <t>     // conversion type (lookup): defaults to {i_key}
+#define i_keytoraw <fn>  // conversion func i_key* => i_keyraw: REQUIRED IF i_keyraw defined.
 #define i_keyfrom <fn>   // from-raw func.
 
 #define i_no_atomic      // Non-atomic reference counting, like Rust Rc.
