@@ -95,14 +95,11 @@ typedef struct {
 #endif
 
 struct tm;
-FMT_API const char* fmt_time(const char *fmt, const struct tm* tm, char* buf, int len);
+FMT_API const char* fmt_time(const char *restrict fmt, const struct tm *restrict tm, char *restrict buf, int len);
 FMT_API void        fmt_close(fmt_stream* ss);
-FMT_API int        _fmt_parse(char* p, int nargs, const char *fmt, ...);
+FMT_API size_t     _fmt_count(int nargs, const char *restrict fmt, ...);
+FMT_API int        _fmt_parse(char *restrict p, int nargs, const char *restrict fmt, ...);
 FMT_API void       _fmt_sprint(fmt_stream*, const char* fmt, ...);
-
-#ifndef FMT_MAX
-#define FMT_MAX 128
-#endif
 
 #define fmt_print(...) fmt_printd(stdout, __VA_ARGS__)
 #define fmt_println(...) fmt_printd((fmt_stream*)0, __VA_ARGS__)
@@ -112,47 +109,60 @@ FMT_API void       _fmt_sprint(fmt_stream*, const char* fmt, ...);
 
 /* Primary function. */
 #define fmt_printd_2(to, fmt) \
-    do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 0, fmt); \
+    do { const char* _fmt = (fmt); char *_fs = alloca(_fmt_count(0, _fmt)); \
+         int _n = _fmt_parse(_fs, 0, _fmt); \
          fmt_OK(_n == 0); _fmt_fn(to)(to, fmt); } while (0)
 #define fmt_printd_3(to, fmt, c) \
-    do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 1, fmt, _fc(c)); \
+    do { const char* _fmt = (fmt); char *_fs = alloca(_fmt_count(1, _fmt)); \
+         int _n = _fmt_parse(_fs, 1, _fmt, _fc(c)); \
          fmt_OK(_n == 1); _fmt_fn(to)(to, _fs, c); } while (0)
 #define fmt_printd_4(to, fmt, c, d) \
-    do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 2, fmt, _fc(c), _fc(d)); \
+    do { const char* _fmt = (fmt); char *_fs = alloca(_fmt_count(2, _fmt)); \
+         int _n = _fmt_parse(_fs, 2, _fmt, _fc(c), _fc(d)); \
          fmt_OK(_n == 2); _fmt_fn(to)(to, _fs, c, d); } while (0)
 #define fmt_printd_5(to, fmt, c, d, e) \
-    do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 3, fmt, _fc(c), _fc(d), _fc(e)); \
+    do { const char* _fmt = (fmt); char *_fs = alloca(_fmt_count(3, _fmt)); \
+         int _n = _fmt_parse(_fs, 3, _fmt, _fc(c), _fc(d), _fc(e)); \
          fmt_OK(_n == 3); _fmt_fn(to)(to, _fs, c, d, e); } while (0)
 #define fmt_printd_6(to, fmt, c, d, e, f) \
-    do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 4, fmt, _fc(c), _fc(d), _fc(e), _fc(f)); \
+    do { const char* _fmt = (fmt); char *_fs = alloca(_fmt_count(4, _fmt)); \
+         int _n = _fmt_parse(_fs, 4, _fmt, _fc(c), _fc(d), _fc(e), _fc(f)); \
          fmt_OK(_n == 4); _fmt_fn(to)(to, _fs, c, d, e, f); } while (0)
 #define fmt_printd_7(to, fmt, c, d, e, f, g) \
-    do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 5, fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g)); \
+    do { const char* _fmt = (fmt); char *_fs = alloca(_fmt_count(5, _fmt)); \
+         int _n = _fmt_parse(_fs, 5, _fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g)); \
          fmt_OK(_n == 5); _fmt_fn(to)(to, _fs, c, d, e, f, g); } while (0)
 #define fmt_printd_8(to, fmt, c, d, e, f, g, h) \
-    do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 6, fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h)); \
+    do { const char* _fmt = (fmt); char *_fs = alloca(_fmt_count(6, _fmt)); \
+         int _n = _fmt_parse(_fs, 6, _fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h)); \
          fmt_OK(_n == 6); _fmt_fn(to)(to, _fs, c, d, e, f, g, h); } while (0)
 #define fmt_printd_9(to, fmt, c, d, e, f, g, h, i) \
-    do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 7, fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h), _fc(i)); \
+    do { const char* _fmt = (fmt); char *_fs = alloca(_fmt_count(7, _fmt)); \
+         int _n = _fmt_parse(_fs, 7, _fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h), _fc(i)); \
          fmt_OK(_n == 7); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i); } while (0)
 #define fmt_printd_10(to, fmt, c, d, e, f, g, h, i, j) \
-    do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 8, fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h), \
+    do { const char* _fmt = (fmt); char *_fs = alloca(_fmt_count(8, _fmt)); \
+         int _n = _fmt_parse(_fs, 8, _fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h), \
                                                                      _fc(i), _fc(j)); \
          fmt_OK(_n == 8); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i, j); } while (0)
 #define fmt_printd_11(to, fmt, c, d, e, f, g, h, i, j, k) \
-    do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 9, fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h), \
+    do { const char* _fmt = (fmt); char *_fs = alloca(_fmt_count(9, _fmt)); \
+         int _n = _fmt_parse(_fs, 9, _fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h), \
                                                                      _fc(i), _fc(j), _fc(k)); \
          fmt_OK(_n == 9); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i, j, k); } while (0)
 #define fmt_printd_12(to, fmt, c, d, e, f, g, h, i, j, k, m) \
-    do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 10, fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h), \
+    do { const char* _fmt = (fmt); char *_fs = alloca(_fmt_count(10, _fmt)); \
+         int _n = _fmt_parse(_fs, 10, _fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h), \
                                                                       _fc(i), _fc(j), _fc(k), _fc(m)); \
          fmt_OK(_n == 10); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i, j, k, m); } while (0)
 #define fmt_printd_13(to, fmt, c, d, e, f, g, h, i, j, k, m, n) \
-    do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 11, fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h), \
+    do { const char* _fmt = (fmt); char *_fs = alloca(_fmt_count(11, _fmt)); \
+         int _n = _fmt_parse(_fs, 11, _fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h), \
                                                                       _fc(i), _fc(j), _fc(k), _fc(m), _fc(n)); \
          fmt_OK(_n == 11); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i, j, k, m, n); } while (0)
 #define fmt_printd_14(to, fmt, c, d, e, f, g, h, i, j, k, m, n, o) \
-    do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 12, fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h), \
+    do { const char* _fmt = (fmt); char *_fs = alloca(_fmt_count(12, _fmt)); \
+         int _n = _fmt_parse(_fs, 12, _fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h), \
                                                                       _fc(i), _fc(j), _fc(k), _fc(m), _fc(n), _fc(o)); \
          fmt_OK(_n == 12); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i, j, k, m, n, o); } while (0)
 
@@ -208,12 +218,12 @@ FMT_DEF FMT_UNUSED void fmt_close(fmt_stream* ss) {
 }
 
 FMT_DEF FMT_UNUSED
-const char* fmt_time(const char *fmt, const struct tm* tm, char* buf, int len) {
+const char* fmt_time(const char *restrict fmt, const struct tm *restrict tm, char *restrict buf, int len) {
     strftime(buf, (size_t)len, fmt, tm);
     return buf;
 }
 
-FMT_DEF void _fmt_sprint(fmt_stream* ss, const char* fmt, ...) {
+FMT_DEF void _fmt_sprint(fmt_stream* ss, const char *restrict fmt, ...) {
     va_list args, args2;
     va_start(args, fmt);
     if (ss == NULL) {
@@ -234,7 +244,58 @@ FMT_DEF void _fmt_sprint(fmt_stream* ss, const char* fmt, ...) {
     done1: va_end(args);
 }
 
-FMT_DEF int _fmt_parse(char* p, int nargs, const char *fmt, ...) {
+FMT_DEF size_t _fmt_count(int nargs, const char *restrict fmt, ...) {
+    char *arg, ch;
+    int n = 0, empty, len = 0;
+    va_list args;
+    va_start(args, fmt);
+    do {
+        switch ((ch = *fmt)) {
+        case '%':
+            len++;
+            break;
+        case '}':
+            if (*++fmt == '}') break; /* ok */
+            n = 99;
+            continue;
+        case '{':
+            if (*++fmt == '{') break; /* ok */
+            if (++n > nargs) continue;
+            if (*fmt != ':' && *fmt != '}') n = 99;
+            fmt += (*fmt == ':');
+            empty = *fmt == '}';
+            arg = va_arg(args, char *);
+            int can_lalign = 1;
+            len++;
+            while (1) switch (*fmt) {
+                case '\0': n = 99; /* FALLTHRU */
+                case '}': goto done;
+                case '<': len++, ++fmt; break;
+                case '>': can_lalign = 0; /* FALLTHRU */
+                case '-': ++fmt; break;
+                case '*': if (++n <= nargs) arg = va_arg(args, char *); /* FALLTHRU */
+                default: len++; fmt++;
+            }
+            done:
+            switch (*arg) {
+            case 'g': if (empty) len += 2; break;
+            case '@': ++arg; if (empty) len += 3; break;
+            }
+            char last = 0;
+            if (strchr("csdioxXufFeEaAgGnp", fmt[-1]) == NULL)
+                while (*arg) len++, last = *arg++;
+            if (can_lalign && (last == 's' || last == 'c')) /* left-align str */
+                len++;
+            fmt += *fmt == '}';
+            continue;
+        }
+        len++; fmt++;
+    } while (ch);
+    va_end(args);
+    return len + 1;
+}
+
+FMT_DEF int _fmt_parse(char *restrict p, int nargs, const char *restrict fmt, ...) {
     char *arg, *p0, ch;
     int n = 0, empty;
     va_list args;
