@@ -3,7 +3,7 @@
 #include "ctest.h"
 
 #define i_type hmap_ii, int, int
-#include "stc/hmap.h"
+#include "stc/hashmap.h"
 
 TEST(hmap, mapdemo1)
 {
@@ -17,7 +17,7 @@ TEST(hmap, mapdemo1)
 #define i_type hmap_si
 #define i_keypro cstr
 #define i_val int
-#include "stc/hmap.h"
+#include "stc/hashmap.h"
 
 TEST(hmap, mapdemo2)
 {
@@ -36,7 +36,7 @@ TEST(hmap, mapdemo2)
 
 #define i_keypro cstr
 #define i_valpro cstr
-#include "stc/hmap.h"
+#include "stc/hashmap.h"
 
 TEST(hmap, mapdemo3)
 {

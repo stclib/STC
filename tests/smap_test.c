@@ -7,8 +7,7 @@
 #define i_key int
 #define i_valpro cstr
 #define i_use_eq
-#include "stc/smap.h"
-
+#include "stc/sortedmap.h"
 
 TEST(smap, erase)
 {
@@ -83,7 +82,7 @@ TEST(smap, erase)
 
 #define i_type smap_ii, int, int
 #define i_use_eq
-#include "stc/smap.h"
+#include "stc/sortedmap.h"
 
 #define i_type vec_ii, smap_ii_value
 #include "stc/vec.h"

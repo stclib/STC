@@ -1,7 +1,7 @@
 #include "stc/cstr.h"
 #define i_keypro cstr
 #define i_valpro cstr
-#include "stc/hmap.h"
+#include "stc/hashmap.h"
 
 int main(void)
 {

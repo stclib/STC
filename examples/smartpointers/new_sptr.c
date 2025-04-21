@@ -7,22 +7,20 @@ void Person_drop(Person* p);
 int Person_cmp(const Person* a, const Person* b);
 size_t Person_hash(const Person* p);
 
-#define i_type PersonArc
-#define i_keyclass Person // "class" binds _clone(), _drop()
-#define i_use_cmp         // binds _cmp(), _hash()
+// "class" binds _clone(), _drop()
+// combined with "use_cmp", it  binds _cmp(), _hash() too.
+#define i_type PersonArc, Person, (c_keyclass | c_use_cmp)
 #include "stc/arc.h"
 
-#define i_type IPtr, int, c_use_cmp
+#define i_type IPtr, int, (c_use_cmp)
 #define i_keydrop(x) printf("drop: %d\n", *x)
 #include "stc/arc.h"
 
-#define i_type IPStack
-#define i_keypro IPtr
+#define i_type IPStack, IPtr, (c_keypro)
 #include "stc/stack.h"
 
-#define i_type PASet
-#define i_keypro PersonArc
-#include "stc/hset.h"
+#define i_type PASet, PersonArc, (c_keypro)
+#include "stc/hashset.h"
 
 
 Person Person_make(const char* name, const char* last) {

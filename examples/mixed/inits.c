@@ -1,14 +1,10 @@
 #include "stc/cstr.h"
 
-#define i_type hmap_id   // Map of int => cstr
-#define i_key int
-#define i_valpro cstr
-#include "stc/hmap.h"
+#define i_type hmap_id, int, cstr, (c_valpro)   // Map of int => cstr
+#include "stc/hashmap.h"
 
-#define i_type hmap_nat  // Map of cstr => int
-#define i_keypro cstr
-#define i_val int
-#include "stc/hmap.h"
+#define i_type hmap_nat, cstr, int, (c_keypro)  // Map of cstr => int
+#include "stc/hashmap.h"
 
 typedef struct {int x, y;} ipair_t;
 inline static int ipair_cmp(const ipair_t* a, const ipair_t* b) {
@@ -24,7 +20,7 @@ inline static int ipair_cmp(const ipair_t* a, const ipair_t* b) {
 #define i_cmp ipair_cmp
 #include "stc/list.h"
 
-#define i_type pqueue_flt,float
+#define i_type pqueue_flt, float
 #include "stc/pqueue.h"
 
 int main(void)

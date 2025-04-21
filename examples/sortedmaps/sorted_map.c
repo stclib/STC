@@ -3,7 +3,7 @@
 #include <stdio.h>
 #define i_key int
 #define i_val int
-#include "stc/smap.h"
+#include "stc/sortedmap.h"
 
 int main(void)
 {

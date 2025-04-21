@@ -1,18 +1,14 @@
 // create a structure like: std::map<std::string, std::map<std::string, std::string>>:
 #include "stc/cstr.h"
 
-// People: std::map<std::string, std::string>
-#define i_type People
-#define i_keypro cstr // name
-#define i_valpro cstr // email
+// People: map cstr -> cstr. (name -> email)
+ #define i_type People, cstr, cstr, (c_keypro | c_valpro)
 #define i_keydrop(p) (printf("kdrop: %s\n", cstr_str(p)), cstr_drop(p)) // override
-#include "stc/hmap.h"
+#include "stc/hashmap.h"
 
-// Departments: std::map<std::string, People>
-#define i_type Departments
-#define i_keypro cstr // dep. name
-#define i_valclass People
-#include "stc/hmap.h"
+// Departments: map cstr -> People. People is a map and has _clone, _drop, therefore a "class".
+#define i_type Departments, cstr, People, (c_keypro | c_valclass)
+#include "stc/hashmap.h"
 
 
 void add(Departments* deps, const char* name, const char* email, const char* dep)

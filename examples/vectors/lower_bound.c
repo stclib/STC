@@ -1,10 +1,10 @@
 #include <stdio.h>
 
-#define i_type IVec, int, c_use_cmp
+#define i_type IVec, int, (c_use_cmp)
 #include "stc/vec.h"
 
 #define i_type ISet, int
-#include "stc/sset.h"
+#include "stc/sortedset.h"
 
 int main(void)
 {

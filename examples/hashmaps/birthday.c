@@ -4,7 +4,7 @@
 #include "stc/random.h"
 
 #define i_type hmap_ui, uint64_t, int
-#include "stc/hmap.h"
+#include "stc/hashmap.h"
 
 static uint64_t seed = 12345;
 
@@ -28,7 +28,7 @@ static void test_repeats(void)
 }
 
 #define i_type hmap_uu, uint32_t, uint64_t
-#include "stc/hmap.h"
+#include "stc/hashmap.h"
 
 void test_distribution(void)
 {

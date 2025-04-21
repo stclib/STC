@@ -4,13 +4,12 @@ void show_drop(int* x) { printf("drop: %d\n", *x); }
 
 
 // enable sort/search for non-atomic Arc int type
-#define i_type Arc, int, c_no_atomic|c_use_cmp
+#define i_type Arc, int, (c_no_atomic | c_use_cmp)
 #define i_keydrop show_drop
 #include "stc/arc.h"        // Shared pointer to int
 
-#define i_type Vec
-#define i_keypro Arc        // use i_keypro, not i_key
-#define i_use_cmp           // enable Arc_value (=int) search/sort
+// arc is "pro", enable search/sort
+#define i_type Vec, Arc, (c_keypro | c_use_cmp)
 #include "stc/vec.h"        // Vec: vec<Arc>
 
 

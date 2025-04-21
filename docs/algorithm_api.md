@@ -26,7 +26,7 @@ descriptive and reduces chances of making mistakes. It is generally easier to re
 [ [Run this code](https://godbolt.org/z/cYhTEr1vM) ]
 ```c++
 #define i_type IMap, int, int
-#include "stc/smap.h"
+#include "stc/sortedmap.h"
 // ...
 IMap map = c_make(IMap, {{23,1}, {3,2}, {7,3}, {5,4}, {12,5}});
 
@@ -234,8 +234,8 @@ its data type (payload). Because C does not have namespaces, it is recommended t
 ```c++
 // https://doc.rust-lang.org/book/ch18-03-pattern-syntax.html#destructuring-enums
 #include <stdio.h>
-#include <stc/algorithm.h>
-#include <stc/cstr.h>
+#include "stc/algorithm.h"
+#include "stc/cstr.h"
 
 c_sumtype (Color,
     (ColorRgb, struct {int32 r, g, b;}),
@@ -305,7 +305,7 @@ These work on any container. *c_make()* may also be used for **cspan** views.
 #include "stc/vec.h"
 
 #define i_type Map, int, int
-#include "stc/hmap.h"
+#include "stc/hashmap.h"
 
 c_func (split_map,(Map map), ->, struct {Vec keys, values;}) {
     split_map_result out = {0};
@@ -380,16 +380,14 @@ Erase linearily in containers using a predicate. `value` is a pointer to each el
 #include "stc/cstr.h"
 #include "stc/algorithm.h"
 
-#define i_type Vec, int, c_use_eq
+#define i_type Vec, int, (c_use_eq)
 #include "stc/stack.h"
 
-#define i_type List, int, c_use_eq
+#define i_type List, int, (c_use_eq)
 #include "stc/list.h"
 
-#define i_type Map
-#define i_keypro cstr
-#define i_val int
-#include "stc/smap.h"
+#define i_type Map, cstr, int, (c_keypro)
+#include "stc/sortedmap.h"
 
 int main(void)
 {
@@ -566,7 +564,7 @@ int main(void) {
 }
 ```
 ```c++
-#define i_type MyDeq, int, c_use_cmp // int elements, enable sorting
+#define i_type MyDeq, int, (c_use_cmp) // int elements, enable sorting
 #include "stc/deque.h"
 #include <stdio.h>
 

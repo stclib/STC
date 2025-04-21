@@ -19,18 +19,18 @@ int point_cmp(const Point* a, const Point* b) {
 #define i_type PMap,Point,int
 #define i_cmp point_cmp
 #define i_declared
-#include "stc/smap.h"
+#include "stc/sortedmap.h"
 
 // cstr => cstr map
 #define i_type SMap
 #define i_keypro cstr
 #define i_valpro cstr
-#include "stc/smap.h"
+#include "stc/sortedmap.h"
 
 // cstr set
 #define i_type SSet
 #define i_keypro cstr
-#include "stc/sset.h"
+#include "stc/sortedset.h"
 
 
 int main(void)

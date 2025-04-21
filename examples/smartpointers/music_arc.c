@@ -35,24 +35,22 @@ typedef struct {
 inline static bool SongView_cmp(const SongView* xw, const SongView* yw)
     { int c = strcmp(xw->artist, yw->artist); return c ? c : strcmp(xw->title, yw->title); }
 
-#define SongView_eq(x, y) SongView_cmp(x, y)==0
-
 inline static size_t SongView_hash(const SongView* xw)
     { return c_hash_mix(c_hash_str(xw->artist), c_hash_str(xw->title)); }
 
 
 // Define the shared pointer type SongArc and conversion functions to SongView:
-#define i_type SongArc
-#define i_keyclass Song      // binds Song_clone(), Song_drop()
-#define i_rawclass SongView  // Element view type
+// "keyclass" binds Song_clone(), Song_drop()
+// "rawclass" specifies the type/view to convert to/from
+#define i_type SongArc, Song, (c_keyclass | c_use_cmp)
+#define i_rawclass SongView
 #define i_keytoraw(x) ((SongView){.artist=cstr_str(&x->artist), .title=cstr_str(&x->title)})
 #define i_keyfrom(sw) ((Song){.artist=cstr_from(sw.artist), .title=cstr_from(sw.title)})
 #include "stc/arc.h"
 
 // Create a set of SongArc
-#define i_type SongSet
-#define i_keypro SongArc // use i_keypro when key is an arc type, instead of i_key
-#include "stc/hset.h"
+#define i_type SongSet, SongArc, (c_keypro) // arc-type is "pro"
+#include "stc/hashset.h"
 
 void example3(void)
 {

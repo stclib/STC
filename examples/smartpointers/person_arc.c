@@ -28,16 +28,12 @@ void Person_drop(Person* p) {
     c_drop(cstr, &p->name, &p->last);
 }
 
-#define i_type PSPtr
-#define i_keyclass Person // binds Person_clone, Person_drop
-#define i_use_cmp
+// binds Person_clone, Person_drop, enable sort/search
+#define i_type PSPtr, Person, (c_keyclass | c_use_cmp)
 #include "stc/arc.h"
 
-#define i_type Persons
-#define i_keypro PSPtr    // binds all needed "members" function of arc
-#define i_use_cmp         // enable search / sort for vec
+#define i_type Persons, PSPtr, (c_keypro | c_use_cmp)
 #include "stc/vec.h"
-
 
 
 int main(void)

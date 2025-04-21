@@ -102,7 +102,7 @@ int32_t              crand32_uniform_r(crand32* rng, uint32_t strm, crand32_unif
 #include "stc/random.h"
 
 #define i_type SortedMap, int, long
-#include "stc/smap.h" // sorted map.
+#include "stc/sortedmap.h" // sorted map.
 
 int main(void)
 {

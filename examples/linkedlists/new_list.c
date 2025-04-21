@@ -9,8 +9,7 @@ typedef struct {
     list_pnt pntlist;
 } MyStruct;
 
-#define i_type list_i32, int32_t
-#define i_declared
+#define i_type list_i32, int32_t, (c_declared)
 #include "stc/list.h"
 
 typedef struct Point { int x, y; } Point;
@@ -19,19 +18,18 @@ int point_cmp(const Point* a, const Point* b) {
     return c ? c : a->y - b->y;
 }
 
-#define i_type list_pnt, Point
+#define i_type list_pnt, Point, (c_declared)
 #define i_cmp point_cmp
-#define i_declared
 #include "stc/list.h"
 
-#define i_key float
-#define i_use_cmp               // use < and == operators for comparison
+// use < and == operators for comparison
+#define i_type list_float, float, (c_use_cmp)
 #include "stc/list.h"
 
 void MyStruct_drop(MyStruct* s);
-#define i_type MyList
-#define i_keyclass MyStruct // bind _drop() function
-#define i_no_clone          // explicitly exclude cloning support because of class/drop.
+
+// exclude cloning support because of class/drop:
+#define i_type MyList, MyStruct, (c_keyclass | c_no_clone)
 #include "stc/list.h"
 
 void MyStruct_drop(MyStruct* s) {

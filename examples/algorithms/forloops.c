@@ -5,7 +5,7 @@
 #include "stc/stack.h"
 
 #define i_type IMap,int,int
-#include "stc/hmap.h"
+#include "stc/hashmap.h"
 
 
 int main(void)

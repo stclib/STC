@@ -97,18 +97,15 @@ bool            arc_X_value_eq(const i_key* x, const i_key* y);
 // Show elements dropped.
 #include "stc/cstr.h"
 
-#define i_type Map
-#define i_keypro cstr  // cstr is a "pro" type:
-#define i_val int      // year
+#define i_type Map, cstr, int, (c_keypro) // cstr is a "pro" type
 #define i_keydrop(p) (printf("  drop name: %s\n", cstr_str(p)), cstr_drop(p))
-#include "stc/smap.h"
+#include "stc/sortedmap.h"
 
-#define i_type Arc     // (atomic) ref. counted pointer
-#define i_keyclass Map // bind _clone & _drop
+// keyclass binds _clone & _drop:
+#define i_type Arc, Map, (c_keyclass) // (Atomic) Ref. Counted pointer
 #include "stc/arc.h"   // try to switch to box.h!
 
-#define i_type Stack
-#define i_keypro Arc // Note: use i_keypro for arc key types
+#define i_type Stack, Arc, (c_keypro) // arc is "pro"
 #include "stc/stack.h"
 
 int main(void)

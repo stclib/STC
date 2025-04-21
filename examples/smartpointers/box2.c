@@ -19,10 +19,9 @@ typedef struct {
 #define i_type BoxRect, Rectangle
 #include "stc/box.h"
 
-// Box in box:
-#define i_type BoxBoxPoint
-#define i_keypro BoxPoint // NB: use i_keypro when value is a box or arc!
-#include "stc/box.h" // BoxBoxPoint
+// Box in box: (box is a "pro" key-type)
+#define i_type BoxBoxPoint, BoxPoint, (c_keypro)
+#include "stc/box.h"
 
 Point origin(void) {
     return c_literal(Point){ .x=1.0, .y=2.0 };

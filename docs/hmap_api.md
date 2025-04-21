@@ -45,7 +45,7 @@ See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/contain
 #define i_valfrom <fn>        // convertion func i_valraw => i_val
 #define i_valtoraw <fn>       // convertion func i_val* => i_valraw
 
-#include "stc/hmap.h"
+#include "stc/hashmap.h"
 ```
 - In the following, `X` is the value of `i_key` unless `i_type` is defined.
 - **emplace**-functions are only available when `i_keyraw`/`i_valraw` are implicitly or explicitly defined.
@@ -131,34 +131,33 @@ bool            c_memcmp_eq(const i_keyraw* a, const i_keyraw* b);    // !memcmp
 ```c++
 #include "stc/cstr.h"
 
-#define i_keypro cstr
-#define i_valpro cstr
-#include "stc/hmap.h"
+#define i_type strmap cstr, cstr, (c_keypro|c_valpro)
+#include "stc/hashmap.h"
 
 int main(void)
 {
     // Create an unordered_map of three strings (that map to strings)
-    hmap_cstr umap = c_make(hmap_cstr, {
+    strmap umap = c_make(strmap, {
         {"RED", "#FF0000"},
         {"GREEN", "#00FF00"},
         {"BLUE", "#0000FF"}
     });
 
     // Iterate and print keys and values of unordered map
-    for (c_each(n, hmap_cstr, umap)) {
-        hmap_cstr_raw v = hmap_cstr_value_toraw(n.ref);
+    for (c_each(n, strmap, umap)) {
+        strmap_raw v = strmap_value_toraw(n.ref);
         printf("Key:[%s] Value:[%s]\n", v.first, v.second);
     }
 
     // Add two new entries to the unordered map
-    hmap_cstr_emplace(&umap, "BLACK", "#000000");
-    hmap_cstr_emplace(&umap, "WHITE", "#FFFFFF");
+    strmap_emplace(&umap, "BLACK", "#000000");
+    strmap_emplace(&umap, "WHITE", "#FFFFFF");
 
     // Output values by key
-    printf("The HEX of color RED is:[%s]\n", cstr_str(hmap_cstr_at(&umap, "RED")));
-    printf("The HEX of color BLACK is:[%s]\n", cstr_str(hmap_cstr_at(&umap, "BLACK")));
+    printf("The HEX of color RED is:[%s]\n", cstr_str(strmap_at(&umap, "RED")));
+    printf("The HEX of color BLACK is:[%s]\n", cstr_str(strmap_at(&umap, "BLACK")));
 
-    hmap_cstr_drop(&umap);
+    strmap_drop(&umap);
 }
 ```
 
@@ -171,7 +170,7 @@ Demonstrate hmap with mapped POD type Vec3i: hmap<int, Vec3i>:
 typedef struct { int x, y, z; } Vec3i;
 
 #define i_type hmap_iv, int, Vec3i
-#include "stc/hmap.h"
+#include "stc/hashmap.h"
 
 int main(void)
 {
@@ -199,7 +198,7 @@ typedef struct { int x, y, z; } Vec3i;
 
 #define i_type hmap_vi, Vec3i, int
 #define i_eq c_memcmp_eq // bitwise equal
-#include "stc/hmap.h"
+#include "stc/hashmap.h"
 
 int main(void)
 {
@@ -223,7 +222,7 @@ Key type is struct. Based on https://doc.rust-lang.org/std/collections/struct.Ha
 
 [ [Run this code](https://godbolt.org/z/qoPaPozYK) ]
 ```c++
-#include <stc/cstr.h>
+#include "stc/cstr.h"
 
 typedef struct {
     cstr name;
@@ -256,7 +255,7 @@ void Viking_drop(Viking* vp) {
 #define i_type Vikings
 #define i_keyclass Viking // binds the four Viking_xxxx() functions above
 #define i_val int
-#include <stc/hmap.h>
+#include "stc/hashmap.h"
 
 int main(void)
 {
@@ -332,11 +331,9 @@ Viking_raw Viking_toraw(const Viking* vp) {
     Viking_raw rv = {cstr_str(&vp->name), cstr_str(&vp->country)}; return rv;
 }
 
-// With this in place, we define the Viking => int hash map type:
-#define i_type   Vikings
-#define i_keypro Viking  // key "class": binds Viking_drop, Viking_clone, Viking_from, Viking_toraw
-#define i_val    int     // mapped health
-#include "stc/hmap.h"
+// Define the map. Viking is now a "pro"-type:
+#define i_type Vikings, Viking, int, (c_keypro)
+#include "stc/hashmap.h"
 
 int main(void)
 {

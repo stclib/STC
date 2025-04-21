@@ -2,10 +2,8 @@
 // https://docs.microsoft.com/en-us/cpp/standard-library/map-class?view=msvc-160#example-17
 #include "stc/cstr.h"
 
-#define i_type smap_istr
-#define i_key int
-#define i_valpro cstr
-#include "stc/smap.h"
+#define i_type smap_istr, int, cstr, (c_valpro)
+#include "stc/sortedmap.h"
 
 #define i_type vec_istr, smap_istr_raw
 #include "stc/vec.h"

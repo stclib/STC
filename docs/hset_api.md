@@ -24,7 +24,7 @@ A **hset** is an associative container that contains a set of unique objects of 
 #define i_keyfrom <fn>   // convertion func i_keyraw => i_key - defaults to plain copy
 #define i_keytoraw <fn>  // convertion func i_key* => i_keyraw - defaults to plain copy
 
-#include "stc/hset.h"
+#include "stc/hashset.h"
 ```
 - In the following, `X` is the value of `i_key` unless `i_type` is defined.
 - **emplace**-functions are only available when `i_keyraw` is implicitly or explicitly defined.
@@ -88,9 +88,8 @@ hset_X_value    hset_X_value_clone(hset_X_value val);
 ```c++
 #include "stc/cstr.h"
 
-#define i_type Strings
-#define i_keypro cstr
-#include "stc/hset.h"
+#define i_type Strings, cstr, (c_keypro)
+#include "stc/hashset.h"
 
 int main(void)
 {

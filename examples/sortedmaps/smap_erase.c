@@ -3,10 +3,8 @@
 #include "stc/cstr.h"
 #include <stdio.h>
 
-#define i_type mymap
-#define i_key int
-#define i_valpro cstr
-#include "stc/smap.h"
+#define i_type mymap, int, cstr, (c_valpro)
+#include "stc/sortedmap.h"
 
 void printmap(mymap m)
 {

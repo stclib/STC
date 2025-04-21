@@ -9,17 +9,14 @@ void int_drop(int* x) {
 // so 'i_keyclone' is not required to be defined (ignored).
 
 // Define the Arc, no need for atomic in single thread, enable default int comparisons.
-#define i_type Arc, int, c_no_atomic | c_use_cmp
+#define i_type Arc, int, (c_no_atomic | c_use_cmp)
 #define i_keydrop int_drop  // optional, just to display the elements destroyed
 #include "stc/arc.h"        // Arc
 
-#define i_type Arcset
-#define i_keypro Arc        // note: use i_keypro instead of i_key for arc elements
-#include "stc/sset.h"       // Arcset (like: std::set<std::shared_ptr<int>>)
+#define i_type Arcset, Arc, (c_keypro) // arc's are "pro" types
+#include "stc/sortedset.h"  // Arcset (like: std::set<std::shared_ptr<int>>)
 
-#define i_type Arcvec
-#define i_keypro Arc        // note: as above.
-#define i_use_cmp
+#define i_type Arcvec, Arc, (c_keypro | c_use_cmp)
 #include "stc/vec.h"        // Arcvec (like: std::vector<std::shared_ptr<int>>)
 
 int main(void)

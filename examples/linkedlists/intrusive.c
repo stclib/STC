@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 
-#define i_type List, int, c_use_cmp
+#define i_type List, int, (c_use_cmp)
 #include "stc/list.h"
 
 void printList(List list) {

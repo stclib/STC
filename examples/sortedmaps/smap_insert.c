@@ -2,17 +2,15 @@
 // https://docs.microsoft.com/en-us/cpp/standard-library/map-class?view=msvc-160#example-19
 
 #define i_type smap_ii, int, int
-#include "stc/smap.h"
+#include "stc/sortedmap.h"
 
 #define i_type vec_ii, smap_ii_value
 #include "stc/vec.h"
 
 #include "stc/cstr.h"
 
-#define i_type smap_istr // Map of int => cstr
-#define i_key int
-#define i_valpro cstr
-#include "stc/smap.h"
+#define i_type smap_istr, int, cstr, (c_valpro) // Map of int => cstr
+#include "stc/sortedmap.h"
 
 void print_ii(smap_ii map) {
     for (c_each(e, smap_ii, map))

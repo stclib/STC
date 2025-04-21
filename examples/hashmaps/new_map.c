@@ -1,7 +1,7 @@
 #include "stc/cstr.h"
 #include "stc/types.h"
 
-declare_hmap(hmap_pnt, struct Point, int);
+declare_hashmap(hmap_pnt, struct Point, int);
 
 typedef struct MyStruct {
     hmap_pnt pntmap;
@@ -10,25 +10,24 @@ typedef struct MyStruct {
 
 // int => int map
 #define i_type hmap_int, int, int
-#include "stc/hmap.h"
+#include "stc/hashmap.h"
 
 // Point => int map
 typedef struct Point { int x, y; } Point;
 
 // Point => int map, uses default hash function
-#define i_type hmap_pnt, struct Point, int
+#define i_type hmap_pnt, struct Point, int, (c_declared)
 #define i_eq c_memcmp_eq
-#define i_declared
-#include "stc/hmap.h"
+#include "stc/hashmap.h"
 
 // cstr => cstr map
 #define i_keypro cstr
 #define i_valpro cstr
-#include "stc/hmap.h"
+#include "stc/hashmap.h"
 
 // string set
 #define i_keypro cstr
-#include "stc/hset.h"
+#include "stc/hashset.h"
 
 
 int main(void)

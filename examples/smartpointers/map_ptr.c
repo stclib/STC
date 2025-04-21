@@ -10,7 +10,7 @@
 #define i_valtoraw(x) **x
 #define i_valclone(x) c_new(long, *x)
 #define i_valdrop(x) free(*x)
-#include "stc/hmap.h"
+#include "stc/hashmap.h"
 
 int main(void)
 {

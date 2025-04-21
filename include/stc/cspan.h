@@ -25,8 +25,8 @@
 #include <stdio.h>
 #include "stc/cspan.h"
 #include "stc/algorithm.h"
-using_cspan(Span2f, float, 2);
-using_cspan(Intspan, int);
+use_cspan(Span2f, float, 2);
+use_cspan(Intspan, int);
 
 int demo1() {
     float raw[4*5];
@@ -65,9 +65,15 @@ int demo2() {
 typedef int32_t cspan_istride, _istride;
 typedef isize _isize_triple[3];
 
-#define using_cspan(...) c_MACRO_OVERLOAD(using_cspan, __VA_ARGS__)
-#define using_cspan_2(Self, T) \
-    using_cspan_3(Self, T, 1); \
+#define using_cspan use_cspan                   // [deprecated]
+#define using_cspan2 use_cspan2                 // [deprecated]
+#define using_cspan3 use_cspan3                 // [deprecated]
+#define using_cspan2_with_eq use_cspan2_with_eq // [deprecated]
+#define using_cspan3_with_eq use_cspan3_with_eq // [deprecated]
+
+#define use_cspan(...) c_MACRO_OVERLOAD(use_cspan, __VA_ARGS__)
+#define use_cspan_2(Self, T) \
+    use_cspan_3(Self, T, 1); \
     STC_INLINE Self Self##_from_n(Self##_value* dataptr, isize n) \
         { return (Self)cspan_from_n(dataptr, n); } \
     STC_INLINE const Self##_value* Self##_at(const Self* self, isize idx) \
@@ -76,14 +82,14 @@ typedef isize _isize_triple[3];
         { return cspan_at(self, idx); } \
     struct stc_nostruct
 
-#define using_cspan_with_eq(...) c_MACRO_OVERLOAD(using_cspan_with_eq, __VA_ARGS__)
-#define using_cspan_with_eq_3(Self, T, i_eq) \
-    using_cspan_with_eq_4(Self, T, i_eq, 1); \
+#define use_cspan_with_eq(...) c_MACRO_OVERLOAD(use_cspan_with_eq, __VA_ARGS__)
+#define use_cspan_with_eq_3(Self, T, i_eq) \
+    use_cspan_with_eq_4(Self, T, i_eq, 1); \
     STC_INLINE Self Self##_from_n(Self##_value* dataptr, isize n) \
         { return (Self)cspan_from_n(dataptr, n); } \
     struct stc_nostruct
 
-#define using_cspan_3(Self, T, RANK) \
+#define use_cspan_3(Self, T, RANK) \
     typedef T Self##_value; \
     typedef T Self##_raw; \
     typedef struct { \
@@ -123,8 +129,8 @@ typedef isize _isize_triple[3];
         { _cspan_transpose(sp.shape, sp.stride.d, cspan_rank(&sp)); return sp; } \
     struct stc_nostruct
 
-#define using_cspan_with_eq_4(Self, T, i_eq, RANK) \
-    using_cspan_3(Self, T, RANK); \
+#define use_cspan_with_eq_4(Self, T, i_eq, RANK) \
+    use_cspan_3(Self, T, RANK); \
     STC_INLINE bool Self##_eq(const Self* x, const Self* y) { \
         if (memcmp(x->shape, y->shape, sizeof x->shape) != 0) \
             return false; \
@@ -137,17 +143,17 @@ typedef isize _isize_triple[3];
         { return Self##_eq(&sp1, &sp2); } \
     struct stc_nostruct
 
-#define using_cspan2(Self, T) using_cspan_2(Self, T); using_cspan_3(Self##2, T, 2)
-#define using_cspan3(Self, T) using_cspan2(Self, T); using_cspan_3(Self##3, T, 3)
-#define using_cspan2_with_eq(Self, T, eq) using_cspan_with_eq_3(Self, T, eq); \
-                                           using_cspan_with_eq_4(Self##2, T, eq, 2)
-#define using_cspan3_with_eq(Self, T, eq) using_cspan2_with_eq(Self, T, eq); \
-                                           using_cspan_with_eq_4(Self##3, T, eq, 3)
-#define using_cspan_tuple(N) typedef struct { _istride d[N]; } cspan_tuple##N
-using_cspan_tuple(1); using_cspan_tuple(2);
-using_cspan_tuple(3); using_cspan_tuple(4);
-using_cspan_tuple(5); using_cspan_tuple(6);
-using_cspan_tuple(7); using_cspan_tuple(8);
+#define use_cspan2(Self, T) use_cspan_2(Self, T); use_cspan_3(Self##2, T, 2)
+#define use_cspan3(Self, T) use_cspan2(Self, T); use_cspan_3(Self##3, T, 3)
+#define use_cspan2_with_eq(Self, T, eq) use_cspan_with_eq_3(Self, T, eq); \
+                                           use_cspan_with_eq_4(Self##2, T, eq, 2)
+#define use_cspan3_with_eq(Self, T, eq) use_cspan2_with_eq(Self, T, eq); \
+                                           use_cspan_with_eq_4(Self##3, T, eq, 3)
+#define use_cspan_tuple(N) typedef struct { _istride d[N]; } cspan_tuple##N
+use_cspan_tuple(1); use_cspan_tuple(2);
+use_cspan_tuple(3); use_cspan_tuple(4);
+use_cspan_tuple(5); use_cspan_tuple(6);
+use_cspan_tuple(7); use_cspan_tuple(8);
 
 
 // cspan_from_n a pointer+size

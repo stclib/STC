@@ -26,13 +26,6 @@
 
 #ifndef STC_TEMPLATE_H_INCLUDED
 #define STC_TEMPLATE_H_INCLUDED
-  #define c_OPTION(flag)  ((i_opt) & (flag))
-  #define c_declared      (1<<0)
-  #define c_no_atomic     (1<<1)
-  #define c_no_clone      (1<<2)
-  #define c_no_hash       (1<<4)
-  #define c_use_cmp       (1<<5)
-  #define c_use_eq        (1<<6)
 
   #define _c_MEMB(name) c_JOIN(Self, name)
   #define _c_DEFTYPES(macro, SELF, ...) c_EXPAND(macro(SELF, __VA_ARGS__))
@@ -45,6 +38,19 @@
   #define _m_iter _c_MEMB(_iter)
   #define _m_result _c_MEMB(_result)
   #define _m_node _c_MEMB(_node)
+
+  #define c_OPTION(flag)  ((i_opt) & (flag))
+  #define c_declared      (1<<0)
+  #define c_no_atomic     (1<<1)
+  #define c_no_clone      (1<<2)
+  #define c_no_hash       (1<<4)
+  #define c_use_cmp       (1<<5)
+  #define c_use_eq        (1<<6)
+  #define c_rawclass      (1<<7)
+  #define c_keyclass      (1<<8)
+  #define c_valclass      (1<<9)
+  #define c_keypro        (1<<10)
+  #define c_valpro        (1<<11)
 #endif
 
 #if defined i_key_arcbox // [deprecated]
@@ -67,8 +73,7 @@
   #define i_type i_TYPE
 #endif
 
-#if defined i_type && !(defined i_key || defined i_keyclass || \
-                        defined i_keypro || defined i_rawclass)
+#if defined i_type && c_NUMARGS(i_type) > 1
   #define Self c_GETARG(1, i_type)
   #define i_key c_GETARG(2, i_type)
   #if c_NUMARGS(i_type) == 3
@@ -87,19 +92,6 @@
   #define Self c_JOIN(_i_prefix, i_tag)
 #endif
 
-#if defined i_rawclass
-  #if defined _i_is_arc || defined _i_is_box
-    #define i_use_cmp
-    #define i_use_eq
-  #endif
-  #if !(defined i_key || defined i_keyclass)
-    #define i_key i_rawclass
-    #define i_keytoraw c_default_toraw
-  #endif
-#endif
-
-#define i_no_emplace
-
 #if c_OPTION(c_declared)
   #define i_declared
 #endif
@@ -115,24 +107,49 @@
 #if c_OPTION(c_no_clone) || defined _i_is_arc
   #define i_no_clone
 #endif
+#if c_OPTION(c_keyclass)
+  #define i_keyclass i_key
+#endif
+#if c_OPTION(c_valclass)
+  #define i_valclass i_val
+#endif
+#if c_OPTION(c_rawclass)
+  #define i_rawclass i_key
+  #define _i_rawclass_is_key
+#endif
+#if c_OPTION(c_keypro)
+  #define i_keypro i_key
+#endif
+#if c_OPTION(c_valpro)
+  #define i_valpro i_val
+#endif
 
-// Handle predefined element-types with lookup convertion types:
-// cstr_from(const char*) and arc_T_from(T) / box_T_from(T)
 #if defined i_keypro
   #define i_keyclass i_keypro
   #define i_rawclass c_JOIN(i_keypro, _raw)
 #endif
 
-// Check for keyclass and rawclass, and fill in missing defs.
 #if defined i_rawclass
   #define i_keyraw i_rawclass
+  #if !(defined i_key || defined i_keyclass)
+    #define i_key i_rawclass
+    #define _i_rawclass_is_key
+    #ifndef i_keytoraw
+      #define i_keytoraw c_default_toraw
+    #endif
+  #endif
 #elif defined i_keyclass && !defined i_keyraw
+  // Special: When only i_keyclass is defined, also define i_rawclass to the same.
+  // Do not define i_keyraw here, otherwise _from() is expected to exist
   #define i_rawclass i_key
+  #define _i_rawclass_is_key
 #endif
 
 // Bind to i_key "class members": _clone, _drop, _from and _toraw (when conditions are met).
 #if defined i_keyclass
-  #define i_key i_keyclass
+  #ifndef i_key
+    #define i_key i_keyclass
+  #endif
   #if !defined i_keyclone && !defined i_no_clone
     #define i_keyclone c_JOIN(i_keyclass, _clone)
   #endif
@@ -172,7 +189,7 @@
 
 #if !defined i_key
   #error "No i_key defined"
-#elif defined i_keyraw && !defined i_keytoraw
+#elif defined i_keyraw && !defined _i_rawclass_is_key && !defined i_keytoraw
   #error "If i_keyraw/i_valraw is defined, i_keytoraw/i_valtoraw must be defined too"
 #elif !defined i_no_clone && (defined i_keyclone ^ defined i_keydrop)
   #error "Both i_keyclone/i_valclone and i_keydrop/i_valdrop must be defined, if any (unless i_no_clone defined)."
@@ -202,6 +219,8 @@
   #define i_hash c_default_hash
 #endif
 
+#define i_no_emplace
+
 #ifndef i_tag
   #define i_tag i_key
 #endif
@@ -225,7 +244,7 @@
   #define i_keydrop c_default_drop
 #endif
 
-#if defined _i_is_map // ---- process hmap/smap value i_val, ... ----
+#if defined _i_is_map // ---- process hashmap/sortedmap value i_val, ... ----
 
 #if defined i_valpro
   #define i_valclass i_valpro
@@ -233,7 +252,9 @@
 #endif
 
 #ifdef i_valclass
-  #define i_val i_valclass
+  #ifndef i_val
+    #define i_val i_valclass
+  #endif
   #if !defined i_valclone && !defined i_no_clone
     #define i_valclone c_JOIN(i_valclass, _clone)
   #endif
@@ -286,4 +307,5 @@
 #ifndef i_valraw
   #define i_valraw i_keyraw
 #endif
+#undef _i_rawclass_is_key
 #endif // STC_TEMPLATE_H_INCLUDED

@@ -3,13 +3,20 @@
 
 # STC - Smart Template Containers
 
-## Version 5.1 RC1
+## Version 5.1 RC2
 STC is a comprehensive, high performance, typesafe and generic general purpose container and algorithms
 library for C99 with excellent ergonomics and ease of use.
 
 <details>
 <summary><b>Version 5 NEWS</b></summary>
 
+V5.1:
+- Several breaking changes in cspan API.
+- Possible to specify container types as one-liners, also for "keypro", "keyclass" and "rawclass" element types.
+- Updated **cregex** to handle invalid utf8 strings and fixed bugs.
+- Many improvements and bug fixes.
+
+V5.0:
 - Added build system/CI with Meson. Makefile provided as well.
 - Added support for extending templated containers by `#define i_aux { ... }`.
 - Changed ranged for-loop macros to use more natural C-syntax (v5.0.2)
@@ -22,9 +29,6 @@ library for C99 with excellent ergonomics and ease of use.
 - Template parameters `i_keypro` and `i_valpro` to specify `cstr`, `box` and `arc` types (users may also define pro-types).
 - **hmap** now uses *Robin Hood hashing* (very fast on clang compiler).
 - Several new algorithms added, e.g. `c_filter` (ranges-like), `c_shuffle`, `c_reverse`.
-- Updated **cregex** to handle invalid utf8 strings and fixed bugs.
-- A lot of improvements and bug fixes.
-
 See also [version history](#version-history) for breaking changes in V5.0.
 </details>
 <details>
@@ -186,7 +190,7 @@ Switching to a different container type, e.g. a sorted set (sset):
 [ [Run this code](https://godbolt.org/z/6KhzdMafd) ]
 ```c++
 #define i_type Floats, float
-#include "stc/sset.h" // Use a sorted set instead
+#include "stc/sortedset.h" // Use a sorted set instead
 #include <stdio.h>
 
 int main(void)
@@ -228,6 +232,10 @@ Let's make a vector of vectors, which can be cloned. All of its element vectors 
 #define i_use_eq         // vec does not have _cmp(), but it has _eq()
 #include "stc/vec.h"
 
+// The above may be written as a one-liner (note the c_-prefix instead of i_):
+//#define i_type Vec2D, Vec, (c_keyclass | c_use_eq)
+//#include "stc/vec.h"
+
 int main(void)
 {
     Vec* v;
@@ -263,7 +271,7 @@ This example uses four different container types:
 #include <stdio.h>
 
 #define i_type hset_int, int
-#include "stc/hset.h"   // unordered/hash set (assume i_key is basic type, uses `==` operator)
+#include "stc/hashset.h"   // unordered/hash set (assume i_key is basic type, uses `==` operator)
 
 struct Point { float x, y; };
 // Define cvec_pnt and enable linear search by defining i_eq
@@ -276,7 +284,7 @@ struct Point { float x, y; };
 #include "stc/list.h"   // singly linked list
 
 #define i_type smap_int, int, int
-#include "stc/smap.h"  // sorted map int => int
+#include "stc/sortedmap.h"  // sorted map int => int
 
 int main(void)
 {
@@ -704,7 +712,7 @@ Usage is straight forward:
 ```c++
 #define i_type IMap, int, int
 #include "stcpgs.h"
-#include "stc/smap.h"
+#include "stc/sortedmap.h"
 
 void maptest()
 {
@@ -724,7 +732,7 @@ Another example is to sort struct elements by the *active field* and *reverse* f
 ```c++
 #include <stdio.h>
 #include <time.h>
-#include <stc/cstr.h>
+#include "stc/cstr.h"
 #include <c11/fmt.h>
 
 typedef struct {
@@ -745,7 +753,7 @@ void FileMetaData_drop(FileMetaData*);
 #define i_cmp(x, y) FileMetaData_cmp(&self->aux, x, y)
 #define i_keydrop FileMetaData_drop
 #define i_no_clone
-#include <stc/stack.h>
+#include "stc/stack.h"
 // --------------
 
 int FileMetaData_cmp(const struct FMDVector_aux* aux, const FileMetaData* a, const FileMetaData* b) {

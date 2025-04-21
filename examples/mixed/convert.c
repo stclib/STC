@@ -3,7 +3,7 @@
 
 #define i_keypro cstr // key = cstr
 #define i_valpro cstr
-#include "stc/hmap.h"
+#include "stc/hashmap.h"
 
 #define i_keypro cstr
 #include "stc/vec.h"

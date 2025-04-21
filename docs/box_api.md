@@ -95,13 +95,11 @@ void int_drop(int* x) {
 #include "stc/box.h"
 
 // ISet : std::set<std::unique_ptr<int>>
-#define i_type ISet
-#define i_keypro IBox       // NB: use i_keypro instead of i_key
-#include "stc/sset.h"
+#define i_type ISet, IBox, (c_keypro) // box is a "pro"-type
+#include "stc/sortedset.h"
 
 // IVec : std::vector<std::unique_ptr<int>>
-#define i_type IVec
-#define i_keypro IBox       // NB: use i_keypro instead of i_key
+#define i_type IVec, IBox, (c_keypro)
 #include "stc/vec.h"
 
 

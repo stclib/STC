@@ -44,7 +44,7 @@ See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) fo
 #define i_valfrom <fn>        // convertion func i_valraw => i_val
 #define i_valtoraw <fn>       // convertion func i_val* => i_valraw
 
-#include "stc/smap.h"
+#include "stc/sortedmap.h"
 ```
 - In the following, `X` is the value of `i_key` unless `i_type` is defined.
 - **emplace**-functions are only available when `i_keyraw`/`i_valraw` are implicitly or explicitly defined.
@@ -122,33 +122,32 @@ void            smap_X_value_drop(i_key* pval);
 ```c++
 #include "stc/cstr.h"
 
-#define i_keypro cstr // special macro for i_key = cstr
-#define i_valpro cstr // ditto
-#include "stc/smap.h"
+#define i_type strmap cstr, cstr, (c_keypro|c_valpro)
+#include "stc/sortedmap.h"
 
 int main(void)
 {
     // Create a sorted map of three strings (maps to string)
-    smap_cstr colors = c_make(smap_cstr, {
+    strmap colors = c_make(strmap, {
         {"RED", "#FF0000"},
         {"GREEN", "#00FF00"},
         {"BLUE", "#0000FF"}
     });
 
     // Iterate and print keys and values of sorted map
-    for (c_each(i, smap_cstr, colors)) {
+    for (c_each(i, strmap, colors)) {
         printf("Key:[%s] Value:[%s]\n", cstr_str(&i.ref->first), cstr_str(&i.ref->second));
     }
 
     // Add two new entries to the sorted map
-    smap_cstr_emplace(&colors, "BLACK", "#000000");
-    smap_cstr_emplace(&colors, "WHITE", "#FFFFFF");
+    strmap_emplace(&colors, "BLACK", "#000000");
+    strmap_emplace(&colors, "WHITE", "#FFFFFF");
 
     // Output values by key
-    printf("The HEX of color RED is:[%s]\n", cstr_str(smap_cstr_at(&colors, "RED")));
-    printf("The HEX of color BLACK is:[%s]\n", cstr_str(smap_cstr_at(&colors, "BLACK")));
+    printf("The HEX of color RED is:[%s]\n", cstr_str(strmap_at(&colors, "RED")));
+    printf("The HEX of color BLACK is:[%s]\n", cstr_str(strmap_at(&colors, "BLACK")));
 
-    smap_cstr_drop(&colors);
+    strmap_drop(&colors);
 }
 ```
 
@@ -160,10 +159,8 @@ Translate a
 [ [Run this code](https://godbolt.org/z/1jYhcjK44) ]
 ```c++
 #include "stc/cstr.h"
-#define i_type strmap
-#define i_keypro cstr // key = cstr class
-#define i_valpro cstr
-#include "stc/smap.h"
+#define i_type strmap, cstr, cstr, (c_keypro|c_valpro)
+#include "stc/sortedmap.h"
 
 static void print_node(const strmap_value* node) {
     printf("[%s] = %s\n", cstr_str(&node->first), cstr_str(&node->second));
@@ -199,7 +196,7 @@ This example uses a smap with cstr as mapped value. Note the `i_valpro` usage.
 #define i_type IdMap
 #define i_key int
 #define i_valpro cstr
-#include "stc/smap.h"
+#include "stc/sortedmap.h"
 
 int main(void)
 {
@@ -240,7 +237,7 @@ static int Vec3i_cmp(const Vec3i* a, const Vec3i* b) {
 
 #define i_type smap_vi, Vec3i, int
 #define i_cmp Vec3i_cmp
-#include "stc/smap.h"
+#include "stc/sortedmap.h"
 
 int main(void)
 {

@@ -5,7 +5,7 @@
 
 // Declare int -> int sorted map.
 #define i_type SortedMap, int, int
-#include "stc/smap.h"
+#include "stc/sortedmap.h"
 
 int main(void)
 {

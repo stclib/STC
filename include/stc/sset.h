@@ -25,8 +25,8 @@
 /*
 #include <stdio.h>
 
-#define i_type Intset,int
-#include "stc/sset.h" // sorted set of int
+#define i_type Intset, int
+#include "stc/sortedset.h" // sorted set of int
 
 int main(void) {
     Intset s = {0};

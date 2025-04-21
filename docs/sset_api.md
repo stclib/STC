@@ -27,7 +27,7 @@ See the c++ class [std::set](https://en.cppreference.com/w/cpp/container/set) fo
 #define i_keyfrom <fn>   // convertion func i_keyraw => i_key - defaults to plain copy
 #define i_keytoraw <fn>  // convertion func i_key* => i_keyraw - defaults to plain copy
 
-#include "stc/sset.h"
+#include "stc/sortedset.h"
 ```
 - In the following, `X` is the value of `i_key` unless `i_type` is defined.
 - **emplace**-functions are only available when `i_keyraw` is implicitly or explicitly defined.
@@ -90,9 +90,8 @@ i_key           sset_X_value_clone(i_key val);
 ```c++
 #include "stc/cstr.h"
 
-#define i_type SSet
-#define i_keypro cstr
-#include "stc/sset.h"
+#define i_type SSet, cstr, (c_keypro)
+#include "stc/sortedset.h"
 
 int main(void)
 {

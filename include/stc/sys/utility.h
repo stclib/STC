@@ -73,7 +73,7 @@
 // c_erase_if
 // --------------------------------
 
-// Use with: list, hmap, hset, smap, sset:
+// Use with: list, hashmap, hashset, sortedmap, sortedset:
 #define c_erase_if(C, cnt_ptr, pred) do { \
     C* _cnt = cnt_ptr; \
     const C##_value* value; \

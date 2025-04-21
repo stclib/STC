@@ -7,11 +7,10 @@
 #include "stc/list.h"
 
 // Map of int => list_cstr.
-#define i_type Multimap
-#define i_key int
-#define i_valclass list_cstr // set i_val = list_cstr, bind list_cstr_clone and list_cstr_drop
+// "valclass" bind list_cstr_clone() and list_cstr_drop()
+#define i_type Multimap, int, list_cstr, (c_valclass)
 #define i_cmp -c_default_cmp // like std::greater<int>
-#include "stc/smap.h"
+#include "stc/sortedmap.h"
 
 void print(const char* lbl, const Multimap mmap)
 {

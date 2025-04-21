@@ -1,22 +1,18 @@
 // Create a vec and a list of shared pointers to maps,
 // and demonstrate sharing and cloning of maps.
 #include "stc/cstr.h"
-#define i_type Map
-#define i_keypro cstr // strings
-#define i_val int
+#define i_type Map, cstr, int, (c_keypro)
 #define i_keydrop(p) (printf("drop name: %s\n", cstr_str(p)), cstr_drop(p))
-#include "stc/smap.h"
+#include "stc/sortedmap.h"
 
-#define i_type Arc, Map, c_no_atomic // non-atomic ref. counted type
+#define i_type Arc, Map, (c_no_atomic) // non-atomic ref. counted Map
 #define i_keydrop(p) (printf("drop Arc:\n"), Map_drop(p))
 #include "stc/arc.h"
 
-#define i_type Vec
-#define i_keypro Arc // define i_keypro for arc keys, not i_key
+#define i_type Vec, Arc, (c_keypro) // arc is a "pro" type
 #include "stc/vec.h"
 
-#define i_type List
-#define i_keypro Arc // as above
+#define i_type List, Arc, (c_keypro)
 #include "stc/list.h"
 
 int main(void)

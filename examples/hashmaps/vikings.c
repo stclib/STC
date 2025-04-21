@@ -44,11 +44,10 @@ static inline RawVik Viking_toraw(const Viking* vp) {
 }
 
 // With this in place, we define the Viking => int hash map type:
-#define i_type      Vikings
-#define i_keyclass  Viking  // binds _drop, _clone, _from, _toraw
+// "keyclass" binds _drop, _clone, _from, _toraw
+#define i_type      Vikings, Viking, int, (c_keyclass)
 #define i_rawclass  RawVik  // bind RawVik_cmp, RawVik_eq, RawVik_hash
-#define i_val       int     // mapped type
-#include "stc/hmap.h"
+#include "stc/hashmap.h"
 
 
 int main(void)

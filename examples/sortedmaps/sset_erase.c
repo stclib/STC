@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 #define i_key int
-#include "stc/sset.h"
+#include "stc/sortedset.h"
 
 int main(void)
 {

@@ -27,10 +27,8 @@
 #define i_implement
 #include "stc/cstr.h"
 
-#define i_type SMap  // Sorted map<cstr, double>
-#define i_keypro cstr
-#define i_val double
-#include "stc/smap.h"
+#define i_type SMap, cstr, double, (c_keypro)  // Sorted map<cstr, double>
+#include "stc/sortedmap.h"
 
 int main(void) {
     SMap m = {0};

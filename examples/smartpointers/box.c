@@ -27,14 +27,14 @@ void Person_drop(Person* p) {
     c_drop(cstr, &p->name, &p->last);
 }
 
-#define i_type PBox       // "class" binds _clone, _drop functions.
-#define i_keyclass Person // "class" binds _clone, _drop functions.
-#define i_use_cmp         // binds _cmp, _hash function
+// "class" binds _clone, _drop functions.
+// "use_cmp" binds _cmp, _hash functions.
+#define i_type PBox, Person, (c_keyclass | c_use_cmp)
 #include "stc/box.h"
 
-#define i_type Persons
-#define i_keypro PBox     // Use i_keypro for box, arc, and cstr types.
-#include "stc/sset.h"
+// box, arc, and cstr types are "pro"-types.
+#define i_type Persons, PBox, (c_keypro)
+#include "stc/sortedset.h"
 
 int main(void)
 {

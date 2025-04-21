@@ -64,11 +64,11 @@ point_key_cmp(const point* a, const point* b)
 
 #define i_type smap_pcost, point,int
 #define i_cmp point_key_cmp
-#include "stc/smap.h"
+#include "stc/sortedmap.h"
 
 #define i_type smap_pstep, point,point
 #define i_cmp point_key_cmp
-#include "stc/smap.h"
+#include "stc/sortedmap.h"
 
 
 deque_pnt

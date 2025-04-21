@@ -7,22 +7,20 @@
 // using MapMap = std::unordered_map<std::string, ListMap>;
 #include "stc/cstr.h"
 
-#define i_type FloatStack,float
+#define i_type FloatStack, float
 #include "stc/stack.h"
 
-#define i_type StackList
-#define i_keyclass FloatStack // "class" binds _clone, _drop
+// "keyclass" binds _clone(), _drop()
+#define i_type StackList, FloatStack, (c_keyclass)
 #include "stc/list.h"
 
-#define i_type ListMap
-#define i_key int
-#define i_valclass StackList   // "valclass" binds _clone, _drop
-#include "stc/hmap.h"
+// "valclass" binds _clone(), _drop()
+#define i_type ListMap, int, StackList, (c_valclass)
+#include "stc/hashmap.h"
 
-#define i_type MapMap
-#define i_keypro cstr
-#define i_valclass ListMap
-#include "stc/hmap.h"
+// "keypro" binds _clone, _drop, _cmp, _hash, _toraw, _from
+#define i_type MapMap, cstr, ListMap, (c_keypro | c_valclass)
+#include "stc/hashmap.h"
 
 
 int main(void)

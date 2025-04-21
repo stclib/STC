@@ -24,7 +24,7 @@
 // Unordered set - implemented with the robin-hood hashing scheme.
 /*
 #define i_type iset,int
-#include "stc/hset.h"
+#include "stc/hashset.h"
 #include <stdio.h>
 
 int main(void) {
