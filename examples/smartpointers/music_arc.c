@@ -43,7 +43,7 @@ inline static size_t SongView_hash(const SongView* xw)
 // "keyclass" binds Song_clone(), Song_drop()
 // "rawclass" specifies the type/view to convert to/from
 #define i_type SongArc, Song, (c_keyclass | c_use_cmp)
-#define i_rawclass SongView
+#define i_cmpclass SongView
 #define i_keytoraw(x) ((SongView){.artist=cstr_str(&x->artist), .title=cstr_str(&x->title)})
 #define i_keyfrom(sw) ((Song){.artist=cstr_from(sw.artist), .title=cstr_from(sw.title)})
 #include "stc/arc.h"

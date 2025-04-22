@@ -26,7 +26,7 @@ See the c++ class [std::deque](https://en.cppreference.com/w/cpp/container/deque
 #define i_eq <fn>        // equality comparison. Implicitly defined with i_cmp, but not i_less.
 
 #define i_keyraw <t>     // conversion "raw" type - defaults to i_key
-#define i_rawclass <t>   // conversion "raw class". binds <t>_cmp(),  <t>_eq(),  <t>_hash()
+#define i_cmpclass <t>   // conversion "raw class". binds <t>_cmp(),  <t>_eq(),  <t>_hash()
 #define i_keyfrom <fn>   // conversion func i_keyraw => i_key
 #define i_keytoraw <fn>  // conversion func i_key* => i_keyraw
 

@@ -35,7 +35,7 @@ See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/contain
 #define i_keydrop <fn>        // destroy key func - defaults to empty destruct
 #define i_keyclone <fn>       // REQUIRED IF i_keydrop defined
 #define i_keyraw <t>          // conversion "raw" type - defaults to i_key
-#define i_rawclass <t>        // conversion "raw class". binds <t>_cmp(),  <t>_eq(),  <t>_hash()
+#define i_cmpclass <t>        // conversion "raw class". binds <t>_cmp(),  <t>_eq(),  <t>_hash()
 #define i_keyfrom <fn>        // conversion func i_keyraw => i_key
 #define i_keytoraw <fn>       // conversion func i_key* => i_keyraw
 

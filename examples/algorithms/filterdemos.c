@@ -73,9 +73,8 @@ fn main() {
     println!("{:?}", words_containing_i);
 }
 */
-#define i_type SVec
-#define i_rawclass csview // set both key+keyraw = csview. Bind comparison functions.
-#define i_use_cmp
+// Bind and enable csview comparison functions for vec.
+#define i_type SVec, csview, (c_cmpclass | c_use_cmp)
 #include "stc/vec.h"
 
 void demo3(void)

@@ -13,6 +13,9 @@ typedef Mat OutMat;
 void base_case_matrix_product(Mat A, Mat B, OutMat C) {
     #ifdef __GNUC__
       #pragma omp parallel for schedule(runtime)
+      #define DEFAULT_DIM 4096
+    #else
+      #define DEFAULT_DIM 512
     #endif
     for (int i = 0; i < A.shape[0]; ++i) {
         for (int k = 0; k < A.shape[1]; k++) {
@@ -62,7 +65,7 @@ void recursive_matrix_product(Mat A, Mat B, OutMat C) {
 #include "stc/random.h"
 
 int main(int argc, char* argv[]) {
-    int M = 4096, P, N;
+    int M = DEFAULT_DIM, P, N;
     if (argc > 1)
         M = atoi(argv[1]);
     if (argc > 3) {

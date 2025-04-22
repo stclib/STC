@@ -462,7 +462,7 @@ same container base type was included earlier. Possible template parameters are:
 - `i_keydrop` *Func* - Destroy key - defaults to empty destructor.
 - `i_keyclone` *Func* - **[required if]** *i_keydrop* is defined (exception for **arc**, as it shares).
 - Advanced, conversion between an alternative input type:
-    - `i_keyraw` *RawType* - Lookup "raw" type. Defaults to *i_key*.
+    - `i_keyraw` *RawType* - Lookup/comparison "raw" type. Defaults to *i_key*.
     - `i_keyfrom` *Func* - Conversion func from a *i_keyraw* to return a *i_key* type.
     - `i_keytoraw` *Func*  - Conversion func from a *i_key* pointer to a *i_keyraw* type. **[required]** if *i_keyraw* was defined. By default, it returns the dereferenced *i_key* value.
 
@@ -481,7 +481,7 @@ following parameters, but the user may override those when needed. E.g. ***i_cmp
 it directly like `#define i_cmp(x, y) strcmp(x->name, y->name)`.
 
 #### Key meta parameters:
-- `i_rawclass` *RawType* - Defines ***i_keyraw*** and binds ***i_cmp***, ***i_eq***, and ***i_hash*** to
+- `i_cmpclass` *RawType* - Defines ***i_keyraw*** and binds ***i_cmp***, ***i_eq***, and ***i_hash*** to
 *RawType_cmp()*, *RawType_eq()*, and *RawType_hash()* comparison functions/macro names. In addition
 ***i_keyfrom***, ***i_keytoraw*** are bound to conversion functions *KeyType_from(RawType\*)* and *KeyType_toraw()*.
     - If neither ***i_key*** nor ***i_keyclass*** are defined, ***i_key*** will be defined as *RawType*. See Notes.
@@ -489,13 +489,13 @@ it directly like `#define i_cmp(x, y) strcmp(x->name, y->name)`.
 - `i_keyclass` *KeyType*
     - Defines ***i_key*** and binds ***i_keyclone***, ***i_keydrop*** to *KeyType_clone()* and *KeyType_drop()*
     function/macro names.
-    - Unless `i_rawclass`/`i_keyraw` are also specified, the comparison functions mentioned with ***i_rawclass*** are
+    - Unless `i_cmpclass`/`i_keyraw` are also specified, the comparison functions mentioned with ***i_cmpclass*** are
     also expected to exist (for containers that requires them or when **i_use_cmp** is specified).
     - Use with container of containers, or in general when the element type has *_clone()* and *_drop()*
     "member" functions.
 - `i_keypro` *KeyType* - Use with "pro"-element types, i.e. library types like **cstr**, **box** and **arc**.
-It combines all the ***i_keyclass*** and ***i_rawclass*** properties. Defining ***i_keypro*** is equal to defining
-    - ***i_rawclass*** *KeyType_raw*.
+It combines all the ***i_keyclass*** and ***i_cmpclass*** properties. Defining ***i_keypro*** is equal to defining
+    - ***i_cmpclass*** *KeyType_raw*.
     - ***i_keyclass*** *KeyType*
     - I.e. `i_key`, `i_keyclone`, `i_keydrop`, `i_keyraw`, `i_keyfrom`, `i_keytoraw`, `i_cmp`, `i_eq`, `i_hash`
     will all be defined/bound.
@@ -514,17 +514,17 @@ as the last comma-separated argument of a `i_type` template parameter, or be spe
   - **c_declared** - container type was predeclared
   - **c_no_atomic** - used with *arc* type, simple reference counting.
   - **c_no_clone** - disable clone functionality in container
-  - **c_no_hash** - don't enable hash function when *c_rawclass* is specified.
+  - **c_no_hash** - don't enable hash function when *c_cmpclass* is specified.
   - **c_use_cmp** - enable `<` comparison for integral types, and _cmp()/_less() for "pro/class" elements.
   - **c_use_eq** - enable `==` for integral types, and _eq() for pro/class elements
   - **c_keyclass** - indicate that `i_key` specified is a "class", i.e. has _clone(), _drop() members.
   - **c_valclass** - like **c_keyclass**, but for mapped values in sortedmap / hashmap.
-  - **c_rawclass** - indicate that `i_key` specified is also "raw"-type and is expected to have _cmp(), _eq(), _hash() members.
+  - **c_cmpclass** - indicate that `i_key` specified is also "raw"-type and is expected to have _cmp(), _eq(), _hash() members.
   - **c_keypro** - specifies that `i_key` is both a "keyclass" and a "rawclass".
   - **c_valpro** - specifies that `i_val` is a "valclass".
 
 **Notes**:
-- When using **c_rawclass**, `i_key` and `i_keyraw` are equal, so no conversion functions are needed.
+- When using **c_cmpclass**, `i_key` and `i_keyraw` are equal, so no conversion functions are needed.
 - `i_use_cmp`/`i_use_eq` are only needed for **vec**, **stack**, **deque**, **list** as sorting and
 linear seach is not enabled by default. For integral types it uses `<` and `==` operators. For pro/class
 element types, _cmp()/_eq(),_hash() functions must be defined. For plain structs, `i_cmp`/`i_eq`
@@ -561,9 +561,9 @@ with **emplace**, e.g. *vec_X_emplace_back()*. This is an ergonimic alternative 
 *vec_X_push_back()* when dealing non-trivial container elements, e.g. strings, shared pointers or
 other elements using dynamic memory or shared resources.
 
-The **emplace** methods ***constructs*** / ***clones*** the given element when they are added
-to the container. In contrast, the *non-emplace* methods ***moves*** the element into the
-container.
+The **emplace** methods ***construct*** / ***clone*** the given raw-type element when it is added
+to the container (specified normally using i_keypro/i_valpro or i_cmpclass or the c_-option variants).
+In contrast, the *non-emplace* methods ***moves*** the element into the container.
 
 **Note**: For containers with integral/trivial element types, or when neither `i_keyraw/i_valraw` is defined,
 the **emplace** functions are ***not*** available (or needed), as it can easier lead to mistakes.

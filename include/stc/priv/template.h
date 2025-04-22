@@ -46,25 +46,23 @@
   #define c_no_hash       (1<<4)
   #define c_use_cmp       (1<<5)
   #define c_use_eq        (1<<6)
-  #define c_rawclass      (1<<7)
+  #define c_cmpclass      (1<<7)
   #define c_keyclass      (1<<8)
   #define c_valclass      (1<<9)
   #define c_keypro        (1<<10)
   #define c_valpro        (1<<11)
 #endif
 
-#if defined i_key_arcbox // [deprecated]
+#if defined i_rawclass   // [deprecated]
+  #define i_cmpclass i_rawclass
+#elif defined i_key_arcbox // [deprecated]
   #define i_keypro i_key_arcbox
-#elif defined i_key_cstr // [deprecated]
-  #define i_keypro cstr
 #elif defined i_key_str  // [deprecated]
   #define i_keypro cstr
   #define i_tag str
 #endif
 #if defined i_val_arcbox // [deprecated]
   #define i_valpro i_val_arcbox
-#elif defined i_val_cstr // [deprecated]
-  #define i_valpro cstr
 #elif defined i_val_str  // [deprecated]
   #define i_valpro cstr
   #define i_tag str
@@ -113,8 +111,8 @@
 #if c_OPTION(c_valclass)
   #define i_valclass i_val
 #endif
-#if c_OPTION(c_rawclass)
-  #define i_rawclass i_key
+#if c_OPTION(c_cmpclass)
+  #define i_cmpclass i_key
   #define _i_rawclass_is_key
 #endif
 #if c_OPTION(c_keypro)
@@ -126,22 +124,22 @@
 
 #if defined i_keypro
   #define i_keyclass i_keypro
-  #define i_rawclass c_JOIN(i_keypro, _raw)
+  #define i_cmpclass c_JOIN(i_keypro, _raw)
 #endif
 
-#if defined i_rawclass
-  #define i_keyraw i_rawclass
+#if defined i_cmpclass
+  #define i_keyraw i_cmpclass
   #if !(defined i_key || defined i_keyclass)
-    #define i_key i_rawclass
+    #define i_key i_cmpclass
     #define _i_rawclass_is_key
     #ifndef i_keytoraw
       #define i_keytoraw c_default_toraw
     #endif
   #endif
 #elif defined i_keyclass && !defined i_keyraw
-  // Special: When only i_keyclass is defined, also define i_rawclass to the same.
+  // Special: When only i_keyclass is defined, also define i_cmpclass to the same.
   // Do not define i_keyraw here, otherwise _from() is expected to exist
-  #define i_rawclass i_key
+  #define i_cmpclass i_key
   #define _i_rawclass_is_key
 #endif
 
@@ -175,15 +173,15 @@
 #endif
 
 // Bind to i_keyraw "class members": _cmp, _eq and _hash (when conditions are met).
-#if defined i_rawclass // => i_keyraw
+#if defined i_cmpclass // => i_keyraw
   #if !(defined i_cmp || defined i_less) && (defined i_use_cmp || defined _i_sorted || defined _i_is_pqueue)
-    #define i_cmp c_JOIN(i_rawclass, _cmp)
+    #define i_cmp c_JOIN(i_cmpclass, _cmp)
   #endif
   #if !defined i_eq && (defined i_use_eq || defined i_hash || defined _i_is_hash)
-    #define i_eq c_JOIN(i_rawclass, _eq)
+    #define i_eq c_JOIN(i_cmpclass, _eq)
   #endif
   #if !(defined i_hash || defined i_no_hash)
-    #define i_hash c_JOIN(i_rawclass, _hash)
+    #define i_hash c_JOIN(i_cmpclass, _hash)
   #endif
 #endif
 
