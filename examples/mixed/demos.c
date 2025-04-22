@@ -70,8 +70,7 @@ void vectordemo2(void)
     vec_cstr_drop(&names);
 }
 
-#define i_key int
-#define i_use_cmp
+#define i_type list_int, int, (c_use_cmp)
 #include "stc/list.h"
 
 void listdemo1(void)
@@ -102,7 +101,7 @@ void listdemo1(void)
     c_drop(list_int, &nums, &nums2);
 }
 
-#define i_key int
+#define i_type hset_int, int
 #include "stc/hashset.h"
 
 void setdemo1(void)

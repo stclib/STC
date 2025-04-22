@@ -1,8 +1,7 @@
 // https://iq.opengenus.org/containers-cpp-stl/
 
 #include <stdio.h>
-#define i_key int
-#define i_val int
+#define i_type smap_int, int, int
 #include "stc/sortedmap.h"
 
 int main(void)

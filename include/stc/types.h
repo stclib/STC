@@ -41,10 +41,10 @@
 #define declare_hashset(C, KEY) _c_htable_types(C, cset, KEY, KEY, c_false, c_true)
 #define declare_sortedmap(C, KEY, VAL) _c_aatree_types(C, KEY, VAL, c_true, c_false)
 #define declare_sortedset(C, KEY) _c_aatree_types(C, KEY, KEY, c_false, c_true)
-#define declare_stack(C, VAL) _c_stack_types(C, VAL)
 #define declare_pqueue(C, VAL) _c_pqueue_types(C, VAL)
 #define declare_queue(C, VAL) _c_deque_types(C, VAL)
 #define declare_vec(C, VAL) _c_vec_types(C, VAL)
+#define declare_stack(C, VAL) _c_vec_types(C, VAL)
 
 #define declare_hmap(...) declare_hashmap(__VA_ARGS__) // [deprecated]
 #define declare_hset(...) declare_hashset(__VA_ARGS__) // [deprecated]
