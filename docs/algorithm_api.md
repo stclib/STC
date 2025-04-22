@@ -287,14 +287,14 @@ int main(void) {
 ## Generic algorithms
 
 <details>
-<summary><b>c_make, c_push_items, c_drop</b> - Generic container operations</summary>
+<summary><b>c_make, c_put_items, c_drop</b> - Generic container operations</summary>
 
 These work on any container. *c_make()* may also be used for **cspan** views.
 
-### c_make, c_push_items, c_drop
+### c_make, c_put_items, c_drop
 
 - **c_make** - construct any container from an initializer list
-- **c_push_items** - push values onto any container from an initializer list
+- **c_put_items** - push (raw) values onto any container from an initializer list
 - **c_drop** - drop (destroy) multiple containers of the same type
 
 [ [Run this code](https://godbolt.org/z/e4G4hW5n6) ]
@@ -320,8 +320,8 @@ int main(void) {
     Vec vec = c_make(Vec, {1, 2, 3, 4, 5, 6});
     Map map = c_make(Map, {{1, 2}, {3, 4}, {5, 6}});
 
-    c_push_items(Vec, &vec, {7, 8, 9, 10, 11, 12});
-    c_push_items(Map, &map, {{7, 8}, {9, 10}, {11, 12}});
+    c_put_items(Vec, &vec, {7, 8, 9, 10, 11, 12});
+    c_put_items(Map, &map, {{7, 8}, {9, 10}, {11, 12}});
 
     for (c_each(i, Vec, vec))
         printf("%d ", *i.ref);

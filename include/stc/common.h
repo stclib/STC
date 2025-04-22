@@ -155,7 +155,6 @@ typedef const char* cstr_raw;
 
 // [deprecated]:
 #define c_init(...) c_make(__VA_ARGS__)
-#define c_push(...) c_push_items(__VA_ARGS__)
 #define c_forlist(...) for (c_items(_VA_ARGS__))
 #define c_foritems(...) for (c_items(__VA_ARGS__))
 #define c_foreach(...) for (c_each(__VA_ARGS__))
@@ -228,8 +227,8 @@ typedef const char* cstr_raw;
 #define c_make(C, ...) \
     C##_from_n(c_make_array(C##_raw, __VA_ARGS__), c_sizeof((C##_raw[])__VA_ARGS__)/c_sizeof(C##_raw))
 
-// push multiple elements from a literal list into a container
-#define c_push_items(C, cnt, ...) \
+// put multiple raw-type elements from a literal list into a container
+#define c_put_items(C, cnt, ...) \
     C##_put_n(cnt, c_make_array(C##_raw, __VA_ARGS__), c_sizeof((C##_raw[])__VA_ARGS__)/c_sizeof(C##_raw))
 
 // drop multiple containers of same type

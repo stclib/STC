@@ -113,7 +113,7 @@
 #endif
 #if c_OPTION(c_cmpclass)
   #define i_cmpclass i_key
-  #define _i_rawclass_is_key
+  #define _i_cmpclass_is_key
 #endif
 #if c_OPTION(c_keypro)
   #define i_keypro i_key
@@ -131,7 +131,7 @@
   #define i_keyraw i_cmpclass
   #if !(defined i_key || defined i_keyclass)
     #define i_key i_cmpclass
-    #define _i_rawclass_is_key
+    #define _i_cmpclass_is_key
     #ifndef i_keytoraw
       #define i_keytoraw c_default_toraw
     #endif
@@ -140,7 +140,7 @@
   // Special: When only i_keyclass is defined, also define i_cmpclass to the same.
   // Do not define i_keyraw here, otherwise _from() is expected to exist
   #define i_cmpclass i_key
-  #define _i_rawclass_is_key
+  #define _i_cmpclass_is_key
 #endif
 
 // Bind to i_key "class members": _clone, _drop, _from and _toraw (when conditions are met).
@@ -187,7 +187,7 @@
 
 #if !defined i_key
   #error "No i_key defined"
-#elif defined i_keyraw && !defined _i_rawclass_is_key && !defined i_keytoraw
+#elif defined i_keyraw && !defined _i_cmpclass_is_key && !defined i_keytoraw
   #error "If i_keyraw/i_valraw is defined, i_keytoraw/i_valtoraw must be defined too"
 #elif !defined i_no_clone && (defined i_keyclone ^ defined i_keydrop)
   #error "Both i_keyclone/i_valclone and i_keydrop/i_valdrop must be defined, if any (unless i_no_clone defined)."
@@ -305,5 +305,5 @@
 #ifndef i_valraw
   #define i_valraw i_keyraw
 #endif
-#undef _i_rawclass_is_key
+#undef _i_cmpclass_is_key
 #endif // STC_TEMPLATE_H_INCLUDED
