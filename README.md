@@ -12,7 +12,7 @@ library for C99 with excellent ergonomics and ease of use.
 
 V5.1:
 - Several breaking changes in cspan API.
-- Possible to specify container types as one-liners, also for "keypro", "keyclass" and "rawclass" element types.
+- Possible to specify container types as one-liners, including "keypro", "keyclass" and "cmpclass" element types.
 - Updated **cregex** to handle invalid utf8 strings and fixed bugs.
 - Many improvements and bug fixes.
 
@@ -520,7 +520,7 @@ as the last comma-separated argument of a `i_type` template parameter, or be spe
   - **c_keyclass** - indicate that `i_key` specified is a "class", i.e. has _clone(), _drop() members.
   - **c_valclass** - like **c_keyclass**, but for mapped values in sortedmap / hashmap.
   - **c_cmpclass** - indicate that `i_key` specified is also "raw"-type and is expected to have _cmp(), _eq(), _hash() members.
-  - **c_keypro** - specifies that `i_key` is both a "keyclass" and a "rawclass".
+  - **c_keypro** - specifies that `i_key` is both a "keyclass" and a "cmpclass".
   - **c_valpro** - specifies that `i_val` is a "valclass".
 
 **Notes**:
