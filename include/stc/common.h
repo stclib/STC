@@ -108,7 +108,7 @@ typedef ptrdiff_t       isize;
                                      while (_n--) T##_drop((_tp + _n)); \
                                      c_free(_tp, _m*c_sizeof(T)); } while (0)
 
-#define c_static_assert(expr)   (1 ? 0 : (int)sizeof(int[(expr) ? 1 : -1]))
+#define c_static_assert(expr)   (void)sizeof(int[(expr) ? 1 : -1])
 #if defined STC_NDEBUG || defined NDEBUG
     #define c_assert(expr)      (void)sizeof(expr)
 #else

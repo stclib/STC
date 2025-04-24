@@ -82,16 +82,16 @@ typedef struct {
 #define cco_active(co) ((co)->cco.state != CCO_STATE_DONE)
 
 #if defined STC_HAS_TYPEOF && STC_HAS_TYPEOF
-    #define _cco_check_task_struct(co) \
+    #define _cco_validate_task_struct(co) \
     c_static_assert(/* error: co->cco not first member in task struct */ \
                     sizeof((co)->cco) == sizeof(cco_state) || \
                     offsetof(__typeof__(*(co)), cco) == 0)
 #else
-    #define _cco_check_task_struct(co) 0
+    #define _cco_validate_task_struct(co) (void)0
 #endif
 
 #define cco_routine(co) \
-    for (int *_state = &(co)->cco.state + _cco_check_task_struct(co) \
+    for (int *_state = (_cco_validate_task_struct(co), &(co)->cco.state) \
            ; *_state != CCO_STATE_DONE ; *_state = CCO_STATE_DONE) \
         _resume: switch (*_state) case CCO_STATE_INIT: // thanks, @liigo!
 

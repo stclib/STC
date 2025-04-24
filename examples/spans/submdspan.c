@@ -8,7 +8,7 @@ use_cspan(span3, double, 3);
 
 // Set all elements of a rank-2 mdspan to zero.
 void zero_2d(span2 grid2d) {
-  (void)c_static_assert(cspan_rank(&grid2d) == 2);
+  c_static_assert(cspan_rank(&grid2d) == 2);
   for (int i = 0; i < grid2d.shape[0]; ++i) {
     for (int j = 0; j < grid2d.shape[1]; ++j) {
       *cspan_at(&grid2d, i,j) = 0;
@@ -17,7 +17,7 @@ void zero_2d(span2 grid2d) {
 }
 
 void zero_surface(span3 grid3d) {
-  (void)c_static_assert(cspan_rank(&grid3d) == 3);
+  c_static_assert(cspan_rank(&grid3d) == 3);
   zero_2d(cspan_slice(&grid3d, span2, {0}, {c_ALL}, {c_ALL}));
   zero_2d(cspan_slice(&grid3d, span2, {c_ALL}, {0}, {c_ALL}));
   zero_2d(cspan_slice(&grid3d, span2, {c_ALL}, {c_ALL}, {0}));

@@ -196,15 +196,17 @@ use_cspan_tuple(7); use_cspan_tuple(8);
 #define cspan_index(...) cspan_index_M(__VA_ARGS__, c_COMMA_N(cspan_index_3d), c_COMMA_N(cspan_index_2d), \
                                                     c_COMMA_N(cspan_index_1d),)(__VA_ARGS__)
 #define cspan_index_M(self, i,j,k, n, ...) c_TUPLE_AT_1(n, cspan_index_nd,)
-#define cspan_index_1d(self, i)     (c_assert((i) < (self)->shape[0]), \
-                                     (i)*(self)->stride.d[0] + c_static_assert(cspan_rank(self) == 1))
-#define cspan_index_2d(self, i,j)   (c_assert((i) < (self)->shape[0] && (j) < (self)->shape[1]), \
-                                     (i)*(self)->stride.d[0] + (j)*(self)->stride.d[1] + c_static_assert(cspan_rank(self) == 2))
-#define cspan_index_3d(self, i,j,k) (c_assert((i) < (self)->shape[0] && (j) < (self)->shape[1] && (k) < (self)->shape[2]), \
-                                     (i)*(self)->stride.d[0] + (j)*(self)->stride.d[1] + (k)*(self)->stride.d[2] + \
-                                     c_static_assert(cspan_rank(self) == 3))
+#define cspan_index_1d(self, i)     (c_static_assert(cspan_rank(self) == 1), \
+                                     c_assert((i) < (self)->shape[0]), \
+                                     (i)*(self)->stride.d[0])
+#define cspan_index_2d(self, i,j)   (c_static_assert(cspan_rank(self) == 2), \
+                                     c_assert((i) < (self)->shape[0] && (j) < (self)->shape[1]), \
+                                     (i)*(self)->stride.d[0] + (j)*(self)->stride.d[1])
+#define cspan_index_3d(self, i,j,k) (c_static_assert(cspan_rank(self) == 3), \
+                                     c_assert((i) < (self)->shape[0] && (j) < (self)->shape[1] && (k) < (self)->shape[2]), \
+                                     (i)*(self)->stride.d[0] + (j)*(self)->stride.d[1] + (k)*(self)->stride.d[2])
 #define cspan_index_nd(self, ...) _cspan_index((self)->shape, (self)->stride.d, c_make_array(isize, {__VA_ARGS__}), \
-                                               cspan_rank(self) + c_static_assert(cspan_rank(self) == c_NUMARGS(__VA_ARGS__)))
+                                               (c_static_assert(cspan_rank(self) == c_NUMARGS(__VA_ARGS__), cspan_rank(self))))
 
 // Multi-dimensional span constructors
 //
@@ -253,7 +255,7 @@ typedef enum {c_ROWMAJOR, c_COLMAJOR, c_STRIDED} cspan_layout;
 #define cspan_slice(self, Outspan, ...) \
     Outspan##_slice_((self)->data, (self)->shape, (self)->stride.d, \
                      c_make_array2d(const isize, 3, {__VA_ARGS__}), \
-                     cspan_rank(self) + c_static_assert(cspan_rank(self) == sizeof((isize[][3]){__VA_ARGS__})/sizeof(isize[3])))
+                     (c_static_assert(cspan_rank(self) == sizeof((isize[][3]){__VA_ARGS__})/sizeof(isize[3])), cspan_rank(self)))
 
 // submd#(): Reduces rank, fully typesafe + range checked by default
 //           int ms3[N1][N2][N3];
