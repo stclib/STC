@@ -5,7 +5,7 @@ use_cspan3(Span, int);
 int main(void)
 {
     Span3 md3 = cspan_md(cspan_zeros(Span, 3*4*5).data, 3, 4, 5);
-    for (c_range(i, 3*4*5)) md3.data[i] = i;
+    for (c_range32(i, 3*4*5)) md3.data[i] = i;
 
     Span2 tmp2 = cspan_submd3(&md3, 2);
     cspan_transpose(&tmp2);
