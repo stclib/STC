@@ -48,7 +48,7 @@ int main(void)
             printf("  %s: %s\n", cstr_str(value1), cstr_str(value2)));
 
         puts("\nCOPY VEC TO LIST:");
-        c_append(list_cstr, &list, vec_cstr, keys);
+        c_copy_to(list_cstr, &list, vec_cstr, keys);
         // print
         c_filter(list_cstr, list, printf("  %s\n", cstr_str(value)));
 

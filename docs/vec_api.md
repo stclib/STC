@@ -214,12 +214,12 @@ void User_drop(User* self) {
 }
 
 // Declare a managed, clonable vector of users.
-#define i_type Users
-#define i_keyclass User  // User is a "class" and binds the _clone, _drop, and _cmp functions.
-#define i_use_cmp        // Sorting/searching a vec is only enabled by either directly specifying an
-                         // i_cmp function or by defining i_use_cmp. In this case i_cmp is indirectly
-                         // bound to User_cmp because i_keyclass was used, otherwise it is assumed that
-                         // i_key is a built-in type that works with < and == operators).
+// c_keyclass: User is a "class" and binds the _clone(), _drop(), and _cmp() functions.
+// c_use_cmp:  Sorting/searching a vec is only enabled by either directly specifying an
+//             i_cmp function or by specifying c_use_cmp. In this case i_cmp is indirectly
+//             bound to User_cmp because c_keyclass was specified, otherwise it is assumed that
+//             i_key is a built-in type that works with < and == operators).
+#define i_type Users, User, (c_keyclass | c_use_cmp)
 #include "stc/vec.h"
 
 int main(void) {

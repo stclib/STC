@@ -344,7 +344,7 @@ int main(void) {
 <!--{%endraw%}-->
 </details>
 <details>
-<summary><b>c_find, c_reverse, c_append, c_erase</b> - Container/array operations</summary>
+<summary><b>c_find, c_reverse, c_copy_to, c_erase</b> - Container/array operations</summary>
 
 ### c_find_if, c_find_reverse_if
 Find linearily in containers using a predicate. `value` is a pointer to each element in predicate.
@@ -359,19 +359,19 @@ Find linearily in containers using a predicate. `value` is a pointer to each ele
 - void `c_reverse`(**CntType**, cnt);   // reverse a cspan, vec, stack, queue or deque type.
 - void `c_reverse_array`(array, len);   // reverse an array of elements.
 
-### c_append, c_append_if
-Clones any container onto an arbitrary container type, optionally using a predicate to filter out elements.
-Requires only that the element types are equal for the two containers.
-`value` is the pointer to each element in predicate. See example below for usage.
-- void `c_append`(**CntType**, outcnt_ptr, cnt)
-- void `c_append`(**OutCnt**, outcnt_ptr, **CntType**, cnt)
-- void `c_append_if`(**CntType**, outcnt_ptr, cnt, pred)
-- void `c_append_if`(**OutCnt**, outcnt_ptr, **CntType**, cnt, pred)
+### c_copy_to, c_copy_if
+Adds elements of any container onto a container of possible a different container type, optionally
+using a predicate to filter out elements. Requires only that the element types are equal for the
+two containers. `value` is the pointer to each element in predicate. See example below for usage.
+- void `c_copy_to`(**CntType**, outcnt_ptr, cnt)
+- void `c_copy_to`(**OutCnt**, outcnt_ptr, **CntType**, cnt)
+- void `c_copy_if`(**CntType**, outcnt_ptr, cnt, pred)
+- void `c_copy_if`(**OutCnt**, outcnt_ptr, **CntType**, cnt, pred)
 
 ### c_erase_if, c_eraseremove_if
 Erase linearily in containers using a predicate. `value` is a pointer to each element in predicate.
-- void `c_erase_if`(**CntType**, cnt_ptr, pred)`. Use with ***list**, ***hmap***, ***hset***, ***smap***, and ***sset***.
-- void `c_eraseremove_if`(**CntType**, cnt_ptr, pred)`. Use with ***stack***, ***vec***, ***deque***, and ***queue*** only.
+- void `c_erase_if`(**CntType**, cnt_ptr, pred). Use with ***list**, ***hmap***, ***hset***, ***smap***, and ***sset***.
+- void `c_eraseremove_if`(**CntType**, cnt_ptr, pred). Use with ***stack***, ***vec***, ***deque***, and ***queue*** only.
 
 [ [Run this code](https://godbolt.org/z/n7c641WhE) ]
 <!--{%raw%}-->
@@ -394,8 +394,8 @@ int main(void)
     Vec vec = c_make(Vec, {2, 30, 21, 5, 9, 11});
     Vec outvec = {0};
 
-    // Clone all *value > 10 to outvec. Note: `value` is a pointer to current element
-    c_append_if(Vec, &outvec, vec, *value > 10);
+    // Copy all *value > 10 to outvec. Note: `value` is a pointer to current element
+    c_copy_if(Vec, &outvec, vec, *value > 10);
     for (c_each(i, Vec, outvec)) printf(" %d", *i.ref);
     puts("");
 
