@@ -5,16 +5,24 @@
 
 ## Version 5.1 RC3
 STC is a comprehensive, high performance, typesafe and generic general purpose container and algorithms
-library for C99 with excellent ergonomics and ease of use.
+library for C99. It has excellent ergonomics and ease of use. The library elevates C into a modern programming
+language featuring a number of common containers and algorithms found in other contemporary system languages
+like Zig, Rust, and C++. Containers are templated and therefore allows for typesafe, high performance implementations.
+
+With STC version 5.1, specifying a container with non-trivial element types can now be done with a single #define prior to the inclusion
+of the container.
 
 <details>
 <summary><b>Version 5 NEWS</b></summary>
 
 V5.1:
-- Several breaking changes in cspan API.
-- Possible to specify container types as one-liners, including "keypro", "keyclass" and "cmpclass" element types.
-- Updated **cregex** to handle invalid utf8 strings and fixed bugs.
-- Many improvements and bug fixes.
+- Possible to specify even complex container types as one-liners using `c_keyclass`, `c_keypro`, and `c_cmpclass` option flags.
+- Some breaking changes in cspan API.
+- Updated and fixed bugs in **cregex** to handle invalid utf8 strings.
+- Several other smaller improvements and bug fixes.
+
+V5.0.2:
+- Changed `c_foreach (...)` => `for (c_each(...))`, and `c_forrange(...)` => `for (c_range(...))`, etc.
 
 V5.0:
 - Added build system/CI with Meson. Makefile provided as well.
@@ -32,7 +40,7 @@ V5.0:
 See also [version history](#version-history) for breaking changes in V5.0.
 </details>
 <details>
-<summary><b>Reasons why you may want to you use STC</b></summary>
+<summary><b>Why use STC?</b></summary>
 
 #### A. Supplementing features missing in the C standard library
 * A wide set of high performance, generic/templated typesafe container types, including smart pointers and bitsets.
@@ -83,7 +91,7 @@ Containers
 
 Algorithms
 ----------
-- [***Ranged for-loop control blocks***](docs/algorithm_api.md#ranged-for-loop-control-blocks)
+- [***Ranged for-loop abstractions***](docs/algorithm_api.md#ranged-for-loop-control-blocks)
 - [***Generic algorithms***](docs/algorithm_api.md#generic-algorithms)
 - [***Sum types*** - a.k.a. variants or tagged unions](docs/algorithm_api.md#sum-types)
 - [***Coroutines*** - ergonomic portable coroutines](docs/coroutine_api.md)
@@ -218,7 +226,7 @@ If an element destructor `i_keydrop` is defined, `i_keyclone` function is requir
 
 Let's make a vector of vectors, which can be cloned. All of its element vectors will be destroyed when destroying the Vec2D.
 
-[ [Run this code](https://godbolt.org/z/36PWz51sn) ]
+[ [Run this code](https://godbolt.org/z/dqfr41Mcc) ]
 ```c++
 #include <stdio.h>
 #include "stc/algorithm.h"
@@ -265,7 +273,7 @@ int main(void)
 ```
 This example uses four different container types:
 
-[ [Run this code](https://godbolt.org/z/3h7WaxoGb) ]
+[ [Run this code](https://godbolt.org/z/Mr8rYqjdf) ]
 <!--{%raw%}-->
 ```c++
 #include <stdio.h>
@@ -279,8 +287,8 @@ struct Point { float x, y; };
 #define i_eq(a, b) (a->x == b->x && a->y == b->y)
 #include "stc/vec.h"    // vector of struct Point
 
-#define i_type list_int, int
-#define i_use_cmp       // enable sort/search. Use native `<` and `==` operators
+// enable sort/search. Use native `<` and `==` operators
+#define i_type list_int, int, (c_use_cmp)
 #include "stc/list.h"   // singly linked list
 
 #define i_type smap_int, int, int
@@ -748,7 +756,7 @@ void maptest()
 ```
 Another example is to sort struct elements by the *active field* and *reverse* flag:
 
-[ [Run this code](https://godbolt.org/z/4WdT5ze1x) ]
+[ [Run this code](https://godbolt.org/z/E4hhvzThr) ]
 ```c++
 #include <stdio.h>
 #include <time.h>
@@ -768,11 +776,10 @@ struct FMDVector_aux; // defined when specifying i_aux
 int FileMetaData_cmp(const struct FMDVector_aux*, const FileMetaData*, const FileMetaData*);
 void FileMetaData_drop(FileMetaData*);
 
-#define i_type FMDVector, FileMetaData
+#define i_type FMDVector, FileMetaData, (c_no_clone)
 #define i_aux { enum FMDActive activeField; bool reverse; }
 #define i_cmp(x, y) FileMetaData_cmp(&self->aux, x, y)
 #define i_keydrop FileMetaData_drop
-#define i_no_clone
 #include "stc/stack.h"
 // --------------
 

@@ -28,8 +28,7 @@
     #include <stdio.h>
     #include "stc/random.h"
 
-    #define i_type List,long
-    #define i_use_cmp // enable sorting, use default *x < *y comparison
+    #define i_type List, long, (c_use_cmp) // enable sorting, uses default *x < *y.
     #include "stc/list.h"
 
     int main(void)

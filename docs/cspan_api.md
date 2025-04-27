@@ -135,7 +135,7 @@ void            SpanTypeN_next(SpanTypeN_iter* it);
 
 ## Example 1
 
-[ [Run this code](https://godbolt.org/z/sdc45vrsh) ]
+[ [Run this code](https://godbolt.org/z/x1PYoarxE) ]
 ```c++
 #include <stdio.h>
 #define i_key int
@@ -231,7 +231,7 @@ b flat:
 ```
 Multi-dimension slicing (STC cspan):
 
-[ [Run this code](https://godbolt.org/z/7ca8PqMEY) ]
+[ [Run this code](https://godbolt.org/z/fr4crj833) ]
 ```c++
 #include <stdio.h>
 #include "stc/cspan.h"
@@ -270,7 +270,7 @@ int main(void) {
 ## Example 3
 Slicing cspan without and with reducing the rank:
 
-[ [Run this code](https://godbolt.org/z/YKx8K1hsn) ]
+[ [Run this code](https://godbolt.org/z/PTh8ojenc) ]
 ```c++
 #include <stdio.h>
 #include "stc/cspan.h"

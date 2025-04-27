@@ -120,12 +120,12 @@ vec_X_raw       vec_X_value_drop(vec_X_value* pval);
 
 ## Examples
 
-https://godbolt.org/z/4fnchzxva
+[ [Run this code](https://godbolt.org/z/rnacsb8x8) ]
 ```c++
 #include <stdio.h>
 
-#define i_key int
-#define i_use_cmp // enable sorting/searching using default <, == operators
+// enable sorting/searching using default <, == operators
+#define i_type vec_int, int, (c_use_cmp)
 #include "stc/vec.h"
 
 int main(void)
@@ -158,7 +158,7 @@ int main(void)
 ```
 ### Example 2
 
-https://godbolt.org/z/c7e3q5v14
+[ [Run this code](https://godbolt.org/z/c7e3q5v14) ]
 ```c++
 #include <stdio.h>
 #include "stc/cstr.h"
@@ -189,7 +189,7 @@ int main(void) {
 ### Example 3
 Container with elements of structs:
 
-https://godbolt.org/z/haY3hqKe6
+[ [Run this code](https://godbolt.org/z/jKrz67hYW) ]
 ```c++
 #include <stdio.h>
 #include "stc/cstr.h"

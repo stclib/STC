@@ -131,10 +131,9 @@ void            list_X_value_drop(i_key* pval);
 
 Interleave *push_front()* / *push_back()* then *sort()*:
 
-[ [Run this code](https://godbolt.org/z/Mhf7afcac) ]
+[ [Run this code](https://godbolt.org/z/fbdfono7s) ]
 ```c++
-#define i_type DList, double
-#define i_use_cmp
+#define i_type DList, double, (c_use_cmp)
 #include "stc/list.h"
 
 #include <stdio.h>
@@ -164,7 +163,7 @@ int main(void) {
 ### Example 2
 Use of *erase_at()* and *erase_range()*:
 
-[ [Run this code](https://godbolt.org/z/9PnPbe9fv) ]
+[ [Run this code](https://godbolt.org/z/MPaGb8jcG) ]
 ```c++
 #include <stdio.h>
 #define i_type IList, int

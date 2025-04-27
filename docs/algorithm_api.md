@@ -4,7 +4,7 @@ STC contains many generic algorithms and loop abstactions. Raw loops are one of 
 sources for errors in C and C++ code. By using the loop abstractions below, your code becomes more
 descriptive and reduces chances of making mistakes. It is generally easier to read and write too.
 
-## Ranged for-loop control blocks
+## Ranged for-loop abstractions
 *"No raw loops"* - Sean Parent
 <details>
 <summary><b>c_each</b> - Ranged sequence iteration</summary>
@@ -297,7 +297,7 @@ These work on any container. *c_make()* may also be used for **cspan** views.
 - **c_put_items** - push (raw) values onto any container from an initializer list
 - **c_drop** - drop (destroy) multiple containers of the same type
 
-[ [Run this code](https://godbolt.org/z/e4G4hW5n6) ]
+[ [Run this code](https://godbolt.org/z/1nKfYh3nz) ]
 <!--{%raw%}-->
 ```c++
 #include <stdio.h>
@@ -373,7 +373,7 @@ Erase linearily in containers using a predicate. `value` is a pointer to each el
 - void `c_erase_if`(**CntType**, cnt_ptr, pred). Use with ***list**, ***hmap***, ***hset***, ***smap***, and ***sset***.
 - void `c_eraseremove_if`(**CntType**, cnt_ptr, pred). Use with ***stack***, ***vec***, ***deque***, and ***queue*** only.
 
-[ [Run this code](https://godbolt.org/z/n7c641WhE) ]
+[ [Run this code](https://godbolt.org/z/88PMq7WP1) ]
 <!--{%raw%}-->
 ```c++
 #include <stdio.h>
@@ -549,7 +549,7 @@ speed with *std::sort()**. Both *X_binary_seach()* and *X_lower_bound()* are abo
 c++ *std::lower_bound()*.
 ##### Usage examples
 
-[ [Run this code](https://godbolt.org/z/v3ncM66az) ]
+[ [Run this code](https://godbolt.org/z/dvr3zYKhY) ]
 ```c++
 #define i_key int // sort a regular c-array of ints
 #include "stc/sort.h"

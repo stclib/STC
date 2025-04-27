@@ -127,37 +127,37 @@ bool            c_memcmp_eq(const i_keyraw* a, const i_keyraw* b);    // !memcmp
 
 ## Examples
 
-[ [Run this code](https://godbolt.org/z/ov349P5Y1) ]
+[ [Run this code](https://godbolt.org/z/GenofeYe3) ]
 ```c++
 #include "stc/cstr.h"
 
-#define i_type strmap cstr, cstr, (c_keypro|c_valpro)
+#define i_type hmap_cstr, cstr, cstr, (c_keypro | c_valpro)
 #include "stc/hashmap.h"
 
 int main(void)
 {
     // Create an unordered_map of three strings (that map to strings)
-    strmap umap = c_make(strmap, {
+    hmap_cstr umap = c_make(hmap_cstr, {
         {"RED", "#FF0000"},
         {"GREEN", "#00FF00"},
         {"BLUE", "#0000FF"}
     });
 
     // Iterate and print keys and values of unordered map
-    for (c_each(n, strmap, umap)) {
-        strmap_raw v = strmap_value_toraw(n.ref);
+    for (c_each(n, hmap_cstr, umap)) {
+        hmap_cstr_raw v = hmap_cstr_value_toraw(n.ref);
         printf("Key:[%s] Value:[%s]\n", v.first, v.second);
     }
 
     // Add two new entries to the unordered map
-    strmap_emplace(&umap, "BLACK", "#000000");
-    strmap_emplace(&umap, "WHITE", "#FFFFFF");
+    hmap_cstr_emplace(&umap, "BLACK", "#000000");
+    hmap_cstr_emplace(&umap, "WHITE", "#FFFFFF");
 
     // Output values by key
-    printf("The HEX of color RED is:[%s]\n", cstr_str(strmap_at(&umap, "RED")));
-    printf("The HEX of color BLACK is:[%s]\n", cstr_str(strmap_at(&umap, "BLACK")));
+    printf("The HEX of color RED is:[%s]\n", cstr_str(hmap_cstr_at(&umap, "RED")));
+    printf("The HEX of color BLACK is:[%s]\n", cstr_str(hmap_cstr_at(&umap, "BLACK")));
 
-    strmap_drop(&umap);
+    hmap_cstr_drop(&umap);
 }
 ```
 
@@ -220,7 +220,7 @@ int main(void)
 ### Example 4: Advanced
 Key type is struct. Based on https://doc.rust-lang.org/std/collections/struct.HashMap.html
 
-[ [Run this code](https://godbolt.org/z/qoPaPozYK) ]
+[ [Run this code](https://godbolt.org/z/Wzv5fEYd9) ]
 ```c++
 #include "stc/cstr.h"
 
@@ -252,9 +252,8 @@ void Viking_drop(Viking* vp) {
     cstr_drop(&vp->country);
 }
 
-#define i_type Vikings
-#define i_keyclass Viking // binds the four Viking_xxxx() functions above
-#define i_val int
+// binds the four Viking_xxxx() functions above
+#define i_type Vikings, Viking, int, (c_keyclass)
 #include "stc/hashmap.h"
 
 int main(void)
@@ -284,7 +283,7 @@ In example 4 we needed to construct a lookup key which may allocate strings, and
 In this example we use keyraw feature to make it simpler to use and avoids the creation of a Viking object
 entirely when doing lookup.
 
-[ [Run this code](https://godbolt.org/z/559noMbsx) ]
+[ [Run this code](https://godbolt.org/z/b7f15zPK3) ]
 <!--{%raw%}-->
 ```c++
 #include "stc/cstr.h"
