@@ -427,7 +427,7 @@ _c_MEMB(_bucket_insert_)(const Self* self, const _m_keyraw* rkeyptr) {
 #if !defined i_no_clone
     STC_DEF Self
     _c_MEMB(_clone)(Self map) {
-        Self* self = &map; (void)self;
+        Self* self = &map; (void)self; // i_malloc may refer self via i_aux
         if (map.bucket_count != 0) {
             _m_value *d = _i_malloc(_m_value, map.bucket_count);
             const isize _mbytes = (map.bucket_count + 1)*c_sizeof *map.meta;

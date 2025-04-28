@@ -73,7 +73,7 @@ int main(void) {
 #if defined _MSC_VER && !defined __clang__
   #include <malloc.h>
 #else
-  #include <alloca.h>
+  #include <stdlib.h>
 #endif
 #include "../stc/common.h"
 
