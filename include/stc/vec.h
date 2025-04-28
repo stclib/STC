@@ -130,21 +130,21 @@ STC_INLINE _m_iter _c_MEMB(_emplace_at)(Self* self, _m_iter it, _m_raw raw)
 #endif // !i_no_emplace
 
 #if !defined i_no_clone
-STC_API _m_iter         _c_MEMB(_copy_n)(Self* self, isize idx, const _m_value arr[], isize n);
+STC_API _m_iter         _c_MEMB(_copy_to)(Self* self, isize idx, const _m_value arr[], isize n);
 
 STC_INLINE _m_value     _c_MEMB(_value_clone)(_m_value val)
                             { return i_keyclone(val); }
 
-STC_INLINE void         _c_MEMB(_copy)(Self* self, const Self other) {
-                            if (self->data == other.data) return;
+STC_INLINE void         _c_MEMB(_copy)(Self* self, const Self* other) {
+                            if (self == other) return;
                             _c_MEMB(_clear)(self);
-                            _c_MEMB(_copy_n)(self, 0, other.data, other.size);
+                            _c_MEMB(_copy_to)(self, 0, other->data, other->size);
                         }
 
 STC_INLINE Self         _c_MEMB(_clone)(Self vec) {
                             Self tmp = vec;
                             vec.data = NULL; vec.size = vec.capacity = 0;
-                            _c_MEMB(_copy_n)(&vec, 0, tmp.data, tmp.size);
+                            _c_MEMB(_copy_to)(&vec, 0, tmp.data, tmp.size);
                             return vec;
                         }
 #endif // !i_no_clone
@@ -337,7 +337,7 @@ _c_MEMB(_erase_n)(Self* self, const isize idx, const isize len) {
 
 #if !defined i_no_clone
 STC_DEF _m_iter
-_c_MEMB(_copy_n)(Self* self, const isize idx,
+_c_MEMB(_copy_to)(Self* self, const isize idx,
                  const _m_value arr[], const isize n) {
     _m_iter it = _c_MEMB(_insert_uninit)(self, idx, n);
     if (it.ref)

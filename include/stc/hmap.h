@@ -141,11 +141,11 @@ _c_MEMB(_insert_entry_)(Self* self, _m_keyraw rkey) {
 #endif // _i_is_map
 
 #if !defined i_no_clone
-    STC_INLINE void _c_MEMB(_copy)(Self *self, const Self other) {
-        if (self->table == other.table)
+    STC_INLINE void _c_MEMB(_copy)(Self *self, const Self* other) {
+        if (self == other)
             return;
         _c_MEMB(_drop)(self);
-        *self = _c_MEMB(_clone)(other);
+        *self = _c_MEMB(_clone)(*other);
     }
 
     STC_INLINE _m_value _c_MEMB(_value_clone)(_m_value _val) {
@@ -427,6 +427,7 @@ _c_MEMB(_bucket_insert_)(const Self* self, const _m_keyraw* rkeyptr) {
 #if !defined i_no_clone
     STC_DEF Self
     _c_MEMB(_clone)(Self map) {
+        Self* self = &map; (void)self;
         if (map.bucket_count != 0) {
             _m_value *d = _i_malloc(_m_value, map.bucket_count);
             const isize _mbytes = (map.bucket_count + 1)*c_sizeof *map.meta;

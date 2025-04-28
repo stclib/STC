@@ -120,9 +120,10 @@ STC_API Self            _c_MEMB(_clone)(Self cx);
 STC_INLINE _m_value     _c_MEMB(_value_clone)(_m_value val) { return i_keyclone(val); }
 
 STC_INLINE void
-_c_MEMB(_copy)(Self *self, const Self other) {
-    if (self->last == other.last) return;
-    _c_MEMB(_drop)(self); *self = _c_MEMB(_clone)(other);
+_c_MEMB(_copy)(Self *self, const Self* other) {
+    if (self->last == other->last) return;
+    _c_MEMB(_drop)(self);
+    *self = _c_MEMB(_clone)(*other);
 }
 #endif // !i_no_clone
 
@@ -226,11 +227,11 @@ STC_INLINE bool _c_MEMB(_eq)(const Self* self, const Self* other) {
 #if !defined i_no_clone
 STC_DEF Self
 _c_MEMB(_clone)(Self lst) {
-    Self tmp = {0};
+    Self tmp = lst;
+    tmp.last = NULL;
     for (c_each(it, Self, lst))
         _c_MEMB(_push_back)(&tmp, i_keyclone((*it.ref)));
-    lst.last = tmp.last;
-    return lst;
+    return tmp;
 }
 #endif
 

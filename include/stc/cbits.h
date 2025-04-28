@@ -229,7 +229,7 @@ STC_INLINE isize    _i_MEMB(_size)(const Self* self) { (void)self; return _i_len
 STC_INLINE Self     _i_MEMB(_move)(Self* self) { return *self; }
 STC_INLINE Self*    _i_MEMB(_take)(Self* self, Self other) { *self = other; return self; }
 STC_INLINE Self     _i_MEMB(_clone)(Self other) { return other; }
-STC_INLINE void     _i_MEMB(_copy)(Self* self, const Self other) { *self = other; }
+STC_INLINE void     _i_MEMB(_copy)(Self* self, const Self* other) { *self = *other; }
 STC_INLINE void     _i_MEMB(_set_all)(Self *self, const bool value);
 STC_INLINE void     _i_MEMB(_set_pattern)(Self *self, const uintptr_t pattern);
 

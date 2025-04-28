@@ -43,7 +43,7 @@ deque_X         deque_X_init(void);
 deque_X         deque_X_with_capacity(isize size);
 
 deque_X         deque_X_clone(deque_X deque);
-void            deque_X_copy(deque_X* self, deque_X other);
+void            deque_X_copy(deque_X* self, const deque_X* other);
 void            deque_X_take(deque_X* self, deque_X unowned);                    // take ownership of unowned
 deque_X         deque_X_move(deque_X* self);                                     // move
 void            deque_X_drop(deque_X* self);                                     // destructor

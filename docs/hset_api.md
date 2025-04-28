@@ -36,7 +36,7 @@ hset_X          hset_X_init(void);
 hset_X          hset_X_with_capacity(isize cap);
 
 hset_X          hset_X_clone(hset_x set);
-void            hset_X_copy(hset_X* self, hset_X other);
+void            hset_X_copy(hset_X* self, const hset_X* other);
 void            hset_X_take(hset_X* self, hset_X unowned);               // take ownership of unowned
 hset_X          hset_X_move(hset_X* self);                               // move
 void            hset_X_drop(hset_X* self);                               // destructor

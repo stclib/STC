@@ -425,7 +425,7 @@ for (c_each(it, MyInts, ints)) *it.ref += 42;
     - Cnt_reserve(Cnt*, isize capacity)
     - Cnt_move(Cnt*) -> Cnt
     - Cnt_take(Cnt*, Cnt unowned)
-    - Cnt_copy(Cnt*, Cnt other)
+    - Cnt_copy(Cnt*, const Cnt* other)
     - Cnt_clone(Cnt other) -> Cnt
     - Cnt_drop(Cnt*)
     - Cnt_value_drop(Cnt_value*)

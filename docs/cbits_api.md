@@ -29,7 +29,7 @@ cbits           cbits_with_pattern(isize size, size_t pattern);
 cbits           cbits_clone(cbits other);
 
 void            cbits_clear(cbits* self);
-void            cbits_copy(cbits* self, cbits other);
+void            cbits_copy(cbits* self, const cbits* other);
 bool            cbits_resize(cbits* self, isize size, bool value);      // NB! only for dynamic bitsets!
 void            cbits_drop(cbits* self);
 

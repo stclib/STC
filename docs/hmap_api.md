@@ -56,7 +56,7 @@ hmap_X          hmap_X_init(void);
 hmap_X          hmap_X_with_capacity(isize cap);
 
 hmap_X          hmap_X_clone(hmap_x map);
-void            hmap_X_copy(hmap_X* self, hmap_X other);
+void            hmap_X_copy(hmap_X* self, const hmap_X* other);
 void            hmap_X_take(hmap_X* self, hmap_X unowned);                        // take ownership of unowned
 hmap_X          hmap_X_move(hmap_X* self);                                        // move
 void            hmap_X_drop(hmap_X* self);                                        // destructor

@@ -39,7 +39,7 @@ sset_X          sset_X_init(void);
 sset_X          sset_X_with_capacity(isize cap);
 
 sset_X          sset_X_clone(sset_x set);
-void            sset_X_copy(sset_X* self, sset_X other);
+void            sset_X_copy(sset_X* self, const sset_X* other);
 void            sset_X_take(sset_X* self, sset_X unowned);                           // take ownership of unowned
 sset_X          sset_X_move(sset_X* self);                                           // move
 void            sset_X_drop(sset_X* self);                                           // destructor

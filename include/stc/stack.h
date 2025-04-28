@@ -185,20 +185,19 @@ STC_INLINE _m_value* _c_MEMB(_emplace)(Self* self, _m_raw raw)
 #endif // !i_no_emplace
 
 #if !defined i_no_clone
-STC_INLINE Self _c_MEMB(_clone)(Self s) {
-    Self tmp = {_i_malloc(_m_value, s.size), s.size, s.size};
-    if (tmp.data == NULL) tmp.capacity = 0;
-    else for (isize i = 0; i < s.size; ++s.data)
-        tmp.data[i++] = i_keyclone((*s.data));
-    s.data = tmp.data;
-    s.capacity = tmp.capacity;
-    return s;
+STC_INLINE Self _c_MEMB(_clone)(Self stk) {
+    Self out = stk;
+    out.size = out.capacity = 0; out.data = NULL;
+    _c_MEMB(_reserve)(&out, stk.size);
+    for (; out.size < stk.size; ++out.size, ++stk.data)
+        out.data[out.size] = i_keyclone((*stk.data));
+    return out;
 }
 
-STC_INLINE void _c_MEMB(_copy)(Self *self, const Self other) {
-    if (self->data == other.data) return;
+STC_INLINE void _c_MEMB(_copy)(Self *self, const Self* other) {
+    if (self == other) return;
     _c_MEMB(_drop)(self);
-    *self = _c_MEMB(_clone)(other);
+    *self = _c_MEMB(_clone)(*other);
 }
 
 STC_INLINE _m_value _c_MEMB(_value_clone)(_m_value val)

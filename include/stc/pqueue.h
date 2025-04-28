@@ -115,10 +115,10 @@ STC_INLINE _m_value _c_MEMB(_pull)(Self* self)
 #if !defined i_no_clone
 STC_API Self _c_MEMB(_clone)(Self q);
 
-STC_INLINE void _c_MEMB(_copy)(Self *self, const Self other) {
-    if (self->data == other.data) return;
+STC_INLINE void _c_MEMB(_copy)(Self *self, const Self* other) {
+    if (self == other) return;
     _c_MEMB(_drop)(self);
-    *self = _c_MEMB(_clone)(other);
+    *self = _c_MEMB(_clone)(*other);
 }
 STC_INLINE _m_value _c_MEMB(_value_clone)(_m_value val)
     { return i_keyclone(val); }
@@ -151,12 +151,12 @@ _c_MEMB(_make_heap)(Self* self) {
 
 #if !defined i_no_clone
 STC_DEF Self _c_MEMB(_clone)(Self q) {
-    Self tmp = _c_MEMB(_with_capacity)(q.size);
-    for (; tmp.size < q.size; ++q.data)
-        tmp.data[tmp.size++] = i_keyclone((*q.data));
-    q.data = tmp.data;
-    q.capacity = tmp.capacity;
-    return q;
+    Self tmp = q;
+    tmp.capacity = tmp.size = 0; tmp.data = NULL;
+    _c_MEMB(_reserve)(&tmp, q.size);
+    for (; tmp.size < q.size; ++q.data, ++tmp.size)
+        tmp.data[tmp.size] = i_keyclone((*q.data));
+    return tmp;
 }
 #endif
 

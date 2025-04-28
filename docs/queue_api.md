@@ -34,7 +34,7 @@ queue_X         queue_X_init(void);
 queue_X         queue_X_with_capacity(isize size);
 
 queue_X         queue_X_clone(queue_X q);
-void            queue_X_copy(queue_X* self, queue_X other);
+void            queue_X_copy(queue_X* self, const queue_X* other);
 void            queue_X_take(queue_X* self, queue_X unowned);      // take ownership of unowned
 queue_X         queue_X_move(queue_X* self);                       // move
 void            queue_X_drop(queue_X* self);                       // destructor
