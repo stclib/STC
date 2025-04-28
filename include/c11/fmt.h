@@ -70,6 +70,7 @@ int main(void) {
 #include <stdio.h> // IWYU pragma: keep
 #include <stddef.h>
 #include <assert.h>
+#include <malloc.h>
 #include "../stc/common.h"
 
 #if defined FMT_NDEBUG || defined STC_NDEBUG || defined NDEBUG
@@ -99,10 +100,9 @@ FMT_API const char* fmt_time(const char *fmt, const struct tm* tm, char* buf, in
 FMT_API void        fmt_close(fmt_stream* ss);
 FMT_API int        _fmt_parse(char* p, int nargs, const char *fmt, ...);
 FMT_API void       _fmt_sprint(fmt_stream*, const char* fmt, ...);
-
-#ifndef FMT_MAX
-#define FMT_MAX 128
-#endif
+#define            _fmt_init(_fs, _fmt, fmt, nargs) \
+                        const char* _fmt = fmt; \
+                        char* _fs = (char*)alloca(strlen(_fmt) + nargs*3 + 7) // "{}" => "%.16g" => +3
 
 #define fmt_print(...) fmt_printd(stdout, __VA_ARGS__)
 #define fmt_println(...) fmt_printd((fmt_stream*)0, __VA_ARGS__)
@@ -112,48 +112,48 @@ FMT_API void       _fmt_sprint(fmt_stream*, const char* fmt, ...);
 
 /* Primary function. */
 #define fmt_printd_2(to, fmt) \
-    do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 0, fmt); \
-         fmt_OK(_n == 0); _fmt_fn(to)(to, fmt); } while (0)
+    do { _fmt_init(_fs, _fmt, fmt, 0); int _n = _fmt_parse(_fs, 0, _fmt); \
+         fmt_OK(_n == 0); _fmt_fn(to)(to, _fmt); } while (0)
 #define fmt_printd_3(to, fmt, c) \
-    do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 1, fmt, _fc(c)); \
+    do { _fmt_init(_fs, _fmt, fmt, 1); int _n = _fmt_parse(_fs, 1, _fmt, _fc(c)); \
          fmt_OK(_n == 1); _fmt_fn(to)(to, _fs, c); } while (0)
 #define fmt_printd_4(to, fmt, c, d) \
-    do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 2, fmt, _fc(c), _fc(d)); \
+    do { _fmt_init(_fs, _fmt, fmt, 2); int _n = _fmt_parse(_fs, 2, _fmt, _fc(c), _fc(d)); \
          fmt_OK(_n == 2); _fmt_fn(to)(to, _fs, c, d); } while (0)
 #define fmt_printd_5(to, fmt, c, d, e) \
-    do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 3, fmt, _fc(c), _fc(d), _fc(e)); \
+    do { _fmt_init(_fs, _fmt, fmt, 3); int _n = _fmt_parse(_fs, 3, _fmt, _fc(c), _fc(d), _fc(e)); \
          fmt_OK(_n == 3); _fmt_fn(to)(to, _fs, c, d, e); } while (0)
 #define fmt_printd_6(to, fmt, c, d, e, f) \
-    do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 4, fmt, _fc(c), _fc(d), _fc(e), _fc(f)); \
+    do { _fmt_init(_fs, _fmt, fmt, 4); int _n = _fmt_parse(_fs, 4, _fmt, _fc(c), _fc(d), _fc(e), _fc(f)); \
          fmt_OK(_n == 4); _fmt_fn(to)(to, _fs, c, d, e, f); } while (0)
 #define fmt_printd_7(to, fmt, c, d, e, f, g) \
-    do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 5, fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g)); \
+    do { _fmt_init(_fs, _fmt, fmt, 5); int _n = _fmt_parse(_fs, 5, _fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g)); \
          fmt_OK(_n == 5); _fmt_fn(to)(to, _fs, c, d, e, f, g); } while (0)
 #define fmt_printd_8(to, fmt, c, d, e, f, g, h) \
-    do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 6, fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h)); \
+    do { _fmt_init(_fs, _fmt, fmt, 6); int _n = _fmt_parse(_fs, 6, _fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h)); \
          fmt_OK(_n == 6); _fmt_fn(to)(to, _fs, c, d, e, f, g, h); } while (0)
 #define fmt_printd_9(to, fmt, c, d, e, f, g, h, i) \
-    do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 7, fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h), _fc(i)); \
+    do { _fmt_init(_fs, _fmt, fmt, 7); int _n = _fmt_parse(_fs, 7, _fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h), _fc(i)); \
          fmt_OK(_n == 7); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i); } while (0)
 #define fmt_printd_10(to, fmt, c, d, e, f, g, h, i, j) \
-    do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 8, fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h), \
-                                                                     _fc(i), _fc(j)); \
+    do { _fmt_init(_fs, _fmt, fmt, 8); int _n = _fmt_parse(_fs, 8, _fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h), \
+                                                           _fc(i), _fc(j)); \
          fmt_OK(_n == 8); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i, j); } while (0)
 #define fmt_printd_11(to, fmt, c, d, e, f, g, h, i, j, k) \
-    do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 9, fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h), \
-                                                                     _fc(i), _fc(j), _fc(k)); \
+    do { _fmt_init(_fs, _fmt, fmt, 9); int _n = _fmt_parse(_fs, 9, _fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h), \
+                                                           _fc(i), _fc(j), _fc(k)); \
          fmt_OK(_n == 9); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i, j, k); } while (0)
 #define fmt_printd_12(to, fmt, c, d, e, f, g, h, i, j, k, m) \
-    do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 10, fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h), \
-                                                                      _fc(i), _fc(j), _fc(k), _fc(m)); \
+    do { _fmt_init(_fs, _fmt, fmt, 10); int _n = _fmt_parse(_fs, 10, _fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h), \
+                                                            _fc(i), _fc(j), _fc(k), _fc(m)); \
          fmt_OK(_n == 10); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i, j, k, m); } while (0)
 #define fmt_printd_13(to, fmt, c, d, e, f, g, h, i, j, k, m, n) \
-    do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 11, fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h), \
-                                                                      _fc(i), _fc(j), _fc(k), _fc(m), _fc(n)); \
+    do { _fmt_init(_fs, _fmt, fmt, 11); int _n = _fmt_parse(_fs, 11, _fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h), \
+                                                            _fc(i), _fc(j), _fc(k), _fc(m), _fc(n)); \
          fmt_OK(_n == 11); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i, j, k, m, n); } while (0)
 #define fmt_printd_14(to, fmt, c, d, e, f, g, h, i, j, k, m, n, o) \
-    do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 12, fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h), \
-                                                                      _fc(i), _fc(j), _fc(k), _fc(m), _fc(n), _fc(o)); \
+    do { _fmt_init(_fs, _fmt, fmt, 12); int _n = _fmt_parse(_fs, 12, _fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h), \
+                                                            _fc(i), _fc(j), _fc(k), _fc(m), _fc(n), _fc(o)); \
          fmt_OK(_n == 12); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i, j, k, m, n, o); } while (0)
 
 #define _fmt_fn(x) _Generic ((x), \
