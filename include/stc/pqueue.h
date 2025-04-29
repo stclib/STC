@@ -32,7 +32,7 @@
 #ifndef _i_prefix
   #define _i_prefix pqueue_
 #endif
-#define _i_is_pqueue
+#define _i_sorted
 #include "priv/template.h"
 #ifndef i_declared
   _c_DEFTYPES(_c_vec_types, Self, i_key);
@@ -179,8 +179,8 @@ _c_MEMB(_push)(Self* self, _m_value value) {
     arr[c] = value;
     return arr + c;
 }
-
 #endif
-#undef _i_is_pqueue
+
+#undef _i_sorted
 #include "priv/linkage2.h"
 #include "priv/template2.h"
