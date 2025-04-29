@@ -3,7 +3,7 @@
 
 # STC - Smart Template Containers
 
-## Version 5.1 RC3
+## Version 5.1 RC4
 STC is a comprehensive, high performance, typesafe and generic general purpose container and algorithms
 library for C99. It has excellent ergonomics and ease of use. The library elevates C into a modern programming
 language featuring a number of common containers and algorithms found in other contemporary system languages
@@ -451,55 +451,104 @@ for (c_each(it, MyInts, ints)) *it.ref += 42;
 
 ## Defining template parameters
 
-The container template parameters are specified with a `#define i_xxxx` statement. Only `i_key` is
-strictly required. Each templated type instantiation requires an `#include` statement, even if the
-same container base type was included earlier. Possible template parameters are:
+The container template parameters are specified with a `#define i_xxxx` statement. Each templated
+type instantiation requires an `#include` statement, even if the same container base type was
+included earlier. Normally it is sufficient to only define `i_type` before including a container,
+and to use the *Options* argument when required:
 
-### Basic template parameters
-- `i_type` *CntType* - Custom container type name.
-- `i_type` *CntType*, *KeyType*[, *ValType*] is a shorthand for defining ***i_type***, ***i_key*** (and ***i_val***) individually, as described below. ***NB!*** Do not use "pro"-types as KeyType/ValType, i.e. **cstr**, **arc** and **box** types.
+- `i_type` *CntType*, *KeyType*[, *ValType*][, *Options*] - Shorthand for defining ***i_type***, ***i_key***
+(and ***i_val*** and/or ***i_opt***) individually, as described below.
+
+Examples of container definitions:
+
+A sortedmap of **int** => **float**:
+```c++
+#define i_type IntfMap, int, float
+#include "stc/sortedmap.h"
+```
+
+A hashmap of **int** => string
+```c++
+#define i_type StrMap, int, cstr, (c_valpro) // cstr is a "pro" type
+#include "stc/hashmap.h"
+```
+
+A vector of searchable string vectors:
+```c++
+#define i_type StrVec, cstr, (c_keypro | c_use_eq) // enable vector linear search (find).
+#include "stc/vec.h"
+#define i_type StrVecVec, StrVec, (c_keyclass) // container as element has "class" properties
+#include "stc/vec.h"
+```
+The **c_keypro** and **c_keyclass** are *options*, and is specified as the last comma-separated argument
+of the `i_type` template parameter. They associate the (key) element type name with a set of standard
+named "member" functions and assigns them to template parameters. These are then used during the
+implementation of the container. NB! Note that the associated/bound "member" functions are only
+required to be implemented if the container actually use them. Option flags are boolean properties,
+and may be combined with the `|` operator. Below is a complete list of *options* that may be
+specified for a container:
+
+  - **c_keyclass** - `i_key` is a "class", i.e. binds _clone(), _drop() member names.
+  - **c_valclass** - like **c_keyclass**, but for the mapped values in sortedmap / hashmap.
+  - **c_cmpclass** - `i_key` is also the raw/cmp-type and binds _cmp(), _eq(), _hash() member names.
+  - **c_keypro** - `i_key` is a "keyclass" with an associated "cmpclass"-type named `i_key`_raw.
+  - **c_valpro** - `i_val` is a "valclass" with an associated "valraw"-type named `i_val`_raw.
+  - **c_use_cmp** - enable `<` comparison on integral types, or _cmp() on "pro/class" elements.
+  - **c_use_eq** - enable `==` on integral types, or _eq() on "pro/class" elements
+  - **c_no_clone** - disable clone functionality in container
+  - **c_no_atomic** - used with **arc** type, do simple reference counting instead of atomic.
+  - **c_no_hash** - don't enable hash function when *c_cmpclass* is specified.
+  - **c_declared** - container type was predeclared
+
+**Notes**:
+- **c_use_cmp** / **c_use_eq** are only needed for **vec**, **stack**, **deque**, **list**, as sorting and
+linear seach are not enabled by default for them.
+- By default, comparison uses `<` and `==` operators, whereas for pro/class element types,
+_cmp(), _eq() and _hash() functions must be defined if used by the container.
+- For a plain struct (PODs), define `i_cmp` / `i_eq` / `i_hash` macros when needed, or make it
+into a "class" by defining required "member" functions, and use the class-options described.
+
+#### Key (element lookup type)
+The assosicated element "member" functions defined from using meta-template parameters may also be
+specified/overridden by defining specific template parameters before including the container.
+Only `i_key` is strictly required to be defined for simple non-maps:
+
 - `i_key` *KeyType* - Element type.
-- `i_val` *MappedType* - Element type. **[required]** for **hmap** and **smap** containers.
-- `i_cmp` *Func* - Three-way comparison of two *i_keyraw* elements, given as pointers.
-- `i_less` *Func* - Comparison of two *i_keyraw* elements - alternative to specifying *i_cmp*.
-- `i_eq` *Func* - Equality comparison of two *i_keyraw* - defaults to *!i_cmp(x,y)*. Companion with *i_hash*.
-- `i_hash` *Func* - Hash function taking a *i_keyraw* pointer - defaults to *c_default_hash*.
-**[required]** for **hmap** and **hset** unless *i_keyraw* is an integral type (or a struct with no padding space).
+- `i_cmp` *Func(xp, yp)* - Three-way comparison of two *i_keyraw* elements, given as pointers.
+- `i_less` *Func(xp, yp)* - Comparison of two *i_keyraw* elements - alternative to specifying *i_cmp*.
+- `i_eq` *Func(xp, yp)* - Equality comparison of two *i_keyraw* - defaults to *!i_cmp(x,y)*. Companion with *i_hash*.
+- `i_hash` *Func(p)* - Hash function taking a *i_keyraw* pointer - defaults to *c_default_hash*.
+ **[required]** for **hmap** and **hset** unless *i_keyraw* is an integral type (or a struct with no padding space).
+- `i_keyclone` *Func(v)* - **[required if]** *i_keydrop* is defined (exception for **arc**, as it shares).
+- `i_keydrop` *Func(p)* - Destroy key - defaults to empty destructor.
 
-#### Key (element lookup type):
-- `i_keydrop` *Func* - Destroy key - defaults to empty destructor.
-- `i_keyclone` *Func* - **[required if]** *i_keydrop* is defined (exception for **arc**, as it shares).
-- Advanced, conversion between an alternative input type:
-    - `i_keyraw` *RawType* - Lookup/comparison "raw" type. Defaults to *i_key*.
-    - `i_keyfrom` *Func* - Conversion func from a *i_keyraw* to return a *i_key* type.
-    - `i_keytoraw` *Func*  - Conversion func from a *i_key* pointer to a *i_keyraw* type. **[required]** if *i_keyraw* was defined. By default, it returns the dereferenced *i_key* value.
-
-#### Val (mapped value type for maps):
-- These are analogues to the Key parameters, i.e. `i_valdrop`, `i_valclone`, `i_valraw`, etc.
+#### Val (mapped value type for maps)
+- `i_val` *MappedType* - **[required]** for **hmap** and **smap** containers.
+- `i_valclone` *Func(v)* - **[required if]** *i_valdrop* is defined (exception for **arc**, as it shares).
+- `i_valdrop` *Func(p)* - Destroy val - defaults to empty destructor.
 
 ---
 
-### Meta template parameters (advanced)
-Note that all the following logic is resolved at compile time, so there is no associated runtime overhead.
-The following meta-template parameters can be specified instead of ***i_key***, ***i_val***, and ***i_keyraw***, etc.
-These parameters make types into "classes" in the sense that they textually bind associated function names to the basic
-template parameters described above. This reduces boiler-plate code and simplifies the management
-of non-trivial container element types. Many basic template parameters are defined when specifying the
-following parameters, but the user may override those when needed. E.g. ***i_cmp*** can be overridden by defining
-it directly like `#define i_cmp(x, y) strcmp(x->name, y->name)`.
+### Meta template parameters (advanced / internal)
+Normally it is simplest to specify the meta-template parameters via the *option* argument to `i_type`,
+however, they can be specified as separate template parameters as well. Specifically, `i_cmpclass`
+can be specified as a different type than `i_key` (**c_cmpclass** always makes it equal to `i_key`).
+This enables a container to be associated with an additional alternative "raw" input key/val-type,
+and one may specify convertion functions between them. Specifically the string, **cstr** and smart
+pointers, **box** and **arc** uses this to enhance ergonmics, but every containers may gain efficiency
+and usage enhancements from this general built-in mechanism.
 
-#### Key meta parameters:
 - `i_cmpclass` *RawType* - Defines ***i_keyraw*** and binds ***i_cmp***, ***i_eq***, and ***i_hash*** to
 *RawType_cmp()*, *RawType_eq()*, and *RawType_hash()* comparison functions/macro names. In addition
 ***i_keyfrom***, ***i_keytoraw*** are bound to conversion functions *KeyType_from(RawType\*)* and *KeyType_toraw()*.
     - If neither ***i_key*** nor ***i_keyclass*** are defined, ***i_key*** will be defined as *RawType*. In this case,
     ***i_keyfrom***, ***i_keytoraw*** are bound to default pass-through conversion macros.
-    - Useful alone for containers of views (like csview).
+    - Useful alone for containers of views (like csview) - may use **c_cmpclass** option in that case.
 - `i_keyclass` *KeyType*
     - Defines ***i_key*** and binds ***i_keyclone***, ***i_keydrop*** to *KeyType_clone()* and *KeyType_drop()*
     function/macro names.
-    - Unless `i_cmpclass`/`i_keyraw` are also specified, the comparison functions mentioned with ***i_cmpclass*** are
-    also expected to exist (for containers that requires them or when **i_use_cmp** is specified).
+    - Unless `i_cmpclass` or `i_keyraw` are also specified, comparison functions associated with ***i_cmpclass*** are
+    also bound.
     - Use with container of containers, or in general when the element type has *_clone()* and *_drop()*
     "member" functions.
 - `i_keypro` *KeyType* - Use with "pro"-element types, i.e. library types like **cstr**, **box** and **arc**.
@@ -510,35 +559,20 @@ It combines the ***i_keyclass*** and ***i_cmpclass*** properties. Defining ***i_
     will all be textually bound to function names. See the vikings.c example on how to create and instantiate
     a self-made pro-type.
 
-#### Val (mapped) meta parameters:
+#### Val meta parameters
 - `i_valclass` *MappedType* - Analogous to the ***i_keyclass***, except for comparison and hash funcs.
-- `i_valpro` *MappedType* - Comparison functions are not relevant for the mapped type, so this defines
+- `i_valpro` *MappedType* - Comparison/lookup functions are not relevant for the mapped type, so this defines
     - ***i_valraw*** *MappedType_raw* (used by *emplace* and *c_make* functions only)
     - ***i_valclass*** *MappedType*
     - I.e. `i_val`, `i_valclone`, `i_valdrop`, `i_valraw`, `i_valfrom`, `i_valtoraw` will all be defined/bound.
 
-Option flags:
-- `i_opt` *Flags* - Boolean properties: May be combined with the `|` operator. These may also be specified
-as the last comma-separated argument of a `i_type` template parameter, or as separate macros, e.g
-`#define i_no_clone` is the same as `#define i_opt c_no_clone`.
-  - **c_declared** - container type was predeclared
-  - **c_no_atomic** - used with *arc* type, do simple reference counting.
-  - **c_no_clone** - disable clone functionality in container
-  - **c_no_hash** - don't enable hash function when *c_cmpclass* is specified.
-  - **c_use_cmp** - enable `<` comparison for integral types, or _cmp() for "pro/class" elements.
-  - **c_use_eq** - enable `==` for integral types, and _eq() for pro/class elements
-  - **c_keyclass** - `i_key` is a "class", i.e. must have _clone(), _drop() members.
-  - **c_valclass** - like **c_keyclass**, but for the mapped values in sortedmap / hashmap.
-  - **c_cmpclass** - `i_key` is also the raw/cmp-type and is expected to have _cmp(), _eq(), _hash() members.
-  - **c_keypro** - `i_key` is a "keyclass" with an associated "cmpclass"-type named `i_key`_raw.
-  - **c_valpro** - `i_val` is a "valclass" with an associated "valraw"-type named `i_val`_raw.
-
-**Notes**:
-- When specifying **c_cmpclass** option, `i_key` and `i_keyraw` are always equal, so no conversion functions are needed.
-- `i_use_cmp`/`i_use_eq` are only needed for **vec**, **stack**, **deque**, **list** as sorting and
-linear seach are not enabled by default. For integral types it uses `<` and `==` operators. For pro/class
-element types, _cmp(), _eq() and _hash() functions must be defined if used by container. For plain structs,
-define `i_cmp` / `i_eq` / `i_hash` macros as needed.
+#### Conversion between an alternative key/val type
+- `i_keyraw` *RawType* - Lookup/emplace-function argument "raw" type. Defaults to *i_key*.
+- `i_keyfrom` *Func(r)* - Conversion func from a *i_keyraw* to return a *i_key* type.
+- `i_keytoraw` *Func(p)*  - Conversion func from a *i_key* pointer to a *i_keyraw* type. **[required]** if *i_keyraw* was defined. By default, it returns the dereferenced *i_key* value.
+- `i_valraw` *RawType* - Emplace-function argument "raw" type. Defaults to *i_val*.
+- `i_valfrom` *Func(r)* - Conversion func from a *i_valraw* to return a *i_val* type.
+- `i_valtoraw` *Func(p)*  - Conversion func from a *i_val* pointer to a *i_valraw* type.
 
 </details>
 <details>
