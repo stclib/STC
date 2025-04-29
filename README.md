@@ -453,11 +453,11 @@ for (c_each(it, MyInts, ints)) *it.ref += 42;
 
 The container template parameters are specified with a `#define i_xxxx` statement. Each templated
 type instantiation requires an `#include` statement, even if the same container base type was
-included earlier. Normally it is sufficient to only define `i_type` before including a container,
-and to use the *Options* argument when required:
+included earlier. Normally it is sufficient to only define `i_type` before including a container:
 
-- `i_type` *CntType*, *KeyType*[, *ValType*][, *Options*] - Shorthand for defining ***i_type***, ***i_key***
-(and ***i_val*** and/or ***i_opt***) individually, as described below.
+```c
+#define i_type ContainerType, KeyType[, ValType][, (Options)]
+```
 
 Examples of container definitions:
 
