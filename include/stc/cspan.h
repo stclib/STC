@@ -146,9 +146,9 @@ typedef isize _isize_triple[3];
 #define use_cspan2(Self, T) use_cspan_2(Self, T); use_cspan_3(Self##2, T, 2)
 #define use_cspan3(Self, T) use_cspan2(Self, T); use_cspan_3(Self##3, T, 3)
 #define use_cspan2_with_eq(Self, T, eq) use_cspan_with_eq_3(Self, T, eq); \
-                                           use_cspan_with_eq_4(Self##2, T, eq, 2)
+                                        use_cspan_with_eq_4(Self##2, T, eq, 2)
 #define use_cspan3_with_eq(Self, T, eq) use_cspan2_with_eq(Self, T, eq); \
-                                           use_cspan_with_eq_4(Self##3, T, eq, 3)
+                                        use_cspan_with_eq_4(Self##3, T, eq, 3)
 #define use_cspan_tuple(N) typedef struct { _istride d[N]; } cspan_tuple##N
 use_cspan_tuple(1); use_cspan_tuple(2);
 use_cspan_tuple(3); use_cspan_tuple(4);
@@ -169,7 +169,7 @@ use_cspan_tuple(7); use_cspan_tuple(8);
 // May make a global scope 1d-span from initializer list, else like c_make(Span, ...).
 #define cspan_make(Span, ...) \
     ((Span)cspan_from_n(c_make_array(Span##_value, __VA_ARGS__), \
-                 sizeof((Span##_value[])__VA_ARGS__)/sizeof(Span##_value)))
+                        sizeof((Span##_value[])__VA_ARGS__)/sizeof(Span##_value)))
 
 // Make 1d-span from a c-array.
 #define cspan_from_array(array) \

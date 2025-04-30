@@ -24,9 +24,9 @@ void        fmt_close(fmt_stream* ss);
     {{  }}  %       Print the '{', '}', and '%' characters.
 
 * C11 or higher required.
-* MAX 127 chars fmt string by default. MAX 12 arguments after fmt string.
+* MAX 12 arguments after fmt string.
 * Define FMT_IMPLEMENT, STC_IMPLEMENT or i_implement prior to #include in one translation unit.
-* (c) operamint, 2022, MIT License.
+* (c) operamint, 2022-2025, MIT License.
 -----------------------------------------------------------------------------------
 #define i_implement
 #include "c11/fmt.h"
@@ -76,7 +76,16 @@ int main(void) {
 #else
   #include <alloca.h>
 #endif
-#include "../stc/common.h"
+#define fmt_MACRO_OVERLOAD(name, ...) \
+    fmt_JOIN(fmt_JOIN0(name,_),fmt_NUMARGS(__VA_ARGS__))(__VA_ARGS__)
+#define fmt_JOIN0(a, b) a ## b
+#define fmt_JOIN(a, b) fmt_JOIN0(a, b)
+#define fmt_EXPAND(...) __VA_ARGS__
+// This is the way to make fmt_NUMARGS work also for MSVC++ and MSVC pre -std:c11
+#define fmt_NUMARGS(...) _fmt_APPLY_ARG_N((__VA_ARGS__, _fmt_RSEQ_N))
+#define _fmt_APPLY_ARG_N(args) fmt_EXPAND(_fmt_ARG_N args)
+#define _fmt_RSEQ_N 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1,
+#define _fmt_ARG_N(_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,_12,_13,_14,_15,_16,N,...) N
 
 #if defined FMT_NDEBUG || defined STC_NDEBUG || defined NDEBUG
 #  define fmt_OK(exp) (void)(exp)
@@ -86,7 +95,7 @@ int main(void) {
 
 typedef struct {
     char* data;
-    intptr_t cap, len;
+    ptrdiff_t cap, len;
     _Bool overwrite;
 } fmt_stream;
 
@@ -101,7 +110,7 @@ typedef struct {
 #endif
 
 struct tm;
-FMT_API const char* _fmt_time(const char *fmt, const struct tm* tm, char* buf, int LEN);
+FMT_API const char* _fmt_time(const char *fmt, const struct tm* tm, char* buf, int bufsize);
 FMT_API void        fmt_close(fmt_stream* ss);
 FMT_API int        _fmt_parse(char* p, int nargs, const char *fmt, ...);
 FMT_API void       _fmt_sprint(fmt_stream*, const char* fmt, ...);
@@ -111,9 +120,10 @@ FMT_API void       _fmt_sprint(fmt_stream*, const char* fmt, ...);
 
 #define fmt_print(...) fmt_printd(stdout, __VA_ARGS__)
 #define fmt_println(...) fmt_printd((fmt_stream*)0, __VA_ARGS__)
-#define fmt_printd(...) c_MACRO_OVERLOAD(fmt_printd, __VA_ARGS__)
-#define fmt_time(fmt, tm, LEN) _fmt_time(fmt, tm, (char[LEN + 1]){0}, LEN)
-#define fmt_sv "{:.*s}"
+#define fmt_printd(...) fmt_MACRO_OVERLOAD(fmt_printd, __VA_ARGS__)
+#define fmt_time(fmt, tm, MAXLEN) _fmt_time(fmt, tm, (char[MAXLEN + 1]){0}, MAXLEN + 1)
+
+#define fmt_sv        "{:.*s}"
 #define fmt_svarg(sv) (int)(sv).size, (sv).buf
 
 /* Primary function. */
@@ -213,8 +223,8 @@ FMT_DEF FMT_UNUSED void fmt_close(fmt_stream* ss) {
 }
 
 FMT_DEF FMT_UNUSED
-const char* _fmt_time(const char *fmt, const struct tm* tm, char* buf, int len) {
-    strftime(buf, (size_t)len, fmt, tm);
+const char* _fmt_time(const char *fmt, const struct tm* tm, char* buf, int bufsize) {
+    strftime(buf, (size_t)bufsize, fmt, tm);
     return buf;
 }
 
@@ -228,7 +238,7 @@ FMT_DEF void _fmt_sprint(fmt_stream* ss, const char* fmt, ...) {
     va_copy(args2, args);
     const int n = vsnprintf(NULL, 0U, fmt, args);
     if (n < 0) goto done2;
-    const intptr_t pos = ss->overwrite ? 0 : ss->len;
+    const ptrdiff_t pos = ss->overwrite ? 0 : ss->len;
     ss->len = pos + n;
     if (ss->len > ss->cap) {
         ss->cap = ss->len + ss->cap/2;
