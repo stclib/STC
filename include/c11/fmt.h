@@ -1,11 +1,11 @@
 #ifndef FMT_H_INCLUDED
 #define FMT_H_INCLUDED
 /*
-VER 2.3 API:
+VER 2.4 API:
 void        fmt_print(fmt, ...);
 void        fmt_println(fmt, ...);
 void        fmt_printd(dst, fmt, ...);
-const char* fmt_time(fmt, const struct tm* tm, char *buf, int len);
+const char* fmt_time(fmt, const struct tm* tm, int MAXLEN);
 void        fmt_close(fmt_stream* ss);
 
   dst - destination, one of:
@@ -62,18 +62,19 @@ int main(void) {
     struct tm t1 = *localtime(&now), t2 = t1;
     t2.tm_hour += 48;
     mktime(&t2);
-    char ts[2][64];
-    fmt_print("Dates: {} and {}\n", fmt_time("%Y-%m-%d %X %Z", &t1, ts[0], 63),
-                                    fmt_time("%Y-%m-%d %X %Z", &t2, ts[1], 63));
+    fmt_print("Dates: {} and {}\n", fmt_time("%Y-%m-%d %X %Z", &t1, 63),
+                                    fmt_time("%Y-%m-%d %X %Z", &t2, 63));
 }
 */
 #include <stdio.h> // IWYU pragma: keep
 #include <stddef.h>
 #include <assert.h>
-#if defined _MSC_VER && !defined __clang__
+#if defined _MSC_VER || defined __MINGW32__
   #include <malloc.h>
-#else
+#elif defined __APPLE__
   #include <stdlib.h>
+#else
+  #include <alloca.h>
 #endif
 #include "../stc/common.h"
 
@@ -100,17 +101,18 @@ typedef struct {
 #endif
 
 struct tm;
-FMT_API const char* fmt_time(const char *fmt, const struct tm* tm, char* buf, int len);
+FMT_API const char* _fmt_time(const char *fmt, const struct tm* tm, char* buf, int LEN);
 FMT_API void        fmt_close(fmt_stream* ss);
 FMT_API int        _fmt_parse(char* p, int nargs, const char *fmt, ...);
 FMT_API void       _fmt_sprint(fmt_stream*, const char* fmt, ...);
 #define            _fmt_init(_fs, _fmt, fmt, nargs) \
                         const char* _fmt = fmt; \
-                        char* _fs = (char*)alloca(strlen(_fmt) + nargs*3 + 7) // "{}" => "%.16g" => +3
+                        char* _fs = (char*)alloca(strlen(_fmt) + nargs*3 + 1) // "{}" => "%.16g" => +3
 
 #define fmt_print(...) fmt_printd(stdout, __VA_ARGS__)
 #define fmt_println(...) fmt_printd((fmt_stream*)0, __VA_ARGS__)
 #define fmt_printd(...) c_MACRO_OVERLOAD(fmt_printd, __VA_ARGS__)
+#define fmt_time(fmt, tm, LEN) _fmt_time(fmt, tm, (char[LEN + 1]){0}, LEN)
 #define fmt_sv "{:.*s}"
 #define fmt_svarg(sv) (int)(sv).size, (sv).buf
 
@@ -211,7 +213,7 @@ FMT_DEF FMT_UNUSED void fmt_close(fmt_stream* ss) {
 }
 
 FMT_DEF FMT_UNUSED
-const char* fmt_time(const char *fmt, const struct tm* tm, char* buf, int len) {
+const char* _fmt_time(const char *fmt, const struct tm* tm, char* buf, int len) {
     strftime(buf, (size_t)len, fmt, tm);
     return buf;
 }
