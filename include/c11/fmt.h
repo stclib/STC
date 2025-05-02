@@ -69,7 +69,7 @@ int main(void) {
 #include <stdio.h> // IWYU pragma: keep
 #include <stddef.h>
 #include <assert.h>
-#if defined _MSC_VER || defined __MINGW32__
+#if defined _WIN32
   #include <malloc.h>
 #elif defined __APPLE__
   #include <stdlib.h>

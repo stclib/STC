@@ -59,7 +59,7 @@ smap_X          smap_X_clone(smap_x map);
 void            smap_X_copy(smap_X* self, const smap_X* other);
 void            smap_X_take(smap_X* self, smap_X unowned);                               // take ownership of unowned
 smap_X          smap_X_move(smap_X* self);                                               // move
-void            smap_X_drop(smap_X* self);                                               // destructor
+void            smap_X_drop(const smap_X* self);                                         // destructor
 
 void            smap_X_clear(smap_X* self);
 bool            smap_X_reserve(smap_X* self, isize cap);
@@ -98,7 +98,7 @@ smap_X_iter     smap_X_end(const smap_X* self);
 void            smap_X_next(smap_X_iter* iter);
 smap_X_iter     smap_X_advance(smap_X_iter it, isize n);
 
-i_key           smap_X_value_clone(i_key val);
+i_key           smap_X_value_clone(const smap_X* self, i_key val);
 smap_X_raw      smap_X_value_toraw(const i_key* pval);
 void            smap_X_value_drop(i_key* pval);
 ```

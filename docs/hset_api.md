@@ -39,7 +39,7 @@ hset_X          hset_X_clone(hset_x set);
 void            hset_X_copy(hset_X* self, const hset_X* other);
 void            hset_X_take(hset_X* self, hset_X unowned);               // take ownership of unowned
 hset_X          hset_X_move(hset_X* self);                               // move
-void            hset_X_drop(hset_X* self);                               // destructor
+void            hset_X_drop(const hset_X* self);                         // destructor
 
 void            hset_X_clear(hset_X* self);
 float           hset_X_max_load_factor(const hset_X* self);              // default: 0.85
@@ -68,7 +68,7 @@ hset_X_iter     hset_X_begin(const hset_X* self);
 hset_X_iter     hset_X_end(const hset_X* self);
 void            hset_X_next(hset_X_iter* it);
 
-hset_X_value    hset_X_value_clone(hset_X_value val);
+hset_X_value    hset_X_value_clone(const hset_X* self, hset_X_value val);
 ```
 
 ## Types

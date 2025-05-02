@@ -46,7 +46,7 @@ deque_X         deque_X_clone(deque_X deque);
 void            deque_X_copy(deque_X* self, const deque_X* other);
 void            deque_X_take(deque_X* self, deque_X unowned);                    // take ownership of unowned
 deque_X         deque_X_move(deque_X* self);                                     // move
-void            deque_X_drop(deque_X* self);                                     // destructor
+void            deque_X_drop(const deque_X* self);                               // destructor
 
 void            deque_X_clear(deque_X* self);
 bool            deque_X_reserve(deque_X* self, isize cap);
@@ -101,7 +101,7 @@ void            deque_X_next(deque_X_iter* it);
 deque_X_iter    deque_X_advance(deque_X_iter it, isize n);
 
 bool            deque_X_eq(const deque_X* c1, const deque_X* c2); // require i_eq/i_cmp/i_less.
-i_key           deque_X_value_clone(i_key val);
+i_key           deque_X_value_clone(const deque_X* self, i_key val);
 deque_X_raw     deque_X_value_toraw(const i_key* pval);
 void            deque_X_value_drop(i_key* pval);
 ```

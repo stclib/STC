@@ -120,8 +120,8 @@ STC_INLINE void _c_MEMB(_copy)(Self *self, const Self* other) {
     _c_MEMB(_drop)(self);
     *self = _c_MEMB(_clone)(*other);
 }
-STC_INLINE _m_value _c_MEMB(_value_clone)(_m_value val)
-    { return i_keyclone(val); }
+STC_INLINE _m_value _c_MEMB(_value_clone)(const Self* self, _m_value val)
+    { (void)self; return i_keyclone(val); }
 #endif // !i_no_clone
 
 #if !defined i_no_emplace
@@ -151,12 +151,13 @@ _c_MEMB(_make_heap)(Self* self) {
 
 #if !defined i_no_clone
 STC_DEF Self _c_MEMB(_clone)(Self q) {
-    Self tmp = q;
-    tmp.capacity = tmp.size = 0; tmp.data = NULL;
-    _c_MEMB(_reserve)(&tmp, q.size);
-    for (; tmp.size < q.size; ++q.data, ++tmp.size)
-        tmp.data[tmp.size] = i_keyclone((*q.data));
-    return tmp;
+    Self out = q, *self = &out; (void)self;
+    out.capacity = out.size = 0; out.data = NULL;
+    _c_MEMB(_reserve)(&out, q.size);
+    out.size = q.size;
+    for (c_range(i, q.size))
+        out.data[i] = i_keyclone(q.data[i]);
+    return out;
 }
 #endif
 

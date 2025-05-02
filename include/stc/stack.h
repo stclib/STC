@@ -106,8 +106,8 @@ STC_INLINE isize _c_MEMB(_capacity)(const Self* self) {
 #endif
 }
 
-STC_INLINE void _c_MEMB(_value_drop)(_m_value* val)
-    { i_keydrop(val); }
+STC_INLINE void _c_MEMB(_value_drop)(const Self* self, _m_value* val)
+    { (void)self; i_keydrop(val); }
 
 STC_INLINE bool _c_MEMB(_reserve)(Self* self, isize n) {
 #ifdef i_capacity
@@ -186,11 +186,12 @@ STC_INLINE _m_value* _c_MEMB(_emplace)(Self* self, _m_raw raw)
 
 #if !defined i_no_clone
 STC_INLINE Self _c_MEMB(_clone)(Self stk) {
-    Self out = stk;
+    Self out = stk, *self = &out; (void)self; // i_keyclone may use self via i_aux
     out.data = NULL; out.size = out.capacity = 0;
     _c_MEMB(_reserve)(&out, stk.size);
+    out.size = stk.size;
     for (c_range(i, stk.size))
-        out.data[out.size++] = i_keyclone((stk.data[i]));
+        out.data[i] = i_keyclone(stk.data[i]);
     return out;
 }
 
@@ -202,8 +203,8 @@ STC_INLINE void _c_MEMB(_copy)(Self *self, const Self* other) {
         self->data[self->size++] = i_keyclone((other->data[i]));
 }
 
-STC_INLINE _m_value _c_MEMB(_value_clone)(_m_value val)
-    { return i_keyclone(val); }
+STC_INLINE _m_value _c_MEMB(_value_clone)(const Self* self, _m_value val)
+    { (void)self; return i_keyclone(val); }
 
 STC_INLINE i_keyraw _c_MEMB(_value_toraw)(const _m_value* val)
     { return i_keytoraw(val); }

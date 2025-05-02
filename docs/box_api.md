@@ -53,7 +53,7 @@ void            box_X_assign(box_X* self, box_X* other);        // transfer owne
 void            box_X_take(box_X* self, box_X unowned);         // take ownership of unowned box object.
 box_X           box_X_move(box_X* self);                        // transfer ownership to receiving box. self set to NULL.
 i_key*          box_X_release(box_X* self);                     // release owned pointer; must be freed by receiver. self set NULL.
-void            box_X_drop(box_X* self);                        // destruct the contained object and free its heap memory.
+void            box_X_drop(const box_X* self);                  // destruct the contained object and free its heap memory.
 
 void            box_X_reset_to(box_X* self, i_key* ptr);        // assign ptr, and take ownership of ptr.
 

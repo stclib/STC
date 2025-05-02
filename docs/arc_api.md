@@ -61,7 +61,7 @@ arc_X           arc_X_clone(arc_X other);                       // return other 
 void            arc_X_assign(arc_X* self, const arc_X* other);  // shared assign (increases use count)
 void            arc_X_take(arc_X* self, arc_X unowned);         // take ownership of unowned.
 arc_X           arc_X_move(arc_X* self);                        // transfer ownership to receiver; self becomes NULL
-void            arc_X_drop(arc_X* self);                        // destruct (decrease use count, free at 0)
+void            arc_X_drop(const arc_X* self);                  // destruct (decrease use count, free at 0)
 
 long            arc_X_use_count(const arc_X* self);
 void            arc_X_reset_to(arc_X* self, i_key* p);          // assign new arc from ptr. Takes ownership of p.

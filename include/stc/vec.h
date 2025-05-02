@@ -88,7 +88,7 @@ STC_API _m_iter         _c_MEMB(_insert_uninit)(Self* self, isize idx, isize n);
 STC_API _m_iter         _c_MEMB(_find_in)(const Self* self, _m_iter it1, _m_iter it2, _m_raw raw);
 #endif // _i_has_eq
 STC_INLINE Self         _c_MEMB(_init)(void) { return c_literal(Self){0}; }
-STC_INLINE void         _c_MEMB(_value_drop)(_m_value* val) { i_keydrop(val); }
+STC_INLINE void         _c_MEMB(_value_drop)(const Self* self, _m_value* val) { (void)self; i_keydrop(val); }
 
 STC_INLINE Self _c_MEMB(_move)(Self *self) {
     Self m = *self;
@@ -133,7 +133,8 @@ STC_INLINE _m_iter _c_MEMB(_emplace_at)(Self* self, _m_iter it, _m_raw raw)
 STC_API void            _c_MEMB(_copy)(Self* self, const Self* other);
 STC_API _m_iter         _c_MEMB(_copy_to)(Self* self, isize idx, const _m_value arr[], isize n);
 STC_API Self            _c_MEMB(_clone)(Self vec);
-STC_INLINE _m_value     _c_MEMB(_value_clone)(_m_value val) { return i_keyclone(val); }
+STC_INLINE _m_value     _c_MEMB(_value_clone)(const Self* self, _m_value val)
+                            { (void)self; return i_keyclone(val); }
 #endif // !i_no_clone
 
 STC_INLINE isize        _c_MEMB(_size)(const Self* self) { return self->size; }
@@ -261,17 +262,19 @@ _c_MEMB(_copy)(Self* self, const Self* other) {
     if (self == other) return;
     _c_MEMB(_clear)(self);
     _c_MEMB(_reserve)(self, other->size);
+    self->size = other->size;
     for (c_range(i, other->size))
-        self->data[self->size++] = i_keyclone((other->data[i]));
+        self->data[i] = i_keyclone((other->data[i]));
 }
 
 STC_DEF Self
 _c_MEMB(_clone)(Self vec) {
-    Self out = vec;
+    Self out = vec, *self = &out; (void)self;
     out.data = NULL; out.size = out.capacity = 0;
     _c_MEMB(_reserve)(&out, vec.size);
+    out.size = vec.size;
     for (c_range(i, vec.size))
-        out.data[out.size++] = i_keyclone((vec.data[i]));
+        out.data[i] = i_keyclone(vec.data[i]);
     return out;
 }
 

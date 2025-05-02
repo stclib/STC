@@ -50,7 +50,7 @@ stack_X         stack_X_clone(stack_X st);
 void            stack_X_copy(stack_X* self, const stack_X* other);
 stack_X         stack_X_move(stack_X* self);                                    // move
 void            stack_X_take(stack_X* self, stack_X unowned);                   // take ownership of unowned
-void            stack_X_drop(stack_X* self);                                    // destructor
+void            stack_X_drop(const stack_X* self);                              // destructor
 
 void            stack_X_clear(stack_X* self);
 bool            stack_X_reserve(stack_X* self, isize n);
@@ -87,7 +87,7 @@ stack_X_iter    stack_X_end(const stack_X* self);
 void            stack_X_next(stack_X_iter* it);
 
 bool            stack_X_eq(const stack_X* c1, const stack_X* c2); // require i_eq/i_cmp/i_less.
-i_key           stack_X_value_clone(i_key value);
+i_key           stack_X_value_clone(const stack_X* self, i_key value);
 i_keyraw        stack_X_value_toraw(const vec_X_value* pval);
 void            stack_X_value_drop(vec_X_value* pval);
 ```

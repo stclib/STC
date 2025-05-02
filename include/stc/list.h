@@ -117,7 +117,8 @@ STC_INLINE _m_node*     _c_MEMB(_unlink_front_node)(Self* self)
                             { return _c_MEMB(_unlink_after_node)(self, self->last); }
 #if !defined i_no_clone
 STC_API Self            _c_MEMB(_clone)(Self cx);
-STC_INLINE _m_value     _c_MEMB(_value_clone)(_m_value val) { return i_keyclone(val); }
+STC_INLINE _m_value     _c_MEMB(_value_clone)(const Self* self, _m_value val)
+                            { (void)self; return i_keyclone(val); }
 
 STC_INLINE void
 _c_MEMB(_copy)(Self *self, const Self* other) {
@@ -155,7 +156,7 @@ STC_INLINE _m_value*       _c_MEMB(_front_mut)(Self* self) { return &self->last-
 STC_INLINE const _m_value* _c_MEMB(_back)(const Self* self) { return &self->last->value; }
 STC_INLINE _m_value*       _c_MEMB(_back_mut)(Self* self) { return &self->last->value; }
 STC_INLINE _m_raw       _c_MEMB(_value_toraw)(const _m_value* pval) { return i_keytoraw(pval); }
-STC_INLINE void         _c_MEMB(_value_drop)(_m_value* pval) { i_keydrop(pval); }
+STC_INLINE void         _c_MEMB(_value_drop)(const Self* self, _m_value* pval) { (void)self; i_keydrop(pval); }
 
 STC_INLINE Self _c_MEMB(_move)(Self *self) {
     Self m = *self;
@@ -227,11 +228,11 @@ STC_INLINE bool _c_MEMB(_eq)(const Self* self, const Self* other) {
 #if !defined i_no_clone
 STC_DEF Self
 _c_MEMB(_clone)(Self lst) {
-    Self tmp = lst;
-    tmp.last = NULL;
+    Self out = lst, *self = &out; (void)self; // may be used by i_keyclone via i_aux
+    out.last = NULL;
     for (c_each(it, Self, lst))
-        _c_MEMB(_push_back)(&tmp, i_keyclone((*it.ref)));
-    return tmp;
+        _c_MEMB(_push_back)(&out, i_keyclone((*it.ref)));
+    return out;
 }
 #endif
 

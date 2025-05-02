@@ -42,7 +42,7 @@ pqueue_X        pqueue_X_clone(pqueue_X pq);
 void            pqueue_X_copy(pqueue_X* self, const pqueue_X* other);
 void            pqueue_X_take(pqueue_X* self, pqueue_X unowned);    // take ownership of unowned
 pqueue_X        pqueue_X_move(pqueue_X* self);                      // move
-void            pqueue_X_drop(pqueue_X* self);                      // destructor
+void            pqueue_X_drop(const pqueue_X* self);                // destructor
 
 void            pqueue_X_clear(pqueue_X* self);
 bool            pqueue_X_reserve(pqueue_X* self, isize n);
@@ -60,7 +60,7 @@ void            pqueue_X_pop(pqueue_X* self);
 i_key           pqueue_X_pull(const pqueue_X* self);
 void            pqueue_X_erase_at(pqueue_X* self, isize idx);
 
-i_key           pqueue_X_value_clone(i_key value);
+i_key           pqueue_X_value_clone(const pqueue_X* self, i_key value);
 ```
 
 ## Types

@@ -42,7 +42,7 @@ sset_X          sset_X_clone(sset_x set);
 void            sset_X_copy(sset_X* self, const sset_X* other);
 void            sset_X_take(sset_X* self, sset_X unowned);                           // take ownership of unowned
 sset_X          sset_X_move(sset_X* self);                                           // move
-void            sset_X_drop(sset_X* self);                                           // destructor
+void            sset_X_drop(const sset_X* self);                                     // destructor
 
 void            sset_X_clear(sset_X* self);
 bool            sset_X_reserve(sset_X* self, isize cap);
@@ -71,7 +71,7 @@ sset_X_iter     sset_X_begin(const sset_X* self);
 sset_X_iter     sset_X_end(const sset_X* self);
 void            sset_X_next(sset_X_iter* it);
 
-i_key           sset_X_value_clone(i_key val);
+i_key           sset_X_value_clone(const sset_X* self, i_key val);
 ```
 
 ## Types

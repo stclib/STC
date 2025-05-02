@@ -59,7 +59,7 @@ hmap_X          hmap_X_clone(hmap_x map);
 void            hmap_X_copy(hmap_X* self, const hmap_X* other);
 void            hmap_X_take(hmap_X* self, hmap_X unowned);                        // take ownership of unowned
 hmap_X          hmap_X_move(hmap_X* self);                                        // move
-void            hmap_X_drop(hmap_X* self);                                        // destructor
+void            hmap_X_drop(const hmap_X* self);                                  // destructor
 
 void            hmap_X_clear(hmap_X* self);
 float           hmap_X_max_load_factor(const hmap_X* self);                       // default: 0.85f
@@ -95,7 +95,7 @@ hmap_X_iter     hmap_X_end(const hmap_X* self);
 void            hmap_X_next(hmap_X_iter* it);
 hmap_X_iter     hmap_X_advance(hmap_X_iter it, hmap_X_ssize n);
 
-hmap_X_value    hmap_X_value_clone(hmap_X_value val);
+hmap_X_value    hmap_X_value_clone(const hmap_X* self, hmap_X_value val);
 hmap_X_raw      hmap_X_value_toraw(hmap_X_value* pval);
 ```
 Free helper functions:

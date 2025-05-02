@@ -47,7 +47,7 @@ STC_INLINE void         _c_MEMB(_put_n)(Self* self, const _m_raw* raw, isize n)
 STC_INLINE Self         _c_MEMB(_from_n)(const _m_raw* raw, isize n)
                             { Self cx = {0}; _c_MEMB(_put_n)(&cx, raw, n); return cx; }
 
-STC_INLINE void         _c_MEMB(_value_drop)(_m_value* val) { i_keydrop(val); }
+STC_INLINE void         _c_MEMB(_value_drop)(const Self* self, _m_value* val) { (void)self; i_keydrop(val); }
 
 #if !defined i_no_emplace
 STC_INLINE _m_value*    _c_MEMB(_emplace)(Self* self, _m_raw raw)
@@ -59,9 +59,9 @@ STC_API bool            _c_MEMB(_eq)(const Self* self, const Self* other);
 #endif
 
 #if !defined i_no_clone
-STC_API Self            _c_MEMB(_clone)(Self cx);
-STC_INLINE _m_value     _c_MEMB(_value_clone)(_m_value val)
-                            { return i_keyclone(val); }
+STC_API Self            _c_MEMB(_clone)(Self q);
+STC_INLINE _m_value     _c_MEMB(_value_clone)(const Self* self, _m_value val)
+                            { (void)self; return i_keyclone(val); }
 
 STC_INLINE void         _c_MEMB(_copy)(Self* self, const Self* other) {
                             if (self == other) return;
@@ -237,15 +237,15 @@ _c_MEMB(_shrink_to_fit)(Self *self) {
 #if !defined i_no_clone
 STC_DEF Self
 _c_MEMB(_clone)(Self q) {
-    Self tmp = q;
-    tmp.start = 0; tmp.end = _c_MEMB(_size)(&q);
-    tmp.capmask = c_next_pow2(tmp.end + 1) - 1;
-    tmp.cbuf = _i_malloc(i_key, tmp.capmask + 1);
-    isize j = 0;
-    if (tmp.cbuf)
-        for (c_each(i, Self, q))
-            tmp.cbuf[j++] = i_keyclone((*i.ref));
-    return tmp;
+    Self out = q, *self = &out; (void)self; // may be used by _i_malloc/i_keyclone via i_aux.
+    out.start = 0; out.end = _c_MEMB(_size)(&q);
+    out.capmask = c_next_pow2(out.end + 1) - 1;
+    out.cbuf = _i_malloc(i_key, out.capmask + 1);
+    isize i = 0;
+    if (out.cbuf)
+        for (c_each(it, Self, q))
+            out.cbuf[i++] = i_keyclone((*it.ref));
+    return out;
 }
 #endif // i_no_clone
 

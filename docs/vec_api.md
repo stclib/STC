@@ -50,7 +50,7 @@ void            vec_X_copy(vec_X* self, const vec_X* other);
 vec_X_iter      vec_X_copy_to(vec_X* self, isize idx, const i_key* arr, isize n);
 vec_X           vec_X_move(vec_X* self);                                    // move
 void            vec_X_take(vec_X* self, vec_X unowned);                     // take ownership of unowned
-void            vec_X_drop(vec_X* self);                                    // destructor
+void            vec_X_drop(const vec_X* self);                              // destructor
 
 void            vec_X_clear(vec_X* self);
 bool            vec_X_reserve(vec_X* self, isize cap);
@@ -104,7 +104,7 @@ void            vec_X_next(vec_X_iter* iter);
 vec_X_iter      vec_X_advance(vec_X_iter it, size_t n);
 
 bool            vec_X_eq(const vec_X* c1, const vec_X* c2); // equality comp.
-vec_X_value     vec_X_value_clone(vec_X_value val);
+vec_X_value     vec_X_value_clone(const vec_X* self, vec_X_value val);
 vec_X_raw       vec_X_value_toraw(const vec_X_value* pval);
 vec_X_raw       vec_X_value_drop(vec_X_value* pval);
 ```

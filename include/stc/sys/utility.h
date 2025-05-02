@@ -96,7 +96,7 @@
     while ((value = _it.ref) && !(pred)) \
         C##_next(&_it); \
     for (_i = _it; (value = _it.ref); C##_next(&_it)) { \
-        if (pred) C##_value_drop(_it.ref), ++_n; \
+        if (pred) C##_value_drop(_cnt, _it.ref), ++_n; \
         else *_i.ref = *_it.ref, C##_next(&_i); \
     } \
     C##_adjust_end_(_cnt, -_n); \
@@ -126,7 +126,7 @@
     C _cnt = cnt; \
     const C##_value* value; \
     for (C##_iter _it = C##rev##begin(&_cnt); (value = _it.ref); C##rev##next(&_it)) \
-        if (pred) C_out##_push(_out, C##_value_clone(*_it.ref)); \
+        if (pred) C_out##_push(_out, C_out##_value_clone(_out, *_it.ref)); \
 } while (0)
 
 // --------------------------------

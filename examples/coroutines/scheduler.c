@@ -23,7 +23,7 @@ int Scheduler(struct Scheduler* co, cco_fiber* fb) {
             if (fb->result == CCO_YIELD) {
                 Tasks_push(&co->tasks, co->pulled);
             } else {
-                Tasks_value_drop(&co->pulled);
+                Tasks_value_drop(&co->tasks, &co->pulled);
             }
         }
 

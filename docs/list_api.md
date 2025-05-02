@@ -56,7 +56,7 @@ list_X          list_X_clone(list_X list);
 void            list_X_copy(list_X* self, const list_X* other);
 void            list_X_take(list_X* self, list_X unowned);                        // take ownership of unowned
 list_X          list_X_move(list_X* self);                                        // move
-void            list_X_drop(list_X* self);                                        // destructor
+void            list_X_drop(const list_X* self);                                  // destructor
 
 void            list_X_clear(list_X* self);
 
@@ -112,7 +112,7 @@ void            list_X_next(list_X_iter* it);
 list_X_iter     list_X_advance(list_X_iter it, size_t n);                        // return n elements ahead.
 
 bool            list_X_eq(const list_X* c1, const list_X* c2);                   // equality test
-i_key           list_X_value_clone(i_key val);
+i_key           list_X_value_clone(const list_X* self, i_key val);
 list_X_raw      list_X_value_toraw(const i_key* pval);
 void            list_X_value_drop(i_key* pval);
 ```

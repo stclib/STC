@@ -142,7 +142,7 @@ STC_INLINE cstr cstr_clone(cstr s) {
     return cstr_from_n(sv.buf, sv.size);
 }
 
-STC_INLINE void cstr_drop(cstr* self) {
+STC_INLINE void cstr_drop(const cstr* self) {
     if (cstr_is_long(self))
         cstr_l_drop(self);
 }
