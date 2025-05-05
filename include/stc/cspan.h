@@ -119,9 +119,9 @@ typedef isize _isize_triple[3];
         return c_literal(Self##_iter){0}; \
     } \
     STC_INLINE void Self##_next(Self##_iter* it) { \
-        int done; \
-        it->ref += _cspan_next##RANK(it->pos, it->_s->shape, it->_s->stride.d, RANK, &done); \
-        if (done) it->ref = NULL; \
+        isize off = it->_s->stride.d[RANK - 1]; \
+        bool done = _cspan_next##RANK(it->pos, it->_s->shape, it->_s->stride.d, RANK, &off); \
+        if (done) it->ref = NULL; else it->ref += off; \
     } \
     STC_INLINE isize Self##_size(const Self* self) \
         { return cspan_size(self); } \
@@ -359,15 +359,19 @@ STC_INLINE isize _cspan_index(const _istride shape[], const _istride stride[],
 STC_API void _cspan_print_assist(_istride pos[], const _istride shape[], const int rank,
                                  char result[2][16], const char* brackets);
 
-STC_API isize _cspan_next2(_istride pos[], const _istride shape[], const _istride stride[],
-                           int rank, int* done);
-#define _cspan_next1(pos, shape, stride, rank, done) (*done = (++pos[0] == shape[0]), stride[0])
-#define _cspan_next3 _cspan_next2
-#define _cspan_next4 _cspan_next2
-#define _cspan_next5 _cspan_next2
-#define _cspan_next6 _cspan_next2
-#define _cspan_next7 _cspan_next2
-#define _cspan_next8 _cspan_next2
+STC_API bool _cspan_nextN(_istride pos[], const _istride shape[], const _istride stride[],
+                           int rank, isize* off);
+#define _cspan_next1(pos, shape, stride, rank, off)            (++pos[0] == shape[0])
+#define _cspan_next2(pos, shape, stride, rank, off)            (++pos[1] == shape[1] && \
+    (pos[1] = 0, *off += stride[0] - (isize)shape[1]*stride[1], ++pos[0] == shape[0]))
+#define _cspan_next3(pos, shape, stride, rank, off)            (++pos[2] == shape[2] && \
+    (pos[2] = 0, *off += stride[1] - (isize)shape[2]*stride[2], ++pos[1] == shape[1]) && \
+    (pos[1] = 0, *off += stride[0] - (isize)shape[1]*stride[1], ++pos[0] == shape[0]))
+#define _cspan_next4 _cspan_nextN
+#define _cspan_next5 _cspan_nextN
+#define _cspan_next6 _cspan_nextN
+#define _cspan_next7 _cspan_nextN
+#define _cspan_next8 _cspan_nextN
 
 STC_API isize _cspan_slice(_istride oshape[], _istride ostride[], int* orank,
                            const _istride shape[], const _istride stride[],
@@ -403,17 +407,14 @@ STC_DEF void _cspan_print_assist(_istride pos[], const _istride shape[], const i
     while (n--) result[1][j++] = '\n';
 }
 
-STC_DEF isize _cspan_next2(_istride pos[], const _istride shape[], const _istride stride[],
-                           int rank, int* done) {
-    isize off = stride[--rank];
-    ++pos[rank];
-
+STC_DEF bool _cspan_nextN(_istride pos[], const _istride shape[], const _istride stride[],
+                          int rank, isize* off) {
+    ++pos[--rank];
     for (; rank && pos[rank] == shape[rank]; --rank) {
         pos[rank] = 0; ++pos[rank - 1];
-        off += stride[rank - 1] - (isize)shape[rank]*stride[rank];
+        *off += stride[rank - 1] - (isize)shape[rank]*stride[rank];
     }
-    *done = pos[rank] == shape[rank];
-    return off;
+    return pos[rank] == shape[rank];
 }
 
 STC_DEF _istride* _cspan_shape2stride(cspan_layout layout, _istride shpstri[], int rank) {

@@ -261,8 +261,9 @@ static inline int _cco_cancel_task(cco_task* task, cco_fiber* fiber)
 #define cco_run_task_2(task, env) cco_run_fiber_2(_it_fb, cco_new_fiber_2(task, env))
 #define cco_run_task_3(it_fiber, task, env) cco_run_fiber_2(it_fiber, cco_new_fiber_2(task, env))
 
-static inline bool cco_is_joined(const cco_fiber* fiber)
+static inline bool cco_joined(const cco_fiber* fiber)
     { return fiber == fiber->next; }
+#define cco_is_joined(fb) cco_joined(fb) // [deprecated]
 
 extern cco_fiber* _cco_new_fiber(cco_task* task, void* env);
 extern cco_fiber* _cco_spawn(cco_task* task, cco_fiber* fb, void* env);

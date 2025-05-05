@@ -13,7 +13,7 @@ typedef Mat OutMat;
 void base_case_matrix_product(Mat A, Mat B, OutMat C) {
     #ifdef __GNUC__
       #pragma omp parallel for schedule(runtime)
-      #define DEFAULT_DIM 4096
+      #define DEFAULT_DIM 512
     #else
       #define DEFAULT_DIM 512
     #endif

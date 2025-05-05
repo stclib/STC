@@ -67,6 +67,7 @@ int main(void) {
 }
 */
 #include <stdio.h> // IWYU pragma: keep
+#include <string.h>
 #include <stddef.h>
 #include <assert.h>
 #if defined _WIN32
@@ -215,7 +216,6 @@ FMT_API void       _fmt_sprint(fmt_stream*, const char* fmt, ...);
 
 #include <stdlib.h>
 #include <stdarg.h>
-#include <string.h>
 #include <time.h>
 
 FMT_DEF FMT_UNUSED void fmt_close(fmt_stream* ss) {

@@ -56,7 +56,7 @@ cco_fiber*      cco_new_fiber(cco_task* task);                      // Create an
 cco_fiber*      cco_new_fiber(cco_task* task, void* env);           // Create an initial fiber from a task and env (inputs or a future).
 cco_fiber*      cco_spawn(cco_task* task, cco_fiber* fb);           // Spawn a new fiber parallel to the given fiber.
 cco_fiber*      cco_spawn(cco_task* task, cco_fiber* fb, void* env);// Same, env is stored in fb, may be used as a future or anything.
-bool            cco_is_joined(const cco_fiber* fb);                 // True if there are no other parallel spawned fibers running.
+bool            cco_joined(const cco_fiber* fb);                    // True if there are no other parallel spawned fibers running.
 
                 cco_run_task(cco_task* task) {}                     // Run task blocking until it and spawned fibers are finished.
                 cco_run_task(cco_task* task, void *env) {}          // Run task blocking with env data
