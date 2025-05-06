@@ -82,11 +82,11 @@ int main(void) {
 #define _c_LOOP_END_1 ,_c_LOOP1
 #define _c_LOOP0(f,T,x,...) f c_EXPAND((T, c_EXPAND x)) _c_LOOP_INDIRECTION _c_EMPTY()()(f,T,__VA_ARGS__)
 #define _c_LOOP1(...)
-#define _c_CHECK(x,...) c_TUPLE_AT_1 c_EXPAND((__VA_ARGS__,x,))
+#define _c_CHECK(x,...) c_TUPLE_AT_1(__VA_ARGS__,x,)
 #define _c_E0(...) __VA_ARGS__
-#define _c_E1(...) _c_E0(_c_E0(_c_E0(_c_E0(_c_E0(__VA_ARGS__)))))
-#define _c_E2(...) _c_E1(_c_E1(_c_E1(_c_E1(_c_E1(__VA_ARGS__)))))
-#define c_EVAL(...) _c_E2(_c_E2(_c_E2(_c_E2(__VA_ARGS__))))
+#define _c_E1(...) _c_E0(_c_E0(_c_E0(_c_E0(_c_E0(_c_E0(_c_E0(__VA_ARGS__)))))))
+#define _c_E2(...) _c_E1(_c_E1(_c_E1(_c_E1(_c_E1(_c_E1(_c_E1(__VA_ARGS__)))))))
+#define c_EVAL(...) _c_E2(_c_E2(_c_E2(_c_E2(_c_E2(__VA_ARGS__)))))
 #define c_LOOP(f,T,x,...) _c_CHECK(_c_LOOP0, c_JOIN(_c_LOOP_END_, c_NUMARGS(c_EXPAND x)))(f,T,x,__VA_ARGS__)
 
 
@@ -97,7 +97,7 @@ int main(void) {
 
 #define c_sumtype(T, ...) \
     typedef union T T; \
-    enum enum_##T { c_EVAL(c_LOOP(_c_vartuple_tag, T, c_EXPAND(_c_enum_1 __VA_ARGS__), (0),)) }; \
+    enum enum_##T { c_EVAL(c_LOOP(_c_vartuple_tag, T, _c_enum_1 __VA_ARGS__, (0),)) }; \
     c_EVAL(c_LOOP(_c_vartuple_type, T,  __VA_ARGS__, (0),)) \
     union T { \
         struct { enum enum_##T tag; } _any_; \
