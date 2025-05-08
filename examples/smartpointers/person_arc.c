@@ -1,21 +1,23 @@
-/* box: heap allocated boxed type */
+/* box example: heap allocated smart pointer type */
 #include "stc/cstr.h"
 
+// ===== Person: create a "pro" type:
 typedef struct { cstr name, last; } Person;
+typedef struct { const char *name, *last; } Person_raw;
 
-Person Person_make(const char* name, const char* last) {
-    Person p = {.name = cstr_from(name), .last = cstr_from(last)};
-    return p;
+Person Person_from(Person_raw raw)
+    { return (Person){.name = cstr_from(raw.name), .last = cstr_from(raw.last)}; }
+
+Person_raw Person_toraw(Person* p)
+    { return (Person_raw){.name = cstr_str(&p->name), .last = cstr_str(&p->last)}; }
+
+int Person_raw_cmp(const Person_raw* a, const Person_raw* b) {
+    int c = strcmp(a->name, b->name);
+    return c ? c : strcmp(a->last, b->last);
 }
 
-int Person_cmp(const Person* a, const Person* b) {
-    int c = cstr_cmp(&a->name, &b->name);
-    return c ? c : cstr_cmp(&a->last, &b->last);
-}
-
-size_t Person_hash(const Person* a) {
-    return cstr_hash(&a->name) ^ cstr_hash(&a->last);
-}
+size_t Person_raw_hash(const Person_raw* a)
+    { return c_hash_str(a->name) ^ c_hash_str(a->last); }
 
 Person Person_clone(Person p) {
     p.name = cstr_clone(p.name);
@@ -27,47 +29,48 @@ void Person_drop(Person* p) {
     printf("drop: %s %s\n", cstr_str(&p->name), cstr_str(&p->last));
     c_drop(cstr, &p->name, &p->last);
 }
+// =====
 
-// binds Person_clone, Person_drop, enable sort/search
-#define i_type PSPtr, Person, (c_keyclass | c_use_cmp)
+// binds Person_clone, Person_drop, enable search/sort
+// Person is a "pro" type (has Person_raw conversion type):
+#define i_type PrsArc, Person, (c_keypro | c_use_cmp)
 #include "stc/arc.h"
 
-#define i_type Persons, PSPtr, (c_keypro | c_use_cmp)
+// Arcs and Boxes are always "pro" types:
+#define i_type Persons, PrsArc, (c_keypro | c_use_cmp)
 #include "stc/vec.h"
 
 
 int main(void)
 {
-    PSPtr p = PSPtr_from(Person_make("Laura", "Palmer"));
-    PSPtr q = PSPtr_from(Person_clone(*p.get)); // deep copy
     Persons vec = {0};
+    PrsArc laura = PrsArc_from((Person_raw){"Laura", "Palmer"});
+    PrsArc bobby = PrsArc_from((Person_raw){"Bobby", "Briggs"});
+
     c_defer(
-        PSPtr_drop(&p),
-        PSPtr_drop(&q),
+        PrsArc_drop(&laura),
+        PrsArc_drop(&bobby),
         Persons_drop(&vec)
     ){
-        cstr_assign(&q.get->name, "Leland");
+        // Use Persons_emplace() to implicitly call PrsArc_from() on the argument:
+        Persons_emplace(&vec, (Person_raw){"Audrey", "Home"});
+        Persons_emplace(&vec, (Person_raw){"Dale", "Cooper"});
 
-        printf("orig: %s %s\n", cstr_str(&p.get->name), cstr_str(&p.get->last));
-        printf("copy: %s %s\n", cstr_str(&q.get->name), cstr_str(&q.get->last));
+        Persons_push(&vec, PrsArc_clone(laura));
+        Persons_push(&vec, PrsArc_clone(bobby));
 
-        // Use Persons_emplace to implicitly call PSPtr_make on the argument.
-        // No need to do: Persons_push(&vec, PSPtr_make(Person_make("Audrey", "Home")));
-        Persons_emplace(&vec, Person_make("Audrey", "Home"));
-        Persons_emplace(&vec, Person_make("Dale", "Cooper"));
-
-        // Clone/share p and q to the vector
-        for (c_items(i, PSPtr, {p, q}))
-            Persons_push(&vec, PSPtr_clone(*i.ref));
-
-        for (c_each(i, Persons, vec))
-            printf("%s %s\n", cstr_str(&i.ref->get->name), cstr_str(&i.ref->get->last));
+        for (c_each(i, Persons, vec)) {
+            Person* p = i.ref->get;
+            printf("%s %s (%d)\n", cstr_str(&p->name),
+                                   cstr_str(&p->last),
+                                   (int)*i.ref->use_count);
+        }
         puts("");
 
         // Look-up Audrey!
-        Person a = Person_make("Audrey", "Home");
-        const PSPtr *v = Persons_find(&vec, a).ref;
-        if (v) printf("found: %s %s\n", cstr_str(&v->get->name), cstr_str(&v->get->last));
-        Person_drop(&a);
+        const PrsArc *a = Persons_find(&vec, (Person_raw){"Audrey", "Home"}).ref;
+        if (a)
+            printf("found: %s %s\n", cstr_str(&a->get->name),
+                                     cstr_str(&a->get->last));
     }
 }

@@ -7,7 +7,6 @@ foreach sample : [
   'map_box',
   'map_ptr',
   'music_arc',
-  'new_sptr',
   'person_arc',
 ]
   test(

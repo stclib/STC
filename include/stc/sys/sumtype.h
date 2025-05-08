@@ -36,8 +36,8 @@ c_sumtype (Action,
 );
 
 void Action_drop(Action* self) {
-    if (c_is(self, ActionSpeak, x))
-        cstr_drop(x);
+    if (c_is(self, ActionSpeak, s))
+        cstr_drop(s);
 }
 
 void action(Action* action) {
@@ -84,9 +84,9 @@ int main(void) {
 #define _c_LOOP1(...)
 #define _c_CHECK(x,...) c_TUPLE_AT_1(__VA_ARGS__,x,)
 #define _c_E0(...) __VA_ARGS__
-#define _c_E1(...) _c_E0(_c_E0(_c_E0(_c_E0(_c_E0(_c_E0(_c_E0(__VA_ARGS__)))))))
-#define _c_E2(...) _c_E1(_c_E1(_c_E1(_c_E1(_c_E1(_c_E1(_c_E1(__VA_ARGS__)))))))
-#define c_EVAL(...) _c_E2(_c_E2(_c_E2(_c_E2(_c_E2(__VA_ARGS__)))))
+#define _c_E1(...) _c_E0(_c_E0(_c_E0(_c_E0(_c_E0(_c_E0(__VA_ARGS__))))))
+#define _c_E2(...) _c_E1(_c_E1(_c_E1(_c_E1(_c_E1(_c_E1(__VA_ARGS__))))))
+#define c_EVAL(...) _c_E2(_c_E2(_c_E2(__VA_ARGS__))) // support up to 130 variants
 #define c_LOOP(f,T,x,...) _c_CHECK(_c_LOOP0, c_JOIN(_c_LOOP_END_, c_NUMARGS(c_EXPAND x)))(f,T,x,__VA_ARGS__)
 
 
@@ -120,8 +120,8 @@ int main(void) {
 #else
     typedef union { struct { int tag; } _any_; } _c_any_variant;
     #define c_when(varptr) \
-        for (_c_any_variant* _vp1 = (_c_any_variant *)(varptr) + 0*sizeof((varptr)->_any_.tag); \
-             _vp1; _vp1 = NULL) \
+        for (_c_any_variant* _vp1 = (_c_any_variant *)(varptr); \
+             _vp1; _vp1 = NULL, (void)sizeof((varptr)->_any_.tag)) \
             switch (_vp1->_any_.tag)
 
     #define c_is_2(Tag, x) \

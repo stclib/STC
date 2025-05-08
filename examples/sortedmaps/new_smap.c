@@ -1,64 +1,60 @@
 #include "stc/cstr.h"
 #include "stc/types.h"
 
-declare_smap(PMap, struct Point, int);
+declare_sortedmap(PntMap, struct Point, int);
 
-// Use forward declared PMap in struct
+// Use forward declared PntMap in struct
 typedef struct {
-    PMap pntmap;
+    PntMap pntmap;
     cstr name;
 } MyStruct;
 
 // Point => int map
 typedef struct Point { int x, y; } Point;
-int point_cmp(const Point* a, const Point* b) {
+int Point_cmp(const Point* a, const Point* b) {
     int c = a->x - b->x;
     return c ? c : a->y - b->y;
 }
 
-#define i_type PMap,Point,int
-#define i_cmp point_cmp
-#define i_declared
+#define i_type PntMap, Point, int, (c_cmpclass | c_declared)
 #include "stc/sortedmap.h"
 
 // cstr => cstr map
-#define i_type SMap
-#define i_keypro cstr
-#define i_valpro cstr
+#define i_type StrMap, cstr, cstr, (c_keypro | c_valpro)
 #include "stc/sortedmap.h"
 
 // cstr set
-#define i_type SSet
-#define i_keypro cstr
+#define i_type StrSet, cstr, (c_keypro)
 #include "stc/sortedset.h"
 
 
 int main(void)
 {
-    PMap pmap = c_make(PMap, {
+    PntMap pmap = c_make(PntMap, {
         {{42, 14}, 1},
         {{32, 94}, 2},
         {{62, 81}, 3},
     });
-    SMap smap = c_make(SMap, {
+
+    StrMap smap = c_make(StrMap, {
         {"Hello, friend", "this is the mapped value"},
         {"The brown fox", "jumped"},
         {"This is the time", "for all good things"},
     });
-    SSet sset = {0};
 
-    for (c_each_kv(p, i, PMap, pmap))
+    for (c_each_kv(p, i, PntMap, pmap))
         printf(" (%d,%d: %d)", p->x, p->y, *i);
     puts("");
 
-    for (c_each_kv(i, j, SMap, smap))
+    for (c_each_kv(i, j, StrMap, smap))
         printf(" (%s: %s)\n", cstr_str(i), cstr_str(j));
 
-    SSet_emplace(&sset, "Hello, friend");
-    SSet_emplace(&sset, "Goodbye, foe");
-    printf("Found? %s\n", SSet_contains(&sset, "Hello, friend") ? "true" : "false");
+    StrSet sset = {0};
+    StrSet_emplace(&sset, "Hello, friend");
+    StrSet_emplace(&sset, "Goodbye, foe");
+    printf("Found? %s\n", StrSet_contains(&sset, "Hello, friend") ? "true" : "false");
 
-    PMap_drop(&pmap);
-    SMap_drop(&smap);
-    SSet_drop(&sset);
+    PntMap_drop(&pmap);
+    StrMap_drop(&smap);
+    StrSet_drop(&sset);
 }

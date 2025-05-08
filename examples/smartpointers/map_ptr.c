@@ -1,32 +1,31 @@
 #include <stdio.h>
 #include "stc/cstr.h"
 
-// hmap of cstr => long*
-#define i_type Ptrmap
-#define i_keypro cstr
-#define i_val long*
-#define i_valraw long
-#define i_valfrom(raw) c_new(long, raw)
-#define i_valtoraw(x) **x
-#define i_valclone(x) c_new(long, *x)
-#define i_valdrop(x) free(*x)
+// box<long>
+#define i_type boxlong, long //, (c_use_cmp) // add if compare is needed
+#include "stc/box.h"
+
+// hashmap<cstr, boxlong>
+#define i_type Magicmap, cstr, boxlong, (c_keypro | c_valpro)
 #include "stc/hashmap.h"
 
 int main(void)
 {
-    Ptrmap map = {0};
+    // c_make() and emplace() implicitly creates cstr from const char*
+    // and a "boxed long" from long.
+    Magicmap map = c_make(Magicmap, {
+        {"just", 10},
+        {"some", 20},
+        {"random", 30},
+        {"words", 40},
+    });
+    Magicmap_emplace(&map, "another", 100);
 
-    puts("Map cstr => long*:");
-    Ptrmap_insert(&map, cstr_lit("Test1"), c_new(long, 1));
-    Ptrmap_insert(&map, cstr_lit("Test2"), c_new(long, 2));
+    printf("Lookup \"some\": %ld\n\n", *Magicmap_at(&map, "some")->get);
 
-    // Simple: emplace() implicitly creates cstr from const char* and an owned long* from long!
-    Ptrmap_emplace(&map, "Test3", 3);
-    Ptrmap_emplace(&map, "Test4", 4);
+    for (c_each_kv(name, num, Magicmap, map)) {
+        printf("%s: %ld\n", cstr_str(name), *num->get);
+    }
 
-    for (c_each_kv(name, number, Ptrmap, map))
-        printf("%s: %ld\n", cstr_str(name), **number);
-    puts("");
-
-    Ptrmap_drop(&map);
+    Magicmap_drop(&map);
 }
