@@ -115,7 +115,7 @@ int main(void) {
 
     #define c_is_3(varptr, Tag, x) \
         false) ; else for (__typeof__(varptr) _vp2 = (varptr); _vp2; _vp2 = NULL) \
-            if (c_holds(_vp2, Tag)) \
+            if (c_holds_tag(_vp2, Tag)) \
                 for (__typeof__(_vp2->Tag.var) *x = &_vp2->Tag.var; x; x = NULL
 #else
     typedef union { struct { int tag; } _any_; } _c_any_variant;
@@ -130,18 +130,17 @@ int main(void) {
 
     #define c_is_3(varptr, Tag, x) \
         false) ; else for (Tag##_sumtype* _vp2 = c_const_cast(Tag##_sumtype*, varptr); _vp2; _vp2 = NULL) \
-            if (c_holds(_vp2, Tag)) \
+            if (c_holds_tag(_vp2, Tag)) \
                 for (Tag##_type *x = &_vp2->Tag.var; x; x = NULL
 #endif
-
-#define c_if_is(...) if (c_is_3(__VA_ARGS__)) // [deprecated]
 
 #define c_is(...) c_MACRO_OVERLOAD(c_is, __VA_ARGS__)
 #define c_is_1(Tag) \
     break; case Tag:
 
-#define c_or_is(Tag) \
-    ; case Tag:
+// A and B same payload, use same var name, e.g.: c_is(A, v) c_or_is(B, v) *v += 1;
+#define c_or_is(Tag, x) \
+    case 1 ? Tag : sizeof(x == (Tag##_type*)0):
 
 #define c_otherwise \
     break; default:
@@ -152,7 +151,7 @@ int main(void) {
 #define c_tag_index(varptr) \
     ((int)(varptr)->_any_.tag)
 
-#define c_holds(varptr, Tag) \
+#define c_holds_tag(varptr, Tag) \
     ((varptr)->_any_.tag == Tag)
 
 #endif // STC_SUMTYPE_H_INCLUDED

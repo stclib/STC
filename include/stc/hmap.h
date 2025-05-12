@@ -430,7 +430,7 @@ _c_MEMB(_bucket_insert_)(const Self* self, const _m_keyraw* rkeyptr) {
     STC_DEF Self
     _c_MEMB(_clone)(Self map) {
         if (map.bucket_count == 0)
-            return (Self){0};
+            return c_literal(Self){0};
         Self out = map, *self = &out; // _i_malloc may refer self via i_aux
         const isize _mbytes = (map.bucket_count + 1)*c_sizeof *map.meta;
         out.table = (_m_value *)i_malloc(map.bucket_count*c_sizeof *out.table);
@@ -445,7 +445,7 @@ _c_MEMB(_bucket_insert_)(const Self* self, const _m_keyraw* rkeyptr) {
         } else {
             if (out.meta) i_free(out.meta, _mbytes);
             if (out.table) i_free(out.table, map.bucket_count*c_sizeof *out.table);
-            return (Self){0};
+            return c_literal(Self){0};
         }
     }
 #endif

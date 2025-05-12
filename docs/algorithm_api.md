@@ -162,21 +162,25 @@ c_sumtype (SumType,
     (VariantEnumN, VariantTypeN)
 );
 
-SumType c_variant(VariantEnum tag, VariantType value); // Sum type constructor
-bool    c_holds(const SumType* obj, VariantEnum tag);  // does obj hold VariantType?
-int     c_tag_index(SumType* obj);                     // 1-based index (mostly for debug)
+SumType c_variant(VariantEnum tag, VariantType value);    // Sum type constructor
+bool    c_holds_tag(const SumType* obj, VariantEnum tag); // does obj hold VariantType?
+int     c_tag_index(SumType* obj);                        // 1-based index (mostly for debug)
 
 // Use a sum type (1)
 c_when (SumType* obj) {
-    c_is(VariantEnum1, VariantType1* x) <body>;
-    c_is(VariantEnum2) c_or_is(VariantEnum3) <body>;
-    ...
-    c_otherwise <body>;
+    c_is(VariantEnum1, VariantType1* x)
+        ActionType1(x);
+    c_is(VariantEnum2, VariantType2* x)
+    c_or_is(VariantEnum3, VariantType2* x) // same payload type, also pass same var name
+    c_or_is(VariantEnumN, VariantType2* x) // ...
+        ActionType2(x);
+    c_otherwise
+        ActionElse();
 }
 
 // Use a sum type (2)
-if (c_is(SumType* obj, VariantEnum1, VariantType1* x))
-    <body>;
+if (c_is(SumType* obj, VariantEnumX, VariantTypeX* x))
+    ActionX(x);
 ```
 The **c_when** statement is exhaustive. The compiler will give a warning if not all variants are
 covered by **c_is** (requires `-Wall` or `-Wswitch` gcc/clang compiler flag). The first enum value
