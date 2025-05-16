@@ -17,7 +17,7 @@ int main(void)
     Span2 half = {img.data, cspan_shape(img.shape[0]/2, img.shape[1]/2),
                             cspan_strides(img.stride.d[0]*2, img.stride.d[1]*2)};
 
-    Span2 half_tr = Span2_transpose(half);
+    Span2 half_tr = Span2_transposed(half);
 
     puts("\n3D SPAN (md3):");
     cspan_print(Span3, "%d", md3);

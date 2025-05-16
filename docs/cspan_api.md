@@ -104,7 +104,7 @@ OutSpanM        cspan_slice(const SpanTypeN* self, <OutSpanM>, {x0,x1,xs}, {y0,y
                 //  brackets : optional brackets and comma. Example "{},". Default "[]".
                 //  field    : optional args macro function, must match fmt args.
                 //             e.g.: #define complexfield(x) creal(x), cimag(x)
-                // Examples: cspan_print(Span2, "%.3f", Span2_transpose(sp2)));
+                // Examples: cspan_print(Span2, "%.3f", Span2_transposed(sp2)));
                 //           cspan_print(Span2, "%.3f", (Span2)cspan_submd3(&sp3, 1));
 void            cspan_print(<SpanTypeN>, const char* fmt, SpanTypeN span, FILE* fp = stdout,
                             const char* brackets = "[]", field(x) = x);
@@ -244,7 +244,7 @@ int main(void) {
     myspan3 ss3 = cspan_slice(&ms3, myspan3, {c_ALL}, {0,3}, {2,c_END});
     puts("ss3:");
     myspan2 a = cspan_submd3(&ss3, 1);
-    myspan2 b = myspan2_transpose(a);
+    myspan2 b = myspan2_transposed(a);
 
     cspan_print(myspan3, "%d", ss3);
     puts("\nms3[1]:");

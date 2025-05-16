@@ -63,7 +63,6 @@ int demo2() {
 #define STC_CSPAN_H_INCLUDED
 #include "common.h"
 typedef int32_t cspan_istride, _istride;
-typedef isize _isize_triple[3];
 
 #define using_cspan use_cspan                   // [deprecated]
 #define using_cspan2 use_cspan2                 // [deprecated]
@@ -125,7 +124,7 @@ typedef isize _isize_triple[3];
     } \
     STC_INLINE isize Self##_size(const Self* self) \
         { return cspan_size(self); } \
-    STC_INLINE Self Self##_transpose(Self sp) \
+    STC_INLINE Self Self##_transposed(Self sp) \
         { _cspan_transpose(sp.shape, sp.stride.d, cspan_rank(&sp)); return sp; } \
     struct stc_nostruct
 
@@ -310,7 +309,7 @@ typedef enum {c_ROWMAJOR, c_COLMAJOR, c_STRIDED} cspan_layout;
     const char *_f = fmt, *_b = brackets; \
     FILE* _fp = fp; \
     int _w, _max = 0; \
-    char _res[2][16], _fld[128]; \
+    char _res[2][16], _fld[64]; \
     for (c_each_3(_it, Span, _s)) { \
         _w = snprintf(NULL, 0ULL, _f, field(_it.ref[0])); \
         if (_w > _max) _max = _w; \
@@ -318,7 +317,7 @@ typedef enum {c_ROWMAJOR, c_COLMAJOR, c_STRIDED} cspan_layout;
     for (c_each_3(_it, Span, _s)) { \
         _cspan_print_assist(_it.pos, _s.shape, cspan_rank(&_s), _res, _b); \
         _w = _max + (_it.pos[cspan_rank(&_s) - 1] > 0); \
-        sprintf(_fld, _f, field(_it.ref[0])); \
+        snprintf(_fld, sizeof _fld, _f, field(_it.ref[0])); \
         fprintf(_fp, "%s%*s%s", _res[0], _w, _fld, _res[1]); \
     } \
 } while (0)
