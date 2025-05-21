@@ -25,8 +25,8 @@
 /*
 #include <stdio.h>
 
-#define i_type Intmap, int, int
-#include "stc/sortedmap.h" // sorted map of int
+#define T Intmap, int, int
+#include <stc/sortedmap.h> // sorted map of int
 
 int main(void) {
     Intmap map = {0};

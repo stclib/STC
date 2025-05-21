@@ -28,7 +28,7 @@ void zero_surface(span3 grid3d) {
 
 int main(void) {
     double arr[4*4*5];
-    for (c_range(i, c_countof(arr)))
+    for (c_range32(i, c_countof(arr)))
         arr[i] = i + i/77.0;
 
     span3 md = cspan_md(arr, 4, 4, 5);

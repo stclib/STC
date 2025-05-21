@@ -24,7 +24,7 @@
 #define STC_COROUTINE_H_INCLUDED
 /*
 #include <stdio.h>
-#include "stc/coroutine.h"
+#include <stc/coroutine.h>
 
 struct iterpair {
     cco_state cco; // required member

@@ -23,7 +23,7 @@
  */
 
 /* cbox: heap allocated boxed type
-#include "stc/cstr.h"
+#include <stc/cstr.h>
 
 typedef struct { cstr name, email; } Person;
 
@@ -40,9 +40,8 @@ void Person_drop(Person* p) {
     c_drop(cstr, &p->name, &p->email);
 }
 
-#define i_type PBox
-#define i_valclass Person // bind Person clone+drop fn's
-#include "stc/box.h"
+#define T PBox, Person, (c_keyclass) // bind Person clone+drop fn's
+#include <stc/box.h>
 
 int main(void) {
     PBox p = PBox_from(Person_from("John Smiths", "josmiths@gmail.com"));

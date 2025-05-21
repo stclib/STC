@@ -31,7 +31,7 @@ The function returns -1 when all command-line arguments are parsed. In this case
 opt->ind is the index of the first non-option argument.
 
 #include <stdio.h>
-#include "stc/coption.h"
+#include <stc/coption.h>
 
 int main(int argc, char *argv[])
 {

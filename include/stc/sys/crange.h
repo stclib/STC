@@ -22,7 +22,7 @@
 */
 /*
 #include <stdio.h>
-#include "stc/algorithm.h"
+#include <stc/algorithm.h>
 
 int main(void)
 {

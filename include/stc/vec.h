@@ -23,8 +23,8 @@
 
 /*
 #define i_implement
-#include "stc/cstr.h"
-#include "stc/types.h"
+#include <stc/cstr.h>
+#include <stc/types.h>
 
 declare_vec(vec_i32, int);
 
@@ -34,14 +34,13 @@ typedef struct MyStruct {
 } MyStruct;
 
 #define i_key float
-#include "stc/vec.h"
+#include <stc/vec.h>
 
 #define i_keypro cstr // cstr is a "pro"-type
-#include "stc/vec.h"
+#include <stc/vec.h>
 
-#define i_type vec_i32,int32_t
-#define i_declared
-#include "stc/vec.h"
+#define T vec_i32, int32_t, (c_declared)
+#include <stc/vec.h>
 
 int main(void) {
     vec_i32 vec = {0};

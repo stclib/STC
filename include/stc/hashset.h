@@ -23,8 +23,8 @@
 
 // Unordered set - implemented with the robin-hood hashing scheme.
 /*
-#define i_type ISet, int
-#include "stc/hashset.h"
+#define T ISet, int
+#include <stc/hashset.h>
 #include <stdio.h>
 
 int main(void) {

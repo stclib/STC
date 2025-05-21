@@ -23,8 +23,8 @@
 
 // Unordered map - implemented with the robin-hood hashing scheme.
 /*
-#define i_type IMap, int, int
-#include "stc/hashmap.h"
+#define T IMap, int, int
+#include <stc/hashmap.h>
 #include <stdio.h>
 
 int main(void) {

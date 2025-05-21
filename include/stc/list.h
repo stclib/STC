@@ -26,10 +26,10 @@
     it also support both push_back() and push_front(), unlike std::forward_list:
 
     #include <stdio.h>
-    #include "stc/random.h"
+    #include <stc/random.h>
 
-    #define i_type List, long, (c_use_cmp) // enable sorting, uses default *x < *y.
-    #include "stc/list.h"
+    #define T List, long, (c_use_cmp) // enable sorting, uses default *x < *y.
+    #include <stc/list.h>
 
     int main(void)
     {

@@ -43,8 +43,8 @@ void vectordemo1(void)
     Vec64_pop(&bignums);           // erase the last
     Vec64_erase_n(&bignums, 0, 1); // erase the first
 
-    for (c_range32(i, Vec64_size(&bignums))) {
-        printf("%d: %lld\n", i, bignums.data[i]);
+    for (c_range(i, Vec64_size(&bignums))) {
+        printf("%d: %lld\n", (int)i, bignums.data[i]);
     }
 
     Vec64_drop(&bignums);

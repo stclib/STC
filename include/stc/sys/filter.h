@@ -22,9 +22,9 @@
 */
 /*
 #include <stdio.h>
-#define i_type Vec, int
-#include "stc/cstack.h"
-#include "stc/algorithm.h"
+#define T Vec, int
+#include <stc/cstack.h>
+#include <stc/algorithm.h>
 
 int main(void)
 {

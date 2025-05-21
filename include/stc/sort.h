@@ -22,16 +22,16 @@
  */
 /* Generic Quicksort in C, performs as fast as c++ std::sort(), and more robust.
 template params:
-#define i_key keytype   - [required] (or use i_type, see below)
-#define i_less(xp, yp)  - optional less function. default: *xp < *yp
-#define i_cmp(xp, yp)   - alternative 3-way comparison. c_default_cmp(xp, yp)
-#define i_type name     - optional, defines {name}_sort(), else {i_key}s_sort().
-#define i_type name,key - alternative one-liner to define both i_type and i_key.
+#define i_key keytype  - [required] (or use i_type, see below)
+#define i_less(xp, yp) - optional less function. default: *xp < *yp
+#define i_cmp(xp, yp)  - alternative 3-way comparison. c_default_cmp(xp, yp)
+#define T name         - optional, defines {name}_sort(), else {i_key}s_sort().
+#define T name, key    - alternative one-liner to define both i_type and i_key.
 
 // ex1:
 #include <stdio.h>
 #define i_key int
-#include "stc/sort.h"
+#include <stc/sort.h>
 
 int main(void) {
     int nums[] = {23, 321, 5434, 25, 245, 1, 654, 33, 543, 21};
@@ -51,9 +51,8 @@ int main(void) {
 
 // ex2: Test on a deque !!
 #include <stdio.h>
-#define i_type IDeq, int
-#define i_use_cmp  // enable sorting (and equality) with defaults
-#include "stc/deque.h"
+#define T IDeq, int, (c_use_cmp) // enable comparison functions
+#include <stc/deque.h>
 
 int main(void) {
     IDeq nums = c_make(IDeq, {5434, 25, 245, 1, 654, 33, 543, 21});

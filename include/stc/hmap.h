@@ -25,8 +25,8 @@
 /*
 #include <stdio.h>
 
-#define i_type icmap, int, char
-#include "stc/hashmap.h"
+#define T icmap, int, char
+#include <stc/hashmap.h>
 
 int main(void) {
     icmap m = {0};

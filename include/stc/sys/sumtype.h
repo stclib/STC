@@ -23,8 +23,8 @@
 /*
 // https://stackoverflow.com/questions/70935435/how-to-create-variants-in-rust
 #include <stdio.h>
-#include "stc/cstr.h"
-#include "stc/algorithm.h"
+#include <stc/cstr.h>
+#include <stc/algorithm.h>
 
 c_sumtype (Action,
     (ActionSpeak, cstr),
@@ -138,9 +138,9 @@ int main(void) {
 #define c_is_1(Tag) \
     break; case Tag:
 
-// A and B same payload, use same var name, e.g.: c_is(A, v) c_or_is(B, v) *v += 1;
-#define c_or_is(Tag, x) \
-    case 1 ? Tag : sizeof(x == (Tag##_type*)0):
+// With different payloads
+#define c_or_is(Tag) \
+    ; case Tag:
 
 #define c_otherwise \
     break; default:

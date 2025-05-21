@@ -157,9 +157,11 @@ Synopsis:
 ```c++
 // Define a sum type
 c_sumtype (SumType,
-    (VariantEnum1, VariantType1),
+    (VariantEnumA, VariantTypeA),
+    (VariantEnumB, VariantTypeB),
+    (VariantEnumC, VariantEnumB_type), // use same payload type as VariantEnumB
     ...
-    (VariantEnumN, VariantTypeN)
+    (VariantEnumN, VariantTypeN),      // optional final comma
 );
 
 SumType c_variant(VariantEnum tag, VariantType value);    // Sum type constructor
@@ -168,28 +170,25 @@ int     c_tag_index(SumType* obj);                        // 1-based index (most
 
 // Use a sum type (1)
 c_when (SumType* obj) {
-    c_is(VariantEnum1, VariantType1* x)
-        ActionType1(x);
-    c_is(VariantEnum2, VariantType2* x)
-    c_or_is(VariantEnum3, VariantType2* x) // same payload type, also pass same var name
-    c_or_is(VariantEnumN, VariantType2* x) // ...
-        ActionType2(x);
-    c_otherwise
+    c_is(VariantEnumA, VariantEnumA_type* x)
+        ActionA(x);
+    c_is(VariantEnumX) c_or_is(VariantEnumY)             // different payload types
+        ActionXY();
+    c_otherwise                                          // optional, removes exhaustiveness-check
         ActionElse();
 }
 
 // Use a sum type (2)
-if (c_is(SumType* obj, VariantEnumX, VariantTypeX* x))
-    ActionX(x);
+if (c_is(SumType* obj, VariantEnumA, VariantEnumA_type* x))
+    ActionA(x);
 ```
 The **c_when** statement is exhaustive. The compiler will give a warning if not all variants are
 covered by **c_is** (requires `-Wall` or `-Wswitch` gcc/clang compiler flag). The first enum value
-is deliberately set to 1 in order to easier detect non/zero-initialized variants.
+is deliberately set to 1 in order to easier detect zero or not initialized variants.
 
 * Note: The `x` variables in the synopsis are "auto" type declared/defined - see examples.
-* Caveat 1: The use of `continue` in a `c_when` or `if (c_is())` block, while `c_when` is inside a loop will
-not work as expected. It will only break out of the `c_when`-block. Instead, use `goto` to jump to the
-end of the loop. `break` will break out of `c_when`, i.e. it behaves like `switch`.
+* Caveat 1: `c_when()` and `if (c_is())` behaves like a one-iteration loop; i.e, the use of `continue`
+  and `break` will just break out of its block (meaning not out of any outer loop/switch).
 * Caveat 2: Sum types will generally not work in coroutines because the `x` variable is local and therefore
 will not be preserved across `cco_yield..` / `cco_await..`.
 * Caveat 3: In the second (2) usage, `c_is(obj,VE,x)` combined with `&&` or `||` will not compile.

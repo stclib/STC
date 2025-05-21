@@ -24,11 +24,10 @@
 // Sorted/Ordered set and map - implemented as an AA-tree.
 /*
 #include <stdio.h>
-#define i_implement
-#include "stc/cstr.h"
+#include <stc/cstr.h>
 
-#define i_type SMap, cstr, double, (c_keypro)  // Sorted map<cstr, double>
-#include "stc/sortedmap.h"
+#define T SMap, cstr, double, (c_keypro)  // Sorted map<cstr, double>
+#include <stc/sortedmap.h>
 
 int main(void) {
     SMap m = {0};
