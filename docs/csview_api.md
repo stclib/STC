@@ -26,8 +26,8 @@ for a functional description.
 All csview definitions and prototypes are available by including a single header file.
 
 ```c++
-#include "stc/cstr.h"
-#include "stc/csview.h" // after cstr.h: include extra cstr-csview functions
+#include <stc/cstr.h>
+#include <stc/csview.h> // after cstr.h: include extra cstr-csview functions
 ```
 ## Methods
 
@@ -115,8 +115,8 @@ bool            csview_ieq(const csview* x, const csview* y);
 
 ## Example
 ```c++
-#include "stc/cstr.h"
-#include "stc/csview.h"
+#include <stc/cstr.h>
+#include <stc/csview.h>
 
 
 int main(void)
@@ -146,7 +146,7 @@ red Apples
 
 ### Example 2: UTF8 handling
 ```c++
-#include "stc/cstr.h"
+#include <stc/cstr.h>
 
 int main(void)
 {
@@ -172,7 +172,7 @@ Splits strings into tokens. *print_split()* makes **no** memory allocations or *
 and does not depend on zero-terminated strings. *string_split()* function returns a vector of cstr.
 ```c++
 #include <stdio.h>
-#include "stc/csview.h"
+#include <stc/csview.h>
 
 void print_split(csview input, const char* sep)
 {
@@ -180,9 +180,9 @@ void print_split(csview input, const char* sep)
         printf("[" c_svfmt "]\n", c_svarg(i.token));
     puts("");
 }
-#include "stc/cstr.h"
+#include <stc/cstr.h>
 #define i_keypro cstr
-#include "stc/stack.h"
+#include <stc/stack.h>
 
 stack_cstr string_split(csview input, const char* sep)
 {

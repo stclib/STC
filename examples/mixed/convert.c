@@ -1,15 +1,15 @@
-#include "stc/cstr.h"
-#include "stc/algorithm.h"
+#include <stc/cstr.h>
+#include <stc/algorithm.h>
 
 #define i_keypro cstr // key = cstr
 #define i_valpro cstr
-#include "stc/hashmap.h"
+#include <stc/hashmap.h>
 
 #define i_keypro cstr
-#include "stc/vec.h"
+#include <stc/vec.h>
 
 #define i_keypro cstr
-#include "stc/list.h"
+#include <stc/list.h>
 
 int main(void)
 {

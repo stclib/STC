@@ -9,22 +9,22 @@ void int_drop(int* x) {
 // so 'i_keyclone' is not required to be defined (ignored).
 
 // Define the Arc, no need for atomic in single thread, enable default int comparisons.
-#define i_type Arc, int, (c_no_atomic | c_use_cmp)
+#define T Arc, int, (c_no_atomic| c_use_cmp)
 #define i_keydrop int_drop  // optional, just to display the elements destroyed
-#include "stc/arc.h"        // Arc
+#include <stc/arc.h>        // Arc
 
-#define i_type Arcset, Arc, (c_keypro) // arc's are "pro" types
-#include "stc/sortedset.h"  // Arcset (like: std::set<std::shared_ptr<int>>)
+#define T Arcset, Arc, (c_keypro) // arc's are "pro" types
+#include <stc/sortedset.h>  // Arcset (like: std::set<std::shared_ptr<int>>)
 
-#define i_type Arcvec, Arc, (c_keypro | c_use_cmp)
-#include "stc/vec.h"        // Arcvec (like: std::vector<std::shared_ptr<int>>)
+#define T Arcvec, Arc, (c_keypro| c_use_cmp)
+#include <stc/vec.h>        // Arcvec (like: std::vector<std::shared_ptr<int>>)
 
 int main(void)
 {
     const int years[] = {2021, 2012, 2022, 2015};
 
     Arcvec vec = {0};
-    for (c_range(i, c_arraylen(years))) {
+    for (c_range(i, c_countof(years))) {
         Arcvec_emplace(&vec, years[i]);
         // Arcvec_push(&vec, Arc_from(years[i])); // alt.
     }

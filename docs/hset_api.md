@@ -7,8 +7,8 @@ A **hset** is an associative container that contains a set of unique objects of 
 ## Header file and declaration
 
 ```c++
-#define i_type <ct>,<kt>[,<op>] // shorthand for defining i_type, i_key, i_opt
-#define i_type <t>       // container type name (default: hset_{i_key})
+#define T <ct>,<kt>[,<op>] // shorthand for defining T, i_key, i_opt
+#define T <ct>           // container type name (default: hset_{i_key})
 // One of the following:
 #define i_key <t>        // key type
 #define i_keyclass <t>   // key type, and bind <t>_clone() and <t>_drop() function names
@@ -24,9 +24,9 @@ A **hset** is an associative container that contains a set of unique objects of 
 #define i_keyfrom <fn>   // conversion func i_keyraw => i_key - defaults to plain copy
 #define i_keytoraw <fn>  // conversion func i_key* => i_keyraw - defaults to plain copy
 
-#include "stc/hashset.h"
+#include <stc/hashset.h>
 ```
-- In the following, `X` is the value of `i_key` unless `i_type` is defined.
+- In the following, `X` is the value of `i_key` unless `T` is defined.
 - **emplace**-functions are only available when `i_keyraw` is implicitly or explicitly defined.
 
 ## Methods
@@ -86,10 +86,10 @@ hset_X_value    hset_X_value_clone(const hset_X* self, hset_X_value val);
 ## Example
 [ [Run this code](https://godbolt.org/z/xqc3TqsMa) ]
 ```c++
-#include "stc/cstr.h"
+#include <stc/cstr.h>
 
-#define i_type Strings, cstr, (c_keypro)
-#include "stc/hashset.h"
+#define T Strings, cstr, (c_keypro)
+#include <stc/hashset.h>
 
 int main(void)
 {

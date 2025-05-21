@@ -1,5 +1,5 @@
 /* box: heap allocated boxed type */
-#include "stc/cstr.h"
+#include <stc/cstr.h>
 
 typedef struct { cstr name, last; } Person;
 
@@ -29,12 +29,12 @@ void Person_drop(Person* p) {
 
 // "class" binds _clone, _drop functions.
 // "use_cmp" binds _cmp, _hash functions.
-#define i_type PBox, Person, (c_keyclass | c_use_cmp)
-#include "stc/box.h"
+#define T PBox, Person, (c_keyclass | c_use_cmp)
+#include <stc/box.h>
 
 // box, arc, and cstr types are "pro"-types.
-#define i_type Persons, PBox, (c_keypro)
-#include "stc/sortedset.h"
+#define T Persons, PBox, (c_keypro)
+#include <stc/sortedset.h>
 
 int main(void)
 {

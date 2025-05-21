@@ -2,9 +2,9 @@
 
 typedef struct Point { int x, y; } Point;
 
-#define i_type PointQ,Point
+#define T PointQ, Point
 #define i_less(a, b) a->x < b->x || (a->x == b->x && a->y < b->y)
-#include "stc/pqueue.h"
+#include <stc/pqueue.h>
 
 
 int main(void)

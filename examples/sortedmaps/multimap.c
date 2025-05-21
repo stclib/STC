@@ -1,4 +1,4 @@
-#include "stc/cstr.h"
+#include <stc/cstr.h>
 
 // Olympics multimap example
 
@@ -40,13 +40,13 @@ void       OlympicLoc_drop(OlympicLoc* self);
 
 // Create a list<OlympicLoc>, can be sorted by year.
 // "class" binds _clone() and _drop().
-#define i_type list_OL, OlympicLoc, (c_keyclass | c_use_cmp)
-#include "stc/list.h"
+#define T list_OL, OlympicLoc, (c_keyclass | c_use_cmp)
+#include <stc/list.h>
 
 // Create a smap<cstr, list_OL> where key is country name
 // "valclass" binds list_OL_clone, list_OL_drop
-#define i_type smap_OL, cstr, list_OL, (c_keypro | c_valclass)
-#include "stc/sortedmap.h"
+#define T smap_OL, cstr, list_OL, (c_keypro | c_valclass)
+#include <stc/sortedmap.h>
 
 int OlympicLoc_cmp(const OlympicLoc* a, const OlympicLoc* b) {
     return a->year - b->year;
@@ -70,7 +70,7 @@ int main(void)
     smap_OL multimap = {0};
     const list_OL empty = {0};
 
-    for (size_t i = 0; i < c_arraylen(ol_data); ++i)
+    for (size_t i = 0; i < c_countof(ol_data); ++i)
     {
         struct OlympicsData* d = &ol_data[i];
         OlympicLoc loc = {.year = d->year,

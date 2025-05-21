@@ -4,10 +4,10 @@
 
 #include <stdio.h>
 
-#define i_type IPQueue, int
+#define T IPQueue, int
 #define i_aux { bool(*less)(const int*, const int*); }
 #define i_less(x, y) self->aux.less(x, y)
-#include "stc/pqueue.h"
+#include <stc/pqueue.h>
 
 void print_queue(const char* name, IPQueue q) {
     // Make a clone, because there is no way to traverse
@@ -31,7 +31,7 @@ static bool int_lambda(const int* x, const int* y) { return (*x ^ 1) < (*y ^ 1);
 
 int main(void)
 {
-    const int data[] = {1,8,5,6,3,4,0,9,7,2}, n = c_arraylen(data);
+    const int data[] = {1,8,5,6,3,4,0,9,7,2}, n = c_countof(data);
     printf("data: \t");
     for (c_range(i, n)) printf("%d ", data[i]);
     puts("");

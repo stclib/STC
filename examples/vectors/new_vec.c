@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "stc/types.h"
+#include <stc/types.h>
 
 declare_vec(vec_i32, int);
 declare_vec(vec_pnt, struct Point);
@@ -9,15 +9,15 @@ typedef struct MyStruct {
     vec_pnt pntvec;
 } MyStruct;
 
-#define i_type vec_i32, int, (c_declared)
-#include "stc/vec.h"
+#define T vec_i32, int, (c_declared)
+#include <stc/vec.h>
 
 typedef struct Point { int x, y; } Point;
 
-#define i_type vec_pnt, Point, (c_declared)
+#define T vec_pnt, Point, (c_declared)
 #define i_less(a, b) a->x < b->x || (a->x == b->x && a->y < b->y)
 #define i_eq(a, b) a->x == b->x && a->y == b->y
-#include "stc/vec.h"
+#include <stc/vec.h>
 
 int main(void)
 {

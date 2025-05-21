@@ -15,8 +15,8 @@ See similar c++ class [std::unique_ptr](https://en.cppreference.com/w/cpp/memory
 ## Header file and declaration
 
 ```c++
-#define i_type <ct>,<kt>[,<op>] // shorthand for defining i_type, i_key, i_opt
-#define i_type <t>       // box container type name (default: box_{i_key})
+#define T <ct>,<kt>[,<op>] // shorthand for defining T, i_key, i_opt
+#define T <ct>           // box container type name (default: box_{i_key})
 // One of the following:
 #define i_key <t>        // key type
 #define i_keyclass <t>   // key type, and bind <t>_clone() and <t>_drop() function names
@@ -35,9 +35,9 @@ See similar c++ class [std::unique_ptr](https://en.cppreference.com/w/cpp/memory
 #define i_keyraw <t>     // conversion type (lookup): defaults to {i_key}
 #define i_keytoraw <fn>  // conversion func i_key* => i_keyraw: REQUIRED IF i_keyraw defined.
 #define i_keyfrom <fn>   // from-raw func.
-#include "stc/box.h"
+#include <stc/box.h>
 ```
-In the following, `X` is the value of `i_key` unless `i_type` is defined.
+In the following, `X` is the value of `i_key` unless `T` is defined.
 Unless `c_use_cmp` is defined, comparison between i_key's is not needed/available. Will then
 compare the pointer addresses when used. Additionally, `c_no_clone` or `i_is_fwd` may be defined.
 
@@ -88,18 +88,18 @@ void int_drop(int* x) {
     printf("\n drop %d", *x);
 }
 
-#define i_type IBox, int, (c_use_cmp) // defines _cmp(), _eq(), and _hash() box-functions
+#define T IBox, int, (c_use_cmp) // defines _cmp(), _eq(), and _hash() box-functions
 #define i_keydrop int_drop  // just to display elements destroyed
 #define i_keyclone(x) x     // must be specified when i_keydrop is defined.
-#include "stc/box.h"
+#include <stc/box.h>
 
 // ISet : std::set<std::unique_ptr<int>>
-#define i_type ISet, IBox, (c_keypro) // box is a "pro"-type
-#include "stc/sortedset.h"
+#define T ISet, IBox, (c_keypro) // box is a "pro"-type
+#include <stc/sortedset.h>
 
 // IVec : std::vector<std::unique_ptr<int>>
-#define i_type IVec, IBox, (c_keypro)
-#include "stc/vec.h"
+#define T IVec, IBox, (c_keypro)
+#include <stc/vec.h>
 
 
 int main(void)

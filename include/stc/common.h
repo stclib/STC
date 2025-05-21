@@ -116,7 +116,8 @@ typedef ptrdiff_t       isize;
 #define c_container_of(p, C, m) ((C*)((char*)(1 ? (p) : &((C*)0)->m) - offsetof(C, m)))
 #define c_const_cast(Tp, p)     ((Tp)(1 ? (p) : (Tp)0))
 #define c_litstrlen(literal)    (c_sizeof("" literal) - 1)
-#define c_arraylen(a)           (isize)(sizeof(a)/sizeof 0[a])
+#define c_countof(a)            (isize)(sizeof(a)/sizeof 0[a])
+#define c_arraylen(a)           c_countof(a)
 
 // expect signed ints to/from these (use with gcc -Wconversion)
 #define c_sizeof                (isize)sizeof

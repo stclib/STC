@@ -1,12 +1,12 @@
 // This implements the c++ std::map::find example at:
 // https://docs.microsoft.com/en-us/cpp/standard-library/map-class?view=msvc-160#example-17
-#include "stc/cstr.h"
+#include <stc/cstr.h>
 
-#define i_type smap_istr, int, cstr, (c_valpro)
-#include "stc/sortedmap.h"
+#define T smap_istr, int, cstr, (c_valpro)
+#include <stc/sortedmap.h>
 
-#define i_type vec_istr, smap_istr_raw
-#include "stc/vec.h"
+#define T vec_istr, smap_istr_raw
+#include <stc/vec.h>
 
 void print_elem(smap_istr_raw p) {
     printf("(%d, %s) ", p.first, p.second);

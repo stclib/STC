@@ -5,22 +5,22 @@
 // using StackList = std::stack<FloatStack>;
 // using ListMap = std::unordered_map<int, std::forward_list<StackList>>;
 // using MapMap = std::unordered_map<std::string, ListMap>;
-#include "stc/cstr.h"
+#include <stc/cstr.h>
 
-#define i_type FloatStack, float
-#include "stc/stack.h"
+#define T FloatStack, float
+#include <stc/stack.h>
 
 // "keyclass" binds _clone(), _drop()
-#define i_type StackList, FloatStack, (c_keyclass)
-#include "stc/list.h"
+#define T StackList, FloatStack, (c_keyclass)
+#include <stc/list.h>
 
 // "valclass" binds _clone(), _drop()
-#define i_type ListMap, int, StackList, (c_valclass)
-#include "stc/hashmap.h"
+#define T ListMap, int, StackList, (c_valclass)
+#include <stc/hashmap.h>
 
 // "keypro" binds _clone, _drop, _cmp, _hash, _toraw, _from
-#define i_type MapMap, cstr, ListMap, (c_keypro | c_valclass)
-#include "stc/hashmap.h"
+#define T MapMap, cstr, ListMap, (c_keypro | c_valclass)
+#include <stc/hashmap.h>
 
 
 int main(void)

@@ -1,11 +1,11 @@
 // https://www.youtube.com/watch?v=8sEe-4tig_A
 #include <stdio.h>
-#include "stc/coroutine.h"
+#include <stc/coroutine.h>
 
-#define i_type Tasks, cco_task*
+#define T Tasks, cco_task*
 #define i_keydrop(x) { puts("free task"); free(*x); }
 #define i_no_clone
-#include "stc/queue.h"
+#include <stc/queue.h>
 
 cco_task_struct (Scheduler) {
     Scheduler_state cco;

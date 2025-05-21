@@ -17,8 +17,8 @@ See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/contain
 ## Header file and declaration
 
 ```c++
-#define i_type <ct>,<kt>,<vt>[,<op>] // shorthand for defining i_type, i_key, i_val, i_opt
-#define i_type <t>            // container type name (default: hmap_{i_key})
+#define T <ct>,<kt>,<vt>[,<op>] // shorthand for defining T, i_key, i_val, i_opt
+#define T <ct>                // container type name (default: hmap_{i_key})
 // One of the following:
 #define i_key <t>             // key type
 #define i_keyclass <t>        // key type, and bind <t>_clone() and <t>_drop() function names
@@ -45,9 +45,9 @@ See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/contain
 #define i_valfrom <fn>        // conversion func i_valraw => i_val
 #define i_valtoraw <fn>       // conversion func i_val* => i_valraw
 
-#include "stc/hashmap.h"
+#include <stc/hashmap.h>
 ```
-- In the following, `X` is the value of `i_key` unless `i_type` is defined.
+- In the following, `X` is the value of `i_key` unless `T` is defined.
 - **emplace**-functions are only available when `i_keyraw`/`i_valraw` are implicitly or explicitly defined.
 ## Methods
 
@@ -129,10 +129,10 @@ bool            c_memcmp_eq(const i_keyraw* a, const i_keyraw* b);    // !memcmp
 
 [ [Run this code](https://godbolt.org/z/GenofeYe3) ]
 ```c++
-#include "stc/cstr.h"
+#include <stc/cstr.h>
 
-#define i_type hmap_cstr, cstr, cstr, (c_keypro | c_valpro)
-#include "stc/hashmap.h"
+#define T hmap_cstr, cstr, cstr, (c_keypro | c_valpro)
+#include <stc/hashmap.h>
 
 int main(void)
 {
@@ -169,8 +169,8 @@ Demonstrate hmap with mapped POD type Vec3i: hmap<int, Vec3i>:
 #include <stdio.h>
 typedef struct { int x, y, z; } Vec3i;
 
-#define i_type hmap_iv, int, Vec3i
-#include "stc/hashmap.h"
+#define T hmap_iv, int, Vec3i
+#include <stc/hashmap.h>
 
 int main(void)
 {
@@ -196,9 +196,9 @@ Inverse: Demonstrate hmap with plain-old-data key type Vec3i and int as mapped t
 #include <stdio.h>
 typedef struct { int x, y, z; } Vec3i;
 
-#define i_type hmap_vi, Vec3i, int
+#define T hmap_vi, Vec3i, int
 #define i_eq c_memcmp_eq // bitwise equal
-#include "stc/hashmap.h"
+#include <stc/hashmap.h>
 
 int main(void)
 {
@@ -222,7 +222,7 @@ Key type is struct. Based on https://doc.rust-lang.org/std/collections/struct.Ha
 
 [ [Run this code](https://godbolt.org/z/Wzv5fEYd9) ]
 ```c++
-#include "stc/cstr.h"
+#include <stc/cstr.h>
 
 typedef struct {
     cstr name;
@@ -253,8 +253,8 @@ void Viking_drop(Viking* vp) {
 }
 
 // binds the four Viking_xxxx() functions above
-#define i_type Vikings, Viking, int, (c_keyclass)
-#include "stc/hashmap.h"
+#define T Vikings, Viking, int, (c_keyclass)
+#include <stc/hashmap.h>
 
 int main(void)
 {
@@ -286,7 +286,7 @@ entirely when doing lookup.
 [ [Run this code](https://godbolt.org/z/b7f15zPK3) ]
 <!--{%raw%}-->
 ```c++
-#include "stc/cstr.h"
+#include <stc/cstr.h>
 
 typedef struct Viking {
     cstr name;
@@ -331,8 +331,8 @@ Viking_raw Viking_toraw(const Viking* vp) {
 }
 
 // Define the map. Viking is now a "pro"-type:
-#define i_type Vikings, Viking, int, (c_keypro)
-#include "stc/hashmap.h"
+#define T Vikings, Viking, int, (c_keypro)
+#include <stc/hashmap.h>
 
 int main(void)
 {

@@ -1,5 +1,5 @@
 /* box example: heap allocated smart pointer type */
-#include "stc/cstr.h"
+#include <stc/cstr.h>
 
 // ===== Person: create a "pro" type:
 typedef struct { cstr name, last; } Person;
@@ -33,44 +33,43 @@ void Person_drop(Person* p) {
 
 // binds Person_clone, Person_drop, enable search/sort
 // Person is a "pro" type (has Person_raw conversion type):
-#define i_type PrsArc, Person, (c_keypro | c_use_cmp)
-#include "stc/arc.h"
+#define T PersArc, Person, (c_keypro | c_use_cmp)
+#include <stc/arc.h>
 
 // Arcs and Boxes are always "pro" types:
-#define i_type Persons, PrsArc, (c_keypro | c_use_cmp)
-#include "stc/vec.h"
+#define T Persons, PersArc, (c_keypro | c_use_cmp)
+#include <stc/vec.h>
 
 
 int main(void)
 {
     Persons vec = {0};
-    PrsArc laura = PrsArc_from((Person_raw){"Laura", "Palmer"});
-    PrsArc bobby = PrsArc_from((Person_raw){"Bobby", "Briggs"});
+    PersArc laura = PersArc_from((Person_raw){"Laura", "Palmer"});
+    PersArc bobby = PersArc_from((Person_raw){"Bobby", "Briggs"});
 
     c_defer(
-        PrsArc_drop(&laura),
-        PrsArc_drop(&bobby),
+        PersArc_drop(&laura),
+        PersArc_drop(&bobby),
         Persons_drop(&vec)
     ){
-        // Use Persons_emplace() to implicitly call PrsArc_from() on the argument:
+        // Use Persons_emplace() to implicitly call PersArc_from() on the argument:
         Persons_emplace(&vec, (Person_raw){"Audrey", "Home"});
         Persons_emplace(&vec, (Person_raw){"Dale", "Cooper"});
 
-        Persons_push(&vec, PrsArc_clone(laura));
-        Persons_push(&vec, PrsArc_clone(bobby));
+        Persons_push(&vec, PersArc_clone(laura));
+        Persons_push(&vec, PersArc_clone(bobby));
 
         for (c_each(i, Persons, vec)) {
-            Person* p = i.ref->get;
-            printf("%s %s (%d)\n", cstr_str(&p->name),
-                                   cstr_str(&p->last),
-                                   (int)*i.ref->use_count);
+            Person_raw p = Persons_value_toraw(i.ref);
+            printf("%s %s (%d)\n", p.name, p.last, (int)*i.ref->use_count);
         }
         puts("");
 
         // Look-up Audrey!
-        const PrsArc *a = Persons_find(&vec, (Person_raw){"Audrey", "Home"}).ref;
-        if (a)
-            printf("found: %s %s\n", cstr_str(&a->get->name),
-                                     cstr_str(&a->get->last));
+        const PersArc *a = Persons_find(&vec, (Person_raw){"Audrey", "Home"}).ref;
+        if (a) {
+            Person_raw p = Persons_value_toraw(a); // two-level unwrap!
+            printf("found: %s %s\n", p.name, p.last);
+        }
     }
 }

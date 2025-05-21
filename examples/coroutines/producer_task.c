@@ -1,8 +1,8 @@
 #include <time.h>
 #include <stdio.h>
-#include "stc/coroutine.h"
-#define i_type Inventory, int
-#include "stc/queue.h"
+#include <stc/coroutine.h>
+#define T Inventory, int
+#include <stc/queue.h>
 
 // Example shows symmetric coroutines producer/consumer style.
 

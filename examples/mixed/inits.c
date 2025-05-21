@@ -1,63 +1,61 @@
-#include "stc/cstr.h"
+#include <stc/cstr.h>
 
-#define i_type hmap_id, int, cstr, (c_valpro)   // Map of int => cstr
-#include "stc/hashmap.h"
+#define T IdMap, int, cstr, (c_valpro)   // Map of int => cstr
+#include <stc/hashmap.h>
 
-#define i_type hmap_nat, cstr, int, (c_keypro)  // Map of cstr => int
-#include "stc/hashmap.h"
+#define T NationMap, cstr, int, (c_keypro)  // Map of cstr => int
+#include <stc/hashmap.h>
 
-typedef struct {int x, y;} ipair_t;
-inline static int ipair_cmp(const ipair_t* a, const ipair_t* b) {
+typedef struct {int x, y;} IPair;
+inline static int IPair_cmp(const IPair* a, const IPair* b) {
     int c = c_default_cmp(&a->x, &b->x);
     return c ? c : c_default_cmp(&a->y, &b->y);
 }
 
-#define i_type vec_ip, ipair_t
-#define i_cmp ipair_cmp
-#include "stc/vec.h"
+#define T vec_ip, IPair, (c_cmpclass)
+#include <stc/vec.h>
 
-#define i_type list_ip, ipair_t
-#define i_cmp ipair_cmp
-#include "stc/list.h"
+#define T list_ip, IPair, (c_cmpclass)
+#include <stc/list.h>
 
-#define i_type pqueue_flt, float
-#include "stc/pqueue.h"
+#define T PriorityQ, float
+#include <stc/pqueue.h>
 
 int main(void)
 {
     // VEC FLOAT / PRIORITY QUEUE
 
-    pqueue_flt floats = {0};
+    PriorityQ floats = {0};
     const float nums[] = {4.0f, 2.0f, 5.0f, 3.0f, 1.0f};
 
     // PRIORITY QUEUE
-    for (c_range(i, c_arraylen(nums)))
-        pqueue_flt_push(&floats, nums[i]);
+    for (c_range(i, c_countof(nums)))
+        PriorityQ_push(&floats, nums[i]);
 
     puts("\npop and show high priorites first:");
-    while (! pqueue_flt_is_empty(&floats)) {
-        printf("%.1f ", (double)*pqueue_flt_top(&floats));
-        pqueue_flt_pop(&floats);
+    while (! PriorityQ_is_empty(&floats)) {
+        printf("%.1f ", (double)*PriorityQ_top(&floats));
+        PriorityQ_pop(&floats);
     }
     puts("\n");
-    pqueue_flt_drop(&floats);
+    PriorityQ_drop(&floats);
 
     // CMAP ID
 
     int year = 2020;
-    hmap_id idnames = {0};
-    hmap_id_emplace(&idnames, 100, "Hello");
-    hmap_id_insert(&idnames, 110, cstr_lit("World"));
-    hmap_id_insert(&idnames, 120, cstr_from_fmt("Howdy, -%d-", year));
+    IdMap idnames = {0};
+    IdMap_emplace(&idnames, 100, "Hello");
+    IdMap_insert(&idnames, 110, cstr_lit("World"));
+    IdMap_insert(&idnames, 120, cstr_from_fmt("Howdy, -%d-", year));
 
-    for (c_each(i, hmap_id, idnames))
+    for (c_each(i, IdMap, idnames))
         printf("%d: %s\n", i.ref->first, cstr_str(&i.ref->second));
     puts("");
-    hmap_id_drop(&idnames);
+    IdMap_drop(&idnames);
 
     // CMAP CNT
 
-    hmap_nat countries = c_make(hmap_nat, {
+    NationMap countries = c_make(NationMap, {
         {"Norway", 100},
         {"Denmark", 50},
         {"Iceland", 10},
@@ -67,15 +65,15 @@ int main(void)
         {"Spain", 10},
         {"France", 10},
     });
-    hmap_nat_emplace(&countries, "Greenland", 0).ref->second += 20;
-    hmap_nat_emplace(&countries, "Sweden", 0).ref->second += 20;
-    hmap_nat_emplace(&countries, "Norway", 0).ref->second += 20;
-    hmap_nat_emplace(&countries, "Finland", 0).ref->second += 20;
+    NationMap_emplace(&countries, "Greenland", 0).ref->second += 20;
+    NationMap_emplace(&countries, "Sweden", 0).ref->second += 20;
+    NationMap_emplace(&countries, "Norway", 0).ref->second += 20;
+    NationMap_emplace(&countries, "Finland", 0).ref->second += 20;
 
-    for (c_each_kv(country, health, hmap_nat, countries))
+    for (c_each_kv(country, health, NationMap, countries))
         printf("%s: %d\n", cstr_str(country), *health);
     puts("");
-    hmap_nat_drop(&countries);
+    NationMap_drop(&countries);
 
     // CVEC PAIR
 

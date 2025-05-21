@@ -7,8 +7,8 @@ See the c++ class [std::queue](https://en.cppreference.com/w/cpp/container/queue
 
 ## Header file and declaration
 ```c++
-#define i_type <ct>,<kt>[,<op>] // shorthand for defining i_type, i_key, i_opt
-#define i_type <t>       // queue container type name (default: queue_{i_key})
+#define T <ct>,<kt>[,<op>] // shorthand for defining T, i_key, i_opt
+#define T <ct>           // queue container type name (default: queue_{i_key})
 // One of the following:
 #define i_key <t>        // key type
 #define i_keyclass <t>   // key type, and bind <t>_clone() and <t>_drop() function names
@@ -22,9 +22,9 @@ See the c++ class [std::queue](https://en.cppreference.com/w/cpp/container/queue
 #define i_keyfrom <fn>   // conversion func i_keyraw => i_key
 #define i_keytoraw <fn>  // conversion func i_key* => i_keyraw
 
-#include "stc/queue.h"
+#include <stc/queue.h>
 ```
-In the following, `X` is the value of `i_key` unless `i_type` is defined.
+In the following, `X` is the value of `i_key` unless `T` is defined.
 
 
 ## Methods
@@ -77,8 +77,8 @@ void            queue_X_value_drop(i_key* pval);
 
 ## Examples
 ```c++
-#define i_type queue, int
-#include "stc/queue.h"
+#define T queue, int
+#include <stc/queue.h>
 
 #include <stdio.h>
 

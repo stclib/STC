@@ -1,4 +1,4 @@
-#include "stc/cstr.h"
+#include <stc/cstr.h>
 
 int main(void)
 {

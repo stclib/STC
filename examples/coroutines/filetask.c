@@ -2,8 +2,8 @@
 
 #include <time.h>
 #include <stdio.h>
-#include "stc/cstr.h"
-#include "stc/coroutine.h"
+#include <stc/cstr.h>
+#include <stc/coroutine.h>
 
 cco_task_struct (file_read) {
     file_read_state cco;

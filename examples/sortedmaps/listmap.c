@@ -2,15 +2,15 @@
 // https://en.cppreference.com/w/cpp/container/multimap/insert
 
 // Multimap entries
-#include "stc/cstr.h"
+#include <stc/cstr.h>
 #define i_keypro cstr
-#include "stc/list.h"
+#include <stc/list.h>
 
 // Map of int => list_cstr.
 // "valclass" bind list_cstr_clone() and list_cstr_drop()
-#define i_type Multimap, int, list_cstr, (c_valclass)
+#define T Multimap, int, list_cstr, (c_valclass)
 #define i_cmp -c_default_cmp // like std::greater<int>
-#include "stc/sortedmap.h"
+#include <stc/sortedmap.h>
 
 void print(const char* lbl, const Multimap mmap)
 {

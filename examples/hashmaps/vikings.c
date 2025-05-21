@@ -1,4 +1,4 @@
-#include "stc/cstr.h"
+#include <stc/cstr.h>
 
 typedef struct Viking {
     cstr name;
@@ -43,8 +43,8 @@ Viking_raw Viking_toraw(const Viking* vp) {
 }
 
 // Define the map. Viking is now a "pro"-type:
-#define i_type Players, Viking, int, (c_keypro)
-#include "stc/hashmap.h"
+#define T Players, Viking, int, (c_keypro)
+#include <stc/hashmap.h>
 
 int main(void)
 {

@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <time.h>
-#include "stc/algorithm.h"
-#include "stc/random.h"
+#include <stc/algorithm.h>
+#include <stc/random.h>
 
-#define i_type DList, double, (c_use_cmp)
-#include "stc/list.h"
+#define T DList, double, (c_use_cmp)
+#include <stc/list.h>
 
 int main(void) {
     const int n = 3000000;

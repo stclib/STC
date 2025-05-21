@@ -1,13 +1,13 @@
 #include <stdio.h>
-#include "stc/cstr.h"
+#include <stc/cstr.h>
 
 // box<long>
-#define i_type boxlong, long //, (c_use_cmp) // add if compare is needed
-#include "stc/box.h"
+#define T boxlong, long //, (c_use_cmp) // add if compare is needed
+#include <stc/box.h>
 
 // hashmap<cstr, boxlong>
-#define i_type Magicmap, cstr, boxlong, (c_keypro | c_valpro)
-#include "stc/hashmap.h"
+#define T Magicmap, cstr, boxlong, (c_keypro | c_valpro)
+#include <stc/hashmap.h>
 
 int main(void)
 {

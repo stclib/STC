@@ -9,7 +9,7 @@ referred to as a ***rune***, and can be 1 to 4 bytes long.
 This header file is rarely needed alone. It is included by all the string/view types mentioned above.
 
 ```c++
-#include "stc/utf8.h"
+#include <stc/utf8.h>
 ```
 ## Methods
 ```c++
@@ -46,8 +46,8 @@ bool            utf8_isgroup(int group, uint32_t c);
 
 ## Example: UTF8 iteration and case conversion
 ```c++
-#include "stc/cstr.h"
-#include "stc/zsview.h"
+#include <stc/cstr.h>
+#include <stc/zsview.h>
 
 int main(void)
 {

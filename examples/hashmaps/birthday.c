@@ -1,10 +1,10 @@
 #include <math.h>
 #include <stdio.h>
 #include <time.h>
-#include "stc/random.h"
+#include <stc/random.h>
 
-#define i_type hmap_ui, uint64_t, int
-#include "stc/hashmap.h"
+#define T hmap_ui, uint64_t, int
+#include <stc/hashmap.h>
 
 static uint64_t seed = 12345;
 
@@ -27,8 +27,8 @@ static void test_repeats(void)
     hmap_ui_drop(&m);
 }
 
-#define i_type hmap_uu, uint32_t, uint64_t
-#include "stc/hashmap.h"
+#define T hmap_uu, uint32_t, uint64_t
+#include <stc/hashmap.h>
 
 void test_distribution(void)
 {

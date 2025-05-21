@@ -34,7 +34,7 @@ state changes, a relative expensive output function with two multiplications is 
 
 ## Header file
 ```c++
-#include "stc/random.h"
+#include <stc/random.h>
 ```
 
 ## Methods (64-bit)
@@ -99,10 +99,10 @@ int32_t              crand32_uniform_r(crand32* rng, uint32_t strm, crand32_unif
 #include <stdio.h>
 #include <time.h>
 #include <math.h>
-#include "stc/random.h"
+#include <stc/random.h>
 
-#define i_type SortedMap, int, long
-#include "stc/sortedmap.h" // sorted map.
+#define T SortedMap, int, long
+#include <stc/sortedmap.h>
 
 int main(void)
 {

@@ -20,12 +20,12 @@
 // IN THE SOFTWARE.
 
 // Program to emulates the phone book.
-#include "stc/cstr.h"
-#define i_type StrMap, cstr, cstr, (c_keypro | c_valpro)
-#include "stc/hashmap.h"
+#include <stc/cstr.h>
+#define T StrMap, cstr, cstr, (c_keypro | c_valpro)
+#include <stc/hashmap.h>
 
-#define i_type StrSet, cstr, (c_keypro)
-#include "stc/hashset.h"
+#define T StrSet, cstr, (c_keypro)
+#include <stc/hashset.h>
 
 void print_phone_book(StrMap phone_book)
 {

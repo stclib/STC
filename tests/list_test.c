@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include "ctest.h"
 
-#define i_type IList, int, (c_use_cmp)
-#include "stc/list.h"
+#define T IList, int, (c_use_cmp)
+#include <stc/list.h>
 
 
 TEST(list, splice)

@@ -13,15 +13,15 @@ typedef struct {
     Point bottom_right;
 } Rectangle;
 
-#define i_type BoxPoint, Point
-#include "stc/box.h"
+#define T BoxPoint, Point
+#include <stc/box.h>
 
-#define i_type BoxRect, Rectangle
-#include "stc/box.h"
+#define T BoxRect, Rectangle
+#include <stc/box.h>
 
 // Box in box: (box is a "pro" key-type)
-#define i_type BoxBoxPoint, BoxPoint, (c_keypro)
-#include "stc/box.h"
+#define T BoxBoxPoint, BoxPoint, (c_keypro)
+#include <stc/box.h>
 
 Point origin(void) {
     return c_literal(Point){ .x=1.0, .y=2.0 };

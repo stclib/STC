@@ -2,10 +2,10 @@
 
 #include <stdio.h>
 #define i_key int
-#include "stc/vec.h"
+#include <stc/vec.h>
 #define i_key int
-#include "stc/stack.h"
-#include "stc/cspan.h"
+#include <stc/stack.h>
+#include <stc/cspan.h>
 
 use_cspan(intspan, const int);
 

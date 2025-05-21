@@ -1,8 +1,8 @@
 #include <stdio.h>
 // Example of static sized (stack allocated) bitsets
 
-#define i_type Bits,80 // enable fixed size bitset on the stack
-#include "stc/cbits.h"
+#define T Bits, 80 // enable fixed size bitset on the stack
+#include <stc/cbits.h>
 
 int main(void)
 {

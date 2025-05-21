@@ -2,7 +2,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include "stc/common.h"
+#include <stc/common.h>
 
 #define DYN_CAST(T, s) \
     (&T##_api == (s)->api ? (T*)(s) : (T*)0)
@@ -76,8 +76,8 @@ struct ShapeAPI Triangle_api = {
 // Polygon implementation
 // ============================================================
 
-#define i_type PointVec,Point
-#include "stc/stack.h"
+#define T PointVec, Point
+#include <stc/stack.h>
 
 typedef struct {
     Shape shape;
@@ -121,10 +121,10 @@ struct ShapeAPI Polygon_api = {
 // Test
 // ============================================================
 
-#define i_type Shapes, Shape*
+#define T Shapes, Shape*
 #define i_keydrop(x) Shape_delete(*x)
 #define i_no_clone
-#include "stc/stack.h"
+#include <stc/stack.h>
 
 void testShape(const Shape* shape)
 {

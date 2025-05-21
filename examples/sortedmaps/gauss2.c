@@ -1,11 +1,11 @@
 #include <stdio.h>
 #include <time.h>
 #include <math.h>
-#include "stc/random.h"
+#include <stc/random.h>
 
 // Declare int -> int sorted map.
-#define i_type SortedMap, int, int
-#include "stc/sortedmap.h"
+#define T SortedMap, int, int
+#include <stc/sortedmap.h>
 
 int main(void)
 {

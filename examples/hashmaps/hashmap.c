@@ -1,8 +1,8 @@
 // https://doc.rust-lang.org/rust-by-example/std/hash.html
 #include <stdio.h>
-#include "stc/cstr.h"
-#define i_type StrMap, cstr, cstr, (c_keypro | c_valpro)
-#include "stc/hashmap.h"
+#include <stc/cstr.h>
+#define T StrMap, cstr, cstr, (c_keypro | c_valpro)
+#include <stc/hashmap.h>
 
 const char* call(const char* number) {
     if (strcmp(number, "798-1364") == 0)

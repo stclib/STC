@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "stc/cspan.h"
+#include <stc/cspan.h>
 #include "ctest.h"
 
 use_cspan3_with_eq(Span, int, c_default_eq);
@@ -44,8 +44,8 @@ TEST(cspan, slice) {
 }
 
 
-#define i_type Stack, int
-#include "stc/stack.h"
+#define T Stack, int
+#include <stc/stack.h>
 
 TEST(cspan, slice2) {
     c_with (Stack stack = {0}, Stack_drop(&stack))
@@ -108,8 +108,8 @@ TEST(cspan, equality) {
 }
 
 
-#define i_type Tiles, Span3
-#include "stc/stack.h"
+#define T Tiles, Span3
+#include <stc/stack.h>
 
 TEST_FIXTURE(cspan_cube) {
     Stack stack;

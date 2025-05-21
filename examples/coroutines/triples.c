@@ -1,7 +1,7 @@
 // https://quuxplusone.github.io/blog/2019/03/06/pythagorean-triples/
 
 #include <stdio.h>
-#include "stc/coroutine.h"
+#include <stc/coroutine.h>
 
 void triples_vanilla(int max_c) {
     for (int c = 5, i = 0;; ++c) {

@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "stc/cspan.h"
+#include <stc/cspan.h>
 
 use_cspan(DSpan2, double, 2);
 use_cspan(DSpan3, double, 3);

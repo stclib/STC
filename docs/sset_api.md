@@ -8,8 +8,8 @@ See the c++ class [std::set](https://en.cppreference.com/w/cpp/container/set) fo
 ## Header file and declaration
 
 ```c++
-#define i_type <ct>,<kt>[,<op>] // shorthand for defining i_type, i_key, i_opt
-#define i_type <t>       // container type name (default: sset_{i_key})
+#define T <ct>,<kt>[,<op>] // shorthand for defining T, i_key, i_opt
+#define T <ct>           // container type name (default: sset_{i_key})
 // One of the following:
 #define i_key <t>        // key type
 #define i_keyclass <t>   // key type, and bind <t>_clone() and <t>_drop() function names
@@ -27,9 +27,9 @@ See the c++ class [std::set](https://en.cppreference.com/w/cpp/container/set) fo
 #define i_keyfrom <fn>   // conversion func i_keyraw => i_key - defaults to plain copy
 #define i_keytoraw <fn>  // conversion func i_key* => i_keyraw - defaults to plain copy
 
-#include "stc/sortedset.h"
+#include <stc/sortedset.h>
 ```
-- In the following, `X` is the value of `i_key` unless `i_type` is defined.
+- In the following, `X` is the value of `i_key` unless `T` is defined.
 - **emplace**-functions are only available when `i_keyraw` is implicitly or explicitly defined.
 
 ## Methods
@@ -88,10 +88,10 @@ i_key           sset_X_value_clone(const sset_X* self, i_key val);
 
 ## Example
 ```c++
-#include "stc/cstr.h"
+#include <stc/cstr.h>
 
-#define i_type SSet, cstr, (c_keypro)
-#include "stc/sortedset.h"
+#define T SSet, cstr, (c_keypro)
+#include <stc/sortedset.h>
 
 int main(void)
 {

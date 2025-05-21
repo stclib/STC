@@ -22,8 +22,8 @@ See the c++ class [std::list](https://en.cppreference.com/w/cpp/container/list) 
 ## Header file and declaration
 
 ```c++
-#define i_type <ct>,<kt>[,<op>] // shorthand for defining i_type, i_key, i_opt
-#define i_type <t>       // list container type name (default: list_{i_key})
+#define T <ct>,<kt>[,<op>] // shorthand for defining T, i_key, i_opt
+#define T <ct>           // list container type name (default: list_{i_key})
 // One of the following:
 #define i_key <t>        // key type
 #define i_keyclass <t>   // key type, and bind <t>_clone() and <t>_drop() function names
@@ -41,11 +41,11 @@ See the c++ class [std::list](https://en.cppreference.com/w/cpp/container/list) 
 #define i_cmpclass <t>   // conversion "raw class". binds <t>_cmp(),  <t>_eq(),  <t>_hash()
 #define i_keytoraw <fn>  // conversion func i_key* => i_keyraw
 #define i_keyfrom <fn>   // conversion func i_keyraw => i_key
-#include "stc/list.h"
+#include <stc/list.h>
 ```
 - Defining either `i_use_cmp`, `i_less` or `i_cmp` will enable sorting
 - **emplace**-functions are only available when `i_keyraw` is implicitly or explicitly defined.
-- In the following, `X` is the value of `i_key` unless `i_type` is defined.
+- In the following, `X` is the value of `i_key` unless `T` is defined.
 
 ## Methods
 
@@ -133,8 +133,8 @@ Interleave *push_front()* / *push_back()* then *sort()*:
 
 [ [Run this code](https://godbolt.org/z/fbdfono7s) ]
 ```c++
-#define i_type DList, double, (c_use_cmp)
-#include "stc/list.h"
+#define T DList, double, (c_use_cmp)
+#include <stc/list.h>
 
 #include <stdio.h>
 
@@ -166,8 +166,8 @@ Use of *erase_at()* and *erase_range()*:
 [ [Run this code](https://godbolt.org/z/MPaGb8jcG) ]
 ```c++
 #include <stdio.h>
-#define i_type IList, int
-#include "stc/list.h"
+#define T IList, int
+#include <stc/list.h>
 
 int main(void)
 {
@@ -196,8 +196,8 @@ Splice {**30**, **40**} from *L2* into *L1* before **3**:
 [ [Run this code](https://godbolt.org/z/cvon65ac6) ]
 ```c++
 #include <stdio.h>
-#define i_type IList, int
-#include "stc/list.h"
+#define T IList, int
+#include <stc/list.h>
 
 int main(void) {
     IList L1 = c_make(IList, {1, 2, 3, 4, 5});

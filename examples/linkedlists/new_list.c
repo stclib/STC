@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "stc/types.h"
+#include <stc/types.h>
 
 declare_list(list_i32, int32_t);
 declare_list(list_pnt, struct Point);
@@ -9,8 +9,8 @@ typedef struct {
     list_pnt pntlist;
 } MyStruct;
 
-#define i_type list_i32, int32_t, (c_declared)
-#include "stc/list.h"
+#define T list_i32, int32_t, (c_declared)
+#include <stc/list.h>
 
 typedef struct Point { int x, y; } Point;
 int point_cmp(const Point* a, const Point* b) {
@@ -18,19 +18,19 @@ int point_cmp(const Point* a, const Point* b) {
     return c ? c : a->y - b->y;
 }
 
-#define i_type list_pnt, Point, (c_declared)
+#define T list_pnt, Point, (c_declared)
 #define i_cmp point_cmp
-#include "stc/list.h"
+#include <stc/list.h>
 
 // use < and == operators for comparison
-#define i_type list_float, float, (c_use_cmp)
-#include "stc/list.h"
+#define T list_float, float, (c_use_cmp)
+#include <stc/list.h>
 
 void MyStruct_drop(MyStruct* s);
 
 // exclude cloning support because of class/drop:
-#define i_type MyList, MyStruct, (c_keyclass | c_no_clone)
-#include "stc/list.h"
+#define T MyList, MyStruct, (c_keyclass | c_no_clone)
+#include <stc/list.h>
 
 void MyStruct_drop(MyStruct* s) {
     list_i32_drop(&s->intlist);

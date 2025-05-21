@@ -1,11 +1,11 @@
 // https://mariusbancila.ro/blog/2019/01/20/cpp-code-samples-before-and-after-ranges/
 
-#define i_type IVec,int
-#include "stc/stack.h"
+#define T IVec, int
+#include <stc/stack.h>
 
-#include "stc/algorithm.h"
-#include "stc/cstr.h"
-#include "stc/cspan.h"
+#include <stc/algorithm.h>
+#include <stc/cstr.h>
+#include <stc/cspan.h>
 use_cspan(ISpan, int);
 
 #include "ctest.h"

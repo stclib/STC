@@ -1,7 +1,7 @@
 #include "ctest.h"
 
-#define i_type IVec, int, (c_use_eq)
-#include "stc/vec.h"
+#define T IVec, int, (c_use_eq)
+#include <stc/vec.h>
 
 
 TEST(vec, basics) {

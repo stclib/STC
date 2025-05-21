@@ -1,8 +1,8 @@
 // Example based on https://en.cppreference.com/w/cpp/container/mdspan
 #include <stdio.h>
-#define i_type Vec, int
-#include "stc/stack.h"
-#include "stc/cspan.h"
+#define T Vec, int
+#include <stc/stack.h>
+#include <stc/cspan.h>
 
 use_cspan3(ISpan, int); // define ISpan, ISpan2, ISpan3
 

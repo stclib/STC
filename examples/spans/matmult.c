@@ -4,7 +4,7 @@
 #define NDEBUG
 #include <stdio.h>
 #include <time.h>
-#include "stc/cspan.h"
+#include <stc/cspan.h>
 
 use_cspan(Mat, float, 2);
 typedef Mat OutMat;
@@ -57,9 +57,9 @@ void recursive_matrix_product(Mat A, Mat B, OutMat C) {
 }
 
 
-#define i_type Data, float
-#include "stc/stack.h"
-#include "stc/random.h"
+#define T Data, float
+#include <stc/stack.h>
+#include <stc/random.h>
 
 int main(int argc, char* argv[]) {
     int M = 512, P, N;

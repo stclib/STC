@@ -2,8 +2,8 @@
 
 #include <time.h>
 #include <stdio.h>
-#include "stc/cstr.h"
-#include "stc/coroutine.h"
+#include <stc/cstr.h>
+#include <stc/coroutine.h>
 
 struct next_value {
     int val;

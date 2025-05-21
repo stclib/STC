@@ -1,4 +1,4 @@
-#include "stc/cstr.h"
+#include <stc/cstr.h>
 
 void stringdemo1(void)
 {
@@ -27,82 +27,85 @@ void stringdemo1(void)
     cstr_drop(&cs);
 }
 
-#define i_type vec_ll, long long
-#include "stc/vec.h"
+#define T Vec64, long long
+#include <stc/vec.h>
 
 void vectordemo1(void)
 {
-    vec_ll bignums = vec_ll_with_capacity(100);
-    vec_ll_reserve(&bignums, 100);
+    Vec64 bignums = Vec64_with_capacity(11);
+
     for (int i = 10; i <= 100; i += 10)
-        vec_ll_push(&bignums, i * i);
+        Vec64_push(&bignums, i * i);
 
     printf("erase - %d: %lld\n", 3, bignums.data[3]);
-    vec_ll_erase_n(&bignums, 3, 1); // erase index 3
+    Vec64_erase_n(&bignums, 3, 1); // erase index 3
 
-    vec_ll_pop(&bignums);           // erase the last
-    vec_ll_erase_n(&bignums, 0, 1); // erase the first
+    Vec64_pop(&bignums);           // erase the last
+    Vec64_erase_n(&bignums, 0, 1); // erase the first
 
-    for (int i = 0; i < vec_ll_size(&bignums); ++i) {
+    for (c_range32(i, Vec64_size(&bignums))) {
         printf("%d: %lld\n", i, bignums.data[i]);
     }
 
-    vec_ll_drop(&bignums);
+    Vec64_drop(&bignums);
 }
 
-#define i_type vec_cstr, cstr, (c_keypro | c_use_cmp)
-#include "stc/vec.h"
+#define T Strvec, cstr, (c_keypro | c_use_cmp)
+#include <stc/vec.h>
 
 void vectordemo2(void)
 {
-    vec_cstr names = {0};
-    vec_cstr_emplace_back(&names, "Mary");
-    vec_cstr_emplace_back(&names, "Joe");
-    vec_cstr_emplace_back(&names, "Chris");
+    Strvec names = {0};
+    Strvec_emplace_back(&names, "Mary");
+    Strvec_emplace_back(&names, "Joe");
+    Strvec_emplace_back(&names, "Chris");
+
     cstr_assign(&names.data[1], "Jane"); // replace Joe
     printf("names[1]: %s\n", cstr_str(&names.data[1]));
 
-    vec_cstr_sort(&names);               // Sort the array
+    Strvec_sort(&names);               // Sort the array
 
-    for (c_each(i, vec_cstr, names))
+    for (c_each(i, Strvec, names))
         printf("sorted: %s\n", cstr_str(i.ref));
 
-    vec_cstr_drop(&names);
+    Strvec_drop(&names);
 }
 
-#define i_type list_int, int, (c_use_cmp)
-#include "stc/list.h"
+#define T Intlist, int, (c_use_cmp)
+#include <stc/list.h>
 
 void listdemo1(void)
 {
-    list_int nums = {0}, nums2 = {0};
+    Intlist nums = {0}, nums2 = {0};
     for (int i = 0; i < 10; ++i)
-        list_int_push_back(&nums, i);
+        Intlist_push_back(&nums, i);
     for (int i = 100; i < 110; ++i)
-        list_int_push_back(&nums2, i);
+        Intlist_push_back(&nums2, i);
 
     /* splice nums2 to front of nums */
-    list_int_splice(&nums, list_int_begin(&nums), &nums2);
-    for (c_each(i, list_int, nums))
+    Intlist_splice(&nums, Intlist_begin(&nums), &nums2);
+    for (c_each(i, Intlist, nums))
         printf("spliced: %d\n", *i.ref);
     puts("");
 
-    *list_int_find(&nums, 104).ref += 50;
-    list_int_remove(&nums, 103);
-    list_int_iter it = list_int_begin(&nums);
-    list_int_erase_range(&nums, list_int_advance(it, 5), list_int_advance(it, 15));
-    list_int_pop_front(&nums);
-    list_int_push_back(&nums, -99);
-    list_int_sort(&nums);
+    *Intlist_find(&nums, 104).ref += 50;
+    Intlist_remove(&nums, 103);
 
-    for (c_each(i, list_int, nums))
+    Intlist_iter it = Intlist_begin(&nums);
+    Intlist_erase_range(&nums, Intlist_advance(it, 5), Intlist_advance(it, 15));
+    Intlist_pop_front(&nums);
+    Intlist_push_back(&nums, -99);
+
+    Intlist_sort(&nums);
+
+    for (c_each(i, Intlist, nums))
         printf("sorted: %d\n", *i.ref);
 
-    c_drop(list_int, &nums, &nums2);
+    c_drop(Intlist, &nums, &nums2);
 }
 
-#define i_type hset_int, int
-#include "stc/hashset.h"
+#define T hset_int, int
+#include <stc/hashset.h>
 
 void setdemo1(void)
 {
@@ -115,61 +118,63 @@ void setdemo1(void)
     hset_int_drop(&nums);
 }
 
-#define i_type hmap_ii, int, int
-#include "stc/hashmap.h"
+#define T Intmap, int, int
+#include <stc/hashmap.h>
 
 void mapdemo1(void)
 {
-    hmap_ii nums = {0};
-    hmap_ii_insert(&nums, 8, 64);
-    hmap_ii_insert(&nums, 11, 121);
-    printf("val 8: %d\n", *hmap_ii_at(&nums, 8));
-    hmap_ii_drop(&nums);
+    Intmap nums = {0};
+    Intmap_insert(&nums, 8, 64);
+    Intmap_insert(&nums, 11, 121);
+
+    printf("val 8: %d\n", *Intmap_at(&nums, 8));
+    Intmap_drop(&nums);
 }
 
-#define i_type hmap_si, cstr, int, (c_keypro)
-#include "stc/hashmap.h"
+#define T SImap, cstr, int, (c_keypro)
+#include <stc/hashmap.h>
 
 void mapdemo2(void)
 {
-    hmap_si nums = {0};
-    hmap_si_emplace_or_assign(&nums, "Hello", 64);
-    hmap_si_emplace_or_assign(&nums, "Groovy", 121);
-    hmap_si_emplace_or_assign(&nums, "Groovy", 200); // overwrite previous
+    SImap nums = {0};
+    SImap_emplace_or_assign(&nums, "Hello", 64);
+    SImap_emplace_or_assign(&nums, "Groovy", 121);
+    SImap_emplace_or_assign(&nums, "Groovy", 200); // overwrite previous
 
     // iterate the map:
-    for (hmap_si_iter i = hmap_si_begin(&nums); i.ref; hmap_si_next(&i))
+    for (SImap_iter i = SImap_begin(&nums); i.ref; SImap_next(&i))
         printf("long: %s: %d\n", cstr_str(&i.ref->first), i.ref->second);
 
     // or rather use the short form:
-    for (c_each(i, hmap_si, nums))
+    for (c_each(i, SImap, nums))
         printf("short: %s: %d\n", cstr_str(&i.ref->first), i.ref->second);
 
-    hmap_si_drop(&nums);
+    SImap_drop(&nums);
 }
 
-#define i_keypro cstr
-#define i_valpro cstr
-#include "stc/hashmap.h"
+#define T Strmap, cstr, cstr, (c_keypro|c_valpro)
+#include <stc/hashmap.h>
 
 void mapdemo3(void)
 {
-    hmap_cstr table = {0};
-    hmap_cstr_emplace(&table, "Map", "test");
-    hmap_cstr_emplace(&table, "Make", "my");
-    hmap_cstr_emplace(&table, "Sunny", "day");
-    hmap_cstr_iter it = hmap_cstr_find(&table, "Make");
-    for (c_each(i, hmap_cstr, table))
-        printf("entry: %s: %s\n", cstr_str(&i.ref->first), cstr_str(&i.ref->second));
-    printf("size %d: remove: Make: %s\n", (int)hmap_cstr_size(&table), cstr_str(&it.ref->second));
-    //hmap_cstr_erase(&table, "Make");
-    hmap_cstr_erase_at(&table, it);
+    Strmap table = {0};
+    Strmap_emplace(&table, "Map", "test");
+    Strmap_emplace(&table, "Make", "my");
+    Strmap_emplace(&table, "Sunny", "day");
 
-    printf("size %d\n", (int)hmap_cstr_size(&table));
-    for (c_each(i, hmap_cstr, table))
+    Strmap_iter it = Strmap_find(&table, "Make");
+    for (c_each(i, Strmap, table))
         printf("entry: %s: %s\n", cstr_str(&i.ref->first), cstr_str(&i.ref->second));
 
-    hmap_cstr_drop(&table); // frees key and value cstrs, and hash table.
+    printf("size %d: remove: Make: %s\n", (int)Strmap_size(&table), cstr_str(&it.ref->second));
+    //Strmap_erase(&table, "Make");
+    Strmap_erase_at(&table, it);
+
+    printf("size %d\n", (int)Strmap_size(&table));
+    for (c_each(i, Strmap, table))
+        printf("entry: %s: %s\n", cstr_str(&i.ref->first), cstr_str(&i.ref->second));
+
+    Strmap_drop(&table); // frees key and value cstrs, and hash table.
 }
 
 int main(void)

@@ -1,9 +1,9 @@
-#include "stc/cstr.h"
-#include "stc/cregex.h"
-#include "stc/csview.h"
+#include <stc/cstr.h>
+#include <stc/cregex.h>
+#include <stc/csview.h>
 
-#define i_type Fvec, float
-#include "stc/stack.h"
+#define T Fvec, float
+#include <stc/stack.h>
 
 int main(void)
 {

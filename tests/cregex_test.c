@@ -1,7 +1,7 @@
-#include "stc/cregex.h"
-#include "stc/cstr.h"
-#include "stc/csview.h"
-#include "stc/algorithm.h"
+#include <stc/cregex.h>
+#include <stc/cstr.h>
+#include <stc/csview.h>
+#include <stc/algorithm.h>
 #include "ctest.h"
 #include <string.h>
 

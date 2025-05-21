@@ -138,7 +138,7 @@ Generator are among the simplest types of coroutines and is easy to write:
 [ [Run this code](https://godbolt.org/z/xMf3d44Gz) ]
 ```c++
 #include <stdio.h>
-#include "stc/coroutine.h"
+#include <stc/coroutine.h>
 
 struct Gen { cco_state cco; int start, end, value; };
 
@@ -177,7 +177,7 @@ Notice that `Gen` now becomes the "container", while `Gen_iter` is the coroutine
 [ [Run this code](https://godbolt.org/z/bbd8oGYxG) ]
 ```c++
 #include <stdio.h>
-#include "stc/coroutine.h"
+#include <stc/coroutine.h>
 
 typedef int Gen_value;
 typedef struct { Gen_value start, end, value; } Gen;
@@ -225,8 +225,8 @@ starts eating (because they must be waiting).
 ```c++
 #include <stdio.h>
 #include <time.h>
-#include "stc/random.h"
-#include "stc/coroutine.h"
+#include <stc/random.h>
+#include <stc/coroutine.h>
 
 enum {num_philosophers = 5};
 enum PhState {ph_thinking, ph_hungry, ph_eating};
@@ -343,7 +343,7 @@ which is very fast.
 <!--{%raw%}-->
 ```c++
 #include <stdio.h>
-#include "stc/coroutine.h"
+#include <stc/coroutine.h>
 
 cco_task_struct (TaskA) { TaskA_state cco; int a; };
 cco_task_struct (TaskB) { TaskB_state cco; double d; };
@@ -450,7 +450,7 @@ call/await:
 <!--{%raw%}-->
 ```c++
 #include <stdio.h>
-#include "stc/coroutine.h"
+#include <stc/coroutine.h>
 
 cco_task_struct (TaskA) { TaskA_state cco; int a; };
 cco_task_struct (TaskB) { TaskB_state cco; double d; };
@@ -561,9 +561,9 @@ the following example:
 ```c++
 #include <time.h>
 #include <stdio.h>
-#include "stc/coroutine.h"
-#define i_type Inventory, int
-#include "stc/queue.h"
+#include <stc/coroutine.h>
+#define T Inventory, int
+#include <stc/queue.h>
 
 // Example shows symmetric coroutines producer/consumer style.
 
@@ -673,12 +673,11 @@ the scope in that it was created.
 ```c++
 // Based on https://www.youtube.com/watch?v=8sEe-4tig_A
 #include <stdio.h>
-#include "stc/coroutine.h"
+#include <stc/coroutine.h>
 
-#define i_type Tasks, cco_task*
+#define T Tasks, cco_task*, (c_no_clone)
 #define i_keydrop(p) free(*p) // { puts("free task"); free(*p); }
-#define i_no_clone
-#include "stc/queue.h"
+#include <stc/queue.h>
 
 cco_task_struct (Scheduler) {
     Scheduler_state cco;

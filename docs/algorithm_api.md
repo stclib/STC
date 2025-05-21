@@ -11,7 +11,7 @@ descriptive and reduces chances of making mistakes. It is generally easier to re
 
 ### c_each, c_each_reverse, c_each_n, c_each_kv
 ```c++
-#include "stc/common.h"
+#include <stc/common.h>
 ```
 
 | Usage                                              | Description                               |
@@ -25,8 +25,8 @@ descriptive and reduces chances of making mistakes. It is generally easier to re
 <!--{%raw%}-->
 [ [Run this code](https://godbolt.org/z/cYhTEr1vM) ]
 ```c++
-#define i_type IMap, int, int
-#include "stc/sortedmap.h"
+#define T IMap, int, int
+#include <stc/sortedmap.h>
 // ...
 IMap map = c_make(IMap, {{23,1}, {3,2}, {7,3}, {5,4}, {12,5}});
 
@@ -115,9 +115,9 @@ for (c_range(i, 30, 0, -5)) printf(" %lld", i);
 For-loop variant of `c_filter`in generic algorithms.
 ```c++
 #include <stdio.h>
-#include "stc/algorithm.h"
-#define i_type IVec,int
-#include "stc/stack.h"
+#include <stc/algorithm.h>
+#define T IVec, int
+#include <stc/stack.h>
 
 int main(void) {
     IVec vec = c_make(IVec, {0, 1, 2, 3, 4, 5, 80, 6, 7, 80, 8, 9, 80,
@@ -199,7 +199,7 @@ will not be preserved across `cco_yield..` / `cco_await..`.
 [ [Run this code](https://godbolt.org/z/PEvjGff3E) ]
 ```c++
 #include <stdio.h>
-#include "stc/algorithm.h"
+#include <stc/algorithm.h>
 
 c_sumtype (Tree,
     (Empty, _Bool),
@@ -238,8 +238,8 @@ its data type (payload). Because C does not have namespaces, it is recommended t
 ```c++
 // https://doc.rust-lang.org/book/ch18-03-pattern-syntax.html#destructuring-enums
 #include <stdio.h>
-#include "stc/algorithm.h"
-#include "stc/cstr.h"
+#include <stc/algorithm.h>
+#include <stc/cstr.h>
 
 c_sumtype (Color,
     (ColorRgb, struct {int32 r, g, b;}),
@@ -265,7 +265,7 @@ int main(void) {
         c_variant(MessageChangeColor, c_variant(ColorHsv, {0, 160, 255})),
     };
 
-    for (c_range(i, c_arraylen(msg)))
+    for (c_range(i, c_countof(msg)))
     c_when (&msg[i]) {
         c_is(MessageQuit) {
             printf("The Quit variant has no data to destructure.\n");
@@ -305,11 +305,11 @@ These work on any container. *c_make()* may also be used for **cspan** views.
 <!--{%raw%}-->
 ```c++
 #include <stdio.h>
-#define i_type Vec, int
-#include "stc/vec.h"
+#define T Vec, int
+#include <stc/vec.h>
 
-#define i_type Map, int, int
-#include "stc/hashmap.h"
+#define T Map, int, int
+#include <stc/hashmap.h>
 
 c_func (split_map,(Map map), ->, struct {Vec keys, values;}) {
     split_map_result out = {0};
@@ -381,17 +381,17 @@ Erase linearily in containers using a predicate. `value` is a pointer to each el
 <!--{%raw%}-->
 ```c++
 #include <stdio.h>
-#include "stc/cstr.h"
-#include "stc/algorithm.h"
+#include <stc/cstr.h>
+#include <stc/algorithm.h>
 
-#define i_type Vec, int, (c_use_eq)
-#include "stc/stack.h"
+#define T Vec, int, (c_use_eq)
+#include <stc/stack.h>
 
-#define i_type List, int, (c_use_eq)
-#include "stc/list.h"
+#define T List, int, (c_use_eq)
+#include <stc/list.h>
 
-#define i_type Map, cstr, int, (c_keypro)
-#include "stc/sortedmap.h"
+#define T Map, cstr, int, (c_keypro)
+#include <stc/sortedmap.h>
 
 int main(void)
 {
@@ -482,9 +482,9 @@ It enables a subset of functional programming like in other popular languages.
 [ [Run this example](https://godbolt.org/z/W87fTdvYd) ]
 ```c++
 #include <stdio.h>
-#define i_type Vec, int
-#include "stc/stack.h"
-#include "stc/algorithm.h"
+#define T Vec, int
+#include <stc/stack.h>
+#include <stc/algorithm.h>
 
 int main(void)
 {
@@ -525,12 +525,12 @@ if (result)
 
 ### sort, lower_bound, binary_search
 
-- `X` refers to the template name specified by `i_type` or `i_key`.
+- `X` refers to the template name specified by `T` or `i_key`.
 - All containers with random access may be sorted, including regular C-arrays, i.e. **stack**, **vec**
 and **deque** when either `i_use_cmp`, `i_cmp` or `i_less` is defined.
 - Linked **list** may also be sorted, i.e. only *X_sort()* is available.
 ```c++
-                // Sort c-arrays by defining i_type and include "stc/sort.h":
+                // Sort c-arrays by defining T and include "stc/sort.h":
 void            X_sort(const X array[], isize len);
 isize           X_lower_bound(const X array[], i_key key, isize len);
 isize           X_binary_search(const X array[], i_key key, isize len);
@@ -545,7 +545,7 @@ void            X_sort_lowhigh(X* self, isize low, isize high);
 isize           X_lower_bound_range(const X* self, i_key key, isize start, isize end);
 isize           X_binary_search_range(const X* self, i_key key, isize start, isize end);
 ```
-`i_type` may be customized in the normal way, along with comparison function `i_cmp` or `i_less`.
+`T` may be customized in the normal way, along with comparison function `i_cmp` or `i_less`.
 
 ##### Performance
 The *X_sort()*, *X_sort_lowhigh()* functions are about twice as fast as *qsort()* and comparable in
@@ -556,20 +556,20 @@ c++ *std::lower_bound()*.
 [ [Run this code](https://godbolt.org/z/dvr3zYKhY) ]
 ```c++
 #define i_key int // sort a regular c-array of ints
-#include "stc/sort.h"
+#include <stc/sort.h>
 #include <stdio.h>
 
 int main(void) {
     int arr[] = {5, 3, 5, 9, 7, 4, 7, 2, 4, 9, 3, 1, 2, 6, 4};
-    ints_sort(arr, c_arraylen(arr)); // `ints` derived from the `i_key` name
+    ints_sort(arr, c_countof(arr)); // `ints` derived from the `i_key` name
 
-    for (c_range(i, c_arraylen(arr)))
+    for (c_range(i, c_countof(arr)))
         printf(" %d", arr[i]);
 }
 ```
 ```c++
-#define i_type MyDeq, int, (c_use_cmp) // int elements, enable sorting
-#include "stc/deque.h"
+#define T MyDeq, int, (c_use_cmp) // int elements, enable sorting
+#include <stc/deque.h>
 #include <stdio.h>
 
 int main(void) {
@@ -619,10 +619,10 @@ c_with (pthread_mutex_lock(&lock), pthread_mutex_unlock(&lock))
 **Example 2**: Load each line of a text file into a vector of strings:
 ```c++
 #include <errno.h>
-#include "stc/cstr.h"
+#include <stc/cstr.h>
 
 #define i_keypro cstr
-#include "stc/vec.h"
+#include <stc/vec.h>
 
 // receiver should check errno variable
 vec_cstr readFile(const char* name)
@@ -741,7 +741,7 @@ c_func (load_data,(const char* fname), ->, struct {Vec vec; int err;}) {
 - void `c_delete`(**Type**, ptr) - *Type_drop(ptr)* and *c_free(ptr, ..)* allocated on the heap. NULL is OK.
 - void `c_delete_n`(**Type**, arr, n) - *Type_drop(&arr[i])* and *c_free(arr, ..)* of ***n*** objects allocated on the heap. (NULL, 0) is OK.
 ```c++
-#include "stc/cstr.h"
+#include <stc/cstr.h>
 
 cstr* stringptr = c_new (cstr, cstr_from("Hello"));
 printf("%s\n", cstr_str(stringp));
@@ -760,9 +760,9 @@ default in containers unless `i_malloc`, `i_calloc`, `i_realloc`, and `i_free` a
 
 </details>
 <details>
-<summary><b>c_swap, c_arraylen, c_const_cast, c_safe_case</b></summary>
+<summary><b>c_swap, c_countof, c_const_cast, c_safe_case</b></summary>
 
-### c_swap, c_arraylen, c_const_cast, c_safe_case
+### c_swap, c_countof, c_const_cast, c_safe_case
 Side effect- and typesafe macro for swapping internals of two objects of same type:
 ```c++
 double x = 1.0, y = 2.0;
@@ -772,7 +772,7 @@ c_swap(&x, &y);
 Return number of elements in an array. array must not be a pointer!
 ```c++
 int array[] = {1, 2, 3, 4};
-isize n = c_arraylen(array);
+isize n = c_countof(array);
 ```
 
 Type-safe casting a from const (pointer):

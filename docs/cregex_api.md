@@ -101,7 +101,7 @@ If an error occurs ```cregex_compile``` returns a negative error code stored in 
 
 [ [Run this code](https://godbolt.org/z/811Yre96s) ]
 ```c++
-#include "stc/cregex.h"
+#include <stc/cregex.h>
 
 int main(void) {
     const char* input = "start date is 2023-03-01, end date 2025-12-31.";

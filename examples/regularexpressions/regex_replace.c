@@ -1,6 +1,6 @@
-#include "stc/cregex.h"
-#include "stc/cstr.h"
-#include "stc/csview.h"
+#include <stc/cregex.h>
+#include <stc/cstr.h>
+#include <stc/csview.h>
 
 bool add_10_years(int group, csview match, cstr* out) {
     if (group == 1) { // year match

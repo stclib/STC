@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 // IWYU pragma: private
-#undef i_TYPE       // [deprecated]
+#undef T            // alias for i_type
 #undef i_type
 #undef i_class
 #undef i_tag

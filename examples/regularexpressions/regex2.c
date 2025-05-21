@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "stc/cregex.h"
+#include <stc/cregex.h>
 
 int main(void)
 {
@@ -16,7 +16,7 @@ int main(void)
     };
 
     cregex re = {0};
-    for (c_range(i, c_arraylen(s)))
+    for (c_range(i, c_countof(s)))
     {
         int res = cregex_compile(&re, s[i].pattern);
         if (res < 0) {

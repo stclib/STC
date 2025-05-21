@@ -1,13 +1,13 @@
 #include <stdio.h>
-#include "stc/common.h"
-#include "stc/cstr.h"
+#include <stc/common.h>
+#include <stc/cstr.h>
 
-#define i_type IBox, long
-#include "stc/box.h" // unique_ptr<long> alike.
+#define T IBox, long
+#include <stc/box.h> // unique_ptr<long> alike.
 
 // hashmap of cstr => IBox (both cstr and box are "pro")
-#define i_type Boxmap, cstr, IBox, (c_keypro | c_valpro)
-#include "stc/hashmap.h"
+#define T Boxmap, cstr, IBox, (c_keypro | c_valpro)
+#include <stc/hashmap.h>
 
 
 int main(void)

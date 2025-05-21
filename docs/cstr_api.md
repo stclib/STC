@@ -17,7 +17,7 @@ for string capacity up to 22 bytes.
 All cstr definitions and prototypes are available by including a single header file.
 
 ```c++
-#include "stc/cstr.h"
+#include <stc/cstr.h>
 ```
 
 ## Methods
@@ -167,7 +167,7 @@ char*           c_strnstrn(const char* str, isize slen, const char* needle, isiz
 
 ## Example
 ```c++
-#include "stc/cstr.h"
+#include <stc/cstr.h>
 
 int main(void) {
     cstr s0, s1, full_path;

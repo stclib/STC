@@ -1,10 +1,10 @@
 // map_erase.c
 // From C++ example: https://docs.microsoft.com/en-us/cpp/standard-library/map-class?view=msvc-160#example-16
-#include "stc/cstr.h"
+#include <stc/cstr.h>
 #include <stdio.h>
 
-#define i_type mymap, int, cstr, (c_valpro)
-#include "stc/sortedmap.h"
+#define T mymap, int, cstr, (c_valpro)
+#include <stc/sortedmap.h>
 
 void printmap(mymap m)
 {

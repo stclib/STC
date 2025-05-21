@@ -1,7 +1,7 @@
 #include <stdio.h>
 
-#define i_type ISet, int
-#include "stc/sortedset.h"
+#define T ISet, int
+#include <stc/sortedset.h>
 
 int main(void)
 {

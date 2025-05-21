@@ -11,8 +11,8 @@ See the c++ class [std::stack](https://en.cppreference.com/w/cpp/container/stack
 ## Header file and declaration
 
 ```c++
-#define i_type <ct>         // container type name (default: stack_{i_key})
-#define i_type <ct>, <kt>   // define both i_type and i_key types
+#define T <ct>, <kt>[,<op>] // define both T and i_key types
+#define T <ct>              // container type name (default: stack_{i_key})
 #define i_capacity <CAP>    // define an inplace stack (on the stack) with CAP capacity.
 // One of the following:
 #define i_key <t>           // key type
@@ -33,11 +33,11 @@ See the c++ class [std::stack](https://en.cppreference.com/w/cpp/container/stack
 #define i_keytoraw <fn>     // conversion func i_key* => i_keyraw
 
 
-#include "stc/stack.h"
+#include <stc/stack.h>
 ```
 - Defining either `i_use_cmp`, `i_less` or `i_cmp` will enable sorting, binary_search and lower_bound
 - **emplace**-functions are only available when `i_keyraw` is implicitly or explicitly defined.
-- In the following, `X` is the value of `i_key` unless `i_type` is defined.
+- In the following, `X` is the value of `i_key` unless `T` is defined.
 
 ## Methods
 
@@ -103,8 +103,8 @@ void            stack_X_value_drop(vec_X_value* pval);
 
 ## Example
 ```c++
-#define i_type IStack, int
-#include "stc/stack.h"
+#define T IStack, int
+#include <stc/stack.h>
 
 #include <stdio.h>
 

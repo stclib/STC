@@ -12,8 +12,8 @@ See the c++ class [std::vector](https://en.cppreference.com/w/cpp/container/vect
 ## Header file and declaration
 
 ```c++
-#define i_type <ct>,<kt>[,<op>] // shorthand for defining i_type, i_key, i_opt
-#define i_type <t>       // container type name (default: vec_{i_key})
+#define T <ct>,<kt>[,<op>] // shorthand for defining T, i_key, i_opt
+#define T <ct>           // container type name (default: vec_{i_key})
 // One of the following:
 #define i_key <t>        // key type
 #define i_keyclass <t>   // key type, and bind <t>_clone() and <t>_drop() function names
@@ -32,11 +32,11 @@ See the c++ class [std::vector](https://en.cppreference.com/w/cpp/container/vect
 #define i_keyfrom <fn>   // conversion func i_keyraw => i_key
 #define i_keytoraw <fn>  // conversion func i_key* => i_keyraw
 
-#include "stc/vec.h"
+#include <stc/vec.h>
 ```
 - Defining either `i_use_cmp`, `i_less` or `i_cmp` will enable sorting, binary_search and lower_bound
 - **emplace**-functions are only available when `i_keyraw` is implicitly or explicitly defined.
-- In the following, `X` is the value of `i_key` unless `i_type` is defined.
+- In the following, `X` is the value of `i_key` unless `T` is defined.
 
 ## Methods
 
@@ -125,8 +125,8 @@ vec_X_raw       vec_X_value_drop(vec_X_value* pval);
 #include <stdio.h>
 
 // enable sorting/searching using default <, == operators
-#define i_type vec_int, int, (c_use_cmp)
-#include "stc/vec.h"
+#define T vec_int, int, (c_use_cmp)
+#include <stc/vec.h>
 
 int main(void)
 {
@@ -161,10 +161,10 @@ int main(void)
 [ [Run this code](https://godbolt.org/z/c7e3q5v14) ]
 ```c++
 #include <stdio.h>
-#include "stc/cstr.h"
+#include <stc/cstr.h>
 
 #define i_keypro cstr
-#include "stc/vec.h"
+#include <stc/vec.h>
 
 int main(void) {
     vec_cstr names = {0};
@@ -192,7 +192,7 @@ Container with elements of structs:
 [ [Run this code](https://godbolt.org/z/jKrz67hYW) ]
 ```c++
 #include <stdio.h>
-#include "stc/cstr.h"
+#include <stc/cstr.h>
 
 typedef struct {
     cstr name; // dynamic string
@@ -219,8 +219,8 @@ void User_drop(User* self) {
 //             i_cmp function or by specifying c_use_cmp. In this case i_cmp is indirectly
 //             bound to User_cmp because c_keyclass was specified, otherwise it is assumed that
 //             i_key is a built-in type that works with < and == operators).
-#define i_type Users, User, (c_keyclass | c_use_cmp)
-#include "stc/vec.h"
+#define T Users, User, (c_keyclass | c_use_cmp)
+#include <stc/vec.h>
 
 int main(void) {
     Users users = {0};

@@ -18,7 +18,7 @@ See also C++
 This is different from other containers where template parameters are defined prior to
 including each container. This works well mainly because cspan is a non-owning type.
 ```c++
-#include "stc/cspan.h"
+#include <stc/cspan.h>
 use_cspan(SpanType, ValueType);                      // Define a 1-d span with ValueType elements.
 use_cspan(SpanTypeN, ValueType, RANK);               // Define multi-dimensional span with RANK.
                                                        // RANK is the number (constant) of dimensions
@@ -139,11 +139,11 @@ void            SpanTypeN_next(SpanTypeN_iter* it);
 ```c++
 #include <stdio.h>
 #define i_key int
-#include "stc/vec.h"
+#include <stc/vec.h>
 
 #define i_key int
-#include "stc/stack.h"
-#include "stc/cspan.h"
+#include <stc/stack.h>
+#include <stc/cspan.h>
 use_cspan(intspan, int);
 
 void printMe(intspan container) {
@@ -234,7 +234,7 @@ Multi-dimension slicing (STC cspan):
 [ [Run this code](https://godbolt.org/z/fr4crj833) ]
 ```c++
 #include <stdio.h>
-#include "stc/cspan.h"
+#include <stc/cspan.h>
 use_cspan3(myspan, int); // define myspan, myspan2, myspan3.
 
 int main(void) {
@@ -273,7 +273,7 @@ Slicing cspan without and with reducing the rank:
 [ [Run this code](https://godbolt.org/z/PTh8ojenc) ]
 ```c++
 #include <stdio.h>
-#include "stc/cspan.h"
+#include <stc/cspan.h>
 
 use_cspan3(Span, int); // Shorthand to define Span, Span2, and Span3
 

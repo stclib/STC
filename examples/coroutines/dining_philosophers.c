@@ -1,8 +1,8 @@
 // https://en.wikipedia.org/wiki/Dining_philosophers_problem
 #include <stdio.h>
 #include <time.h>
-#include "stc/random.h"
-#include "stc/coroutine.h"
+#include <stc/random.h>
+#include <stc/coroutine.h>
 
 enum {num_philosophers = 5};
 enum PhState {ph_thinking, ph_hungry, ph_eating};

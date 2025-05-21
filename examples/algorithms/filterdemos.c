@@ -1,11 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "stc/cstr.h"
-#include "stc/csview.h"
-#include "stc/algorithm.h"
+#include <stc/cstr.h>
+#include <stc/csview.h>
+#include <stc/algorithm.h>
 
-#define i_type IVec,int
-#include "stc/stack.h"
+#define T IVec, int
+#include <stc/stack.h>
 
 // filters and transforms:
 #define f_skipValue(x) (*value != (x))
@@ -74,8 +74,8 @@ fn main() {
 }
 */
 // Bind and enable csview comparison functions for vec.
-#define i_type SVec, csview, (c_cmpclass | c_use_cmp)
-#include "stc/vec.h"
+#define T SVec, csview, (c_cmpclass | c_use_cmp)
+#include <stc/vec.h>
 
 void demo3(void)
 {

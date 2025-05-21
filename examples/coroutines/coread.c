@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <errno.h>
-#include "stc/cstr.h"
-#include "stc/coroutine.h"
+#include <stc/cstr.h>
+#include <stc/coroutine.h>
 
 // Read file line by line using coroutines:
 

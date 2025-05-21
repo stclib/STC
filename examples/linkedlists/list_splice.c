@@ -1,7 +1,7 @@
 #include <stdio.h>
 
-#define i_type IList, int
-#include "stc/list.h"
+#define T IList, int
+#include <stc/list.h>
 
 void print_IList(const char* s, IList list)
 {

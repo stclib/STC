@@ -1,5 +1,5 @@
-#include "stc/cstr.h"
-#include "stc/zsview.h"
+#include <stc/cstr.h>
+#include <stc/zsview.h>
 
 int main(void)
 {

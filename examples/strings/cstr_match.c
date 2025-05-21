@@ -1,5 +1,5 @@
-#include "stc/cstr.h"
-#include "stc/csview.h"
+#include <stc/cstr.h>
+#include <stc/csview.h>
 #include <stdio.h>
 
 int main(void)

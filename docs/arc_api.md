@@ -21,8 +21,8 @@ See similar c++ class [std::shared_ptr](https://en.cppreference.com/w/cpp/memory
 ## Header file and declaration
 
 ```c++
-#define i_type <ct>,<kt>[,<op>] // shorthand for defining i_type, i_key, i_opt
-#define i_type <t>       // arc container type name
+#define T <ct>,<kt>[,<op>] // shorthand
+#define T <ct>           // arc container type name
 // One of the following:
 #define i_key <t>        // key type
 #define i_keyclass <t>   // key type, and bind <t>_clone() and <t>_drop() function names
@@ -44,11 +44,11 @@ See similar c++ class [std::shared_ptr](https://en.cppreference.com/w/cpp/memory
 
 #define i_no_atomic      // Non-atomic reference counting, like Rust Rc.
 #define i_opt c_no_atomic // Same as above, but can combine other options on one line with |.
-#include "stc/arc.h"
+#include <stc/arc.h>
 ```
 When defining a container with **arc** elements, specify `#define i_keypro <arc-type>` instead of `i_key`.
 
-In the following, `X` is the value of `i_key` unless `i_type` is defined.
+In the following, `X` is the value of `i_key` unless `T` is defined.
 
 ## Methods
 ```c++
@@ -95,18 +95,18 @@ bool            arc_X_value_eq(const i_key* x, const i_key* y);
 // Create two stacks with arcs to maps.
 // Demonstrate sharing and cloning of maps.
 // Show elements dropped.
-#include "stc/cstr.h"
+#include <stc/cstr.h>
 
-#define i_type Map, cstr, int, (c_keypro) // cstr is a "pro" type
+#define T Map, cstr, int, (c_keypro) // cstr is a "pro" type
 #define i_keydrop(p) (printf("  drop name: %s\n", cstr_str(p)), cstr_drop(p))
-#include "stc/sortedmap.h"
+#include <stc/sortedmap.h>
 
 // keyclass binds _clone & _drop:
-#define i_type Arc, Map, (c_keyclass) // (Atomic) Ref. Counted pointer
-#include "stc/arc.h"   // try to switch to box.h!
+#define T Arc, Map, (c_keyclass) // (Atomic) Ref. Counted pointer
+#include <stc/arc.h>   // try to switch to box.h!
 
-#define i_type Stack, Arc, (c_keypro) // arc is "pro"
-#include "stc/stack.h"
+#define T Stack, Arc, (c_keypro) // arc is "pro"
+#include <stc/stack.h>
 
 int main(void)
 {

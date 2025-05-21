@@ -32,7 +32,7 @@ V5.0:
 - Added single/multi-dimensional generic **span** type, with numpy-like slicing.
 - Updated coroutines support with *structured concurrency* and *symmetric coroutines*.
 - Updated coroutines support with proper *error handling* and *error recovery*.
-- Template parameter `i_type` lets you define container type plus `i_key` and `i_val` (or `i_opt`) all in one line.
+- Template parameter `T` lets you define container type plus `i_key` and `i_val` (or `i_opt`) all in one line.
 - Template parameters `i_keyclass` and `i_valclass` to specify types with `_drop()` and `_clone()` functions defined.
 - Template parameters `i_keypro` and `i_valpro` to specify `cstr`, `box` and `arc` types (users may also define pro-types).
 - **hmap** now uses *Robin Hood hashing* (very fast on clang compiler).
@@ -148,8 +148,8 @@ used container type instances (more than 2-3 TUs), consider creating a separate 
 #ifndef INTVEC_H_
 #define INTVEC_H_
 #define i_header // header definitions only
-#define i_type intvec, int
-#include "stc/vec.h"
+#define T intvec, int
+#include <stc/vec.h>
 #endif
 ```
 So anyone may use the shared vec-type. Implement the shared functions in one C file (if several containers are shared,
@@ -173,8 +173,8 @@ like **cstr** and **cbits** are generic/templated. No type casting is used, so c
 templated types in C++. To specify template parameters with STC, you define them as macros prior to
 including the container, e.g.
 ```c++
-#define i_type Floats, float // Container type (name, element type)
-#include "stc/vec.h"         // "instantiate" the desired container type
+#define T Floats, float  // Container type (name, element type)
+#include <stc/vec.h>     // "instantiate" the desired container type
 #include <stdio.h>
 
 int main(void)
@@ -197,8 +197,8 @@ Switching to a different container type, e.g. a sorted set (sset):
 <!-- https://raw.githubusercontent.com/stclib/stcsingle/main/ -->
 [ [Run this code](https://godbolt.org/z/6KhzdMafd) ]
 ```c++
-#define i_type Floats, float
-#include "stc/sortedset.h" // Use a sorted set instead
+#define T Floats, float
+#include <stc/sortedset.h> // Use a sorted set instead
 #include <stdio.h>
 
 int main(void)
@@ -229,20 +229,22 @@ Let's make a vector of vectors, which can be cloned. All of its element vectors 
 [ [Run this code](https://godbolt.org/z/dqfr41Mcc) ]
 ```c++
 #include <stdio.h>
-#include "stc/algorithm.h"
+#include <stc/algorithm.h>
 
-#define i_type Vec, float
+#define T Vec, float
 #define i_use_cmp        // enable default ==, < and hash operations
-#include "stc/vec.h"
+#include <stc/vec.h>
 
-#define i_type Vec2D
+#define T Vec2D
 #define i_keyclass Vec   // Use i_keyclass when key type has "members" _clone() and _drop().
 #define i_use_eq         // vec does not have _cmp(), but it has _eq()
-#include "stc/vec.h"
+#include <stc/vec.h>
 
-// The above may be written as a one-liner (note the c_-prefix instead of i_):
-//#define i_type Vec2D, Vec, (c_keyclass | c_use_eq)
-//#include "stc/vec.h"
+// The above may be written as a one-liners (note the c_-prefix instead of i_):
+// #define T Vec, float, (c_use_cmp)
+// #include <stc/vec.h>
+// #define T Vec2D, Vec, (c_keyclass | c_use_eq)
+// #include <stc/vec.h>
 
 int main(void)
 {
@@ -278,21 +280,21 @@ This example uses four different container types:
 ```c++
 #include <stdio.h>
 
-#define i_type hset_int, int
-#include "stc/hashset.h"   // unordered/hash set (assume i_key is basic type, uses `==` operator)
+#define T hset_int, int
+#include <stc/hashset.h>   // unordered/hash set (assume i_key is basic type, uses `==` operator)
 
 struct Point { float x, y; };
 // Define cvec_pnt and enable linear search by defining i_eq
-#define i_type vec_pnt, struct Point
+#define T vec_pnt, struct Point
 #define i_eq(a, b) (a->x == b->x && a->y == b->y)
-#include "stc/vec.h"    // vector of struct Point
+#include <stc/vec.h>    // vector of struct Point
 
 // enable sort/search. Use native `<` and `==` operators
-#define i_type list_int, int, (c_use_cmp)
-#include "stc/list.h"   // singly linked list
+#define T list_int, int, (c_use_cmp)
+#include <stc/list.h>   // singly linked list
 
-#define i_type smap_int, int, int
-#include "stc/sortedmap.h"  // sorted map int => int
+#define T smap_int, int, int
+#include <stc/sortedmap.h>  // sorted map int => int
 
 int main(void)
 {
@@ -382,7 +384,7 @@ Benchmark notes:
 
 1. ***Centralized analysis of template parameters***. The analyser assigns values to all
 non-specified template parameters using meta-programming. You may specify a set of "standard"
-template parameters for each container, but as a minimum *only one is required*: `i_type` or
+template parameters for each container, but as a minimum *only one is required*: `T` or
 `i_key` (+ `i_val` for maps). In this case, STC assumes that the elements are of basic types.
 For non-trivial types, additional template parameters must be given.
 2. ***Alternative lookup and insert type***. Specify an alternative type to use for
@@ -394,8 +396,8 @@ as an alternative to `vec_cstr_push(&vec, cstr_from("Hello"))`.
 3. ***Standardized container iterators***. All containers can be iterated in the same manner, and all use the
 same element access syntax. The following works for single-element type containers, e.g a linked list:
 ```c++
-#define i_type MyInts, int
-#include "stc/list.h"
+#define T MyInts, int
+#include <stc/list.h>
 ...
 MyInts ints = c_make(MyInts, {3, 5, 9, 7, 2});
 for (c_each(it, MyInts, ints)) *it.ref += 42;
@@ -409,7 +411,7 @@ for (c_each(it, MyInts, ints)) *it.ref += 42;
 - Naming conventions
     - Non-templated container names are prefixed by `c`, e.g. `cstr`, `cbits`, `cregex`.
     - Public STC macros and "keywords" are prefixed by `c_`, e.g. `c_each`, `c_make`.
-    - Template parameter macros are prefixed by `i_`, e.g. `i_key`, `i_type`.
+    - Template parameter macros are prefixed by `i_`, e.g. `i_key`, `T`.
     - All owning containers can be initialized with `{0}` (also `cstr`), i.e. no heap allocation initially.
 
 - Common types defined for any container type Cnt:
@@ -453,35 +455,35 @@ for (c_each(it, MyInts, ints)) *it.ref += 42;
 
 The container template parameters are specified with a `#define i_xxxx` statement. Each templated
 type instantiation requires an `#include` statement, even if the same container base type was
-included earlier. Normally it is sufficient to only define `i_type` before including a container:
+included earlier. Normally it is sufficient to only define `T` before including a container:
 
 ```c
-#define i_type ContainerType, KeyType[, ValType][, (Options)]
+#define T ContainerType, KeyType[, ValType][, (Options)]
 ```
 
 Examples of container definitions:
 
 A sortedmap of **int** => **float**:
 ```c++
-#define i_type IntfMap, int, float
-#include "stc/sortedmap.h"
+#define T IntfMap, int, float
+#include <stc/sortedmap.h>
 ```
 
 A hashmap of **int** => string
 ```c++
-#define i_type StrMap, int, cstr, (c_valpro) // cstr is a "pro" type
-#include "stc/hashmap.h"
+#define T StrMap, int, cstr, (c_valpro) // cstr is a "pro" type
+#include <stc/hashmap.h>
 ```
 
 A vector of searchable string vectors:
 ```c++
-#define i_type StrVec, cstr, (c_keypro | c_use_eq) // enable vector linear search (find).
-#include "stc/vec.h"
-#define i_type StrVecVec, StrVec, (c_keyclass) // container as element has "class" properties
-#include "stc/vec.h"
+#define T StrVec, cstr, (c_keypro | c_use_eq) // enable vector linear search (find).
+#include <stc/vec.h>
+#define T StrVecVec, StrVec, (c_keyclass) // container as element has "class" properties
+#include <stc/vec.h>
 ```
 The **c_keypro** and **c_keyclass** are *options*, and is specified as the last comma-separated argument
-of the `i_type` template parameter. They associate the (key) element type name with a set of standard
+of the `T` template parameter. They associate the (key) element type name with a set of standard
 named "member" functions and assigns them to template parameters. These are then used during the
 implementation of the container. NB! Note that the associated/bound "member" functions are only
 required to be implemented if the container actually use them. Option flags are boolean properties,
@@ -530,7 +532,7 @@ Only `i_key` is strictly required to be defined for simple non-maps:
 ---
 
 ### Meta template parameters (advanced / internal)
-Normally it is simplest to specify the meta-template parameters via the *option* argument to `i_type`,
+Normally it is simplest to specify the meta-template parameters via the *option* argument to `T`,
 however, they can be specified as separate template parameters as well. Specifically, `i_cmpclass`
 can be specified as a different type than `i_key` (**c_cmpclass** always makes it equal to `i_key`).
 This enables a container to be associated with an additional alternative "raw" input key/val-type,
@@ -624,10 +626,10 @@ Strings are the most commonly used non-trivial data type. STC containers have pr
 definitions for cstr container elements, so they are fail-safe to use both with the **emplace**
 and non-emplace methods:
 ```c++
-#include "stc/cstr.h"
+#include <stc/cstr.h>
 
 #define i_keypro cstr  // use i_keypro for "pro" types like cstr, arc, box
-#include "stc/vec.h"   // vector of string (cstr)
+#include <stc/vec.h>   // vector of string (cstr)
 ...
 vec_cstr vec = {0};
 cstr s = cstr_lit("a string literal");
@@ -687,12 +689,12 @@ last example on the **hmap** page demonstrates how to specify a map with non-tri
 
 ## User-defined container type name
 
-Define `i_type` and/or `i_key`:
+Define `T` and/or `i_key`:
 ```c++
-// #define i_type MyVec, int // shorthand
-#define i_type MyVec
+// #define T MyVec, int // shorthand
+#define T MyVec
 #define i_key int
-#include "stc/vec.h"
+#include <stc/vec.h>
 
 MyVec vec = {0};
 MyVec_push(&vec, 42);
@@ -710,7 +712,7 @@ member of a struct defined in a header file.
 // Dataset.h
 #ifndef Dataset_H_
 #define Dataset_H_
-#include "stc/types.h"   // include various container data structure templates
+#include <stc/types.h>   // include various container data structure templates
 
 // declare PointVec as a vec. Also struct Point may be incomplete/undeclared.
 declare_vec(PointVec, struct Point);
@@ -731,9 +733,9 @@ Define and use the "private" container in the c-file:
 #include "Dataset.h"
 #include "Point.h"      // struct Point must be defined here.
 
-#define i_type PointVec, struct Point
+#define T PointVec, struct Point
 #define i_declared      // must flag that the container was pre-declared.
-#include "stc/vec.h"    // Implements PointVec with static linking by default
+#include <stc/vec.h>    // Implements PointVec with static linking by default
 ...
 ```
 </details>
@@ -772,9 +774,9 @@ allocated size of the given pointer, unlike standard `realloc` and `free`.
 ```
 Usage is straight forward:
 ```c++
-#define i_type IMap, int, int
+#define T IMap, int, int
 #include "stcpgs.h"
-#include "stc/sortedmap.h"
+#include <stc/sortedmap.h>
 
 void maptest()
 {
@@ -794,7 +796,7 @@ Another example is to sort struct elements by the *active field* and *reverse* f
 ```c++
 #include <stdio.h>
 #include <time.h>
-#include "stc/cstr.h"
+#include <stc/cstr.h>
 #include <c11/fmt.h>
 
 typedef struct {
@@ -810,11 +812,11 @@ struct FMDVector_aux; // defined when specifying i_aux
 int FileMetaData_cmp(const struct FMDVector_aux*, const FileMetaData*, const FileMetaData*);
 void FileMetaData_drop(FileMetaData*);
 
-#define i_type FMDVector, FileMetaData, (c_no_clone)
+#define T FMDVector, FileMetaData, (c_no_clone)
 #define i_aux { enum FMDActive activeField; bool reverse; }
 #define i_cmp(x, y) FileMetaData_cmp(&self->aux, x, y)
 #define i_keydrop FileMetaData_drop
-#include "stc/stack.h"
+#include <stc/stack.h>
 // --------------
 
 int FileMetaData_cmp(const struct FMDVector_aux* aux, const FileMetaData* a, const FileMetaData* b) {
@@ -923,8 +925,8 @@ STC is generally very memory efficient. Memory usage for the different container
 - **cspan**: Added **column-major** order (fortran) multidimensional spans and transposed views (changed representation of strides).
 - All new faster and smaller **queue** and **deque** implementations, using a circular buffer.
 - Renamed i_extern => `i_import` (i_extern deprecated).
-    - Define `i_import` before `#include "stc/cstr.h"` will also define full utf8 case conversions.
-    - Define `i_import` before `#include "stc/cregex.h"` will also define cstr + utf8 tables.
+    - Define `i_import` before `#include <stc/cstr.h>` will also define full utf8 case conversions.
+    - Define `i_import` before `#include <stc/cregex.h>` will also define cstr + utf8 tables.
 - Renamed c_make() => ***c_make()*** macro for initializing containers with element lists. c_make deprecated.
 - Removed deprecated uppercase flow-control macro names.
 - Other smaller additions, bug fixes and improved documentation.
@@ -940,7 +942,7 @@ STC is generally very memory efficient. Memory usage for the different container
 - Removed RAII macros usage from examples
 - Renamed c_flt_count(i) => `c_flt_counter(i)`
 - Renamed c_flt_last(i) => `c_flt_getcount(i)`
-- Renamed c_ARRAYLEN() => c_arraylen()
+- Renamed c_ARRAYLEN() => c_countof()
 - Removed deprecated c_ARGSV(). Use c_svarg()
 - Removed c_PAIR
 

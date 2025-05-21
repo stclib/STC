@@ -1,8 +1,8 @@
 #include <errno.h>
-#include "stc/cstr.h"
+#include <stc/cstr.h>
 
 #define i_keypro cstr
-#include "stc/vec.h"
+#include <stc/vec.h>
 
 vec_cstr read_file(const char* name)
 {

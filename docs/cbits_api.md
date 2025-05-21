@@ -13,12 +13,12 @@ for a functional description.
 All cbits definitions and prototypes are available by including a single header file.
 
 ```c++
-// if i_type is defined, the bitset will be fixed-size of N bits on the stack, and with the given type name.
-#define i_type MyBits, MY_MAX_BITS
-#include "stc/cbits.h"
+// if T is defined, the bitset will be fixed-size of N bits on the stack, and with the given type name.
+#define T MyBits, MY_MAX_BITS
+#include <stc/cbits.h>
 
 // otherwise, just include the header. The type name is cbits, data will be dynamically allocated.
-#include "stc/cbits.h"
+#include <stc/cbits.h>
 ```
 ## Methods
 
@@ -73,7 +73,7 @@ void            cbits_xor(cbits* self, const cbits* other);             // set o
 
 ## Example
 ```c++
-#include "stc/cbits.h"
+#include <stc/cbits.h>
 #include <stdio.h>
 #include <math.h>
 #include <time.h>

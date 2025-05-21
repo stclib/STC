@@ -1,8 +1,8 @@
 #include <stdio.h>
-#include "stc/random.h"
+#include <stc/random.h>
 
-#define i_type queue_i, int
-#include "stc/queue.h"
+#define T queue_i, int
+#include <stc/queue.h>
 
 int main(void) {
     int n = 1000000;

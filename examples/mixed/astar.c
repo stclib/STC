@@ -4,7 +4,7 @@
 // This is a reimplementation of the CTL example to STC:
 //     https://github.com/glouw/ctl/blob/master/examples/astar.c
 //     https://www.redblobgames.com/pathfinding/a-star/introduction.html
-#include "stc/cstr.h"
+#include <stc/cstr.h>
 #include <stdio.h>
 
 typedef struct
@@ -55,20 +55,20 @@ point_key_cmp(const point* a, const point* b)
     return (i == j) ? 0 : (i < j) ? -1 : 1;
 }
 
-#define i_type pqueue_pnt, point
+#define T pqueue_pnt, point
 #define i_cmp point_cmp_priority
-#include "stc/pqueue.h"
+#include <stc/pqueue.h>
 
-#define i_type deque_pnt, point
-#include "stc/deque.h"
+#define T deque_pnt, point
+#include <stc/deque.h>
 
-#define i_type smap_pcost, point,int
+#define T smap_pcost, point,int
 #define i_cmp point_key_cmp
-#include "stc/sortedmap.h"
+#include <stc/sortedmap.h>
 
-#define i_type smap_pstep, point,point
+#define T smap_pstep, point,point
 #define i_cmp point_key_cmp
-#include "stc/sortedmap.h"
+#include <stc/sortedmap.h>
 
 
 deque_pnt
@@ -99,7 +99,7 @@ astar(cstr* maze, int width)
                 { -1,  0, 0, width }, /* ~ ~ ~ ~ ~ ~ ~ */  { 1,  0, 0, width },
                 { -1, -1, 0, width }, { 0, -1, 0, width }, { 1, -1, 0, width },
             };
-            for (size_t i = 0; i < c_arraylen(deltas); i++)
+            for (size_t i = 0; i < c_countof(deltas); i++)
             {
                 point delta = deltas[i];
                 point next = point_init(current.x + delta.x, current.y + delta.y, width);

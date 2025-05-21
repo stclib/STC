@@ -140,6 +140,9 @@ STC_INLINE bool _cbits_disjoint(const uintptr_t* set, const uintptr_t* other, co
 
 #endif // STC_CBITS_H_INCLUDED
 
+#if defined T
+  #define i_type T
+#endif
 #if defined i_type
   #define Self c_GETARG(1, i_type)
   #define _i_length c_GETARG(2, i_type)

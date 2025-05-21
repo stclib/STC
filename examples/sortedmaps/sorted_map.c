@@ -1,64 +1,64 @@
 // https://iq.opengenus.org/containers-cpp-stl/
 
 #include <stdio.h>
-#define i_type smap_int, int, int
-#include "stc/sortedmap.h"
+#define T Mymap, int, int
+#include <stc/sortedmap.h>
 
 int main(void)
 {
-    smap_int gquiz1 = {0}, gquiz2 = {0};
+    Mymap gquiz1 = {0}, gquiz2 = {0};
     c_defer(
-        smap_int_drop(&gquiz1),
-        smap_int_drop(&gquiz2)
+        Mymap_drop(&gquiz1),
+        Mymap_drop(&gquiz2)
     ){
         // insert elements in random order
-        smap_int_insert(&gquiz1, 2, 30);
-        smap_int_insert(&gquiz1, 4, 20);
-        smap_int_insert(&gquiz1, 7, 10);
-        smap_int_insert(&gquiz1, 5, 50);
-        smap_int_insert(&gquiz1, 3, 60);
-        smap_int_insert(&gquiz1, 1, 40);
-        smap_int_insert(&gquiz1, 6, 50);
+        Mymap_insert(&gquiz1, 2, 30);
+        Mymap_insert(&gquiz1, 4, 20);
+        Mymap_insert(&gquiz1, 7, 10);
+        Mymap_insert(&gquiz1, 5, 50);
+        Mymap_insert(&gquiz1, 3, 60);
+        Mymap_insert(&gquiz1, 1, 40);
+        Mymap_insert(&gquiz1, 6, 50);
 
         // printing map gquiz1
         printf("\nThe map gquiz1 is :\n\tKEY\tELEMENT\n");
-        for (c_each(itr, smap_int, gquiz1))
+        for (c_each(itr, Mymap, gquiz1))
             printf("\t%d\t%d\n", itr.ref->first, itr.ref->second);
         printf("\n");
 
         // assigning the elements from gquiz1 to gquiz2
-        for (c_each(i, smap_int, gquiz1))
-            smap_int_insert(&gquiz2, i.ref->first, i.ref->second);
+        for (c_each(i, Mymap, gquiz1))
+            Mymap_insert(&gquiz2, i.ref->first, i.ref->second);
 
         // print all elements of the map gquiz2
         printf("\nThe map gquiz2 is :\n\tKEY\tELEMENT\n");
-        for (c_each(itr, smap_int, gquiz2))
+        for (c_each(itr, Mymap, gquiz2))
             printf("\t%d\t%d\n", itr.ref->first, itr.ref->second);
         printf("\n");
 
         // remove all elements up to element with key=3 in gquiz2
         printf("\ngquiz2 after removal of elements less than key=3 :\n");
         printf("\tKEY\tELEMENT\n");
-        smap_int_erase_range(&gquiz2, smap_int_begin(&gquiz2),
-                                       smap_int_find(&gquiz2, 3));
-        for (c_each(itr, smap_int, gquiz2))
+        Mymap_erase_range(&gquiz2, Mymap_begin(&gquiz2),
+                                   Mymap_find(&gquiz2, 3));
+        for (c_each(itr, Mymap, gquiz2))
             printf("\t%d\t%d\n", itr.ref->first, itr.ref->second);
         printf("\n");
 
         // remove all elements with key = 4
-        int num = smap_int_erase(&gquiz2, 4);
+        int num = Mymap_erase(&gquiz2, 4);
         printf("\ngquiz2.erase(4) : %d removed\n", num);
         printf("\tKEY\tELEMENT\n");
-        for (c_each(itr, smap_int, gquiz2))
+        for (c_each(itr, Mymap, gquiz2))
             printf("\t%d\t%d\n", itr.ref->first, itr.ref->second);
         printf("\n");
 
         // lower bound and upper bound for map gquiz1 key = 5
         printf("gquiz1.lower_bound(5) : ");
-        printf("\tKEY = %d\t", smap_int_lower_bound(&gquiz1, 5).ref->first);
-        printf("\tELEMENT = %d\n", smap_int_lower_bound(&gquiz1, 5).ref->second);
+        printf("\tKEY = %d\t", Mymap_lower_bound(&gquiz1, 5).ref->first);
+        printf("\tELEMENT = %d\n", Mymap_lower_bound(&gquiz1, 5).ref->second);
         printf("gquiz1.upper_bound(5) : ");
-        printf("\tKEY = %d\t", smap_int_lower_bound(&gquiz1, 5+1).ref->first);
-        printf("\tELEMENT = %d\n", smap_int_lower_bound(&gquiz1, 5+1).ref->second);
+        printf("\tKEY = %d\t", Mymap_lower_bound(&gquiz1, 5+1).ref->first);
+        printf("\tELEMENT = %d\n", Mymap_lower_bound(&gquiz1, 5+1).ref->second);
     }
 }

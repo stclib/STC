@@ -1,8 +1,8 @@
 // https://doc.rust-lang.org/std/collections/struct.HashMap.html
-#include "stc/cstr.h"
+#include <stc/cstr.h>
 #define i_keypro cstr
 #define i_valpro cstr
-#include "stc/hmap.h"
+#include <stc/hashmap.h>
 
 // Type inference lets us omit an explicit type signature (which
 // would be `HashMap<String, String>` in this example).
@@ -41,7 +41,7 @@ int main(void)
 
     // Look up the values associated with some keys.
     const char* to_find[] = {"Pride and Prejudice", "Alice's Adventure in Wonderland"};
-    for (c_range(i, c_arraylen(to_find))) {
+    for (c_range(i, c_countof(to_find))) {
         const hmap_cstr_value* b = hmap_cstr_get(&book_reviews, to_find[i]);
         if (b)
             printf("%s: %s\n", cstr_str(&b->first), cstr_str(&b->second));

@@ -1,5 +1,5 @@
-#include "stc/cstr.h"
-#include "stc/types.h"
+#include <stc/cstr.h>
+#include <stc/types.h>
 
 declare_sortedmap(PntMap, struct Point, int);
 
@@ -16,16 +16,16 @@ int Point_cmp(const Point* a, const Point* b) {
     return c ? c : a->y - b->y;
 }
 
-#define i_type PntMap, Point, int, (c_cmpclass | c_declared)
-#include "stc/sortedmap.h"
+#define T PntMap, Point, int, (c_cmpclass | c_declared)
+#include <stc/sortedmap.h>
 
 // cstr => cstr map
-#define i_type StrMap, cstr, cstr, (c_keypro | c_valpro)
-#include "stc/sortedmap.h"
+#define T StrMap, cstr, cstr, (c_keypro | c_valpro)
+#include <stc/sortedmap.h>
 
 // cstr set
-#define i_type StrSet, cstr, (c_keypro)
-#include "stc/sortedset.h"
+#define T StrSet, cstr, (c_keypro)
+#include <stc/sortedset.h>
 
 
 int main(void)

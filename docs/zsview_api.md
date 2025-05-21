@@ -16,7 +16,7 @@ storage. It keeps the length of the string, i.e. no need to call *strlen()* for 
 All zsview definitions and prototypes are available by including a single header file.
 
 ```c++
-#include "stc/zsview.h"
+#include <stc/zsview.h>
 ```
 
 ## Methods
@@ -78,8 +78,8 @@ bool            zsview_ieq(const zsview* s1, const zsview* s2);     // "
 
 ## Example: UTF8 iteration and case conversion
 ```c++
-#include "stc/cstr.h"
-#include "stc/zsview.h"
+#include <stc/cstr.h>
+#include <stc/zsview.h>
 
 int main(void)
 {

@@ -8,8 +8,8 @@ See the c++ class [std::priority_queue](https://en.cppreference.com/w/cpp/contai
 ## Header file and declaration
 
 ```c++
-#define i_type <ct>,<kt>[,<op>] // shorthand for defining i_type, i_key, i_opt
-#define i_type <t>       // pqueue container type name (default: pqueue_{i_key})
+#define T <ct>,<kt>[,<op>] // shorthand for defining T, i_key, i_opt
+#define T <ct>           // pqueue container type name (default: pqueue_{i_key})
 // One of the following:
 #define i_key <t>        // key type
 #define i_keyclass <t>   // key type, and bind <t>_clone() and <t>_drop() function names
@@ -27,9 +27,9 @@ See the c++ class [std::priority_queue](https://en.cppreference.com/w/cpp/contai
 #define i_keyfrom <fn>   // conversion func i_keyraw => i_key
 #define i_keytoraw <fn>  // conversion func i_key* => i_keyraw.
 
-#include "stc/pqueue.h"
+#include <stc/pqueue.h>
 ```
-In the following, `X` is the value of `i_key` unless `i_type` is defined.
+In the following, `X` is the value of `i_key` unless `T` is defined.
 
 ## Methods
 
@@ -75,11 +75,11 @@ i_key           pqueue_X_value_clone(const pqueue_X* self, i_key value);
 [ [Run this code](https://godbolt.org/z/5rYPEaavW) ]
 ```c++
 #include <stdio.h>
-#include "stc/random.h"
+#include <stc/random.h>
 
-#define i_type PriorityQ, int32
+#define T PriorityQ, int32
 #define i_cmp -c_default_cmp // min-heap
-#include "stc/pqueue.h"
+#include <stc/pqueue.h>
 
 int main(void)
 {
@@ -92,7 +92,7 @@ int main(void)
 
     // Add some negative ones.
     int32 nums[] = {-231, -32, -873, -4, -343};
-    for (c_range(i, c_arraylen(nums)))
+    for (c_range(i, c_countof(nums)))
         PriorityQ_push(&numbers, nums[i]);
 
     for (c_range(N/2))

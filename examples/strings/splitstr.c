@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include "stc/cregex.h"
-#include "stc/csview.h"
+#include <stc/cregex.h>
+#include <stc/csview.h>
 
 int main(void)
 {

@@ -67,10 +67,10 @@
   #define i_valpro cstr
   #define i_tag str
 #endif
-#ifdef i_TYPE            // [deprecated]
-  #define i_type i_TYPE
-#endif
 
+#ifdef T
+  #define i_type T
+#endif
 #if defined i_type && c_NUMARGS(i_type) > 1
   #define Self c_GETARG(1, i_type)
   #define i_key c_GETARG(2, i_type)

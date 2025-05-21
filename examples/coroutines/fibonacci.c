@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "stc/coroutine.h"
+#include <stc/coroutine.h>
 
 // Use coroutine to create a fibonacci sequence generator:
 
