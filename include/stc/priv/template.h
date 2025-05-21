@@ -68,7 +68,7 @@
   #define i_tag str
 #endif
 
-#ifdef T
+#if defined T && !defined i_type
   #define i_type T
 #endif
 #if defined i_type && c_NUMARGS(i_type) > 1

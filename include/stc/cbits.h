@@ -140,7 +140,7 @@ STC_INLINE bool _cbits_disjoint(const uintptr_t* set, const uintptr_t* other, co
 
 #endif // STC_CBITS_H_INCLUDED
 
-#if defined T
+#if defined T && !defined i_type
   #define i_type T
 #endif
 #if defined i_type

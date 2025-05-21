@@ -79,6 +79,9 @@ int main(void) {
   #include "common.h"
 
   #define _i_is_array
+  #if defined T && !defined i_type
+    #define i_type T
+  #endif
   #if defined i_type && !defined i_key
     #define Self c_GETARG(1, i_type)
     #define i_key c_GETARG(2, i_type)
