@@ -155,24 +155,22 @@
 // c_min, c_max, c_min_n, c_max_n
 // --------------------------------
 
-#define c_min32(...) _c_MINMAX(int32, c_min32_n, __VA_ARGS__)
-#define c_min(...) _c_MINMAX(isize, c_min_n, __VA_ARGS__)
-#define c_umin(...) _c_MINMAX(size_t, c_umin_n, __VA_ARGS__)
-#define c_fmin(...) _c_MINMAX(float, c_fmin_n, __VA_ARGS__)
-#define c_dmin(...) _c_MINMAX(double, c_dmin_n, __VA_ARGS__)
-#define c_max32(...) _c_MINMAX(int32, c_max32_n, __VA_ARGS__)
-#define c_max(...) _c_MINMAX(isize, c_max_n, __VA_ARGS__)
-#define c_umax(...) _c_MINMAX(size_t, c_umax_n, __VA_ARGS__)
-#define c_fmax(...) _c_MINMAX(float, c_fmax_n, __VA_ARGS__)
-#define c_dmax(...) _c_MINMAX(double, c_dmax_n, __VA_ARGS__)
+#define c_min32(...) c_min32_n(c_make_array(int32_t, {__VA_ARGS__}), c_NUMARGS(__VA_ARGS__))
+#define c_min(...) c_min_n(c_make_array(isize, {__VA_ARGS__}), c_NUMARGS(__VA_ARGS__))
+#define c_umin(...) c_umin_n(c_make_array(size_t, {__VA_ARGS__}), c_NUMARGS(__VA_ARGS__))
+#define c_fmin(...) c_fmin_n(c_make_array(float, {__VA_ARGS__}), c_NUMARGS(__VA_ARGS__))
+#define c_dmin(...) c_dmin_n(c_make_array(double, {__VA_ARGS__}), c_NUMARGS(__VA_ARGS__))
+#define c_max32(...) c_max32_n(c_make_array(int32_t, {__VA_ARGS__}), c_NUMARGS(__VA_ARGS__))
+#define c_max(...) c_max_n(c_make_array(isize, {__VA_ARGS__}), c_NUMARGS(__VA_ARGS__))
+#define c_umax(...) c_umax_n(c_make_array(size_t, {__VA_ARGS__}), c_NUMARGS(__VA_ARGS__))
+#define c_fmax(...) c_fmax_n(c_make_array(float, {__VA_ARGS__}), c_NUMARGS(__VA_ARGS__))
+#define c_dmax(...) c_dmax_n(c_make_array(double, {__VA_ARGS__}), c_NUMARGS(__VA_ARGS__))
 
-#define _c_MINMAX(T, fn, ...) \
-    fn(c_make_array(T, {__VA_ARGS__}), c_NUMARGS(__VA_ARGS__))
-#define _c_minmax(T, fn, cmp) \
+#define _c_minmax(T, fn, opr) \
     STC_INLINE T fn(const T a[], int n) { \
-        T _x = a[0]; \
-        for (int i = 1; i < n; ++i) if (a[i] cmp _x) _x = a[i]; \
-        return _x; \
+        T x = a[0]; \
+        for (int i = 1; i < n; ++i) if (a[i] opr x) x = a[i]; \
+        return x; \
     }
 _c_minmax(int32_t, c_min32_n, <)
 _c_minmax(isize, c_min_n, <)

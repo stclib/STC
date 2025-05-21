@@ -13,7 +13,7 @@ cc=gcc; cflags="-s -O3 $common"
 #cc=gcc; cflags="-g $sanitize $common"
 #cc=gcc; cflags="-x c++ -std=c++17 -O2 -s -DSTC_IMPLEMENT -Di_import"
 #cc=tcc; cflags="-std=c99"
-#cc=cl; cflags="-nologo -O2 -MD -W3 -c -std:c11 -wd4003"
+#cc=cl; cflags="-nologo -O2 -MD -W3 -std:c11 -wd4003"
 #cc=cl; cflags="-nologo -c -TP -std:c++20 -wd4003 -DSTC_IMPLEMENT -Di_import"
 
 if [ "$cc" = "cl" ]; then
@@ -38,8 +38,8 @@ else
 fi
 
 INC=
-#INC=-I../../include
-#INC=-I../../../stcsingle
+#INC=-I../include
+#INC=-I../../stcsingle
 #CPATH=
 if [ $run = 0 ] ; then
     for i in */*.c ; do
@@ -47,7 +47,8 @@ if [ $run = 0 ] ; then
         #out=$(dirname $i)/$(basename $i .c).exe
         #echo $comp -I../../../stcsingle $i $clibs $oflag$out
         echo $comp $INC $i $clibs $oflag$out
-        $comp $INC $i $clibs $oflag$out -lstc
+        #$comp $INC $i $clibs $oflag$out -lstc
+        $comp $INC $i $clibs $oflag$out -I../include -DSTC_STATIC
     done
 else
     for i in */*.c ; do

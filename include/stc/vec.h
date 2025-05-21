@@ -86,8 +86,12 @@ STC_API _m_iter         _c_MEMB(_insert_uninit)(Self* self, isize idx, isize n);
 #if defined _i_has_eq
 STC_API _m_iter         _c_MEMB(_find_in)(const Self* self, _m_iter it1, _m_iter it2, _m_raw raw);
 #endif // _i_has_eq
-STC_INLINE Self         _c_MEMB(_init)(void) { return c_literal(Self){0}; }
-STC_INLINE void         _c_MEMB(_value_drop)(const Self* self, _m_value* val) { (void)self; i_keydrop(val); }
+
+STC_INLINE Self _c_MEMB(_init)(void)
+    { return c_literal(Self){0}; }
+
+STC_INLINE void _c_MEMB(_value_drop)(const Self* self, _m_value* val)
+    { (void)self; i_keydrop(val); }
 
 STC_INLINE Self _c_MEMB(_move)(Self *self) {
     Self m = *self;

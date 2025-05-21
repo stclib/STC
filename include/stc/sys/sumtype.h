@@ -97,11 +97,11 @@ int main(void) {
 
 #define c_sumtype(T, ...) \
     typedef union T T; \
-    enum enum_##T { c_EVAL(c_LOOP(_c_vartuple_tag, T, _c_enum_1 __VA_ARGS__, (0),)) }; \
-    c_EVAL(c_LOOP(_c_vartuple_type, T,  __VA_ARGS__, (0),)) \
+    enum enum_##T { c_EVAL(c_LOOP(_c_vartuple_tag, T, _c_enum_1 __VA_ARGS__, (0))) }; \
+    c_EVAL(c_LOOP(_c_vartuple_type, T,  __VA_ARGS__, (0))) \
     union T { \
         struct { enum enum_##T tag; } _any_; \
-        c_EVAL(c_LOOP(_c_vartuple_var, T, __VA_ARGS__, (0),)) \
+        c_EVAL(c_LOOP(_c_vartuple_var, T, __VA_ARGS__, (0))) \
     }
 
 #if defined STC_HAS_TYPEOF && STC_HAS_TYPEOF
@@ -134,13 +134,24 @@ int main(void) {
                 for (Tag##_type *x = &_vp2->Tag.var; x; x = NULL
 #endif
 
+// Handling multiple tags with different payloads:
 #define c_is(...) c_MACRO_OVERLOAD(c_is, __VA_ARGS__)
 #define c_is_1(Tag) \
     break; case Tag:
 
-// With different payloads
 #define c_or_is(Tag) \
     ; case Tag:
+
+// Type checked multiple tags with same payload:
+#define c_is_same(...) c_MACRO_OVERLOAD(c_is_same, __VA_ARGS__)
+#define _c_chk(Tag1, Tag2) \
+    case 1 ? Tag1 : sizeof((Tag1##_type*)0 == (Tag2##_type*)0):
+#define c_is_same_2(Tag1, Tag2) \
+    break; _c_chk(Tag1, Tag2) case Tag2:
+#define c_is_same_3(Tag1, Tag2, Tag3) \
+    break; _c_chk(Tag1, Tag2) _c_chk(Tag2, Tag3) case Tag3:
+#define c_is_same_4(Tag1, Tag2, Tag3, Tag4) \
+    break; _c_chk(Tag1, Tag2) _c_chk(Tag2, Tag3) _c_chk(Tag3, Tag4) case Tag4:
 
 #define c_otherwise \
     break; default:
@@ -152,6 +163,9 @@ int main(void) {
     ((int)(varptr)->_any_.tag)
 
 #define c_holds_tag(varptr, Tag) \
-    ((varptr)->_any_.tag == Tag)
+    ((varptr)->Tag.tag == Tag)
+
+#define c_get(varptr, Tag) \
+    (c_holds_tag(varptr, Tag) ? &(varptr)->Tag.var : NULL)
 
 #endif // STC_SUMTYPE_H_INCLUDED

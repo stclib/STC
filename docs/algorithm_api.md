@@ -122,9 +122,9 @@ For-loop variant of `c_filter`in generic algorithms.
 int main(void) {
     IVec vec = c_make(IVec, {0, 1, 2, 3, 4, 5, 80, 6, 7, 80, 8, 9, 80,
                              10, 11, 12, 13, 14, 15, 80, 16, 17});
-	#define ff_skipValue(i, x) (*i.ref != (x))
-	#define ff_isEven(i) ((*i.ref & 1) == 0)
-	#define ff_square(i) (*i.ref * *i.ref)
+    #define ff_skipValue(i, x) (*i.ref != (x))
+    #define ff_isEven(i) ((*i.ref & 1) == 0)
+    #define ff_square(i) (*i.ref * *i.ref)
 
     int sum = 0;
     for (c_ffilter(i, IVec, vec, true
@@ -157,29 +157,32 @@ Synopsis:
 ```c++
 // Define a sum type
 c_sumtype (SumType,
-    (VariantEnumA, VariantTypeA),
-    (VariantEnumB, VariantTypeB),
-    (VariantEnumC, VariantEnumB_type), // use same payload type as VariantEnumB
+    (VariantTagA, VariantTypeA),
+    (VariantTagB, VariantTypeB),
+    (VariantTagC, VariantTagB_type), // use same payload type as VariantTagB
     ...
-    (VariantEnumN, VariantTypeN),      // optional final comma
+    (VariantTagN, VariantTypeN),      // optional final comma
 );
 
-SumType c_variant(VariantEnum tag, VariantType value);    // Sum type constructor
-bool    c_holds_tag(const SumType* obj, VariantEnum tag); // does obj hold VariantType?
-int     c_tag_index(SumType* obj);                        // 1-based index (mostly for debug)
+SumType           c_variant(VariantTag tag, VariantType value); // Sum type constructor
+bool              c_holds_tag(const SumType* obj, VariantTag tag); // Does obj hold VariantType?
+int               c_tag_index(SumType* obj);               // 1-based index (mostly for debug)
+VariantTag_type*  c_get(SumType* obj, VariantTag tag);     // NULL if tag does does not match what it holds.
 
 // Use a sum type (1)
 c_when (SumType* obj) {
-    c_is(VariantEnumA, VariantEnumA_type* x)
+    c_is(VariantTagA, VariantTagA_type* x)
         ActionA(x);
-    c_is(VariantEnumX) c_or_is(VariantEnumY)             // different payload types
+    c_is_same(VariantTagB, VariantTagC, VariantTagD)       // same payload types (checked)
+        ActionBCD(obj->VariantTagB.var);
+    c_is(VariantTagX) c_or_is(VariantTagY)                 // different payload types
         ActionXY();
-    c_otherwise                                          // optional, removes exhaustiveness-check
-        ActionElse();
+    c_otherwise                                            // optional, removes exhaustiveness-check
+        ActionElse(obj);
 }
 
 // Use a sum type (2)
-if (c_is(SumType* obj, VariantEnumA, VariantEnumA_type* x))
+if (c_is(SumType* obj, VariantTagA, VariantTagA_type* x))
     ActionA(x);
 ```
 The **c_when** statement is exhaustive. The compiler will give a warning if not all variants are
@@ -310,7 +313,9 @@ These work on any container. *c_make()* may also be used for **cspan** views.
 #define T Map, int, int
 #include <stc/hashmap.h>
 
-c_func (split_map,(Map map), ->, struct {Vec keys, values;}) {
+c_func (split_map,(Map map),
+    ->, struct {Vec keys, values;})
+{
     split_map_result out = {0};
     for (c_each_kv(k, v, Map, map)) {
         Vec_push(&out.keys, *k);
@@ -717,11 +722,13 @@ c_func (get_data2,(void), ->, struct {Vec v1, v2;}) {
     };
 }
 
-// return a Vec, and an err code which is 0 if OK.
-c_func (load_data,(const char* fname), ->, struct {Vec vec; int err;}) {
+// return a Vec, and an error code which is 0 if OK.
+c_func (load_data,(const char* fname),
+    ->, struct {Vec vec; int error;})
+{
     FILE* fp = fopen(fname, "rb");
     if (fp == 0)
-        return (load_data_result){.err = 1};
+        return (load_data_result){.error=1};
 
     load_data_result out = {Vec_with_size(1024, '\0')};
     fread(out.vec.data, sizeof(out.vec.data[0]), 1024, fp);

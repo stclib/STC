@@ -490,44 +490,90 @@ required to be implemented if the container actually use them. Option flags are 
 and may be combined with the `|` operator. Below is a complete list of *options* that may be
 specified for a container:
 
-  - **c_keyclass** - `i_key` is a "class", i.e. binds _clone(), _drop() member names.
-  - **c_valclass** - like **c_keyclass**, but for the mapped values in sortedmap / hashmap.
-  - **c_cmpclass** - `i_key` is also the raw/cmp-type and binds _cmp(), _eq(), _hash() member names.
-  - **c_keypro** - `i_key` is a "keyclass" with an associated "cmpclass"-type named `i_key`_raw.
-  - **c_valpro** - `i_val` is a "valclass" with an associated "valraw"-type named `i_val`_raw.
-  - **c_use_cmp** - enable `<` comparison on integral types, or _cmp() on "pro/class" elements.
-  - **c_use_eq** - enable `==` on integral types, or _eq() on "pro/class" elements
+  - **c_cmpclass** - `i_key` binds _cmp(), _eq() and _hash() member names.
+  - **c_keyclass** - `i_key` binds _clone(), _drop(), _cmp(), _eq(), and _hash()  member names.
+  - **c_valclass** -  `i_val` binds _clone() and _drop() member names for sortedmaps / hashmaps.
+  - **c_keypro** - `i_key` is a "keyclass" with an associated "cmpclass"-type named KeyType_raw (see below).
+  - **c_valpro** - `i_val` is a "valclass" with an associated "raw"-type named ValType_raw.
+  - **c_use_cmp** - enable `<` comparison on integral types, or the _cmp() member on "pro/class" elements.
+  - **c_use_eq** - enable `==` on integral types, or the _eq() member on "pro/class" elements.
   - **c_no_clone** - disable clone functionality in container
   - **c_no_atomic** - used with **arc** type, do simple reference counting instead of atomic.
-  - **c_no_hash** - don't enable hash function when *c_cmpclass* is specified.
+  - **c_no_hash** - don't enable hash function when "cmpclass" is specified.
   - **c_declared** - container type was predeclared
 
+Bound element "member" functions when **c_keyclass** / **c_valclass** / **c_cmpclass** are specified:
+```c++
+int      KeyType_cmp(const KeyType* x, const KeyType* y);
+bool     KeyType_less(const KeyType* x, const KeyType* y);
+bool     KeyType_eq(const KeyType* x, const KeyType* y);
+size_t   KeyType_hash(const KeyType* kp);
+KeyType  KeyType_clone(KeyType k);
+void     KeyType_drop(KeyType* kp);
+
+ValType  ValType_clone(ValType v);
+void     ValType_drop(ValType* vp);
+```
+
 **Notes**:
-- **c_use_cmp** / **c_use_eq** are only needed for **vec**, **stack**, **deque**, **list**, as sorting and
-linear seach are not enabled by default for them.
-- By default, comparison uses `<` and `==` operators, whereas for pro/class element types,
-_cmp(), _eq() and _hash() functions must be defined if used by the container.
-- For a plain struct (PODs), define `i_cmp` / `i_eq` / `i_hash` macros when needed, or make it
+- **c_use_cmp** is only needed for **vec**, **stack**, **deque**, **list**, as sorting
+and linear seach are not enabled by default for them. Maps/sets/priority queues enables
+these by default.
+- Comparison uses `<` and `==` operators by default whereas when **class/pro** are specified, it
+uses the _cmp() member function by default. However, the _cmp() member is also used for
+equality comparison, so **c_use_eq** has to be specified in order to use the _eq() member!
+- For plain structs (PODs), define `i_cmp` / `i_eq` / `i_hash` macros when needed, or make it
 into a "class" by defining required "member" functions, and use the class-options described.
 
-#### Key (element lookup type)
+#### The **c_keypro** and **c_valpro** options (properties)
+The **c_cmpclass**'s type is equal to the `i_key` type. However, it is posible to
+- `i_cmpclass` *RawType*
+
+#### Key type template parameters (advanced usage)
 The assosicated element "member" functions defined from using meta-template parameters may also be
 specified/overridden by defining specific template parameters before including the container.
 Only `i_key` is strictly required to be defined for simple non-maps:
 
 - `i_key` *KeyType* - Element type.
-- `i_cmp` *Func(xp, yp)* - Three-way comparison of two *i_keyraw* elements, given as pointers.
-- `i_less` *Func(xp, yp)* - Comparison of two *i_keyraw* elements - alternative to specifying *i_cmp*.
-- `i_eq` *Func(xp, yp)* - Equality comparison of two *i_keyraw* - defaults to *!i_cmp(x,y)*. Companion with *i_hash*.
-- `i_hash` *Func(p)* - Hash function taking a *i_keyraw* pointer - defaults to *c_default_hash*.
- **[required]** for **hmap** and **hset** unless *i_keyraw* is an integral type (or a struct with no padding space).
-- `i_keyclone` *Func(v)* - **[required if]** *i_keydrop* is defined (exception for **arc**, as it shares).
-- `i_keydrop` *Func(p)* - Destroy key - defaults to empty destructor.
+- `i_keyclass` *KeyType* - Meta template parameter
+- `i_cmpclass` *KeyRaw* - Meta template parameter (defaults to *KeyType*)
+    - `i_keyfrom` *Func* - Conversion from *KeyRaw* to *KeyType*.
+    - `i_keytoraw` *Func* - Conversion from *KeyType* to *KeyRaw*.
+- `i_cmp` *Func* - Three-way comparison of two *KeyRaw* elements, given as pointers.
+- `i_less` *Func* - Comparison of two *KeyRaw* elements. Alternative to specifying *i_cmp*.
+- `i_eq` *Func* - Equality comparison of two *KeyRaw*. Defaults to *!i_cmp(x,y)*.
+- `i_hash` *Func* - Hash function taking a *KeyRaw* pointer. Companion with *i_eq*.
+ **[required]** for **hmap** and **hset** unless *KeyRaw* is an integral type (or a struct with no padding space).
+- `i_keyclone` *Func* - **[required if]** *i_keydrop* is defined (exception for **arc**, as it shares).
+- `i_keydrop` *Func* - Destroy key - defaults to empty destructor.
 
-#### Val (mapped value type for maps)
-- `i_val` *MappedType* - **[required]** for **hmap** and **smap** containers.
-- `i_valclone` *Func(v)* - **[required if]** *i_valdrop* is defined (exception for **arc**, as it shares).
-- `i_valdrop` *Func(p)* - Destroy val - defaults to empty destructor.
+Bound key-element member functions when `i_keyclass` and/or `i_cmpclass` parameters are specified:
+```c++
+int      KeyType_cmp(const KeyRaw* rx, const KeyRaw* ry);
+bool     KeyType_less(const KeyRaw* rx, const KeyRaw* ry);
+bool     KeyType_eq(const KeyRaw* rx, const KeyRaw* ry);
+size_t   KeyType_hash(const KeyRaw* rp);
+KeyType  KeyType_from(KeyRaw r);
+KeyRaw   KeyType_toraw(const KeyType* kp);
+KeyType  KeyType_clone(KeyType k);
+void     KeyType_drop(KeyType* kp);
+```
+
+#### Val type template parameters (mapped value type for maps)
+- `i_val` *ValType* - **[required]** for **hmap** and **smap** containers.
+- `i_valraw` *ValRaw* - Alternative input type (converted to/from *ValType*). Defaults to *ValType*
+    - `i_valfrom` *Func* - Conversion from *ValRaw* to *ValType*.
+    - `i_valtoraw` *Func* - Conversion from *ValType* to *ValRaw*.
+- `i_valclone` *Func* - **[required if]** *i_valdrop* is defined (exception for **arc**, as it shares).
+- `i_valdrop` *Func* - Destroy mapped val - defaults to empty destructor.
+
+Bound mapped-element member functions when `i_valraw` / `i_val` is specified:
+```c++
+ValType  ValType_from(ValRaw r);
+ValRaw   ValType_toraw(const ValType* vp);
+ValType  ValType_clone(ValType v);
+void     ValType_drop(ValType* vp);
+```
 
 ---
 
