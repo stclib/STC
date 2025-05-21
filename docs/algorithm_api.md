@@ -23,7 +23,7 @@ descriptive and reduces chances of making mistakes. It is generally easier to re
 | for (`c_each_n`(it, **CntType**, container, n))    | Iteratate `n` first elements. Index variable is `{it}_index`. |
 | for (`c_each_kv`(key, val, **CntType**, container))| Iterate maps with "structured binding" |
 <!--{%raw%}-->
-[ [Run this code](https://godbolt.org/z/cYhTEr1vM) ]
+[ [Run this code](https://godbolt.org/z/xK8s5cKc9) ]
 ```c++
 #define T IMap, int, int
 #include <stc/sortedmap.h>
@@ -303,7 +303,7 @@ These work on any container. *c_make()* may also be used for **cspan** views.
 - **c_put_items** - push (raw) values onto any container from an initializer list
 - **c_drop** - drop (destroy) multiple containers of the same type
 
-[ [Run this code](https://godbolt.org/z/1nKfYh3nz) ]
+[ [Run this code](https://godbolt.org/z/Tsjqd93oK) ]
 <!--{%raw%}-->
 ```c++
 #include <stdio.h>
@@ -381,7 +381,7 @@ Erase linearily in containers using a predicate. `value` is a pointer to each el
 - void `c_erase_if`(**CntType**, cnt_ptr, pred). Use with ***list**, ***hmap***, ***hset***, ***smap***, and ***sset***.
 - void `c_eraseremove_if`(**CntType**, cnt_ptr, pred). Use with ***stack***, ***vec***, ***deque***, and ***queue*** only.
 
-[ [Run this code](https://godbolt.org/z/88PMq7WP1) ]
+[ [Run this code](https://godbolt.org/z/rYoPM34Y9) ]
 <!--{%raw%}-->
 ```c++
 #include <stdio.h>
@@ -483,7 +483,7 @@ It enables a subset of functional programming like in other popular languages.
 | **Type** `c_flt_src1`, `c_flt_src2`| Pointer variables to current unmapped source values |
 | **Type** `value1`, `value2`        | Pointer variables to (possible mapped) values |
 
-[ [Run this example](https://godbolt.org/z/W87fTdvYd) ]
+[ [Run this example](https://godbolt.org/z/rWax63bdK) ]
 ```c++
 #include <stdio.h>
 #define T Vec, int
@@ -557,7 +557,7 @@ speed with *std::sort()**. Both *X_binary_seach()* and *X_lower_bound()* are abo
 c++ *std::lower_bound()*.
 ##### Usage examples
 
-[ [Run this code](https://godbolt.org/z/dvr3zYKhY) ]
+[ [Run this code](https://godbolt.org/z/YE613YbT4) ]
 ```c++
 #define i_key int // sort a regular c-array of ints
 #include <stc/sort.h>
@@ -703,7 +703,7 @@ c_filter(crange, c_iota(3), true
 A macro for conveniently defining functions with multiple return values. This is for encouraging
 to write functions that returns extra error context when error occurs, or just multiple return values.
 
-[ [Run this code](https://godbolt.org/z/MsYG75Eae) ]
+[ [Run this code](https://godbolt.org/z/nj31o1dn6) ]
 ```c++
 Vec get_data(void) {
     return c_make(Vec, {1, 2, 3, 4, 5, 6});

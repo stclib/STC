@@ -80,7 +80,7 @@ bool            box_X_value_eq(const i_key* x, const i_key* y);
 ## Example
 Create a vec and a set with owned pointers to int elements, using box.
 
-[ [Run this code](https://godbolt.org/z/dhTPheMxM) ]
+[ [Run this code](https://godbolt.org/z/61rcjcz1x) ]
 ```c++
 #include <stdio.h>
 

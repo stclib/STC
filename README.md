@@ -195,7 +195,7 @@ int main(void)
 ```
 Switching to a different container type, e.g. a sorted set (sset):
 <!-- https://raw.githubusercontent.com/stclib/stcsingle/main/ -->
-[ [Run this code](https://godbolt.org/z/6KhzdMafd) ]
+[ [Run this code](https://godbolt.org/z/1PKqWo4z6) ]
 ```c++
 #define T Floats, float
 #include <stc/sortedset.h> // Use a sorted set instead
@@ -226,7 +226,7 @@ If an element destructor `i_keydrop` is defined, `i_keyclone` function is requir
 
 Let's make a vector of vectors, which can be cloned. All of its element vectors will be destroyed when destroying the Vec2D.
 
-[ [Run this code](https://godbolt.org/z/dqfr41Mcc) ]
+[ [Run this code](https://godbolt.org/z/PncareMEn) ]
 ```c++
 #include <stdio.h>
 #include <stc/algorithm.h>
@@ -275,7 +275,7 @@ int main(void)
 ```
 This example uses four different container types:
 
-[ [Run this code](https://godbolt.org/z/Mr8rYqjdf) ]
+[ [Run this code](https://godbolt.org/z/fdavvGoE8) ]
 <!--{%raw%}-->
 ```c++
 #include <stdio.h>
@@ -838,7 +838,7 @@ void maptest()
 ```
 Another example is to sort struct elements by the *active field* and *reverse* flag:
 
-[ [Run this code](https://godbolt.org/z/E4hhvzThr) ]
+[ [Run this code](https://godbolt.org/z/aKe5hMYMr) ]
 ```c++
 #include <stdio.h>
 #include <time.h>

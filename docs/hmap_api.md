@@ -127,7 +127,7 @@ bool            c_memcmp_eq(const i_keyraw* a, const i_keyraw* b);    // !memcmp
 
 ## Examples
 
-[ [Run this code](https://godbolt.org/z/GenofeYe3) ]
+[ [Run this code](https://godbolt.org/z/5441E5dEx) ]
 ```c++
 #include <stc/cstr.h>
 
@@ -164,7 +164,7 @@ int main(void)
 ### Example 2
 Demonstrate hmap with mapped POD type Vec3i: hmap<int, Vec3i>:
 
-[ [Run this code](https://godbolt.org/z/nhjMvvWjo) ]
+[ [Run this code](https://godbolt.org/z/q46YnvWee) ]
 ```c++
 #include <stdio.h>
 typedef struct { int x, y, z; } Vec3i;
@@ -191,7 +191,7 @@ int main(void)
 ### Example 3
 Inverse: Demonstrate hmap with plain-old-data key type Vec3i and int as mapped type: hmap<Vec3i, int>.
 
-[ [Run this code](https://godbolt.org/z/9qznc7Gec) ]
+[ [Run this code](https://godbolt.org/z/sjcqG35x6) ]
 ```c++
 #include <stdio.h>
 typedef struct { int x, y, z; } Vec3i;
@@ -220,7 +220,7 @@ int main(void)
 ### Example 4: Advanced
 Key type is struct. Based on https://doc.rust-lang.org/std/collections/struct.HashMap.html
 
-[ [Run this code](https://godbolt.org/z/Wzv5fEYd9) ]
+[ [Run this code](https://godbolt.org/z/3WGx8sWET) ]
 ```c++
 #include <stc/cstr.h>
 
@@ -283,7 +283,7 @@ In example 4 we needed to construct a lookup key which may allocate strings, and
 In this example we use keyraw feature to make it simpler to use and avoids the creation of a Viking object
 entirely when doing lookup.
 
-[ [Run this code](https://godbolt.org/z/b7f15zPK3) ]
+[ [Run this code](https://godbolt.org/z/Y5sTefr4q) ]
 <!--{%raw%}-->
 ```c++
 #include <stc/cstr.h>

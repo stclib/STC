@@ -119,7 +119,7 @@ vec_X_raw       vec_X_value_drop(vec_X_value* pval);
 
 ## Examples
 
-[ [Run this code](https://godbolt.org/z/rnacsb8x8) ]
+[ [Run this code](https://godbolt.org/z/P84zMWro8) ]
 ```c++
 #include <stdio.h>
 
@@ -188,7 +188,7 @@ int main(void) {
 ### Example 3
 Container with elements of structs:
 
-[ [Run this code](https://godbolt.org/z/jKrz67hYW) ]
+[ [Run this code](https://godbolt.org/z/bWEb5vc4K) ]
 ```c++
 #include <stdio.h>
 #include <stc/cstr.h>
