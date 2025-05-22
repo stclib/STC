@@ -24,10 +24,10 @@ RM_F      ?= rm -f
 
 ifeq ($(OS),Windows_NT)
 	DOTEXE := .exe
-	BUILDDIR := build_Windows/$(CC)
+	BUILDDIR := build/Windows_$(CC)
 else
 #	CC_VER := $(shell $(CC) -dumpversion | cut -f1 -d.)
-	BUILDDIR := build_$(shell uname)/$(CC)
+	BUILDDIR := build/$(shell uname)_$(CC)
 	LDFLAGS += -lm
 	ifneq ($(CC),clang)
 	  CFLAGS += -Wno-clobbered
@@ -68,10 +68,11 @@ clean:
 	@echo "Cleaned"
 
 distclean:
-	@$(RM_F) -r build_*
+	@$(RM_F) -r build
 	@echo "All Cleaned"
 
 lib: $(LIB_PATH)
+	@echo
 
 $(LIB_PATH): $(LIB_OBJS)
 	@printf "\r\e[2K%s" "$(AR_RCS) $@"
