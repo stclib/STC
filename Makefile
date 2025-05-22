@@ -11,7 +11,7 @@ ifeq ($(origin CXX),default)
 	CXX := g++
 endif
 
-CFLAGS 	  ?= -std=c11 -Iinclude -MMD -O3 -Wpedantic -Wall -Wextra -Werror -Wno-missing-field-initializers
+CFLAGS    ?= -std=c11 -Iinclude -MMD -O3 -Wpedantic -Wall -Wextra -Werror -Wno-missing-field-initializers
 CXXFLAGS  ?= -std=c++20 -Iinclude -O3 -MMD -Wall
 LDFLAGS   ?= -fopenmp
 ifeq ($(CC),tcc)
@@ -24,10 +24,10 @@ RM_F      ?= rm -f
 
 ifeq ($(OS),Windows_NT)
 	DOTEXE := .exe
-	BUILDDIR := build_Windows/$(CC)
+	BUILDDIR := build/Windows_$(CC)
 else
 #	CC_VER := $(shell $(CC) -dumpversion | cut -f1 -d.)
-	BUILDDIR := build_$(shell uname)/$(CC)
+	BUILDDIR := build/$(shell uname)_$(CC)
 	LDFLAGS += -lm
 	ifneq ($(CC),clang)
 	  CFLAGS += -Wno-clobbered
@@ -46,12 +46,12 @@ LIB_PATH  := $(BUILDDIR)/lib$(LIB_NAME).a
 EX_SRCS   := $(wildcard examples/*/*.c)
 EX_OBJS   := $(EX_SRCS:%.c=$(OBJ_DIR)/%.o)
 EX_DEPS   := $(EX_SRCS:%.c=$(OBJ_DIR)/%.d)
-EX_EXES   := $(EX_SRCS:%.c=$(OBJ_DIR)/%$(DOTEXE))
+EX_EXES   := $(EX_SRCS:%.c=$(BUILDDIR)/%$(DOTEXE))
 
 TEST_SRCS   := $(wildcard tests/*_test.c) tests/main.c
 TEST_OBJS   := $(TEST_SRCS:%.c=$(OBJ_DIR)/%.o)
 TEST_DEPS   := $(TEST_SRCS:%.c=$(OBJ_DIR)/%.d)
-TEST_EXE    := $(OBJ_DIR)/tests/test_all$(DOTEXE)
+TEST_EXE    := $(BUILDDIR)/tests/test_all$(DOTEXE)
 
 PROGRAMS	:= $(EX_EXES) $(TEST_EXE)
 
@@ -64,13 +64,15 @@ all: $(PROGRAMS)
 $(PROGRAMS): $(LIB_PATH) $(MAKEFILE)
 
 clean:
-	@$(RM_F) $(LIB_OBJS) $(TEST_OBJS) $(EX_OBJS) $(LIB_DEPS) $(EX_DEPS) $(LIB_PATH) $(EX_EXES) $(TEST_EXE)
+	@$(RM_F) $(LIB_OBJS) $(EX_OBJS) $(TEST_OBJS) $(LIB_DEPS) $(EX_DEPS) $(TEST_DEPS) $(LIB_PATH) $(EX_EXES) $(TEST_EXE)
 	@echo "Cleaned"
 
 distclean:
-	$(RM_F) $(OBJ_DIR)
+	@$(RM_F) -r build
+	@echo "All Cleaned"
 
 lib: $(LIB_PATH)
+	@echo
 
 $(LIB_PATH): $(LIB_OBJS)
 	@printf "\r\e[2K%s" "$(AR_RCS) $@"
