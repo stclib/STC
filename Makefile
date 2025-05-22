@@ -46,12 +46,12 @@ LIB_PATH  := $(BUILDDIR)/lib$(LIB_NAME).a
 EX_SRCS   := $(wildcard examples/*/*.c)
 EX_OBJS   := $(EX_SRCS:%.c=$(OBJ_DIR)/%.o)
 EX_DEPS   := $(EX_SRCS:%.c=$(OBJ_DIR)/%.d)
-EX_EXES   := $(EX_SRCS:%.c=$(OBJ_DIR)/%$(DOTEXE))
+EX_EXES   := $(EX_SRCS:%.c=$(BUILDDIR)/%$(DOTEXE))
 
 TEST_SRCS   := $(wildcard tests/*_test.c) tests/main.c
 TEST_OBJS   := $(TEST_SRCS:%.c=$(OBJ_DIR)/%.o)
 TEST_DEPS   := $(TEST_SRCS:%.c=$(OBJ_DIR)/%.d)
-TEST_EXE    := $(OBJ_DIR)/tests/test_all$(DOTEXE)
+TEST_EXE    := $(BUILDDIR)/tests/test_all$(DOTEXE)
 
 PROGRAMS	:= $(EX_EXES) $(TEST_EXE)
 
