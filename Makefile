@@ -11,7 +11,7 @@ ifeq ($(origin CXX),default)
 	CXX := g++
 endif
 
-CFLAGS 	  ?= -std=c11 -Iinclude -MMD -O3 -Wpedantic -Wall -Wextra -Werror -Wno-missing-field-initializers
+CFLAGS    ?= -std=c11 -Iinclude -MMD -O3 -Wpedantic -Wall -Wextra -Werror -Wno-missing-field-initializers
 CXXFLAGS  ?= -std=c++20 -Iinclude -O3 -MMD -Wall
 LDFLAGS   ?= -fopenmp
 ifeq ($(CC),tcc)
@@ -64,11 +64,12 @@ all: $(PROGRAMS)
 $(PROGRAMS): $(LIB_PATH) $(MAKEFILE)
 
 clean:
-	@$(RM_F) $(LIB_OBJS) $(TEST_OBJS) $(EX_OBJS) $(LIB_DEPS) $(EX_DEPS) $(LIB_PATH) $(EX_EXES) $(TEST_EXE)
+	@$(RM_F) $(LIB_OBJS) $(EX_OBJS) $(TEST_OBJS) $(LIB_DEPS) $(EX_DEPS) $(TEST_DEPS) $(LIB_PATH) $(EX_EXES) $(TEST_EXE)
 	@echo "Cleaned"
 
 distclean:
-	$(RM_F) $(OBJ_DIR)
+	@$(RM_F) -r build_*
+	@echo "All Cleaned"
 
 lib: $(LIB_PATH)
 
