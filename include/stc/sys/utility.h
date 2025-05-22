@@ -167,9 +167,9 @@
 #define c_dmax(...) c_dmax_n(c_make_array(double, {__VA_ARGS__}), c_NUMARGS(__VA_ARGS__))
 
 #define _c_minmax(T, fn, opr) \
-    STC_INLINE T fn(const T a[], int n) { \
+    STC_INLINE T fn(const T a[], isize n) { \
         T x = a[0]; \
-        for (int i = 1; i < n; ++i) if (a[i] opr x) x = a[i]; \
+        for (isize i = 1; i < n; ++i) if (a[i] opr x) x = a[i]; \
         return x; \
     }
 _c_minmax(int32_t, c_min32_n, <)
