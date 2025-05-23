@@ -71,9 +71,11 @@ typedef i_keyraw _m_raw;
 #endif
 
 #if (!defined i_no_atomic || (defined (__STDC_VERSION__) && __STDC_VERSION__ < 201112L)) \
-    && !(defined __GNUC__ || defined __clang__ || defined _MSC_VER) && !defined SUPRESS_NONATOMIC_WARNING
+    && !(defined __GNUC__ || defined __clang__ || defined _MSC_VER)
+#ifndef SUPRESS_NONATOMIC_WARNING
 #warning ISO C99 dose not support atomic types, arc will degenerate to rc. \
 Suppression warning by option `c_no_atomic` or define `i_no_automic` or define `SUPRESS_NONATOMIC_WARNING`.
+#endif
 #define i_no_atomic
 #endif
 
