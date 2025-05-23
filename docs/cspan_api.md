@@ -231,7 +231,7 @@ b flat:
 ```
 Multi-dimension slicing (STC cspan):
 
-[ [Run this code](https://godbolt.org/z/fr4crj833) ]
+[ [Run this code](https://godbolt.org/z/cEPbsja98) ]
 ```c++
 #include <stdio.h>
 #include <stc/cspan.h>

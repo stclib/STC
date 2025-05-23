@@ -19,18 +19,17 @@ See the c++ class [std::vector](https://en.cppreference.com/w/cpp/container/vect
 #define i_keyclass <t>   // key type, and bind <t>_clone() and <t>_drop() function names
 #define i_keypro <t>     // key "pro" type, use for cstr, arc, box types
 
-#define i_keydrop <fn>   // destroy value func - defaults to empty destruct
-#define i_keyclone <fn>  // REQUIRED IF i_keydrop defined
+// Use alone or combined with i_keyclass:
+#define i_cmpclass <ct>  // Comparison "class". <ct>, aka `raw` defaults to <kt>
+                         // Bind <ct>_cmp(),  <ct>_eq(),  <ct>_hash() member functions.
 
-#define i_use_cmp        // enable sorting, binary_search and lower_bound
-#define i_cmp <fn>       // three-way compare two i_keyraw*
-#define i_less <fn>      // less comparison. Alternative to i_cmp
-#define i_eq <fn>        // equality comparison. Implicitly defined with i_cmp, but not i_less.
+// Override or define when not "class" or "pro" is used:
+#define i_keydrop <fn>   // Destroy element func - defaults to empty destruct
+#define i_keyclone <fn>  // Clone element func (required when i_keydrop is defined)
 
-#define i_keyraw <t>     // conversion "raw" type - defaults to i_key
-#define i_cmpclass <t>   // conversion "raw class". binds <t>_cmp(),  <t>_eq(),  <t>_hash()
-#define i_keyfrom <fn>   // conversion func i_keyraw => i_key
-#define i_keytoraw <fn>  // conversion func i_key* => i_keyraw
+#define i_cmp <fn>       // Three-way compare two i_keyraw*
+#define i_less <fn>      // Less comparison. Alternative to i_cmp
+#define i_eq <fn>        // Equality comparison. Implicitly defined with i_cmp, but not i_less.
 
 #include <stc/vec.h>
 ```
@@ -120,7 +119,7 @@ vec_X_raw       vec_X_value_drop(vec_X_value* pval);
 
 ## Examples
 
-[ [Run this code](https://godbolt.org/z/rnacsb8x8) ]
+[ [Run this code](https://godbolt.org/z/P84zMWro8) ]
 ```c++
 #include <stdio.h>
 
@@ -189,7 +188,7 @@ int main(void) {
 ### Example 3
 Container with elements of structs:
 
-[ [Run this code](https://godbolt.org/z/jKrz67hYW) ]
+[ [Run this code](https://godbolt.org/z/bWEb5vc4K) ]
 ```c++
 #include <stdio.h>
 #include <stc/cstr.h>

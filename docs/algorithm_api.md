@@ -23,7 +23,7 @@ descriptive and reduces chances of making mistakes. It is generally easier to re
 | for (`c_each_n`(it, **CntType**, container, n))    | Iteratate `n` first elements. Index variable is `{it}_index`. |
 | for (`c_each_kv`(key, val, **CntType**, container))| Iterate maps with "structured binding" |
 <!--{%raw%}-->
-[ [Run this code](https://godbolt.org/z/cYhTEr1vM) ]
+[ [Run this code](https://godbolt.org/z/xK8s5cKc9) ]
 ```c++
 #define T IMap, int, int
 #include <stc/sortedmap.h>
@@ -122,9 +122,9 @@ For-loop variant of `c_filter`in generic algorithms.
 int main(void) {
     IVec vec = c_make(IVec, {0, 1, 2, 3, 4, 5, 80, 6, 7, 80, 8, 9, 80,
                              10, 11, 12, 13, 14, 15, 80, 16, 17});
-	#define ff_skipValue(i, x) (*i.ref != (x))
-	#define ff_isEven(i) ((*i.ref & 1) == 0)
-	#define ff_square(i) (*i.ref * *i.ref)
+    #define ff_skipValue(i, x) (*i.ref != (x))
+    #define ff_isEven(i) ((*i.ref & 1) == 0)
+    #define ff_square(i) (*i.ref * *i.ref)
 
     int sum = 0;
     for (c_ffilter(i, IVec, vec, true
@@ -157,29 +157,32 @@ Synopsis:
 ```c++
 // Define a sum type
 c_sumtype (SumType,
-    (VariantEnumA, VariantTypeA),
-    (VariantEnumB, VariantTypeB),
-    (VariantEnumC, VariantEnumB_type), // use same payload type as VariantEnumB
+    (VariantTagA, VariantTypeA),
+    (VariantTagB, VariantTypeB),
+    (VariantTagC, VariantTagB_type), // use same payload type as VariantTagB
     ...
-    (VariantEnumN, VariantTypeN),      // optional final comma
+    (VariantTagN, VariantTypeN),      // optional final comma
 );
 
-SumType c_variant(VariantEnum tag, VariantType value);    // Sum type constructor
-bool    c_holds_tag(const SumType* obj, VariantEnum tag); // does obj hold VariantType?
-int     c_tag_index(SumType* obj);                        // 1-based index (mostly for debug)
+SumType           c_variant(VariantTag tag, VariantType value); // Sum type constructor
+bool              c_holds_tag(const SumType* obj, VariantTag tag); // Does obj hold VariantType?
+int               c_tag_index(SumType* obj);               // 1-based index (mostly for debug)
+VariantTag_type*  c_get(SumType* obj, VariantTag tag);     // NULL if tag does does not match what it holds.
 
 // Use a sum type (1)
 c_when (SumType* obj) {
-    c_is(VariantEnumA, VariantEnumA_type* x)
+    c_is(VariantTagA, VariantTagA_type* x)
         ActionA(x);
-    c_is(VariantEnumX) c_or_is(VariantEnumY)             // different payload types
+    c_is_same(VariantTagB, VariantTagC, VariantTagD)       // same payload types (checked)
+        ActionBCD(obj->VariantTagB.var);
+    c_is(VariantTagX) c_or_is(VariantTagY)                 // different payload types
         ActionXY();
-    c_otherwise                                          // optional, removes exhaustiveness-check
-        ActionElse();
+    c_otherwise                                            // optional, removes exhaustiveness-check
+        ActionElse(obj);
 }
 
 // Use a sum type (2)
-if (c_is(SumType* obj, VariantEnumA, VariantEnumA_type* x))
+if (c_is(SumType* obj, VariantTagA, VariantTagA_type* x))
     ActionA(x);
 ```
 The **c_when** statement is exhaustive. The compiler will give a warning if not all variants are
@@ -300,7 +303,7 @@ These work on any container. *c_make()* may also be used for **cspan** views.
 - **c_put_items** - push (raw) values onto any container from an initializer list
 - **c_drop** - drop (destroy) multiple containers of the same type
 
-[ [Run this code](https://godbolt.org/z/1nKfYh3nz) ]
+[ [Run this code](https://godbolt.org/z/Tsjqd93oK) ]
 <!--{%raw%}-->
 ```c++
 #include <stdio.h>
@@ -310,7 +313,9 @@ These work on any container. *c_make()* may also be used for **cspan** views.
 #define T Map, int, int
 #include <stc/hashmap.h>
 
-c_func (split_map,(Map map), ->, struct {Vec keys, values;}) {
+c_func (split_map,(Map map),
+    ->, struct {Vec keys, values;})
+{
     split_map_result out = {0};
     for (c_each_kv(k, v, Map, map)) {
         Vec_push(&out.keys, *k);
@@ -376,7 +381,7 @@ Erase linearily in containers using a predicate. `value` is a pointer to each el
 - void `c_erase_if`(**CntType**, cnt_ptr, pred). Use with ***list**, ***hmap***, ***hset***, ***smap***, and ***sset***.
 - void `c_eraseremove_if`(**CntType**, cnt_ptr, pred). Use with ***stack***, ***vec***, ***deque***, and ***queue*** only.
 
-[ [Run this code](https://godbolt.org/z/88PMq7WP1) ]
+[ [Run this code](https://godbolt.org/z/rYoPM34Y9) ]
 <!--{%raw%}-->
 ```c++
 #include <stdio.h>
@@ -478,7 +483,7 @@ It enables a subset of functional programming like in other popular languages.
 | **Type** `c_flt_src1`, `c_flt_src2`| Pointer variables to current unmapped source values |
 | **Type** `value1`, `value2`        | Pointer variables to (possible mapped) values |
 
-[ [Run this example](https://godbolt.org/z/W87fTdvYd) ]
+[ [Run this example](https://godbolt.org/z/rWax63bdK) ]
 ```c++
 #include <stdio.h>
 #define T Vec, int
@@ -552,7 +557,7 @@ speed with *std::sort()**. Both *X_binary_seach()* and *X_lower_bound()* are abo
 c++ *std::lower_bound()*.
 ##### Usage examples
 
-[ [Run this code](https://godbolt.org/z/dvr3zYKhY) ]
+[ [Run this code](https://godbolt.org/z/YE613YbT4) ]
 ```c++
 #define i_key int // sort a regular c-array of ints
 #include <stc/sort.h>
@@ -698,7 +703,7 @@ c_filter(crange, c_iota(3), true
 A macro for conveniently defining functions with multiple return values. This is for encouraging
 to write functions that returns extra error context when error occurs, or just multiple return values.
 
-[ [Run this code](https://godbolt.org/z/MsYG75Eae) ]
+[ [Run this code](https://godbolt.org/z/nj31o1dn6) ]
 ```c++
 Vec get_data(void) {
     return c_make(Vec, {1, 2, 3, 4, 5, 6});
@@ -717,11 +722,13 @@ c_func (get_data2,(void), ->, struct {Vec v1, v2;}) {
     };
 }
 
-// return a Vec, and an err code which is 0 if OK.
-c_func (load_data,(const char* fname), ->, struct {Vec vec; int err;}) {
+// return a Vec, and an error code which is 0 if OK.
+c_func (load_data,(const char* fname),
+    ->, struct {Vec vec; int error;})
+{
     FILE* fp = fopen(fname, "rb");
     if (fp == 0)
-        return (load_data_result){.err = 1};
+        return (load_data_result){.error=1};
 
     load_data_result out = {Vec_with_size(1024, '\0')};
     fread(out.vec.data, sizeof(out.vec.data[0]), 1024, fp);

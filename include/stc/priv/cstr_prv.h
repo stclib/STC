@@ -35,26 +35,25 @@
   #pragma GCC diagnostic ignored "-Warray-bounds"
 #endif
 
-enum  { cstr_s_last = sizeof(cstr_buf) - 1,
-        cstr_s_cap = cstr_s_last - 1 };
-#define cstr_s_size(s)          ((isize)(s)->sml.data[cstr_s_last])
-#define cstr_s_set_size(s, len) ((s)->sml.data[len] = 0, (s)->sml.data[cstr_s_last] = (char)(len))
+enum  { cstr_s_cap = sizeof(cstr_buf) - 2 };
+#define cstr_s_size(s)          ((isize)(s)->sml.size)
+#define cstr_s_set_size(s, len) ((s)->sml.data[(s)->sml.size = (uint8_t)(len)] = 0)
 #define cstr_s_data(s)          (s)->sml.data
 
 #if defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
     #define byte_rotl_(x, b)       ((x) << (b)*8 | (x) >> (sizeof(x) - (b))*8)
     #define cstr_l_cap(s)          (isize)(~byte_rotl_((s)->lon.ncap, sizeof((s)->lon.ncap) - 1))
-    #define cstr_l_set_cap(s, cap) ((s)->lon.ncap = ~byte_rotl_((size_t)(cap), 1))
+    #define cstr_l_set_cap(s, cap) ((s)->lon.ncap = ~byte_rotl_((uintptr_t)(cap), 1))
 #else
     #define cstr_l_cap(s)          (isize)(~(s)->lon.ncap)
-    #define cstr_l_set_cap(s, cap) ((s)->lon.ncap = ~(size_t)(cap))
+    #define cstr_l_set_cap(s, cap) ((s)->lon.ncap = ~(uintptr_t)(cap))
 #endif
 #define cstr_l_size(s)          (isize)((s)->lon.size)
-#define cstr_l_set_size(s, len) ((s)->lon.data[(s)->lon.size = (size_t)(len)] = 0)
+#define cstr_l_set_size(s, len) ((s)->lon.data[(s)->lon.size = (uintptr_t)(len)] = 0)
 #define cstr_l_data(s)          (s)->lon.data
 #define cstr_l_drop(s)          i_free((s)->lon.data, cstr_l_cap(s) + 1)
 
-#define cstr_is_long(s)         (((s)->sml.data[cstr_s_last] & 128) != 0)
+#define cstr_is_long(s)         ((s)->sml.size >= 128)
 extern  char* _cstr_init(cstr* self, isize len, isize cap);
 extern  char* _cstr_internal_move(cstr* self, isize pos1, isize pos2);
 
@@ -171,7 +170,7 @@ STC_INLINE bool cstr_is_empty(const cstr* self)
     { return cstr_size(self) == 0; }
 
 STC_INLINE isize cstr_capacity(const cstr* self)
-    { return cstr_is_long(self) ? cstr_l_cap(self) : (isize)cstr_s_cap; }
+    { return cstr_is_long(self) ? cstr_l_cap(self) : cstr_s_cap; }
 
 STC_INLINE isize cstr_to_index(const cstr* self, cstr_iter it)
     { return it.ref - cstr_str(self); }

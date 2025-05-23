@@ -557,7 +557,7 @@ the following example:
 <details>
 <summary>Producer-consumer coroutine implementation</summary>
 
-[ [Run this code](https://godbolt.org/z/jeTvTdEcW) ]
+[ [Run this code](https://godbolt.org/z/faxr8dz5E) ]
 ```c++
 #include <time.h>
 #include <stdio.h>
@@ -669,7 +669,7 @@ the scope in that it was created.
 <details>
 <summary>Scheduled coroutines implementation</summary>
 
-[ [Run this code](https://godbolt.org/z/aT6YKaM9q) ]
+[ [Run this code](https://godbolt.org/z/71GqPYn3e) ]
 ```c++
 // Based on https://www.youtube.com/watch?v=8sEe-4tig_A
 #include <stdio.h>
@@ -704,7 +704,7 @@ int scheduler(struct Scheduler* self, cco_fiber* fb) {
             if (fb->result == CCO_YIELD) {
                 Tasks_push(&self->tasks, self->_pulled);
             } else { // CCO_DONE
-                Tasks_value_drop(&self->_pulled);
+                Tasks_value_drop(&self->tasks, &self->_pulled);
             }
         }
 

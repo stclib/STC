@@ -157,7 +157,7 @@ Translate a
 [C++ example using *insert* and *emplace*](https://en.cppreference.com/w/cpp/container/map/try_emplace)
  to STC:
 
-[ [Run this code](https://godbolt.org/z/z91aM68n6) ]
+[ [Run this code](https://godbolt.org/z/anabce8ox) ]
 ```c++
 #include <stc/cstr.h>
 #define T strmap, cstr, cstr, (c_keypro | c_valpro)
@@ -189,7 +189,7 @@ int main(void)
 ### Example 3
 This example uses a smap with cstr as mapped value. Note the `i_valpro` usage.
 
-[ [Run this code](https://godbolt.org/z/bs9ca511a) ]
+[ [Run this code](https://godbolt.org/z/PTW9h9b56) ]
 <!--{%raw%}-->
 ```c++
 #include <stc/cstr.h>
@@ -223,7 +223,7 @@ int main(void)
 ### Example 4
 Demonstrate smap with plain-old-data key type Vec3i and int as mapped type: smap<Vec3i, int>.
 
-[ [Run this code](https://godbolt.org/z/WT1z5eaKa) ]
+[ [Run this code](https://godbolt.org/z/os54jhqrj) ]
 ```c++
 #include <stdio.h>
 typedef struct { int x, y, z; } Vec3i;

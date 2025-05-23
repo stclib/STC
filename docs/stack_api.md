@@ -15,23 +15,24 @@ See the c++ class [std::stack](https://en.cppreference.com/w/cpp/container/stack
 #define T <ct>              // container type name (default: stack_{i_key})
 #define i_capacity <CAP>    // define an inplace stack (on the stack) with CAP capacity.
 // One of the following:
-#define i_key <t>           // key type
-#define i_keyclass <t>      // key type, and bind <t>_clone() and <t>_drop() function names
-#define i_keypro <t>        // key "pro" type, use for cstr, arc, box types
+#define i_key <kt>       // key type
+#define i_capacity <CAP> // define an inplace stack (on the stack) with CAP capacity.
+#define i_keyclass <kt>  // key type, and bind <kt>_clone() and <kt>_drop() function names
+#define i_keypro <kt>    // "pro" key type, use for `cstr`, `arc`, and `box` types.
+                         // Defines i_keyclass = <kt>, i_cmpclass = <kt>_raw
 
-#define i_keydrop <fn>      // destroy value func - defaults to empty destruct
-#define i_keyclone <fn>     // REQUIRED IF i_keydrop defined
+// Use alone or combined with i_keyclass:
+#define i_cmpclass <ct>  // comparison "class". <ct>, aka `raw` defaults to <kt>
+                         // binds <ct>_cmp(),  <ct>_eq(),  <ct>_hash() member functions.
+#define i_opt            // enable optional properties, see ...
 
-#define i_use_cmp           // enable sorting, binary_search and lower_bound
-#define i_cmp <fn>          // three-way compare two i_keyraw's
-#define i_less <fn>         // less comparison. Alternative to i_cmp
-#define i_eq <fn>           // equality comparison. Implicitly defined with i_cmp, but not i_less.
------------------------
-#define i_keyraw <t>        // conversion "raw" type - defaults to i_key
-#define i_cmpclass <t>      // conversion "raw class". binds <t>_cmp(),  <t>_eq(),  <t>_hash()
-#define i_keyfrom <fn>      // conversion func i_keyraw => i_key
-#define i_keytoraw <fn>     // conversion func i_key* => i_keyraw
+// Override or define when not "class" or "pro" is used:
+#define i_keydrop <fn>   // destroy value func - defaults to empty destruct
+#define i_keyclone <fn>  // REQUIRED IF i_keydrop defined
 
+#define i_cmp <fn>       // three-way compare two i_keyraw*
+#define i_less <fn>      // less comparison. Alternative to i_cmp
+#define i_eq <fn>        // equality comparison. Implicitly defined with i_cmp, but not i_less.
 
 #include <stc/stack.h>
 ```

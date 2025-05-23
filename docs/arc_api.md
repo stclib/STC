@@ -89,7 +89,7 @@ bool            arc_X_value_eq(const i_key* x, const i_key* y);
 
 ## Example
 
-[ [Run this code](https://godbolt.org/z/1aehd33b5) ]
+[ [Run this code](https://godbolt.org/z/TvcoxG1fz) ]
 <!--{%raw%}-->
 ```c++
 // Create two stacks with arcs to maps.
