@@ -88,10 +88,10 @@ Suppression warning by option `c_no_atomic` or define `i_no_automic` or define `
     #include <intrin.h>
     #define c_atomic_inc(v) (void)_InterlockedIncrement(v)
     #define c_atomic_dec_and_test(v) !_InterlockedDecrement(v)
-#elif defined __GNUC__ || defined __clang__ || defined i_no_atomic
+#elif defined __GNUC__ || defined __clang__
     #define c_atomic_inc(v) (void)__atomic_add_fetch(v, 1, __ATOMIC_SEQ_CST)
     #define c_atomic_dec_and_test(v) !__atomic_sub_fetch(v, 1, __ATOMIC_SEQ_CST)
-#else // try with C11
+#elif defined (__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
     #include <stdatomic.h>
     #define c_atomic_inc(v) (void)atomic_fetch_add(v, 1)
     #define c_atomic_dec_and_test(v) (atomic_fetch_sub(v, 1) == 1)
