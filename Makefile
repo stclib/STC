@@ -18,7 +18,7 @@ else
   AR_RCS  ?= ar rcs
   OPT_MD  ?= -MMD
 endif
-CFLAGS    ?= -std=c11 -Iinclude $(OPT_MD) -O3 -Wpedantic -Wall -Wextra -Wno-missing-field-initializers
+CFLAGS    ?= -std=c11 -Iinclude $(OPT_MD) -O3 -Wpedantic -Wall -Wextra -Werror -Wno-missing-field-initializers -DSUPRESS_NONATOMIC_WARNING
 CXXFLAGS  ?= -std=c++20 -Iinclude -O3 -MMD -Wall
 LDFLAGS   ?= -fopenmp
 
