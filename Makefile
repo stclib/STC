@@ -11,17 +11,16 @@ ifeq ($(origin CXX),default)
 	CXX := g++
 endif
 
-ifeq ($(CC),tcc)
-  AR_RCS  ?= tcc -ar rcs
-  OPT_MD  ?= -MD
-else
-  AR_RCS  ?= ar rcs
-  OPT_MD  ?= -MMD
-endif
-CFLAGS    ?= -std=c11 -Iinclude $(OPT_MD) -O3 -Wpedantic -Wall -Wextra -Werror -Wno-missing-field-initializers -DSUPRESS_NONATOMIC_WARNING
+CFLAGS    ?= -std=c11 -Iinclude -O3 -Wpedantic -Wall -Wextra -Werror -Wno-missing-field-initializers -DSUPRESS_NONATOMIC_WARNING
 CXXFLAGS  ?= -std=c++20 -Iinclude -O3 -MMD -Wall
 LDFLAGS   ?= -fopenmp
-
+ifeq ($(CC),tcc)
+  AR_RCS  ?= tcc -ar rcs
+  CFLAGS  += -MD
+else
+  AR_RCS  ?= ar rcs
+  CFLAGS  += -MMD
+endif
 MKDIR_P   ?= mkdir -p
 RM_F      ?= rm -f
 
