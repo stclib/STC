@@ -59,6 +59,24 @@ int main(void) {
 #include "common.h"
 #include <stdlib.h>
 
+#ifndef _i_prefix
+  #define _i_prefix arc_
+#endif
+#define _i_is_arc
+#include "priv/template.h"
+typedef i_keyraw _m_raw;
+
+#if c_OPTION(c_no_atomic)
+  #define i_no_atomic
+#endif
+
+#if (!defined i_no_atomic || (defined (__STDC_VERSION__) && __STDC_VERSION__ < 201112L)) \
+    && !(defined __GNUC__ || defined __clang__ || defined _MSC_VER)
+#warning ISO C99 dose not support atomic types, arc will degenerate to rc. \
+Suppression warning by option `c_no_atomic` or define `i_no_automic`.
+#define i_no_atomic
+#endif
+
 #if defined __GNUC__ || defined __clang__ || defined _MSC_VER || defined i_no_atomic
     typedef long catomic_long;
 #else // try with C11
@@ -68,7 +86,7 @@ int main(void) {
     #include <intrin.h>
     #define c_atomic_inc(v) (void)_InterlockedIncrement(v)
     #define c_atomic_dec_and_test(v) !_InterlockedDecrement(v)
-#elif defined __GNUC__ || defined __clang__
+#elif defined __GNUC__ || defined __clang__ || defined i_no_atomic
     #define c_atomic_inc(v) (void)__atomic_add_fetch(v, 1, __ATOMIC_SEQ_CST)
     #define c_atomic_dec_and_test(v) !__atomic_sub_fetch(v, 1, __ATOMIC_SEQ_CST)
 #else // try with C11
@@ -81,16 +99,6 @@ int main(void) {
 struct _arc_metadata { catomic_long counter; };
 #endif // STC_ARC_H_INCLUDED
 
-#ifndef _i_prefix
-  #define _i_prefix arc_
-#endif
-#define _i_is_arc
-#include "priv/template.h"
-typedef i_keyraw _m_raw;
-
-#if c_OPTION(c_no_atomic)
-  #define i_no_atomic
-#endif
 #if !defined i_no_atomic
   #define _i_atomic_inc(v)          c_atomic_inc(v)
   #define _i_atomic_dec_and_test(v) c_atomic_dec_and_test(v)

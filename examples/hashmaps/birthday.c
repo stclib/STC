@@ -18,11 +18,12 @@ static void test_repeats(void)
     crand64 rng = crand64_from(seed);
 
     hmap_ui m = hmap_ui_with_capacity(N);
+    const LOG2E = 1/log(2);
     for (c_range(i, N)) {
         uint64_t k = crand64_uint_r(&rng, 1) & mask;
         int v = hmap_ui_insert(&m, k, 0).ref->second += 1;
         if (v > 1) printf("repeated value %" PRIu64 " (%d) at 2^%d\n",
-                          k, v, (int)log2((double)i));
+                          k, v, (int)(log((double)i))*LOG2E);
     }
     hmap_ui_drop(&m);
 }
