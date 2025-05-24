@@ -8,14 +8,12 @@
 // Requires coroutine Triple_next() and function Triple_begin() to be defined.
 
 typedef struct {
-    int max_triples;
     int a, b, c;
 } Triple, Triple_value;
 
 typedef struct {
     Triple* ref;    // required by iterator
     cco_state cco;  // required by coroutine
-    int count;
 } Triple_iter;
 
 int Triple_next(Triple_iter* it) {
@@ -26,8 +24,6 @@ int Triple_next(Triple_iter* it) {
             for (g->a = 1; g->a < g->c; ++g->a) {
                 for (g->b = g->a; g->b < g->c; ++g->b) {
                     if (g->a*g->a + g->b*g->b == g->c*g->c) {
-                        if (it->count++ == g->max_triples)
-                            cco_return;
                         cco_yield;
                     }
                 }
@@ -35,7 +31,7 @@ int Triple_next(Triple_iter* it) {
         }
         cco_finally:
         it->ref = NULL; // stop iteration
-        printf("Done\n");
+        printf("Coroutine done\n");
     }
     return 0;
 }
@@ -48,12 +44,13 @@ Triple_iter Triple_begin(Triple* g) {
 
 int main(void)
 {
-    Triple triple = {.max_triples = INT32_MAX};
+    Triple triple = {0};
 
     puts("Pythagorean triples.\nGet all triples with c < 40, using for c_each:");
+    int n=0;
     for (c_each(i, Triple, triple)) {
         if (i.ref->c < 40)
-            printf("%u: (%d, %d, %d)\n", i.count, i.ref->a, i.ref->b, i.ref->c);
+            printf("%u: (%d, %d, %d)\n", n++, i.ref->a, i.ref->b, i.ref->c);
         else
             cco_stop(&i);
     }
@@ -61,9 +58,9 @@ int main(void)
     puts("\nGet the 10 first triples with c < 40, using c_filter:");
     c_filter(Triple, triple, true
         && (value->c < 40)
-        && (cco_flt_take(10), // NB! use cco_flt_take(n) instead of c_flt_take(n)
-                              // to ensure coroutine/iter cleanup.
-                              // Also applies to cco_flt_takewhile(pred)
-            printf("%d: (%d, %d, %d)\n", c_flt_getcount(), value->a, value->b, value->c))
+        && cco_flt_take(10) // NB! use cco_flt_take(n) instead of c_flt_take(n)
+                            // to ensure coroutine cleanup.
+                            // Also applies to cco_flt_takewhile(pred)
+        && printf("%d: (%d, %d, %d)\n", c_flt_getcount(), value->a, value->b, value->c)
     );
 }

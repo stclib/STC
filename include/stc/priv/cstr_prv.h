@@ -272,13 +272,13 @@ STC_INLINE void cstr_uppercase(cstr* self)
 STC_INLINE bool cstr_istarts_with(const cstr* self, const char* sub) {
     csview sv = cstr_sv(self);
     isize len = c_strlen(sub);
-    return len <= sv.size && !utf8_icompare(sv, c_sv(sub, len));
+    return len <= sv.size && !utf8_icompare((sv.size = len, sv), c_sv(sub, len));
 }
 
 STC_INLINE bool cstr_iends_with(const cstr* self, const char* sub) {
     csview sv = cstr_sv(self);
-    isize n = c_strlen(sub);
-    return n <= sv.size && !utf8_icmp(sv.buf + sv.size - n, sub);
+    isize len = c_strlen(sub);
+    return len <= sv.size && !utf8_icmp(sv.buf + sv.size - len, sub);
 }
 
 STC_INLINE int cstr_icmp(const cstr* s1, const cstr* s2)

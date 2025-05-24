@@ -3,7 +3,7 @@
 
 # STC - Smart Template Containers
 
-## Version 5.1 RC4
+## Version 5.1 RC5
 STC is a comprehensive, high performance, typesafe and generic general purpose container and algorithms
 library for C99. It has excellent ergonomics and ease of use. The library elevates C into a modern programming
 language featuring a number of common containers and algorithms found in other contemporary system languages
@@ -16,9 +16,10 @@ of the container.
 <summary><b>Version 5 NEWS</b></summary>
 
 V5.1:
-- Possible to specify even complex container types as one-liners using `c_keyclass`, `c_keypro`, and `c_cmpclass` option flags.
-- Some breaking changes in cspan API.
+- Possible to specify even complex container types as one-liners using `c_keyclass`, `c_keypro`, and `c_cmpclass` option flags. May now define `T` instead of `i_type` as a shorthand.
+- Replaced **arc** with a new implementation which takes up only one pointer. Previous arc is now available as `<stc/arc2.h>`. The new **arc** may not be constructed from an object pointer, for that use **arc2**.
 - Updated and fixed bugs in **cregex** to handle invalid utf8 strings.
+- Some breaking changes in cspan API.
 - Several other smaller improvements and bug fixes.
 
 V5.0.2:
@@ -71,7 +72,7 @@ safety concerns.
 
 Containers
 ----------
-- [***arc*** - (atomic) reference counted shared pointer`](docs/arc_api.md)
+- [***arc***, ***arc2*** - (atomic) reference counted shared pointers](docs/arc_api.md)
 - [***box*** - heap allocated unique pointer`](docs/box_api.md)
 - [***cbits*** - dynamic bitset](docs/cbits_api.md)
 - [***list*** - forward linked list](docs/list_api.md)
@@ -918,7 +919,8 @@ STC is generally very memory efficient. Memory usage for the different container
 - **deque**, **queue**:  Type size: 2 pointers, 2 isize. Otherwise like *vec*.
 - **hmap/hset**: Type size: 2 pointers, 2 int32_t (default). *hmap* uses one table of keys+value, and one table of precomputed hash-value/used bucket, which occupies only one byte per bucket. The closed hashing has a default max load factor of 85%, and hash table scales by 1.5x when reaching that.
 - **smap/sset**: Type size: 1 pointer. *smap* manages its own ***array of tree-nodes*** for allocation efficiency. Each node uses two 32-bit ints for child nodes, and one byte for `level`, but has ***no parent node***.
-- **arc**: Type size: 1 pointer, 1 long for the reference counter + memory for the shared element.
+- **arc**: Type size: 1 pointer, 1 long for the shared reference counter + memory for the shared element.
+- **arc2**: Type size: 2 pointers, 1 long for the shared reference counter + memory for the shared element.
 - **box**: Type size: 1 pointer + memory for the pointed-to element.
 </details>
 

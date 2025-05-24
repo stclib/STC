@@ -28,7 +28,7 @@
 #define STC_TEMPLATE_H_INCLUDED
 
   #define _c_MEMB(name) c_JOIN(Self, name)
-  #define _c_DEFTYPES(macro, SELF, ...) c_EXPAND(macro(SELF, __VA_ARGS__))
+  #define _c_DEFTYPES(macro, SELF, ...) macro(SELF, __VA_ARGS__)
   #define _m_value _c_MEMB(_value)
   #define _m_key _c_MEMB(_key)
   #define _m_mapped _c_MEMB(_mapped)
@@ -42,7 +42,8 @@
   #define c_OPTION(flag)  ((i_opt) & (flag))
   #define c_declared      (1<<0)
   #define c_no_atomic     (1<<1)
-  #define c_no_clone      (1<<2)
+  #define c_arc2          (1<<2)
+  #define c_no_clone      (1<<3)
   #define c_no_hash       (1<<4)
   #define c_use_cmp       (1<<5)
   #define c_use_eq        (1<<6)

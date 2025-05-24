@@ -61,7 +61,7 @@ int main(void)
 
         for (c_each(i, Persons, vec)) {
             Person_raw p = Persons_value_toraw(i.ref);
-            printf("%s %s (%d)\n", p.name, p.last, (int)*i.ref->use_count);
+            printf("%s %s (%d)\n", p.name, p.last, (int)PersArc_use_count(*i.ref));
         }
         puts("");
 

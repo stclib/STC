@@ -33,7 +33,8 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#define declare_arc(C, VAL) _c_arc_types(C, VAL)
+#define declare_arc(C, VAL) _c_arc1_types(C, VAL)
+#define declare_arc2(C, VAL) _c_arc2_types(C, VAL)
 #define declare_box(C, VAL) _c_box_types(C, VAL)
 #define declare_deq(C, VAL) _c_deque_types(C, VAL)
 #define declare_list(C, VAL) _c_list_types(C, VAL)
@@ -69,8 +70,6 @@ typedef union {
 #define c_sv_2(str, n) (c_literal(csview){str, n})
 #define c_svfmt "%.*s"
 #define c_svarg(sv) (int)(sv).size, (sv).buf // printf(c_svfmt "\n", c_svarg(sv));
-#define c_SVARG(sv) c_svarg(sv) // [deprecated]
-#define c_SV(sv) c_svarg(sv) // [deprecated]
 
 // zsview : zero-terminated string view
 typedef csview_value zsview_value;
@@ -102,8 +101,22 @@ typedef union {
 #define c_true(...) __VA_ARGS__
 #define c_false(...)
 
-#define _c_arc_types(SELF, VAL) \
+#define _c_arc1_types(SELF, VAL) \
     typedef VAL SELF##_value; \
+\
+    typedef struct { \
+        SELF##_value value; \
+        catomic_long counter; \
+    } SELF##_ctrl; \
+\
+    typedef union SELF { \
+        SELF##_value* get; \
+        SELF##_ctrl* ctrl; \
+    } SELF
+
+#define _c_arc2_types(SELF, VAL) \
+    typedef VAL SELF##_value; \
+\
     typedef struct SELF { \
         SELF##_value* get; \
         catomic_long* use_count; \
@@ -111,6 +124,7 @@ typedef union {
 
 #define _c_box_types(SELF, VAL) \
     typedef VAL SELF##_value; \
+\
     typedef struct SELF { \
         SELF##_value* get; \
     } SELF

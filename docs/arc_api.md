@@ -54,7 +54,7 @@ In the following, `X` is the value of `i_key` unless `T` is defined.
 ```c++
 arc_X           arc_X_init();                                   // empty shared pointer
 arc_X           arc_X_from(i_keyraw raw);                       // create an arc from raw type (available if i_keyraw defined by user).
-arc_X           arc_X_from_ptr(i_key* p);                       // create an arc from raw pointer. Takes ownership of p.
+arc_X           arc2_X_from_ptr(i_key* p);                      // NB! only arc2: create an arc from raw pointer. Takes ownership of p.
 arc_X           arc_X_make(i_key key);                          // create an arc from constructed key object. Faster than from_ptr().
 
 arc_X           arc_X_clone(arc_X other);                       // return other with increased use count
@@ -63,17 +63,17 @@ void            arc_X_take(arc_X* self, arc_X unowned);         // take ownershi
 arc_X           arc_X_move(arc_X* self);                        // transfer ownership to receiver; self becomes NULL
 void            arc_X_drop(const arc_X* self);                  // destruct (decrease use count, free at 0)
 
-long            arc_X_use_count(const arc_X* self);
-void            arc_X_reset_to(arc_X* self, i_key* p);          // assign new arc from ptr. Takes ownership of p.
+long            arc_X_use_count(arc_X arc);
+void            arc2_X_reset_to(arc_X* self, i_key* p);         // NB! only arc2: assign new arc from ptr. Takes ownership of p.
 
-size_t          arc_X_hash(const arc_X* x);                     // hash value
+size_t          arc_X_hash(const arc_X* self);                  // hash value
 int             arc_X_cmp(const arc_X* x, const arc_X* y);      // compares pointer addresses if no `i_cmp` is specified
                                                                 // is defined. Otherwise uses 'i_cmp' or default cmp.
 bool            arc_X_eq(const arc_X* x, const arc_X* y);       // arc_X_cmp() == 0
 
 // functions on pointed to objects.
 
-size_t          arc_X_value_hash(const i_key* x);
+size_t          arc_X_value_hash(const i_key* self);
 int             arc_X_value_cmp(const i_key* x, const i_key* y);
 bool            arc_X_value_eq(const i_key* x, const i_key* y);
 ```
@@ -83,7 +83,7 @@ bool            arc_X_value_eq(const i_key* x, const i_key* y);
 | Type name        | Type definition                                   | Used to represent...   |
 |:-----------------|:--------------------------------------------------|:-----------------------|
 | `arc_null`       | `{0}`                                             | Init nullptr const     |
-| `arc_X`          | `struct { arc_X_value* get; long* use_count; }`   | The arc type          |
+| `arc_X`          | `union { arc_X_value* get; }`                     | The arc type          |
 | `arc_X_value`    | `i_key`                                           | The arc element type  |
 | `arc_X_raw`      | `i_keyraw`                                        | Convertion type        |
 

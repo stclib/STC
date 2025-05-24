@@ -240,7 +240,7 @@ _c_MEMB(_clone)(Self q) {
     Self out = q, *self = &out; (void)self; // may be used by _i_malloc/i_keyclone via i_aux.
     out.start = 0; out.end = _c_MEMB(_size)(&q);
     out.capmask = c_next_pow2(out.end + 1) - 1;
-    out.cbuf = _i_malloc(i_key, out.capmask + 1);
+    out.cbuf = _i_malloc(_m_value, out.capmask + 1);
     isize i = 0;
     if (out.cbuf)
         for (c_each(it, Self, q))

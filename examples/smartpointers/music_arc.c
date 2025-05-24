@@ -67,16 +67,10 @@ void example3(void)
     // Add a few more SongArcs to set2.
     SongSet_emplace(&set2, (SongView){"Bob Dylan", "The Times They Are A Changing"});
     SongSet_emplace(&set2, (SongView){"Michael Jackson", "Billie Jean"});
-    /*
+
     // The previous line is identical to:
-        SongSet_insert(&set2, SongArc_make((Song){cstr_lit("Michael Jackson"), cstr_lit("Billie Jean")}));
-    // And similar to:
-        Song* tmp = malloc(sizeof *tmp);
-        tmp->artist = cstr_lit("Michael Jackson");
-        tmp->title = cstr_lit("Billie Jean");
-        SongSet_insert(&set2, SongArc_from_ptr(tmp));
-    // Note that attemting to insert an existing element, insert will "drop"/free the given inputs.
-    */
+    //   SongSet_insert(&set2, SongArc_make((Song){cstr_lit("Michael Jackson"), cstr_lit("Billie Jean")}));
+
     // We now have two sets with some shared, some unique entries.
     // Remove "Thalia" from set1. Song is not destroyed, there is still one reference in set2:
     SongSet_erase(&set1, (SongView){"Thalia", "Entre El Mar y Una Estrella"});
@@ -87,7 +81,7 @@ void example3(void)
         for (c_each(s, SongSet, *i.ref))
             printf("  %s (%s), REFS: %ld\n", cstr_str(&s.ref->get->title),
                                              cstr_str(&s.ref->get->artist),
-                                             *s.ref->use_count);
+                                             SongArc_use_count(*s.ref));
     }
     const SongArc* found = SongSet_get(&set2, (SongView){"Aretha Franklin", "Bridge Over Troubled Water"});
     if (found) printf("FOUND: %s\n", cstr_str(&found->get->title));

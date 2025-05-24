@@ -53,7 +53,7 @@ int main(void)
     for (c_each(i, Arcset, set)) printf(" %d", *i.ref->get);
 
     Arc p = Arc_clone(vec.data[0]);
-    printf("\n%d is now owned by %ld objects\n", *p.get, *p.use_count);
+    printf("\n%d is now owned by %ld objects\n", *p.get, Arc_use_count(p));
 
     Arc_drop(&p);
     Arcvec_drop(&vec);

@@ -20,8 +20,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-/* carc: atomic reference counted shared_ptr
+/* arc: atomic reference counted shared_ptr (new implementation)
+ *
+ * The difference between arc and arc2 is that arc only takes up one pointer,
+ * whereas arc2 uses two. arc cannot be constructed from an already allocated pointer,
+ * which arc2 may. To use arc2, specify the `(c_arc2)` option after the key type, e.g.:
+ * #define T MyArc, MyType, (c_arc2 | c_no_atomic)
+ */
+/*
 #include <stc/cstr.h>
 
 typedef struct { cstr name, last; } Person;
@@ -98,17 +104,61 @@ typedef i_keyraw _m_raw;
   #define _i_atomic_inc(v)          (void)(++*(v))
   #define _i_atomic_dec_and_test(v) !(--*(v))
 #endif
+
+#if !c_OPTION(c_arc2)
+// ------------ Arc with one pointer (union) -------------
+
 #ifndef i_declared
-_c_DEFTYPES(_c_arc_types, Self, i_key);
+_c_DEFTYPES(_c_arc1_types, Self, i_key);
 #endif
-struct _c_MEMB(_rep_) { struct _arc_metadata metadata; i_key value; };
 
-STC_INLINE Self _c_MEMB(_init)(void)
-    { return c_literal(Self){NULL, NULL}; }
+STC_INLINE long _c_MEMB(_use_count)(Self arc)
+    { return arc.ctrl ? arc.ctrl->counter : 0; }
 
-STC_INLINE long _c_MEMB(_use_count)(const Self* self)
-    { return self->use_count ? *self->use_count : 0; }
+// c++: std::make_shared<_m_value>(val)
+STC_INLINE Self _c_MEMB(_make)(_m_value val) {
+    Self arc = {.ctrl=_i_malloc(_c_MEMB(_ctrl), 1)};
+    arc.ctrl->value = val;
+    arc.ctrl->counter = 1;
+    return arc;
+}
 
+// destructor
+STC_INLINE void _c_MEMB(_drop)(const Self* self) {
+    if (self->ctrl && _i_atomic_dec_and_test(&self->ctrl->counter)) {
+        i_keydrop(self->get);
+        free(self->ctrl);
+    }
+}
+
+// make shared ownership with owned arc
+STC_INLINE void _c_MEMB(_assign)(Self* self, const Self* owned) {
+    if (owned->ctrl)
+        _i_atomic_inc(&owned->ctrl->counter);
+    _c_MEMB(_drop)(self);
+    *self = *owned;
+}
+
+// clone by sharing. Does not use i_keyclone, so OK to always define.
+STC_INLINE Self _c_MEMB(_clone)(Self owned) {
+    if (owned.ctrl)
+        _i_atomic_inc(&owned.ctrl->counter);
+    return owned;
+}
+
+#else // -------------- Arc with two pointers ---------------
+
+#ifndef i_declared
+_c_DEFTYPES(_c_arc2_types, Self, i_key);
+#endif
+
+struct _c_MEMB(_rep_) {
+    struct _arc_metadata metadata;
+    _m_value value;
+};
+
+STC_INLINE long _c_MEMB(_use_count)(Self arc)
+    { return arc.use_count ? *arc.use_count : 0; }
 
 // c++: std::make_shared<_m_value>(val)
 STC_INLINE Self _c_MEMB(_make)(_m_value val) {
@@ -130,12 +180,6 @@ STC_INLINE Self _c_MEMB(_from_ptr)(_m_value* ptr) {
     return unowned;
 }
 
-STC_INLINE Self _c_MEMB(_from)(_m_raw raw)
-    { return _c_MEMB(_make)(i_keyfrom(raw)); }
-
-STC_INLINE _m_raw _c_MEMB(_toraw)(const Self* self)
-    { return i_keytoraw(self->get); }
-
 // destructor
 STC_INLINE void _c_MEMB(_drop)(const Self* self) {
     if (self->use_count && _i_atomic_dec_and_test(self->use_count)) {
@@ -151,36 +195,42 @@ STC_INLINE void _c_MEMB(_drop)(const Self* self) {
     }
 }
 
-// move ownership to receiving arc
-STC_INLINE Self _c_MEMB(_move)(Self* self) {
-    Self arc = *self;
-    memset(self, 0, sizeof *self);
-    return arc; // now unowned
-}
-
-// take ownership of pointer p
-STC_INLINE void _c_MEMB(_reset_to)(Self* self, _m_value* ptr) {
-    _c_MEMB(_drop)(self);
-    *self = _c_MEMB(_from_ptr)(ptr);
-}
-
-// take ownership of unowned arc
-STC_INLINE void _c_MEMB(_take)(Self* self, Self unowned) {
-    _c_MEMB(_drop)(self);
-    *self = unowned;
-}
-
 // make shared ownership with owned arc
 STC_INLINE void _c_MEMB(_assign)(Self* self, const Self* owned) {
-    if (owned->use_count) _i_atomic_inc(owned->use_count);
+    if (owned->use_count)
+        _i_atomic_inc(owned->use_count);
     _c_MEMB(_drop)(self);
     *self = *owned;
 }
 
 // clone by sharing. Does not use i_keyclone, so OK to always define.
 STC_INLINE Self _c_MEMB(_clone)(Self owned) {
-    if (owned.use_count) _i_atomic_inc(owned.use_count);
+    if (owned.use_count)
+        _i_atomic_inc(owned.use_count);
     return owned;
+}
+#endif // ---------- end Arc with two pointers ------------
+
+STC_INLINE Self _c_MEMB(_init)(void)
+    { return c_literal(Self){0}; }
+
+STC_INLINE Self _c_MEMB(_from)(_m_raw raw)
+    { return _c_MEMB(_make)(i_keyfrom(raw)); }
+
+STC_INLINE _m_raw _c_MEMB(_toraw)(const Self* self)
+    { return i_keytoraw(self->get); }
+
+// move ownership to receiving arc
+STC_INLINE Self _c_MEMB(_move)(Self* self) {
+    Self arc = *self;
+    *self = (Self){0};
+    return arc; // now unowned
+}
+
+// take ownership of unowned arc
+STC_INLINE void _c_MEMB(_take)(Self* self, Self unowned) {
+    _c_MEMB(_drop)(self);
+    *self = unowned; // now owned
 }
 
 #if defined _i_has_cmp

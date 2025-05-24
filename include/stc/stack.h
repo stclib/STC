@@ -206,7 +206,7 @@ STC_INLINE void _c_MEMB(_copy)(Self *self, const Self* other) {
 STC_INLINE _m_value _c_MEMB(_value_clone)(const Self* self, _m_value val)
     { (void)self; return i_keyclone(val); }
 
-STC_INLINE i_keyraw _c_MEMB(_value_toraw)(const _m_value* val)
+STC_INLINE _m_raw _c_MEMB(_value_toraw)(const _m_value* val)
     { return i_keytoraw(val); }
 #endif // !i_no_clone
 
