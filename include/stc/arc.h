@@ -82,9 +82,6 @@ int main(void) {
     #define c_atomic_inc(v) (void)atomic_fetch_add(v, 1)
     #define c_atomic_dec_and_test(v) (atomic_fetch_sub(v, 1) == 1)
 #endif
-
-// @wmww: Now fixed rare memleak by adding 4 bytes when allocating the counter alone.
-struct _arc_metadata { catomic_long counter; };
 #endif // STC_ARC_H_INCLUDED
 
 #ifndef _i_prefix
@@ -106,14 +103,11 @@ typedef i_keyraw _m_raw;
 #endif
 
 #if !c_OPTION(c_arc2)
-// ------------ Arc with one pointer (union) -------------
+// ------------ Arc occupying one pointer (union) -------------
 
 #ifndef i_declared
 _c_DEFTYPES(_c_arc1_types, Self, i_key);
 #endif
-
-STC_INLINE long _c_MEMB(_use_count)(Self arc)
-    { return arc.ctrl ? arc.ctrl->counter : 0; }
 
 // c++: std::make_shared<_m_value>(val)
 STC_INLINE Self _c_MEMB(_make)(_m_value val) {
@@ -131,85 +125,58 @@ STC_INLINE void _c_MEMB(_drop)(const Self* self) {
     }
 }
 
-// make shared ownership with owned arc
-STC_INLINE void _c_MEMB(_assign)(Self* self, const Self* owned) {
-    if (owned->ctrl)
-        _i_atomic_inc(&owned->ctrl->counter);
-    _c_MEMB(_drop)(self);
-    *self = *owned;
-}
-
-// clone by sharing. Does not use i_keyclone, so OK to always define.
-STC_INLINE Self _c_MEMB(_clone)(Self owned) {
-    if (owned.ctrl)
-        _i_atomic_inc(&owned.ctrl->counter);
-    return owned;
-}
-
-#else // -------------- Arc with two pointers ---------------
+#else // -------------- Arc2 occupying two pointers ---------------
 
 #ifndef i_declared
 _c_DEFTYPES(_c_arc2_types, Self, i_key);
 #endif
 
-struct _c_MEMB(_rep_) {
-    struct _arc_metadata metadata;
-    _m_value value;
-};
-
-STC_INLINE long _c_MEMB(_use_count)(Self arc)
-    { return arc.use_count ? *arc.use_count : 0; }
-
 // c++: std::make_shared<_m_value>(val)
 STC_INLINE Self _c_MEMB(_make)(_m_value val) {
-    Self unowned;
-    struct _c_MEMB(_rep_)* rep = _i_malloc(struct _c_MEMB(_rep_), 1);
-    *(unowned.use_count = &rep->metadata.counter) = 1;
-    *(unowned.get = &rep->value) = val; // (.use_count, .get) are OFFSET bytes apart.
-    return unowned;
+    Self out = {.ctrl=_i_malloc(_c_MEMB(_ctrl), 1)};
+    out.ctrl->counter = 1;
+    out.get = &out.ctrl->value;
+    *out.get = val;
+    return out;
 }
 
 STC_INLINE Self _c_MEMB(_from_ptr)(_m_value* ptr) {
-    enum {OFFSET = offsetof(struct _c_MEMB(_rep_), value)};
-    Self unowned = {ptr};
+    Self out = {.get=ptr};
     if (ptr) {
-        // Adds 4 dummy bytes to ensure that the if-test in _drop() is safe.
-        struct _arc_metadata* meta = (struct _arc_metadata*)i_malloc(OFFSET + 4);
-        *(unowned.use_count = &meta->counter) = 1;
+        enum {OFFSET = offsetof(_c_MEMB(_ctrl), value)};
+        // Adds 2 dummy bytes to ensure that the second if-test in _drop() is safe.
+        catomic_long* _rc = (catomic_long*)i_malloc(OFFSET + 2);
+        out.ctrl = (_c_MEMB(_ctrl)*) _rc;
+        out.ctrl->counter = 1;
     }
-    return unowned;
+    return out;
 }
 
 // destructor
 STC_INLINE void _c_MEMB(_drop)(const Self* self) {
-    if (self->use_count && _i_atomic_dec_and_test(self->use_count)) {
-        enum {OFFSET = offsetof(struct _c_MEMB(_rep_), value)};
+    if (self->ctrl && _i_atomic_dec_and_test(&self->ctrl->counter)) {
+        enum {OFFSET = offsetof(_c_MEMB(_ctrl), value)};
         i_keydrop(self->get);
 
-        if ((char*)self->use_count + OFFSET == (char*)self->get) {
-            i_free((void*)self->use_count, c_sizeof(struct _c_MEMB(_rep_))); // _make()
+        if ((char*)self->ctrl + OFFSET == (char*)self->get) {
+            i_free((void*)self->ctrl, c_sizeof *self->ctrl); // _make()
         } else {
-            i_free((void*)self->use_count, OFFSET + 4); // _from_ptr()
+            i_free((void*)self->ctrl, OFFSET + 2); // _from_ptr()
             i_free(self->get, c_sizeof *self->get);
         }
     }
 }
 
-// make shared ownership with owned arc
-STC_INLINE void _c_MEMB(_assign)(Self* self, const Self* owned) {
-    if (owned->use_count)
-        _i_atomic_inc(owned->use_count);
+// take ownership of pointer p
+STC_INLINE void _c_MEMB(_reset_to)(Self* self, _m_value* ptr) {
     _c_MEMB(_drop)(self);
-    *self = *owned;
+    *self = _c_MEMB(_from_ptr)(ptr);
 }
 
-// clone by sharing. Does not use i_keyclone, so OK to always define.
-STC_INLINE Self _c_MEMB(_clone)(Self owned) {
-    if (owned.use_count)
-        _i_atomic_inc(owned.use_count);
-    return owned;
-}
-#endif // ---------- end Arc with two pointers ------------
+#endif // ---------- end Arc2 with two pointers ------------
+
+STC_INLINE long _c_MEMB(_use_count)(Self arc)
+    { return arc.ctrl ? arc.ctrl->counter : 0; }
 
 STC_INLINE Self _c_MEMB(_init)(void)
     { return c_literal(Self){0}; }
@@ -231,6 +198,21 @@ STC_INLINE Self _c_MEMB(_move)(Self* self) {
 STC_INLINE void _c_MEMB(_take)(Self* self, Self unowned) {
     _c_MEMB(_drop)(self);
     *self = unowned; // now owned
+}
+
+// make shared ownership with owned arc
+STC_INLINE void _c_MEMB(_assign)(Self* self, const Self* owned) {
+    if (owned->ctrl)
+        _i_atomic_inc(&owned->ctrl->counter);
+    _c_MEMB(_drop)(self);
+    *self = *owned;
+}
+
+// clone by sharing. Does not use i_keyclone, so OK to always define.
+STC_INLINE Self _c_MEMB(_clone)(Self owned) {
+    if (owned.ctrl)
+        _i_atomic_inc(&owned.ctrl->counter);
+    return owned;
 }
 
 #if defined _i_has_cmp

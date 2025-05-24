@@ -116,10 +116,15 @@ typedef union {
 
 #define _c_arc2_types(SELF, VAL) \
     typedef VAL SELF##_value; \
-\
+    \
+    typedef struct { \
+        catomic_long counter; \
+        SELF##_value value; \
+    } SELF##_ctrl; \
+    \
     typedef struct SELF { \
         SELF##_value* get; \
-        catomic_long* use_count; \
+        SELF##_ctrl* ctrl; \
     } SELF
 
 #define _c_box_types(SELF, VAL) \
