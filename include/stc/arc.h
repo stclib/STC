@@ -109,7 +109,7 @@ typedef i_keyraw _m_raw;
 // ------------ Arc occupying one pointer (union) -------------
 
 #ifndef i_declared
-_c_DEFTYPES(_c_arc1_types, Self, i_key);
+_c_DEFTYPES(declare_arc1, Self, i_key);
 #endif
 
 // c++: std::make_shared<_m_value>(val)
@@ -131,7 +131,7 @@ STC_INLINE void _c_MEMB(_drop)(const Self* self) {
 #else // -------------- Arc2 occupying two pointers ---------------
 
 #ifndef i_declared
-_c_DEFTYPES(_c_arc2_types, Self, i_key);
+_c_DEFTYPES(declare_arc2, Self, i_key);
 #endif
 
 // c++: std::make_shared<_m_value>(val)

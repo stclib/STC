@@ -39,9 +39,9 @@
 #ifndef i_declared
 #ifdef i_capacity
   #define i_no_clone
-  _c_DEFTYPES(_c_stack_fixed, Self, i_key, i_capacity);
+  _c_DEFTYPES(declare_stack_fixed, Self, i_key, i_capacity);
 #else
-  _c_DEFTYPES(_c_vec_types, Self, i_key);
+  _c_DEFTYPES(declare_stack, Self, i_key);
 #endif
 #endif
 typedef i_keyraw _m_raw;

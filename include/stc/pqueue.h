@@ -35,7 +35,7 @@
 #define _i_sorted
 #include "priv/template.h"
 #ifndef i_declared
-  _c_DEFTYPES(_c_vec_types, Self, i_key);
+  _c_DEFTYPES(declare_pqueue, Self, i_key);
 #endif
 typedef i_keyraw _m_raw;
 

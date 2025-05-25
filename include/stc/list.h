@@ -87,7 +87,7 @@
 
 #define _i_is_list
 #ifndef i_declared
-  _c_DEFTYPES(_c_list_types, Self, i_key);
+  _c_DEFTYPES(declare_list, Self, i_key);
 #endif
 _c_DEFTYPES(_c_list_complete_types, Self, dummy);
 typedef i_keyraw _m_raw;

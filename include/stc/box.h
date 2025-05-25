@@ -73,7 +73,7 @@ int main(void) {
 typedef i_keyraw _m_raw;
 
 #ifndef i_declared
-_c_DEFTYPES(_c_box_types, Self, i_key);
+_c_DEFTYPES(declare_box, Self, i_key);
 #endif
 
 // constructors (take ownership)

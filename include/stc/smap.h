@@ -71,7 +71,7 @@ int main(void) {
 #define _i_sorted
 #include "priv/template.h"
 #ifndef i_declared
-  _c_DEFTYPES(_c_aatree_types, Self, i_key, i_val, _i_MAP_ONLY, _i_SET_ONLY);
+  _c_DEFTYPES(declare_aatree, Self, i_key, i_val, _i_MAP_ONLY, _i_SET_ONLY);
 #endif
 
 _i_MAP_ONLY( struct _m_value {

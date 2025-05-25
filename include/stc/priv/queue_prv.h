@@ -23,7 +23,7 @@
 
 // IWYU pragma: private
 #ifndef i_declared
-_c_DEFTYPES(_c_deque_types, Self, i_key);
+_c_DEFTYPES(declare_queue, Self, i_key);
 #endif
 typedef i_keyraw _m_raw;
 
