@@ -53,7 +53,7 @@ int main(void) {
     ArcPers p = ArcPers_from(Person_make("John", "Smiths"));
     ArcPers q = ArcPers_clone(p); // share the pointer
 
-    printf("%s %s. uses: %ld\n", cstr_str(&q.get->name), cstr_str(&q.get->last), *q.use_count);
+    printf("%s %s. uses: %ld\n", cstr_str(&q.get->name), cstr_str(&q.get->last), ArcPers_use_count(q));
     c_drop(ArcPers, &p, &q);
 }
 */
@@ -102,7 +102,10 @@ typedef i_keyraw _m_raw;
   #define _i_atomic_dec_and_test(v) !(--*(v))
 #endif
 
-#if !c_OPTION(c_arc2)
+#if c_OPTION(c_arc2)
+  #define i_arc2
+#endif
+#if !(defined i_arc2 || defined STC_USE_ARC2)
 // ------------ Arc occupying one pointer (union) -------------
 
 #ifndef i_declared
@@ -231,6 +234,7 @@ STC_INLINE Self _c_MEMB(_clone)(Self owned) {
 #endif // i_no_hash
 
 #undef i_no_atomic
+#undef i_arc2
 #undef _i_atomic_inc
 #undef _i_atomic_dec_and_test
 #undef _i_is_arc

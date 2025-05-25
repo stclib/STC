@@ -33,7 +33,7 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#define declare_arc(C, VAL) _c_arc1_types(C, VAL)
+#define declare_arc1(C, VAL) _c_arc1_types(C, VAL)
 #define declare_arc2(C, VAL) _c_arc2_types(C, VAL)
 #define declare_box(C, VAL) _c_box_types(C, VAL)
 #define declare_deq(C, VAL) _c_deque_types(C, VAL)
