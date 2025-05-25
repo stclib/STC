@@ -14,7 +14,18 @@ All **arc** functions can be called by multiple threads on different instances o
 additional synchronization even if these instances are copies and share ownership of the same object.
 **arc** uses thread-safe atomic reference counting, through the *arc_X_clone()* and *arc_X_drop()* methods.
 
-When declaring a container with shared pointers, define `i_keypro` with the arc type, see example.
+- ***arc type 1*** is the default arc type. It occupies the size of only one pointer, and it can convert
+a raw pointer gotten from an arc back to an arc with the *X_toarc()* function. Conceptually, the arc which
+passed the raw pointer should be ***moved*** (or not dropped), e.g.:
+```c++
+Arc a1 = Arc_make(value);
+Value* vp = Arc_move(&a1).get; // a1 will now be NULL
+Arc a2 = Arc_toarc(vp);
+c_drop(Arc, &a1, &a2);
+```
+- ***arc type 2*** occupies the size of two pointers, however it may also be constructed from a existing unmanaged
+pointer. Enable it by `#define T Arc, key, (c_arc2)`
+- When defining a container with shared pointer elements, add *c_keypro*/*valpro*: `#define T MyVec, MyArc, (c_keypro)`
 
 See similar c++ class [std::shared_ptr](https://en.cppreference.com/w/cpp/memory/shared_ptr) for a functional reference, or Rust [std::sync::Arc](https://doc.rust-lang.org/std/sync/struct.Arc.html) / [std::rc::Rc](https://doc.rust-lang.org/std/rc/struct.Rc.html).
 
@@ -54,17 +65,18 @@ In the following, `X` is the value of `i_key` unless `T` is defined.
 ```c++
 arc_X           arc_X_init();                                   // empty shared pointer
 arc_X           arc_X_from(i_keyraw raw);                       // create an arc from raw type (available if i_keyraw defined by user).
-arc_X           arc2_X_from_ptr(i_key* p);                      // NB! only arc2: create an arc from raw pointer. Takes ownership of p.
+arc_X           arc2_X_from_ptr(i_key* ptr);                    // NB! arc2 only: create an arc from raw pointer. Takes ownership of p.
 arc_X           arc_X_make(i_key key);                          // create an arc from constructed key object. Faster than from_ptr().
 
 arc_X           arc_X_clone(arc_X other);                       // return other with increased use count
 void            arc_X_assign(arc_X* self, const arc_X* other);  // shared assign (increases use count)
 void            arc_X_take(arc_X* self, arc_X unowned);         // take ownership of unowned.
 arc_X           arc_X_move(arc_X* self);                        // transfer ownership to receiver; self becomes NULL
+arc_X           arc1_X_toarc(i_key* ptr);                       // NB! arc1 only: convert raw pointer previously created by arc back to arc.
 void            arc_X_drop(const arc_X* self);                  // destruct (decrease use count, free at 0)
 
 long            arc_X_use_count(arc_X arc);
-void            arc2_X_reset_to(arc_X* self, i_key* p);         // NB! only arc2: assign new arc from ptr. Takes ownership of p.
+void            arc2_X_reset_to(arc_X* self, i_key* ptr);       // NB! arc2 only: assign new arc from ptr. Takes ownership of p.
 
 size_t          arc_X_hash(const arc_X* self);                  // hash value
 int             arc_X_cmp(const arc_X* x, const arc_X* y);      // compares pointer addresses if no `i_cmp` is specified

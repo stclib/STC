@@ -105,7 +105,7 @@ typedef union {
 \
     typedef union SELF { \
         SELF##_value* get; \
-        SELF##_ctrl* ctrl; \
+        SELF##_ctrl* ctrl1; \
     } SELF
 
 #define declare_arc2(SELF, VAL) \
@@ -118,7 +118,7 @@ typedef union {
     \
     typedef struct SELF { \
         SELF##_value* get; \
-        SELF##_ctrl* ctrl; \
+        SELF##_ctrl* ctrl2; \
     } SELF
 
 #define declare_box(SELF, VAL) \

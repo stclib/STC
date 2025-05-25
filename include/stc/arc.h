@@ -106,39 +106,44 @@ typedef i_keyraw _m_raw;
   #define i_arc2
 #endif
 #if !(defined i_arc2 || defined STC_USE_ARC2)
-// ------------ Arc occupying one pointer (union) -------------
+// ------------ Arc1 size of one pointer (union) -------------
 
 #ifndef i_declared
 _c_DEFTYPES(declare_arc1, Self, i_key);
 #endif
+#define ctrl ctrl1
 
 // c++: std::make_shared<_m_value>(val)
 STC_INLINE Self _c_MEMB(_make)(_m_value val) {
-    Self arc = {.ctrl=_i_malloc(_c_MEMB(_ctrl), 1)};
-    arc.ctrl->value = val;
-    arc.ctrl->counter = 1;
+    Self arc = {.ctrl1=_i_malloc(_c_MEMB(_ctrl), 1)};
+    arc.ctrl1->value = val;
+    arc.ctrl1->counter = 1;
     return arc;
 }
 
+STC_INLINE Self _c_MEMB(_toarc)(_m_value* arc_raw)
+    { Self arc = {.ctrl1=(_c_MEMB(_ctrl) *)arc_raw}; return arc; }
+
 // destructor
 STC_INLINE void _c_MEMB(_drop)(const Self* self) {
-    if (self->ctrl && _i_atomic_dec_and_test(&self->ctrl->counter)) {
+    if (self->ctrl1 && _i_atomic_dec_and_test(&self->ctrl1->counter)) {
         i_keydrop(self->get);
-        free(self->ctrl);
+        i_free(self->ctrl1, c_sizeof *self->ctrl1);
     }
 }
 
-#else // -------------- Arc2 occupying two pointers ---------------
+#else // ------------ Arc2 size of two pointers -------------
 
 #ifndef i_declared
 _c_DEFTYPES(declare_arc2, Self, i_key);
 #endif
+#define ctrl ctrl2
 
 // c++: std::make_shared<_m_value>(val)
 STC_INLINE Self _c_MEMB(_make)(_m_value val) {
-    Self out = {.ctrl=_i_malloc(_c_MEMB(_ctrl), 1)};
-    out.ctrl->counter = 1;
-    out.get = &out.ctrl->value;
+    Self out = {.ctrl2=_i_malloc(_c_MEMB(_ctrl), 1)};
+    out.ctrl2->counter = 1;
+    out.get = &out.ctrl2->value;
     *out.get = val;
     return out;
 }
@@ -149,22 +154,22 @@ STC_INLINE Self _c_MEMB(_from_ptr)(_m_value* ptr) {
         enum {OFFSET = offsetof(_c_MEMB(_ctrl), value)};
         // Adds 2 dummy bytes to ensure that the second if-test in _drop() is safe.
         catomic_long* _rc = (catomic_long*)i_malloc(OFFSET + 2);
-        out.ctrl = (_c_MEMB(_ctrl)*) _rc;
-        out.ctrl->counter = 1;
+        out.ctrl2 = (_c_MEMB(_ctrl)*) _rc;
+        out.ctrl2->counter = 1;
     }
     return out;
 }
 
 // destructor
 STC_INLINE void _c_MEMB(_drop)(const Self* self) {
-    if (self->ctrl && _i_atomic_dec_and_test(&self->ctrl->counter)) {
+    if (self->ctrl2 && _i_atomic_dec_and_test(&self->ctrl2->counter)) {
         enum {OFFSET = offsetof(_c_MEMB(_ctrl), value)};
         i_keydrop(self->get);
 
-        if ((char*)self->ctrl + OFFSET == (char*)self->get) {
-            i_free((void*)self->ctrl, c_sizeof *self->ctrl); // _make()
+        if ((char*)self->ctrl2 + OFFSET == (char*)self->get) {
+            i_free((void*)self->ctrl2, c_sizeof *self->ctrl2); // _make()
         } else {
-            i_free((void*)self->ctrl, OFFSET + 2); // _from_ptr()
+            i_free((void*)self->ctrl2, OFFSET + 2); // _from_ptr()
             i_free(self->get, c_sizeof *self->get);
         }
     }
@@ -233,6 +238,7 @@ STC_INLINE Self _c_MEMB(_clone)(Self owned) {
         { return i_hash(rx); }
 #endif // i_no_hash
 
+#undef ctrl
 #undef i_no_atomic
 #undef i_arc2
 #undef _i_atomic_inc
