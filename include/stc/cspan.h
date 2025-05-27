@@ -111,7 +111,8 @@ typedef int32_t cspan_istride, _istride;
         return s; \
     } \
     STC_INLINE Self##_iter Self##_begin(const Self* self) { \
-        return c_literal(Self##_iter){.ref=self->data, ._s=self}; \
+        return c_literal(Self##_iter){ \
+            .ref=RANK==1 && self->shape[0]==0 ? NULL : self->data, ._s=self}; \
     } \
     STC_INLINE Self##_iter Self##_end(const Self* self) { \
         (void)self; \

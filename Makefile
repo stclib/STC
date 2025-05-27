@@ -11,7 +11,7 @@ ifeq ($(origin CXX),default)
 	CXX := g++
 endif
 
-CFLAGS    ?= -std=c11 -Iinclude -MMD -O3 -Wpedantic -Wall -Wextra -Werror -Wno-missing-field-initializers
+CFLAGS    ?= -std=c11 -Iinclude -MMD -O3 -Werror -Wpedantic -Wall -Wextra -Wconversion -Wno-missing-field-initializers
 CXXFLAGS  ?= -std=c++20 -Iinclude -O3 -MMD -Wall
 LDFLAGS   ?= -fopenmp
 ifeq ($(CC),tcc)
@@ -61,7 +61,7 @@ fast:
 all: $(PROGRAMS)
 	@echo
 
-$(PROGRAMS): $(LIB_PATH) $(MAKEFILE)
+$(PROGRAMS): $(LIB_PATH)
 
 clean:
 	@$(RM_F) $(LIB_OBJS) $(EX_OBJS) $(TEST_OBJS) $(LIB_DEPS) $(EX_DEPS) $(TEST_DEPS) $(LIB_PATH) $(EX_EXES) $(TEST_EXE)
@@ -78,17 +78,17 @@ $(LIB_PATH): $(LIB_OBJS)
 	@printf "\r\e[2K%s" "$(AR_RCS) $@"
 	@$(AR_RCS) $@ $(LIB_OBJS)
 
-$(OBJ_DIR)/%.o: %.c
+$(OBJ_DIR)/%.o: %.c Makefile
 	@$(MKDIR_P) $(@D)
 	@printf "\r\e[2K%s" "$(CC) $(<F) -o $@"
 	@$(CC) $< -c -o $@ $(CFLAGS)
 
-$(OBJ_DIR)/%.o: %.cpp
+$(OBJ_DIR)/%.o: %.cpp Makefile
 	@$(MKDIR_P) $(@D)
 	@printf "\r\e[2K%s" "$(CXX) $(<F) -o $@"
 	@$(CXX) $< -c -o $@ $(CXXFLAGS)
 
-$(OBJ_DIR)/%$(DOTEXE): %.c $(LIB_PATH)
+$(OBJ_DIR)/%$(DOTEXE): %.c $(LIB_PATH) Makefile
 	@$(MKDIR_P) $(@D)
 	@printf "\r\e[2K%s" "$(CC) $(<F) -o $@"
 	@$(CC) -o $@ $(CFLAGS) -s $< $(LDFLAGS) -L$(BUILDDIR) -l$(LIB_NAME)
