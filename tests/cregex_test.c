@@ -27,7 +27,7 @@ TEST(cregex, compile_match_char)
     EXPECT_EQ(re.error, 0);
 
     csview match;
-    EXPECT_EQ(cregex_match(&re, input="äsdf", &match, CREG_FULLMATCH), CREG_OK);
+    EXPECT_EQ(cregex_match_pro(&re, input="äsdf", &match, CREG_FULLMATCH), CREG_OK);
     EXPECT_EQ(M_START(match), 0);
     EXPECT_EQ(M_END(match), 5); // ä is two bytes wide
 

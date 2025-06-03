@@ -90,15 +90,15 @@ typedef struct {
     cregex_match_next_sv(it.regex, it.input, it.match) == CREG_OK && it.match[0].size;
 
 /* compile a regex from a pattern. return CREG_OK, or negative error code on failure. */
-#define cregex_compile(...) c_MACRO_OVERLOAD(cregex_compile, __VA_ARGS__)
-#define cregex_compile_2(re, pattern) \
-    cregex_compile_3(re, pattern, CREG_DEFAULT)
-int cregex_compile_3(cregex *re, const char* pattern, int cflags);
+int cregex_compile_pro(cregex *re, const char* pattern, int cflags);
+
+STC_INLINE int cregex_compile(cregex *re, const char* pattern)
+    { return cregex_compile_pro(re, pattern, CREG_DEFAULT); }
 
 /* construct and return a regex from a pattern. return CREG_OK, or negative error code on failure. */
 STC_INLINE cregex cregex_make(const char* pattern, int cflags) {
     cregex re = {0};
-    cregex_compile_3(&re, pattern, cflags);
+    cregex_compile_pro(&re, pattern, cflags);
     return re;
 }
 STC_INLINE cregex cregex_from(const char* pattern)
@@ -110,30 +110,30 @@ int cregex_captures(const cregex* re);
 
 
 /* return CREG_OK, CREG_NOMATCH or CREG_MATCHERROR. */
-#define cregex_match(...) c_MACRO_OVERLOAD(cregex_match, __VA_ARGS__)
-#define cregex_match_3(re, input, match) \
-    cregex_match_4(re, input, match, CREG_DEFAULT)
-int cregex_match_4(const cregex* re, const char* input, csview match[], int mflags);
+int cregex_match_pro(const cregex* re, const char* input, csview match[], int mflags);
+
+STC_INLINE int cregex_match(const cregex* re, const char* input, csview match[])
+    { return cregex_match_pro(re, input, match, CREG_DEFAULT); }
 
 STC_INLINE int cregex_match_sv(const cregex* re, csview input, csview match[]) {
     match[0] = input;
-    return cregex_match_4(re, input.buf, match, CREG_STARTEND);
+    return cregex_match_pro(re, input.buf, match, CREG_STARTEND);
 }
 
 
 STC_INLINE bool cregex_is_match(const cregex* re, const char* input)
-    { return cregex_match_4(re, input, NULL, CREG_DEFAULT) == CREG_OK; }
+    { return cregex_match_pro(re, input, NULL, CREG_DEFAULT) == CREG_OK; }
 
 STC_INLINE int cregex_match_next_sv(const cregex* re, csview input, csview match[]) {
     if (match[0].buf) {
         match[0].buf += match[0].size;
         match[0].size = input.buf + input.size - match[0].buf;
     }
-    return cregex_match_4(re, input.buf, match, CREG_STARTEND);
+    return cregex_match_pro(re, input.buf, match, CREG_STARTEND);
 }
 
 STC_INLINE int cregex_match_next(const cregex* re, const char* input, csview match[]) {
-    return cregex_match_4(re, input, match, CREG_NEXT);
+    return cregex_match_pro(re, input, match, CREG_NEXT);
 }
 
 /* match + compile RE pattern */
