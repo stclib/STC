@@ -114,6 +114,7 @@ struct tm;
 FMT_API const char* _fmt_time(const char *fmt, const struct tm* tm, char* buf, int bufsize);
 FMT_API void        fmt_close(fmt_stream* ss);
 FMT_API int        _fmt_parse(char* p, int nargs, const char *fmt, ...);
+__attribute__((format(printf, 2, 3)))
 FMT_API void       _fmt_sprint(fmt_stream*, const char* fmt, ...);
 #define            _fmt_init(_fs, _fmt, fmt, nargs) \
                         const char* _fmt = fmt; \

@@ -63,6 +63,7 @@ extern  char* _cstr_internal_move(cstr* self, isize pos1, isize pos2);
 #define             cstr_lit(literal) cstr_from_n(literal, c_litstrlen(literal))
 
 extern  cstr        cstr_from_replace(csview sv, csview search, csview repl, int32_t count);
+__attribute__((format(printf, 1, 2)))
 extern  cstr        cstr_from_fmt(const char* fmt, ...);
 
 extern  char*       cstr_reserve(cstr* self, isize cap);
@@ -74,10 +75,12 @@ extern  char*       cstr_assign_n(cstr* self, const char* str, isize len);
 STC_INLINE char*    cstr_append(cstr* self, const char* str);
 STC_INLINE char*    cstr_append_s(cstr* self, cstr s);
 extern  char*       cstr_append_n(cstr* self, const char* str, isize len);
+__attribute__((format(printf, 2, 3)))
 extern  isize       cstr_append_fmt(cstr* self, const char* fmt, ...);
 extern  char*       cstr_append_uninit(cstr *self, isize len);
 extern  bool        cstr_getdelim(cstr *self, int delim, FILE *fp);
 extern  void        cstr_erase(cstr* self, isize pos, isize len);
+__attribute__((format(printf, 2, 3)))
 extern  isize       cstr_printf(cstr* self, const char* fmt, ...);
 extern  size_t      cstr_hash(const cstr *self);
 extern  bool        cstr_u8_valid(const cstr* self);
