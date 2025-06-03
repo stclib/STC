@@ -24,16 +24,16 @@ cregex          cregex_from(const char* pattern);
 cregex          cregex_make(const char* pattern, int cflags);
 
                 // return CREG_OK, or negative error code on failure
-int             cregex_compile(cregex *self, const char* pattern);
-int             cregex_compile_pro(cregex *self, const char* pattern, int cflags);
+int             cregex_compile(cregex *self, const char* pattern,
+                               int cflags = CREG_DEFAULT);
 
                 // num. of capture groups in regex, excluding the 0th group which is the full match
 int             cregex_captures(const cregex* self);
 
                 // Match RE. Return CREG_OK, CREG_NOMATCH, or CREG_MATCHERROR
-int             cregex_match(const cregex* re, const char* input, csview match[]);
+int             cregex_match(const cregex* re, const char* input, csview match[],
+                             int mflags = CREG_DEFAULT);
 int             cregex_match_sv(const cregex* re, csview input, csview match[]);
-int             cregex_match_pro(const cregex* re, const char* input, csview match[], int mflags);
 
                 // Check if there are matches in input
 bool            cregex_is_match(const cregex* re, const char* input);
@@ -48,13 +48,13 @@ int             cregex_match_aio(const char* pattern, const char* input, csview 
                 // Replace all matched instances
 cstr            cregex_replace(const cregex* re, const char* input, const char* replace);
                 // String view input and transform up to count replacements
-cstr            cregex_replace_pro(const cregex* re, csview input, const char* replace, int count,
-                                   bool(*transform)(int group, csview match, cstr* result), int rflags);
+cstr            cregex_replace_sv(const cregex* re, csview input, const char* replace, int count,
+                                  bool(*transform)(int group, csview match, cstr* result), int rflags);
 
                 // All-in-one replacement (compile + match/replace + drop)
 cstr            cregex_replace_aio(const char* pattern, const char* input, const char* replace);
-cstr            cregex_replace_aio_pro(const char* pattern, csview input, const char* replace, int count,
-                                       bool(*transform)(int group, csview match, cstr* result), int crflags);
+cstr            cregex_replace_aio_sv(const char* pattern, csview input, const char* replace, int count,
+                                      bool(*transform)(int group, csview match, cstr* result), int crflags);
                 // destroy
 void            cregex_drop(cregex* self);
 ```

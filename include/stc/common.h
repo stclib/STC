@@ -235,10 +235,6 @@ typedef const char* cstr_raw;
 #define c_drop(C, ...) \
     do { for (c_items(_c_i2, C*, {__VA_ARGS__})) C##_drop(*_c_i2.ref); } while(0)
 
-// define function with "on-the-fly" defined return type (e.g. variant, optional)
-#define c_func(name, args, RIGHTARROW, ...) \
-    typedef __VA_ARGS__ name##_result; name##_result name args
-
 // RAII scopes
 #define c_defer(...) \
     for (int _c_i3 = 0; _c_i3++ == 0; __VA_ARGS__)

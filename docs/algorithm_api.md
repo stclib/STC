@@ -696,48 +696,6 @@ c_filter(crange, c_iota(3), true
 ```
 </details>
 <details>
-<summary><b>c_func</b> - Function with on-the-fly defined return type</summary>
-
-### c_func
-
-A macro for conveniently defining functions with multiple return values. This is for encouraging
-to write functions that returns extra error context when error occurs, or just multiple return values.
-
-[ [Run this code](https://godbolt.org/z/nj31o1dn6) ]
-```c++
-Vec get_data(void) {
-    return c_make(Vec, {1, 2, 3, 4, 5, 6});
-}
-
-// same as get_data(), but with the c_func macro "syntax".
-c_func (get_data1,(void), ->, Vec) {
-    return c_make(Vec, {1, 2, 3, 4, 5, 6});
-}
-
-// return two Vec types "on-the-fly".
-c_func (get_data2,(void), ->, struct {Vec v1, v2;}) {
-    return (get_data2_result){
-        .v1 = c_make(Vec, {1, 2, 3, 4, 5, 6}),
-        .v2 = c_make(Vec, {7, 8, 9, 10, 11})
-    };
-}
-
-// return a Vec, and an error code which is 0 if OK.
-c_func (load_data,(const char* fname),
-    ->, struct {Vec vec; int error;})
-{
-    FILE* fp = fopen(fname, "rb");
-    if (fp == 0)
-        return (load_data_result){.error=1};
-
-    load_data_result out = {Vec_with_size(1024, '\0')};
-    fread(out.vec.data, sizeof(out.vec.data[0]), 1024, fp);
-    fclose(fp);
-    return out;
-}
-```
-</details>
-<details>
 <summary><b>c_new, c_delete, c_malloc, etc.</b> - Allocation helpers</summary>
 
 ### c_new, c_delete

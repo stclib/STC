@@ -17,8 +17,9 @@
 
 int main(void)
 {
-    c_with (Vec vec = {0}, Vec_drop(&vec))
-    c_with (List list = {0}, List_drop(&list))
+    Vec vec = {0};
+    List list = {0};
+    c_defer(Vec_drop(&vec), List_drop(&list))
     {
         // POPULATE vec with shared pointers to Maps:
         Map *map;
@@ -28,14 +29,12 @@ int main(void)
         Map_emplace(map, "Mary", 1995);
         Map_emplace(map, "Joanna", 1992);
 
-        //map = Vec_push(&vec, Arc_from(Map_init()))->get;
         map = Vec_emplace(&vec, Map_init())->get;
         Map_emplace(map, "Rosanna", 2001);
         Map_emplace(map, "Brad", 1999);
         Map_emplace(map, "Jack", 1980);
 
         // POPULATE list:
-        //map = List_push_back(&list, Arc_from(Map_init()))->get;
         map = List_emplace_back(&list, Map_init())->get;
         Map_emplace(map, "Steve", 1979);
         Map_emplace(map, "Rick", 1974);
