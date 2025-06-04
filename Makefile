@@ -101,4 +101,4 @@ $(TEST_EXE): $(TEST_OBJS)
 .SECONDARY: $(EX_OBJS) # Prevent deleting objs after building
 .PHONY: fast all clean distclean lib
 
--include $(LIB_DEPS) $(EX_DEPS)
+-include $(LIB_DEPS) $(TEST_DEPS) $(EX_DEPS)
