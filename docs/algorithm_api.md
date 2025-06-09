@@ -166,7 +166,7 @@ c_sumtype (SumType,
 
 SumType           c_variant(VariantTag tag, VariantType value); // Sum type constructor
 bool              c_holds_tag(const SumType* obj, VariantTag tag); // Does obj hold VariantType?
-int               c_tag_index(SumType* obj);               // 1-based index (mostly for debug)
+int               c_tag_index(SumType* obj);               // (for debug only)
 VariantTag_type*  c_get(SumType* obj, VariantTag tag);     // NULL if tag does does not match what it holds.
 
 // Use a sum type (1)

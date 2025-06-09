@@ -91,3 +91,55 @@ TEST(algorithm, c_filter)
 
     IVec_drop(&vec);
 }
+
+
+c_sumtype (Action,
+    (ActionSpeak, cstr),
+    (ActionQuit, _Bool),
+    (ActionRunFunc, struct {
+        int32 (*func)(int32, int32);
+        int32 v1, v2;
+    }),
+);
+
+void Action_drop(Action* self) {
+    if (c_is(self, ActionSpeak, s))
+        cstr_drop(s);
+}
+
+static void action(Action* action, cstr* out) {
+    c_when (action) {
+        c_is(ActionSpeak, s) {
+            cstr_printf(out, "Asked to speak: %s\n", cstr_str(s));
+        }
+        c_is(ActionQuit) {
+            cstr_printf(out, "Asked to quit!\n");
+        }
+        c_is(ActionRunFunc, r) {
+            int32 res = r->func(r->v1, r->v2);
+            cstr_printf(out, "v1: %d, v2: %d, res: %d\n", r->v1, r->v2, res);
+        }
+        c_otherwise assert("no match" == NULL);
+    }
+}
+
+static int32 add(int32 a, int32 b) {
+    return a + b;
+}
+
+TEST(algorithm, c_sumtype) {
+    Action act1 = c_variant(ActionSpeak, cstr_from("Hello"));
+    Action act2 = c_variant(ActionQuit, 1);
+    Action act3 = c_variant(ActionRunFunc, {add, 5, 6});
+
+    cstr res = {0};
+    action(&act1, &res);
+    EXPECT_STREQ(cstr_str(&res), "Asked to speak: Hello\n");
+    action(&act2, &res);
+    EXPECT_STREQ(cstr_str(&res), "Asked to quit!\n");
+    action(&act3, &res);
+    EXPECT_STREQ(cstr_str(&res), "v1: 5, v2: 6, res: 11\n");
+
+    c_drop(Action, &act1, &act2, &act3);
+    c_drop(cstr, &res);
+}

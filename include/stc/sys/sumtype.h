@@ -90,18 +90,18 @@ int main(void) {
 #define c_LOOP(f,T,x,...) _c_CHECK(_c_LOOP0, c_JOIN(_c_LOOP_END_, c_NUMARGS(c_EXPAND x)))(f,T,x,__VA_ARGS__)
 
 
-#define _c_enum_1(x,...) (x=1, __VA_ARGS__)
+#define _c_enum_1(x,...) (x=__LINE__*100, __VA_ARGS__)
 #define _c_vartuple_tag(T, Tag, ...) Tag,
 #define _c_vartuple_type(T, Tag, ...) typedef __VA_ARGS__ Tag##_type; typedef T Tag##_sumtype;
 #define _c_vartuple_var(T, Tag, ...) struct { enum enum_##T tag; Tag##_type var; } Tag;
 
 #define c_sumtype(T, ...) \
     typedef union T T; \
-    enum enum_##T { c_EVAL(c_LOOP(_c_vartuple_tag, T, _c_enum_1 __VA_ARGS__, (0))) }; \
-    c_EVAL(c_LOOP(_c_vartuple_type, T,  __VA_ARGS__, (0))) \
+    enum enum_##T { c_EVAL(c_LOOP(_c_vartuple_tag, T, _c_enum_1 __VA_ARGS__, (0),)) }; \
+    c_EVAL(c_LOOP(_c_vartuple_type, T,  __VA_ARGS__, (0),)) \
     union T { \
         struct { enum enum_##T tag; } _any_; \
-        c_EVAL(c_LOOP(_c_vartuple_var, T, __VA_ARGS__, (0))) \
+        c_EVAL(c_LOOP(_c_vartuple_var, T, __VA_ARGS__, (0),)) \
     }
 
 #if defined STC_HAS_TYPEOF && STC_HAS_TYPEOF

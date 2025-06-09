@@ -1,30 +1,31 @@
 
 #include <stdio.h>
 
-#define T stack_i, int
-#define i_capacity 100
+#define T IVec, int, 100, (c_use_cmp)
 #include <stc/stack.h>
 
-#define T stack_c, char
+#define T CVec, char, 100, (0)
 #include <stc/stack.h>
 
 int main(void) {
-    stack_i stack = {0};
-    stack_c chars = {0};
+    IVec stack = {0};
+    CVec chars = {0};
+
+    IVec_sort(&stack);
 
     for (c_range(i, 101))
-        stack_i_push(&stack, (int)(i*i));
+        IVec_push(&stack, (int)(i*i));
 
-    printf("%d\n", *stack_i_top(&stack));
+    printf("%d\n", *IVec_top(&stack));
 
     for (c_range(i, 90))
-        stack_i_pop(&stack);
+        IVec_pop(&stack);
 
-    for (c_each(i, stack_i, stack))
+    for (c_each(i, IVec, stack))
         printf(" %d", *i.ref);
     puts("");
-    printf("top: %d\n", *stack_i_top(&stack));
+    printf("top: %d\n", *IVec_top(&stack));
 
-    stack_i_drop(&stack);
-    stack_c_drop(&chars);
+    IVec_drop(&stack);
+    CVec_drop(&chars);
 }

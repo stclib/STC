@@ -4,20 +4,20 @@
 # STC - Smart Template Containers
 
 ## Version 5.1 RC5
-STC is a comprehensive, high performance, typesafe and generic general purpose container and algorithms
-library for C99. It has excellent ergonomics and ease of use. The library elevates C into a modern programming
-language featuring a number of common containers and algorithms found in other contemporary system languages
-like Zig, Rust, and C++. Containers are templated and therefore allows for typesafe, high performance implementations.
-
-With STC version 5.1, specifying a container with non-trivial element types can now be done with a single #define prior to the inclusion
-of the container.
+STC is a mature, comprehensive, general purpose container and algorithm library for C99/C11.
+It has excellent ergonomics and requires virtually no boilerplate code. The library adds many
+missing features to C, like common data containers, algorithms, and abstractions found in
+contemporary system languages like Zig, Rust, and C++. Containers and algorithms are templated
+or generic, which allows for a fully typesafe, compact, and high performance implementation.
 
 <details>
 <summary><b>Version 5 NEWS</b></summary>
 
 V5.1:
-- Possible to specify even complex container types as one-liners using `c_keyclass`, `c_keypro`, and `c_cmpclass` option flags. May now define `T` instead of `i_type` as a shorthand.
-- Replaced **arc** with a new implementation which takes up only one pointer. Previous arc is now available as `<stc/arc2.h>`. The new **arc** may not be constructed from an object pointer, for that use **arc2**.
+- Specifying containers with non-trivial element types can now be done with a single `#define`
+prior to including the container (using `c_keyclass`, `c_keypro`, and `c_cmpclass` option *traits*).
+- Users may now define `T` as a shorthand for `i_type`.
+- Replaced **arc** with a new implementation which take up only one pointer. Previous arc is now available as a traits option (c_arc2). The new **arc** may not be constructed from an object pointer, for that use **arc2**.
 - Updated and fixed bugs in **cregex** to handle invalid utf8 strings.
 - Some breaking changes in cspan API.
 - Several other smaller improvements and bug fixes.
@@ -72,7 +72,7 @@ safety concerns.
 
 Containers
 ----------
-- [***arc***, ***arc2*** - (atomic) reference counted shared pointers](docs/arc_api.md)
+- [***arc*** - (atomic) reference counted; shared pointer](docs/arc_api.md)
 - [***box*** - heap allocated unique pointer`](docs/box_api.md)
 - [***cbits*** - dynamic bitset](docs/cbits_api.md)
 - [***list*** - forward linked list](docs/list_api.md)

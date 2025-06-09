@@ -35,8 +35,10 @@
   #define _i_prefix stack_
 #endif
 #include "priv/template.h"
-
 #ifndef i_declared
+#if c_NUMARGS(i_type) == 4
+  #define i_capacity i_val
+#endif
 #ifdef i_capacity
   #define i_no_clone
   _c_DEFTYPES(declare_stack_fixed, Self, i_key, i_capacity);
@@ -46,19 +48,23 @@
 #endif
 typedef i_keyraw _m_raw;
 
-STC_INLINE Self _c_MEMB(_init)(void)
-    { Self s={0}; return s; }
-
 #ifdef i_capacity
-STC_INLINE Self _c_MEMB(_move)(Self *self)
-    { return *self; }
+STC_INLINE void _c_MEMB(_init)(Self* news)
+    { news->size = 0; }
+
+STC_INLINE isize _c_MEMB(_capacity)(const Self* self)
+    { (void)self; return i_capacity; }
+
+STC_INLINE bool _c_MEMB(_reserve)(Self* self, isize n)
+    { (void)self; return n <= i_capacity; }
+
 #else
 
-STC_INLINE Self _c_MEMB(_move)(Self *self) {
-    Self m = *self;
-    memset(self, 0, sizeof *self);
-    return m;
-}
+STC_INLINE Self _c_MEMB(_init)(void)
+    { Self out = {0}; return out; }
+
+STC_INLINE Self _c_MEMB(_move)(Self *self)
+    { Self m = *self; *self = (Self){0}; return m; }
 
 STC_INLINE Self _c_MEMB(_with_capacity)(isize cap) {
     Self out = {_i_malloc(_m_value, cap), 0, cap};
@@ -69,6 +75,21 @@ STC_INLINE Self _c_MEMB(_with_size)(isize size, _m_value null) {
     Self out = {_i_malloc(_m_value, size), size, size};
     while (size) out.data[--size] = null;
     return out;
+}
+
+STC_INLINE isize _c_MEMB(_capacity)(const Self* self)
+    { return self->capacity; }
+
+STC_INLINE bool _c_MEMB(_reserve)(Self* self, isize n) {
+    if (n > self->capacity || (n && n == self->size)) {
+        _m_value *d = (_m_value *)i_realloc(self->data, self->capacity*c_sizeof *d,
+                                            n*c_sizeof *d);
+        if (d == NULL)
+            return false;
+        self->data = d;
+        self->capacity = n;
+    }
+    return self->data != NULL;
 }
 #endif // i_capacity
 
@@ -98,33 +119,8 @@ STC_INLINE isize _c_MEMB(_size)(const Self* self)
 STC_INLINE bool _c_MEMB(_is_empty)(const Self* self)
     { return !self->size; }
 
-STC_INLINE isize _c_MEMB(_capacity)(const Self* self) {
-#ifndef i_capacity
-    return self->capacity;
-#else
-    (void)self; return i_capacity;
-#endif
-}
-
 STC_INLINE void _c_MEMB(_value_drop)(const Self* self, _m_value* val)
     { (void)self; i_keydrop(val); }
-
-STC_INLINE bool _c_MEMB(_reserve)(Self* self, isize n) {
-#ifdef i_capacity
-    (void)self;
-    return n <= i_capacity;
-#else
-    if (n > self->capacity || (n && n == self->size)) {
-        _m_value *d = (_m_value *)i_realloc(self->data, self->capacity*c_sizeof *d,
-                                            n*c_sizeof *d);
-        if (d == NULL)
-            return false;
-        self->data = d;
-        self->capacity = n;
-    }
-    return self->data != NULL;
-#endif
-}
 
 STC_INLINE _m_value* _c_MEMB(_append_uninit)(Self *self, isize n) {
     isize len = self->size;

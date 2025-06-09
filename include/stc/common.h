@@ -47,11 +47,12 @@ typedef ptrdiff_t       isize;
     defined __GNUC__ || defined __clang__ || defined __TINYC__)
     #define STC_HAS_TYPEOF 1
 #endif
-#if defined __GNUC__ || defined __clang__
-    #define STC_INLINE static inline __attribute((unused))
+#if defined __GNUC__
+  #define c_GNUATTR(...) __attribute__((__VA_ARGS__))
 #else
-    #define STC_INLINE static inline
+  #define c_GNUATTR(...)
 #endif
+#define STC_INLINE static inline c_GNUATTR(unused)
 #define c_ZI PRIiPTR
 #define c_ZU PRIuPTR
 #define c_NPOS INTPTR_MAX
@@ -79,12 +80,6 @@ typedef ptrdiff_t       isize;
 #define c_ARG_2(a, b, ...) b
 #define c_ARG_3(a, b, c, ...) c
 #define c_ARG_4(a, b, c, d, ...) d
-
-#if defined __GNUC__
-  #define c_GNUATTR(...) __attribute__((__VA_ARGS__))
-#else
-  #define c_GNUATTR(...)
-#endif
 
 #define _i_malloc(T, n)     ((T*)i_malloc((n)*c_sizeof(T)))
 #define _i_calloc(T, n)     ((T*)i_calloc((n), c_sizeof(T)))
