@@ -27,6 +27,7 @@
 #include <stdio.h> /* FILE*, vsnprintf */
 #include <stdlib.h> /* malloc */
 #include <stddef.h> /* size_t */
+#include <stdarg.h> /* cstr_vfmt() */
 /**************************** PRIVATE API **********************************/
 
 #if defined __GNUC__ && !defined __clang__
@@ -63,8 +64,7 @@ extern  char* _cstr_internal_move(cstr* self, isize pos1, isize pos2);
 #define             cstr_lit(literal) cstr_from_n(literal, c_litstrlen(literal))
 
 extern  cstr        cstr_from_replace(csview sv, csview search, csview repl, int32_t count);
-__attribute__((format(printf, 1, 2)))
-extern  cstr        cstr_from_fmt(const char* fmt, ...);
+extern  cstr        cstr_from_fmt(const char* fmt, ...) c_GNUATTR(format(printf, 1, 2));
 
 extern  char*       cstr_reserve(cstr* self, isize cap);
 extern  void        cstr_shrink_to_fit(cstr* self);
@@ -72,16 +72,14 @@ extern  char*       cstr_resize(cstr* self, isize size, char value);
 extern  isize       cstr_find_at(const cstr* self, isize pos, const char* search);
 extern  isize       cstr_find_sv(const cstr* self, csview search);
 extern  char*       cstr_assign_n(cstr* self, const char* str, isize len);
-STC_INLINE char*    cstr_append(cstr* self, const char* str);
-STC_INLINE char*    cstr_append_s(cstr* self, cstr s);
 extern  char*       cstr_append_n(cstr* self, const char* str, isize len);
-__attribute__((format(printf, 2, 3)))
-extern  isize       cstr_append_fmt(cstr* self, const char* fmt, ...);
+extern  isize       cstr_append_fmt(cstr* self, const char* fmt, ...) c_GNUATTR(format(printf, 2, 3));
 extern  char*       cstr_append_uninit(cstr *self, isize len);
+
 extern  bool        cstr_getdelim(cstr *self, int delim, FILE *fp);
 extern  void        cstr_erase(cstr* self, isize pos, isize len);
-__attribute__((format(printf, 2, 3)))
-extern  isize       cstr_printf(cstr* self, const char* fmt, ...);
+extern  isize       cstr_printf(cstr* self, const char* fmt, ...) c_GNUATTR(format(printf, 2, 3));
+extern  isize       cstr_vfmt(cstr* self, isize start, const char* fmt, va_list args);
 extern  size_t      cstr_hash(const cstr *self);
 extern  bool        cstr_u8_valid(const cstr* self);
 extern  void        cstr_u8_erase(cstr* self, isize u8pos, isize u8len);

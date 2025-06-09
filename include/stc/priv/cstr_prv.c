@@ -160,8 +160,6 @@ void cstr_shrink_to_fit(cstr* self) {
     (defined i_import || defined STC_CSTR_IO)
 #define STC_CSTR_IO_C_INCLUDED
 
-#include <stdarg.h>
-
 char* cstr_append_uninit(cstr *self, isize len) {
     cstr_buf b = cstr_getbuf(self);
     if (b.size + len > b.cap && (b.data = cstr_reserve(self, b.size*3/2 + len)) == NULL)
@@ -191,7 +189,7 @@ bool cstr_getdelim(cstr *self, const int delim, FILE *fp) {
     }
 }
 
-static isize cstr_vfmt(cstr* self, isize start, const char* fmt, va_list args) {
+isize cstr_vfmt(cstr* self, isize start, const char* fmt, va_list args) {
     va_list args2;
     va_copy(args2, args);
     const int n = vsnprintf(NULL, 0ULL, fmt, args);

@@ -62,6 +62,7 @@ char*           cstr_assign_n(cstr* self, const char* str, isize n);    // assig
 char*           cstr_assign_sv(cstr* self, csview sv);
 char*           cstr_copy(cstr* self, cstr s);                          // assign a clone of s
 int             cstr_printf(cstr* self, const char* fmt, ...);          // source and target must not overlap.
+isize           cstr_vfmt(cstr* self, isize start, const char* fmt, va_list args); // mostly for internal use.
 
 char*           cstr_append(cstr* self, const char* str);
 char*           cstr_append_n(cstr* self, const char* str, isize n);    // append n first bytes of str

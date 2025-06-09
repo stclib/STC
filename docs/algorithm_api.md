@@ -303,7 +303,7 @@ These work on any container. *c_make()* may also be used for **cspan** views.
 - **c_put_items** - push (raw) values onto any container from an initializer list
 - **c_drop** - drop (destroy) multiple containers of the same type
 
-[ [Run this code](https://godbolt.org/z/Tsjqd93oK) ]
+[ [Run this code](https://godbolt.org/z/TadM4zeeb) ]
 <!--{%raw%}-->
 ```c++
 #include <stdio.h>
@@ -313,10 +313,10 @@ These work on any container. *c_make()* may also be used for **cspan** views.
 #define T Map, int, int
 #include <stc/hashmap.h>
 
-c_func (split_map,(Map map),
-    ->, struct {Vec keys, values;})
+struct VecPair { Vec keys, values; }
+split_map(Map map)
 {
-    split_map_result out = {0};
+    struct VecPair out = {0};
     for (c_each_kv(k, v, Map, map)) {
         Vec_push(&out.keys, *k);
         Vec_push(&out.values, *v);
@@ -339,7 +339,7 @@ int main(void) {
         printf("[%d %d] ", *k, *v);
     puts("");
 
-    split_map_result res = split_map(map);
+    struct VecPair res = split_map(map);
 
     for (c_each(i, Vec, res.values))
         printf("%d ", *i.ref);

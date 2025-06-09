@@ -1273,7 +1273,7 @@ _build_substitution(const char* replace, int nmatch, const csview match[],
  */
 
 int
-cregex_compile_3(cregex *self, const char* pattern, int cflags) {
+cregex_compile_pro(cregex *self, const char* pattern, int cflags) {
     _Parser par;
     self->prog = _regcomp1(self->prog, &par, pattern, cflags);
     return self->error = par.error;
@@ -1285,7 +1285,7 @@ cregex_captures(const cregex* self) {
 }
 
 int
-cregex_match_4(const cregex* re, const char* input, csview match[], int mflags) {
+cregex_match_pro(const cregex* re, const char* input, csview match[], int mflags) {
     int res = _regexec(re->prog, input, cregex_captures(re) + 1, match, mflags);
     switch (res) {
         case 1: return CREG_OK;
@@ -1298,7 +1298,7 @@ int
 cregex_match_aio(const char* pattern, const char* input, csview match[]) {
     cregex re = cregex_make(pattern, CREG_DEFAULT);
     if (re.error != CREG_OK) return re.error;
-    int res = cregex_match_4(&re, input, match, CREG_DEFAULT);
+    int res = cregex_match_pro(&re, input, match, CREG_DEFAULT);
     cregex_drop(&re);
     return res;
 }
@@ -1329,7 +1329,7 @@ cstr
 cregex_replace_aio_sv(const char* pattern, csview input, const char* replace,
                       int count, bool(*transform)(int, csview, cstr*), int crflags) {
     cregex re = {0};
-    if (cregex_compile(&re, pattern, crflags) != CREG_OK)
+    if (cregex_compile_pro(&re, pattern, crflags) != CREG_OK)
         assert(0);
     cstr out = cregex_replace_sv(&re, input, replace, count, transform, crflags);
     cregex_drop(&re);
