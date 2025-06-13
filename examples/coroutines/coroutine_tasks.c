@@ -36,7 +36,7 @@ int prime(struct prime* g, cco_fiber* fb) {
                 cco_yield_v(YIELD_PRM);
             }
         }
-        cco_finally:
+        cco_cleanup:
         puts("DONE prm");
     }
     return 0;
@@ -66,7 +66,7 @@ int fibonacci(struct fibonacci* g, cco_fiber* fb) {
             g->b += tmp;
             cco_yield_v(YIELD_FIB);
         }
-        cco_finally:
+        cco_cleanup:
         puts("DONE fib");
     }
     return 0;

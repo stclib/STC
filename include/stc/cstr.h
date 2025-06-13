@@ -21,8 +21,8 @@
  * SOFTWARE.
  */
 
-/* A string type with short string optimization in C99 with good small-string
- * optimization (22 characters with 24 bytes string).
+/* A string type with short string optimization in C99.
+ * Stores up to a 22 bytes long string inside a 24 bytes string representation (x64).
  */
 #define i_header // external linkage by default. override with i_static.
 #include "priv/linkage.h"

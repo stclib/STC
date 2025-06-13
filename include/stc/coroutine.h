@@ -38,7 +38,7 @@ int iterpair(struct iterpair* I) {
             for (I->y = 0; I->y < I->max_y; I->y++)
                 cco_yield; // suspend
 
-        cco_finally: // required if there is cleanup code
+        cco_cleanup: // required if there is cleanup code
         puts("done");
     }
     return 0; // CCO_DONE
@@ -61,7 +61,8 @@ int main(void) {
 
 enum {
     CCO_STATE_INIT = 0,
-    CCO_STATE_FINALLY = -1,
+    CCO_STATE_CLEANUP = -1,
+    CCO_STATE_FINALLY = CCO_STATE_CLEANUP, // [deprecated]
     CCO_STATE_DONE = -2,
 };
 typedef enum {
@@ -105,21 +106,21 @@ typedef struct {
 
 #define cco_recover_error(fiber) \
     do {cco_fiber* _fb = fiber; \
-        c_assert(*_state == CCO_STATE_FINALLY); \
+        c_assert(*_state == CCO_STATE_CLEANUP); \
         *_state = _fb->recover_state; \
         _fb->error = 0; \
         goto _resume; \
     } while (0)
 
-#define cco_finally \
-    *_state = CCO_STATE_FINALLY; /* FALLTHRU */ \
-    case CCO_STATE_FINALLY
+#define cco_cleanup \
+    *_state = CCO_STATE_CLEANUP; /* FALLTHRU */ \
+    case CCO_STATE_CLEANUP
 
-#define cco_final cco_finally   // [deprecated]
+#define cco_finally cco_cleanup
 
 #define cco_return \
     do { \
-        *_state = *_state >= CCO_STATE_INIT ? CCO_STATE_FINALLY : CCO_STATE_DONE; \
+        *_state = *_state >= CCO_STATE_INIT ? CCO_STATE_CLEANUP : CCO_STATE_DONE; \
         goto _resume; \
     } while (0)
 
@@ -133,7 +134,7 @@ typedef struct {
 #define cco_yield_final cco_yield_final_v(CCO_YIELD)
 #define cco_yield_final_v(value) \
     do { \
-        *_state = *_state >= CCO_STATE_INIT ? CCO_STATE_FINALLY : CCO_STATE_DONE; \
+        *_state = *_state >= CCO_STATE_INIT ? CCO_STATE_CLEANUP : CCO_STATE_DONE; \
         return value; \
     } while (0)
 
@@ -162,7 +163,7 @@ typedef struct {
 #define cco_stop(co) \
     do { \
         int* _st = &(co)->cco.state; \
-        *_st = *_st >= CCO_STATE_INIT ? CCO_STATE_FINALLY : CCO_STATE_DONE; \
+        *_st = *_st >= CCO_STATE_INIT ? CCO_STATE_CLEANUP : CCO_STATE_DONE; \
     } while (0)
 
 #define cco_reset(co) \
@@ -293,7 +294,7 @@ int cco_resume_current(cco_fiber* fb) {
             cco_yield_v(CCO_NOOP);
         }
 
-        cco_finally:
+        cco_cleanup:
         if (fb->error != 0) {
             fprintf(stderr, __FILE__ ":%d: error: unhandled error '%d' in a coroutine task at line %d.\n",
                             __LINE__, fb->error, fb->error_line);
@@ -351,7 +352,7 @@ cco_fiber* _cco_spawn(cco_task* _task, cco_fiber* fb, void* env) {
  *        ... it->ref->data ...
  *        cco_yield; // suspend exec, gen with value ready
  *        ...
- *        cco_finally:
+ *        cco_cleanup:
  *        it->ref = NULL; // stops the iteration
  *     }
  * }
@@ -382,10 +383,10 @@ cco_fiber* _cco_spawn(cco_task* _task, cco_fiber* fb, void* env) {
  * Using c_filter with coroutine iterators:
  */
 #define cco_flt_take(n) \
-    (c_flt_take(n), _base.done ? _it.cco.state = CCO_STATE_FINALLY : 1)
+    (c_flt_take(n), _base.done ? _it.cco.state = CCO_STATE_CLEANUP : 1)
 
 #define cco_flt_takewhile(pred) \
-    (c_flt_takewhile(pred), _base.done ? _it.cco.state = CCO_STATE_FINALLY : 1)
+    (c_flt_takewhile(pred), _base.done ? _it.cco.state = CCO_STATE_CLEANUP : 1)
 
 
 /*
@@ -426,7 +427,7 @@ typedef struct { ptrdiff_t count; } cco_semaphore;
         return (double)(quad - 116444736000000000ULL)*1e-7;  /* time diff Jan 1 1601-Jan 1 1970 in 1/10th usecs */
     }
 
-    static inline void cco_sleep_sec(double sec) {
+    static inline void cco_sleep(double sec) {
         Sleep((unsigned long)(sec*1000.0));
     }
 #else
@@ -437,22 +438,28 @@ typedef struct { ptrdiff_t count; } cco_semaphore;
         return (double)tv.tv_sec + (double)tv.tv_usec*1e-6;
     }
 
-    static inline void cco_sleep_sec(double sec) {
+    static inline void cco_sleep(double sec) {
         struct timeval tv;
         tv.tv_sec = (time_t)sec;
         tv.tv_usec = (suseconds_t)((sec - (double)(long)sec)*1e6);
         select(0, NULL, NULL, NULL, &tv);
     }
 #endif
+// [deprecated]:
+#define cco_sleep_sec cco_sleep
+#define cco_make_timer_sec cco_make_timer
+#define cco_timer_elapsed_sec cco_timer_elapsed
+#define cco_timer_remaining_sec cco_timer_remaining
+#define cco_await_timer_sec cco_await_timer
 
 typedef struct { double duration, start_time; } cco_timer;
 
-static inline cco_timer cco_make_timer_sec(double sec) {
+static inline cco_timer cco_make_timer(double sec) {
     cco_timer tm = {.duration=sec, .start_time=cco_time()};
     return tm;
 }
 
-static inline void cco_start_timer_sec(cco_timer* tm, double sec) {
+static inline void cco_start_timer(cco_timer* tm, double sec) {
     tm->duration = sec;
     tm->start_time = cco_time();
 }
@@ -465,17 +472,17 @@ static inline bool cco_timer_expired(cco_timer* tm) {
     return cco_time() - tm->start_time >= tm->duration;
 }
 
-static inline double cco_timer_elapsed_sec(cco_timer* tm) {
+static inline double cco_timer_elapsed(cco_timer* tm) {
     return cco_time() - tm->start_time;
 }
 
-static inline double cco_timer_remaining_sec(cco_timer* tm) {
+static inline double cco_timer_remaining(cco_timer* tm) {
     return tm->start_time + tm->duration - cco_time();
 }
 
-#define cco_await_timer_sec(tm, sec) \
+#define cco_await_timer(tm, sec) \
     do { \
-        cco_start_timer_sec(tm, sec); \
+        cco_start_timer(tm, sec); \
         cco_await(cco_timer_expired(tm)); \
     } while (0)
 

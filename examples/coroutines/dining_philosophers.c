@@ -26,7 +26,7 @@ int Philosopher(struct Philosopher* self) {
             printf("Philosopher %d is thinking for %.0f minutes...\n", self->id, duration*10);
             self->hunger = 0;
             self->state = ph_thinking;
-            cco_await_timer_sec(&self->tm, duration);
+            cco_await_timer(&self->tm, duration);
 
             printf("Philosopher %d is hungry...\n", self->id);
             self->state = ph_hungry;
@@ -37,14 +37,14 @@ int Philosopher(struct Philosopher* self) {
             printf("Philosopher %d is eating for %.0f minutes...\n", self->id, duration*10);
             self->hunger = 3;
             self->state = ph_eating;
-            cco_await_timer_sec(&self->tm, duration);
+            cco_await_timer(&self->tm, duration);
 
             // increase the neighbours hunger only if they are already hungry.
             if (self->left->state == ph_hungry) ++self->left->hunger;
             if (self->right->state == ph_hungry) ++self->right->hunger;
         }
 
-        cco_finally:
+        cco_cleanup:
         printf("Philosopher %d done\n", self->id);
     }
     return 0;
@@ -74,10 +74,10 @@ int Dining(struct Dining* self) {
                        // can do other tasks before resuming dining.
         }
 
-        cco_finally:
+        cco_cleanup:
         for (int i = 0; i < num_philosophers; ++i) {
             cco_stop(&self->philos[i]);
-            Philosopher(&self->philos[i]); // execute philos. cco_finally.
+            Philosopher(&self->philos[i]); // execute philos. cco_cleanup.
         }
         puts("Dining done");
     }
@@ -87,12 +87,12 @@ int Dining(struct Dining* self) {
 int main(void)
 {
     struct Dining dining = {0};
-    cco_timer tm = cco_make_timer_sec(5.0);
+    cco_timer tm = cco_make_timer(5.0);
     crand64_seed((uint64_t)time(NULL));
 
     cco_run_coroutine(Dining(&dining)) {
         if (cco_timer_expired(&tm))
             cco_stop(&dining);
-        cco_sleep_sec(0.001); // do other things
+        cco_sleep(0.001); // do other things
     }
 }

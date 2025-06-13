@@ -6,10 +6,10 @@ This is small and portable implementation of coroutines.
 * Stackful or stackless typesafe coroutines.
 * Supports both asymmetric coroutine calls (structured concurrency) and symmetric transfer of control.
 * Good ergonomics and minimal boilerplate code.
-* Supports "throwing" errors, handled in `cco_finally` during immediate unwinding of the call stack.
+* Supports "throwing" errors, handled in `cco_cleanup` during immediate unwinding of the call stack.
 * Recovery from errors mechanism.
 * Small memory usage and efficient context switching. No heap allocation required by default.
-* Coroutines may be cleaned up at the `cco_finally` label. Will also happen on errors and cancelation.
+* Coroutines may be cleaned up at the `cco_cleanup` label. Will also happen on errors and cancelation.
 Unhandled errors will exit program with an error message including the offendig throw's line number.
 
 STC coroutines may behave stackless or stackful.
@@ -33,12 +33,12 @@ coroutine. See examples.
                 cco_await(bool condition);                          // Await for condition to be true else suspend with CCO_AWAIT.
                 cco_await_coroutine(coroutine(co));                 // Await for coroutine to finish else suspend with CCO_AWAIT.
                 cco_await_coroutine(coroutine(co), int awaitbits);  // Await for coroutine suspend value in (awaitbits | CCO_DONE).
-                cco_return;                                         // Execute `cco_finally:` section if present,
+                cco_return;                                         // Execute `cco_cleanup:` section if present,
                                                                     // then set coroutine to done-state and return CCO_DONE.
 bool            cco_active(Coroutine* co);                          // Is coroutine active? (= not done).
 bool            cco_done(Coroutine* co);                            // Is coroutine done?
 void            cco_reset(Coroutine* co);                           // Reset state to initial (for reuse).
-void            cco_stop(Coroutine* co);                            // Next resume of coroutine enters `cco_finally:`.
+void            cco_stop(Coroutine* co);                            // Next resume of coroutine enters `cco_cleanup:`.
                 cco_run_coroutine(coroutine(co)) {};                // Run blocking until coroutine is finished.
 ```
 #### Tasks (coroutine function-objects) and fibers (green thread-like entity within a thread)
@@ -48,7 +48,7 @@ void            cco_await_task(cco_task* task, cco_fiber* fb);      // Await for
 void            cco_await_task(cco_task* task, cco_fiber* fb, int awaitbits); // Await until task's suspend/return value
                                                                               // to be in (awaitbits | CCO_DONE).
 void            cco_yield_to(cco_task* task, cco_fiber* fb);        // Yield to task (symmetric control transfer).
-void            cco_throw_error(int error, cco_fiber* fb);          // Throw an error and unwind call stack at the cco_finally point.
+void            cco_throw_error(int error, cco_fiber* fb);          // Throw an error and unwind call stack at the cco_cleanup point.
                                                                     // Error accessible as `fb->error` and `fb->error_line`.
 void            cco_recover_error(cco_fiber* fb);                   // Reset error, and jump to original resume point in current task.
 void            cco_resume_task(cco_task* task, cco_fiber* fb);     // Resume suspended task, return value in `fb->result`.
@@ -67,15 +67,15 @@ bool            cco_joined(const cco_fiber* fb);                    // True if t
 ```
 #### Timers and time functions
 ```c++
-                cco_start_timer_sec(cco_timer* tm, double sec);     // Start timer with seconds duration.
+                cco_start_timer(cco_timer* tm, double sec);         // Start timer with seconds duration.
                 cco_restart_timer(cco_timer* tm);                   // Restart timer with previous duration.
 bool            cco_timer_expired(cco_timer* tm);                   // Return true if timer is expired.
-double          cco_timer_elapsed_sec(cco_timer* tm);               // Return elapsed seconds.
-double          cco_timer_remaining_sec(cco_timer* tm);             // Return remaining seconds.
-                cco_await_timer_sec(cco_timer* tm, double sec);     // Start timer with duration and await for it to expire.
+double          cco_timer_elapsed(cco_timer* tm);                   // Return elapsed seconds.
+double          cco_timer_remaining(cco_timer* tm);                 // Return remaining seconds.
+                cco_await_timer(cco_timer* tm, double sec);         // Start timer with duration and await for it to expire.
 
 double          cco_time(void);                                     // Return seconds (with usec precision) since Epoch.
-                cco_sleep_sec(double sec);                          // Sleep for seconds (msec or usec precision).
+                cco_sleep(double sec);                              // Sleep for seconds (msec or usec precision).
 
 ```
 #### Semaphores
@@ -101,7 +101,7 @@ cco_semaphore   cco_make_semaphore(long value);                     // Create se
 | Type name         | Type definition / usage                             | Used to represent... |
 |:------------------|:----------------------------------------------------|:---------------------|
 |`cco_result`       | **enum** `CCO_DONE`, `CCO_AWAIT`, `CCO_YIELD` | Default set of return values from coroutines |
-|`cco_finally:`     | Label inside coroutine                              | Label to mark cleanup position in coroutine |
+|`cco_cleanup:`     | Label inside coroutine                              | Label to mark cleanup position in coroutine |
 |`cco_task`         | Base function-object coroutine type                 |                      |
 |`cco_timer`        | Timer type                                          |                      |
 |`cco_semaphore`    | Semaphore type                                      |                      |
@@ -113,7 +113,7 @@ cco_semaphore   cco_make_semaphore(long value);                     // Create se
 suspension point. Normally place them in the coroutine struct. Be particularly careful with control variables in loops.
 2. Do not call ***cco_yield\**** or ***cco_await\**** inside a `switch` statement within a
 `cco_routine` scope. In general, use `if-else-if` to avoid this trap.
-3. Do not call ***cco_yield\**** or ***cco_await\**** after the `cco_finally:` label.
+3. Do not call ***cco_yield\**** or ***cco_await\**** after the `cco_cleanup:` label.
 
 ## Implementation and examples
 A regular coroutine may have any signature, however this implementation has specific support for
@@ -187,7 +187,7 @@ int Gen_next(Gen_iter* it) {
      cco_routine (it) {
         for (*it->ref = it->g->start; *it->ref < it->g->end; ++*it->ref)
             cco_yield;
-        cco_finally:
+        cco_cleanup:
         it->ref = NULL; // stop
      }
      return 0;
@@ -250,7 +250,7 @@ int Philosopher(struct Philosopher* self) {
             printf("Philosopher %d is thinking for %.0f minutes...\n", self->id, duration*10);
             self->hunger = 0;
             self->state = ph_thinking;
-            cco_await_timer_sec(&self->tm, duration);
+            cco_await_timer(&self->tm, duration);
 
             printf("Philosopher %d is hungry...\n", self->id);
             self->state = ph_hungry;
@@ -263,10 +263,10 @@ int Philosopher(struct Philosopher* self) {
             printf("Philosopher %d is eating for %.0f minutes...\n", self->id, duration*10);
             self->hunger = INT32_MAX;
             self->state = ph_eating;
-            cco_await_timer_sec(&self->tm, duration);
+            cco_await_timer(&self->tm, duration);
         }
 
-        cco_finally:
+        cco_cleanup:
         printf("Philosopher %d done\n", self->id);
     }
     return 0;
@@ -296,10 +296,10 @@ int Dining(struct Dining* self) {
                        // can do other tasks before resuming dining.
         }
 
-        cco_finally:
+        cco_cleanup:
         for (int i = 0; i < num_philosophers; ++i) {
             cco_stop(&self->philos[i]);
-            Philosopher(&self->philos[i]); // execute philos. cco_finally.
+            Philosopher(&self->philos[i]); // execute philos. cco_cleanup.
         }
         puts("Dining done");
     }
@@ -309,13 +309,13 @@ int Dining(struct Dining* self) {
 int main(void)
 {
     struct Dining dining = {0};
-    cco_timer tm = cco_make_timer_sec(5.0);
+    cco_timer tm = cco_make_timer(5.0);
     crand64_seed((uint64_t)time(NULL));
 
     cco_run_coroutine(Dining(&dining)) {
         if (cco_timer_expired(&tm))
             cco_stop(&dining);
-        cco_sleep_sec(0.001); // do other things
+        cco_sleep(0.001); // do other things
     }
 }
 ```
@@ -334,7 +334,7 @@ and errors may be handled and recoveded higher up in the call tree in a simple, 
 <summary>Implementation of nested awaiting coroutines with error handling</summary>
 
 The following example shows a task `start` which awaits `TaskA`, => awaits `TaskB`, => awaits `TaskC`. `TaskC` throws
-an error, which causes unwinding of the call stack. The error is finally handled in `TaskA`'s `cco_finally:` block
+an error, which causes unwinding of the call stack. The error is finally handled in `TaskA`'s `cco_cleanup:` block
 and recovered using `cco_recover_error()`. This call will resume control back to the original suspension point in the
 current task. Because the "call-tree" is fixed, the coroutine frames to be called may be pre-allocated on the stack,
 which is very fast.
@@ -366,7 +366,7 @@ int TaskC(struct TaskC* self, cco_fiber* fb) {
         cco_yield;
         puts("TaskC more work");
 
-        cco_finally:
+        cco_cleanup:
         if (fb->error) {
             puts("TaskC has error, ignored");
         }
@@ -382,7 +382,7 @@ int TaskB(struct TaskB* self, cco_fiber* fb) {
         cco_await_task(&sub->C, fb);
         puts("TaskB work");
 
-        cco_finally:
+        cco_cleanup:
         puts("TaskB done");
     }
     return 0;
@@ -395,7 +395,7 @@ int TaskA(struct TaskA* self, cco_fiber* fb) {
         cco_await_task(&sub->B, fb);
         puts("TaskA work");
 
-        cco_finally:
+        cco_cleanup:
         if (fb->error == 99) {
             // if error not handled, will cause 'unhandled error'...
             printf("TaskA recovered error '99' thrown on line %d\n", fb->error_line);
@@ -412,7 +412,7 @@ int start(cco_task* self, cco_fiber* fb) {
         Subtasks* sub = fb->env;
         cco_await_task(&sub->A, fb);
 
-        cco_finally:
+        cco_cleanup:
         puts("done");
     }
     return 0;
@@ -439,7 +439,7 @@ int main(void)
 
 Sometimes the call-tree is dynamic or more complex, then we can dynamically allocate the coroutine frames before
 they are awaited. This is somewhat more general and simpler, but requires heap allocation. Note that the coroutine
-frames are now freed at the end of the coroutine functions (after any cleanup at cco_finally). Example is based on
+frames are now freed at the end of the coroutine functions (after any cleanup at cco_cleanup). Example is based on
 the previous, but also shows how to use the env field in `cco_fiber` to return a value from the coroutine
 call/await:
 
@@ -471,7 +471,7 @@ int TaskC(struct TaskC* self, cco_fiber* fb) {
         // initial return value
         ((Result *)fb->env)->value = self->x * self->y;
 
-        cco_finally:
+        cco_cleanup:
         if (fb->error) {
             puts("TaskC has error, ignored");
         }
@@ -488,7 +488,7 @@ int TaskB(struct TaskB* self, cco_fiber* fb) {
         puts("TaskB work");
         ((Result *)fb->env)->value += self->d;
 
-        cco_finally:
+        cco_cleanup:
         puts("TaskB done");
     }
     free(self);
@@ -502,7 +502,7 @@ int TaskA(struct TaskA* self, cco_fiber* fb) {
         puts("TaskA work");
         ((Result *)fb->env)->value += self->a; // final return value;
 
-        cco_finally:
+        cco_cleanup:
         if (fb->error == 99) {
             // if error not handled, will cause 'unhandled error'...
             printf("TaskA recovered error '99' thrown on line %d\n", fb->error_line);
@@ -520,7 +520,7 @@ int start(cco_task* self, cco_fiber* fb) {
         puts("start");
         cco_await_task(cco_new_task(TaskA, 42), fb);
 
-        cco_finally:
+        cco_cleanup:
         puts("done");
     }
     free(self);
@@ -602,7 +602,7 @@ int produce(struct produce* self, cco_fiber* fb) {
             cco_yield_to(self->consumer, fb); // symmetric transfer
         }
 
-        cco_finally:
+        cco_cleanup:
         cco_cancel_task(self->consumer, fb);
         Inventory_drop(&self->inventory);
         puts("cleanup producer");
@@ -625,7 +625,7 @@ int consume(struct consume* self, cco_fiber* fb) {
             cco_yield_to(self->producer, fb); // symmetric transfer
         }
 
-        cco_finally:
+        cco_cleanup:
         puts("cleanup consumer");
     }
     return 0;
@@ -708,7 +708,7 @@ int scheduler(struct Scheduler* self, cco_fiber* fb) {
             }
         }
 
-        cco_finally:
+        cco_cleanup:
         Tasks_drop(&self->tasks);
         puts("Task queue dropped");
     }
@@ -725,7 +725,7 @@ static int taskX(struct TaskX* self, cco_fiber* fb) {
         printf("%c is back doing more work\n", self->id);
         cco_yield;
 
-        cco_finally:
+        cco_cleanup:
         printf("%c is done\n", self->id);
     }
     return 0;
@@ -744,7 +744,7 @@ static int TaskA(struct TaskA* self, cco_fiber* fb) {
         puts("A is back doing more work");
         cco_yield;
 
-        cco_finally:
+        cco_cleanup:
         puts("A is done");
     }
     return 0;

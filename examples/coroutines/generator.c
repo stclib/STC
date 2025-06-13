@@ -29,7 +29,7 @@ int Triple_next(Triple_iter* it) {
                 }
             }
         }
-        cco_finally:
+        cco_cleanup:
         it->ref = NULL; // stop iteration
         printf("Coroutine done\n");
     }

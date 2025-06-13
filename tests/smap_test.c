@@ -80,7 +80,7 @@ TEST(sortedmap, erase)
 #define T Intmap, int, int, (c_use_eq)
 #include <stc/sortedmap.h>
 
-#define T Intvec, Intmap_value
+#define T Pairvec, Intmap_raw
 #include <stc/vec.h>
 
 TEST(sortedmap, insert)
@@ -107,17 +107,15 @@ TEST(sortedmap, insert)
 
     // The templatized version inserting a jumbled range
     Intmap m2 = {0};
-    Intvec v = {0};
-    typedef Intvec_value ipair;
-    Intvec_push(&v, (ipair){43, 294});
-    Intvec_push(&v, (ipair){41, 262});
-    Intvec_push(&v, (ipair){45, 330});
-    Intvec_push(&v, (ipair){42, 277});
-    Intvec_push(&v, (ipair){44, 311});
+    Pairvec v = {0};
+    Pairvec_push(&v, (Pairvec_value){43, 294});
+    Pairvec_push(&v, (Pairvec_value){41, 262});
+    Pairvec_push(&v, (Pairvec_value){45, 330});
+    Pairvec_push(&v, (Pairvec_value){42, 277});
+    Pairvec_push(&v, (Pairvec_value){44, 311});
 
     // Inserting the following vector data into m2:
-    for (c_each(e, Intvec, v))
-        Intmap_insert_or_assign(&m2, e.ref->first, e.ref->second);
+    Intmap_put_n(&m2, v.data, Pairvec_size(&v));
 
     // The modified key and mapped values of m2 are:
     Intmap_take(&res, c_make(Intmap, {{41, 262}, {42, 277}, {43, 294}, {44, 311}, {45, 330}}));
@@ -143,5 +141,5 @@ TEST(sortedmap, insert)
 
     c_drop(Intmap, &m1, &m2, &res);
     c_drop(Mymap, &m3, &res3);
-    c_drop(Intvec, &v);
+    c_drop(Pairvec, &v);
 }

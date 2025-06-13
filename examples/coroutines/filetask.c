@@ -23,14 +23,14 @@ int file_read(struct file_read* co, cco_fiber* fb)
 
         while (true) {
             // emulate async io: await 10ms per line
-            cco_await_timer_sec(&co->tm, 0.010);
+            cco_await_timer(&co->tm, 0.010);
 
             if (!cstr_getline(&co->line, co->fp))
                 break;
             cco_yield;
         }
 
-        cco_finally:
+        cco_cleanup:
         fclose(co->fp);
         cstr_drop(&co->line);
         puts("done file_read");
@@ -61,7 +61,7 @@ int count_line(struct count_line* co, cco_fiber* fb)
             cco_yield;
         }
 
-        cco_finally:
+        cco_cleanup:
         cstr_drop(&co->path);
         puts("done count_line");
     }

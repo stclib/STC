@@ -21,7 +21,7 @@ int file_read(struct file_read* g)
 
         cco_await( !cstr_getline(&g->line, g->fp) );
 
-        cco_finally:
+        cco_cleanup:
         printf("finish\n");
         cstr_drop(&g->line);
         if (g->fp) fclose(g->fp);
