@@ -11,8 +11,8 @@ cco_task_struct (worker) {
 int worker(struct worker* co, cco_fiber* fb) {
     cco_async (co) {
         printf("Worker %d starting\n", co->id);
-        cco_await_timer(&co->tm, 1.0 + co->id / 4.0);
-        printf("Worker %d done\n", co->id);
+        cco_await_timer(&co->tm, 1.0 + co->id / 8.0);
+        printf("Worker %d done: %f\n", co->id, cco_timer_elapsed(&co->tm));
     }
 
 	*co->count -= 1;
@@ -21,32 +21,31 @@ int worker(struct worker* co, cco_fiber* fb) {
 }
 
 
-cco_task_struct (something) {
-    something_base base;
+cco_task_struct (chiller) {
+    chiller_base base;
     cco_timer tm;
 };
 
-int something(struct something* co, cco_fiber* fb) {
+int chiller(struct chiller* co, cco_fiber* fb) {
     cco_async (co) {
-        printf("something starting\n");
+        printf("Chiller starting\n");
         cco_await_timer(&co->tm, 3.0);
-        printf("something done\n");
+        printf("Chiller done: %g\n", cco_timer_elapsed(&co->tm));
     }
 
     free(co); (void)fb;
     return 0;
 }
 
-
-cco_task_struct (ccomain) {
-    ccomain_base base;
+cco_task_struct (all_together) {
+    all_together_base base;
     int wgroup;
 };
 
-int ccomain(struct ccomain* co, cco_fiber* fb) {
+int all_together(struct all_together* co, cco_fiber* fb) {
     cco_async (co) {
-        struct something* thing = c_new(struct something, {{something}});
-        cco_spawn(thing, fb);
+        struct chiller* chill = c_new(struct chiller, {{chiller}});
+        cco_spawn(chill, fb);
 
         for (c_range32(i, 8)) {
             co->wgroup += 1;
@@ -64,6 +63,6 @@ int ccomain(struct ccomain* co, cco_fiber* fb) {
 
 int main()
 {
-    struct ccomain* go = c_new(struct ccomain, {{ccomain}});
+    struct all_together* go = c_new(struct all_together, {{all_together}});
     cco_run_task(go);
 }
