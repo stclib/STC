@@ -49,12 +49,12 @@ int main(void)
 #include "../common.h"
 
 // ------- c_filter --------
-#define c_flt_take(n) _flt_take(&_base, n)
+#define c_flt_take(n) _flt_take(&fltbase, n)
 #define c_flt_skip(n) (c_flt_counter() > (n))
-#define c_flt_takewhile(pred) _flt_takewhile(&_base, pred)
-#define c_flt_skipwhile(pred) (_base.sb[_base.sb_top++] |= !(pred))
-#define c_flt_counter() (++_base.sn[++_base.sn_top])
-#define c_flt_getcount() (_base.sn[_base.sn_top])
+#define c_flt_takewhile(pred) _flt_takewhile(&fltbase, pred)
+#define c_flt_skipwhile(pred) (fltbase.sb[fltbase.sb_top++] |= !(pred))
+#define c_flt_counter() (++fltbase.sn[++fltbase.sn_top])
+#define c_flt_getcount() (fltbase.sn[fltbase.sn_top])
 #define c_flt_map(expr) (_mapped = (expr), value = &_mapped)
 #define c_flt_src _it.ref
 
@@ -71,11 +71,11 @@ int main(void)
     _c_filter(C, start, _r, pred)
 
 #define _c_filter(C, start, rev, pred) do { \
-    struct _flt_base _base = {0}; \
+    struct _flt_base fltbase = {0}; \
     C##_iter _it = start; \
     C##_value *value = _it.ref, _mapped = {0}; \
-    for ((void)_mapped ; !_base.done & (_it.ref != NULL) ; \
-         C##rev##next(&_it), value = _it.ref, _base.sn_top=0, _base.sb_top=0) \
+    for ((void)_mapped ; !fltbase.done & (_it.ref != NULL) ; \
+         C##rev##next(&_it), value = _it.ref, fltbase.sn_top=0, fltbase.sb_top=0) \
       (void)(pred); \
 } while (0)
 
@@ -101,14 +101,14 @@ int main(void)
 #define c_flt_src2 _it2.ref
 
 #define _c_filter_zip(C1, start1, C2, start2, rev, pred) do { \
-    struct _flt_base _base = {0}; \
+    struct _flt_base fltbase = {0}; \
     C1##_iter _it1 = start1; \
     C2##_iter _it2 = start2; \
     C1##_value* value1 = _it1.ref, _mapped1; (void)_mapped1; \
     C2##_value* value2 = _it2.ref, _mapped2; (void)_mapped2; \
-    for (; !_base.done & (_it1.ref != NULL) & (_it2.ref != NULL); \
+    for (; !fltbase.done & (_it1.ref != NULL) & (_it2.ref != NULL); \
          C1##rev##next(&_it1), value1 = _it1.ref, C2##rev##next(&_it2), value2 = _it2.ref, \
-         _base.sn_top=0, _base.sb_top=0) \
+         fltbase.sn_top=0, fltbase.sb_top=0) \
       (void)(pred); \
 } while (0)
 

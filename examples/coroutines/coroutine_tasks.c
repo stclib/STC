@@ -16,14 +16,14 @@ bool is_prime(long long i) {
 }
 
 cco_task_struct (prime) {
-    prime_state cco;
+    prime_base base;
     int count;
     long long value;
 };
 
 int prime(struct prime* g, cco_fiber* fb) {
     (void)fb;
-    cco_routine (g) {
+    cco_async (g) {
         if (g->value <= 2) {
             g->value = 2;
             if (g->count-- == 0)
@@ -36,9 +36,9 @@ int prime(struct prime* g, cco_fiber* fb) {
                 cco_yield_v(YIELD_PRM);
             }
         }
-        cco_cleanup:
-        puts("DONE prm");
     }
+
+    puts("DONE prm");
     return 0;
 }
 
@@ -46,7 +46,7 @@ int prime(struct prime* g, cco_fiber* fb) {
 // Use coroutine to create a fibonacci sequence generator:
 
 cco_task_struct (fibonacci) {
-    fibonacci_state cco;
+    fibonacci_base base;
     int count;
     long long value, b;
 };
@@ -54,7 +54,7 @@ cco_task_struct (fibonacci) {
 int fibonacci(struct fibonacci* g, cco_fiber* fb) {
     (void)fb;
     assert(g->count < 94);
-    cco_routine (g) {
+    cco_async (g) {
         if (g->value == 0)
             g->b = 1;
         while (true) {
@@ -66,9 +66,9 @@ int fibonacci(struct fibonacci* g, cco_fiber* fb) {
             g->b += tmp;
             cco_yield_v(YIELD_FIB);
         }
-        cco_cleanup:
-        puts("DONE fib");
     }
+
+    puts("DONE fib");
     return 0;
 }
 

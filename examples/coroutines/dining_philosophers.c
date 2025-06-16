@@ -5,64 +5,64 @@
 #include <stc/coroutine.h>
 
 enum {num_philosophers = 5};
-enum PhState {ph_thinking, ph_hungry, ph_eating};
+enum PhMode {ph_thinking, ph_hungry, ph_eating};
 
 // Philosopher coroutine
 struct Philosopher {
+    cco_base base; // required
     int id;
     cco_timer tm;
-    enum PhState state;
+    enum PhMode mode;
     int hunger;
     struct Philosopher* left;
     struct Philosopher* right;
-    cco_state cco; // required
 };
 
 int Philosopher(struct Philosopher* self) {
     double duration;
-    cco_routine (self) {
+    cco_async (self) {
         while (1) {
             duration = 1.0 + crand64_real()*2.0;
             printf("Philosopher %d is thinking for %.0f minutes...\n", self->id, duration*10);
             self->hunger = 0;
-            self->state = ph_thinking;
+            self->mode = ph_thinking;
             cco_await_timer(&self->tm, duration);
 
             printf("Philosopher %d is hungry...\n", self->id);
-            self->state = ph_hungry;
+            self->mode = ph_hungry;
             cco_await(self->hunger >= self->left->hunger &&
                       self->hunger >= self->right->hunger);
 
             duration = 0.5 + crand64_real();
             printf("Philosopher %d is eating for %.0f minutes...\n", self->id, duration*10);
             self->hunger = 3;
-            self->state = ph_eating;
+            self->mode = ph_eating;
             cco_await_timer(&self->tm, duration);
 
             // increase the neighbours hunger only if they are already hungry.
-            if (self->left->state == ph_hungry) ++self->left->hunger;
-            if (self->right->state == ph_hungry) ++self->right->hunger;
+            if (self->left->mode == ph_hungry) ++self->left->hunger;
+            if (self->right->mode == ph_hungry) ++self->right->hunger;
         }
-
-        cco_cleanup:
-        printf("Philosopher %d done\n", self->id);
     }
+
+    printf("Philosopher %d done\n", self->id);
     return 0;
 }
 
 // Dining coroutine
 struct Dining {
+    cco_base base; // required
     struct Philosopher philos[num_philosophers];
-    cco_state cco; // required
 };
 
 int Dining(struct Dining* self) {
-    cco_routine (self) {
+    cco_async (self) {
         for (int i = 0; i < num_philosophers; ++i) {
-            cco_reset(&self->philos[i]);
-            self->philos[i].id = i + 1;
-            self->philos[i].left = &self->philos[(i - 1 + num_philosophers) % num_philosophers];
-            self->philos[i].right = &self->philos[(i + 1) % num_philosophers];
+            self->philos[i] = (struct Philosopher){
+                .id = i + 1,
+                .left = &self->philos[(i - 1 + num_philosophers) % num_philosophers],
+                .right = &self->philos[(i + 1) % num_philosophers],
+            };
         }
 
         while (1) {
@@ -73,14 +73,13 @@ int Dining(struct Dining* self) {
             cco_yield; // suspend, return control back to caller who
                        // can do other tasks before resuming dining.
         }
-
-        cco_cleanup:
-        for (int i = 0; i < num_philosophers; ++i) {
-            cco_stop(&self->philos[i]);
-            Philosopher(&self->philos[i]); // execute philos. cco_cleanup.
-        }
-        puts("Dining done");
     }
+
+    for (int i = 0; i < num_philosophers; ++i) {
+        cco_stop(&self->philos[i]);
+        Philosopher(&self->philos[i]); // execute philos cleanup.
+    }
+    puts("Dining done");
     return 0;
 }
 

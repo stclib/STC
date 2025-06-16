@@ -5,12 +5,12 @@
 
 struct fibonacci {
     unsigned long long value, b;
-    cco_state cco;
+    cco_base base;
 };
 
 int fibonacci(struct fibonacci* g) {
     unsigned long long tmp;
-    cco_routine (g) {
+    cco_async (g) {
         g->value = 0;
         g->b = 1;
         cco_yield;
@@ -21,10 +21,9 @@ int fibonacci(struct fibonacci* g) {
             g->b += tmp;
             cco_yield;
         }
-
-        cco_cleanup:
-        puts("done");
     }
+
+    puts("done");
     return 0;
 }
 

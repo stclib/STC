@@ -13,12 +13,12 @@ typedef struct {
 
 typedef struct {
     Triple* ref;    // required by iterator
-    cco_state cco;  // required by coroutine
+    cco_base base;  // required by coroutine
 } Triple_iter;
 
 int Triple_next(Triple_iter* it) {
-    Triple* g = it->ref; // get generator before cco_routine starts!
-    cco_routine (it)
+    Triple* g = it->ref; // get generator before cco_async starts!
+    cco_async (it)
     {
         for (g->c = 5;; ++g->c) {
             for (g->a = 1; g->a < g->c; ++g->a) {
@@ -29,10 +29,10 @@ int Triple_next(Triple_iter* it) {
                 }
             }
         }
-        cco_cleanup:
-        it->ref = NULL; // stop iteration
-        printf("Coroutine done\n");
     }
+
+    it->ref = NULL; // stop iteration
+    printf("Coroutine done\n");
     return 0;
 }
 

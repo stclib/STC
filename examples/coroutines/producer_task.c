@@ -7,20 +7,20 @@
 // Example shows symmetric coroutines producer/consumer style.
 
 cco_task_struct (produce) {
-    produce_state cco; // must be first (compile-time checked)
+    produce_base base; // must be first (compile-time checked)
     struct consume* consumer;
     Inventory inv;
     int limit, batch, serial, total;
 };
 
 cco_task_struct (consume) {
-    consume_state cco; // must be first
+    consume_base base; // must be first
     struct produce* producer;
 };
 
 
 int produce(struct produce* co, cco_fiber* fb) {
-    cco_routine (co) {
+    cco_async (co) {
         while (1) {
             if (co->serial > co->total) {
                 if (Inventory_is_empty(&co->inv))
@@ -40,17 +40,16 @@ int produce(struct produce* co, cco_fiber* fb) {
 
             cco_yield_to(co->consumer, fb); // symmetric transfer
         }
-
-        cco_cleanup:
-        cco_cancel_task(co->consumer, fb);
-        Inventory_drop(&co->inv);
-        puts("cleanup producer");
     }
+
+    cco_cancel_task(co->consumer, fb);
+    Inventory_drop(&co->inv);
+    puts("cleanup producer");
     return 0;
 }
 
 int consume(struct consume* co, cco_fiber* fb) {
-    cco_routine (co) {
+    cco_async (co) {
         int n, sz;
         while (1) {
             n = rand() % 10;
@@ -63,10 +62,9 @@ int consume(struct consume* co, cco_fiber* fb) {
 
             cco_yield_to(co->producer, fb); // symmetric transfer
         }
-
-        cco_cleanup:
-        puts("cleanup consumer");
     }
+
+    puts("cleanup consumer");
     return 0;
 }
 
@@ -74,14 +72,14 @@ int main(void)
 {
     srand((unsigned)time(0));
     struct produce producer = {
-        .cco = {produce},
+        .base = {produce},
         .inv = {0},
         .limit = 12,
         .batch = 8,
         .total = 50,
     };
     struct consume consumer = {
-        .cco = {consume},
+        .base = {consume},
         .producer = &producer,
     };
     producer.consumer = &consumer;

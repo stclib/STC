@@ -18,11 +18,11 @@ bool is_prime(long long i) {
 struct prime {
     int count;
     long long result;
-    cco_state cco;
+    cco_base base;
 };
 
 int prime(struct prime* g) {
-    cco_routine (g) {
+    cco_async (g) {
         if (g->result <= 2) {
             g->result = 2;
             if (g->count-- == 0)
@@ -35,9 +35,9 @@ int prime(struct prime* g) {
                 cco_yield_v(YIELD_PRM);
             }
         }
-        cco_cleanup:
-        puts("DONE prm");
     }
+
+    puts("DONE prm");
     return 0;
 }
 
@@ -47,12 +47,12 @@ int prime(struct prime* g) {
 struct fibonacci {
     int count;
     long long result, b;
-    cco_state cco;
+    cco_base base;
 };
 
 int fibonacci(struct fibonacci* g) {
     assert(g->count < 94);
-    cco_routine (g) {
+    cco_async (g) {
         if (g->result == 0)
             g->b = 1;
         while (true) {
@@ -64,9 +64,9 @@ int fibonacci(struct fibonacci* g) {
             g->b += tmp;
             cco_yield_v(YIELD_FIB);
         }
-        cco_cleanup:
-        puts("DONE fib");
     }
+
+    puts("DONE fib");
     return 0;
 }
 
@@ -75,11 +75,11 @@ int fibonacci(struct fibonacci* g) {
 struct combined {
     struct prime prm;
     struct fibonacci fib;
-    cco_state cco;
+    cco_base base;
 };
 
 int combined(struct combined* g) {
-    cco_routine (g) {
+    cco_async (g) {
         puts("SEQUENCED:");
         g->prm = (struct prime){.count = 8}, g->fib = (struct fibonacci){.count = 12};
         cco_await_coroutine( prime(&g->prm) );
@@ -89,9 +89,9 @@ int combined(struct combined* g) {
         g->prm = (struct prime){.count = 8}, g->fib = (struct fibonacci){.count = 12};
         cco_await_coroutine( prime(&g->prm) |
                              fibonacci(&g->fib) );
-        cco_cleanup:
-        puts("DONE prime and fib");
     }
+
+    puts("DONE prime and fib");
     return 0;
 }
 
