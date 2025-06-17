@@ -255,7 +255,6 @@ static inline int _cco_cancel_task(cco_task* task, cco_fiber* fiber)
 
 static inline bool cco_joined(const cco_fiber* fiber)
     { return fiber == fiber->next; }
-#define cco_is_joined(fb) cco_joined(fb) // [deprecated]
 
 extern cco_fiber* _cco_new_fiber(cco_task* task, void* env);
 extern cco_fiber* _cco_spawn(cco_task* task, cco_fiber* fb, void* env);
@@ -402,7 +401,6 @@ typedef struct { ptrdiff_t count; } cco_semaphore;
  */
 
 #ifdef _WIN32
-//#include <stdlib.h>
     #ifdef __cplusplus
       #define _c_LINKC extern "C" __declspec(dllimport)
     #else
@@ -432,7 +430,8 @@ typedef struct { ptrdiff_t count; } cco_semaphore;
     }
 #else
     #include <sys/time.h>
-    #define cco_timer_res 1.0E-6
+    #define cco_timer_freq 1000000LL
+    #define cco_timer_res (1.0/cco_timer_freq)
 
     static inline double cco_time(void) { /* seconds since epoch */
         struct timeval tv;
@@ -440,24 +439,19 @@ typedef struct { ptrdiff_t count; } cco_semaphore;
         return (double)tv.tv_sec + (double)tv.tv_usec*cco_timer_res;
     }
 
-    static inline void cco_sleep(double sec) {
-        struct timeval tv;
-        tv.tv_sec = (time_t)sec;
-        tv.tv_usec = (suseconds_t)((sec - (double)(long)sec)*1.0E6);
-        select(0, NULL, NULL, NULL, &tv);
-    }
-
     static inline long long cco_ticks(void) { /* microseconds */
         struct timeval tv;
         gettimeofday(&tv, NULL);
-        return tv.tv_sec*1000000 + tv.tv_usec;
+        return tv.tv_sec*cco_timer_freq + tv.tv_usec;
+    }
+
+    static inline void cco_sleep(double sec) {
+        struct timeval tv;
+        tv.tv_sec = (time_t)sec;
+        tv.tv_usec = (suseconds_t)((sec - (double)(long)sec)*cco_timer_freq);
+        select(0, NULL, NULL, NULL, &tv);
     }
 #endif
-#define cco_sleep_sec cco_sleep                      // [deprecated]
-#define cco_make_timer_sec cco_make_timer            // [deprecated]
-#define cco_timer_elapsed_sec cco_timer_elapsed      // [deprecated]
-#define cco_timer_remaining_sec cco_timer_remaining  // [deprecated]
-#define cco_await_timer_sec cco_await_timer          // [deprecated]
 
 typedef struct { double duration; long long start_time; } cco_timer;
 
