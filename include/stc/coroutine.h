@@ -72,8 +72,7 @@ typedef enum {
 
 typedef struct {
     int state;
-} cco_base, cco_state; // [deprecated] cco_state
-#define cco base       // [deprecated] cco
+} cco_base;
 
 #define cco_initial(co) ((co)->base.state == CCO_STATE_INIT)
 #define cco_suspended(co) ((co)->base.state > CCO_STATE_INIT)
@@ -93,8 +92,6 @@ typedef struct {
     for (int *_state = (_cco_validate_task_struct(co), &(co)->base.state) \
            ; *_state != CCO_STATE_DONE ; *_state = CCO_STATE_DONE) \
         _resume: switch (*_state) case CCO_STATE_INIT: // thanks, @liigo!
-
-#define cco_routine(co) cco_async(co) // [deprecated] cco_routine
 
 /* Throw an error "exception"; can be catched up in the cco_await_task call tree */
 #define cco_throw_error(error_code, fiber) \
@@ -173,7 +170,7 @@ typedef struct cco_fiber {
     int recover_state, awaitbits, result;
     int error, error_line;
     cco_base base;
-} cco_fiber, cco_runtime; // [deprecated] cco_runtime
+} cco_fiber;
 
 /* Define a Task struct */
 #define cco_task_struct(Task) \
@@ -182,7 +179,7 @@ typedef struct cco_fiber {
         int (*func)(struct Task*, cco_fiber*); \
         int state, awaitbits; \
         struct cco_task* parent_task; \
-    } Task##_base, Task##_state; /* [deprecated] Task##_state */ \
+    } Task##_base; \
     struct Task
 
 /* Base cco_task type */
@@ -232,7 +229,7 @@ static inline int _cco_cancel_task(cco_task* task, cco_fiber* fiber)
  * cco_run_fiber()/cco_run_task(): Run fibers/tasks in parallel
  */
 #define cco_new_task(Task, ...) \
-    ((cco_task*)c_new(struct Task, {{.func=Task}, __VA_ARGS__}))
+    (c_new(struct Task, {{.func=Task}, __VA_ARGS__}))
 
 #define cco_new_fiber(...) c_MACRO_OVERLOAD(cco_new_fiber, __VA_ARGS__)
 #define cco_new_fiber_1(task) cco_new_fiber_2(task, NULL)
@@ -406,17 +403,18 @@ typedef struct { ptrdiff_t count; } cco_semaphore;
     #else
       #define _c_LINKC __declspec(dllimport)
     #endif
-    struct _FILETIME;
-    struct _LARGE_INTEGER;
+    struct _FILETIME; struct _LARGE_INTEGER;
     _c_LINKC void __stdcall GetSystemTimePreciseAsFileTime(struct _FILETIME*);
     _c_LINKC void __stdcall Sleep(unsigned long);
     _c_LINKC int __stdcall QueryPerformanceCounter(struct _LARGE_INTEGER*);
     #define cco_timer_res 1.0E-7
 
     static inline double cco_time(void) { /* seconds since epoch */
-        unsigned long long quad;          /* 64-bit value representing 1/10th usecs since Jan 1 1601, 00:00 UTC */
+        unsigned long long quad;
+        /* 64-bit value representing 1/10th usecs since Jan 1 1601 */
         GetSystemTimePreciseAsFileTime((struct _FILETIME*)&quad);
-        return (double)(quad - 116444736000000000ULL)*cco_timer_res;  /* time diff Jan 1 1601-Jan 1 1970 in 1/10th usecs */
+        /* subtract time diff to Jan 1 1970 in 1/10th usecs */
+        return (double)(quad - 116444736000000000ULL)*cco_timer_res;
     }
 
     static inline long long cco_ticks(void) { /* 1/10th microseconds */
@@ -469,16 +467,16 @@ static inline void cco_restart_timer(cco_timer* tm) {
     tm->start_time = cco_ticks();
 }
 
-static inline bool cco_timer_expired(cco_timer* tm) {
-    return cco_timer_res*(double)(cco_ticks() - tm->start_time) >= tm->duration;
+static inline double cco_timer_elapsed(cco_timer* tm) {
+    return (double)(cco_ticks() - tm->start_time)*cco_timer_res;
 }
 
-static inline double cco_timer_elapsed(cco_timer* tm) {
-    return cco_timer_res*(double)(cco_ticks() - tm->start_time);
+static inline bool cco_timer_expired(cco_timer* tm) {
+    return cco_timer_elapsed(tm) >= tm->duration;
 }
 
 static inline double cco_timer_remaining(cco_timer* tm) {
-    return tm->duration - cco_timer_res*(double)(cco_ticks() - tm->start_time);
+    return tm->duration - cco_timer_elapsed(tm);
 }
 
 #define cco_await_timer(tm, sec) \

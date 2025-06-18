@@ -4,8 +4,8 @@
 // Use coroutine to create a fibonacci sequence generator:
 
 struct fibonacci {
-    unsigned long long value, b;
     cco_base base;
+    unsigned long long value, b;
 };
 
 int fibonacci(struct fibonacci* g) {

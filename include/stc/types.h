@@ -83,8 +83,8 @@ typedef union {
 typedef char cstr_value;
 typedef struct { cstr_value* data; intptr_t size, cap; } cstr_buf;
 typedef union cstr {
+    struct { uintptr_t size; cstr_value* data; uintptr_t ncap; } lon;
     struct { cstr_value data[ sizeof(cstr_buf) - 1 ]; uint8_t size; } sml;
-    struct { cstr_value* data; uintptr_t size, ncap; } lon;
 } cstr;
 
 typedef union {
