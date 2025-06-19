@@ -11,8 +11,8 @@ cco_task_struct (worker) {
 int worker(struct worker* co, cco_fiber* fb) {
     cco_async (co) {
         printf("Worker %d starting\n", co->id);
-        cco_await_timer(&co->tm, 1.0 + co->id / 4.0);
-        printf("Worker %d done\n", co->id);
+        cco_await_timer(&co->tm, 1.0 + co->id / 8.0);
+        printf("Worker %d done: %f\n", co->id, cco_timer_elapsed(&co->tm));
     }
 
 	*co->count -= 1;
@@ -30,7 +30,7 @@ int something(struct something* co, cco_fiber* fb) {
     cco_async (co) {
         printf("something starting\n");
         cco_await_timer(&co->tm, 3.0);
-        printf("something done\n");
+        printf("something done: %f\n", cco_timer_elapsed(&co->tm));
     }
 
     free(co); (void)fb;

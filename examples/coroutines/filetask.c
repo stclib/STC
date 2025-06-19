@@ -22,8 +22,8 @@ int file_read(struct file_read* co, cco_fiber* fb)
         co->line = cstr_init();
 
         while (true) {
-            // emulate async io: await 10ms per line
-            cco_await_timer(&co->tm, 0.010);
+            // emulate async io: await 1ms per line
+            cco_await_timer(&co->tm, 0.001);
 
             if (!cstr_getline(&co->line, co->fp))
                 break;

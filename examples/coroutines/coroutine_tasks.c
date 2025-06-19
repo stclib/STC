@@ -97,8 +97,8 @@ int main(void) {
     cco_spawn(&prm, fb);
     cco_spawn(&fib, fb);
 
-    cco_run_fiber(run, fb) {
-        switch (run->result) {
+    cco_run_fiber(&fb) {
+        switch (fb->result) {
             case YIELD_PRM:
                 printf("  Prime=%lld\n", prm.value);
                 break;
