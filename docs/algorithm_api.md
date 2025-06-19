@@ -161,13 +161,13 @@ c_sumtype (SumType,
     (VariantTagB, VariantTypeB),
     (VariantTagC, VariantTagB_type), // use same payload type as VariantTagB
     ...
-    (VariantTagN, VariantTypeN),      // optional final comma
+    (VariantTagN, VariantTypeN),     // optional final comma
 );
 
 SumType           c_variant(VariantTag tag, VariantType value); // Sum type constructor
-bool              c_holds_tag(const SumType* obj, VariantTag tag); // Does obj hold VariantType?
-int               c_tag_index(SumType* obj);               // (for debug only)
-VariantTag_type*  c_get(SumType* obj, VariantTag tag);     // NULL if tag does does not match what it holds.
+bool              c_is_variant(SumType* obj, VariantTag tag);   // Does obj hold VariantType?
+int               c_variant_index(SumType* obj);                // (for debug only)
+VariantTag_type*  c_get(SumType* obj, VariantTag tag);          // NULL if tag does does not match what it holds.
 
 // Use a sum type (1)
 c_when (SumType* obj) {
