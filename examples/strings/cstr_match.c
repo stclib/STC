@@ -4,15 +4,15 @@
 
 int main(void)
 {
-    cstr ss = cstr_lit("The quick brown fox jumps over the lazy dog.JPG");
+    cstr str = cstr_lit("The quick brown fox jumps over the lazy dog.JPG");
 
-    isize pos = cstr_find_at(&ss, 0, "brown");
-    printf("%" c_ZI " [%s]\n", pos, pos == c_NPOS ? "<NULL>" : cstr_str(&ss) + pos);
-    printf("equals: %d\n", cstr_equals(&ss, "The quick brown fox jumps over the lazy dog.JPG"));
-    printf("contains: %d\n", cstr_contains(&ss, "umps ove"));
-    printf("starts_with: %d\n", cstr_starts_with(&ss, "The quick brown"));
-    printf("ends_with: %d\n", cstr_ends_with(&ss, ".jpg"));
-    printf("ends_with: %d\n", cstr_ends_with(&ss, ".JPG"));
+    isize pos = cstr_find_at(&str, 0, "brown");
+    printf("%" c_ZI " [%s]\n", pos, pos == c_NPOS ? "<NULL>" : cstr_str(&str) + pos);
+    printf("equals: %d\n", cstr_equals(&str, "The quick brown fox jumps over the lazy dog.JPG"));
+    printf("contains 'umps ove': %d\n", cstr_contains(&str, "umps ove"));
+    printf("starts_with 'The quick brown': %d\n", cstr_starts_with(&str, "The quick brown"));
+    printf("ends_with '.jpg': %d\n", cstr_ends_with(&str, ".jpg"));
+    printf("ends_with '.JPG': %d\n", cstr_ends_with(&str, ".JPG"));
 
     cstr s1 = cstr_lit("hell😀 w😀rl🐨");
     csview ch1 = cstr_u8_at(&s1, 7).chr;
@@ -21,5 +21,5 @@ int main(void)
     printf("ch1: " c_svfmt "\n", c_svarg(ch1));
     printf("ch2: " c_svfmt "\n", c_svarg(ch2));
 
-    c_drop(cstr, &ss, &s1);
+    c_drop(cstr, &str, &s1);
 }

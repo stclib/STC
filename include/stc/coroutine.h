@@ -241,7 +241,7 @@ static inline int _cco_cancel_task(cco_task* task, cco_fiber* fiber)
  * cco_run_fiber()/cco_run_task(): Run fibers/tasks in parallel
  */
 #define cco_new_task(Task, ...) \
-    ((cco_task*)c_new(struct Task, {{.func=Task}, __VA_ARGS__}))
+    (c_new(struct Task, {{.func=Task}, __VA_ARGS__}))
 
 #define cco_new_fiber(...) c_MACRO_OVERLOAD(cco_new_fiber, __VA_ARGS__)
 #define cco_new_fiber_1(task) cco_new_fiber_2(task, NULL)
@@ -416,14 +416,24 @@ typedef struct { ptrdiff_t count; } cco_semaphore;
     #else
       #define _c_LINKC __declspec(dllimport)
     #endif
-    struct _FILETIME;
-    _c_LINKC void __stdcall GetSystemTimeAsFileTime(struct _FILETIME*);
+    struct _FILETIME; struct _LARGE_INTEGER;
+    _c_LINKC void __stdcall GetSystemTimePreciseAsFileTime(struct _FILETIME*);
     _c_LINKC void __stdcall Sleep(unsigned long);
+    _c_LINKC int __stdcall QueryPerformanceCounter(struct _LARGE_INTEGER*);
+    #define cco_timer_res 1.0E-7
 
     static inline double cco_time(void) { /* seconds since epoch */
-        unsigned long long quad;          /* 64-bit value representing 1/10th usecs since Jan 1 1601, 00:00 UTC */
-        GetSystemTimeAsFileTime((struct _FILETIME*)&quad);
-        return (double)(quad - 116444736000000000ULL)*1e-7;  /* time diff Jan 1 1601-Jan 1 1970 in 1/10th usecs */
+        unsigned long long quad;
+        /* 64-bit value representing 1/10th usecs since Jan 1 1601 */
+        GetSystemTimePreciseAsFileTime((struct _FILETIME*)&quad);
+        /* subtract time diff to Jan 1 1970 in 1/10th usecs */
+        return (double)(quad - 116444736000000000ULL)*cco_timer_res;
+    }
+
+    static inline long long cco_ticks(void) { /* 1/10th microseconds */
+        long long quad;
+        QueryPerformanceCounter((struct _LARGE_INTEGER*)&quad);
+        return quad;
     }
 
     static inline void cco_sleep(double sec) {
@@ -431,16 +441,25 @@ typedef struct { ptrdiff_t count; } cco_semaphore;
     }
 #else
     #include <sys/time.h>
+    #define cco_timer_freq 1000000LL
+    #define cco_timer_res (1.0/cco_timer_freq)
+
     static inline double cco_time(void) { /* seconds since epoch */
         struct timeval tv;
         gettimeofday(&tv, NULL);
-        return (double)tv.tv_sec + (double)tv.tv_usec*1e-6;
+        return (double)tv.tv_sec + (double)tv.tv_usec*cco_timer_res;
+    }
+
+    static inline long long cco_ticks(void) { /* microseconds */
+        struct timeval tv;
+        gettimeofday(&tv, NULL);
+        return tv.tv_sec*cco_timer_freq + tv.tv_usec;
     }
 
     static inline void cco_sleep(double sec) {
         struct timeval tv;
         tv.tv_sec = (time_t)sec;
-        tv.tv_usec = (suseconds_t)((sec - (double)(long)sec)*1e6);
+        tv.tv_usec = (suseconds_t)((sec - (double)(long)sec)*cco_timer_freq);
         select(0, NULL, NULL, NULL, &tv);
     }
 #endif
@@ -451,32 +470,32 @@ typedef struct { ptrdiff_t count; } cco_semaphore;
 #define cco_timer_remaining_sec cco_timer_remaining
 #define cco_await_timer_sec cco_await_timer
 
-typedef struct { double duration, start_time; } cco_timer;
+typedef struct { double duration; long long start_time; } cco_timer;
 
 static inline cco_timer cco_make_timer(double sec) {
-    cco_timer tm = {.duration=sec, .start_time=cco_time()};
+    cco_timer tm = {.duration=sec, .start_time=cco_ticks()};
     return tm;
 }
 
 static inline void cco_start_timer(cco_timer* tm, double sec) {
     tm->duration = sec;
-    tm->start_time = cco_time();
+    tm->start_time = cco_ticks();
 }
 
 static inline void cco_restart_timer(cco_timer* tm) {
-    tm->start_time = cco_time();
-}
-
-static inline bool cco_timer_expired(cco_timer* tm) {
-    return cco_time() - tm->start_time >= tm->duration;
+    tm->start_time = cco_ticks();
 }
 
 static inline double cco_timer_elapsed(cco_timer* tm) {
-    return cco_time() - tm->start_time;
+    return (double)(cco_ticks() - tm->start_time)*cco_timer_res;
+}
+
+static inline bool cco_timer_expired(cco_timer* tm) {
+    return cco_timer_elapsed(tm) >= tm->duration;
 }
 
 static inline double cco_timer_remaining(cco_timer* tm) {
-    return tm->start_time + tm->duration - cco_time();
+    return tm->duration - cco_timer_elapsed(tm);
 }
 
 #define cco_await_timer(tm, sec) \

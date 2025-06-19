@@ -95,13 +95,9 @@ typedef union {
 #define c_true(...) __VA_ARGS__
 #define c_false(...)
 
-#define declare_arc1(SELF, VAL) \
+#define declare_arc(SELF, VAL) \
     typedef VAL SELF##_value; \
-\
-    typedef struct { \
-        SELF##_value value; \
-        catomic_long counter; \
-    } SELF##_ctrl; \
+    typedef struct SELF##_ctrl SELF##_ctrl; \
 \
     typedef union SELF { \
         SELF##_value* get; \
@@ -110,12 +106,8 @@ typedef union {
 
 #define declare_arc2(SELF, VAL) \
     typedef VAL SELF##_value; \
-    \
-    typedef struct { \
-        catomic_long counter; \
-        SELF##_value value; \
-    } SELF##_ctrl; \
-    \
+    typedef struct SELF##_ctrl SELF##_ctrl; \
+\
     typedef struct SELF { \
         SELF##_value* get; \
         SELF##_ctrl* ctrl2; \

@@ -93,7 +93,7 @@ int main(void) {
 #define _c_enum_1(x,...) (x=__LINE__*100, __VA_ARGS__)
 #define _c_vartuple_tag(T, Tag, ...) Tag,
 #define _c_vartuple_type(T, Tag, ...) typedef __VA_ARGS__ Tag##_type; typedef T Tag##_sumtype;
-#define _c_vartuple_var(T, Tag, ...) struct { enum enum_##T tag; Tag##_type var; } Tag;
+#define _c_vartuple_var(T, Tag, ...) struct { enum enum_##T tag; Tag##_type get; } Tag;
 
 #define c_sumtype(T, ...) \
     typedef union T T; \
@@ -111,12 +111,12 @@ int main(void) {
 
     #define c_is_2(Tag, x) \
         break; case Tag: \
-        for (__typeof__(_vp1->Tag.var)* x = &_vp1->Tag.var; x; x = NULL)
+        for (__typeof__(_vp1->Tag.get)* x = &_vp1->Tag.get; x; x = NULL)
 
     #define c_is_3(varptr, Tag, x) \
         false) ; else for (__typeof__(varptr) _vp2 = (varptr); _vp2; _vp2 = NULL) \
             if (c_holds_tag(_vp2, Tag)) \
-                for (__typeof__(_vp2->Tag.var) *x = &_vp2->Tag.var; x; x = NULL
+                for (__typeof__(_vp2->Tag.get) *x = &_vp2->Tag.get; x; x = NULL
 #else
     typedef union { struct { int tag; } _any_; } _c_any_variant;
     #define c_when(varptr) \
@@ -126,12 +126,12 @@ int main(void) {
 
     #define c_is_2(Tag, x) \
         break; case Tag: \
-        for (Tag##_type *x = &((Tag##_sumtype *)_vp1)->Tag.var; x; x = NULL)
+        for (Tag##_type *x = &((Tag##_sumtype *)_vp1)->Tag.get; x; x = NULL)
 
     #define c_is_3(varptr, Tag, x) \
         false) ; else for (Tag##_sumtype* _vp2 = c_const_cast(Tag##_sumtype*, varptr); _vp2; _vp2 = NULL) \
             if (c_holds_tag(_vp2, Tag)) \
-                for (Tag##_type *x = &_vp2->Tag.var; x; x = NULL
+                for (Tag##_type *x = &_vp2->Tag.get; x; x = NULL
 #endif
 
 // Handling multiple tags with different payloads:
@@ -157,7 +157,7 @@ int main(void) {
     break; default:
 
 #define c_variant(Tag, ...) \
-    (c_literal(Tag##_sumtype){.Tag={.tag=Tag, .var=__VA_ARGS__}})
+    (c_literal(Tag##_sumtype){.Tag={.tag=Tag, .get=__VA_ARGS__}})
 
 #define c_tag_index(varptr) \
     ((int)(varptr)->_any_.tag)
@@ -166,6 +166,6 @@ int main(void) {
     ((varptr)->Tag.tag == Tag)
 
 #define c_get(varptr, Tag) \
-    (c_holds_tag(varptr, Tag) ? &(varptr)->Tag.var : NULL)
+    (c_holds_tag(varptr, Tag) ? &(varptr)->Tag.get : NULL)
 
 #endif // STC_SUMTYPE_H_INCLUDED
