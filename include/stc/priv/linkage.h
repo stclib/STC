@@ -45,7 +45,7 @@
 #elif !defined i_allocator
   #define i_allocator c
 #endif
-#ifndef i_malloc
+#ifndef i_free
   #define i_malloc c_JOIN(i_allocator, _malloc)
   #define i_calloc c_JOIN(i_allocator, _calloc)
   #define i_realloc c_JOIN(i_allocator, _realloc)
