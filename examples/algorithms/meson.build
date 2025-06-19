@@ -3,6 +3,8 @@ foreach sample : [
   'forloops',
   'random',
   'shape',
+  'tree',
+  'tree_rc',
 ]
   test(
     sample,

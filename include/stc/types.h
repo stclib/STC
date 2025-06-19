@@ -33,6 +33,7 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#define declare_rc(C, KEY) declare_arc(C, KEY)
 #define declare_vec(C, KEY) declare_stack(C, KEY)
 #define declare_pqueue(C, KEY) declare_stack(C, KEY)
 #define declare_deque(C, KEY) declare_queue(C, KEY)

@@ -95,6 +95,7 @@ install_headers(
   'include/stc/pqueue.h',
   'include/stc/queue.h',
   'include/stc/random.h',
+  'include/stc/rc.h',
   'include/stc/smap.h',
   'include/stc/sset.h',
   'include/stc/sortedmap.h',
