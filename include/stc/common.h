@@ -96,7 +96,12 @@ typedef ptrdiff_t       isize;
     #define c_make_array(T, ...) (_c_Array<T, 1, sizeof((T[])__VA_ARGS__)/sizeof(T)>{{__VA_ARGS__}}.data[0])
     #define c_make_array2d(T, N, ...) (_c_Array<T, sizeof((T[][N])__VA_ARGS__)/sizeof(T[N]), N>{__VA_ARGS__}.data)
 #endif
-#ifndef c_free
+#ifdef STC_ALLOCATOR
+    #define c_malloc c_JOIN(STC_ALLOCATOR, _malloc)
+    #define c_calloc c_JOIN(STC_ALLOCATOR, _calloc)
+    #define c_realloc c_JOIN(STC_ALLOCATOR, _realloc)
+    #define c_free c_JOIN(STC_ALLOCATOR, _free)
+#else
     #define c_malloc(sz)        malloc(c_i2u_size(sz))
     #define c_calloc(n, sz)     calloc(c_i2u_size(n), c_i2u_size(sz))
     #define c_realloc(ptr, old_sz, sz) realloc(ptr, c_i2u_size(1 ? (sz) : (old_sz)))

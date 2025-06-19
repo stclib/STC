@@ -16,7 +16,7 @@ int worker(struct worker* co, cco_fiber* fb) {
     }
 
 	*co->count -= 1;
-    free(co); (void)fb;
+    c_free(co, c_sizeof *co); (void)fb;
     return 0;
 }
 
@@ -33,7 +33,7 @@ int something(struct something* co, cco_fiber* fb) {
         printf("something done: %f\n", cco_timer_elapsed(&co->tm));
     }
 
-    free(co); (void)fb;
+    c_free(co, c_sizeof *co); (void)fb;
     return 0;
 }
 
@@ -57,7 +57,7 @@ int ccomain(struct ccomain* co, cco_fiber* fb) {
         puts("All workers done.");
     }
 
-    free(co);
+    c_free(co, c_sizeof *co);
     return 0;
 }
 
