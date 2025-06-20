@@ -180,7 +180,8 @@ _c_MEMB(_drop)(const Self* cself) {
 
 STC_DEF bool
 _c_MEMB(_reserve)(Self* self, const isize cap) {
-    isize oldpow2 = self->capmask + 1, newpow2 = c_next_pow2(cap + 1);
+    isize oldpow2 = self->capmask + (self->capmask & 1); // handle capmask = 0
+    isize newpow2 = c_next_pow2(cap + 1);
     if (newpow2 <= oldpow2)
         return self->cbuf != NULL;
     _m_value* d = (_m_value *)i_realloc(self->cbuf, oldpow2*c_sizeof *d, newpow2*c_sizeof *d);
