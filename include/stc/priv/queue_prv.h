@@ -221,17 +221,20 @@ _c_MEMB(_push)(Self* self, _m_value value) { // push_back
 
 STC_DEF void
 _c_MEMB(_shrink_to_fit)(Self *self) {
-    isize sz = _c_MEMB(_size)(self), j = 0;
-    if (sz > self->capmask/2)
+    isize sz = _c_MEMB(_size)(self);
+    if (sz*2 + 1 > self->capmask)
         return;
-    Self out = _c_MEMB(_with_capacity)(sz);
-    if (out.cbuf == NULL)
-        return;
-    for (c_each(i, Self, *self))
-        out.cbuf[j++] = *i.ref;
-    out.end = sz;
-    i_free(self->cbuf, (self->capmask + 1)*c_sizeof(*self->cbuf));
-    *self = out;
+    isize new_cap = c_next_pow2(sz);
+    if (self->start < self->end) {
+        c_memmove(self->cbuf, self->cbuf + self->start, sz*c_sizeof *self->cbuf);
+        self->start = 0, self->end = sz;
+    } else {
+        isize n = self->capmask - self->start + 1;
+        c_memmove(self->cbuf + (new_cap - n), self->cbuf + self->start, n*c_sizeof *self->cbuf);
+        self->start = new_cap - n;
+    }
+    self->cbuf = i_realloc(self->cbuf, (self->capmask + 1)*c_sizeof(*self->cbuf), new_cap*c_sizeof(*self->cbuf));
+    self->capmask = new_cap - 1;
 }
 
 #if !defined i_no_clone
