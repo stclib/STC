@@ -22,9 +22,9 @@
  */
 
 #ifdef i_aux
-  #define _i_aux_struct struct c_JOIN(Self, _aux) i_aux aux;
+  #define _i_aux_def i_aux aux;
 #else
-  #define _i_aux_struct
+  #define _i_aux_def
 #endif
 
 #ifndef STC_TYPES_H_INCLUDED
@@ -84,8 +84,8 @@ typedef union {
 typedef char cstr_value;
 typedef struct { cstr_value* data; intptr_t size, cap; } cstr_buf;
 typedef union cstr {
+    struct { uintptr_t size; cstr_value* data; uintptr_t ncap; } lon;
     struct { cstr_value data[ sizeof(cstr_buf) - 1 ]; uint8_t size; } sml;
-    struct { cstr_value* data; uintptr_t size, ncap; } lon;
 } cstr;
 
 typedef union {
@@ -127,7 +127,7 @@ typedef union {
     typedef struct SELF { \
         SELF##_value *cbuf; \
         ptrdiff_t start, end, capmask; \
-        _i_aux_struct \
+        _i_aux_def \
     } SELF; \
 \
     typedef struct { \
@@ -147,7 +147,7 @@ typedef union {
 \
     typedef struct SELF { \
         SELF##_node *last; \
-        _i_aux_struct \
+        _i_aux_def \
     } SELF
 
 #define declare_htable(SELF, KEY, VAL, MAP_ONLY, SET_ONLY) \
@@ -175,7 +175,7 @@ typedef union {
         SELF##_value* table; \
         struct hmap_meta* meta; \
         ptrdiff_t size, bucket_count; \
-        _i_aux_struct \
+        _i_aux_def \
     } SELF
 
 #define declare_aatree(SELF, KEY, VAL, MAP_ONLY, SET_ONLY) \
@@ -202,7 +202,7 @@ typedef union {
     typedef struct SELF { \
         SELF##_node *nodes; \
         int32_t root, disp, head, size, capacity; \
-        _i_aux_struct \
+        _i_aux_def \
     } SELF
 
 #define declare_stack_fixed(SELF, VAL, CAP) \
@@ -213,6 +213,6 @@ typedef union {
 #define declare_stack(SELF, VAL) \
     typedef VAL SELF##_value; \
     typedef struct { SELF##_value *ref, *end; } SELF##_iter; \
-    typedef struct SELF { SELF##_value *data; ptrdiff_t size, capacity; _i_aux_struct } SELF
+    typedef struct SELF { SELF##_value *data; ptrdiff_t size, capacity; _i_aux_def } SELF
 
 #endif // STC_TYPES_H_INCLUDED

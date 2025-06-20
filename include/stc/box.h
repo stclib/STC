@@ -78,7 +78,7 @@ _c_DEFTYPES(declare_box, Self, i_key);
 
 // constructors (take ownership)
 STC_INLINE Self _c_MEMB(_init)(void)
-    { return c_literal(Self){NULL}; }
+    { return c_literal(Self){0}; }
 
 STC_INLINE long _c_MEMB(_use_count)(const Self* self)
     { return (long)(self->get != NULL); }

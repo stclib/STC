@@ -139,11 +139,13 @@ STC_INLINE _m_value*    _c_MEMB(_emplace)(Self* self, _m_raw raw)
                             { return _c_MEMB(_push_back)(self, i_keyfrom(raw)); }
 #endif // !i_no_emplace
 
-STC_INLINE Self         _c_MEMB(_init)(void) { return c_literal(Self){NULL}; }
 STC_INLINE void         _c_MEMB(_put_n)(Self* self, const _m_raw* raw, isize n)
                             { while (n--) _c_MEMB(_push_back)(self, i_keyfrom(*raw++)); }
+#ifndef i_aux
+STC_INLINE Self         _c_MEMB(_init)(void) { return c_literal(Self){0}; }
 STC_INLINE Self         _c_MEMB(_from_n)(const _m_raw* raw, isize n)
                             { Self cx = {0}; _c_MEMB(_put_n)(&cx, raw, n); return cx; }
+#endif
 STC_INLINE bool         _c_MEMB(_reserve)(Self* self, isize n) { (void)(self + n); return true; }
 STC_INLINE bool         _c_MEMB(_is_empty)(const Self* self) { return self->last == NULL; }
 STC_INLINE void         _c_MEMB(_clear)(Self* self) { _c_MEMB(_drop)(self); }
@@ -185,7 +187,7 @@ _c_MEMB(_begin)(const Self* self) {
 
 STC_INLINE _m_iter
 _c_MEMB(_end)(const Self* self)
-    { (void)self; return c_literal(_m_iter){NULL}; }
+    { (void)self; return c_literal(_m_iter){0}; }
 
 STC_INLINE void
 _c_MEMB(_next)(_m_iter* it) {
@@ -239,7 +241,8 @@ _c_MEMB(_clone)(Self lst) {
 STC_DEF void
 _c_MEMB(_drop)(const Self* cself) {
     Self* self = (Self*)cself;
-    while (self->last) _c_MEMB(_erase_after_node)(self, self->last);
+    while (self->last)
+       _c_MEMB(_erase_after_node)(self, self->last);
 }
 
 STC_DEF _m_value*
@@ -322,7 +325,8 @@ _c_MEMB(_unlink_after_node)(Self* self, _m_node* ref) {
 
 STC_DEF void
 _c_MEMB(_reverse)(Self* self) {
-    Self rev = {NULL};
+    Self rev = *self;
+    rev.last = NULL;
     while (self->last) {
         _m_node* node = _c_MEMB(_unlink_after_node)(self, self->last);
         _c_MEMB(_insert_after_node)(&rev, rev.last, node);
@@ -347,7 +351,8 @@ _c_MEMB(_splice)(Self* self, _m_iter it, Self* other) {
 
 STC_DEF Self
 _c_MEMB(_split_off)(Self* self, _m_iter it1, _m_iter it2) {
-    Self lst = {NULL};
+    Self lst = *self;
+    lst.last = NULL;
     if (it1.ref == it2.ref)
         return lst;
     _m_node *p1 = it1.prev,

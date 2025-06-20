@@ -27,7 +27,7 @@ V5.0.2:
 
 V5.0:
 - Added build system/CI with Meson. Makefile provided as well.
-- Added support for extending templated containers by `#define i_aux { ... }`.
+- Added support for extending templated containers by `#define i_aux <TYPE>`.
 - Changed ranged for-loop macros to use more natural C-syntax (v5.0.2)
 - Added **sum type** (tagged union), included via `algorithm.h`
 - Added single/multi-dimensional generic **span** type, with numpy-like slicing.
@@ -799,6 +799,7 @@ typesafe custom attributes.
 
 The example below shows how to customize containers to work with PostgreSQL memory management.
 It adds a MemoryContext to each container by defining the `i_aux` template parameter.
+`i_aux` may define a struct on the fly, or refer to an already defined type.
 Note that `pgs_realloc` and `pgs_free` is also passed the
 allocated size of the given pointer, unlike standard `realloc` and `free`.
 
@@ -815,7 +816,7 @@ allocated size of the given pointer, unlike standard `realloc` and `free`.
 #define pgs_realloc(p, old_sz, sz) (p ? repalloc(p, sz) : pgs_malloc(sz))
 #define pgs_free(p, sz) (p ? pfree(p) : (void)0) // pfree/repalloc does not accept NULL.
 
-#define i_aux { MemoryContext memctx; } // NB: enclose in curly braces!
+#define i_aux struct { MemoryContext memctx; }
 #define i_allocator pgs
 #define i_no_clone
 ```
@@ -855,12 +856,12 @@ typedef struct {
 
 enum FMDActive {FMD_fileName, FMD_directory, FMD_size, FMD_lastWriteTime};
 
-struct FMDVector_aux; // defined when specifying i_aux
+struct FMDSelector { enum FMDActive activeField; bool reverse; };
 int FileMetaData_cmp(const struct FMDVector_aux*, const FileMetaData*, const FileMetaData*);
 void FileMetaData_drop(FileMetaData*);
 
 #define T FMDVector, FileMetaData, (c_no_clone)
-#define i_aux { enum FMDActive activeField; bool reverse; }
+#define i_aux struct FMDSelector
 #define i_cmp(x, y) FileMetaData_cmp(&self->aux, x, y)
 #define i_keydrop FileMetaData_drop
 #include <stc/stack.h>

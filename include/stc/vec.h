@@ -87,15 +87,13 @@ STC_API _m_iter         _c_MEMB(_insert_uninit)(Self* self, isize idx, isize n);
 STC_API _m_iter         _c_MEMB(_find_in)(const Self* self, _m_iter it1, _m_iter it2, _m_raw raw);
 #endif // _i_has_eq
 
-STC_INLINE Self _c_MEMB(_init)(void)
-    { return c_literal(Self){0}; }
-
 STC_INLINE void _c_MEMB(_value_drop)(const Self* self, _m_value* val)
     { (void)self; i_keydrop(val); }
 
 STC_INLINE Self _c_MEMB(_move)(Self *self) {
     Self m = *self;
-    memset(self, 0, sizeof *self);
+    self->capacity = self->size = 0;
+    self->data = NULL;
     return m;
 }
 
@@ -115,9 +113,6 @@ STC_INLINE _m_value* _c_MEMB(_push)(Self* self, _m_value value) {
 
 STC_INLINE void _c_MEMB(_put_n)(Self* self, const _m_raw* raw, isize n)
     { while (n--) _c_MEMB(_push)(self, i_keyfrom((*raw))), ++raw; }
-
-STC_INLINE Self _c_MEMB(_from_n)(const _m_raw* raw, isize n)
-    { Self cx = {0}; _c_MEMB(_put_n)(&cx, raw, n); return cx; }
 
 #if !defined i_no_emplace
 STC_API _m_iter _c_MEMB(_emplace_n)(Self* self, isize idx, const _m_raw raw[], isize n);
@@ -157,6 +152,10 @@ STC_INLINE _m_value*    _c_MEMB(_push_back)(Self* self, _m_value value)
                             { return _c_MEMB(_push)(self, value); }
 STC_INLINE void         _c_MEMB(_pop_back)(Self* self) { _c_MEMB(_pop)(self); }
 
+#ifndef i_aux
+STC_INLINE Self _c_MEMB(_init)(void)
+    { return c_literal(Self){0}; }
+
 STC_INLINE Self _c_MEMB(_with_size)(const isize size, _m_value null) {
     Self cx = {0};
     _c_MEMB(_resize)(&cx, size, null);
@@ -168,6 +167,10 @@ STC_INLINE Self _c_MEMB(_with_capacity)(const isize cap) {
     _c_MEMB(_reserve)(&cx, cap);
     return cx;
 }
+
+STC_INLINE Self _c_MEMB(_from_n)(const _m_raw* raw, isize n)
+    { Self cx = {0}; _c_MEMB(_put_n)(&cx, raw, n); return cx; }
+#endif
 
 STC_INLINE void _c_MEMB(_shrink_to_fit)(Self* self) {
     _c_MEMB(_reserve)(self, _c_MEMB(_size)(self));

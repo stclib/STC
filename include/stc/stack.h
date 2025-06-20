@@ -60,21 +60,11 @@ STC_INLINE bool _c_MEMB(_reserve)(Self* self, isize n)
 
 #else
 
-STC_INLINE Self _c_MEMB(_init)(void)
-    { Self out = {0}; return out; }
-
-STC_INLINE Self _c_MEMB(_move)(Self *self)
-    { Self m = *self; *self = (Self){0}; return m; }
-
-STC_INLINE Self _c_MEMB(_with_capacity)(isize cap) {
-    Self out = {_i_malloc(_m_value, cap), 0, cap};
-    return out;
-}
-
-STC_INLINE Self _c_MEMB(_with_size)(isize size, _m_value null) {
-    Self out = {_i_malloc(_m_value, size), size, size};
-    while (size) out.data[--size] = null;
-    return out;
+STC_INLINE Self _c_MEMB(_move)(Self *self) { 
+    Self m = *self;
+    self->capacity = self->size = 0;
+    self->data = NULL;
+    return m;
 }
 
 STC_INLINE isize _c_MEMB(_capacity)(const Self* self)
@@ -166,8 +156,24 @@ STC_INLINE _m_value _c_MEMB(_pull)(Self* self)
 STC_INLINE void _c_MEMB(_put_n)(Self* self, const _m_raw* raw, isize n)
     { while (n--) _c_MEMB(_push)(self, i_keyfrom((*raw))), ++raw; }
 
+#if !defined i_aux && !defined i_capacity
+STC_INLINE Self _c_MEMB(_init)(void)
+    { Self out = {0}; return out; }
+
+STC_INLINE Self _c_MEMB(_with_capacity)(isize cap) {
+    Self out = {_i_malloc(_m_value, cap), 0, cap};
+    return out;
+}
+
+STC_INLINE Self _c_MEMB(_with_size)(isize size, _m_value null) {
+    Self out = {_i_malloc(_m_value, size), size, size};
+    while (size) out.data[--size] = null;
+    return out;
+}
+
 STC_INLINE Self _c_MEMB(_from_n)(const _m_raw* raw, isize n)
     { Self cx = {0}; _c_MEMB(_put_n)(&cx, raw, n); return cx; }
+#endif
 
 STC_INLINE const _m_value* _c_MEMB(_at)(const Self* self, isize idx)
     { c_assert(c_uless(idx, self->size)); return self->data + idx; }

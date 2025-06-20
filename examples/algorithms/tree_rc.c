@@ -15,8 +15,10 @@ void Tree_drop(Tree*);
 #include <stc/rc.h>
 
 void Tree_drop(Tree* self) {
-	if (c_is(self, TreeNode, n))
-	    c_drop(TreeRc, &n->left, &n->right);
+    if (c_is(self, TreeNode, n)) {
+        TreeRc_drop(&n->left);
+        TreeRc_drop(&n->right);
+    }
 }
 
 int tree_sum(TreeRc tree) {
@@ -30,15 +32,14 @@ int tree_sum(TreeRc tree) {
 
 int main(void) {
     TreeRc tree =
-	TreeRc_make(c_variant(TreeNode, {1,
-		TreeRc_make(c_variant(TreeNode, {2,
-			TreeRc_make(c_variant(TreeLeaf, 3)),
-			TreeRc_make(c_variant(TreeLeaf, 4))
-		})),
-		TreeRc_make(c_variant(TreeLeaf, 5))
-	}));
+    TreeRc_make(c_variant(TreeNode, {1,
+        TreeRc_make(c_variant(TreeNode, {2,
+            TreeRc_make(c_variant(TreeLeaf, 3)),
+            TreeRc_make(c_variant(TreeLeaf, 4))
+        })),
+        TreeRc_make(c_variant(TreeLeaf, 5))
+    }));
 
     printf("sum = %d\n", tree_sum(tree));
-	TreeRc_drop(&tree);
-
+    TreeRc_drop(&tree);
 }

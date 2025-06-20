@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 #define T IPQueue, int
-#define i_aux { bool(*less)(const int*, const int*); }
+#define i_aux struct { bool(*less)(const int*, const int*); }
 #define i_less(x, y) self->aux.less(x, y)
 #include <stc/pqueue.h>
 

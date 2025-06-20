@@ -101,7 +101,6 @@ STC_API isize           _c_MEMB(_capacity)(const Self* map);
 static _m_result        _c_MEMB(_bucket_lookup_)(const Self* self, const _m_keyraw* rkeyptr);
 static _m_result        _c_MEMB(_bucket_insert_)(const Self* self, const _m_keyraw* rkeyptr);
 
-STC_INLINE Self         _c_MEMB(_init)(void) { Self map = {0}; return map; }
 STC_INLINE void         _c_MEMB(_shrink_to_fit)(Self* self) { _c_MEMB(_reserve)(self, (isize)self->size); }
 STC_INLINE bool         _c_MEMB(_is_empty)(const Self* map) { return !map->size; }
 STC_INLINE isize        _c_MEMB(_size)(const Self* map) { return (isize)map->size; }
@@ -181,7 +180,8 @@ STC_INLINE void _c_MEMB(_value_drop)(const Self* self, _m_value* _val) {
 
 STC_INLINE Self _c_MEMB(_move)(Self *self) {
     Self m = *self;
-    memset(self, 0, sizeof *self);
+    self->bucket_count = self->size = 0;
+    self->meta = NULL; self->table = NULL;
     return m;
 }
 
@@ -230,8 +230,13 @@ STC_INLINE void _c_MEMB(_put_n)(Self* self, const _m_raw* raw, isize n) {
         #endif
 }
 
+#ifndef i_aux
+STC_INLINE Self _c_MEMB(_init)(void)
+    { Self map = {0}; return map; }
+
 STC_INLINE Self _c_MEMB(_from_n)(const _m_raw* raw, isize n)
     { Self cx = {0}; _c_MEMB(_put_n)(&cx, raw, n); return cx; }
+#endif
 
 STC_API _m_iter _c_MEMB(_begin)(const Self* self);
 
@@ -314,11 +319,13 @@ STC_DEF isize _c_MEMB(_capacity)(const Self* map) {
     return (isize)((float)map->bucket_count * (i_max_load_factor));
 }
 
+#ifndef i_aux
 STC_DEF Self _c_MEMB(_with_capacity)(const isize cap) {
     Self map = {0};
     _c_MEMB(_reserve)(&map, cap);
     return map;
 }
+#endif
 
 static void _c_MEMB(_wipe_)(Self* self) {
     if (self->size == 0)
