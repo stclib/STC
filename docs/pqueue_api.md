@@ -36,7 +36,6 @@ In the following, `X` is the value of `i_key` unless `T` is defined.
 ```c++
 pqueue_X        pqueue_X_init(void);                                // create empty pri-queue.
 pqueue_X        pqueue_X_with_capacity(isize cap);
-pqueue_X        pqueue_X_with_size(isize size, i_key null);
 
 pqueue_X        pqueue_X_clone(pqueue_X pq);
 void            pqueue_X_copy(pqueue_X* self, const pqueue_X* other);

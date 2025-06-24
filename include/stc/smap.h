@@ -250,18 +250,15 @@ STC_INLINE void _c_MEMB(_put_n)(Self* self, const _m_raw* raw, isize n) {
         #endif
 }
 
-#ifndef i_aux
+#ifndef _i_aux_alloc
 STC_INLINE Self _c_MEMB(_init)(void)
-    { Self tree = {0}; return tree; }
+    { Self cx = {0}; return cx; }
 
 STC_INLINE Self _c_MEMB(_from_n)(const _m_raw* raw, isize n)
-    { Self tree = {0}; _c_MEMB(_put_n)(&tree, raw, n); return tree; }
+    { Self cx = {0}; _c_MEMB(_put_n)(&cx, raw, n); return cx; }
 
-STC_INLINE Self _c_MEMB(_with_capacity)(const isize cap) {
-    Self tree = {0};
-    _c_MEMB(_reserve)(&tree, cap);
-    return tree;
-}
+STC_INLINE Self _c_MEMB(_with_capacity)(const isize cap)
+    { Self cx = {0}; _c_MEMB(_reserve)(&cx, cap); return cx; }
 #endif
 
 /* -------------------------- IMPLEMENTATION ------------------------- */

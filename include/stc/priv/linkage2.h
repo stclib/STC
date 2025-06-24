@@ -28,6 +28,7 @@
 #undef i_free
 #undef i_aux
 #undef _i_aux_def
+#undef _i_aux_alloc
 
 #undef i_static
 #undef i_header

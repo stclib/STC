@@ -88,7 +88,6 @@ typedef _i_SET_ONLY( i_keyraw )
                               _m_rmapped second; } )
 _m_raw;
 
-STC_API Self            _c_MEMB(_with_capacity)(isize cap);
 #if !defined i_no_clone
 STC_API Self            _c_MEMB(_clone)(Self map);
 #endif
@@ -101,12 +100,13 @@ STC_API isize           _c_MEMB(_capacity)(const Self* map);
 static _m_result        _c_MEMB(_bucket_lookup_)(const Self* self, const _m_keyraw* rkeyptr);
 static _m_result        _c_MEMB(_bucket_insert_)(const Self* self, const _m_keyraw* rkeyptr);
 
-STC_INLINE void         _c_MEMB(_shrink_to_fit)(Self* self) { _c_MEMB(_reserve)(self, (isize)self->size); }
 STC_INLINE bool         _c_MEMB(_is_empty)(const Self* map) { return !map->size; }
 STC_INLINE isize        _c_MEMB(_size)(const Self* map) { return (isize)map->size; }
 STC_INLINE isize        _c_MEMB(_bucket_count)(Self* map) { return map->bucket_count; }
 STC_INLINE bool         _c_MEMB(_contains)(const Self* self, _m_keyraw rkey)
                             { return self->size && _c_MEMB(_bucket_lookup_)(self, &rkey).ref; }
+STC_INLINE void         _c_MEMB(_shrink_to_fit)(Self* self)
+                            { _c_MEMB(_reserve)(self, (isize)self->size); }
 
 #ifndef i_max_load_factor
   #define i_max_load_factor 0.80f
@@ -230,12 +230,15 @@ STC_INLINE void _c_MEMB(_put_n)(Self* self, const _m_raw* raw, isize n) {
         #endif
 }
 
-#ifndef i_aux
+#ifndef _i_aux_alloc
 STC_INLINE Self _c_MEMB(_init)(void)
-    { Self map = {0}; return map; }
+    { Self cx = {0}; return cx; }
 
 STC_INLINE Self _c_MEMB(_from_n)(const _m_raw* raw, isize n)
     { Self cx = {0}; _c_MEMB(_put_n)(&cx, raw, n); return cx; }
+
+STC_INLINE Self _c_MEMB(_with_capacity)(const isize cap)
+    { Self cx = {0}; _c_MEMB(_reserve)(&cx, cap); return cx; }
 #endif
 
 STC_API _m_iter _c_MEMB(_begin)(const Self* self);
@@ -318,14 +321,6 @@ STC_DEF float _c_MEMB(_max_load_factor)(const Self* self) {
 STC_DEF isize _c_MEMB(_capacity)(const Self* map) {
     return (isize)((float)map->bucket_count * (i_max_load_factor));
 }
-
-#ifndef i_aux
-STC_DEF Self _c_MEMB(_with_capacity)(const isize cap) {
-    Self map = {0};
-    _c_MEMB(_reserve)(&map, cap);
-    return map;
-}
-#endif
 
 static void _c_MEMB(_wipe_)(Self* self) {
     if (self->size == 0)

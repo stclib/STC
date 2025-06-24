@@ -152,29 +152,22 @@ STC_INLINE _m_value*    _c_MEMB(_push_back)(Self* self, _m_value value)
                             { return _c_MEMB(_push)(self, value); }
 STC_INLINE void         _c_MEMB(_pop_back)(Self* self) { _c_MEMB(_pop)(self); }
 
-#ifndef i_aux
+#ifndef _i_aux_alloc
 STC_INLINE Self _c_MEMB(_init)(void)
     { return c_literal(Self){0}; }
 
-STC_INLINE Self _c_MEMB(_with_size)(const isize size, _m_value null) {
-    Self cx = {0};
-    _c_MEMB(_resize)(&cx, size, null);
-    return cx;
-}
+STC_INLINE Self _c_MEMB(_with_size)(const isize size, _m_value null)
+    { Self cx = {0}; _c_MEMB(_resize)(&cx, size, null); return cx; }
 
-STC_INLINE Self _c_MEMB(_with_capacity)(const isize cap) {
-    Self cx = {0};
-    _c_MEMB(_reserve)(&cx, cap);
-    return cx;
-}
+STC_INLINE Self _c_MEMB(_with_capacity)(const isize cap)
+    { Self cx = {0}; _c_MEMB(_reserve)(&cx, cap); return cx; }
 
 STC_INLINE Self _c_MEMB(_from_n)(const _m_raw* raw, isize n)
     { Self cx = {0}; _c_MEMB(_put_n)(&cx, raw, n); return cx; }
 #endif
 
-STC_INLINE void _c_MEMB(_shrink_to_fit)(Self* self) {
-    _c_MEMB(_reserve)(self, _c_MEMB(_size)(self));
-}
+STC_INLINE void _c_MEMB(_shrink_to_fit)(Self* self)
+    { _c_MEMB(_reserve)(self, _c_MEMB(_size)(self)); }
 
 STC_INLINE _m_iter
 _c_MEMB(_insert_n)(Self* self, const isize idx, const _m_value arr[], const isize n) {

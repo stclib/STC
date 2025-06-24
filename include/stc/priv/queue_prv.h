@@ -27,7 +27,6 @@ _c_DEFTYPES(declare_queue, Self, i_key);
 #endif
 typedef i_keyraw _m_raw;
 
-STC_API Self            _c_MEMB(_with_capacity)(const isize cap);
 STC_API bool            _c_MEMB(_reserve)(Self* self, const isize cap);
 STC_API void            _c_MEMB(_clear)(Self* self);
 STC_API void            _c_MEMB(_drop)(const Self* cself);
@@ -40,17 +39,20 @@ STC_API _m_iter         _c_MEMB(_advance)(_m_iter it, isize n);
 
 STC_INLINE void         _c_MEMB(_put_n)(Self* self, const _m_raw* raw, isize n)
                             { while (n--) _c_MEMB(_push)(self, i_keyfrom((*raw))), ++raw; }
-#ifndef i_aux
+
+STC_INLINE void         _c_MEMB(_value_drop)(const Self* self, _m_value* val)
+                            { (void)self; i_keydrop(val); }
+
+#ifndef _i_aux_alloc
 STC_INLINE Self         _c_MEMB(_init)(void)
                             { Self cx = {0}; return cx; }
 
-STC_DEF Self            _c_MEMB(_with_capacity)(const isize cap)
+STC_INLINE Self         _c_MEMB(_with_capacity)(const isize cap)
                             { Self cx = {0}; _c_MEMB(_reserve)(&cx, cap); return cx; }
 
 STC_INLINE Self         _c_MEMB(_from_n)(const _m_raw* raw, isize n)
                             { Self cx = {0}; _c_MEMB(_put_n)(&cx, raw, n); return cx; }
 #endif
-STC_INLINE void         _c_MEMB(_value_drop)(const Self* self, _m_value* val) { (void)self; i_keydrop(val); }
 
 #if !defined i_no_emplace
 STC_INLINE _m_value*    _c_MEMB(_emplace)(Self* self, _m_raw raw)
@@ -72,6 +74,7 @@ STC_INLINE void         _c_MEMB(_copy)(Self* self, const Self* other) {
                             *self = _c_MEMB(_clone)(*other);
                         }
 #endif // !i_no_clone
+
 STC_INLINE isize        _c_MEMB(_size)(const Self* self)
                             { return _cbuf_toidx(self, self->end); }
 STC_INLINE isize        _c_MEMB(_capacity)(const Self* self)

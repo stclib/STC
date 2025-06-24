@@ -40,15 +40,16 @@
   #define i_implement
 #endif
 
+#if defined i_aux && defined i_allocator
+  #define _i_aux_alloc
+#endif
 #if !defined i_allocator
   #define i_allocator c
 #endif
-#ifndef i_free
-  #define i_malloc c_JOIN(i_allocator, _malloc)
-  #define i_calloc c_JOIN(i_allocator, _calloc)
-  #define i_realloc c_JOIN(i_allocator, _realloc)
-  #define i_free c_JOIN(i_allocator, _free)
-#endif
+#define i_malloc c_JOIN(i_allocator, _malloc)
+#define i_calloc c_JOIN(i_allocator, _calloc)
+#define i_realloc c_JOIN(i_allocator, _realloc)
+#define i_free c_JOIN(i_allocator, _free)
 
 #if defined __clang__ && !defined __cplusplus
   #pragma clang diagnostic push

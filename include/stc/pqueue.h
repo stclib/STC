@@ -55,23 +55,15 @@ STC_INLINE bool _c_MEMB(_reserve)(Self* self, const isize cap) {
 STC_INLINE void _c_MEMB(_shrink_to_fit)(Self* self)
     { _c_MEMB(_reserve)(self, self->size); }
 
-#ifndef i_aux
+#ifndef _i_aux_alloc
 STC_INLINE Self _c_MEMB(_init)(void)
     { return c_literal(Self){0}; }
 
 STC_INLINE Self _c_MEMB(_from_n)(const _m_raw* raw, isize n)
     { Self cx = {0}; _c_MEMB(_put_n)(&cx, raw, n); return cx; }
 
-STC_INLINE Self _c_MEMB(_with_capacity)(const isize cap) {
-    Self out = {0}; _c_MEMB(_reserve)(&out, cap);
-    return out;
-}
-
-STC_INLINE Self _c_MEMB(_with_size)(const isize size, _m_value null) {
-    Self out = {0}; _c_MEMB(_reserve)(&out, size);
-    while (out.size < size) out.data[out.size++] = null;
-    return out;
-}
+STC_INLINE Self _c_MEMB(_with_capacity)(const isize cap)
+    { Self cx = {0}; _c_MEMB(_reserve)(&cx, cap); return cx; }
 #endif
 
 STC_INLINE void _c_MEMB(_clear)(Self* self) {
