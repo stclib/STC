@@ -97,8 +97,8 @@ STC_API bool            _c_MEMB(_reserve)(Self* self, isize capacity);
 STC_API void            _c_MEMB(_erase_entry)(Self* self, _m_value* val);
 STC_API float           _c_MEMB(_max_load_factor)(const Self* self);
 STC_API isize           _c_MEMB(_capacity)(const Self* map);
-static _m_result        _c_MEMB(_bucket_lookup_)(const Self* self, const _m_keyraw* rkeyptr);
-static _m_result        _c_MEMB(_bucket_insert_)(const Self* self, const _m_keyraw* rkeyptr);
+STC_API _m_result       _c_MEMB(_bucket_lookup_)(const Self* self, const _m_keyraw* rkeyptr);
+STC_API _m_result       _c_MEMB(_bucket_insert_)(const Self* self, const _m_keyraw* rkeyptr);
 
 STC_INLINE bool         _c_MEMB(_is_empty)(const Self* map) { return !map->size; }
 STC_INLINE isize        _c_MEMB(_size)(const Self* map) { return (isize)map->size; }
@@ -376,7 +376,7 @@ STC_DEF void _c_MEMB(_clear)(Self* self) {
     #endif // !i_no_emplace
 #endif // _i_is_map
 
-static _m_result
+STC_DEF _m_result
 _c_MEMB(_bucket_lookup_)(const Self* self, const _m_keyraw* rkeyptr) {
     const size_t _hash = i_hash(rkeyptr);
     const size_t _idxmask = (size_t)self->bucket_count - 1;
@@ -396,7 +396,7 @@ _c_MEMB(_bucket_lookup_)(const Self* self, const _m_keyraw* rkeyptr) {
     return _res;
 }
 
-static _m_result
+STC_DEF _m_result
 _c_MEMB(_bucket_insert_)(const Self* self, const _m_keyraw* rkeyptr) {
     _m_result res = _c_MEMB(_bucket_lookup_)(self, rkeyptr);
     if (res.ref) // bucket exists
