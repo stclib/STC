@@ -32,13 +32,14 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include <stdbool.h>
 
 #define declare_rc(C, KEY) declare_arc(C, KEY)
 #define declare_vec(C, KEY) declare_stack(C, KEY)
 #define declare_pqueue(C, KEY) declare_stack(C, KEY)
 #define declare_deque(C, KEY) declare_queue(C, KEY)
 #define declare_hashmap(C, KEY, VAL) declare_htable(C, KEY, VAL, c_true, c_false)
-#define declare_hashset(C, KEY) declare_htable(C, cset, KEY, KEY, c_false, c_true)
+#define declare_hashset(C, KEY) declare_htable(C, KEY, KEY, c_false, c_true)
 #define declare_sortedmap(C, KEY, VAL) declare_aatree(C, KEY, VAL, c_true, c_false)
 #define declare_sortedset(C, KEY) declare_aatree(C, KEY, KEY, c_false, c_true)
 
