@@ -752,8 +752,12 @@ MyVec_push(&vec, 42);
 <summary>Pre-declarations</summary>
 
 ## Pre-declarations
-Pre-declare templated container in header file. The container can then e.g. be a "private"
-member of a struct defined in a header file.
+Pre-declare templated container in header file. The container can then e.g. be a member of a
+struct defined in a header file.
+- If the container will use an auxiliary member the with `i_aux AuxType` parameter, the declaration
+must also add it as the last argument: `declare_vec_aux(VecType, Element, AuxType)`.
+- Up to, but not including C23, a `(c_declared)` option must be specified when defining the container.
+See example below.
 
 ```c++
 // Dataset.h
@@ -780,8 +784,7 @@ Define and use the "private" container in the c-file:
 #include "Dataset.h"
 #include "Point.h"      // struct Point must be defined here.
 
-#define T PointVec, struct Point
-#define i_declared      // must flag that the container was pre-declared.
+#define T PointVec, struct Point, (c_declared) // Was pre-declared.
 #include <stc/vec.h>    // Implements PointVec with static linking by default
 ...
 ```
@@ -794,7 +797,7 @@ Sometimes it is useful to extend a container type to store extra data, e.g. a co
 or allocator function pointer or a context which the function pointers can use. Most
 libraries solve this by adding an opaque pointer (void*) or function pointer(s) into
 the data structure for the user to manage. Because most containers are templated,
-an extra template parameter, `i_aux` may be defined to extend the container with
+an auxiliary template parameter, `i_aux` may be defined to extend the container with
 typesafe custom attributes.
 
 The example below shows how to customize containers to work with PostgreSQL memory management.
@@ -804,13 +807,13 @@ Note that `pgs_realloc` and `pgs_free` is also passed the
 allocated size of the given pointer, unlike standard `realloc` and `free`.
 
 `self->aux` is accessible from the following template parameters / container combinations:
-- `i_malloc`, `i_calloc`, `i_realloc`, `i_free`: **all containers**
+- `i_allocator`: **all containers**
 - `i_eq` : **all containers**
 - `i_cmp`, `i_less`: **all containers except hmap and hset**
 - `i_hash`: **hmap and hset**
 
 ```c++
-// stcpgs.h
+// pgs_alloc.h
 #define pgs_malloc(sz) MemoryContextAlloc(self->aux.memctx, sz)
 #define pgs_calloc(n, sz) MemoryContextAllocZero(self->aux.memctx, (n)*(sz))
 #define pgs_realloc(p, old_sz, sz) (p ? repalloc(p, sz) : pgs_malloc(sz))
@@ -823,19 +826,22 @@ allocated size of the given pointer, unlike standard `realloc` and `free`.
 Usage is straight forward:
 ```c++
 #define T IMap, int, int
-#include "stcpgs.h"
+#include "pgs_alloc.h"
 #include <stc/sortedmap.h>
 
 void maptest()
 {
-    IMap map = {.aux={CurrentMemoryContext}};
+    IMap map = {.aux={
+        AllocSetContextCreate(CurrentMemoryContext, "MapContext", ALLOCSET_DEFAULT_SIZES)
+    }};
     for (c_range(i, 1, 16))
-        IMap_insert(&map, i*i, i); // uses pgs_malloc
+        IMap_insert(&map, i*i, i); // uses pgs_realloc()
 
     for (c_each(i, IMap, map))
         printf("%d:%d ", i.ref->first, i.ref->second);
 
-    IMap_drop(&map);
+    IMap_drop(&map); // uses psg_free()
+    MemoryContextDelete(map.aux.memctx);
 }
 ```
 Another example is to sort struct elements by the *active field* and *reverse* flag:

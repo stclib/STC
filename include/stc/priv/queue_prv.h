@@ -23,7 +23,7 @@
 
 // IWYU pragma: private
 #ifndef i_declared
-_c_DEFTYPES(declare_queue, Self, i_key);
+_c_DEFTYPES(_declare_queue, Self, i_key, _i_aux_def);
 #endif
 typedef i_keyraw _m_raw;
 
@@ -240,10 +240,10 @@ _c_MEMB(_shrink_to_fit)(Self *self) {
 #if !defined i_no_clone
 STC_DEF Self
 _c_MEMB(_clone)(Self q) {
-    Self out = q, *self = &out; (void)self; // may be used by _i_malloc/i_keyclone via i_aux.
+    Self out = q, *self = &out; (void)self; // may be used by i_new_n/i_keyclone via i_aux.
     out.start = 0; out.end = _c_MEMB(_size)(&q);
     out.capmask = c_next_pow2(out.end + 1) - 1;
-    out.cbuf = _i_malloc(_m_value, out.capmask + 1);
+    out.cbuf = i_new_n(_m_value, out.capmask + 1);
     isize i = 0;
     if (out.cbuf)
         for (c_each(it, Self, q))

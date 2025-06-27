@@ -43,7 +43,7 @@
   #define i_no_clone
   _c_DEFTYPES(declare_stack_fixed, Self, i_key, i_capacity);
 #else
-  _c_DEFTYPES(declare_stack, Self, i_key);
+  _c_DEFTYPES(_declare_stack, Self, i_key, _i_aux_def);
 #endif
 #endif
 typedef i_keyraw _m_raw;
@@ -60,7 +60,7 @@ STC_INLINE bool _c_MEMB(_reserve)(Self* self, isize n)
 
 #else
 
-STC_INLINE Self _c_MEMB(_move)(Self *self) { 
+STC_INLINE Self _c_MEMB(_move)(Self *self) {
     Self m = *self;
     self->capacity = self->size = 0;
     self->data = NULL;
@@ -161,12 +161,12 @@ STC_INLINE Self _c_MEMB(_init)(void)
     { Self out = {0}; return out; }
 
 STC_INLINE Self _c_MEMB(_with_capacity)(isize cap) {
-    Self out = {_i_malloc(_m_value, cap), 0, cap};
+    Self out = {i_new_n(_m_value, cap), 0, cap};
     return out;
 }
 
 STC_INLINE Self _c_MEMB(_with_size)(isize size, _m_value null) {
-    Self out = {_i_malloc(_m_value, size), size, size};
+    Self out = {i_new_n(_m_value, size), size, size};
     while (size) out.data[--size] = null;
     return out;
 }

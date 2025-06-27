@@ -70,7 +70,7 @@
 #define _clist_tonode(vp) c_safe_cast(_m_node*, _m_value*, vp)
 
 #define _c_list_insert_entry_after(ref, val) \
-    _m_node *entry = _i_malloc(_m_node, 1); entry->value = val; \
+    _m_node *entry = i_new_n(_m_node, 1); entry->value = val; \
     _c_list_insert_after_node(ref, entry)
 
 #define _c_list_insert_after_node(ref, entry) \
@@ -87,7 +87,7 @@
 
 #define _i_is_list
 #ifndef i_declared
-  _c_DEFTYPES(declare_list, Self, i_key);
+  _c_DEFTYPES(_declare_list, Self, i_key, _i_aux_def);
 #endif
 _c_DEFTYPES(_c_list_complete_types, Self, dummy);
 typedef i_keyraw _m_raw;

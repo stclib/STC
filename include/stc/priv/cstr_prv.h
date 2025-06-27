@@ -52,7 +52,7 @@ enum  { cstr_s_cap = sizeof(cstr_buf) - 2 };
 #define cstr_l_size(s)          (isize)((s)->lon.size)
 #define cstr_l_set_size(s, len) ((s)->lon.data[(s)->lon.size = (uintptr_t)(len)] = 0)
 #define cstr_l_data(s)          (s)->lon.data
-#define cstr_l_drop(s)          i_free((s)->lon.data, cstr_l_cap(s) + 1)
+#define cstr_l_drop(s)          c_free((s)->lon.data, cstr_l_cap(s) + 1)
 
 #define cstr_is_long(s)         ((s)->sml.size >= 128)
 extern  char* _cstr_init(cstr* self, isize len, isize cap);
@@ -66,6 +66,8 @@ extern  char* _cstr_internal_move(cstr* self, isize pos1, isize pos2);
 extern  cstr        cstr_from_replace(csview sv, csview search, csview repl, int32_t count);
 extern  cstr        cstr_from_fmt(const char* fmt, ...) c_GNUATTR(format(printf, 1, 2));
 
+extern  void        cstr_drop(const cstr* self);
+extern  cstr*       cstr_take(cstr* self, const cstr s);
 extern  char*       cstr_reserve(cstr* self, isize cap);
 extern  void        cstr_shrink_to_fit(cstr* self);
 extern  char*       cstr_resize(cstr* self, isize size, char value);
@@ -124,13 +126,6 @@ STC_INLINE cstr cstr_with_capacity(const isize cap) {
     return s;
 }
 
-STC_INLINE cstr* cstr_take(cstr* self, const cstr s) {
-    if (cstr_is_long(self) && self->lon.data != s.lon.data)
-        cstr_l_drop(self);
-    *self = s;
-    return self;
-}
-
 STC_INLINE cstr cstr_move(cstr* self) {
     cstr tmp = *self;
     *self = cstr_init();
@@ -140,11 +135,6 @@ STC_INLINE cstr cstr_move(cstr* self) {
 STC_INLINE cstr cstr_clone(cstr s) {
     csview sv = cstr_sv(&s);
     return cstr_from_n(sv.buf, sv.size);
-}
-
-STC_INLINE void cstr_drop(const cstr* self) {
-    if (cstr_is_long(self))
-        cstr_l_drop(self);
 }
 
 #define SSO_CALL(s, call) (cstr_is_long(s) ? cstr_l_##call : cstr_s_##call)

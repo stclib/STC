@@ -56,17 +56,6 @@
 
 #if defined i_rawclass   // [deprecated]
   #define i_cmpclass i_rawclass
-#elif defined i_key_arcbox // [deprecated]
-  #define i_keypro i_key_arcbox
-#elif defined i_key_str  // [deprecated]
-  #define i_keypro cstr
-  #define i_tag str
-#endif
-#if defined i_val_arcbox // [deprecated]
-  #define i_valpro i_val_arcbox
-#elif defined i_val_str  // [deprecated]
-  #define i_valpro cstr
-  #define i_tag str
 #endif
 
 #if defined T && !defined i_type
@@ -89,6 +78,21 @@
   #define Self i_type
 #elif !defined Self
   #define Self c_JOIN(_i_prefix, i_tag)
+#endif
+
+#if defined i_aux && c_NUMARGS(i_aux) == 2
+  #define _i_aux_def c_GETARG(1, i_aux) aux;
+  #define i_allocator c_GETARG(2, i_aux)
+#elif defined i_aux
+  #define _i_aux_def i_aux aux;
+#else
+  #define _i_aux_def
+#endif
+#if defined i_aux && defined i_allocator
+  #define _i_aux_alloc
+#endif
+#if !defined i_allocator
+  #define i_allocator c
 #endif
 
 #if c_OPTION(c_declared)

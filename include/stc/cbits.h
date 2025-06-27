@@ -149,7 +149,9 @@ STC_INLINE bool _cbits_disjoint(const uintptr_t* set, const uintptr_t* other, co
 #else
   #define Self cbits
 #endif
-
+#ifndef i_allocator
+  #define i_allocator c
+#endif
 #define _i_MEMB(name) c_JOIN(Self, name)
 
 
@@ -170,8 +172,9 @@ STC_INLINE cbits* cbits_take(cbits* self, cbits other) {
 }
 
 STC_INLINE cbits cbits_clone(cbits other) {
+    cbits set = other;
     const isize bytes = _cbits_bytes(other._size);
-    cbits set = {(uintptr_t *)c_memcpy(i_malloc(bytes), other.buffer, bytes), other._size};
+    set.buffer = (uintptr_t *)c_safe_memcpy(i_malloc(bytes), other.buffer, bytes);
     return set;
 }
 
@@ -205,7 +208,7 @@ STC_INLINE void cbits_set_pattern(cbits *self, const uintptr_t pattern);
 
 STC_INLINE cbits cbits_move(cbits* self) {
     cbits tmp = *self;
-    memset(self, 0, sizeof *self);
+    self->buffer = NULL, self->_size = 0;
     return tmp;
 }
 

@@ -25,6 +25,18 @@
     (defined i_implement || defined STC_CSTR_CORE)
 #define STC_CSTR_CORE_C_INCLUDED
 
+void cstr_drop(const cstr* self) {
+    if (cstr_is_long(self))
+        cstr_l_drop(self);
+}
+
+cstr* cstr_take(cstr* self, const cstr s) {
+    if (cstr_is_long(self) && self->lon.data != s.lon.data)
+        cstr_l_drop(self);
+    *self = s;
+    return self;
+}
+
 size_t cstr_hash(const cstr *self) {
     csview sv = cstr_sv(self);
     return c_basehash_n(sv.buf, sv.size);
@@ -50,7 +62,7 @@ char* _cstr_internal_move(cstr* self, const isize pos1, const isize pos2) {
 
 char* _cstr_init(cstr* self, const isize len, const isize cap) {
     if (cap > cstr_s_cap) {
-        self->lon.data = (char *)i_malloc(cap + 1);
+        self->lon.data = (char *)c_malloc(cap + 1);
         cstr_l_set_size(self, len);
         cstr_l_set_cap(self, cap);
         return self->lon.data;
@@ -62,14 +74,14 @@ char* _cstr_init(cstr* self, const isize len, const isize cap) {
 char* cstr_reserve(cstr* self, const isize cap) {
     if (cstr_is_long(self)) {
         if (cap > cstr_l_cap(self)) {
-            self->lon.data = (char *)i_realloc(self->lon.data, cstr_l_cap(self) + 1, cap + 1);
+            self->lon.data = (char *)c_realloc(self->lon.data, cstr_l_cap(self) + 1, cap + 1);
             cstr_l_set_cap(self, cap);
         }
         return self->lon.data;
     }
     /* from short to long: */
     if (cap > cstr_s_cap) {
-        char* data = (char *)i_malloc(cap + 1);
+        char* data = (char *)c_malloc(cap + 1);
         const isize len = cstr_s_size(self);
         /* copy full short buffer to emulate realloc() */
         c_memcpy(data, self->sml.data, c_sizeof self->sml);
@@ -145,12 +157,12 @@ void cstr_shrink_to_fit(cstr* self) {
     if (b.size == b.cap)
         return;
     if (b.size > cstr_s_cap) {
-        self->lon.data = (char *)i_realloc(self->lon.data, cstr_l_cap(self) + 1, b.size + 1);
+        self->lon.data = (char *)c_realloc(self->lon.data, cstr_l_cap(self) + 1, b.size + 1);
         cstr_l_set_cap(self, b.size);
     } else if (b.cap > cstr_s_cap) {
         c_memcpy(self->sml.data, b.data, b.size + 1);
         cstr_s_set_size(self, b.size);
-        i_free(b.data, b.cap + 1);
+        c_free(b.data, b.cap + 1);
     }
 }
 #endif // STC_CSTR_CORE_C_INCLUDED

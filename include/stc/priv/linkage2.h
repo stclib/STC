@@ -21,14 +21,8 @@
  * SOFTWARE.
  */
 
-#undef i_allocator
-#undef i_malloc
-#undef i_calloc
-#undef i_realloc
-#undef i_free
 #undef i_aux
 #undef _i_aux_def
-#undef _i_aux_alloc
 
 #undef i_static
 #undef i_header

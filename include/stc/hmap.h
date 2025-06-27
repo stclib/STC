@@ -73,7 +73,7 @@ struct hmap_meta { uint16_t hashx:6, dist:10; }; // dist: 0=empty, 1=PSL 0, 2=PS
 #define _i_is_hash
 #include "priv/template.h"
 #ifndef i_declared
-  _c_DEFTYPES(declare_htable, Self, i_key, i_val, _i_MAP_ONLY, _i_SET_ONLY);
+  _c_DEFTYPES(_declare_htable, Self, i_key, i_val, _i_MAP_ONLY, _i_SET_ONLY, _i_aux_def);
 #endif
 
 _i_MAP_ONLY( struct _m_value {
@@ -433,7 +433,7 @@ _c_MEMB(_bucket_insert_)(const Self* self, const _m_keyraw* rkeyptr) {
     _c_MEMB(_clone)(Self map) {
         if (map.bucket_count == 0)
             return c_literal(Self){0};
-        Self out = map, *self = &out; // _i_malloc may refer self via i_aux
+        Self out = map, *self = &out; // i_new_n may refer self via i_aux
         const isize _mbytes = (map.bucket_count + 1)*c_sizeof *map.meta;
         out.table = (_m_value *)i_malloc(map.bucket_count*c_sizeof *out.table);
         out.meta = (struct hmap_meta *)i_malloc(_mbytes);
@@ -460,8 +460,8 @@ _c_MEMB(_reserve)(Self* _self, const isize _newcap) {
     if (_newcap < _self->size || _newbucks == _self->bucket_count)
         return true;
     Self map = *_self, *self = &map; (void)self;
-    map.table = _i_malloc(_m_value, _newbucks);
-    map.meta = _i_calloc(struct hmap_meta, _newbucks + 1);
+    map.table = i_new_n(_m_value, _newbucks);
+    map.meta = i_new_zeros(struct hmap_meta, _newbucks + 1);
     map.bucket_count = _newbucks;
 
     bool ok = map.table && map.meta;

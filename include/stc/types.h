@@ -21,12 +21,6 @@
  * SOFTWARE.
  */
 
-#ifdef i_aux
-  #define _i_aux_def i_aux aux;
-#else
-  #define _i_aux_def
-#endif
-
 #ifndef STC_TYPES_H_INCLUDED
 #define STC_TYPES_H_INCLUDED
 
@@ -35,18 +29,27 @@
 #include <stdbool.h>
 
 #define declare_rc(C, KEY) declare_arc(C, KEY)
-#define declare_vec(C, KEY) declare_stack(C, KEY)
-#define declare_pqueue(C, KEY) declare_stack(C, KEY)
-#define declare_deque(C, KEY) declare_queue(C, KEY)
-#define declare_hashmap(C, KEY, VAL) declare_htable(C, KEY, VAL, c_true, c_false)
-#define declare_hashset(C, KEY) declare_htable(C, KEY, KEY, c_false, c_true)
-#define declare_sortedmap(C, KEY, VAL) declare_aatree(C, KEY, VAL, c_true, c_false)
-#define declare_sortedset(C, KEY) declare_aatree(C, KEY, KEY, c_false, c_true)
+#define declare_list(C, KEY) _declare_list(C, KEY,)
+#define declare_stack(C, KEY) _declare_stack(C, KEY,)
+#define declare_vec(C, KEY) _declare_stack(C, KEY,)
+#define declare_pqueue(C, KEY) _declare_stack(C, KEY,)
+#define declare_queue(C, KEY) _declare_queue(C, KEY,)
+#define declare_deque(C, KEY) _declare_queue(C, KEY,)
+#define declare_hashmap(C, KEY, VAL) _declare_htable(C, KEY, VAL, c_true, c_false,)
+#define declare_hashset(C, KEY) _declare_htable(C, KEY, KEY, c_false, c_true,)
+#define declare_sortedmap(C, KEY, VAL) _declare_aatree(C, KEY, VAL, c_true, c_false,)
+#define declare_sortedset(C, KEY) _declare_aatree(C, KEY, KEY, c_false, c_true,)
 
-#define declare_hmap(...) declare_hashmap(__VA_ARGS__) // [deprecated]
-#define declare_hset(...) declare_hashset(__VA_ARGS__) // [deprecated]
-#define declare_smap(...) declare_sortedmap(__VA_ARGS__) // [deprecated]
-#define declare_sset(...) declare_sortedset(__VA_ARGS__) // [deprecated]
+#define declare_list_aux(C, KEY, AUX) _declare_list(C, KEY, AUX aux;)
+#define declare_stack_aux(C, KEY, AUX) _declare_stack(C, KEY, AUX aux;)
+#define declare_vec_aux(C, KEY, AUX) _declare_stack(C, KEY, AUX aux;)
+#define declare_pqueue_aux(C, KEY, AUX) _declare_stack(C, KEY, AUX aux;)
+#define declare_queue_aux(C, KEY, AUX) _declare_queue(C, KEY, AUX aux;)
+#define declare_deque_aux(C, KEY, AUX) _declare_queue(C, KEY, AUX aux;)
+#define declare_hashmap_aux(C, KEY, VAL, AUX) _declare_htable(C, KEY, VAL, c_true, c_false, AUX aux;)
+#define declare_hashset_aux(C, KEY, AUX) _declare_htable(C, KEY, KEY, c_false, c_true, AUX aux;)
+#define declare_sortedmap_aux(C, KEY, VAL, AUX) _declare_aatree(C, KEY, VAL, c_true, c_false, AUX aux;)
+#define declare_sortedset_aux(C, KEY, AUX) _declare_aatree(C, KEY, KEY, c_false, c_true, AUX aux;)
 
 // csview : non-null terminated string view
 typedef const char csview_value;
@@ -122,13 +125,13 @@ typedef union {
         SELF##_value* get; \
     } SELF
 
-#define declare_queue(SELF, VAL) \
+#define _declare_queue(SELF, VAL, AUXDEF) \
     typedef VAL SELF##_value; \
 \
     typedef struct SELF { \
         SELF##_value *cbuf; \
         ptrdiff_t start, end, capmask; \
-        _i_aux_def \
+        AUXDEF \
     } SELF; \
 \
     typedef struct { \
@@ -137,7 +140,7 @@ typedef union {
         const SELF* _s; \
     } SELF##_iter
 
-#define declare_list(SELF, VAL) \
+#define _declare_list(SELF, VAL, AUXDEF) \
     typedef VAL SELF##_value; \
     typedef struct SELF##_node SELF##_node; \
 \
@@ -148,10 +151,10 @@ typedef union {
 \
     typedef struct SELF { \
         SELF##_node *last; \
-        _i_aux_def \
+        AUXDEF \
     } SELF
 
-#define declare_htable(SELF, KEY, VAL, MAP_ONLY, SET_ONLY) \
+#define _declare_htable(SELF, KEY, VAL, MAP_ONLY, SET_ONLY, AUXDEF) \
     typedef KEY SELF##_key; \
     typedef VAL SELF##_mapped; \
 \
@@ -176,10 +179,10 @@ typedef union {
         SELF##_value* table; \
         struct hmap_meta* meta; \
         ptrdiff_t size, bucket_count; \
-        _i_aux_def \
+        AUXDEF \
     } SELF
 
-#define declare_aatree(SELF, KEY, VAL, MAP_ONLY, SET_ONLY) \
+#define _declare_aatree(SELF, KEY, VAL, MAP_ONLY, SET_ONLY, AUXDEF) \
     typedef KEY SELF##_key; \
     typedef VAL SELF##_mapped; \
     typedef struct SELF##_node SELF##_node; \
@@ -203,7 +206,7 @@ typedef union {
     typedef struct SELF { \
         SELF##_node *nodes; \
         int32_t root, disp, head, size, capacity; \
-        _i_aux_def \
+        AUXDEF \
     } SELF
 
 #define declare_stack_fixed(SELF, VAL, CAP) \
@@ -211,9 +214,9 @@ typedef union {
     typedef struct { SELF##_value *ref, *end; } SELF##_iter; \
     typedef struct SELF { SELF##_value data[CAP]; ptrdiff_t size; } SELF
 
-#define declare_stack(SELF, VAL) \
+#define _declare_stack(SELF, VAL, AUXDEF) \
     typedef VAL SELF##_value; \
     typedef struct { SELF##_value *ref, *end; } SELF##_iter; \
-    typedef struct SELF { SELF##_value *data; ptrdiff_t size, capacity; _i_aux_def } SELF
+    typedef struct SELF { SELF##_value *data; ptrdiff_t size, capacity; AUXDEF } SELF
 
 #endif // STC_TYPES_H_INCLUDED

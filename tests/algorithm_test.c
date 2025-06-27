@@ -141,7 +141,7 @@ TEST(algorithm, c_sumtype) {
     EXPECT_STREQ(cstr_str(&res), "v1: 5, v2: 6, res: 11\n");
 
     EXPECT_TRUE(c_is_variant(&act1, ActionSpeak));
-    EXPECT_STREQ(cstr_str(&act1.ActionSpeak.get), "Asked to speak: Hello\n");
+    EXPECT_STREQ(cstr_str(&act1.ActionSpeak.get), "Hello");
 
     c_drop(Action, &act1, &act2, &act3);
     c_drop(cstr, &res);

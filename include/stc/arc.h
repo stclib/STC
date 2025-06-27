@@ -119,7 +119,7 @@ struct _c_MEMB(_ctrl) {
 
 // c++: std::make_shared<_m_value>(val)
 STC_INLINE Self _c_MEMB(_make)(_m_value val) {
-    Self arc = {.ctrl1=_i_malloc(_c_MEMB(_ctrl), 1)};
+    Self arc = {.ctrl1=i_new_n(_c_MEMB(_ctrl), 1)};
     arc.ctrl1->value = val;
     arc.ctrl1->counter = 1;
     return arc;
@@ -149,7 +149,7 @@ struct _c_MEMB(_ctrl) {
 
 // c++: std::make_shared<_m_value>(val)
 STC_INLINE Self _c_MEMB(_make)(_m_value val) {
-    Self out = {.ctrl2=_i_malloc(_c_MEMB(_ctrl), 1)};
+    Self out = {.ctrl2=i_new_n(_c_MEMB(_ctrl), 1)};
     out.ctrl2->counter = 1;
     out.get = &out.ctrl2->value;
     *out.get = val;

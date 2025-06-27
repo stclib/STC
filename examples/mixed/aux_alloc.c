@@ -1,49 +1,51 @@
 #include <stdio.h>
 #include <stc/algorithm.h>
-
-#define T Vec, double, (c_use_eq)
 #include "myalloc.h"
-#include <stc/deque.h>
 
-#define T Vec2D, Vec, (c_keyclass | c_use_eq)
-#include "myalloc.h"
+#define T List, double, (c_use_eq)
+#define i_aux MyAlloc* // define an auxiliary field `aux` in the List
+#define i_allocator my // explicitly define allocator prefix.
+#include <stc/stack.h>
+
+#define T ListDeque, List, (c_keyclass | c_use_eq)
+#define i_aux MyAlloc*, my // shorthand: use optional second arg to define i_allocator
 #include <stc/deque.h>
 
 int main(void)
 {
-    struct MyAlloc myalloc = {0};
-    Vec* v;
-    Vec2D vec_a = {.aux={&myalloc}};                // All containers in STC can be initialized with {0}.
-    v = Vec2D_push(&vec_a, (Vec){.aux={&myalloc}}); // push() returns a pointer to the new element in vec.
-    Vec_push(v, 10.0);
-    Vec_push(v, 20.0);
+    MyAlloc myalloc = {.bytes=0};
+    List* v;
+    ListDeque store_a = {.aux=&myalloc};                // All containers in STC can be initialized with {0}.
 
-    v = Vec2D_push(&vec_a, (Vec){.aux={&myalloc}});
-    Vec_push(v, 30.0);
-    Vec_push(v, 40.0);
+    v = ListDeque_push(&store_a, (List){.aux=&myalloc}); // push() returns a pointer to the new element in vec.
+    List_push(v, 100.0);
+    List_push(v, 200.0);
 
+    v = ListDeque_push(&store_a, (List){.aux=&myalloc});
+    List_push(v, 300.0);
+    List_push(v, 400.0);
 
-   Vec2D vec_b = {.aux={&myalloc}};                  // All containers in STC can be initialized with {0}.
-    v = Vec2D_push(&vec_b, (Vec){.aux={&myalloc}}); // push() returns a pointer to the new element in vec.
-    Vec_push(v, 10.0);
-    Vec_push(v, 20.0);
+    printf("alloc: %d\n", (int)myalloc.bytes);
+    ListDeque store_b = {.aux=&myalloc};
 
-    v = Vec2D_push(&vec_b, (Vec){.aux={&myalloc}});
-    Vec_push(v, 30.0);
-    Vec_push(v, 40.0);
+    v = ListDeque_push(&store_b, (List){.aux=&myalloc});
+    List_push(v, 10.0);
+    List_push(v, 20.0);
 
-    printf("vec_a == vec_b is %s.\n", Vec2D_eq(&vec_a, &vec_b) ? "true" : "false");
+    v = ListDeque_push(&store_b, (List){.aux=&myalloc});
+    List_push(v, 30.0);
+    List_push(v, 40.0);
 
-    Vec2D clone = Vec2D_clone(vec_a);   // Make a deep-copy of vec
+    printf("store_a == store_b is %s.\n", ListDeque_eq(&store_a, &store_b) ? "true" : "false");
+    printf("alloc: %d\n", (int)myalloc.bytes);
 
-    for (c_each(i, Vec2D, clone))         // Loop through the cloned vector
-        for (c_each(j, Vec, *i.ref))
+    ListDeque store_c = ListDeque_clone(store_a); // Make a deep-copy, using myalloc.
+
+    for (c_each(i, ListDeque, store_c))           // Loop through the cloned deque
+        for (c_each(j, List, *i.ref))
             printf(" %g", *j.ref);
-    puts("");
+    printf("\nalloc: %d\n", (int)myalloc.bytes);
 
-    printf("alloc: %d %d\n", (int)vec_a.aux.alloc->count, (int)vec_b.aux.alloc->count);
-
-    c_drop(Vec2D, &vec_a, &vec_b, &clone);  // Free all 9 vectors.
-
-    printf("alloc: %d %d\n", (int)vec_a.aux.alloc->count, (int)vec_b.aux.alloc->count);
+    c_drop(ListDeque, &store_a, &store_b, &store_c);  // Free all 9 storages.
+    printf("alloc: %d\n", (int)myalloc.bytes);
 }

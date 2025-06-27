@@ -86,7 +86,7 @@ STC_INLINE long _c_MEMB(_use_count)(const Self* self)
 
 // c++: std::make_unique<i_key>(val)
 STC_INLINE Self _c_MEMB(_make)(_m_value val) {
-    Self box = {_i_malloc(_m_value, 1)};
+    Self box = {i_new_n(_m_value, 1)};
     *box.get = val;
     return box;
 }
@@ -143,7 +143,7 @@ STC_INLINE void _c_MEMB(_assign)(Self* self, Self* owned) {
 #if !defined i_no_clone
     STC_INLINE Self _c_MEMB(_clone)(Self other) {
         if (other.get == NULL) return other;
-        Self out = {_i_malloc(_m_value, 1)};
+        Self out = {i_new_n(_m_value, 1)};
         *out.get = i_keyclone((*other.get));
         return out;
     }

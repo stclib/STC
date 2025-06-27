@@ -23,8 +23,8 @@
 #undef STC_API
 #undef STC_DEF
 
-#if !defined i_static && !defined STC_STATIC  && (defined i_header || defined STC_HEADER  || \
-                                                  defined i_implement || defined STC_IMPLEMENT)
+#if !defined i_static && !defined STC_STATIC && (defined i_header || defined STC_HEADER  || \
+                                                 defined i_implement || defined STC_IMPLEMENT)
   #define STC_API extern
   #define STC_DEF
 #else
@@ -39,17 +39,6 @@
 #if defined STC_IMPLEMENT || defined i_import
   #define i_implement
 #endif
-
-#if defined i_aux && defined i_allocator
-  #define _i_aux_alloc
-#endif
-#if !defined i_allocator
-  #define i_allocator c
-#endif
-#define i_malloc c_JOIN(i_allocator, _malloc)
-#define i_calloc c_JOIN(i_allocator, _calloc)
-#define i_realloc c_JOIN(i_allocator, _realloc)
-#define i_free c_JOIN(i_allocator, _free)
 
 #if defined __clang__ && !defined __cplusplus
   #pragma clang diagnostic push
