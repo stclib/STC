@@ -223,7 +223,7 @@ STC_DEF void
 _c_MEMB(_shrink_to_fit)(Self *self) {
     isize sz = _c_MEMB(_size)(self);
     isize new_cap = c_next_pow2(sz + 1);
-    if (new_cap == self->capmask)
+    if (new_cap > self->capmask)
         return;
     if (self->start <= self->end) {
         c_memmove(self->cbuf, self->cbuf + self->start, sz*c_sizeof *self->cbuf);
