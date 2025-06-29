@@ -178,7 +178,7 @@ STC_DEF void
 _c_MEMB(_drop)(const Self* cself) {
     Self* self = (Self*)cself;
     _c_MEMB(_clear)(self);
-    i_free(self->cbuf, (self->capmask + 1)*c_sizeof(*self->cbuf));
+    i_free_n(self->cbuf, self->capmask + 1);
 }
 
 STC_DEF bool
@@ -187,7 +187,7 @@ _c_MEMB(_reserve)(Self* self, const isize cap) {
     isize newpow2 = c_next_pow2(cap + 1);
     if (newpow2 <= oldpow2)
         return self->cbuf != NULL;
-    _m_value* d = (_m_value *)i_realloc(self->cbuf, oldpow2*c_sizeof *d, newpow2*c_sizeof *d);
+    _m_value* d = (_m_value *)i_realloc_n(self->cbuf, oldpow2, newpow2);
     if (d == NULL)
         return false;
     isize head = oldpow2 - self->start;

@@ -696,21 +696,7 @@ c_filter(crange, c_iota(3), true
 ```
 </details>
 <details>
-<summary><b>c_new, c_delete, c_malloc, etc.</b> - Allocation helpers</summary>
-
-### c_new, c_delete
-
-- Type\* `c_new`(**Type**, value) - Allocate *and initialize* a new object on the heap with *value*.
-- Type\* `c_new_n`(**Type**, n) - Allocate an array of ***n*** new objects on the heap, initialized to zero.
-- void `c_delete`(**Type**, ptr) - *Type_drop(ptr)* and *c_free(ptr, ..)* allocated on the heap. NULL is OK.
-- void `c_delete_n`(**Type**, arr, n) - *Type_drop(&arr[i])* and *c_free(arr, ..)* of ***n*** objects allocated on the heap. (NULL, 0) is OK.
-```c++
-#include <stc/cstr.h>
-
-cstr* stringptr = c_new (cstr, cstr_from("Hello"));
-printf("%s\n", cstr_str(stringp));
-c_delete(cstr, stringptr);
-```
+<summary><b>c_malloc, c_calloc, c_realloc, c_free, c_new, c_delete_n</b> - Allocator helpers</summary>
 
 ### c_malloc, c_calloc, c_realloc, c_free
 Memory allocator wrappers which uses signed sizes. Note that the signatures for
@@ -722,6 +708,20 @@ default in containers unless `i_malloc`, `i_calloc`, `i_realloc`, and `i_free` a
 - void* `c_realloc`(void* old_p, isize old_sz, isize new_sz)
 - void  `c_free`(void* p, isize sz)
 
+### c_new, c_new_n, c_realloc_n, c_free_n, c_delete_n
+
+- Type\* `c_new`(**Type**, value) - Allocate *and initialize* a new object on the heap with *value*.
+- Type\* `c_new_n`(**Type**, n) - Allocate an array of ***n*** new objects on the heap, *uninitialized*.
+- void\* `c_realloc_n`(arr, old_n, n) - Calls *c_realloc(arr, (old_n)\*c_sizeof \*(arr), (n)\*c_sizeof \*(arr))*.
+- void `c_free_n`(arr, n) - Calls *c_free(arr, (n)\*c_sizeof \*(arr))*.
+- void `c_delete_n`(**Type**, arr, n) - Calls *Type_drop(&arr[i])* and *c_free_n(arr, n)*.
+```c++
+#include <stc/cstr.h>
+
+cstr* stringptr = c_new (cstr, cstr_from("Hello"));
+printf("%s\n", cstr_str(stringp));
+c_delete_n(cstr, stringptr, 1);
+```
 </details>
 <details>
 <summary><b>c_swap, c_countof, c_const_cast, c_safe_case</b></summary>

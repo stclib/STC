@@ -309,7 +309,7 @@ STC_DEF void
 _c_MEMB(_erase_after_node)(Self* self, _m_node* ref) {
     _m_node* node = _c_MEMB(_unlink_after_node)(self, ref);
     i_keydrop((&node->value));
-    i_free(node, c_sizeof *node);
+    i_free_n(node, 1);
 }
 
 STC_DEF _m_node*
@@ -404,7 +404,7 @@ STC_DEF bool _c_MEMB(_sort)(Self* self) {
     for (c_each(i, Self, *self)) {
         if (len == cap) {
             isize cap_n = cap + cap/2 + 8;
-            if ((p = (_m_value *)i_realloc(arr, cap*c_sizeof *p, cap_n*c_sizeof *p)) == NULL)
+            if ((p = (_m_value *)i_realloc_n(arr, cap, cap_n)) == NULL)
                 goto done;
             arr = p, cap = cap_n;
         }
@@ -416,7 +416,7 @@ STC_DEF bool _c_MEMB(_sort)(Self* self) {
     self->last = keep;
     for (c_each(i, Self, *self))
         *i.ref = *p++;
-    done: i_free(arr, cap*c_sizeof *arr);
+    done: i_free_n(arr, cap);
     return p != NULL;
 }
 #endif // _i_has_cmp

@@ -336,8 +336,8 @@ STC_DEF void _c_MEMB(_drop)(const Self* cself) {
     Self* self = (Self*)cself;
     if (self->bucket_count > 0) {
         _c_MEMB(_wipe_)(self);
-        i_free(self->meta, (self->bucket_count + 1)*c_sizeof *self->meta);
-        i_free(self->table, self->bucket_count*c_sizeof *self->table);
+        i_free_n(self->meta, self->bucket_count + 1);
+        i_free_n(self->table, self->bucket_count);
     }
 }
 
@@ -446,7 +446,7 @@ _c_MEMB(_bucket_insert_)(const Self* self, const _m_keyraw* rkeyptr) {
             return out;
         } else {
             if (out.meta) i_free(out.meta, _mbytes);
-            if (out.table) i_free(out.table, map.bucket_count*c_sizeof *out.table);
+            if (out.table) i_free_n(out.table, map.bucket_count);
             return c_literal(Self){0};
         }
     }
@@ -476,8 +476,8 @@ _c_MEMB(_reserve)(Self* _self, const isize _newcap) {
         }
         c_swap(_self, &map);
     }
-    i_free(map.meta, (map.bucket_count + (int)(map.meta != NULL))*c_sizeof *map.meta);
-    i_free(map.table, map.bucket_count*c_sizeof *map.table);
+    i_free_n(map.meta, map.bucket_count + (int)(map.meta != NULL));
+    i_free_n(map.table, map.bucket_count);
     return ok;
 }
 

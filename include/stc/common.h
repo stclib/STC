@@ -87,6 +87,8 @@ typedef ptrdiff_t       isize;
 #define i_free c_JOIN(i_allocator, _free)
 #define i_new_n(T, n) ((T*)i_malloc((n)*c_sizeof(T)))
 #define i_new_zeros(T, n) ((T*)i_calloc(n, c_sizeof(T)))
+#define i_realloc_n(ptr, old_n, n) i_realloc(ptr, (old_n)*c_sizeof *(ptr), (n)*c_sizeof *(ptr))
+#define i_free_n(ptr, n) i_free(ptr, (n)*c_sizeof *(ptr))
 
 #ifndef __cplusplus
     #define c_new(T, ...) ((T*)c_safe_memcpy(c_malloc(c_sizeof(T)), ((T[]){__VA_ARGS__}), c_sizeof(T)))
@@ -115,12 +117,12 @@ typedef ptrdiff_t       isize;
 #endif
 
 #define c_new_n(T, n) ((T*)c_malloc((n)*c_sizeof(T)))
-#define c_delete(T, ptr) \
-    do { T* _tp = ptr; T##_drop(_tp); c_free(_tp, c_sizeof(T)); } while (0)
+#define c_free_n(ptr, n) c_free(ptr, (n)*c_sizeof *(ptr))
+#define c_realloc_n(ptr, old_n, n) c_realloc(ptr, (old_n)*c_sizeof *(ptr), (n)*c_sizeof *(ptr))
 #define c_delete_n(T, ptr, n) do { \
-    T* _tp = ptr; isize _n = n, _m = _n; \
-    while (_n--) T##_drop((_tp + _n)); \
-    c_free(_tp, _m*c_sizeof(T)); \
+    T* _tp = ptr; isize _n = n, _i = _n; \
+    while (_i--) T##_drop((_tp + _i)); \
+    c_free(_tp, _n*c_sizeof(T)); \
 } while (0)
 
 #define c_static_assert(expr)   (void)sizeof(int[(expr) ? 1 : -1])

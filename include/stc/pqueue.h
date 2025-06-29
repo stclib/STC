@@ -48,7 +48,7 @@ STC_INLINE void _c_MEMB(_put_n)(Self* self, const _m_raw* raw, isize n)
 
 STC_INLINE bool _c_MEMB(_reserve)(Self* self, const isize cap) {
     if (cap != self->size && cap <= self->capacity) return true;
-    _m_value *d = (_m_value *)i_realloc(self->data, self->capacity*c_sizeof *d, cap*c_sizeof *d);
+    _m_value *d = (_m_value *)i_realloc_n(self->data, self->capacity, cap);
     return d ? (self->data = d, self->capacity = cap, true) : false;
 }
 
@@ -74,7 +74,7 @@ STC_INLINE void _c_MEMB(_clear)(Self* self) {
 STC_INLINE void _c_MEMB(_drop)(const Self* cself) {
     Self* self = (Self*)cself;
     _c_MEMB(_clear)(self);
-    i_free(self->data, self->capacity*c_sizeof(*self->data));
+    i_free_n(self->data, self->capacity);
 }
 
 STC_INLINE Self _c_MEMB(_move)(Self *self) {

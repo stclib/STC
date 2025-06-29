@@ -72,8 +72,7 @@ STC_INLINE isize _c_MEMB(_capacity)(const Self* self)
 
 STC_INLINE bool _c_MEMB(_reserve)(Self* self, isize n) {
     if (n > self->capacity || (n && n == self->size)) {
-        _m_value *d = (_m_value *)i_realloc(self->data, self->capacity*c_sizeof *d,
-                                            n*c_sizeof *d);
+        _m_value *d = (_m_value *)i_realloc_n(self->data, self->capacity, n);
         if (d == NULL)
             return false;
         self->data = d;
@@ -94,7 +93,7 @@ STC_INLINE void _c_MEMB(_drop)(const Self* cself) {
     Self* self = (Self*)cself;
     _c_MEMB(_clear)(self);
 #ifndef i_capacity
-    i_free(self->data, self->capacity*c_sizeof(*self->data));
+    i_free_n(self->data, self->capacity);
 #endif
 }
 

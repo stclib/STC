@@ -33,5 +33,5 @@ int main(void) {
     printf("ms[:, :, 0]\n");
     cspan_print(DSpan2, "%g", cspan_slice(&ms, DSpan2, {c_ALL}, {c_ALL}, {0}));
 
-    c_free(data, nx*ny*nz*c_sizeof *data);
+    c_free_n(data, nx*ny*nz);
 }
