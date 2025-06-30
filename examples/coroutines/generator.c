@@ -29,16 +29,17 @@ int Triple_next(Triple_iter* it) {
                 }
             }
         }
-    }
 
-    it->ref = NULL; // stop iteration
-    printf("Coroutine done\n");
+        cco_drop:
+        it->ref = NULL; // stop iteration
+        printf("Coroutine done\n");
+    }
     return 0;
 }
 
 Triple_iter Triple_begin(Triple* g) {
     Triple_iter it = {.ref = g};
-    Triple_next(&it);
+    Triple_next(&it); // advance to first
     return it;
 }
 

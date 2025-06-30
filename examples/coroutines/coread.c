@@ -19,11 +19,12 @@ int file_read(struct file_read* g)
         if (g->fp == NULL) cco_return;
         g->line = (cstr){0};
         cco_await( !cstr_getline(&g->line, g->fp) );
-    }
 
-    printf("finish\n");
-    cstr_drop(&g->line);
-    if (g->fp) fclose(g->fp);
+        cco_drop:
+        printf("finish\n");
+        cstr_drop(&g->line);
+        if (g->fp) fclose(g->fp);
+    }
     return 0;
 }
 

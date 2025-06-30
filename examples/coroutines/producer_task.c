@@ -40,11 +40,12 @@ int produce(struct produce* co, cco_fiber* fb) {
 
             cco_yield_to(co->consumer, fb); // symmetric transfer
         }
-    }
 
-    cco_cancel_task(co->consumer, fb);
-    Inventory_drop(&co->inv);
-    puts("cleanup producer");
+        cco_drop:
+        cco_cancel_task(co->consumer, fb);
+        Inventory_drop(&co->inv);
+        puts("cleanup producer");
+    }
     return 0;
 }
 
@@ -62,9 +63,10 @@ int consume(struct consume* co, cco_fiber* fb) {
 
             cco_yield_to(co->producer, fb); // symmetric transfer
         }
-    }
 
-    puts("cleanup consumer");
+        cco_drop:
+        puts("cleanup consumer");
+    }
     return 0;
 }
 

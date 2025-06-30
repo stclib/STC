@@ -19,6 +19,8 @@ int file_read(struct file_read* co, cco_fiber* fb)
     cco_async (co) {
         (void)fb;
         co->fp = fopen(co->path, "r");
+        if (!co->fp)
+            goto fail;
         co->line = cstr_init();
 
         while (true) {
@@ -29,11 +31,16 @@ int file_read(struct file_read* co, cco_fiber* fb)
                 break;
             cco_yield;
         }
-    }
 
-    fclose(co->fp);
-    cstr_drop(&co->line);
-    puts("done file_read");
+        cco_drop:
+        fclose(co->fp);
+        cstr_drop(&co->line);
+        puts("done file_read");
+        break;
+
+        fail:
+        printf("error: couldn't open file '%s'.\n", co->path);
+    }
     return 0;
 }
 
@@ -59,10 +66,11 @@ int count_line(struct count_line* co, cco_fiber* fb)
             co->lineCount += 1;
             cco_yield;
         }
-    }
 
-    cstr_drop(&co->path);
-    puts("done count_line");
+        cco_drop:
+        cstr_drop(&co->path);
+        puts("done count_line");
+    }
     return 0;
 }
 
@@ -72,7 +80,7 @@ int main(void)
     // Creates a new task
     struct count_line countTask = {
         .base = {count_line},
-        .path = cstr_from(__FILE__),
+        .path = cstr_from("go_" __FILE__),
     };
 
     // Execute coroutine as top-level blocking

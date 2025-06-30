@@ -26,10 +26,11 @@ int Scheduler(struct Scheduler* co, cco_fiber* fb) {
                 Tasks_value_drop(&co->tasks, &co->pulled);
             }
         }
-    }
 
-    Tasks_drop(&co->tasks);
-    puts("Task queue dropped");
+        cco_drop:
+        Tasks_drop(&co->tasks);
+        puts("Task queue dropped");
+    }
     return 0;
 }
 
@@ -44,9 +45,11 @@ static int TaskA(struct cco_task* co, cco_fiber* fb) {
         puts("A is back doing more work");
         cco_yield;
         puts("A is back doing even more work");
+
+        cco_drop:
+        puts("A done");
     }
 
-    puts("A done");
     return 0;
 }
 
@@ -59,9 +62,10 @@ static int TaskB(struct cco_task* co, cco_fiber* fb) {
         puts("B is back doing work");
         cco_yield;
         puts("B is back doing more work");
-    }
 
-    puts("B done");
+        cco_drop:
+        puts("B done");
+    }
     return 0;
 }
 

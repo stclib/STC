@@ -59,89 +59,66 @@ int main(void) {
 #include "common.h"
 
 enum {
-    CCO_STATE_INIT = 0,
-    CCO_STATE_CLEANUP = -1, // [deprecated]
-    CCO_STATE_DONE = -2,
+    CCO_STATE_NORM = 0,
+    CCO_STATE_DONE = -1,
+    CCO_STATE_DROP = -2,
 };
 typedef enum {
     CCO_DONE = 0,
-    CCO_YIELD_FINAL = 1<<27,
-    CCO_YIELD = 1<<28,
-    CCO_AWAIT = 1<<29,
-    CCO_NOOP = 1<<30,
+    CCO_YIELD = 1<<12,
+    CCO_AWAIT = 1<<13,
+    CCO_NOOP = 1<<14,
 } cco_result;
 
 typedef struct {
-    int state;
-} cco_base, cco_state; // [deprecated] cco_state
-#define cco base       // [deprecated] cco
+    struct cco_state { int32_t pos:24; bool drop; } state;
+} cco_base;
 
-#define cco_initial(co) ((co)->base.state == CCO_STATE_INIT)
-#define cco_suspended(co) ((co)->base.state > CCO_STATE_INIT)
-#define cco_done(co) ((co)->base.state == CCO_STATE_DONE)
-#define cco_active(co) ((co)->base.state != CCO_STATE_DONE)
+#define cco_is_initial(co) ((co)->base.state.pos == 0)
+#define cco_is_done(co) ((co)->base.state.pos == CCO_STATE_DONE)
+#define cco_is_active(co) ((co)->base.state.pos != CCO_STATE_DONE)
 
 #if defined STC_HAS_TYPEOF && STC_HAS_TYPEOF
     #define _cco_validate_task_struct(co) \
-    c_static_assert(/* error: co->base not first member in task struct */ \
-                    sizeof((co)->base) == sizeof(cco_base) || \
-                    offsetof(__typeof__(*(co)), base) == 0)
+        c_static_assert(/* error: co->base not first member in task struct */ \
+                        sizeof((co)->base) == sizeof(cco_base) || \
+                        offsetof(__typeof__(*(co)), base) == 0)
 #else
     #define _cco_validate_task_struct(co) (void)0
 #endif
 
 #define cco_async(co) \
-    for (int *_state = (_cco_validate_task_struct(co), &(co)->base.state) \
-           ; *_state != CCO_STATE_DONE ; *_state = CCO_STATE_DONE) \
-        _resume: switch (*_state) case CCO_STATE_INIT: // thanks, @liigo!
+    for (struct cco_state *_state = (_cco_validate_task_struct(co), &(co)->base.state) \
+           ; _state->pos != CCO_STATE_DONE ; _state->pos = CCO_STATE_DONE) \
+        _resume: switch (_state->pos) case 0: // thanks, @liigo!
 
-#define cco_routine(co) cco_async(co) // [deprecated] cco_routine
+#define cco_drop /* label */ \
+    _state->drop = true; /* FALLTHRU */ \
+    case CCO_STATE_DROP
 
-/* Throw an error "exception"; can be catched up in the cco_await_task call tree */
-#define cco_throw_error(error_code, fiber) \
-    do {cco_fiber* _fb = fiber; \
-        _fb->error = error_code; \
-        _fb->error_line = __LINE__; \
-        cco_return; \
-    } while (0)
-
-#define cco_recover_error(fiber) \
-    do {cco_fiber* _fb = fiber; \
-        c_assert(_fb->task->base.state == CCO_STATE_DONE); \
-        _fb->task->base.state = _fb->recover_state; \
-        _fb->error = 0; \
-        goto _resume; \
-    } while (0)
-
-#define cco_cleanup /* [deprecated] */ \
-    *_state = CCO_STATE_CLEANUP; /* FALLTHRU */ \
-    case CCO_STATE_CLEANUP
-#define cco_finally cco_cleanup // [deprecated]
+#define cco_routine(co) cco_async(co) // [deprecated]
+#define cco_cleanup cco_drop          // [deprecated]?
 
 #define cco_return \
     do { \
-        *_state = *_state >= CCO_STATE_INIT ? CCO_STATE_CLEANUP : CCO_STATE_DONE; \
+        _state->pos = (_state->drop ? CCO_STATE_DONE : CCO_STATE_DROP); \
+        _state->drop = true; \
         goto _resume; \
     } while (0)
 
-#define cco_yield cco_yield_v(CCO_YIELD)
+#define cco_yield \
+    cco_yield_v(CCO_YIELD)
+
 #define cco_yield_v(value) \
     do { \
-        *_state = __LINE__; return value; goto _resume; \
+        _state->pos = __LINE__; return value; goto _resume; \
         case __LINE__:; \
-    } while (0)
-
-#define cco_yield_final cco_yield_final_v(CCO_YIELD)
-#define cco_yield_final_v(value) \
-    do { \
-        *_state = *_state >= CCO_STATE_INIT ? CCO_STATE_CLEANUP : CCO_STATE_DONE; \
-        return value; \
     } while (0)
 
 #define cco_await(until) \
     do { \
-        *_state = __LINE__; /* FALLTHRU */ \
-        case __LINE__: if (!(until)) {return CCO_AWAIT; goto _resume;} \
+        _state->pos = __LINE__; /* FALLTHRU */ \
+        case __LINE__: if (!(until)) { return CCO_AWAIT; goto _resume; } \
     } while (0)
 
 /* cco_await_coroutine(): assumes coroutine returns a cco_result value (int) */
@@ -149,7 +126,7 @@ typedef struct {
 #define cco_await_coroutine_1(corocall) cco_await_coroutine_2(corocall, CCO_DONE)
 #define cco_await_coroutine_2(corocall, awaitbits) \
     do { \
-        *_state = __LINE__; /* FALLTHRU */ \
+        _state->pos = __LINE__; /* FALLTHRU */ \
         case __LINE__: { \
             int _res = corocall; \
             if (_res & ~(awaitbits)) { return _res; goto _resume; } \
@@ -162,12 +139,12 @@ typedef struct {
 
 #define cco_stop(co) \
     do { \
-        int* _st = &(co)->base.state; \
-        *_st = *_st >= CCO_STATE_INIT ? CCO_STATE_CLEANUP : CCO_STATE_DONE; \
+        struct cco_state* _s = &(co)->base.state; \
+        if (!_s->drop) { _s->pos = CCO_STATE_DROP; _s->drop = true; } \
     } while (0)
 
 #define cco_reset_state(co) \
-    (void)((co)->base.state = CCO_STATE_INIT)
+    (void)((co)->base.state = c_literal(struct cco_state){0})
 
 
 /*
@@ -179,19 +156,21 @@ typedef struct cco_fiber {
     void* env;
     struct cco_task* parent_task;
     struct cco_fiber* next;
-    int recover_state, awaitbits, result;
-    int error, error_line;
-    cco_base base;
-} cco_fiber, cco_runtime; // [deprecated] cco_runtime
+    struct cco_state recover_state;
+    int awaitbits, result;
+    int32_t error, error_line;
+    cco_base base; /* is a coroutine object itself */
+} cco_fiber;
 
 /* Define a Task struct */
 #define cco_task_struct(Task) \
     struct Task; \
     typedef struct { \
         int (*func)(struct Task*, cco_fiber*); \
-        int state, awaitbits; \
+        int awaitbits; \
+        struct cco_state state; \
         struct cco_task* parent_task; \
-    } Task##_base, Task##_state; /* [deprecated] Task##_state */ \
+    } Task##_base; \
     struct Task
 
 /* Base cco_task type */
@@ -212,6 +191,22 @@ static inline int _cco_resume_task(cco_task* task, cco_fiber* fiber)
     { return task->base.func(task, fiber); }
 static inline int _cco_cancel_task(cco_task* task, cco_fiber* fiber)
     { cco_stop(task); return task->base.func(task, fiber); }
+
+/* Throw an error "exception"; can be catched up in the cco_await_task call tree */
+#define cco_throw_error(error_code, fiber) \
+    do {cco_fiber* _fb = fiber; \
+        _fb->error = error_code; \
+        _fb->error_line = __LINE__; \
+        cco_return; \
+    } while (0)
+
+#define cco_recover_error(fiber) \
+    do {cco_fiber* _fb = fiber; \
+        c_assert(_fb->task->base.state.pos == CCO_STATE_ERROR); \
+        _fb->task->base.state = _fb->recover_state; \
+        _fb->error = 0; \
+        goto _resume; \
+    } while (0)
 
 /* Asymmetric coroutine await/call */
 #define cco_await_task(...) c_MACRO_OVERLOAD(cco_await_task, __VA_ARGS__)
@@ -264,7 +259,6 @@ static inline int _cco_cancel_task(cco_task* task, cco_fiber* fiber)
 
 static inline bool cco_joined(const cco_fiber* fiber)
     { return fiber == fiber->next; }
-#define cco_is_joined(fb) cco_joined(fb) // [deprecated]
 
 extern cco_fiber* _cco_new_fiber(cco_task* task, void* env);
 extern cco_fiber* _cco_spawn(cco_task* task, cco_fiber* fb, void* env);
@@ -280,7 +274,7 @@ int cco_resume_current(cco_fiber* fb) {
         while (1) {
             fb->parent_task = fb->task->base.parent_task;
             fb->awaitbits = fb->task->base.awaitbits;
-            fb->result = cco_resume_task(fb->task, fb);
+            fb->result = fb->task->base.func(fb->task, fb); // resume
             if (fb->error) {
                 fb->task = fb->parent_task;
                 if (fb->task == NULL)
@@ -300,7 +294,7 @@ int cco_resume_current(cco_fiber* fb) {
                         __LINE__, fb->error, fb->error_line);
         exit(fb->error);
     }
-    return 0;
+    return CCO_DONE;
 }
 
 cco_fiber* cco_resume_next(cco_fiber* prev) {
@@ -332,43 +326,6 @@ cco_fiber* _cco_spawn(cco_task* _task, cco_fiber* fb, void* env) {
 #undef i_implement
 #endif
 
-/* // Iterators for coroutine generators
- *
- * typedef struct { // A generator data struct
- *     Data data; ...
- * } Gen, Gen_value;
- *
- * // Define the iterator coroutine struct
- * typedef struct {
- *     cco_base base; // or a task base state.
- *     Gen* ref;
- *     ...
- * } Gen_iter;
- *
- * // Define the iterator coroutine func; produce the next value:
- * int Gen_next(Gen_iter* it) {
- *     cco_async (it) {
- *        ... it->ref->data ...
- *        cco_yield; // suspend exec, gen with value ready
- *        ...
- *     }
- *     it->ref = NULL; // stops the iteration
- *     return 0;
- * }
- *
- * // Return the coroutine iter; advance to the first yield:
- * Gen_iter Gen_begin(Gen* g) {
- *     Gen_iter it = {.ref = g};
- *     ...
- *     Gen_next(&it);
- *     return it;
- * }
- *
- * ...
- * for (c_each(i, Gen, gen))
- *     printf("%d ", *i.ref);
- */
-
 /*
  * Iterate containers with already defined iterator (prefer to use in coroutines only):
  */
@@ -382,10 +339,10 @@ cco_fiber* _cco_spawn(cco_task* _task, cco_fiber* fb, void* env) {
  * Using c_filter with coroutine iterators:
  */
 #define cco_flt_take(n) \
-    (c_flt_take(n), fltbase.done ? _it.base.state = CCO_STATE_CLEANUP : 1)
+    (c_flt_take(n), fltbase.done ? (_it.base.state.pos = CCO_STATE_DROP, _it.base.state.drop = 1) : 1)
 
 #define cco_flt_takewhile(pred) \
-    (c_flt_takewhile(pred), fltbase.done ? _it.base.state = CCO_STATE_CLEANUP : 1)
+    (c_flt_takewhile(pred), fltbase.done ? (_it.base.state.pos = CCO_STATE_DROP, _it.base.state.drop = 1) : 1)
 
 
 /*

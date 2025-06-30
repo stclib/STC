@@ -31,12 +31,12 @@ int interleaved(struct Generator* g)
     cco_async (g) {
         do {
             g->value = get_value(&g->x);
-            g->xact = cco_active(&g->x);
+            g->xact = cco_is_active(&g->x);
             if (g->xact)
                 cco_yield;
 
             g->value = get_value(&g->y);
-            g->yact = cco_active(&g->y);
+            g->yact = cco_is_active(&g->y);
             if (g->yact)
                 cco_yield;
         } while (g->xact | g->yact);

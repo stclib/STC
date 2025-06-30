@@ -35,9 +35,9 @@ int prime(struct prime* g) {
                 cco_yield_v(YIELD_PRM);
             }
         }
+        cco_drop:
+        puts("DONE prm");
     }
-
-    puts("DONE prm");
     return 0;
 }
 
@@ -64,9 +64,9 @@ int fibonacci(struct fibonacci* g) {
             g->b += tmp;
             cco_yield_v(YIELD_FIB);
         }
+        cco_drop:
+        puts("DONE fib");
     }
-
-    puts("DONE fib");
     return 0;
 }
 
@@ -89,9 +89,10 @@ int combined(struct combined* g) {
         g->prm = (struct prime){.count = 8}, g->fib = (struct fibonacci){.count = 12};
         cco_await_coroutine( prime(&g->prm) |
                              fibonacci(&g->fib) );
-    }
 
-    puts("DONE prime and fib");
+        cco_drop:
+        puts("DONE prime and fib");
+    }
     return 0;
 }
 

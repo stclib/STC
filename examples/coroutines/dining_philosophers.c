@@ -43,9 +43,10 @@ int Philosopher(struct Philosopher* self) {
             if (self->left->mode == ph_hungry) ++self->left->hunger;
             if (self->right->mode == ph_hungry) ++self->right->hunger;
         }
-    }
 
-    printf("Philosopher %d done\n", self->id);
+        cco_drop:
+        printf("Philosopher %d done\n", self->id);
+    }
     return 0;
 }
 
@@ -73,13 +74,14 @@ int Dining(struct Dining* self) {
             cco_yield; // suspend, return control back to caller who
                        // can do other tasks before resuming dining.
         }
-    }
 
-    for (int i = 0; i < num_philosophers; ++i) {
-        cco_stop(&self->philos[i]);
-        Philosopher(&self->philos[i]); // execute philos cleanup.
+        cco_drop:
+        for (int i = 0; i < num_philosophers; ++i) {
+            cco_stop(&self->philos[i]);
+            Philosopher(&self->philos[i]); // execute philos cleanup.
+        }
+        puts("Dining done");
     }
-    puts("Dining done");
     return 0;
 }
 

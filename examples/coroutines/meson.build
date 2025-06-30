@@ -11,6 +11,7 @@ foreach sample : [
   'generator',
   'scheduler',
   'triples',
+  'waitgroup',
 ]
   test(
     sample,

@@ -40,9 +40,10 @@ int triples_coro(struct triples* t) {
                 }
             }
         }
-    }
 
-    puts("done");
+        cco_drop:
+        puts("done");
+    }
     return 0;
 }
 

@@ -4,66 +4,71 @@
 cco_task_struct (worker) {
     worker_base base;
     int id;
-    int *count;
+    int *wg; // waitgroup pointer
     cco_timer tm;
 };
 
-int worker(struct worker* co, cco_fiber* fb) {
+int worker(struct worker* co, cco_fiber* const fb) {
     cco_async (co) {
-        printf("Worker %d starting\n", co->id);
-        cco_await_timer(&co->tm, 1.0 + co->id / 8.0);
+        printf("Worker %d starting\n", co->id); (void)fb;
+
+        cco_await_timer(&co->tm, 2.0 - co->id/8.0);
         printf("Worker %d done: %f\n", co->id, cco_timer_elapsed(&co->tm));
     }
 
-	*co->count -= 1;
-    c_free(co, c_sizeof *co); (void)fb;
+    *co->wg -= 1;
+    c_free_n(co, 1);
     return 0;
 }
 
 
-cco_task_struct (something) {
-    something_base base;
+cco_task_struct (sleeper) {
+    sleeper_base base;
     cco_timer tm;
 };
 
-int something(struct something* co, cco_fiber* fb) {
+int sleeper(struct sleeper* co, cco_fiber* const fb) {
     cco_async (co) {
-        printf("something starting\n");
+        printf("Sleeper starting\n"); (void)fb;
+
         cco_await_timer(&co->tm, 3.0);
-        printf("something done: %f\n", cco_timer_elapsed(&co->tm));
+        printf("Sleeper done: %f\n", cco_timer_elapsed(&co->tm));
     }
 
-    c_free(co, c_sizeof *co); (void)fb;
+    c_free_n(co, 1);
     return 0;
 }
 
 
-cco_task_struct (ccomain) {
-    ccomain_base base;
-    int wgroup;
+cco_task_struct (everyone) {
+    everyone_base base;
+    int wg; // waitgroup
 };
 
-int ccomain(struct ccomain* co, cco_fiber* fb) {
+int everyone(struct everyone* co, cco_fiber* const fb) {
     cco_async (co) {
-        struct something* thing = c_new(struct something, {{something}});
-        cco_spawn(thing, fb);
+        struct sleeper* sleep = c_new(struct sleeper, {{sleeper}});
+        cco_spawn(sleep, fb);
+        cco_yield; // suspend: starts sleeper task
 
-        for (c_range32(i, 8)) {
-            co->wgroup += 1;
-            struct worker* work = c_new(struct worker, {.base={worker}, .id=i, .count=&co->wgroup});
-            cco_spawn(work, fb);
+        cco_fiber* f2 = fb;
+        for (c_range32(i, 8)) { // nb! local i, do not yield or await inside loop.
+            co->wg += 1;
+            struct worker* work = c_new(struct worker, {.base={worker}, .id=i, .wg=&co->wg});
+            f2 = cco_spawn(work, f2); // optionally assign result to f2 to make tasks start in given order.
         }
-        cco_await(co->wgroup == 0); // wait for all workers to finish
+
+        cco_await(co->wg == 0); // suspend: starts workers and wait for all of them to finish
         puts("All workers done.");
     }
 
-    c_free(co, c_sizeof *co);
+    c_free_n(co, 1);
     return 0;
 }
 
 
-int main()
+int main(void)
 {
-    struct ccomain* go = c_new(struct ccomain, {{ccomain}});
+    struct everyone* go = c_new(struct everyone, {{everyone}});
     cco_run_task(go);
 }

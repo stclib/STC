@@ -28,18 +28,22 @@ coroutine. See examples.
                 cco_async (Coroutine* co) { ... }                   // The coroutine scope.
                 cco_yield;                                          // Yield/suspend execution with CCO_YIELD returned.
                 cco_yield_v(value);                                 // Yield/suspend execution with value returned.
-                cco_yield_final;                                    // Yield final suspend, enter cleanup-state.
-                cco_yield_final_v(value);                           // Yield with a final value.
                 cco_await(bool condition);                          // Await for condition to be true else suspend with CCO_AWAIT.
                 cco_await_coroutine(coroutine(co));                 // Await for coroutine to finish else suspend with CCO_AWAIT.
                 cco_await_coroutine(coroutine(co), int awaitbits);  // Await for coroutine suspend value in (awaitbits | CCO_DONE).
-                cco_return;                                         // Exit `cco_async` scope and finalize coroutine.
-bool            cco_active(Coroutine* co);                          // Is coroutine active? (= not done).
-bool            cco_done(Coroutine* co);                            // Is coroutine done?
+                cco_return;                                         // Jump to `cco_drop:` label and cleanup. If there is no cco_drop:,
+                                                                    // or if called after passing it, exit the `cco_async` scope.
+                cco_drop:                                           // Label marks where cleanup of coroutine object happens.
+bool            cco_is_active(Coroutine* co);                       // Is coroutine active? (= not done).
+bool            cco_is_done(Coroutine* co);                         // Is coroutine done?
 void            cco_reset_state(Coroutine* co);                     // Reset state to initial (for reuse).
-void            cco_stop(Coroutine* co);                            // Next resume of coroutine is after the `cco_async` block.
+void            cco_stop(Coroutine* co);                            // Next coroutine resume is at cco_done: or after `cco_async` scope.
                 cco_run_coroutine(coroutine(co)) {};                // Run blocking until coroutine is finished.
 ```
+- All cco-features must be placed within the cco_async scope.
+- Never use return, use cco_return.
+- Destruction (cco_drop) may be asynchronous.
+
 #### Tasks (coroutine function-objects) and fibers (green thread-like entity within a thread)
 ```c++
                 cco_task_struct(name) { <name>_base base; ... };    // A custom coroutine task struct; extends cco_task struct.
@@ -59,10 +63,10 @@ bool            cco_joined(const cco_fiber* fb);                    // True if t
 
                 cco_run_task(cco_task* task) {}                     // Run task blocking until it and spawned fibers are finished.
                 cco_run_task(cco_task* task, void *env) {}          // Run task blocking with env data
-                cco_run_task(it_fiber, cco_task* task, void *env) {} // Run task blocking. it_fiber is current fiber.
+                cco_run_task(fb_iter, cco_task* task, void *env) {} // Run task blocking. fb_iter reference the current fiber.
 
                 cco_run_fiber(cco_fiber** fiber_ref) {}             // Run fiber(s) blocking.
-                cco_run_fiber(it_fiber, cco_fiber* fiber) {}        // Run fiber(s) blocking, it_fiber is current fiber.
+                cco_run_fiber(fb_iter, cco_fiber* fiber) {}         // Run fiber(s) blocking. fb_iter reference the current fiber.
 ```
 #### Timers and time functions
 ```c++
@@ -73,7 +77,7 @@ double          cco_timer_elapsed(cco_timer* tm);                   // Return el
 double          cco_timer_remaining(cco_timer* tm);                 // Return remaining seconds.
                 cco_await_timer(cco_timer* tm, double sec);         // Start timer with duration and await for it to expire.
 
-double          cco_time(void);                                     // Return seconds (with usec precision) since Epoch.
+double          cco_time(void);                                     // Return seconds since 1970-01-01_00:00 UTC (usec precision).
                 cco_sleep(double sec);                              // Sleep for seconds (msec or usec precision).
 
 ```
@@ -85,13 +89,13 @@ cco_semaphore   cco_make_semaphore(long value);                     // Create se
                 cco_release_semaphore(cco_semaphore* sem);          // "Signal" the semaphore (count += 1)
                 cco_await_semaphore(cco_semaphore* sem);            // Await for the semaphore count > 0, then count -= 1
 ```
-#### Interoperability with iterators and filters
+#### Interoperability with fb_iterators and filters
 ```c++
-                // Container iteration within coroutines
-                for (cco_each(iter_name, CntType, cnt)) ...;          // Use an existing iterator (stored in coroutine object)
-                for (cco_each_reverse(iter_name, CntType, cnt)) ...;  // Iterate in reverse order
+                // Container fb_iteration within coroutines
+                for (cco_each(fb_iter_name, CntType, cnt)) ...;          // Use an existing fb_iterator (stored in coroutine object)
+                for (cco_each_reverse(fb_iter_name, CntType, cnt)) ...;  // Iterate in reverse order
 
-                // c_filter() interoperability with coroutine iterators
+                // c_filter() interoperability with coroutine fb_iterators
                 cco_flt_take(int num);                              // Use instead of *c_flt_take(num)* to ensure cleanup
                 cco_flt_takewhile(bool predicate);                  // Use instead of *c_flt_takewhile(pred)* to ensure cleanup
 ```
@@ -198,6 +202,7 @@ int Gen_next(Gen_iter* it) {
         for (*it->ref = it->g->start; *it->ref < it->g->end; ++*it->ref)
             cco_yield;
     }
+
     it->ref = NULL; // stop
     return 0;
 }

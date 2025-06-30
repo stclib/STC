@@ -21,9 +21,10 @@ int fibonacci(struct fibonacci* g) {
             g->b += tmp;
             cco_yield;
         }
-    }
 
-    puts("done");
+        cco_drop:
+        puts("done");
+    }
     return 0;
 }
 

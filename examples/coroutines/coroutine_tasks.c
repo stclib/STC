@@ -36,9 +36,10 @@ int prime(struct prime* g, cco_fiber* fb) {
                 cco_yield_v(YIELD_PRM);
             }
         }
-    }
 
-    puts("DONE prm");
+        cco_drop:
+        puts("DONE prm");
+    }
     return 0;
 }
 
@@ -66,9 +67,10 @@ int fibonacci(struct fibonacci* g, cco_fiber* fb) {
             g->b += tmp;
             cco_yield_v(YIELD_FIB);
         }
-    }
 
-    puts("DONE fib");
+        cco_drop:
+        puts("DONE fib");
+    }
     return 0;
 }
 
