@@ -16,14 +16,15 @@ int file_read(struct file_read* g)
 {
     cco_async (g) {
         g->fp = fopen(g->filename, "r");
-        if (g->fp == NULL) cco_return;
+        if (g->fp == NULL)
+            cco_abort();
         g->line = (cstr){0};
         cco_await( !cstr_getline(&g->line, g->fp) );
 
         cco_drop:
-        printf("finish\n");
         cstr_drop(&g->line);
         if (g->fp) fclose(g->fp);
+        puts("finish");
     }
     return 0;
 }

@@ -19,7 +19,7 @@ cco_task_struct (consume) {
 };
 
 
-int produce(struct produce* co, cco_fiber* fb) {
+int produce(struct produce* co) {
     cco_async (co) {
         while (1) {
             if (co->serial > co->total) {
@@ -38,18 +38,18 @@ int produce(struct produce* co, cco_fiber* fb) {
                 puts("");
             }
 
-            cco_yield_to(co->consumer, fb); // symmetric transfer
+            cco_yield_to(co->consumer); // symmetric transfer
         }
 
         cco_drop:
-        cco_cancel_task(co->consumer, fb);
+        cco_cancel_task(co->consumer);
         Inventory_drop(&co->inv);
         puts("cleanup producer");
     }
     return 0;
 }
 
-int consume(struct consume* co, cco_fiber* fb) {
+int consume(struct consume* co) {
     cco_async (co) {
         int n, sz;
         while (1) {
@@ -61,7 +61,7 @@ int consume(struct consume* co, cco_fiber* fb) {
                 Inventory_pop(&co->producer->inv);
             printf("consumed %d items\n", n);
 
-            cco_yield_to(co->producer, fb); // symmetric transfer
+            cco_yield_to(co->producer); // symmetric transfer
         }
 
         cco_drop:

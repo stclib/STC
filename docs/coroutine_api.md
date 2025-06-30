@@ -47,18 +47,19 @@ void            cco_stop(Coroutine* co);                            // Next coro
 #### Tasks (coroutine function-objects) and fibers (green thread-like entity within a thread)
 ```c++
                 cco_task_struct(name) { <name>_base base; ... };    // A custom coroutine task struct; extends cco_task struct.
-void            cco_await_task(cco_task* task, cco_fiber* fb);      // Await for task to return CCO_DONE (asymmetric call).
-void            cco_await_task(cco_task* task, cco_fiber* fb, int awaitbits); // Await until task's suspend/return value
-                                                                              // to be in (awaitbits | CCO_DONE).
-void            cco_yield_to(cco_task* task, cco_fiber* fb);        // Yield to task (symmetric control transfer).
-void            cco_throw_error(int error, cco_fiber* fb);          // Throw an error and unwind call stack after the cco_async block.
+void            cco_await_task(cco_task* task);                     // Await for task to return CCO_DONE (asymmetric call).
+void            cco_await_task(cco_task* task, int awaitbits);      // Await until task's suspend/return value
+                                                                    // to be in (awaitbits | CCO_DONE).
+void            cco_yield_to(cco_task* task);                       // Yield to task (symmetric control transfer).
+void            cco_throw_error(int error);                         // Throw an error and unwind call stack after the cco_async block.
                                                                     // Error accessible as `fb->error` and `fb->error_line`.
-void            cco_recover_error(cco_fiber* fb);                   // Reset error, and jump to original resume point in current task.
-void            cco_resume_task(cco_task* task, cco_fiber* fb);     // Resume suspended task, return value in `fb->result`.
+void            cco_recover_error();                                // Reset error, and jump to original resume point in current task.
+void            cco_resume_task(cco_task* task);                    // Resume suspended task, return value in `fb->result`.
 cco_fiber*      cco_new_fiber(cco_task* task);                      // Create an initial fiber from a task.
 cco_fiber*      cco_new_fiber(cco_task* task, void* env);           // Create an initial fiber from a task and env (inputs or a future).
-cco_fiber*      cco_spawn(cco_task* task, cco_fiber* fb);           // Spawn a new fiber parallel to the given fiber.
-cco_fiber*      cco_spawn(cco_task* task, cco_fiber* fb, void* env);// Same, env is stored in fb, may be used as a future or anything.
+cco_fiber*      cco_spawn(cco_task* task);                          // Spawn a new parallel task.
+cco_fiber*      cco_spawn(cco_task* task, void* env);               // Same, env may be used as a future or anything.
+cco_fiber*      cco_spawn(cco_task* task, void* env, cco_fiber* fb);// Same, env may be used as a future or anything.
 bool            cco_joined(const cco_fiber* fb);                    // True if there are no other parallel spawned fibers running.
 
                 cco_run_task(cco_task* task) {}                     // Run task blocking until it and spawned fibers are finished.
@@ -368,61 +369,63 @@ typedef struct {
     struct TaskC C;
 } Subtasks;
 
-int TaskC(struct TaskC* self, cco_fiber* fb) {
+int TaskC(struct TaskC* self) {
     cco_async (self) {
         printf("TaskC start: {%g, %g}\n", self->x, self->y);
 
         // assume there is an error...
-        cco_throw_error(99, fb);
+        cco_throw_error(99);
 
         puts("TaskC work");
         cco_yield;
         puts("TaskC more work");
-    }
 
-    if (fb->error) {
-        puts("TaskC has error, ignored");
+        cco_drop:
+        puts("TaskC done");
     }
-    puts("TaskC done");
     return 0;
 }
 
-int TaskB(struct TaskB* self, cco_fiber* fb) {
+int TaskB(struct TaskB* self) {
     cco_async (self) {
         printf("TaskB start: %g\n", self->d);
-        Subtasks* sub = fb->env;
-        cco_await_task(&sub->C, fb);
+        Subtasks* sub = cco_fb()->env;
+        cco_await_task(&sub->C);
         puts("TaskB work");
-    }
 
-    puts("TaskB done");
+        cco_drop:
+        puts("TaskB done");
+    }
     return 0;
 }
 
-int TaskA(struct TaskA* self, cco_fiber* fb) {
+int TaskA(struct TaskA* self) {
     cco_async (self) {
         printf("TaskA start: %d\n", self->a);
-        Subtasks* sub = fb->env;
-        cco_await_task(&sub->B, fb);
+        Subtasks* sub = cco_fb()->env;
+        cco_await_task(&sub->B);
         puts("TaskA work");
-    }
 
-    if (fb->error == 99) {
-        // if error not handled, will cause 'unhandled error'...
-        printf("TaskA recovered error '99' thrown on line %d\n", fb->error_line);
-        cco_recover_error(fb);
+        cco_drop:
+        if (cco_fb()->error == 99) {
+            // if error not handled, will cause 'unhandled error'...
+            printf("TaskA recovered error '99' thrown on line %d\n", cco_fb()->error_line);
+            cco_recover_error();
+        }
+        puts("TaskA done");
     }
-    puts("TaskA done");
     return 0;
 }
 
-int start(cco_task* self, cco_fiber* fb) {
+int start(cco_task* self) {
     cco_async (self) {
         puts("start");
-        Subtasks* sub = fb->env;
-        cco_await_task(&sub->A, fb);
+        Subtasks* sub = ccp_fib()->env;
+        cco_await_task(&sub->A);
+
+        cco_drop:
+        puts("done");
     }
-    puts("done");
     return 0;
 }
 
@@ -443,7 +446,7 @@ int main(void)
 <!--{%endraw%}-->
 </details>
 
-#### Stackful coroutines allocated on the heap
+#### Coroutines objects allocated on the heap
 
 Sometimes the call-tree is dynamic or more complex, then we can dynamically allocate the coroutine frames before
 they are awaited. This is somewhat more general and simpler, but requires heap allocation. Note that the coroutine
@@ -452,7 +455,7 @@ the previous, but also shows how to use the env field in `cco_fiber` to return a
 call/await:
 
 <details>
-<summary>Implementation of stackful coroutines</summary>
+<summary>Implementation of coroutine objects on the heap</summary>
 
 [ [Run this code](https://godbolt.org/z/TbWYsbaaq) ]
 <!--{%raw%}-->
@@ -466,64 +469,74 @@ cco_task_struct (TaskC) { TaskC_base base; float x, y; };
 
 typedef struct { double value; int error; } Result;
 
-int TaskC(struct TaskC* self, cco_fiber* fb) {
+int TaskC(struct TaskC* self) {
     cco_async (self) {
         printf("TaskC start: {%g, %g}\n", self->x, self->y);
 
         // assume there is an error...
-        cco_throw_error(99, fb);
+        cco_throw_error(99);
 
         puts("TaskC work");
         cco_yield;
+
         puts("TaskC more work");
         // initial return value
-        ((Result *)fb->env)->value = self->x * self->y;
+        cco_env(Result *)->value = self->x * self->y;
+        cco_drop:
+        puts("TaskC done");
     }
 
-    puts("TaskC done");
     free(self);
     return 0;
 }
 
-int TaskB(struct TaskB* self, cco_fiber* fb) {
+int TaskB(struct TaskB* self) {
     cco_async (self) {
         printf("TaskB start: %g\n", self->d);
-        cco_await_task(cco_new_task(TaskC, 1.2f, 3.4f), fb);
+        cco_await_task(cco_new_task(TaskC, 1.2f, 3.4f));
+
         puts("TaskB work");
-        ((Result *)fb->env)->value += self->d;
+        cco_env(Result *)->value += self->d;
+
+        cco_drop:
+        puts("TaskB done");
     }
 
-    puts("TaskB done");
     free(self);
     return 0;
 }
 
-int TaskA(struct TaskA* self, cco_fiber* fb) {
+int TaskA(struct TaskA* self) {
     cco_async (self) {
         printf("TaskA start: %d\n", self->a);
-        cco_await_task(cco_new_task(TaskB, 3.1415), fb);
-        puts("TaskA work");
-        ((Result *)fb->env)->value += self->a; // final return value;
-    }
+        cco_await_task(cco_new_task(TaskB, 3.1415));
 
-    if (fb->error == 99) {
-        // if error not handled, will cause 'unhandled error'...
-        printf("TaskA recovered error '99' thrown on line %d\n", fb->error_line);
-        ((Result *)fb->env)->error = fb->error; // set error in output
-        cco_recover_error(fb); // reset error to 0 and jump to after the await call.
+        puts("TaskA work");
+        cco_env(Result *)->value += self->a; // final return value;
+
+        cco_drop:
+        if (cco_fb()->error == 99) {
+            // if error not handled, will cause 'unhandled error'...
+            printf("TaskA recovered error '99' thrown on line %d\n", fb->error_line);
+
+            cco_env(Result *)->error = cco_fb()->error; // set error in output
+            cco_recover_error(); // reset error to 0 and jump to after the await call.
+        }
+        puts("TaskA done");
     }
-    puts("TaskA done");
     free(self);
     return 0;
 }
 
-int start(cco_task* self, cco_fiber* fb) {
+int start(cco_task* self) {
     cco_async (self) {
         puts("start");
-        cco_await_task(cco_new_task(TaskA, 42), fb);
+        cco_await_task(cco_new_task(TaskA, 42));
+
+        cco_drop:
+        puts("done");
     }
 
-    puts("done");
     free(self);
     return 0;
 }
@@ -581,7 +594,7 @@ cco_task_struct (consume) {
 };
 
 
-int produce(struct produce* self, cco_fiber* fb) {
+int produce(struct produce* self) {
     cco_async (self) {
         while (1) {
             if (self->serial > self->total) {
@@ -600,17 +613,17 @@ int produce(struct produce* self, cco_fiber* fb) {
                 puts("");
             }
 
-            cco_yield_to(self->consumer, fb); // symmetric transfer
+            cco_yield_to(self->consumer); // symmetric transfer
         }
     }
 
-    cco_cancel_task(self->consumer, fb);
+    cco_cancel_task(self->consumer);
     Inventory_drop(&self->inventory);
     puts("cleanup producer");
     return 0;
 }
 
-int consume(struct consume* self, cco_fiber* fb) {
+int consume(struct consume* self) {
     cco_async (self) {
         int n, sz;
         while (1) {
@@ -622,7 +635,7 @@ int consume(struct consume* self, cco_fiber* fb) {
                 Inventory_pop(&self->producer->inventory);
             printf("consumed %d items\n", n);
 
-            cco_yield_to(self->producer, fb); // symmetric transfer
+            cco_yield_to(self->producer); // symmetric transfer
         }
     }
 
@@ -693,28 +706,28 @@ cco_task_struct (TaskX) {
     char id;
 };
 
-int scheduler(struct Scheduler* self, cco_fiber* fb) {
+int scheduler(struct Scheduler* self) {
     cco_async (self) {
         while (!Tasks_is_empty(&self->tasks)) {
             self->_pulled = Tasks_pull(&self->tasks);
 
-            cco_await_task(self->_pulled, fb, CCO_YIELD | CCO_DONE);
+            cco_await_task(self->_pulled, CCO_YIELD | CCO_DONE);
 
-            if (fb->result == CCO_YIELD) {
+            if (cco_fb()->result == CCO_YIELD) {
                 Tasks_push(&self->tasks, self->_pulled);
             } else { // CCO_DONE
                 Tasks_value_drop(&self->tasks, &self->_pulled);
             }
         }
-    }
 
-    Tasks_drop(&self->tasks);
-    puts("Task queue dropped");
+        cco_drop:
+        Tasks_drop(&self->tasks);
+        puts("Task queue dropped");
+    }
     return 0;
 }
 
-static int taskX(struct TaskX* self, cco_fiber* fb) {
-    (void)fb;
+static int taskX(struct TaskX* self) {
     cco_async (self) {
         printf("Hello from task %c\n", self->id);
         cco_yield;
@@ -722,27 +735,33 @@ static int taskX(struct TaskX* self, cco_fiber* fb) {
         cco_yield;
         printf("%c is back doing more work\n", self->id);
         cco_yield;
+
+        cco_done:
+        printf("%c is done\n", self->id);
     }
 
-    printf("%c is done\n", self->id);
     return 0;
 }
 
-static int TaskA(struct TaskA* self, cco_fiber* fb) {
+static int TaskA(struct TaskA* self) {
     cco_async (self) {
         puts("Hello from task A");
         cco_yield;
+
         puts("A is back doing work");
         cco_yield;
+
         puts("A adds task C");
-        Tasks *_tasks = fb->env; // local var only alive until cco_yield.
+        Tasks *_tasks = cco_fb()->env; // local var only alive until cco_yield.
         Tasks_push(_tasks, cco_cast_task(c_new(struct TaskX, {.base={taskX}, .id='C'})));
         cco_yield;
+
         puts("A is back doing more work");
         cco_yield;
-    }
 
-    puts("A is done");
+        cco_drop:
+        puts("A is done");
+    }
     return 0;
 }
 

@@ -13,14 +13,14 @@ cco_task_struct (Scheduler) {
     Tasks tasks;
 };
 
-int Scheduler(struct Scheduler* co, cco_fiber* fb) {
+int Scheduler(struct Scheduler* co) {
     cco_async (co) {
         while (!Tasks_is_empty(&co->tasks)) {
             co->pulled = Tasks_pull(&co->tasks);
 
-            cco_await_task(co->pulled, fb, CCO_YIELD);
+            int result = cco_resume_task(co->pulled);
 
-            if (fb->result == CCO_YIELD) {
+            if (result == CCO_YIELD) {
                 Tasks_push(&co->tasks, co->pulled);
             } else {
                 Tasks_value_drop(&co->tasks, &co->pulled);
@@ -35,8 +35,7 @@ int Scheduler(struct Scheduler* co, cco_fiber* fb) {
 }
 
 
-static int TaskA(struct cco_task* co, cco_fiber* fb) {
-    (void)fb;
+static int TaskA(struct cco_task* co) {
     cco_async (co) {
         puts("Hello, from task A");
         cco_yield;
@@ -54,8 +53,7 @@ static int TaskA(struct cco_task* co, cco_fiber* fb) {
 }
 
 
-static int TaskB(struct cco_task* co, cco_fiber* fb) {
-    (void)fb;
+static int TaskB(struct cco_task* co) {
     cco_async (co) {
         puts("Hello, from task B");
         cco_yield;

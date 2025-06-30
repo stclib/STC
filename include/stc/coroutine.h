@@ -71,7 +71,7 @@ typedef enum {
 } cco_result;
 
 typedef struct {
-    struct cco_state { int32_t pos:24; bool drop; } state;
+    struct cco_state { int32_t pos:24; bool drop; struct cco_fiber* fb; } state;
 } cco_base;
 
 #define cco_is_initial(co) ((co)->base.state.pos == 0)
@@ -88,7 +88,8 @@ typedef struct {
 #endif
 
 #define cco_async(co) \
-    for (struct cco_state *_state = (_cco_validate_task_struct(co), &(co)->base.state) \
+    if (0) goto _resume; \
+    else for (struct cco_state *_state = (_cco_validate_task_struct(co), &(co)->base.state) \
            ; _state->pos != CCO_STATE_DONE ; _state->pos = CCO_STATE_DONE) \
         _resume: switch (_state->pos) case 0: // thanks, @liigo!
 
@@ -106,19 +107,25 @@ typedef struct {
         goto _resume; \
     } while (0)
 
+#define cco_abort() \
+    do { \
+        _state->pos = CCO_STATE_DONE; \
+        goto _resume; \
+    } while (0)
+
 #define cco_yield \
     cco_yield_v(CCO_YIELD)
 
 #define cco_yield_v(value) \
     do { \
-        _state->pos = __LINE__; return value; goto _resume; \
+        _state->pos = __LINE__; return value; \
         case __LINE__:; \
     } while (0)
 
 #define cco_await(until) \
     do { \
         _state->pos = __LINE__; /* FALLTHRU */ \
-        case __LINE__: if (!(until)) { return CCO_AWAIT; goto _resume; } \
+        case __LINE__: if (!(until)) return CCO_AWAIT; \
     } while (0)
 
 /* cco_await_coroutine(): assumes coroutine returns a cco_result value (int) */
@@ -129,7 +136,7 @@ typedef struct {
         _state->pos = __LINE__; /* FALLTHRU */ \
         case __LINE__: { \
             int _res = corocall; \
-            if (_res & ~(awaitbits)) { return _res; goto _resume; } \
+            if (_res & ~(awaitbits)) return _res; \
         } \
     } while (0)
 
@@ -166,7 +173,7 @@ typedef struct cco_fiber {
 #define cco_task_struct(Task) \
     struct Task; \
     typedef struct { \
-        int (*func)(struct Task*, cco_fiber*); \
+        int (*func)(struct Task*); \
         int awaitbits; \
         struct cco_state state; \
         struct cco_task* parent_task; \
@@ -177,32 +184,36 @@ typedef struct cco_fiber {
 cco_task_struct(cco_task) { cco_task_base base; };
 typedef struct cco_task cco_task;
 
-#define cco_cast_task(...) \
-    ((cco_task *)(__VA_ARGS__) + (1 ? 0 : sizeof((__VA_ARGS__)->base.func(__VA_ARGS__, (cco_fiber*)0))))
+#define cco_fb() (_state->fb + 0)
+#define cco_env(Tp) ((Tp)_state->fb->env)
 
-#define cco_resume_task(task, fiber) \
-    _cco_resume_task(cco_cast_task(task), fiber)
+#define cco_cast_task(...) \
+    ((cco_task *)(__VA_ARGS__) + (1 ? 0 : sizeof((__VA_ARGS__)->base.func(__VA_ARGS__))))
+
+#define cco_resume_task(task) \
+    _cco_resume_task(cco_cast_task(task))
 
 /* Stop and immediate cleanup */
-#define cco_cancel_task(task, fiber) \
-    _cco_cancel_task(cco_cast_task(task), fiber)
+#define cco_cancel_task(task) \
+    _cco_cancel_task(cco_cast_task(task))
 
-static inline int _cco_resume_task(cco_task* task, cco_fiber* fiber)
-    { return task->base.func(task, fiber); }
-static inline int _cco_cancel_task(cco_task* task, cco_fiber* fiber)
-    { cco_stop(task); return task->base.func(task, fiber); }
+static inline int _cco_resume_task(cco_task* task)
+    { return task->base.func(task); }
+
+static inline int _cco_cancel_task(cco_task* task)
+    { cco_stop(task); return task->base.func(task); }
 
 /* Throw an error "exception"; can be catched up in the cco_await_task call tree */
-#define cco_throw_error(error_code, fiber) \
-    do {cco_fiber* _fb = fiber; \
+#define cco_throw_error(error_code) \
+    do {cco_fiber* _fb = _state->fb; \
         _fb->error = error_code; \
         _fb->error_line = __LINE__; \
         cco_return; \
     } while (0)
 
-#define cco_recover_error(fiber) \
-    do {cco_fiber* _fb = fiber; \
-        c_assert(_fb->task->base.state.pos == CCO_STATE_ERROR); \
+#define cco_recover_error() \
+    do {cco_fiber* _fb = _state->fb; \
+        c_assert(_fb->error); \
         _fb->task->base.state = _fb->recover_state; \
         _fb->error = 0; \
         goto _resume; \
@@ -210,24 +221,26 @@ static inline int _cco_cancel_task(cco_task* task, cco_fiber* fiber)
 
 /* Asymmetric coroutine await/call */
 #define cco_await_task(...) c_MACRO_OVERLOAD(cco_await_task, __VA_ARGS__)
-#define cco_await_task_2(a_task, fiber) cco_await_task_3(a_task, fiber, CCO_DONE)
-#define cco_await_task_3(a_task, fiber, _awaitbits) do { \
+#define cco_await_task_1(a_task) cco_await_task_2(a_task, CCO_DONE)
+#define cco_await_task_2(a_task, _awaitbits) do { \
     {   cco_task* _await_task = cco_cast_task(a_task); \
-        cco_fiber* _fb = fiber; \
+        cco_fiber* _fb = _state->fb; \
         _await_task->base.awaitbits = (_awaitbits); \
         _await_task->base.parent_task = _fb->task; \
         _fb->task = _await_task; \
+        _await_task->base.state.fb = _fb; \
     } \
     cco_yield_v(CCO_NOOP); \
 } while (0)
 
 /* Symmetric coroutine flow of control transfer */
-#define cco_yield_to(a_task, fiber) do { \
+#define cco_yield_to(a_task) do { \
     {   cco_task* _to_task = cco_cast_task(a_task); \
-        cco_fiber* _fb = fiber; \
+        cco_fiber* _fb = _state->fb; \
         _to_task->base.awaitbits = _fb->task->base.awaitbits; \
         _to_task->base.parent_task = _fb->task->base.parent_task; \
         _fb->task = _to_task; \
+        _to_task->base.state.fb = _fb; \
     } \
     cco_yield_v(CCO_NOOP); \
 } while (0)
@@ -243,8 +256,9 @@ static inline int _cco_cancel_task(cco_task* task, cco_fiber* fiber)
 #define cco_new_fiber_2(task, env) _cco_new_fiber(cco_cast_task(task), env)
 
 #define cco_spawn(...) c_MACRO_OVERLOAD(cco_spawn, __VA_ARGS__)
-#define cco_spawn_2(task, fiber) cco_spawn_3(task, fiber, NULL)
-#define cco_spawn_3(task, fiber, env) _cco_spawn(cco_cast_task(task), fiber, env)
+#define cco_spawn_1(task) cco_spawn_3(task, NULL, _state->fb)
+#define cco_spawn_2(task, env) cco_spawn_3(task, env, _state->fb)
+#define cco_spawn_3(task, env, fiber) _cco_spawn(cco_cast_task(task), env, fiber)
 
 #define cco_run_fiber(...) c_MACRO_OVERLOAD(cco_run_fiber, __VA_ARGS__)
 #define cco_run_fiber_1(fiber_ref) \
@@ -261,7 +275,7 @@ static inline bool cco_joined(const cco_fiber* fiber)
     { return fiber == fiber->next; }
 
 extern cco_fiber* _cco_new_fiber(cco_task* task, void* env);
-extern cco_fiber* _cco_spawn(cco_task* task, cco_fiber* fb, void* env);
+extern cco_fiber* _cco_spawn(cco_task* task, void* env, cco_fiber* fb);
 extern cco_fiber* cco_resume_next(cco_fiber* prev);
 extern int        cco_resume_current(cco_fiber* co); /* coroutine */
 
@@ -274,7 +288,7 @@ int cco_resume_current(cco_fiber* fb) {
         while (1) {
             fb->parent_task = fb->task->base.parent_task;
             fb->awaitbits = fb->task->base.awaitbits;
-            fb->result = fb->task->base.func(fb->task, fb); // resume
+            fb->result = fb->task->base.func(fb->task); // resume
             if (fb->error) {
                 fb->task = fb->parent_task;
                 if (fb->task == NULL)
@@ -312,14 +326,16 @@ cco_fiber* cco_resume_next(cco_fiber* prev) {
 
 cco_fiber* _cco_new_fiber(cco_task* _task, void* env) {
     cco_fiber* new_fb = c_new(cco_fiber, {.task=_task, .env=env});
+    _task->base.state.fb = new_fb;
     return (new_fb->next = new_fb);
 }
 
-cco_fiber* _cco_spawn(cco_task* _task, cco_fiber* fb, void* env) {
+cco_fiber* _cco_spawn(cco_task* _task, void* env, cco_fiber* fb) {
     cco_fiber* new_fb;
     new_fb = fb->next = (fb->next == NULL ? fb : c_new(cco_fiber, {.next=fb->next}));
     new_fb->task = _task;
     new_fb->env = (env == NULL ? fb->env : env);
+    _task->base.state.fb = new_fb;
     return new_fb;
 }
 
@@ -420,12 +436,6 @@ typedef struct { ptrdiff_t count; } cco_semaphore;
         select(0, NULL, NULL, NULL, &tv);
     }
 #endif
-// [deprecated]:
-#define cco_sleep_sec cco_sleep
-#define cco_make_timer_sec cco_make_timer
-#define cco_timer_elapsed_sec cco_timer_elapsed
-#define cco_timer_remaining_sec cco_timer_remaining
-#define cco_await_timer_sec cco_await_timer
 
 typedef struct { double duration; long long start_time; } cco_timer;
 

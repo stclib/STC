@@ -14,10 +14,9 @@ cco_task_struct (file_read) {
 };
 
 
-int file_read(struct file_read* co, cco_fiber* fb)
+int file_read(struct file_read* co)
 {
     cco_async (co) {
-        (void)fb;
         co->fp = fopen(co->path, "r");
         if (!co->fp)
             goto fail;
@@ -53,7 +52,7 @@ cco_task_struct (count_line) {
 };
 
 
-int count_line(struct count_line* co, cco_fiber* fb)
+int count_line(struct count_line* co)
 {
     cco_async (co) {
         co->reader.base.func = file_read;
@@ -61,8 +60,8 @@ int count_line(struct count_line* co, cco_fiber* fb)
 
         while (true) {
             // await for next CCO_YIELD (or CCO_DONE) in file_read()
-            cco_await_task(&co->reader, fb, CCO_YIELD);
-            if (fb->result == CCO_DONE) break;
+            cco_await_task(&co->reader, CCO_YIELD);
+            if (cco_fb()->result == CCO_DONE) break;
             co->lineCount += 1;
             cco_yield;
         }
@@ -80,7 +79,7 @@ int main(void)
     // Creates a new task
     struct count_line countTask = {
         .base = {count_line},
-        .path = cstr_from("go_" __FILE__),
+        .path = cstr_from(__FILE__),
     };
 
     // Execute coroutine as top-level blocking

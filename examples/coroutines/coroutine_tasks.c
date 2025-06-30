@@ -21,8 +21,7 @@ cco_task_struct (prime) {
     long long value;
 };
 
-int prime(struct prime* g, cco_fiber* fb) {
-    (void)fb;
+int prime(struct prime* g) {
     cco_async (g) {
         if (g->value <= 2) {
             g->value = 2;
@@ -52,12 +51,12 @@ cco_task_struct (fibonacci) {
     long long value, b;
 };
 
-int fibonacci(struct fibonacci* g, cco_fiber* fb) {
-    (void)fb;
+int fibonacci(struct fibonacci* g) {
     assert(g->count < 94);
     cco_async (g) {
         if (g->value == 0)
             g->b = 1;
+
         while (true) {
             if (g->count-- == 0)
                 cco_return;
@@ -96,8 +95,8 @@ int main(void) {
     fib = (struct fibonacci){{fibonacci}, .count=12};
 
     cco_fiber* fb = c_new(cco_fiber, 0);
-    cco_spawn(&prm, fb);
-    cco_spawn(&fib, fb);
+    cco_spawn(&prm, NULL, fb);
+    cco_spawn(&fib, NULL, fb);
 
     cco_run_fiber(&fb) {
         switch (fb->result) {
