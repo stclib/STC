@@ -94,7 +94,7 @@ void listdemo1(void)
     Intlist_iter it = Intlist_begin(&nums);
     Intlist_erase_range(&nums, Intlist_advance(it, 5), Intlist_advance(it, 15));
     Intlist_pop_front(&nums);
-    Intlist_push_back(&nums, -99);
+    Intlist_push_back(&nums, 99);
 
     Intlist_sort(&nums);
 

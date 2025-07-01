@@ -97,10 +97,21 @@ typedef struct {
     _state->drop = true; /* FALLTHRU */ \
     case CCO_STATE_DROP
 
+#define cco_stop(co) \
+    do { \
+        struct cco_state* _s = &(co)->base.state; \
+        if (!_s->drop) { _s->pos = CCO_STATE_DROP; _s->drop = true; } \
+    } while (0)
+
+#define cco_reset_state(co) \
+    do { \
+        struct cco_state* _s = (co)->base.state; \
+        _s->pos = CCO_STATE_INIT, _s->drop = false; \
+    } while (0)
+
 #define cco_return \
     do { \
-        _state->pos = (_state->drop ? CCO_STATE_DONE : CCO_STATE_DROP); \
-        _state->drop = true; \
+        if (!_state->drop) { _state->pos = CCO_STATE_DROP; _state->drop = true; } \
         goto _resume; \
     } while (0)
 
@@ -141,18 +152,6 @@ typedef struct {
 #define cco_run_coroutine(corocall) \
     while ((1 ? (corocall) : -1) != CCO_DONE)
 
-#define cco_stop(co) \
-    do { \
-        struct cco_state* _s = &(co)->base.state; \
-        if (!_s->drop) { _s->pos = CCO_STATE_DROP; _s->drop = true; } \
-    } while (0)
-
-#define cco_reset_state(co) \
-    do { \
-        struct cco_state* _s = (co)->base.state; \
-        _s->pos = CCO_STATE_INIT, _s->drop = false; \
-    } while (0)
-
 
 /*
  * Tasks and Fibers
@@ -190,21 +189,8 @@ typedef struct cco_task cco_task;
 #define cco_cast_task(...) \
     ((void)sizeof((__VA_ARGS__)->base.func(__VA_ARGS__)), (cco_task *)(__VA_ARGS__))
 
-#define cco_resume_task(task) \
-    _cco_resume_task(cco_cast_task(task))
-
-/* Stop and immediate cleanup */
-#define cco_cancel_task(task) \
-    _cco_cancel_task(cco_cast_task(task))
-
-static inline int _cco_resume_task(cco_task* task)
-    { return task->base.func(task); }
-
-static inline int _cco_cancel_task(cco_task* task)
-    { cco_stop(task); return task->base.func(task); }
-
 /* Throw an error "exception"; can be catched up in the cco_await_task call tree */
-#define cco_task_error(error_code) \
+#define cco_task_throw(error_code) \
     do {cco_fiber* _fb = _state->fb; \
         _fb->error = error_code; \
         _fb->error_line = __LINE__; \
@@ -244,6 +230,24 @@ static inline int _cco_cancel_task(cco_task* task)
     } \
     cco_yield_v(CCO_NOOP); \
 } while (0)
+
+#define cco_resume_task(task) \
+    _cco_resume_task(cco_cast_task(task))
+
+static inline int _cco_resume_task(cco_task* task)
+    { return task->base.func(task); }
+
+#define cco_cancel_task(co) \
+    do { \
+        cco_task* _tsk = cco_cast_task(co); \
+        cco_stop(_tsk); cco_await_task(_tsk); \
+    } while (0)
+
+#define cco_cancel_fiber(fb) /* propagates to parent tasks */ \
+    do { \
+        cco_fiber* _fb3 = fb; \
+        cco_stop(_fb3->task); _fb3->error = 1; \
+    } while (0)
 
 /*
  * cco_run_fiber()/cco_run_task(): Run fibers/tasks in parallel
@@ -303,7 +307,7 @@ int cco_resume_current(cco_fiber* fb) {
         }
     }
 
-    if (fb->error < 0) {
+    if ((uint32_t)fb->error & ~1U) { // Allow 1 to not trigger error.
         fprintf(stderr, __FILE__ ":%d: error: unhandled error '%d' in a coroutine task at line %d.\n",
                         __LINE__, fb->error, fb->error_line);
         exit(fb->error);

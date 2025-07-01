@@ -51,7 +51,7 @@ void            cco_await_task(cco_task* task);                     // Await for
 void            cco_await_task(cco_task* task, int awaitbits);      // Await until task's suspend/return value
                                                                     // to be in (awaitbits | CCO_DONE).
 void            cco_yield_to(cco_task* task);                       // Yield to task (symmetric control transfer).
-void            cco_task_error(int error);                          // Throw an error and unwind call stack after the cco_async block.
+void            cco_task_throw(int error);                          // Throw an error and unwind call stack after the cco_async block.
                                                                     // Error accessible as `fb->error` and `fb->error_line`.
 void            cco_recover_task();                                 // Reset error, and jump to original resume point in current task.
 void            cco_resume_task(cco_task* task);                    // Resume suspended task, return value in `fb->result`.
@@ -374,7 +374,7 @@ int TaskC(struct TaskC* self) {
         printf("TaskC start: {%g, %g}\n", self->x, self->y);
 
         // assume there is an error...
-        cco_task_error(99);
+        cco_task_throw(99);
 
         puts("TaskC work");
         cco_yield;
@@ -478,7 +478,7 @@ int TaskC(struct TaskC* self) {
         printf("TaskC start: {%g, %g}\n", self->x, self->y);
 
         // assume there is an error...
-        cco_task_error(99);
+        cco_task_throw(99);
 
         puts("TaskC work");
         cco_yield;
@@ -621,11 +621,12 @@ int produce(struct produce* self) {
 
             cco_yield_to(self->consumer); // symmetric transfer
         }
-    }
 
-    cco_cancel_task(self->consumer);
-    Inventory_drop(&self->inventory);
-    puts("cleanup producer");
+        cco_drop:
+        cco_cancel_task(self->consumer);
+        Inventory_drop(&self->inventory);
+        puts("done producer");
+    }
     return 0;
 }
 
@@ -643,9 +644,13 @@ int consume(struct consume* self) {
 
             cco_yield_to(self->producer); // symmetric transfer
         }
+
+        cco_drop:
+		puts("drop consumer");
+		cco_yield; // demo async destruction.
+        puts("done consumer");
     }
 
-    puts("done consumer");
     return 0;
 }
 

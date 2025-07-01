@@ -33,8 +33,10 @@ int myTask(struct myTask* self) {
 			printf("myTask: %d\n", self->n);
 			cco_yield;
 		}
+
         cco_drop:
         OUT->myCount -= 1;
+        puts("myTask done");
 	}
 
 	c_free_n(self, 1);
@@ -47,7 +49,7 @@ int taskC(struct taskC* self) {
         printf("taskC start: {%g, %g}\n", self->x, self->y);
 
         // assume there is an error...
-        cco_task_error(-99);
+        cco_task_throw(99);
 
         puts("taskC work");
         cco_yield;
@@ -55,9 +57,11 @@ int taskC(struct taskC* self) {
 
         // initial return value
         OUT->value = self->x * self->y;
+
+        cco_drop:
+        puts("taskC done");
     }
 
-    puts("taskC done");
     c_free_n(self, 1);
     return 0;
 }
@@ -96,7 +100,7 @@ int taskA(struct taskA* self) {
         OUT->value += self->a; // final return value;
 
         cco_drop:
-        if (cco_fb()->error == -99) {
+        if (cco_fb()->error == 99) {
             printf("taskA recovered error '99' thrown on line %d\n", cco_fb()->error_line);
             OUT->error = cco_fb()->error; // set error in output
             cco_recover_task(); // reset error to 0 and jump to after the await call.
