@@ -243,7 +243,7 @@ static inline int _cco_resume_task(cco_task* task)
         cco_stop(_tsk); cco_await_task(_tsk); \
     } while (0)
 
-#define cco_cancel_fiber(fb) /* propagates to parent tasks */ \
+#define cco_stop_fiber(fb) /* propagates to parent tasks */ \
     do { \
         cco_fiber* _fb3 = fb; \
         cco_stop(_fb3->task); _fb3->error = 1; \
