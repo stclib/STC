@@ -233,7 +233,7 @@ _c_MEMB(_shrink_to_fit)(Self *self) {
         c_memmove(self->cbuf + (new_cap - n), self->cbuf + self->start, n*c_sizeof *self->cbuf);
         self->start = new_cap - n;
     }
-    self->cbuf = i_realloc(self->cbuf, (self->capmask + 1)*c_sizeof(*self->cbuf), new_cap*c_sizeof(*self->cbuf));
+    self->cbuf = (_m_value *)i_realloc_n(self->cbuf, self->capmask + 1, new_cap);
     self->capmask = new_cap - 1;
 }
 

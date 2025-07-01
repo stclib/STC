@@ -51,16 +51,16 @@ void            cco_await_task(cco_task* task);                     // Await for
 void            cco_await_task(cco_task* task, int awaitbits);      // Await until task's suspend/return value
                                                                     // to be in (awaitbits | CCO_DONE).
 void            cco_yield_to(cco_task* task);                       // Yield to task (symmetric control transfer).
-void            cco_task_error(int error);                         // Throw an error and unwind call stack after the cco_async block.
+void            cco_task_error(int error);                          // Throw an error and unwind call stack after the cco_async block.
                                                                     // Error accessible as `fb->error` and `fb->error_line`.
-void            cco_recover_task();                                // Reset error, and jump to original resume point in current task.
+void            cco_recover_task();                                 // Reset error, and jump to original resume point in current task.
 void            cco_resume_task(cco_task* task);                    // Resume suspended task, return value in `fb->result`.
 cco_fiber*      cco_new_fiber(cco_task* task);                      // Create an initial fiber from a task.
 cco_fiber*      cco_new_fiber(cco_task* task, void* env);           // Create an initial fiber from a task and env (inputs or a future).
 cco_fiber*      cco_spawn(cco_task* task);                          // Spawn a new parallel task.
 cco_fiber*      cco_spawn(cco_task* task, void* env);               // Same, env may be used as a future or anything.
 cco_fiber*      cco_spawn(cco_task* task, void* env, cco_fiber* fb);// Same, env may be used as a future or anything.
-bool            cco_joined(const cco_fiber* fb);                    // True if there are no other parallel spawned fibers running.
+bool            cco_joined();                                       // True if there are no other parallel spawned fibers running.
 
                 cco_run_task(cco_task* task) {}                     // Run task blocking until it and spawned fibers are finished.
                 cco_run_task(cco_task* task, void *env) {}          // Run task blocking with env data
