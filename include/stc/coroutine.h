@@ -303,7 +303,7 @@ int cco_resume_current(cco_fiber* fb) {
         }
     }
 
-    if (fb->error != 0) {
+    if (fb->error < 0) {
         fprintf(stderr, __FILE__ ":%d: error: unhandled error '%d' in a coroutine task at line %d.\n",
                         __LINE__, fb->error, fb->error_line);
         exit(fb->error);
