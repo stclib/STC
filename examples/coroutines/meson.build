@@ -1,8 +1,9 @@
 foreach sample : [
   'cointerleave',
   'coread',
-  'coroutines',
-  'coroutine_tasks',
+  'coroutines1',
+  'coroutines2',
+  'coroutines3',
   'producer',
   'producer_task',
   'dining_philosophers',

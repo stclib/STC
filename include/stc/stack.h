@@ -155,7 +155,7 @@ STC_INLINE _m_value _c_MEMB(_pull)(Self* self)
 STC_INLINE void _c_MEMB(_put_n)(Self* self, const _m_raw* raw, isize n)
     { while (n--) _c_MEMB(_push)(self, i_keyfrom((*raw))), ++raw; }
 
-#if !defined i_aux && !defined i_capacity
+#if !defined _i_aux_alloc && !defined i_capacity
 STC_INLINE Self _c_MEMB(_init)(void)
     { Self out = {0}; return out; }
 

@@ -59,7 +59,7 @@ int main(void) {
 #include "common.h"
 
 enum {
-    CCO_STATE_NORM = 0,
+    CCO_STATE_INIT = 0,
     CCO_STATE_DONE = -1,
     CCO_STATE_DROP = -2,
 };
@@ -74,7 +74,7 @@ typedef struct {
     struct cco_state { int32_t pos:24; bool drop; struct cco_fiber* fb; } state;
 } cco_base;
 
-#define cco_is_initial(co) ((co)->base.state.pos == 0)
+#define cco_is_initial(co) ((co)->base.state.pos == CCO_STATE_INIT)
 #define cco_is_done(co) ((co)->base.state.pos == CCO_STATE_DONE)
 #define cco_is_active(co) ((co)->base.state.pos != CCO_STATE_DONE)
 
@@ -91,14 +91,11 @@ typedef struct {
     if (0) goto _resume; \
     else for (struct cco_state *_state = (_cco_validate_task_struct(co), &(co)->base.state) \
            ; _state->pos != CCO_STATE_DONE ; _state->pos = CCO_STATE_DONE) \
-        _resume: switch (_state->pos) case 0: // thanks, @liigo!
+        _resume: switch (_state->pos) case CCO_STATE_INIT: // thanks, @liigo!
 
 #define cco_drop /* label */ \
     _state->drop = true; /* FALLTHRU */ \
     case CCO_STATE_DROP
-
-#define cco_routine(co) cco_async(co) // [deprecated]
-#define cco_cleanup cco_drop          // [deprecated]?
 
 #define cco_return \
     do { \
@@ -153,7 +150,7 @@ typedef struct {
 #define cco_reset_state(co) \
     do { \
         struct cco_state* _s = (co)->base.state; \
-        _s->pos = 0, _s->drop = false; \
+        _s->pos = CCO_STATE_INIT, _s->drop = false; \
     } while (0)
 
 
@@ -191,7 +188,7 @@ typedef struct cco_task cco_task;
 #define cco_env(Tp) ((Tp)_state->fb->env)
 
 #define cco_cast_task(...) \
-    ((cco_task *)(__VA_ARGS__) + (1 ? 0 : sizeof((__VA_ARGS__)->base.func(__VA_ARGS__))))
+    ((void)sizeof((__VA_ARGS__)->base.func(__VA_ARGS__)), (cco_task *)(__VA_ARGS__))
 
 #define cco_resume_task(task) \
     _cco_resume_task(cco_cast_task(task))
@@ -274,8 +271,8 @@ static inline int _cco_cancel_task(cco_task* task)
 #define cco_run_task_2(task, env) cco_run_fiber_2(_it_fb, cco_new_fiber_2(task, env))
 #define cco_run_task_3(it, task, env) cco_run_fiber_2(it, cco_new_fiber_2(task, env))
 
-static inline bool cco_joined(const cco_fiber* fiber)
-    { return fiber == fiber->next; }
+#define cco_joined() \
+    (cco_fb() == cco_fb()->next)
 
 extern cco_fiber* _cco_new_fiber(cco_task* task, void* env);
 extern cco_fiber* _cco_spawn(cco_task* task, void* env, cco_fiber* fb);

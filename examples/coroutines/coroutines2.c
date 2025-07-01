@@ -52,8 +52,8 @@ cco_task_struct (fibonacci) {
 };
 
 int fibonacci(struct fibonacci* g) {
-    assert(g->count < 94);
     cco_async (g) {
+        assert(g->count < 94);
         if (g->value == 0)
             g->b = 1;
 
@@ -73,6 +73,7 @@ int fibonacci(struct fibonacci* g) {
     return 0;
 }
 
+
 int main(void) {
     struct prime prm;
     struct fibonacci fib;
@@ -87,10 +88,9 @@ int main(void) {
     cco_run_task(&fib) {
         printf("  Fibon=%lld\n", fib.value);
     }
-    puts("");
 
 
-    puts("CONCURRENT:");
+    puts("\nCONCURRENT:");
     prm = (struct prime){{prime}, .count=8};
     fib = (struct fibonacci){{fibonacci}, .count=12};
 
@@ -108,4 +108,5 @@ int main(void) {
                 break;
         }
     }
+    puts("DONE prime and fib");
 }
