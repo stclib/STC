@@ -51,9 +51,9 @@ void            cco_await_task(cco_task* task);                     // Await for
 void            cco_await_task(cco_task* task, int awaitbits);      // Await until task's suspend/return value
                                                                     // to be in (awaitbits | CCO_DONE).
 void            cco_yield_to(cco_task* task);                       // Yield to task (symmetric control transfer).
-void            cco_throw_error(int error);                         // Throw an error and unwind call stack after the cco_async block.
+void            cco_task_error(int error);                         // Throw an error and unwind call stack after the cco_async block.
                                                                     // Error accessible as `fb->error` and `fb->error_line`.
-void            cco_recover_error();                                // Reset error, and jump to original resume point in current task.
+void            cco_recover_task();                                // Reset error, and jump to original resume point in current task.
 void            cco_resume_task(cco_task* task);                    // Resume suspended task, return value in `fb->result`.
 cco_fiber*      cco_new_fiber(cco_task* task);                      // Create an initial fiber from a task.
 cco_fiber*      cco_new_fiber(cco_task* task, void* env);           // Create an initial fiber from a task and env (inputs or a future).
@@ -349,7 +349,7 @@ and errors may be handled and recoveded higher up in the call tree in a simple, 
 
 The following example shows a task `start` which awaits `TaskA`, => awaits `TaskB`, => awaits `TaskC`. `TaskC` throws
 an error, which causes unwinding of the call stack. The error is finally handled after `TaskA`'s `cco_async` scope
-and recovered using `cco_recover_error()`. This call will resume control back to the original suspension point in the
+and recovered using `cco_recover_task()`. This call will resume control back to the original suspension point in the
 current task. Because the "call-tree" is fixed, the coroutine frames to be called may be pre-allocated on the stack,
 which is very fast.
 
@@ -374,7 +374,7 @@ int TaskC(struct TaskC* self) {
         printf("TaskC start: {%g, %g}\n", self->x, self->y);
 
         // assume there is an error...
-        cco_throw_error(99);
+        cco_task_error(99);
 
         puts("TaskC work");
         cco_yield;
@@ -389,6 +389,7 @@ int TaskC(struct TaskC* self) {
 int TaskB(struct TaskB* self) {
     cco_async (self) {
         printf("TaskB start: %g\n", self->d);
+
         Subtasks* sub = cco_fb()->env;
         cco_await_task(&sub->C);
         puts("TaskB work");
@@ -402,15 +403,17 @@ int TaskB(struct TaskB* self) {
 int TaskA(struct TaskA* self) {
     cco_async (self) {
         printf("TaskA start: %d\n", self->a);
+
         Subtasks* sub = cco_fb()->env;
         cco_await_task(&sub->B);
+
         puts("TaskA work");
 
         cco_drop:
         if (cco_fb()->error == 99) {
             // if error not handled, will cause 'unhandled error'...
             printf("TaskA recovered error '99' thrown on line %d\n", cco_fb()->error_line);
-            cco_recover_error();
+            cco_recover_task();
         }
         puts("TaskA done");
     }
@@ -420,7 +423,8 @@ int TaskA(struct TaskA* self) {
 int start(cco_task* self) {
     cco_async (self) {
         puts("start");
-        Subtasks* sub = ccp_fib()->env;
+
+        Subtasks* sub = cco_fb()->env;
         cco_await_task(&sub->A);
 
         cco_drop:
@@ -474,7 +478,7 @@ int TaskC(struct TaskC* self) {
         printf("TaskC start: {%g, %g}\n", self->x, self->y);
 
         // assume there is an error...
-        cco_throw_error(99);
+        cco_task_error(99);
 
         puts("TaskC work");
         cco_yield;
@@ -482,11 +486,12 @@ int TaskC(struct TaskC* self) {
         puts("TaskC more work");
         // initial return value
         cco_env(Result *)->value = self->x * self->y;
+
         cco_drop:
         puts("TaskC done");
     }
 
-    free(self);
+    c_free_n(self, 1);
     return 0;
 }
 
@@ -502,7 +507,7 @@ int TaskB(struct TaskB* self) {
         puts("TaskB done");
     }
 
-    free(self);
+    c_free_n(self, 1);
     return 0;
 }
 
@@ -520,11 +525,12 @@ int TaskA(struct TaskA* self) {
             printf("TaskA recovered error '99' thrown on line %d\n", fb->error_line);
 
             cco_env(Result *)->error = cco_fb()->error; // set error in output
-            cco_recover_error(); // reset error to 0 and jump to after the await call.
+            cco_recover_task(); // reset error to 0 and jump to past the await TaskB call.
         }
         puts("TaskA done");
     }
-    free(self);
+
+    c_free_n(self, 1);
     return 0;
 }
 
@@ -537,7 +543,7 @@ int start(cco_task* self) {
         puts("done");
     }
 
-    free(self);
+    c_free_n(self, 1);
     return 0;
 }
 
@@ -688,7 +694,7 @@ the scope in that it was created.
 #include <stc/coroutine.h>
 
 #define T Tasks, cco_task*, (c_no_clone)
-#define i_keydrop(p) free(*p) // { puts("free task"); free(*p); }
+#define i_keydrop(p) c_free_n(*p, 1) // { puts("free task"); c_free_n(*p, 1); }
 #include <stc/queue.h>
 
 cco_task_struct (Scheduler) {
@@ -778,7 +784,7 @@ int main(void) {
     cco_run_task(schedule, &schedule->tasks);
 
     // schedule is now cleaned up/destructed, free heap mem.
-    free(schedule);
+    c_free_n(schedule, 1);
 }
 ```
 

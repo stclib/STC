@@ -151,7 +151,10 @@ typedef struct {
     } while (0)
 
 #define cco_reset_state(co) \
-    (void)((co)->base.state = c_literal(struct cco_state){0})
+    do { \
+        struct cco_state* _s = (co)->base.state; \
+        _s->pos = 0, _s->drop = false; \
+    } while (0)
 
 
 /*
@@ -204,14 +207,14 @@ static inline int _cco_cancel_task(cco_task* task)
     { cco_stop(task); return task->base.func(task); }
 
 /* Throw an error "exception"; can be catched up in the cco_await_task call tree */
-#define cco_throw_error(error_code) \
+#define cco_task_error(error_code) \
     do {cco_fiber* _fb = _state->fb; \
         _fb->error = error_code; \
         _fb->error_line = __LINE__; \
         cco_return; \
     } while (0)
 
-#define cco_recover_error() \
+#define cco_recover_task() \
     do {cco_fiber* _fb = _state->fb; \
         c_assert(_fb->error); \
         _fb->task->base.state = _fb->recover_state; \
