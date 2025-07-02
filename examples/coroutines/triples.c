@@ -24,16 +24,16 @@ struct triples {
     cco_base base;
 };
 
-int triples_coro(struct triples* t) {
-    cco_async (t) {
-        for (t->c = 5;; ++t->c) {
-            for (t->a = 1; t->a < t->c; ++t->a) {
-                for (t->b = t->a + 1; t->b < t->c; ++t->b) {
-                    if ((int64_t)t->a * t->a +
-                        (int64_t)t->b * t->b ==
-                        (int64_t)t->c * t->c)
+int triples_coro(struct triples* o) {
+    cco_async (o) {
+        for (o->c = 5;; ++o->c) {
+            for (o->a = 1; o->a < o->c; ++o->a) {
+                for (o->b = o->a + 1; o->b < o->c; ++o->b) {
+                    if ((int64_t)o->a * o->a +
+                        (int64_t)o->b * o->b ==
+                        (int64_t)o->c * o->c)
                     {
-                        if (t->c > t->max_c)
+                        if (o->c > o->max_c)
                             cco_return;
                         cco_yield;
                     }
@@ -49,9 +49,9 @@ int triples_coro(struct triples* t) {
 
 int gcd(int a, int b) {
     while (b) {
-        int t = a % b;
+        int tmp = a % b;
         a = b;
-        b = t;
+        b = tmp;
     }
     return a;
 }
@@ -62,15 +62,15 @@ int main(void)
     triples_vanilla(20);
 
     puts("\nCoroutine triples with GCD = 1:");
-    struct triples t = {.max_c = 100};
+    struct triples tri = {.max_c = 100};
     int n = 0;
 
-    cco_run_coroutine(triples_coro(&t)) {
-        if (gcd(t.a, t.b) > 1)
+    cco_run_coroutine(triples_coro(&tri)) {
+        if (gcd(tri.a, tri.b) > 1)
             continue;
         if (++n <= 20)
-            printf("%d: {%d, %d, %d}\n", n, t.a, t.b, t.c);
+            printf("%d: {%d, %d, %d}\n", n, tri.a, tri.b, tri.c);
         else
-            cco_stop(&t);
+            cco_stop(&tri);
     }
 }

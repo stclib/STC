@@ -15,8 +15,8 @@ cco_task_struct (taskC) {
 };
 
 cco_task_struct (myTask) {
-	myTask_base base;
-	int n, end;
+    myTask_base base;
+    int n, end;
 };
 
 typedef struct {
@@ -27,26 +27,26 @@ typedef struct {
 
 #define OUT cco_env(Output *)
 
-int myTask(struct myTask* self) {
-	cco_async (self) {
-		for (; self->n < self->end; ++self->n) {
-			printf("myTask: %d\n", self->n);
-			cco_yield;
-		}
+int myTask(struct myTask* o) {
+    cco_async (o) {
+        for (; o->n < o->end; ++o->n) {
+            printf("myTask: %d\n", o->n);
+            cco_yield;
+        }
 
         cco_drop:
         OUT->myCount -= 1;
         puts("myTask done");
-	}
+    }
 
-	c_free_n(self, 1);
-	return 0;
+    c_free_n(o, 1);
+    return 0;
 }
 
 
-int taskC(struct taskC* self) {
-    cco_async (self) {
-        printf("taskC start: {%g, %g}\n", self->x, self->y);
+int taskC(struct taskC* o) {
+    cco_async (o) {
+        printf("taskC start: {%g, %g}\n", o->x, o->y);
 
         // assume there is an error...
         cco_task_throw(99);
@@ -56,48 +56,48 @@ int taskC(struct taskC* self) {
         puts("taskC more work");
 
         // initial return value
-        OUT->value = self->x * self->y;
+        OUT->value = o->x * o->y;
 
         cco_drop:
         puts("taskC done");
     }
 
-    c_free_n(self, 1);
+    c_free_n(o, 1);
     return 0;
 }
 
 
-int taskB(struct taskB* self) {
-    cco_async (self) {
-        printf("taskB start: %g\n", self->d);
+int taskB(struct taskB* o) {
+    cco_async (o) {
+        printf("taskB start: %g\n", o->d);
         cco_await_task(cco_new_task(taskC, 1.2f, 3.4f));
 
         puts("taskB work");
-        OUT->value += self->d;
+        OUT->value += o->d;
 
-		OUT->myCount = 3;
+        OUT->myCount = 3;
         cco_spawn(cco_new_task(myTask, 1, 6));
-		cco_spawn(cco_new_task(myTask, 101, 104));
-		cco_spawn(cco_new_task(myTask, 1001, 1008));
-		puts("Spawned 3 tasks.");
+        cco_spawn(cco_new_task(myTask, 101, 104));
+        cco_spawn(cco_new_task(myTask, 1001, 1008));
+        puts("Spawned 3 tasks.");
 
-		cco_await(OUT->myCount == 0);
-		puts("Joined");
+        cco_await(OUT->myCount == 0);
+        puts("Joined");
         puts("taskB done");
     }
 
-    c_free_n(self, 1);
+    c_free_n(o, 1);
     return 0;
 }
 
 
-int taskA(struct taskA* self) {
-    cco_async (self) {
-        printf("taskA start: %d\n", self->a);
+int taskA(struct taskA* o) {
+    cco_async (o) {
+        printf("taskA start: %d\n", o->a);
         cco_await_task(cco_new_task(taskB, 3.1415));
 
         puts("taskA work");
-        OUT->value += self->a; // final return value;
+        OUT->value += o->a; // final return value;
 
         cco_drop:
         if (cco_fb()->error == 99) {
@@ -108,14 +108,14 @@ int taskA(struct taskA* self) {
         puts("taskA done");
     }
 
-    c_free_n(self, 1);
+    c_free_n(o, 1);
     return 0;
 }
 
 
 int main(void)
 {
-	Output output = {0};
+    Output output = {0};
     int count = 0;
 
     puts("start");

@@ -10,36 +10,36 @@ struct GenValue {
     cco_base base;
 };
 
-static long get_value(struct GenValue* g)
+static long get_value(struct GenValue* o)
 {
-    cco_async (g) {
-        for (cco_each(g->it, IVec, *g->v))
-            cco_yield_v(*g->it.ref);
+    cco_async (o) {
+        for (cco_each(o->it, IVec, *o->v))
+            cco_yield_v(*o->it.ref);
     }
     return 1L<<31;
 }
 
 struct Generator {
-    struct GenValue x, y;
-    bool xact, yact;
+    struct GenValue a, b;
+    bool xactive, yactive;
     long value;
     cco_base base;
 };
 
-int interleaved(struct Generator* g)
+int interleaved(struct Generator* o)
 {
-    cco_async (g) {
+    cco_async (o) {
         do {
-            g->value = get_value(&g->x);
-            g->xact = cco_is_active(&g->x);
-            if (g->xact)
+            o->value = get_value(&o->a);
+            o->xactive = cco_is_active(&o->a);
+            if (o->xactive)
                 cco_yield;
 
-            g->value = get_value(&g->y);
-            g->yact = cco_is_active(&g->y);
-            if (g->yact)
+            o->value = get_value(&o->b);
+            o->yactive = cco_is_active(&o->b);
+            if (o->yactive)
                 cco_yield;
-        } while (g->xact | g->yact);
+        } while (o->xactive | o->yactive);
     }
     return 0;
 }
@@ -49,10 +49,10 @@ void Use(void)
     IVec a = c_make(IVec, {2, 4, 6, 8, 10, 11});
     IVec b = c_make(IVec, {3, 5, 7, 9});
 
-    struct Generator g = {{&a}, {&b}};
+    struct Generator gen = {{&a}, {&b}};
 
-    cco_run_coroutine(interleaved(&g)) {
-        printf("%ld ", g.value);
+    cco_run_coroutine(interleaved(&gen)) {
+        printf("%ld ", gen.value);
     }
     puts("");
     c_drop(IVec, &a, &b);

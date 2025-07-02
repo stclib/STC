@@ -19,49 +19,49 @@ cco_task_struct (consume) {
 };
 
 
-int produce(struct produce* co) {
-    cco_async (co) {
+int produce(struct produce* o) {
+    cco_async (o) {
         while (1) {
-            if (co->serial > co->total) {
-                if (Inventory_is_empty(&co->inv))
+            if (o->serial > o->total) {
+                if (Inventory_is_empty(&o->inv))
                     cco_return; // cleanup and finish
             }
-            else if (Inventory_size(&co->inv) < co->limit) {
-                for (c_range(co->batch))
-                    Inventory_push(&co->inv, ++co->serial);
+            else if (Inventory_size(&o->inv) < o->limit) {
+                for (c_range(o->batch))
+                    Inventory_push(&o->inv, ++o->serial);
 
                 printf("produced %d items, Inventory has now %d items:\n",
-                       co->batch, (int)Inventory_size(&co->inv));
+                       o->batch, (int)Inventory_size(&o->inv));
 
-                for (c_each(i, Inventory, co->inv))
+                for (c_each(i, Inventory, o->inv))
                     printf(" %2d", *i.ref);
                 puts("");
             }
 
-            cco_yield_to(co->consumer); // symmetric transfer
+            cco_yield_to(o->consumer); // symmetric transfer
         }
 
         cco_drop:
-        cco_cancel_task(co->consumer);
-        Inventory_drop(&co->inv);
+        cco_cancel_task(o->consumer);
+        Inventory_drop(&o->inv);
         puts("cleanup producer");
     }
     return 0;
 }
 
-int consume(struct consume* co) {
-    cco_async (co) {
+int consume(struct consume* o) {
+    cco_async (o) {
         int n, sz;
         while (1) {
             n = rand() % 10;
-            sz = (int)Inventory_size(&co->producer->inv);
+            sz = (int)Inventory_size(&o->producer->inv);
             if (n > sz) n = sz;
 
             for (c_range(n))
-                Inventory_pop(&co->producer->inv);
+                Inventory_pop(&o->producer->inv);
             printf("consumed %d items\n", n);
 
-            cco_yield_to(co->producer); // symmetric transfer
+            cco_yield_to(o->producer); // symmetric transfer
         }
 
         cco_drop:

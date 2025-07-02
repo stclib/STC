@@ -3,6 +3,7 @@ foreach sample : [
   'complex',
   'convert',
   'demos',
+  'FMD',
   'inits',
   'read',
 ]

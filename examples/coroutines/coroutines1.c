@@ -21,17 +21,17 @@ struct prime {
     long long value;
 };
 
-int prime(struct prime* g) {
-    cco_async (g) {
-        if (g->value <= 2) {
-            g->value = 2;
-            if (g->count-- == 0)
+int prime(struct prime* o) {
+    cco_async (o) {
+        if (o->value <= 2) {
+            o->value = 2;
+            if (o->count-- == 0)
                 cco_return;
             cco_yield_v(YIELD_PRM);
         }
-        for (g->value |= 1; g->count > 0; g->value += 2) {
-            if (is_prime(g->value)) {
-                --g->count;
+        for (o->value |= 1; o->count > 0; o->value += 2) {
+            if (is_prime(o->value)) {
+                --o->count;
                 cco_yield_v(YIELD_PRM);
             }
         }
@@ -50,19 +50,19 @@ struct fibonacci {
     long long value, b;
 };
 
-int fibonacci(struct fibonacci* g) {
-    cco_async (g) {
-        assert(g->count < 94);
-        if (g->value == 0)
-            g->b = 1;
+int fibonacci(struct fibonacci* o) {
+    cco_async (o) {
+        assert(o->count < 94);
+        if (o->value == 0)
+            o->b = 1;
 
         while (true) {
-            if (g->count-- == 0)
+            if (o->count-- == 0)
                 cco_return;
             // NB! locals lasts only until next yield/await!
-            long long tmp = g->value;
-            g->value = g->b;
-            g->b += tmp;
+            long long tmp = o->value;
+            o->value = o->b;
+            o->b += tmp;
             cco_yield_v(YIELD_FIB);
         }
 
@@ -79,20 +79,20 @@ struct combined {
     cco_base base;
 };
 
-int combined(struct combined* g) {
-    cco_async (g) {
+int combined(struct combined* o) {
+    cco_async (o) {
         puts("SERIAL:");
-        g->prm = (struct prime){.count = 8};
-        g->fib = (struct fibonacci){.count = 12};
+        o->prm = (struct prime){.count = 8};
+        o->fib = (struct fibonacci){.count = 12};
 
-        cco_await_coroutine( prime(&g->prm) );
-        cco_await_coroutine( fibonacci(&g->fib) );
+        cco_await_coroutine( prime(&o->prm) );
+        cco_await_coroutine( fibonacci(&o->fib) );
 
         puts("\nCONCURRENT:");
-        g->prm = (struct prime){.count = 8};
-        g->fib = (struct fibonacci){.count = 12};
+        o->prm = (struct prime){.count = 8};
+        o->fib = (struct fibonacci){.count = 12};
 
-        cco_await_coroutine( prime(&g->prm) | fibonacci(&g->fib) );
+        cco_await_coroutine( prime(&o->prm) | fibonacci(&o->fib) );
 
         cco_drop:
         puts("DONE prime and fib");
@@ -102,13 +102,13 @@ int combined(struct combined* g) {
 
 
 int main(void) {
-    struct combined c = {0};
+    struct combined comb = {0};
     int res;
 
-    cco_run_coroutine(res = combined(&c)) {
+    cco_run_coroutine(res = combined(&comb)) {
         if (res & YIELD_PRM)
-            printf("  Prime=%lld\n", c.prm.value);
+            printf("  Prime=%lld\n", comb.prm.value);
         if (res & YIELD_FIB)
-            printf("  Fibon=%lld\n", c.fib.value);
+            printf("  Fibon=%lld\n", comb.fib.value);
     }
 }

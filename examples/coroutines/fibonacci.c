@@ -8,17 +8,17 @@ struct fibonacci {
     cco_base base;
 };
 
-int fibonacci(struct fibonacci* g) {
+int fibonacci(struct fibonacci* o) {
     unsigned long long tmp;
-    cco_async (g) {
-        g->value = 0;
-        g->b = 1;
+    cco_async (o) {
+        o->value = 0;
+        o->b = 1;
         cco_yield;
 
         while (true) {
-            tmp = g->value;
-            g->value = g->b;
-            g->b += tmp;
+            tmp = o->value;
+            o->value = o->b;
+            o->b += tmp;
             cco_yield;
         }
 

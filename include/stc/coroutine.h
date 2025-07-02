@@ -183,8 +183,9 @@ typedef struct cco_fiber {
 cco_task_struct(cco_task) { cco_task_base base; };
 typedef struct cco_task cco_task;
 
-#define cco_fb() (_state->fb + 0)
 #define cco_env(Tp) ((Tp)_state->fb->env)
+#define cco_fb() (_state->fb + 0)
+#define cco_task_fb(a_task) ((a_task)->base.state.fb + 0)
 
 #define cco_cast_task(...) \
     ((void)sizeof((__VA_ARGS__)->base.func(__VA_ARGS__)), (cco_task *)(__VA_ARGS__))

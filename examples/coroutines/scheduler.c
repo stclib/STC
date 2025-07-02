@@ -13,30 +13,30 @@ cco_task_struct (Scheduler) {
     Tasks tasks;
 };
 
-int Scheduler(struct Scheduler* co) {
-    cco_async (co) {
-        while (!Tasks_is_empty(&co->tasks)) {
-            co->pulled = Tasks_pull(&co->tasks);
+int Scheduler(struct Scheduler* o) {
+    cco_async (o) {
+        while (!Tasks_is_empty(&o->tasks)) {
+            o->pulled = Tasks_pull(&o->tasks);
 
-            int result = cco_resume_task(co->pulled);
+            int result = cco_resume_task(o->pulled);
 
             if (result == CCO_YIELD) {
-                Tasks_push(&co->tasks, co->pulled);
+                Tasks_push(&o->tasks, o->pulled);
             } else {
-                Tasks_value_drop(&co->tasks, &co->pulled);
+                Tasks_value_drop(&o->tasks, &o->pulled);
             }
         }
 
         cco_drop:
-        Tasks_drop(&co->tasks);
+        Tasks_drop(&o->tasks);
         puts("Task queue dropped");
     }
     return 0;
 }
 
 
-static int TaskA(struct cco_task* co) {
-    cco_async (co) {
+static int TaskA(struct cco_task* o) {
+    cco_async (o) {
         puts("Hello, from task A");
         cco_yield;
         puts("A is back doing work");
@@ -53,8 +53,8 @@ static int TaskA(struct cco_task* co) {
 }
 
 
-static int TaskB(struct cco_task* co) {
-    cco_async (co) {
+static int TaskB(struct cco_task* o) {
+    cco_async (o) {
         puts("Hello, from task B");
         cco_yield;
         puts("B is back doing work");

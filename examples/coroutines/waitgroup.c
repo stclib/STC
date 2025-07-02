@@ -8,16 +8,16 @@ cco_task_struct (worker) {
     cco_timer tm;
 };
 
-int worker(struct worker* co) {
-    cco_async (co) {
-        printf("Worker %d starting\n", co->id);
+int worker(struct worker* o) {
+    cco_async (o) {
+        printf("Worker %d starting\n", o->id);
 
-        cco_await_timer(&co->tm, 2.0 - co->id/8.0);
-        printf("Worker %d done: %f\n", co->id, cco_timer_elapsed(&co->tm));
+        cco_await_timer(&o->tm, 2.0 - o->id/8.0);
+        printf("Worker %d done: %f\n", o->id, cco_timer_elapsed(&o->tm));
     }
 
-    *co->wg -= 1;
-    c_free_n(co, 1);
+    *o->wg -= 1;
+    c_free_n(o, 1);
     return 0;
 }
 
@@ -27,15 +27,15 @@ cco_task_struct (sleeper) {
     cco_timer tm;
 };
 
-int sleeper(struct sleeper* co) {
-    cco_async (co) {
+int sleeper(struct sleeper* o) {
+    cco_async (o) {
         printf("Sleeper starting\n");
 
-        cco_await_timer(&co->tm, 3.0);
-        printf("Sleeper done: %f\n", cco_timer_elapsed(&co->tm));
+        cco_await_timer(&o->tm, 3.0);
+        printf("Sleeper done: %f\n", cco_timer_elapsed(&o->tm));
     }
 
-    c_free_n(co, 1);
+    c_free_n(o, 1);
     return 0;
 }
 
@@ -45,24 +45,24 @@ cco_task_struct (everyone) {
     int wg; // waitgroup
 };
 
-int everyone(struct everyone* co) {
-    cco_async (co) {
+int everyone(struct everyone* o) {
+    cco_async (o) {
         struct sleeper* sleep = c_new(struct sleeper, {{sleeper}});
         cco_spawn(sleep);
         cco_yield; // suspend: starts sleeper task
 
         cco_fiber* fb = cco_fb();
         for (c_range32(i, 8)) { // nb! local i, do not yield or await inside loop.
-            co->wg += 1;
-            struct worker* work = c_new(struct worker, {.base={worker}, .id=i, .wg=&co->wg});
+            o->wg += 1;
+            struct worker* work = c_new(struct worker, {.base={worker}, .id=i, .wg=&o->wg});
             fb = cco_spawn(work, NULL, fb); // optionally assign result to f2 to make tasks start in given order.
         }
 
-        cco_await(co->wg == 0); // suspend: starts workers and wait for all of them to finish
+        cco_await(o->wg == 0); // suspend: starts workers and wait for all of them to finish
         puts("All workers done.");
     }
 
-    c_free_n(co, 1);
+    c_free_n(o, 1);
     return 0;
 }
 

@@ -12,18 +12,18 @@ struct file_read {
     cco_base base;
 };
 
-int file_read(struct file_read* g)
+int file_read(struct file_read* o)
 {
-    cco_async (g) {
-        g->fp = fopen(g->filename, "r");
-        if (g->fp == NULL)
+    cco_async (o) {
+        o->fp = fopen(o->filename, "r");
+        if (o->fp == NULL)
             cco_abort();
-        g->line = (cstr){0};
-        cco_await( !cstr_getline(&g->line, g->fp) );
+        o->line = (cstr){0};
+        cco_await( !cstr_getline(&o->line, o->fp) );
 
         cco_drop:
-        cstr_drop(&g->line);
-        if (g->fp) fclose(g->fp);
+        cstr_drop(&o->line);
+        if (o->fp) fclose(o->fp);
         puts("finish");
     }
     return 0;
@@ -31,11 +31,11 @@ int file_read(struct file_read* g)
 
 int main(void)
 {
-    struct file_read g = {.filename=__FILE__};
+    struct file_read reader = {.filename=__FILE__};
     int n = 0;
-    cco_run_coroutine(file_read(&g))
+    cco_run_coroutine(file_read(&reader))
     {
-        printf("%3d %s\n", ++n, cstr_str(&g.line));
-        //if (n == 10) cco_stop(&g);
+        printf("%3d %s\n", ++n, cstr_str(&reader.line));
+        //if (n == 10) cco_stop(&reader);
     }
 }

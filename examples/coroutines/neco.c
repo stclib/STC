@@ -6,10 +6,10 @@ cco_task_struct (ticktock) {
     cco_timer tm;
 };
 
-int ticker(struct ticktock* g) {
-    cco_async (g) {
+int ticker(struct ticktock* o) {
+    cco_async (o) {
         while (1) {
-            cco_await_timer(&g->tm, 1.0);
+            cco_await_timer(&o->tm, 1.0);
             puts("tick");
         }
         cco_drop:
@@ -18,10 +18,10 @@ int ticker(struct ticktock* g) {
     return 0;
 }
 
-int tocker(struct ticktock* g) {
-    cco_async (g) {
+int tocker(struct ticktock* o) {
+    cco_async (o) {
         while (1) {
-            cco_await_timer(&g->tm, 2.0);
+            cco_await_timer(&o->tm, 2.0);
             puts("tock");
         }
         cco_drop:

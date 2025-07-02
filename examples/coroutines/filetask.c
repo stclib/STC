@@ -14,31 +14,31 @@ cco_task_struct (file_read) {
 };
 
 
-int file_read(struct file_read* co)
+int file_read(struct file_read* o)
 {
-    cco_async (co) {
-        co->fp = fopen(co->path, "r");
-        if (!co->fp)
+    cco_async (o) {
+        o->fp = fopen(o->path, "r");
+        if (!o->fp)
             goto fail;
-        co->line = cstr_init();
+        o->line = cstr_init();
 
         while (true) {
             // emulate async io: await 1ms per line
-            cco_await_timer(&co->tm, 0.001);
+            cco_await_timer(&o->tm, 0.001);
 
-            if (!cstr_getline(&co->line, co->fp))
+            if (!cstr_getline(&o->line, o->fp))
                 break;
             cco_yield;
         }
 
         cco_drop:
-        fclose(co->fp);
-        cstr_drop(&co->line);
+        fclose(o->fp);
+        cstr_drop(&o->line);
         puts("done file_read");
         break;
 
         fail:
-        printf("error: couldn't open file '%s'.\n", co->path);
+        printf("error: couldn't open file '%s'.\n", o->path);
     }
     return 0;
 }
@@ -52,22 +52,22 @@ cco_task_struct (count_line) {
 };
 
 
-int count_line(struct count_line* co)
+int count_line(struct count_line* o)
 {
-    cco_async (co) {
-        co->reader.base.func = file_read;
-        co->reader.path = cstr_str(&co->path);
+    cco_async (o) {
+        o->reader.base.func = file_read;
+        o->reader.path = cstr_str(&o->path);
 
         while (true) {
             // await for next CCO_YIELD (or CCO_DONE) in file_read()
-            cco_await_task(&co->reader, CCO_YIELD);
+            cco_await_task(&o->reader, CCO_YIELD);
             if (cco_fb()->result == CCO_DONE) break;
-            co->lineCount += 1;
+            o->lineCount += 1;
             cco_yield;
         }
 
         cco_drop:
-        cstr_drop(&co->path);
+        cstr_drop(&o->path);
         puts("done count_line");
     }
     return 0;

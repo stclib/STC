@@ -18,34 +18,34 @@ struct Philosopher {
     struct Philosopher* right;
 };
 
-int Philosopher(struct Philosopher* self) {
+int Philosopher(struct Philosopher* o) {
     double duration;
-    cco_async (self) {
+    cco_async (o) {
         while (1) {
             duration = 1.0 + crand64_real()*2.0;
-            printf("Philosopher %d is thinking for %.0f minutes...\n", self->id, duration*10);
-            self->hunger = 0;
-            self->mode = ph_thinking;
-            cco_await_timer(&self->tm, duration);
+            printf("Philosopher %d is thinking for %.0f minutes...\n", o->id, duration*10);
+            o->hunger = 0;
+            o->mode = ph_thinking;
+            cco_await_timer(&o->tm, duration);
 
-            printf("Philosopher %d is hungry...\n", self->id);
-            self->mode = ph_hungry;
-            cco_await(self->hunger >= self->left->hunger &&
-                      self->hunger >= self->right->hunger);
+            printf("Philosopher %d is hungry...\n", o->id);
+            o->mode = ph_hungry;
+            cco_await(o->hunger >= o->left->hunger &&
+                      o->hunger >= o->right->hunger);
 
             duration = 0.5 + crand64_real();
-            printf("Philosopher %d is eating for %.0f minutes...\n", self->id, duration*10);
-            self->hunger = 3;
-            self->mode = ph_eating;
-            cco_await_timer(&self->tm, duration);
+            printf("Philosopher %d is eating for %.0f minutes...\n", o->id, duration*10);
+            o->hunger = 3;
+            o->mode = ph_eating;
+            cco_await_timer(&o->tm, duration);
 
             // increase the neighbours hunger only if they are already hungry.
-            if (self->left->mode == ph_hungry) ++self->left->hunger;
-            if (self->right->mode == ph_hungry) ++self->right->hunger;
+            if (o->left->mode == ph_hungry) ++o->left->hunger;
+            if (o->right->mode == ph_hungry) ++o->right->hunger;
         }
 
         cco_drop:
-        printf("Philosopher %d done\n", self->id);
+        printf("Philosopher %d done\n", o->id);
     }
     return 0;
 }
@@ -56,20 +56,20 @@ struct Dining {
     struct Philosopher philos[num_philosophers];
 };
 
-int Dining(struct Dining* self) {
-    cco_async (self) {
+int Dining(struct Dining* o) {
+    cco_async (o) {
         for (int i = 0; i < num_philosophers; ++i) {
-            self->philos[i] = (struct Philosopher){
+            o->philos[i] = (struct Philosopher){
                 .id = i + 1,
-                .left = &self->philos[(i - 1 + num_philosophers) % num_philosophers],
-                .right = &self->philos[(i + 1) % num_philosophers],
+                .left = &o->philos[(i - 1 + num_philosophers) % num_philosophers],
+                .right = &o->philos[(i + 1) % num_philosophers],
             };
         }
 
         while (1) {
             // NB! local i OK here as it does not cross yield/await.
             for (int i = 0; i < num_philosophers; ++i) {
-                Philosopher(&self->philos[i]); // resume until next yield
+                Philosopher(&o->philos[i]); // resume until next yield
             }
             cco_yield; // suspend, return control back to caller who
                        // can do other tasks before resuming dining.
@@ -77,8 +77,8 @@ int Dining(struct Dining* self) {
 
         cco_drop:
         for (int i = 0; i < num_philosophers; ++i) {
-            cco_stop(&self->philos[i]);
-            Philosopher(&self->philos[i]); // execute philos cleanup.
+            cco_stop(&o->philos[i]);
+            Philosopher(&o->philos[i]); // execute philos cleanup.
         }
         puts("Dining done");
     }
