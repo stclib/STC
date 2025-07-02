@@ -108,7 +108,7 @@ typedef struct {
 
 #define cco_reset_state(co) \
     do { \
-        struct cco_state* _s = (co)->base.state; \
+        struct cco_state* _s = &(co)->base.state; \
         _s->pos = CCO_STATE_INIT, _s->drop = false; \
     } while (0)
 
