@@ -71,7 +71,16 @@ typedef enum {
 } cco_result;
 
 typedef struct {
-    struct cco_state { int32_t pos:24; bool drop; struct cco_fiber* fb; } state;
+    int launch_count;
+} cco_group; // waitgroup
+
+typedef struct {
+    struct cco_state {
+        int32_t pos:24;
+        bool drop;
+        struct cco_fiber* fb;
+        cco_group* wg;
+    } state;
 } cco_base;
 
 #define cco_is_initial(co) ((co)->base.state.pos == CCO_STATE_INIT)
@@ -90,7 +99,8 @@ typedef struct {
 #define cco_async(co) \
     if (0) goto _resume; \
     else for (struct cco_state *_state = (_cco_validate_task_struct(co), &(co)->base.state) \
-           ; _state->pos != CCO_STATE_DONE ; _state->pos = CCO_STATE_DONE) \
+              ; _state->pos != CCO_STATE_DONE \
+              ; _state->pos = CCO_STATE_DONE, _state->wg ? --_state->wg->launch_count : 0) \
         _resume: switch (_state->pos) case CCO_STATE_INIT: // thanks, @liigo!
 
 #define cco_drop /* label */ \
@@ -261,12 +271,21 @@ static inline int _cco_resume_task(cco_task* task)
 
 #define cco_new_fiber(...) c_MACRO_OVERLOAD(cco_new_fiber, __VA_ARGS__)
 #define cco_new_fiber_1(task) cco_new_fiber_2(task, NULL)
-#define cco_new_fiber_2(task, env) _cco_new_fiber(cco_cast_task(task), env)
+#define cco_new_fiber_2(task, env) _cco_new_fiber(cco_cast_task(task), env, NULL)
 
 #define cco_spawn(...) c_MACRO_OVERLOAD(cco_spawn, __VA_ARGS__)
 #define cco_spawn_1(task) cco_spawn_3(task, NULL, _state->fb)
 #define cco_spawn_2(task, env) cco_spawn_3(task, env, _state->fb)
-#define cco_spawn_3(task, env, fiber) _cco_spawn(cco_cast_task(task), env, fiber)
+#define cco_spawn_3(task, env, fiber) _cco_spawn(cco_cast_task(task), env, fiber, NULL)
+
+#define cco_reset_group(waitgroup) ((waitgroup)->launch_count = 0)
+#define cco_launch(...) c_MACRO_OVERLOAD(cco_launch, __VA_ARGS__)
+#define cco_launch_2(task, waitgroup) cco_launch_3(task, waitgroup, NULL)
+#define cco_launch_3(task, waitgroup, env) do { \
+    cco_group* _wg = waitgroup; _wg->launch_count += 1; \
+    _cco_spawn(cco_cast_task(task), env, _state->fb, _wg); \
+} while (0)
+#define cco_await_group(waitgroup) cco_await((waitgroup)->launch_count == 0)
 
 #define cco_run_fiber(...) c_MACRO_OVERLOAD(cco_run_fiber, __VA_ARGS__)
 #define cco_run_fiber_1(fiber_ref) \
@@ -282,8 +301,8 @@ static inline int _cco_resume_task(cco_task* task)
 #define cco_joined() \
     (cco_fb() == cco_fb()->next)
 
-extern cco_fiber* _cco_new_fiber(cco_task* task, void* env);
-extern cco_fiber* _cco_spawn(cco_task* task, void* env, cco_fiber* fb);
+extern cco_fiber* _cco_new_fiber(cco_task* task, void* env, cco_group* wg);
+extern cco_fiber* _cco_spawn(cco_task* task, void* env, cco_fiber* fb, cco_group* wg);
 extern cco_fiber* cco_resume_next(cco_fiber* prev);
 extern int        cco_resume_current(cco_fiber* co); /* coroutine */
 
@@ -332,18 +351,20 @@ cco_fiber* cco_resume_next(cco_fiber* prev) {
     return curr;
 }
 
-cco_fiber* _cco_new_fiber(cco_task* _task, void* env) {
+cco_fiber* _cco_new_fiber(cco_task* _task, void* env, cco_group* wg) {
     cco_fiber* new_fb = c_new(cco_fiber, {.task=_task, .env=env});
     _task->base.state.fb = new_fb;
+    _task->base.state.wg = wg;
     return (new_fb->next = new_fb);
 }
 
-cco_fiber* _cco_spawn(cco_task* _task, void* env, cco_fiber* fb) {
+cco_fiber* _cco_spawn(cco_task* _task, void* env, cco_fiber* fb, cco_group* wg) {
     cco_fiber* new_fb;
     new_fb = fb->next = (fb->next == NULL ? fb : c_new(cco_fiber, {.next=fb->next}));
     new_fb->task = _task;
     new_fb->env = (env == NULL ? fb->env : env);
     _task->base.state.fb = new_fb;
+    _task->base.state.wg = wg;
     return new_fb;
 }
 
@@ -373,16 +394,16 @@ cco_fiber* _cco_spawn(cco_task* _task, void* env, cco_fiber* fb) {
  * Semaphore
  */
 
-typedef struct { ptrdiff_t count; } cco_semaphore;
+typedef struct { ptrdiff_t acq_count; } cco_semaphore;
 
 #define cco_make_semaphore(value) (c_literal(cco_semaphore){value})
-#define cco_set_semaphore(sem, value) ((sem)->count = value)
-#define cco_acquire_semaphore(sem) (--(sem)->count)
-#define cco_release_semaphore(sem) (++(sem)->count)
+#define cco_set_semaphore(sem, value) ((sem)->acq_count = value)
+#define cco_acquire_semaphore(sem) (--(sem)->acq_count)
+#define cco_release_semaphore(sem) (++(sem)->acq_count)
 
 #define cco_await_semaphore(sem) \
     do { \
-        cco_await((sem)->count > 0); \
+        cco_await((sem)->acq_count > 0); \
         cco_acquire_semaphore(sem); \
     } while (0)
 

@@ -46,59 +46,64 @@ void            cco_stop(Coroutine* co);                            // Next coro
 
 #### Tasks (coroutine function-objects) and fibers (green thread-like entity within a thread)
 ```c++
-                cco_task_struct(name) { <name>_base base; ... };    // A custom coroutine task struct; extends cco_task struct.
-void            cco_await_task(cco_task* task);                     // Await for task to return CCO_DONE (asymmetric call).
-void            cco_await_task(cco_task* task, int awaitbits);      // Await until task's suspend/return value
-                                                                    // to be in (awaitbits | CCO_DONE).
-void            cco_yield_to(cco_task* task);                       // Yield to task (symmetric control transfer).
-void            cco_task_throw(int error);                          // Throw an error and unwind call stack after the cco_async block.
-                                                                    // Error accessible as `fb->error` and `fb->error_line`.
-void            cco_recover_task();                                 // Reset error, and jump to original resume point in current task.
-void            cco_resume_task(cco_task* task);                    // Resume suspended task, return value in `fb->result`.
-cco_fiber*      cco_new_fiber(cco_task* task);                      // Create an initial fiber from a task.
-cco_fiber*      cco_new_fiber(cco_task* task, void* env);           // Create an initial fiber from a task and env (inputs or a future).
-cco_fiber*      cco_spawn(cco_task* task);                          // Spawn a new parallel task.
-cco_fiber*      cco_spawn(cco_task* task, void* env);               // Same, env may be used as a future or anything.
-cco_fiber*      cco_spawn(cco_task* task, void* env, cco_fiber* fb);// Same, env may be used as a future or anything.
-bool            cco_joined();                                       // True if there are no other parallel spawned fibers running.
+                cco_task_struct(name) { <name>_base base; ... };      // A custom coroutine task struct; extends cco_task struct.
+void            cco_await_task(cco_task* task);                       // Await for task to return CCO_DONE (asymmetric call).
+void            cco_await_task(cco_task* task, int awaitbits);        // Await until task's suspend/return value
+                                                                      // to be in (awaitbits | CCO_DONE).
+void            cco_yield_to(cco_task* task);                         // Yield to task (symmetric control transfer).
+void            cco_task_throw(int error);                            // Throw an error and unwind call stack after the cco_async block.
+                                                                      // Error accessible as `fb->error` and `fb->error_line`.
+void            cco_recover_task();                                   // Reset error, and jump to original resume point in current task.
+void            cco_resume_task(cco_task* task);                      // Resume suspended task, return value in `fb->result`.
+cco_fiber*      cco_new_fiber(cco_task* task);                        // Create an initial fiber from a task.
+cco_fiber*      cco_new_fiber(cco_task* task, void* env);             // Create an initial fiber from a task and env (inputs or a future).
+cco_fiber*      cco_spawn(cco_task* task);                            // Spawn a new concurrent task inside a cco_async scope.
+cco_fiber*      cco_spawn(cco_task* task, void* env);                 // Same, env may be used hold result or reference other tasks.
+cco_fiber*      cco_spawn(cco_task* task, void* env, cco_fiber* fb);  // Same, but this may be called outside a cco_async scope.
+bool            cco_joined();                                         // True if there are no other concurrent spawned fibers running.
 
-                cco_run_task(cco_task* task) {}                     // Run task blocking until it and spawned fibers are finished.
-                cco_run_task(cco_task* task, void *env) {}          // Run task blocking with env data
-                cco_run_task(fb_iter, cco_task* task, void *env) {} // Run task blocking. fb_iter reference the current fiber.
+void            cco_reset_group(cco_group* wg);                       // Reset a task waitgroup.
+void            cco_launch(cco_task* task, cco_group* wg);            // Launch/spawn a new concurrent task that can be awaited for.
+void            cco_launch(cco_task* task, cco_group* wg, void* env); // Same, with additional contex to the task
+                cco_await_group(cco_group* wg);                       // Mandatory await for all launched tasks in group to finish.
 
-                cco_run_fiber(cco_fiber** fiber_ref) {}             // Run fiber(s) blocking.
-                cco_run_fiber(fb_iter, cco_fiber* fiber) {}         // Run fiber(s) blocking. fb_iter reference the current fiber.
+                cco_run_task(cco_task* task) {}                       // Run task blocking until it and spawned fibers are finished.
+                cco_run_task(cco_task* task, void *env) {}            // Run task blocking with env data
+                cco_run_task(fb_iter, cco_task* task, void *env) {}   // Run task blocking. fb_iter reference the current fiber.
+
+                cco_run_fiber(cco_fiber** fiber_ref) {}               // Run fiber(s) blocking.
+                cco_run_fiber(fb_iter, cco_fiber* fiber) {}           // Run fiber(s) blocking. fb_iter reference the current fiber.
 ```
 #### Timers and time functions
 ```c++
-                cco_start_timer(cco_timer* tm, double sec);         // Start timer with seconds duration.
-                cco_restart_timer(cco_timer* tm);                   // Restart timer with previous duration.
-bool            cco_timer_expired(cco_timer* tm);                   // Return true if timer is expired.
-double          cco_timer_elapsed(cco_timer* tm);                   // Return elapsed seconds.
-double          cco_timer_remaining(cco_timer* tm);                 // Return remaining seconds.
-                cco_await_timer(cco_timer* tm, double sec);         // Start timer with duration and await for it to expire.
+                cco_start_timer(cco_timer* tm, double sec);           // Start timer with seconds duration.
+                cco_restart_timer(cco_timer* tm);                     // Restart timer with previous duration.
+bool            cco_timer_expired(cco_timer* tm);                     // Return true if timer is expired.
+double          cco_timer_elapsed(cco_timer* tm);                     // Return elapsed seconds.
+double          cco_timer_remaining(cco_timer* tm);                   // Return remaining seconds.
+                cco_await_timer(cco_timer* tm, double sec);           // Start timer with duration and await for it to expire.
 
-double          cco_time(void);                                     // Return seconds since 1970-01-01_00:00 UTC (usec precision).
-                cco_sleep(double sec);                              // Sleep for seconds (msec or usec precision).
+double          cco_time(void);                                       // Return seconds since 1970-01-01_00:00 UTC (usec precision).
+                cco_sleep(double sec);                                // Sleep for seconds (msec or usec precision).
 
 ```
 #### Semaphores
 ```c++
-cco_semaphore   cco_make_semaphore(long value);                     // Create semaphore
-                cco_set_semaphore(cco_semaphore* sem, long value);  // Set initial semaphore value
-                cco_acquire_semaphore(cco_semaphore* sem);          // if (count > 0) count -= 1
-                cco_release_semaphore(cco_semaphore* sem);          // "Signal" the semaphore (count += 1)
-                cco_await_semaphore(cco_semaphore* sem);            // Await for the semaphore count > 0, then count -= 1
+cco_semaphore   cco_make_semaphore(long value);                       // Create semaphore
+                cco_set_semaphore(cco_semaphore* sem, long value);    // Set initial semaphore value
+                cco_acquire_semaphore(cco_semaphore* sem);            // if (count > 0) count -= 1
+                cco_release_semaphore(cco_semaphore* sem);            // "Signal" the semaphore (count += 1)
+                cco_await_semaphore(cco_semaphore* sem);              // Await for the semaphore count > 0, then count -= 1
 ```
 #### Interoperability with fb_iterators and filters
 ```c++
                 // Container fb_iteration within coroutines
-                for (cco_each(fb_iter_name, CntType, cnt)) ...;          // Use an existing fb_iterator (stored in coroutine object)
-                for (cco_each_reverse(fb_iter_name, CntType, cnt)) ...;  // Iterate in reverse order
+                for (cco_each(fb_iter_name, CntType, cnt)) ..;        // Use an existing fb_iterator (stored in coroutine object)
+                for (cco_each_reverse(fb_iter_name, CntType, cnt))..; // Iterate in reverse order
 
                 // c_filter() interoperability with coroutine fb_iterators
-                cco_flt_take(int num);                              // Use instead of *c_flt_take(num)* to ensure cleanup
-                cco_flt_takewhile(bool predicate);                  // Use instead of *c_flt_takewhile(pred)* to ensure cleanup
+                cco_flt_take(int num);                                // Use instead of *c_flt_take(num)* to ensure cleanup
+                cco_flt_takewhile(bool predicate);                    // Use instead of *c_flt_takewhile(pred)* to ensure cleanup
 ```
 
 ## Types

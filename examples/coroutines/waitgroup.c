@@ -4,7 +4,6 @@
 cco_task_struct (worker) {
     worker_base base;
     int id;
-    int *wg; // waitgroup pointer
     cco_timer tm;
 };
 
@@ -16,7 +15,6 @@ int worker(struct worker* o) {
         printf("Worker %d done: %f\n", o->id, cco_timer_elapsed(&o->tm));
     }
 
-    *o->wg -= 1;
     c_free_n(o, 1);
     return 0;
 }
@@ -42,7 +40,7 @@ int sleeper(struct sleeper* o) {
 
 cco_task_struct (everyone) {
     everyone_base base;
-    int wg; // waitgroup
+    cco_group wg;
 };
 
 int everyone(struct everyone* o) {
@@ -51,14 +49,12 @@ int everyone(struct everyone* o) {
         cco_spawn(sleep);
         cco_yield; // suspend: starts sleeper task
 
-        cco_fiber* fb = cco_fb();
-        for (c_range32(i, 8)) { // nb! local i, do not yield or await inside loop.
-            o->wg += 1;
-            struct worker* work = c_new(struct worker, {.base={worker}, .id=i, .wg=&o->wg});
-            fb = cco_spawn(work, NULL, fb); // optionally assign result to f2 to make tasks start in given order.
+        cco_reset_group(&o->wg);
+        for (c_range32(i, 8)) { // NB: local i, do not yield or await inside loop.
+            struct worker* work = c_new(struct worker, {.base={worker}, .id=i});
+            cco_launch(work, &o->wg);
         }
-
-        cco_await(o->wg == 0); // suspend: starts workers and wait for all of them to finish
+        cco_await_group(&o->wg); // starts launched workers and await for them to finish
         puts("All workers done.");
     }
 
