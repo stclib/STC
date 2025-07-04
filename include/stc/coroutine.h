@@ -245,22 +245,30 @@ typedef struct cco_task cco_task;
     cco_yield_v(CCO_NOOP); \
 } while (0)
 
-#define cco_resume_task(task) \
-    _cco_resume_task(cco_cast_task(task))
+#define cco_resume_task(a_task) \
+    _cco_resume_task(cco_cast_task(a_task))
 
 static inline int _cco_resume_task(cco_task* task)
     { return task->base.func(task); }
 
-#define cco_cancel_task(co) \
+#define cco_cancel() /* propagates to parent tasks */ \
     do { \
-        cco_task* _tsk = cco_cast_task(co); \
-        cco_stop(_tsk); cco_await_task(_tsk); \
+        cco_fiber* _fb = _state->fb; \
+        c_assert(_fb); \
+        cco_stop(_fb->task); _fb->error = 1; \
     } while (0)
 
-#define cco_stop_fiber(fb) /* propagates to parent tasks */ \
+#define cco_cancel_task(a_task) /* propagates to parent tasks */ \
     do { \
-        cco_fiber* _fb3 = fb; \
-        cco_stop(_fb3->task); _fb3->error = 1; \
+        cco_fiber* _fb = (a_task)->base.state.fb; \
+        cco_stop(_fb->task); _fb->error = 1; \
+    } while (0)
+
+#define cco_await_cancel(a_task) \
+    do { \
+        cco_task* _tsk = cco_cast_task(a_task); \
+        cco_cancel_task(_tsk); \
+        cco_await_task(_tsk); \
     } while (0)
 
 /*

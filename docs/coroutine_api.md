@@ -62,6 +62,10 @@ cco_fiber*      cco_spawn(cco_task* task, void* env);                 // Same, e
 cco_fiber*      cco_spawn(cco_task* task, void* env, cco_fiber* fb);  // Same, but this may be called outside a cco_async scope.
 bool            cco_joined();                                         // True if there are no other concurrent spawned fibers running.
 
+void            cco_cancel();                                         // Cancel current fiber.
+void            cco_cancel_task(cco_task* task);                      // Cancel a task's associated fiber.
+                cco_await_cancel(cco_task* task);                     // Cancel and await for the task+fiber to finish.
+
 void            cco_reset_group(cco_group* wg);                       // Reset a task waitgroup.
 void            cco_launch(cco_task* task, cco_group* wg);            // Launch/spawn a new concurrent task that can be awaited for.
 void            cco_launch(cco_task* task, cco_group* wg, void* env); // Same, with additional contex to the task
@@ -628,7 +632,8 @@ int produce(struct produce* self) {
         }
 
         cco_drop:
-        cco_cancel_task(self->consumer);
+        cco_stop(self->consumer);
+        cco_await_task(self->consumer);
         Inventory_drop(&self->inventory);
         puts("done producer");
     }
