@@ -69,7 +69,7 @@ typedef enum {
     CCO_AWAIT = 1<<13,
     CCO_NOOP = 1<<14,
 } cco_result;
-#define CCO_CANCEL 1U<<30
+#define CCO_CANCEL (1U<<30)
 
 typedef struct {
     int launch_count;
@@ -170,6 +170,10 @@ typedef struct {
 /*
  * Tasks and Fibers
  */
+typedef struct {
+    int32_t code, line;
+    const char* file;
+} cco_error;
 
 typedef struct cco_fiber {
     struct cco_task* task;
@@ -177,8 +181,8 @@ typedef struct cco_fiber {
     struct cco_task* parent_task;
     struct cco_fiber* next;
     struct cco_state recover_state;
+    cco_error err;
     int awaitbits, status;
-    int32_t error, error_line;
     cco_base base; /* is a coroutine object itself */
 } cco_fiber;
 
@@ -198,29 +202,36 @@ cco_task_struct(cco_task) { cco_task_base base; };
 typedef struct cco_task cco_task;
 
 #define cco_env(Tp) ((Tp)_state->fb->env)
-#define cco_error() (_state->fb->error + 0)
-#define cco_error_line() (_state->fb->error_line + 0)
+#define cco_err() (*(const cco_error*)&_state->fb->err)
 #define cco_status() (_state->fb->status + 0)
-#define cco_task_fb(a_task) ((a_task)->base.state.fb + 0)
-
 
 
 #define cco_cast_task(...) \
     ((void)sizeof((__VA_ARGS__)->base.func(__VA_ARGS__)), (cco_task *)(__VA_ARGS__))
 
-/* Throw an error "exception"; can be catched up in the cco_await_task call tree */
+/* Throw an "exception"; can be catched up in the cco_await_task call tree */
 #define cco_task_throw(error_code) \
     do {cco_fiber* _fb = _state->fb; \
-        _fb->error = error_code; \
-        _fb->error_line = __LINE__; \
+        _fb->err.code = error_code; \
+        _fb->err.line = __LINE__; \
+        _fb->err.file = __FILE__; \
         cco_return; \
+    } while (0)
+
+#define cco_cancel_task(a_task) \
+    do { \
+        cco_fiber* _fb = cco_cast_task(a_task)->base.state.fb; \
+        cco_stop(_fb->task); \
+        _fb->err.code = CCO_CANCEL; \
+        _fb->err.line = __LINE__; \
+        _fb->err.file = __FILE__; \
     } while (0)
 
 #define cco_recover_task() \
     do {cco_fiber* _fb = _state->fb; \
-        c_assert(_fb->error); \
+        c_assert(_fb->err.code); \
         _fb->task->base.state = _fb->recover_state; \
-        _fb->error = 0; \
+        _fb->err.code = 0; \
         goto _resume; \
     } while (0)
 
@@ -237,6 +248,13 @@ typedef struct cco_task cco_task;
     } \
     cco_yield_v(CCO_NOOP); \
 } while (0)
+
+#define cco_await_with_cancel(a_task) \
+    do { \
+        cco_task* _tsk = cco_cast_task(a_task); \
+        cco_cancel_task(_tsk); \
+        cco_await_task(_tsk); \
+    } while (0)
 
 /* Symmetric coroutine flow of control transfer */
 #define cco_yield_to(a_task) do { \
@@ -255,19 +273,6 @@ typedef struct cco_task cco_task;
 
 static inline int _cco_resume_task(cco_task* task)
     { return task->base.func(task); }
-
-#define cco_cancel_task(a_task) /* propagates to parent tasks */ \
-    do { \
-        cco_fiber* _fb = cco_cast_task(a_task)->base.state.fb; \
-        cco_stop(_fb->task); _fb->error = CCO_CANCEL; \
-    } while (0)
-
-#define cco_await_cancel(a_task) \
-    do { \
-        cco_task* _tsk = cco_cast_task(a_task); \
-        cco_cancel_task(_tsk); \
-        cco_await_task(_tsk); \
-    } while (0)
 
 /*
  * cco_run_fiber()/cco_run_task(): Run fibers/tasks in parallel
@@ -322,7 +327,7 @@ int cco_resume_current(cco_fiber* fb) {
             fb->parent_task = fb->task->base.parent_task;
             fb->awaitbits = fb->task->base.awaitbits;
             fb->status = fb->task->base.func(fb->task); // resume
-            if (fb->error) {
+            if (fb->err.code) {
                 fb->task = fb->parent_task;
                 if (fb->task == NULL)
                     break;
@@ -336,10 +341,11 @@ int cco_resume_current(cco_fiber* fb) {
         }
     }
 
-    if ((uint32_t)fb->error & ~CCO_CANCEL) { // Allow CCO_CANCEL not to trigger error.
-        fprintf(stderr, __FILE__ ":%d: error: unhandled error '%d' in a coroutine task at line %d.\n",
-                        __LINE__, fb->error, fb->error_line);
-        exit(fb->error);
+    if ((uint32_t)fb->err.code & ~CCO_CANCEL) { // Allow CCO_CANCEL not to trigger error.
+        fprintf(stderr, __FILE__ ": error: unhandled coroutine exception '%d'\n"
+                        "%s:%d: unhandled: cco_task_throw(%d)\n",
+                        fb->err.code, fb->err.file, fb->err.line, fb->err.code);
+        exit(fb->err.code);
     }
     return CCO_DONE;
 }

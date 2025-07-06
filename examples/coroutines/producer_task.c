@@ -42,7 +42,7 @@ int produce(struct produce* o) {
         }
 
         cco_drop:
-        cco_await_cancel(o->consumer);
+        cco_await_with_cancel(o->consumer);
         Inventory_drop(&o->inv);
         puts("cleanup producer");
     }

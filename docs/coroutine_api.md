@@ -28,7 +28,7 @@ scope end, and `return 0`.
 
 ## Methods and statements
 
-#### Coroutine basics
+#### Coroutine basics (both simplistic and tasks)
 ```c++
                 cco_async (Coroutine* co) { ... }                   // The coroutine scope.
 
@@ -43,7 +43,7 @@ scope end, and `return 0`.
 bool            cco_is_active(Coroutine* co);                       // Is coroutine active/not done?.
 bool            cco_is_done(Coroutine* co);                         // Is coroutine done/not active?
 void            cco_reset_state(Coroutine* co);                     // Reset state to initial (for reuse).
-void            cco_stop(Coroutine* co);                            // Signals that coroutine will resume next at cco_done:
+void            cco_stop(Coroutine* co);                            // Signals that coroutine will resume next at cco_done: label.
 ```
 
 #### Simplistic coroutines (non-Task types)
@@ -62,12 +62,13 @@ int             cco_resume_task(cco_task* task);                    // Resume su
                 cco_await_task(cco_task* task, int awaitbits);      // Await until task's resume status is in (awaitbits | CCO_DONE).
 void            cco_yield_to(cco_task* task);                       // Yield to task (symmetric transfer of control).
 
-void            cco_task_throw(int error);                          // Throw error, will unwind call/await-task stack.
-                                                                    // Error accessible as cco_error() and cco_error_line().
-void            cco_cancel_task(cco_task* task);                    // Like cco_task_throw(), but is not required to be handled.
-                cco_await_cancel(cco_task* task);                   // Cancel task, and await for it to finish.
+void            cco_task_throw(int error);                          // Throw error, will unwind call/await-task stack. Handling required.
+                                                                    // Error object accessible as cco_err().
+cco_error       cco_err();                                          // Return current error object for exception handling.
+void            cco_cancel_task(cco_task* task);                    // Similar to cco_task_throw(CCO_CANCEL). Handling of it is optional.
+                cco_await_with_cancel(cco_task* task);              // Cancel task and await for it to finish - in one call.
                 cco_recover_task();                                 // Reset error, and jump to original resume point in current task.
-                                                                    // This should be called from the cco_drop: section.
+                                                                    // Should be called from the cco_drop: section.
 void            cco_spawn(cco_task* task);                          // Spawn a new concurrent task. Does not suspend coroutine!
 void            cco_spawn(cco_task* task, void* env);               // Same, env may be used as a future or anything.
 void            cco_spawn(cco_task* task, void* env,
@@ -125,6 +126,7 @@ bool            cco_flt_takewhile(bool predicate);                  // Use inste
 | Type name         | Type definition / usage                             | Used to represent... |
 |:------------------|:----------------------------------------------------|:---------------------|
 |`cco_status`       | **enum** `CCO_DONE`, `CCO_AWAIT`, `CCO_YIELD`       | Default set of return status from coroutines |
+|`cco_error`        | `struct { int32 code, line; const char* file; }`    | Error object for exceptions |
 |`cco_task`         | Base function-object coroutine frame type           |                      |
 |`cco_timer`        | Timer type                                          |                      |
 |`cco_semaphore`    | Semaphore type                                      |                      |
@@ -431,9 +433,9 @@ int TaskA(struct TaskA* self) {
         puts("TaskA work");
 
         cco_drop:
-        if (cco_error() == 99) {
+        if (cco_err().code == 99) {
             // if error not handled, will cause 'unhandled error'...
-            printf("TaskA recovered error '99' thrown on line %d\n", cco_error()_line);
+            printf("TaskA recovered error '99' thrown on line %d\n", cco_err().line);
             cco_recover_task();
         }
         puts("TaskA done");
@@ -541,11 +543,11 @@ int TaskA(struct TaskA* self) {
         cco_env(Result *)->value += self->a; // final return value;
 
         cco_drop:
-        if (cco_error() == 99) {
+        if (cco_err().code == 99) {
             // if error not handled, will cause 'unhandled error'...
-            printf("TaskA recovered error '99' thrown on line %d\n", cco_error_line());
+            printf("TaskA recovered error '99' thrown on line %d\n", cco_err().line);
 
-            cco_env(Result *)->error = cco_error(); // set error in output
+            cco_env(Result *)->error = cco_err().code; // set error in output
             cco_recover_task(); // reset error to 0 and jump to past the await TaskB call.
         }
         puts("TaskA done");
