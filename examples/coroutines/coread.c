@@ -17,7 +17,7 @@ int file_read(struct file_read* o)
     cco_async (o) {
         o->fp = fopen(o->filename, "r");
         if (o->fp == NULL)
-            cco_abort();
+            cco_exit();
         o->line = (cstr){0};
         cco_await( !cstr_getline(&o->line, o->fp) );
 

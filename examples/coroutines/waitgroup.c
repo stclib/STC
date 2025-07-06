@@ -49,7 +49,7 @@ int everyone(struct everyone* o) {
         cco_spawn(sleep);
         cco_yield; // suspend: starts sleeper task
 
-        cco_reset_group(&o->wg);
+        cco_reset_group(&o->wg); // not needed if initially 0.
         for (c_range32(i, 8)) { // NB: local i, do not yield or await inside loop.
             struct worker* work = c_new(struct worker, {.base={worker}, .id=i});
             cco_launch(work, &o->wg);

@@ -100,9 +100,9 @@ int taskA(struct taskA* o) {
         OUT->value += o->a; // final return value;
 
         cco_drop:
-        if (cco_fb()->error == 99) {
-            printf("taskA recovered error '99' thrown on line %d\n", cco_fb()->error_line);
-            OUT->error = cco_fb()->error; // set error in output
+        if (cco_error() == 99) {
+            printf("taskA recovered error '99' thrown on line %d\n", cco_error_line());
+            OUT->error = cco_error(); // set error in output
             cco_recover_task(); // reset error to 0 and jump to after the await call.
         }
         puts("taskA done");

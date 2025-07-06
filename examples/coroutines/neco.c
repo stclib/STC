@@ -33,8 +33,8 @@ int tocker(struct ticktock* o) {
 int main(void) {
     struct ticktock tick = {{ticker}}, tock = {{tocker}};
     cco_fiber* fb = c_new(cco_fiber, {0});
-    cco_spawn(&tick, NULL, fb);
-    cco_spawn(&tock, NULL, fb);
+    cco_spawn(&tick, NULL, &fb);
+    cco_spawn(&tock, NULL, &fb);
 
     cco_timer tm = cco_make_timer(5.0);
     cco_run_fiber(&fb) {

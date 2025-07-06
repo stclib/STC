@@ -109,9 +109,9 @@ int main(void) {
     struct combined comb = {{combined}};
 
     cco_run_task(it, &comb, NULL) {
-        if (it->result & YIELD_PRM)
+        if (it->status & YIELD_PRM)
             printf("  Prime=%lld\n", comb.prm.value);
-        if (it->result & YIELD_FIB)
+        if (it->status & YIELD_FIB)
             printf("  Fibon=%lld\n", comb.fib.value);
     }
 }
