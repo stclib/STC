@@ -221,10 +221,11 @@ typedef struct cco_task cco_task;
 #define cco_cancel_task(a_task) \
     do { \
         cco_fiber* _fb = cco_cast_task(a_task)->base.state.fb; \
-        cco_stop(_fb->task); \
         _fb->err.code = CCO_CANCEL; \
         _fb->err.line = __LINE__; \
         _fb->err.file = __FILE__; \
+        cco_stop(_fb->task); \
+        if (_fb == _state->fb) goto _resume; \
     } while (0)
 
 #define cco_recover_task() \
@@ -285,8 +286,8 @@ static inline int _cco_resume_task(cco_task* task)
 #define cco_new_fiber_2(task, env) _cco_new_fiber(cco_cast_task(task), env, NULL)
 
 #define cco_spawn(...) c_MACRO_OVERLOAD(cco_spawn, __VA_ARGS__)
-#define cco_spawn_1(task) cco_spawn_3(task, NULL, &_state->fb)
-#define cco_spawn_2(task, env) cco_spawn_3(task, env, &_state->fb)
+#define cco_spawn_1(task) _cco_spawn(cco_cast_task(task), NULL, _state->fb, NULL)
+#define cco_spawn_2(task, env) _cco_spawn(cco_cast_task(task), env, _state->fb, NULL)
 #define cco_spawn_3(task, env, fiber) _cco_spawn(cco_cast_task(task), env, fiber, NULL)
 
 #define cco_reset_group(waitgroup) ((waitgroup)->launch_count = 0)
@@ -294,7 +295,7 @@ static inline int _cco_resume_task(cco_task* task)
 #define cco_launch_2(task, waitgroup) cco_launch_3(task, waitgroup, NULL)
 #define cco_launch_3(task, waitgroup, env) do { \
     cco_group* _wg = waitgroup; _wg->launch_count += 1; \
-    _cco_spawn(cco_cast_task(task), env, &_state->fb, _wg); \
+    _cco_spawn(cco_cast_task(task), env, _state->fb, _wg); \
 } while (0)
 #define cco_await_group(waitgroup) cco_await((waitgroup)->launch_count == 0)
 
@@ -313,7 +314,7 @@ static inline int _cco_resume_task(cco_task* task)
     (_state->fb == _state->fb->next)
 
 extern cco_fiber* _cco_new_fiber(cco_task* task, void* env, cco_group* wg);
-extern void       _cco_spawn(cco_task* task, void* env, cco_fiber** _fb, cco_group* wg);
+extern cco_fiber* _cco_spawn(cco_task* task, void* env, cco_fiber* fb, cco_group* wg);
 extern cco_fiber* cco_resume_next(cco_fiber* prev);
 extern int        cco_resume_current(cco_fiber* co); /* coroutine */
 
@@ -370,14 +371,14 @@ cco_fiber* _cco_new_fiber(cco_task* _task, void* env, cco_group* wg) {
     return (new_fb->next = new_fb);
 }
 
-void _cco_spawn(cco_task* _task, void* env, cco_fiber** _fb, cco_group* wg) {
-    cco_fiber* new_fb, *fb = *_fb;
+cco_fiber* _cco_spawn(cco_task* _task, void* env, cco_fiber* fb, cco_group* wg) {
+    cco_fiber* new_fb;
     new_fb = fb->next = (fb->next == NULL ? fb : c_new(cco_fiber, {.next=fb->next}));
     new_fb->task = _task;
     new_fb->env = (env == NULL ? fb->env : env);
     _task->base.state.fb = new_fb;
     _task->base.state.wg = wg;
-    *_fb = new_fb;
+    return new_fb;
 }
 
 #undef i_implement
