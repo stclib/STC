@@ -22,7 +22,7 @@ cco_task_struct (myTask) {
 typedef struct {
     double value;
     int error;
-    int myCount;
+    cco_group wg;
 } Output;
 
 #define OUT cco_env(Output *)
@@ -35,8 +35,7 @@ int myTask(struct myTask* o) {
         }
 
         cco_drop:
-        OUT->myCount -= 1;
-        puts("myTask done");
+        printf("myTask %d done\n", o->n);
     }
 
     c_free_n(o, 1);
@@ -75,13 +74,14 @@ int taskB(struct taskB* o) {
         puts("taskB work");
         OUT->value += o->d;
 
-        OUT->myCount = 3;
-        cco_spawn(c_new(struct myTask, {{myTask}, 1, 6}));
-        cco_spawn(c_new(struct myTask, {{myTask}, 101, 104}));
-        cco_spawn(c_new(struct myTask, {{myTask}, 1001, 1008}));
+        cco_reset_group(&OUT->wg);
+        cco_launch(c_new(struct myTask, {{myTask}, 1, 6}), &OUT->wg);
+        cco_launch(c_new(struct myTask, {{myTask}, 101, 104}), &OUT->wg);
+        cco_launch(c_new(struct myTask, {{myTask}, 1001, 1008}), &OUT->wg);
         puts("Spawned 3 tasks.");
 
-        cco_await(OUT->myCount == 0);
+        cco_drop:
+        cco_await_group(&OUT->wg);
         puts("Joined");
         puts("taskB done");
     }

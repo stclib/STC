@@ -322,13 +322,15 @@ int cco_resume_current(cco_fiber* fb) {
             fb->parent_task = fb->task->base.parent_task;
             fb->awaitbits = fb->task->base.awaitbits;
             fb->status = fb->task->base.func(fb->task); // resume
-            if (fb->err.code && !fb->task->base.state.drop) {
-                fb->task = fb->parent_task;
-                if (fb->task == NULL)
-                    break;
+            if (fb->err.code) {
                 fb->recover_state = fb->task->base.state;
-                cco_stop(fb->task);
-                continue;
+                if (!fb->task->base.state.drop) {
+                    fb->task = fb->parent_task;
+                    if (fb->task == NULL)
+                        break;
+                    cco_stop(fb->task);
+                    continue;
+                }
             }
             if (!((fb->status & ~fb->awaitbits) || (fb->task = fb->parent_task) != NULL))
                 break;
