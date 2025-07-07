@@ -222,13 +222,12 @@ typedef struct cco_task cco_task;
 
 #define cco_cancel_task(a_task) \
     do { \
-        cco_task* _tsk = cco_cast_task(a_task); \
-        cco_fiber* _fb = _tsk->base.state.fb; \
+        cco_fiber* _fb = cco_cast_task(a_task)->base.state.fb; \
         _fb->err.code = CCO_CANCEL; \
         _fb->err.line = __LINE__; \
         _fb->err.file = __FILE__; \
         cco_stop(_fb->task); \
-        if (_tsk == _state->fb->task) goto _resume; \
+        if (_fb->task == _state->fb->task) goto _resume; \
     } while (0)
 
 #define cco_recover_task() \
@@ -322,15 +321,14 @@ int cco_resume_current(cco_fiber* fb) {
             fb->parent_task = fb->task->base.parent_task;
             fb->awaitbits = fb->task->base.awaitbits;
             fb->status = fb->task->base.func(fb->task); // resume
-            if (fb->err.code) {
+            // Note: if fb->status == CCO_DONE, fb->task may already be destructed.
+            if (fb->err.code && (fb->status == CCO_DONE || !fb->task->base.state.drop)) {
+                fb->task = fb->parent_task;
+                if (fb->task == NULL)
+                    break;
                 fb->recover_state = fb->task->base.state;
-                if (!fb->task->base.state.drop) {
-                    fb->task = fb->parent_task;
-                    if (fb->task == NULL)
-                        break;
-                    cco_stop(fb->task);
-                    continue;
-                }
+                cco_stop(fb->task);
+                continue;
             }
             if (!((fb->status & ~fb->awaitbits) || (fb->task = fb->parent_task) != NULL))
                 break;

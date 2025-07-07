@@ -58,10 +58,13 @@ int everyone(struct everyone* o) {
         }
         cco_yield;
 
+        //puts("Cancelling");
         //cco_cancel_task(o->sleep);
         //cco_cancel_task(o);
+        //puts("Cancelled");
 
         cco_drop:
+        puts("Await group");
         cco_await_group(&o->wg); // await for launched workers to finish
         puts("All workers done.");
         puts("everyone dropped");

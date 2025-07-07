@@ -29,6 +29,7 @@ typedef struct {
 
 int myTask(struct myTask* o) {
     cco_async (o) {
+        puts("start myTask");
         for (; o->n < o->end; ++o->n) {
             printf("myTask: %d\n", o->n);
             cco_yield;
@@ -38,6 +39,8 @@ int myTask(struct myTask* o) {
         printf("myTask %d done\n", o->n);
     }
 
+
+    puts("FREE myTask");
     c_free_n(o, 1);
     return 0;
 }
@@ -55,12 +58,13 @@ int taskC(struct taskC* o) {
         puts("taskC more work");
 
         // initial return value
-        OUT->value = o->x * o->y;
+        //OUT->value = o->x * o->y;
 
         cco_drop:
         puts("taskC done");
     }
 
+    puts("FREE taskC");
     c_free_n(o, 1);
     return 0;
 }
@@ -72,8 +76,10 @@ int taskB(struct taskB* o) {
         cco_await_task(c_new(struct taskC, {{taskC}, 1.2f, 3.4f}));
 
         puts("taskB work");
-        OUT->value += o->d;
+        //OUT->value += o->d;
 
+
+        puts("Spawning 3 tasks.");
         cco_reset_group(&OUT->wg);
         cco_launch(c_new(struct myTask, {{myTask}, 1, 6}), &OUT->wg);
         cco_launch(c_new(struct myTask, {{myTask}, 101, 104}), &OUT->wg);
@@ -81,11 +87,16 @@ int taskB(struct taskB* o) {
         puts("Spawned 3 tasks.");
 
         cco_drop:
+        if (cco_err().code == 1) {
+            printf("taskA recovered error '99' thrown on line %d\n", cco_err().line);
+            cco_recover_task(); // reset error to 0 and jump to after the await call.
+        }
         cco_await_group(&OUT->wg);
         puts("Joined");
         puts("taskB done");
     }
 
+    puts("FREE taskB");
     c_free_n(o, 1);
     return 0;
 }
@@ -97,7 +108,7 @@ int taskA(struct taskA* o) {
         cco_await_task(c_new(struct taskB, {{taskB}, 3.1415}));
 
         puts("taskA work");
-        OUT->value += o->a; // final return value;
+        //OUT->value += o->a; // final return value;
 
         cco_drop:
         if (cco_err().code == 99) {
@@ -108,6 +119,7 @@ int taskA(struct taskA* o) {
         puts("taskA done");
     }
 
+    puts("FREE taskA");
     c_free_n(o, 1);
     return 0;
 }
@@ -119,6 +131,7 @@ int main(void)
     int count = 0;
 
     puts("start");
+
     struct taskA* start = c_new(struct taskA, {{taskA}, 42});
     cco_run_task(start, &output) { ++count; }
 
