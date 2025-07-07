@@ -58,7 +58,7 @@ int taskC(struct taskC* o) {
         puts("taskC more work");
 
         // initial return value
-        //OUT->value = o->x * o->y;
+        OUT->value = o->x * o->y;
 
         cco_drop:
         puts("taskC done");
@@ -76,7 +76,7 @@ int taskB(struct taskB* o) {
         cco_await_task(c_new(struct taskC, {{taskC}, 1.2f, 3.4f}));
 
         puts("taskB work");
-        //OUT->value += o->d;
+        OUT->value += o->d;
 
 
         puts("Spawning 3 tasks.");
@@ -87,7 +87,7 @@ int taskB(struct taskB* o) {
         puts("Spawned 3 tasks.");
 
         cco_drop:
-        if (cco_err().code == 1) {
+        if (cco_err().code == 99) {
             printf("taskA recovered error '99' thrown on line %d\n", cco_err().line);
             cco_recover_task(); // reset error to 0 and jump to after the await call.
         }
@@ -108,14 +108,9 @@ int taskA(struct taskA* o) {
         cco_await_task(c_new(struct taskB, {{taskB}, 3.1415}));
 
         puts("taskA work");
-        //OUT->value += o->a; // final return value;
+        OUT->value += o->a; // final return value;
 
         cco_drop:
-        if (cco_err().code == 99) {
-            printf("taskA recovered error '99' thrown on line %d\n", cco_err().line);
-            OUT->error = cco_err().code; // set error in output
-            cco_recover_task(); // reset error to 0 and jump to after the await call.
-        }
         puts("taskA done");
     }
 
