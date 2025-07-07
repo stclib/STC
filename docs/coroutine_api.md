@@ -521,7 +521,7 @@ int TaskC(struct TaskC* self) {
 int TaskB(struct TaskB* self) {
     cco_async (self) {
         printf("TaskB start: %g\n", self->d);
-        cco_await_task(cco_new_task(TaskC, 1.2f, 3.4f));
+        cco_await_task(c_new(struct TaskC, {{TaskC}, 1.2f, 3.4f}));
 
         puts("TaskB work");
         cco_env(Result *)->value += self->d;
@@ -537,7 +537,7 @@ int TaskB(struct TaskB* self) {
 int TaskA(struct TaskA* self) {
     cco_async (self) {
         printf("TaskA start: %d\n", self->a);
-        cco_await_task(cco_new_task(TaskB, 3.1415));
+        cco_await_task(c_new(struct TaskB, {{TaskB}, 3.1415}));
 
         puts("TaskA work");
         cco_env(Result *)->value += self->a; // final return value;
@@ -560,7 +560,7 @@ int TaskA(struct TaskA* self) {
 int start(cco_task* self) {
     cco_async (self) {
         puts("start");
-        cco_await_task(cco_new_task(TaskA, 42));
+        cco_await_task(c_new(struct TaskA, {{TaskA}, 42}));
 
         cco_drop:
         puts("done");

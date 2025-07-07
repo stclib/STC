@@ -211,7 +211,8 @@ typedef struct cco_task cco_task;
 
 /* Throw an "exception"; can be catched up in the cco_await_task call tree */
 #define cco_task_throw(error_code) \
-    do {cco_fiber* _fb = _state->fb; \
+    do { \
+        cco_fiber* _fb = _state->fb; \
         _fb->err.code = error_code; \
         _fb->err.line = __LINE__; \
         _fb->err.file = __FILE__; \
@@ -229,7 +230,8 @@ typedef struct cco_task cco_task;
     } while (0)
 
 #define cco_recover_task() \
-    do {cco_fiber* _fb = _state->fb; \
+    do { \
+        cco_fiber* _fb = _state->fb; \
         c_assert(_fb->err.code); \
         _fb->task->base.state = _fb->recover_state; \
         _fb->err.code = 0; \
@@ -278,9 +280,6 @@ static inline int _cco_resume_task(cco_task* task)
 /*
  * cco_run_fiber()/cco_run_task(): Run fibers/tasks in parallel
  */
-#define cco_new_task(Task, ...) \
-    (c_new(struct Task, {{.func=Task}, __VA_ARGS__}))
-
 #define cco_new_fiber(...) c_MACRO_OVERLOAD(cco_new_fiber, __VA_ARGS__)
 #define cco_new_fiber_1(task) cco_new_fiber_2(task, NULL)
 #define cco_new_fiber_2(task, env) _cco_new_fiber(cco_cast_task(task), env, NULL)
@@ -359,7 +358,7 @@ cco_fiber* cco_resume_next(cco_fiber* prev) {
         unlink = curr;
         curr = (curr == prev ? NULL : curr->next);
         prev->next = curr;
-        free(unlink);
+        c_free_n(unlink, 1);
     }
     return curr;
 }

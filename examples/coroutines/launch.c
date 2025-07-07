@@ -70,15 +70,15 @@ int taskC(struct taskC* o) {
 int taskB(struct taskB* o) {
     cco_async (o) {
         printf("taskB start: %g\n", o->d);
-        cco_await_task(cco_new_task(taskC, 1.2f, 3.4f));
+        cco_await_task(c_new(struct taskC, {{taskC}, 1.2f, 3.4f}));
 
         puts("taskB work");
         OUT->value += o->d;
 
         OUT->myCount = 3;
-        cco_spawn(cco_new_task(myTask, 1, 6));
-        cco_spawn(cco_new_task(myTask, 101, 104));
-        cco_spawn(cco_new_task(myTask, 1001, 1008));
+        cco_spawn(c_new(struct myTask, {{myTask}, 1, 6}));
+        cco_spawn(c_new(struct myTask, {{myTask}, 101, 104}));
+        cco_spawn(c_new(struct myTask, {{myTask}, 1001, 1008}));
         puts("Spawned 3 tasks.");
 
         cco_await(OUT->myCount == 0);
@@ -94,7 +94,7 @@ int taskB(struct taskB* o) {
 int taskA(struct taskA* o) {
     cco_async (o) {
         printf("taskA start: %d\n", o->a);
-        cco_await_task(cco_new_task(taskB, 3.1415));
+        cco_await_task(c_new(struct taskB, {{taskB}, 3.1415}));
 
         puts("taskA work");
         OUT->value += o->a; // final return value;
