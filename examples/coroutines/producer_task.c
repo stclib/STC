@@ -42,9 +42,11 @@ int produce(struct produce* o) {
         }
 
         cco_drop:
-        cco_await_with_cancel(o->consumer);
+        puts("stop consumer");
+        cco_stop(o->consumer);
+        cco_await_task(o->consumer);
         Inventory_drop(&o->inv);
-        puts("cleanup producer");
+        puts("producer dropped");
     }
     return 0;
 }
@@ -65,7 +67,11 @@ int consume(struct consume* o) {
         }
 
         cco_drop:
-        puts("cleanup consumer");
+        puts("consumer drop step 1");
+        cco_yield;
+        puts("consumer drop step 2");
+        cco_yield;
+        puts("consumer dropped");
     }
     return 0;
 }

@@ -60,11 +60,11 @@ int everyone(struct everyone* o) {
 
         //cco_cancel_task(o->sleep);
         //cco_cancel_task(o);
-        cco_await_group(&o->wg); // starts launched workers and await for them to finish
-        puts("All workers done.");
 
         cco_drop:
-        puts("Finished.");
+        cco_await_group(&o->wg); // await for launched workers to finish
+        puts("All workers done.");
+        puts("everyone dropped");
     }
 
     c_free_n(o, 1);

@@ -125,7 +125,8 @@ typedef struct {
 
 #define cco_return \
     do { \
-        if (!_state->drop) { _state->pos = CCO_STATE_DROP; _state->drop = true; } \
+        _state->pos = (_state->drop ? CCO_STATE_DONE : CCO_STATE_DROP); \
+        _state->drop = true; \
         goto _resume; \
     } while (0)
 
@@ -221,12 +222,13 @@ typedef struct cco_task cco_task;
 
 #define cco_cancel_task(a_task) \
     do { \
-        cco_fiber* _fb = cco_cast_task(a_task)->base.state.fb; \
+        cco_task* _tsk = cco_cast_task(a_task); \
+        cco_fiber* _fb = _tsk->base.state.fb; \
         _fb->err.code = CCO_CANCEL; \
         _fb->err.line = __LINE__; \
         _fb->err.file = __FILE__; \
         cco_stop(_fb->task); \
-        if (_fb == _state->fb) goto _resume; \
+        if (_tsk == _state->fb->task) goto _resume; \
     } while (0)
 
 #define cco_recover_task() \
@@ -252,19 +254,12 @@ typedef struct cco_task cco_task;
     cco_yield_v(CCO_NOOP); \
 } while (0)
 
-#define cco_await_with_cancel(a_task) \
-    do { \
-        cco_task* _tsk = cco_cast_task(a_task); \
-        cco_cancel_task(_tsk); \
-        cco_await_task(_tsk); \
-    } while (0)
-
 /* Symmetric coroutine flow of control transfer */
 #define cco_yield_to(a_task) do { \
     {   cco_task* _to_task = cco_cast_task(a_task); \
         cco_fiber* _fb = _state->fb; \
         _to_task->base.awaitbits = _fb->task->base.awaitbits; \
-        _to_task->base.parent_task = _fb->task->base.parent_task; \
+        _to_task->base.parent_task = NULL; \
         _fb->task = _to_task; \
         _to_task->base.state.fb = _fb; \
     } \
@@ -327,7 +322,7 @@ int cco_resume_current(cco_fiber* fb) {
             fb->parent_task = fb->task->base.parent_task;
             fb->awaitbits = fb->task->base.awaitbits;
             fb->status = fb->task->base.func(fb->task); // resume
-            if (fb->err.code) {
+            if (fb->err.code && !fb->task->base.state.drop) {
                 fb->task = fb->parent_task;
                 if (fb->task == NULL)
                     break;

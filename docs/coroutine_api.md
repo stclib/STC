@@ -66,7 +66,6 @@ void            cco_task_throw(int error);                          // Throw err
                                                                     // Error object accessible as cco_err().
 cco_error       cco_err();                                          // Return current error object for exception handling.
 void            cco_cancel_task(cco_task* task);                    // Similar to cco_task_throw(CCO_CANCEL). Handling of it is optional.
-                cco_await_with_cancel(cco_task* task);              // Cancel task and await for it to finish - in one call.
                 cco_recover_task();                                 // Reset error, and jump to original resume point in current task.
                                                                     // Should be called from the cco_drop: section.
 void            cco_spawn(cco_task* task);                          // Spawn a new concurrent task. Does not suspend coroutine!
