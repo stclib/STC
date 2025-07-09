@@ -65,8 +65,9 @@ void            cco_yield_to(cco_task* task);                       // Yield to 
 void            cco_task_throw(int error);                          // Throw error, will unwind call/await-task stack. Handling required.
                                                                     // Error object accessible as cco_err().
 cco_error       cco_err();                                          // Return current error object for exception handling.
-void            cco_cancel_task(cco_task* task);                    // Similar to cco_task_throw(CCO_CANCEL). Handling of it is optional.
                 cco_recover_task();                                 // Reset error, and jump to original resume point in current task.
+void            cco_cancel_fiber(cco_task* task);                   // Cancel the fiber associated with task by throwing
+                                                                    // a CCO_CANCEL. Propagates, but can be handled/recovered at cco_drop:
                                                                     // Should be called from the cco_drop: section.
 void            cco_spawn(cco_task* task);                          // Spawn a new concurrent task. Does not suspend coroutine!
 void            cco_spawn(cco_task* task, void* env);               // Same, env may be used as a future or anything.

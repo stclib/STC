@@ -59,8 +59,8 @@ int everyone(struct everyone* o) {
         cco_yield;
 
         //puts("Cancelling");
-        //cco_cancel_task(o->sleep);
-        //cco_cancel_task(o);
+        //cco_cancel_fiber(o->sleep);
+        //cco_cancel_fiber(o);
         //puts("Cancelled");
 
         cco_drop:

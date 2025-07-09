@@ -220,7 +220,7 @@ typedef struct cco_task cco_task;
         cco_return; \
     } while (0)
 
-#define cco_cancel_task(a_task) \
+#define cco_cancel_fiber(a_task) \
     do { \
         cco_fiber* _fb = cco_cast_task(a_task)->base.state.fb; \
         _fb->err.code = CCO_CANCEL; \
