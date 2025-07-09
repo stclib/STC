@@ -27,7 +27,6 @@
 #undef i_tag
 #undef i_opt
 #undef i_capacity
-#undef i_allocator
 
 #undef i_key
 #undef i_keypro     // Replaces next two
@@ -64,7 +63,6 @@
 #undef i_no_emplace
 #undef i_declared
 
-#undef _i_aux_alloc
 #undef _i_aux_def
 #undef _i_has_cmp
 #undef _i_has_eq

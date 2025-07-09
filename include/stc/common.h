@@ -81,10 +81,6 @@ typedef ptrdiff_t       isize;
 #define c_ARG_3(a, b, c, ...) c
 #define c_ARG_4(a, b, c, d, ...) d
 
-#define i_malloc c_JOIN(i_allocator, _malloc)
-#define i_calloc c_JOIN(i_allocator, _calloc)
-#define i_realloc c_JOIN(i_allocator, _realloc)
-#define i_free c_JOIN(i_allocator, _free)
 #define i_new_n(T, n) ((T*)i_malloc((n)*c_sizeof(T)))
 #define i_new_zeros(T, n) ((T*)i_calloc(n, c_sizeof(T)))
 #define i_realloc_n(ptr, old_n, n) i_realloc(ptr, (old_n)*c_sizeof *(ptr), (n)*c_sizeof *(ptr))

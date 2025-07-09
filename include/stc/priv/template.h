@@ -82,17 +82,12 @@
 
 #if defined i_aux && c_NUMARGS(i_aux) == 2
   #define _i_aux_def c_GETARG(1, i_aux) aux;
+  #undef i_allocator // override:
   #define i_allocator c_GETARG(2, i_aux)
 #elif defined i_aux
   #define _i_aux_def i_aux aux;
 #else
   #define _i_aux_def
-#endif
-#if defined i_aux && defined i_allocator
-  #define _i_aux_alloc
-#endif
-#if !defined i_allocator
-  #define i_allocator c
 #endif
 
 #if c_OPTION(c_declared)
