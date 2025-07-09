@@ -62,22 +62,20 @@ int             cco_resume_task(cco_task* task);                    // Resume su
                 cco_await_task(cco_task* task, int awaitbits);      // Await until task's resume status is in (awaitbits | CCO_DONE).
 void            cco_yield_to(cco_task* task);                       // Yield to task (symmetric transfer of control).
 
-void            cco_task_throw(int error);                          // Throw error, will unwind call/await-task stack. Handling required.
-                                                                    // Error object accessible as cco_err().
-cco_error       cco_err();                                          // Return current error object for exception handling.
-                cco_recover_task();                                 // Reset error, and jump to original resume point in current task.
-void            cco_cancel_fiber(cco_task* task);                   // Cancel the fiber associated with task by throwing
-                                                                    // a CCO_CANCEL. Propagates, but can be handled/recovered at cco_drop:
-                                                                    // Should be called from the cco_drop: section.
-void            cco_spawn(cco_task* task);                          // Spawn a new concurrent task. Does not suspend coroutine!
-void            cco_spawn(cco_task* task, void* env);               // Same, env may be used as a future or anything.
+void            cco_task_throw(int error);                          // Throw an error. Will unwind call/await-task stack. Handling is required.
+cco_error       cco_err();                                          // Get current thrown error object. Should be handled in a cco_drop: section.
+                cco_recover_task();                                 // Reset current error and jump to the original resume point in current task.
+void            cco_cancel_fiber(cco_task* task);                   // Cancel the fiber associated with task, by throwing a CCO_CANCEL.
+                                                                    // It propagates to parent awaits - may be stopped/recovered at cco_drop:.
+void            cco_spawn(cco_task* task);                          // Spawn a new concurrent task. Does not suspend the current task.
+void            cco_spawn(cco_task* task, void* env);               // Same, env may be used as a future, or anything.
 void            cco_spawn(cco_task* task, void* env,
-                          cco_fiber** fb_ref);                      // Same, but may be called from main/outside `cco_async`.
+                          cco_fiber** fb_ref);                      // Same, but it may be called from main/outside `cco_async`.
 bool            cco_joined();                                       // Return true if all concurrent spawned tasks are joined.
 
 void            cco_reset_group(cco_group* waitgroup);              // Reset waitgroup (normally not required).
-void            cco_launch(cco_task* task, cco_group* waitgroup);   // Spawn a new concurrent task, with a waitgroup. Does not suspend.
-void            cco_launch(cco_task* t, cco_group* wg, void* env);  // Same, env may be used as a future or anything.
+void            cco_launch(cco_task* task, cco_group* waitgroup);   // Spawn a new concurrent task, with a waitgroup. Does not suspend current.
+void            cco_launch(cco_task* t, cco_group* wg, void* env);  // Same, env may be used as a future, or anything.
                 cco_await_group(cco_group* waitgroup);              // Await for all concurrent tasks in waitgroup to finish.
 
 
