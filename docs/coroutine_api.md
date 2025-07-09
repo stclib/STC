@@ -43,7 +43,7 @@ scope end, and `return 0`.
 bool            cco_is_active(Coroutine* co);                       // Is coroutine active/not done?.
 bool            cco_is_done(Coroutine* co);                         // Is coroutine done/not active?
 void            cco_reset_state(Coroutine* co);                     // Reset state to initial (for reuse).
-void            cco_stop(Coroutine* co);                            // Signals that coroutine will resume next at cco_done: label.
+void            cco_stop(Coroutine* co);                            // Signals that coroutine will resume next at cco_drop: label.
 ```
 
 #### Simplistic coroutines (non-Task types)
@@ -162,7 +162,7 @@ or await from a deeply nested coroutine call by utilizing extended `cco_task` st
 
 Generator are among the simplest types of coroutines and is easy to write:
 
-[ [Run this code](https://godbolt.org/z/xMf3d44Gz) ]
+[ [Run this code](https://godbolt.org/z/n5fGEcjYj) ]
 ```c++
 #include <stdio.h>
 #include <stc/coroutine.h>
@@ -204,7 +204,7 @@ Notice that `Gen` now becomes the "container", while `Gen_iter` is the coroutine
 <details>
 <summary>Iterable generator coroutine implementation</summary>
 
-[ [Run this code](https://godbolt.org/z/bbd8oGYxG) ]
+[ [Run this code](https://godbolt.org/z/fhh9b95Wh) ]
 ```c++
 #include <stdio.h>
 #include <stc/coroutine.h>
@@ -258,7 +258,7 @@ starts eating (because they must be waiting).
 <details>
 <summary>The "Dining philosophers" C implementation</summary>
 
-[ [Run this code](https://godbolt.org/z/EK6zs6vbz) ]
+[ [Run this code](https://godbolt.org/z/n5Px511x5) ]
 ```c++
 #include <stdio.h>
 #include <time.h>
@@ -375,7 +375,7 @@ and recovered using `cco_recover_task()`. This call will resume control back to 
 current task. Because the "call-tree" is fixed, the coroutine frames to be called may be pre-allocated on the stack,
 which is very fast.
 
-[ [Run this code](https://godbolt.org/z/z1WWPhsan) ]
+[ [Run this code](https://godbolt.org/z/Yf99EKGje) ]
 <!--{%raw%}-->
 ```c++
 #include <stdio.h>
@@ -483,7 +483,7 @@ call/await:
 <details>
 <summary>Implementation of coroutine objects on the heap</summary>
 
-[ [Run this code](https://godbolt.org/z/TbWYsbaaq) ]
+[ [Run this code](https://godbolt.org/z/GMocv3P4d) ]
 <!--{%raw%}-->
 ```c++
 #include <stdio.h>
@@ -599,7 +599,7 @@ the following example:
 <details>
 <summary>Producer-consumer coroutine implementation</summary>
 
-[ [Run this code](https://godbolt.org/z/faxr8dz5E) ]
+[ [Run this code](https://godbolt.org/z/7Tfa7WP7s) ]
 ```c++
 #include <time.h>
 #include <stdio.h>
@@ -645,7 +645,7 @@ int produce(struct produce* self) {
         }
 
         cco_drop:
-        cco_cancel_task(self->consumer);
+        cco_stop(self->consumer);
         Inventory_drop(&self->inventory);
         puts("done producer");
     }
@@ -714,7 +714,7 @@ the scope in that it was created.
 <details>
 <summary>Scheduled coroutines implementation</summary>
 
-[ [Run this code](https://godbolt.org/z/71GqPYn3e) ]
+[ [Run this code](https://godbolt.org/z/rWYoY8azo) ]
 ```c++
 // Based on https://www.youtube.com/watch?v=8sEe-4tig_A
 #include <stdio.h>
@@ -769,7 +769,7 @@ static int taskX(struct TaskX* self) {
         printf("%c is back doing more work\n", self->id);
         cco_yield;
 
-        cco_done:
+        cco_drop:
         printf("%c is done\n", self->id);
     }
 

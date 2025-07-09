@@ -849,7 +849,7 @@ void maptest()
 ```
 Another example is to sort struct elements by the *active field* and *reverse* flag:
 
-[ [Run this code](https://godbolt.org/z/aKe5hMYMr) ]
+[ [Run this code](https://godbolt.org/z/eqrGGzbKh) ]
 ```c++
 #include <stdio.h>
 #include <time.h>
@@ -863,26 +863,26 @@ typedef struct {
     time_t lastWriteTime;
 }  FileMetaData;
 
-enum FMDActive {FMD_fileName, FMD_directory, FMD_size, FMD_lastWriteTime};
+enum FMDActive {FMD_fileName, FMD_directory, FMD_size, FMD_lastWriteTime, FMD_LAST};
+typedef struct { enum FMDActive activeField; bool reverse; } FMDVectorSorting;
 
-struct FMDSelector { enum FMDActive activeField; bool reverse; };
-int FileMetaData_cmp(const struct FMDVector_aux*, const FileMetaData*, const FileMetaData*);
+int FileMetaData_cmp(const FMDVectorSorting*, const FileMetaData*, const FileMetaData*);
 void FileMetaData_drop(FileMetaData*);
 
-#define T FMDVector, FileMetaData, (c_no_clone)
-#define i_aux struct FMDSelector
+#define T FMDVector, FileMetaData, (c_keyclass | c_no_clone)
+#define i_aux FMDVectorSorting
 #define i_cmp(x, y) FileMetaData_cmp(&self->aux, x, y)
-#define i_keydrop FileMetaData_drop
 #include <stc/stack.h>
 // --------------
 
-int FileMetaData_cmp(const struct FMDVector_aux* aux, const FileMetaData* a, const FileMetaData* b) {
+int FileMetaData_cmp(const FMDVectorSorting* aux, const FileMetaData* a, const FileMetaData* b) {
     int dir = aux->reverse ? -1 : 1;
     switch (aux->activeField) {
         case FMD_fileName: return dir*cstr_cmp(&a->fileName, &b->fileName);
         case FMD_directory: return dir*cstr_cmp(&a->directory, &b->directory);
         case FMD_size: return dir*c_default_cmp(&a->size, &b->size);
         case FMD_lastWriteTime: return dir*c_default_cmp(&a->lastWriteTime, &b->lastWriteTime);
+        default:;
     }
     return 0;
 }
@@ -900,8 +900,8 @@ int main(void) {
     });
 
     vec.aux.reverse = true;
-    for (c_range(activeField, FMD_lastWriteTime + 1)) {
-        vec.aux.activeField = (enum FMDActive)activeField;
+    for (c_range_t(enum FMDActive, field, FMD_LAST)) {
+        vec.aux.activeField = field;
         FMDVector_sort(&vec);
 
         for (c_each(i, FMDVector, vec)) {

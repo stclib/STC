@@ -222,19 +222,19 @@ _c_MEMB(_push)(Self* self, _m_value value) { // push_back
 STC_DEF void
 _c_MEMB(_shrink_to_fit)(Self *self) {
     isize sz = _c_MEMB(_size)(self);
-    isize new_cap = c_next_pow2(sz + 1);
-    if (new_cap > self->capmask)
+    isize newpow2 = c_next_pow2(sz + 1);
+    if (newpow2 > self->capmask)
         return;
     if (self->start <= self->end) {
         c_memmove(self->cbuf, self->cbuf + self->start, sz*c_sizeof *self->cbuf);
         self->start = 0, self->end = sz;
     } else {
         isize n = self->capmask - self->start + 1;
-        c_memmove(self->cbuf + (new_cap - n), self->cbuf + self->start, n*c_sizeof *self->cbuf);
-        self->start = new_cap - n;
+        c_memmove(self->cbuf + (newpow2 - n), self->cbuf + self->start, n*c_sizeof *self->cbuf);
+        self->start = newpow2 - n;
     }
-    self->cbuf = (_m_value *)_i_realloc_n(self->cbuf, self->capmask + 1, new_cap);
-    self->capmask = new_cap - 1;
+    self->cbuf = (_m_value *)_i_realloc_n(self->cbuf, self->capmask + 1, newpow2);
+    self->capmask = newpow2 - 1;
 }
 
 #if !defined i_no_clone
