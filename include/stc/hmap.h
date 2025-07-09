@@ -336,8 +336,8 @@ STC_DEF void _c_MEMB(_drop)(const Self* cself) {
     Self* self = (Self*)cself;
     if (self->bucket_count > 0) {
         _c_MEMB(_wipe_)(self);
-        i_free_n(self->meta, self->bucket_count + 1);
-        i_free_n(self->table, self->bucket_count);
+        _i_free_n(self->meta, self->bucket_count + 1);
+        _i_free_n(self->table, self->bucket_count);
     }
 }
 
@@ -433,7 +433,7 @@ _c_MEMB(_bucket_insert_)(const Self* self, const _m_keyraw* rkeyptr) {
     _c_MEMB(_clone)(Self map) {
         if (map.bucket_count == 0)
             return c_literal(Self){0};
-        Self out = map, *self = &out; // i_new_n may refer self via i_aux
+        Self out = map, *self = &out; // _i_new_n may refer self via i_aux
         const isize _mbytes = (map.bucket_count + 1)*c_sizeof *map.meta;
         out.table = (_m_value *)i_malloc(map.bucket_count*c_sizeof *out.table);
         out.meta = (struct hmap_meta *)i_malloc(_mbytes);
@@ -446,7 +446,7 @@ _c_MEMB(_bucket_insert_)(const Self* self, const _m_keyraw* rkeyptr) {
             return out;
         } else {
             if (out.meta) i_free(out.meta, _mbytes);
-            if (out.table) i_free_n(out.table, map.bucket_count);
+            if (out.table) _i_free_n(out.table, map.bucket_count);
             return c_literal(Self){0};
         }
     }
@@ -460,8 +460,8 @@ _c_MEMB(_reserve)(Self* _self, const isize _newcap) {
     if (_newcap < _self->size || _newbucks == _self->bucket_count)
         return true;
     Self map = *_self, *self = &map; (void)self;
-    map.table = i_new_n(_m_value, _newbucks);
-    map.meta = i_new_zeros(struct hmap_meta, _newbucks + 1);
+    map.table = _i_new_n(_m_value, _newbucks);
+    map.meta = _i_new_zeros(struct hmap_meta, _newbucks + 1);
     map.bucket_count = _newbucks;
 
     bool ok = map.table && map.meta;
@@ -476,8 +476,8 @@ _c_MEMB(_reserve)(Self* _self, const isize _newcap) {
         }
         c_swap(_self, &map);
     }
-    i_free_n(map.meta, map.bucket_count + (int)(map.meta != NULL));
-    i_free_n(map.table, map.bucket_count);
+    _i_free_n(map.meta, map.bucket_count + (int)(map.meta != NULL));
+    _i_free_n(map.table, map.bucket_count);
     return ok;
 }
 

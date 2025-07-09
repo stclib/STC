@@ -178,7 +178,7 @@ STC_DEF void
 _c_MEMB(_drop)(const Self* cself) {
     Self* self = (Self*)cself;
     _c_MEMB(_clear)(self);
-    i_free_n(self->cbuf, self->capmask + 1);
+    _i_free_n(self->cbuf, self->capmask + 1);
 }
 
 STC_DEF bool
@@ -187,7 +187,7 @@ _c_MEMB(_reserve)(Self* self, const isize cap) {
     isize newpow2 = c_next_pow2(cap + 1);
     if (newpow2 <= oldpow2)
         return self->cbuf != NULL;
-    _m_value* d = (_m_value *)i_realloc_n(self->cbuf, oldpow2, newpow2);
+    _m_value* d = (_m_value *)_i_realloc_n(self->cbuf, oldpow2, newpow2);
     if (d == NULL)
         return false;
     isize head = oldpow2 - self->start;
@@ -233,17 +233,17 @@ _c_MEMB(_shrink_to_fit)(Self *self) {
         c_memmove(self->cbuf + (new_cap - n), self->cbuf + self->start, n*c_sizeof *self->cbuf);
         self->start = new_cap - n;
     }
-    self->cbuf = (_m_value *)i_realloc_n(self->cbuf, self->capmask + 1, new_cap);
+    self->cbuf = (_m_value *)_i_realloc_n(self->cbuf, self->capmask + 1, new_cap);
     self->capmask = new_cap - 1;
 }
 
 #if !defined i_no_clone
 STC_DEF Self
 _c_MEMB(_clone)(Self q) {
-    Self out = q, *self = &out; (void)self; // may be used by i_new_n/i_keyclone via i_aux.
+    Self out = q, *self = &out; (void)self; // may be used by _i_new_n/i_keyclone via i_aux.
     out.start = 0; out.end = _c_MEMB(_size)(&q);
     out.capmask = c_next_pow2(out.end + 1) - 1;
-    out.cbuf = i_new_n(_m_value, out.capmask + 1);
+    out.cbuf = _i_new_n(_m_value, out.capmask + 1);
     isize i = 0;
     if (out.cbuf)
         for (c_each(it, Self, q))

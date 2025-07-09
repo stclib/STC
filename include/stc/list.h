@@ -70,7 +70,7 @@
 #define _clist_tonode(vp) c_safe_cast(_m_node*, _m_value*, vp)
 
 #define _c_list_insert_entry_after(ref, val) \
-    _m_node *entry = i_new_n(_m_node, 1); entry->value = val; \
+    _m_node *entry = _i_new_n(_m_node, 1); entry->value = val; \
     _c_list_insert_after_node(ref, entry)
 
 #define _c_list_insert_after_node(ref, entry) \
@@ -309,7 +309,7 @@ STC_DEF void
 _c_MEMB(_erase_after_node)(Self* self, _m_node* ref) {
     _m_node* node = _c_MEMB(_unlink_after_node)(self, ref);
     i_keydrop((&node->value));
-    i_free_n(node, 1);
+    _i_free_n(node, 1);
 }
 
 STC_DEF _m_node*
@@ -404,7 +404,7 @@ STC_DEF bool _c_MEMB(_sort)(Self* self) {
     for (c_each(i, Self, *self)) {
         if (len == cap) {
             isize cap_n = cap + cap/2 + 8;
-            if ((p = (_m_value *)i_realloc_n(arr, cap, cap_n)) == NULL)
+            if ((p = (_m_value *)_i_realloc_n(arr, cap, cap_n)) == NULL)
                 goto done;
             arr = p, cap = cap_n;
         }
@@ -416,7 +416,7 @@ STC_DEF bool _c_MEMB(_sort)(Self* self) {
     self->last = keep;
     for (c_each(i, Self, *self))
         *i.ref = *p++;
-    done: i_free_n(arr, cap);
+    done: _i_free_n(arr, cap);
     return p != NULL;
 }
 #endif // _i_has_cmp

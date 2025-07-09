@@ -294,7 +294,7 @@ STC_DEF bool
 _c_MEMB(_reserve)(Self* self, const isize cap) {
     if (cap <= self->capacity)
         return false;
-    _m_node* nodes = (_m_node*)i_realloc_n(self->nodes, self->capacity + 1, cap + 1);
+    _m_node* nodes = (_m_node*)_i_realloc_n(self->nodes, self->capacity + 1, cap + 1);
     if (nodes == NULL)
         return false;
     nodes[0] = c_literal(_m_node){0};
@@ -592,7 +592,7 @@ _c_MEMB(_drop)(const Self* cself) {
     Self* self = (Self*)cself;
     if (self->capacity != 0) {
         _c_MEMB(_drop_r_)(self, self->root);
-        i_free_n(self->nodes, self->capacity + 1);
+        _i_free_n(self->nodes, self->capacity + 1);
     }
 }
 
