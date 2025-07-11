@@ -73,6 +73,7 @@ typedef enum {
 
 typedef struct {
     int launch_count;
+    int await_count;
 } cco_group; // waitgroup
 
 typedef struct {
@@ -101,7 +102,8 @@ typedef struct {
     if (0) goto _resume; \
     else for (struct cco_state *_state = (_cco_validate_task_struct(co), &(co)->base.state) \
               ; _state->pos != CCO_STATE_DONE \
-              ; _state->pos = CCO_STATE_DONE, _state->wg ? --_state->wg->launch_count : 0) \
+              ; _state->pos = CCO_STATE_DONE, \
+                (void)(sizeof((co)->base) > sizeof(cco_base) && _state->wg ? --_state->wg->launch_count : 0)) \
         _resume: switch (_state->pos) case CCO_STATE_INIT: // thanks, @liigo!
 
 #define cco_drop /* label */ \
@@ -290,7 +292,21 @@ static inline int _cco_resume_task(cco_task* task)
     cco_group* _wg = waitgroup; _wg->launch_count += 1; \
     _cco_spawn(cco_cast_task(task), env, _state->fb, _wg); \
 } while (0)
-#define cco_await_group(waitgroup) cco_await((waitgroup)->launch_count == 0)
+
+#define cco_await_all(waitgroup) cco_await((waitgroup)->launch_count == 0)
+#define cco_await_any(waitgroup) cco_await_n(waitgroup, 1)
+#define cco_await_n(waitgroup, n) do { \
+    (waitgroup)->await_count = (waitgroup)->launch_count - (n); \
+    if ((waitgroup)->await_count < 0) cco_task_throw(1); \
+    cco_await((waitgroup)->launch_count == (waitgroup)->await_count); \
+} while (0)
+
+#define cco_await_cancel(waitgroup) do { \
+    for (cco_fiber* _ifb = _state->fb->next; _ifb != _state->fb; _ifb = _ifb->next) \
+        if (_ifb->task->base.state.wg == (waitgroup)) \
+            cco_cancel_fiber(_ifb->task); \
+    cco_await_all(waitgroup); \
+} while (0)
 
 #define cco_run_fiber(...) c_MACRO_OVERLOAD(cco_run_fiber, __VA_ARGS__)
 #define cco_run_fiber_1(fiber_ref) \

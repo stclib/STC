@@ -12,6 +12,8 @@ int worker(struct worker* o) {
         printf("Worker %d starting\n", o->id);
 
         cco_await_timer(&o->tm, 1.0 + o->id/8.0);
+
+        cco_drop:
         printf("Worker %d done: %f\n", o->id, cco_timer_elapsed(&o->tm));
     }
 
@@ -58,16 +60,19 @@ int everyone(struct everyone* o) {
         }
         cco_yield;
 
-        //puts("Cancelling");
+        puts("Start");
         //cco_cancel_fiber(o->sleep);
         //cco_cancel_fiber(o);
-        //puts("Cancelled");
+        puts("End");
 
         cco_drop:
         puts("Await group");
-        cco_await_group(&o->wg); // await for launched workers to finish
+        cco_await_any(&o->wg); // await for any (one) launched worker to finish
+        puts("1 worker done.");
+        cco_await_n(&o->wg, 3); // await for 3 workers to finish
+        puts("3 more workers done.");
+        cco_await_cancel(&o->wg); // cancel and await for remaining workers to finish
         puts("All workers done.");
-        puts("everyone dropped");
     }
 
     c_free_n(o, 1);
@@ -79,4 +84,5 @@ int main(void)
 {
     struct everyone* go = c_new(struct everyone, {{everyone}});
     cco_run_task(go);
+    puts("Everyone done");
 }

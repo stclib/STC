@@ -73,11 +73,14 @@ void            cco_spawn(cco_task* task, void* env,
                           cco_fiber** fb_ref);                      // Same, but it may be called from main/outside `cco_async`.
 bool            cco_joined();                                       // Return true if all concurrent spawned tasks are joined.
 
-void            cco_reset_group(cco_group* waitgroup);              // Reset waitgroup (normally not required).
-void            cco_launch(cco_task* task, cco_group* waitgroup);   // Spawn a new concurrent task, with a waitgroup. Does not suspend current.
+void            cco_reset_group(cco_group* wg);                     // Reset waitgroup.
+void            cco_launch(cco_task* task, cco_group* wg);          // Spawn a new concurrent task, with a waitgroup. Does not suspend current.
 void            cco_launch(cco_task* t, cco_group* wg, void* env);  // Same, env may be used as a future, or anything.
-                cco_await_group(cco_group* waitgroup);              // Await for all concurrent tasks in waitgroup to finish.
 
+                cco_await_all(cco_group* wg);                       // Await for all launched tasks in waitgroup to finish.
+                cco_await_any(cco_group* wg);                       // Await for any launched tasks in waitgroup to finish.
+                cco_await_n(cco_group* wg, int n);                  // Await for n launched tasks in waitgroup to finish.
+                cco_await_cancel(cco_group* wg);                    // Cancel remaining tasks/fibers in wg and await for them.
 
 void            cco_run_task(cco_task* task) {}                     // Run task blocking until it and spawned fibers are finished.
 void            cco_run_task(cco_task* task, void *env) {}          // Run task blocking with env data

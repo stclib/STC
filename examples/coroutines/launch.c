@@ -91,7 +91,7 @@ int taskB(struct taskB* o) {
             printf("taskA recovered error '99' thrown on line %d\n", cco_err().line);
             cco_recover_task(); // reset error to 0 and jump to after the await call.
         }
-        cco_await_group(&OUT->wg);
+        cco_await_all(&OUT->wg);
         puts("Joined");
         puts("taskB done");
     }
