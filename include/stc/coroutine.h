@@ -302,9 +302,13 @@ static inline int _cco_resume_task(cco_task* task)
 } while (0)
 
 #define cco_await_cancel(waitgroup) do { \
-    for (cco_fiber* _ifb = _state->fb->next; _ifb != _state->fb; _ifb = _ifb->next) \
-        if (_ifb->task->base.state.wg == (waitgroup)) \
-            cco_cancel_fiber(_ifb->task); \
+    for (cco_fiber *_ifb = _state->fb->next; _ifb != _state->fb; _ifb = _ifb->next) { \
+        cco_task* _top = _ifb->task; \
+        while (_top->base.parent_task) \
+            _top = _top->base.parent_task; \
+        if (_top->base.state.wg == (waitgroup)) \
+            cco_cancel_fiber(_top); \
+    } \
     cco_await_all(waitgroup); \
 } while (0)
 
