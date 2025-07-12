@@ -33,12 +33,12 @@ int interleaved(struct Generator* o)
             o->value = get_value(&o->a);
             o->xactive = cco_is_active(&o->a);
             if (o->xactive)
-                cco_yield;
+                cco_suspend;
 
             o->value = get_value(&o->b);
             o->yactive = cco_is_active(&o->b);
             if (o->yactive)
-                cco_yield;
+                cco_suspend;
         } while (o->xactive | o->yactive);
     }
     return 0;

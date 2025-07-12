@@ -71,8 +71,8 @@ int Dining(struct Dining* o) {
             for (int i = 0; i < num_philosophers; ++i) {
                 Philosopher(&o->philos[i]); // resume until next yield
             }
-            cco_yield; // suspend, return control back to caller who
-                       // can do other tasks before resuming dining.
+            cco_suspend; // return control back to caller who
+                         // can do other tasks before resuming dining.
         }
 
         cco_drop:

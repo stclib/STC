@@ -68,9 +68,9 @@ int consume(struct consume* o) {
 
         cco_drop:
         puts("consumer drop step 1");
-        cco_yield;
+        cco_suspend;
         puts("consumer drop step 2");
-        cco_yield;
+        cco_suspend;
         puts("consumer dropped");
     }
     return 0;

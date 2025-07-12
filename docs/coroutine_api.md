@@ -32,13 +32,15 @@ scope end, and `return 0`.
 ```c++
                 cco_async (Coroutine* co) { ... }                   // The coroutine scope.
 
-                cco_yield;                                          // Yield/suspend execution with CCO_YIELD status returned.
-                cco_yield_v(status);                                // Yield/suspend execution with custom status returned.
-                cco_await(bool condition);                          // Continue if condition is true, else suspend with CCO_AWAIT status.
-                cco_drop:                                           // Label marks where cleanup of coroutine frame happens.
-                cco_return;                                         // Jumps to the `cco_drop:` label and does cleanup if present,
-                                                                    // otherwise it just exits the `cco_async` scope.
-                cco_exit();                                         // Cancel current coroutine immediately and do no further cleanup.
+                cco_suspend;                                        // Suspend execution with CCO_SUSPEND status returned.
+                cco_yield;                                          // Suspend execution with CCO_YIELD status returned.
+                cco_yield_v(status);                                // Suspend execution with custom status returned.
+                cco_await(bool condition);                          // Suspend with CCO_AWAIT status or continue if condition is true.
+                                                                    // Resumption takes place at the condition test, not after.
+                cco_drop:                                           // Label marks where cleanup of the task/coroutine frame happens.
+                cco_return;                                         // Jumps to the cco_drop: label for cleanup. If we already passed
+                                                                    // it, or it is absent, it just exits the cco_async scope.
+                cco_exit();                                         // Cancel current coroutine immediately (skip cco_drop: stage).
 
 bool            cco_is_active(Coroutine* co);                       // Is coroutine active/not done?.
 bool            cco_is_done(Coroutine* co);                         // Is coroutine done/not active?
@@ -135,10 +137,10 @@ bool            cco_flt_takewhile(bool predicate);                  // Use inste
 
 ## Rules
 1. All cco-features must be called/placed in the ***cco_async*** scope.
-2. Avoid declaring local variables within a ***cco_async*** scope. They are only alive until next ***cco_yield..***
-or `cco_await..` suspension point. Normally place them in the coroutine struct. Be particularly careful with
+2. Avoid declaring local variables within a ***cco_async*** scope. They are only alive until next ***cco_suspend..***,
+***cco_yield..***, or `cco_await..`. Normally place them in the coroutine struct. Be particularly careful with
 control variables in loops.
-3. Do not call ***cco_yield\**** or ***cco_await\**** inside a `switch` statement. Use `if-else-if` in those cases.
+3. Do not call ***cco_suspend\****, ***cco_yield\**** or ***cco_await\**** inside a `switch` statement. Use `if-else-if` in those cases.
 4. Never use regular `return` inside ***cco_async*** scope, always use ***cco_return***.
 5. Resuming a coroutine after it has returned 0 (CCO_DONE) is undefined behaviour ***if*** there is additional
 code between the ***cco_async*** scope and `return 0`.
@@ -253,7 +255,7 @@ int main(void) {
 ### Actor models of concurrency in video games and simulations
 A common usage of coroutines is long-running concurrent tasks, often found in video games. An example of this is the
 [Dining philosopher's problem](https://en.wikipedia.org/wiki/Dining_philosophers_problem). The following
-implementation uses `cco_await` and `cco_yield`. It avoids deadlocks by awaiting for both forks to be
+implementation uses `cco_await` and `cco_suspend`. It avoids deadlocks by awaiting for both forks to be
 available before aquiring them. It also avoids starvation by increasing both neighbor's hunger when a philosopher
 starts eating (because they must be waiting).
 
@@ -330,8 +332,8 @@ int Dining(struct Dining* self) {
             for (int i = 0; i < num_philosophers; ++i) {
                 Philosopher(&self->philos[i]); // resume until next yield
             }
-            cco_yield; // suspend, return control back to caller who
-                       // can do other tasks before resuming dining.
+            cco_suspend; // return control back to caller who
+                         // can do other tasks before resuming dining.
         }
     }
 
@@ -401,7 +403,7 @@ int TaskC(struct TaskC* self) {
         cco_task_throw(99);
 
         puts("TaskC work");
-        cco_yield;
+        cco_suspend;
         puts("TaskC more work");
 
         cco_drop:
@@ -505,7 +507,7 @@ int TaskC(struct TaskC* self) {
         cco_task_throw(99);
 
         puts("TaskC work");
-        cco_yield;
+        cco_suspend;
 
         puts("TaskC more work");
         // initial return value
@@ -590,7 +592,7 @@ int main(void)
 ### Producer-consumer pattern (symmetric coroutines) tasks
 Tasks are executed using an *executor*, which is easy to do via the ***cco_run_task()*** macro.
 Coroutines awaits (or "calls") other coroutines with ***cco_await_task()***, in which case the awaited coroutine will give
-control back to the caller whenever it finishes or reaches a `cco_yield` or another `cco_await*` suspension point in the
+control back to the caller whenever it finishes or reaches a `cco_suspend` or another `cco_await*` suspension point in the
 code. This is knows as asymmetric calls.
 
 However, coroutines may also transfer control directly to another coroutine using ***cco_yield_to()***.
@@ -671,7 +673,7 @@ int consume(struct consume* self) {
 
         cco_drop:
 		puts("drop consumer");
-		cco_yield; // demo async destruction.
+		cco_suspend; // demo async destruction.
         puts("done consumer");
     }
 
@@ -765,11 +767,11 @@ int scheduler(struct Scheduler* self) {
 static int taskX(struct TaskX* self) {
     cco_async (self) {
         printf("Hello from task %c\n", self->id);
-        cco_yield;
+        cco_suspend;
         printf("%c is back doing work\n", self->id);
-        cco_yield;
+        cco_suspend;
         printf("%c is back doing more work\n", self->id);
-        cco_yield;
+        cco_suspend;
 
         cco_drop:
         printf("%c is done\n", self->id);
@@ -781,18 +783,18 @@ static int taskX(struct TaskX* self) {
 static int TaskA(struct TaskA* self) {
     cco_async (self) {
         puts("Hello from task A");
-        cco_yield;
+        cco_suspend;
 
         puts("A is back doing work");
-        cco_yield;
+        cco_suspend;
 
         puts("A adds task C");
-        Tasks *_tasks = cco_env(Tasks*); // local var only alive until cco_yield.
+        Tasks *_tasks = cco_env(Tasks*); // local var only alive until cco_suspend.
         Tasks_push(_tasks, cco_cast_task(c_new(struct TaskX, {.base={taskX}, .id='C'})));
-        cco_yield;
+        cco_suspend;
 
         puts("A is back doing more work");
-        cco_yield;
+        cco_suspend;
 
         cco_drop:
         puts("A is done");

@@ -193,7 +193,7 @@ is deliberately set to 1 in order to easier detect zero or not initialized varia
 * Caveat 1: `c_when()` and `if (c_is())` behaves like a one-iteration loop; i.e, the use of `continue`
   and `break` will just break out of its block (meaning not out of any outer loop/switch).
 * Caveat 2: Sum types will generally not work in coroutines because the `x` variable is local and therefore
-will not be preserved across `cco_yield..` / `cco_await..`.
+will not be preserved across `cco_suspend` / `cco_yield..` / `cco_await..`.
 * Caveat 3: In the second (2) usage, `c_is(obj,VE,x)` combined with `&&` or `||` will not compile.
 
 ### Example 1

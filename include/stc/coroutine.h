@@ -66,8 +66,8 @@ enum {
 typedef enum {
     CCO_DONE = 0,
     CCO_YIELD = 1<<12,
-    CCO_AWAIT = 1<<13,
-    CCO_NOOP = 1<<14,
+    CCO_SUSPEND = 1<<13,
+    CCO_AWAIT = 1<<14,
 } cco_result;
 #define CCO_CANCEL (1U<<30)
 
@@ -140,10 +140,12 @@ typedef struct {
 
 #define cco_yield \
     cco_yield_v(CCO_YIELD)
+#define cco_suspend \
+    cco_yield_v(CCO_SUSPEND)
 
-#define cco_yield_v(value) \
+#define cco_yield_v(status) \
     do { \
-        _state->pos = __LINE__; return value; \
+        _state->pos = __LINE__; return status; \
         case __LINE__:; \
     } while (0)
 
@@ -252,7 +254,7 @@ typedef struct cco_task cco_task;
         _fb->task = _await_task; \
         _await_task->base.state.fb = _fb; \
     } \
-    cco_yield_v(CCO_NOOP); \
+    cco_yield_v(CCO_SUSPEND); \
 } while (0)
 
 /* Symmetric coroutine flow of control transfer */
@@ -264,7 +266,7 @@ typedef struct cco_task cco_task;
         _fb->task = _to_task; \
         _to_task->base.state.fb = _fb; \
     } \
-    cco_yield_v(CCO_NOOP); \
+    cco_yield_v(CCO_SUSPEND); \
 } while (0)
 
 #define cco_resume_task(a_task) \
@@ -352,7 +354,7 @@ int cco_resume_current(cco_fiber* fb) {
             }
             if (!((fb->status & ~fb->awaitbits) || (fb->task = fb->parent_task) != NULL))
                 break;
-            cco_yield_v(CCO_NOOP);
+            cco_yield_v(CCO_SUSPEND);
         }
     }
 
