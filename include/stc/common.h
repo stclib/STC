@@ -264,18 +264,29 @@ typedef const char* cstr_raw;
 STC_INLINE void* c_safe_memcpy(void* dst, const void* src, isize size)
     { return dst ? memcpy(dst, src, (size_t)size) : NULL; }
 
+#if INTPTR_MAX == INT64_MAX
+    #define FNV_BASIS 0xcbf29ce484222325
+    #define FNV_PRIME 0x00000100000001b3
+#else
+    #define FNV_BASIS 0x811c9dc5
+    #define FNV_PRIME 0x01000193
+#endif
+
 STC_INLINE size_t c_basehash_n(const void* key, isize len) {
-    size_t block = 0, hash = 0x811c9dc5;
+    size_t block = 0, h = FNV_BASIS;
     const uint8_t* msg = (const uint8_t*)key;
-    while (len > c_sizeof(size_t)) {
+    while (len >= c_sizeof(size_t)) {
         memcpy(&block, msg, sizeof(size_t));
-        hash = (hash ^ block) * (size_t)0x89bb179901000193;
+        h ^= block;
+        h *= FNV_PRIME;
         msg += c_sizeof(size_t);
         len -= c_sizeof(size_t);
     }
-    c_memcpy(&block, msg, len);
-    hash = (hash ^ block) * (size_t)0xb0340f4501000193;
-    return hash ^ (hash >> 3);
+    while (len--) {
+        h ^= *(msg++);
+        h *= FNV_PRIME;
+    }
+    return h;
 }
 
 STC_INLINE size_t c_hash_n(const void* key, isize len) {
@@ -287,8 +298,15 @@ STC_INLINE size_t c_hash_n(const void* key, isize len) {
     }
 }
 
-STC_INLINE size_t c_hash_str(const char *str)
-    { return c_basehash_n(str, c_strlen(str)); }
+STC_INLINE size_t c_hash_str(const char *str) {
+    uint64_t h = FNV_BASIS;
+    const uint8_t* msg = (const uint8_t*)str;
+    while (*msg) {
+        h ^= *(msg++);
+        h *= FNV_PRIME;
+    }
+    return h;
+}
 
 #define c_hash_mix(...) /* non-commutative hash combine! */ \
     _chash_mix(c_make_array(size_t, {__VA_ARGS__}), c_NUMARGS(__VA_ARGS__))

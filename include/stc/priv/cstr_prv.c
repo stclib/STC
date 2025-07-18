@@ -39,7 +39,7 @@ cstr* cstr_take(cstr* self, const cstr s) {
 
 size_t cstr_hash(const cstr *self) {
     csview sv = cstr_sv(self);
-    return c_basehash_n(sv.buf, sv.size);
+    return c_hash_str(sv.buf);
 }
 
 isize cstr_find_sv(const cstr* self, csview search) {
