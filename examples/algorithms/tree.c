@@ -4,7 +4,7 @@
 #include <stc/types.h>
 
 c_sumtype (Tree,
-    (TreeEmpty, _Bool),
+    (TreeEmpty, bool),
     (TreeLeaf, int),
     (TreeNode, struct { int value; Tree *left, *right; })
 );

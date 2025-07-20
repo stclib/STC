@@ -5,7 +5,7 @@
 declare_rc(TreeRc, union Tree);
 
 c_sumtype (Tree,
-    (TreeEmpty, _Bool),
+    (TreeEmpty, bool),
     (TreeLeaf, int),
     (TreeNode, struct { int value; TreeRc left, right; })
 );

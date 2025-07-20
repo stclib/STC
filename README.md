@@ -3,7 +3,7 @@
 
 # STC - Smart Template Containers
 
-## Version 6.0 beta1
+## Version 6.0 beta2
 STC is a mature, comprehensive, general purpose container and algorithm library for C99/C11.
 It has excellent ergonomics and requires virtually no boilerplate code. The library adds many
 missing features to C, like common data containers, algorithms, and abstractions found in
@@ -14,7 +14,16 @@ or generic, which allows for a fully typesafe, compact, and high performance imp
 <summary><b>Version 6 NEWS</b></summary>
 
 V6.0:
-- New powerful V2 coroutines with much improved usability.
+- New powerful V2 coroutines with waitgroups, cancellation and async_drop.
+- Fixed #138: general hash function bug.
+- Fixed queue/deque shrink_to_fit() and reserve() bugs.
+- Fixed i_aux and custom allocations bugs.
+- Fixed #136: missing exports in hmap, #137: declare_hash_set()
+- Fixed #133: bug in vec/stack _begin() and _rbegin().
+- Fixed #129: Makefile bugs and improvements.
+- Fixed #128: bug in cstr_istarts_with(). 
+- Issue #123: Added GNU print format attribute to cstr_from_fmt(), cstr_printf().
+- Improved documentation.
 
 V5.1:
 - Specifying containers with non-trivial element types can now be done with a single `#define`
@@ -95,11 +104,12 @@ Containers
 
 Algorithms
 ----------
-- [***Ranged for-loop abstractions***](docs/algorithm_api.md#ranged-for-loop-control-blocks)
-- [***Generic algorithms***](docs/algorithm_api.md#generic-algorithms)
-- [***Sum types*** - a.k.a. variants or tagged unions](docs/algorithm_api.md#sum-types)
-- [***Coroutines*** - ergonomic portable coroutines](docs/coroutine_api.md)
+- [***Coroutines*** - ergonomic, portable coroutines](docs/coroutine_api.md)
+- [***Sum types*** - a.k.a. variants, tagged/discriminating unions](docs/algorithm_api.md#sum-types)
 - [***Regular expressions*** - Rob Pike's Plan 9 regexp modernized!](docs/cregex_api.md)
+- [***Multi-dimensional span*** - dynamic mdspan/subspan views into arrays](docs/cspan_api.md)
+- [***for-loop abstractions*** - ranged and on containers](docs/algorithm_api.md#ranged-for-loop-control-blocks)
+- [***Misc generic algorithms*** - incl. fast qsort/binsort/lowerbound](docs/algorithm_api.md#generic-algorithms)
 - [***Random numbers*** - a very fast *PRNG* based on *SFC64*](docs/random_api.md)
 - [***Command line argument parser*** - similar to *getopt()*](docs/coption_api.md)
 

@@ -187,14 +187,15 @@ if (c_is(SumType* obj, VariantTagA, VariantTagA_type* x))
 ```
 The **c_when** statement is exhaustive. The compiler will give a warning if not all variants are
 covered by **c_is** (requires `-Wall` or `-Wswitch` gcc/clang compiler flag). The first enum value
-is deliberately set to 1 in order to easier detect zero or not initialized variants.
+is deliberately set to `__LINE__*1000` in order to easier detect zero or not initialized variants.
 
 * Note: The `x` variables in the synopsis are "auto" type declared/defined - see examples.
 * Caveat 1: `c_when()` and `if (c_is())` behaves like a one-iteration loop; i.e, the use of `continue`
   and `break` will just break out of its block (meaning not out of any outer loop/switch).
 * Caveat 2: Sum types will generally not work in coroutines because the `x` variable is local and therefore
 will not be preserved across `cco_suspend` / `cco_yield..` / `cco_await..`.
-* Caveat 3: In the second (2) usage, `c_is(obj,VE,x)` combined with `&&` or `||` will not compile.
+* Caveat 3: The second usage (2), `c_is(obj, TAG, x)` can only be used isolated in an if-statement, like
+in the _drop() function of Example 2 below.
 
 ### Example 1
 
@@ -204,7 +205,7 @@ will not be preserved across `cco_suspend` / `cco_yield..` / `cco_await..`.
 #include <stc/algorithm.h>
 
 c_sumtype (Tree,
-    (Empty, _Bool),
+    (Empty, bool),
     (Leaf, int),
     (Node, struct {int value; Tree *left, *right;})
 );
@@ -249,7 +250,7 @@ c_sumtype (Color,
 );
 
 c_sumtype (Message,
-    (MessageQuit, _Bool),
+    (MessageQuit, bool),
     (MessageMove, struct {int32 x, y;}),
     (MessageWrite, cstr),
     (MessageChangeColor, Color)

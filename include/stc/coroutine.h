@@ -140,6 +140,7 @@ typedef struct {
 
 #define cco_yield \
     cco_yield_v(CCO_YIELD)
+
 #define cco_suspend \
     cco_yield_v(CCO_SUSPEND)
 
@@ -254,7 +255,7 @@ typedef struct cco_task cco_task;
         _fb->task = _await_task; \
         _await_task->base.state.fb = _fb; \
     } \
-    cco_yield_v(CCO_SUSPEND); \
+    cco_suspend; \
 } while (0)
 
 /* Symmetric coroutine flow of control transfer */
@@ -266,7 +267,7 @@ typedef struct cco_task cco_task;
         _fb->task = _to_task; \
         _to_task->base.state.fb = _fb; \
     } \
-    cco_yield_v(CCO_SUSPEND); \
+    cco_suspend; \
 } while (0)
 
 #define cco_resume_task(a_task) \
@@ -354,7 +355,7 @@ int cco_resume_current(cco_fiber* fb) {
             }
             if (!((fb->status & ~fb->awaitbits) || (fb->task = fb->parent_task) != NULL))
                 break;
-            cco_yield_v(CCO_SUSPEND);
+            cco_suspend;
         }
     }
 

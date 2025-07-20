@@ -273,14 +273,15 @@ STC_INLINE void* c_safe_memcpy(void* dst, const void* src, isize size)
 #endif
 
 STC_INLINE size_t c_basehash_n(const void* key, isize len) {
-    size_t block = 0, h = FNV_BASIS;
     const uint8_t* msg = (const uint8_t*)key;
-    while (len >= c_sizeof(size_t)) {
-        memcpy(&block, msg, sizeof(size_t));
+    size_t h = FNV_BASIS, block = 0;
+
+    while (len >= c_sizeof h) {
+        memcpy(&block, msg, sizeof h);
         h ^= block;
         h *= FNV_PRIME;
-        msg += c_sizeof(size_t);
-        len -= c_sizeof(size_t);
+        msg += c_sizeof h;
+        len -= c_sizeof h;
     }
     while (len--) {
         h ^= *(msg++);
@@ -299,8 +300,8 @@ STC_INLINE size_t c_hash_n(const void* key, isize len) {
 }
 
 STC_INLINE size_t c_hash_str(const char *str) {
-    uint64_t h = FNV_BASIS;
     const uint8_t* msg = (const uint8_t*)str;
+    uint64_t h = FNV_BASIS;
     while (*msg) {
         h ^= *(msg++);
         h *= FNV_PRIME;

@@ -28,7 +28,7 @@
 
 c_sumtype (Action,
     (ActionSpeak, cstr),
-    (ActionQuit, _Bool),
+    (ActionQuit, bool),
     (ActionRunFunc, struct {
         int32 (*func)(int32, int32);
         int32 v1, v2;
@@ -86,11 +86,11 @@ int main(void) {
 #define _c_E0(...) __VA_ARGS__
 #define _c_E1(...) _c_E0(_c_E0(_c_E0(_c_E0(_c_E0(_c_E0(__VA_ARGS__))))))
 #define _c_E2(...) _c_E1(_c_E1(_c_E1(_c_E1(_c_E1(_c_E1(__VA_ARGS__))))))
-#define c_EVAL(...) _c_E2(_c_E2(_c_E2(__VA_ARGS__))) // support up to 130 variants
+#define c_EVAL(...) _c_E2(_c_E2(_c_E2(__VA_ARGS__))) // currently supports up to 130 variants
 #define c_LOOP(f,T,x,...) _c_CHECK(_c_LOOP0, c_JOIN(_c_LOOP_END_, c_NUMARGS(c_EXPAND x)))(f,T,x,__VA_ARGS__)
 
 
-#define _c_enum_1(x,...) (x=__LINE__*100, __VA_ARGS__)
+#define _c_enum_1(x,...) (x=__LINE__*1000, __VA_ARGS__)
 #define _c_vartuple_tag(T, Tag, ...) Tag,
 #define _c_vartuple_type(T, Tag, ...) typedef __VA_ARGS__ Tag##_type; typedef T Tag##_sumtype;
 #define _c_vartuple_var(T, Tag, ...) struct { enum enum_##T tag; Tag##_type get; } Tag;

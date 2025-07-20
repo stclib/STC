@@ -92,13 +92,14 @@ TEST(algorithm, c_filter)
     IVec_drop(&vec);
 }
 
+// TEST c_sumtype:
 
 c_sumtype (Action,
     (ActionSpeak, cstr),
-    (ActionQuit, _Bool),
+    (ActionQuit, bool),
     (ActionRunFunc, struct {
-        int32 (*func)(int32, int32);
-        int32 v1, v2;
+        int (*func)(int, int);
+        int v1, v2;
     }),
 );
 
@@ -116,14 +117,14 @@ static void action(Action* action, cstr* out) {
             cstr_printf(out, "Asked to quit!\n");
         }
         c_is(ActionRunFunc, r) {
-            int32 res = r->func(r->v1, r->v2);
+            int res = r->func(r->v1, r->v2);
             cstr_printf(out, "v1: %d, v2: %d, res: %d\n", r->v1, r->v2, res);
         }
         c_otherwise assert("no match" == NULL);
     }
 }
 
-static int32 add(int32 a, int32 b) {
+static int add(int a, int b) {
     return a + b;
 }
 
