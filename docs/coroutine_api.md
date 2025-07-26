@@ -59,30 +59,45 @@ void            cco_run_coroutine(corofunc(co)) {};                 // Run block
 ```c++
                 cco_task_struct(name) { <name>_base base; ... };    // Define a custom coroutine task struct; extends cco_task struct.
 
-int             cco_resume_task(cco_task* task);                    // Resume suspended task, return status.
+const struct
+int             cco_status();                                       // Get current return status from last cco_resume() call.
+<Type>*         cco_env(<Type> *);                                  // Get awaited task environment pointer, casted to <Type>*.
+cco_fiber*      cco_fb();                                           // Get current fiber.
+cco_error*      cco_err();                                          // Get error object created from cco_throw(error) call.
+                                                                    // Should be handled in a cco_drop: section.
+
+int             cco_resume(cco_task* task);                         // Resume suspended task, return status.
+
                 cco_await_task(cco_task* task);                     // Await until task's resume status is CCO_DONE/0 (asymmetric "call").
                 cco_await_task(cco_task* task, int awaitbits);      // Await until task's resume status is in (awaitbits | CCO_DONE).
 void            cco_yield_to(cco_task* task);                       // Yield to task (symmetric transfer of control).
 
-void            cco_task_throw(int error);                          // Throw an error. Will unwind call/await-task stack. Handling is required.
-cco_error       cco_err();                                          // Get current thrown error object. Should be handled in a cco_drop: section.
-                cco_recover_task();                                 // Reset current error and jump to the original resume point in current task.
-void            cco_cancel_fiber(cco_task* task);                   // Cancel the fiber associated with task, by throwing a CCO_CANCEL.
-                                                                    // It propagates to parent awaits - may be stopped/recovered at cco_drop:.
-void            cco_spawn(cco_task* task);                          // Spawn a new concurrent task. Does not suspend the current task.
-void            cco_spawn(cco_task* task, void* env);               // Same, env may be used as a future, or anything.
+                cco_throw(int error);                               // Throw an error. Will unwind call/await-task stack.
+                                                                    // Handling of error *is* required else abort().
+                cco_throw(CCO_CANCEL);                              // Throw a cancellation of the current task.
+                                                                    // It will silently unwind the await stack. Handling *not*
+                                                                    // required, but it may be recovered in a cco_drop: section.
+                cco_cancel(cco_task* task);                         // Use for cancelling a spawned/launched task.
+
+                cco_recover;                                        // Resume from the original suspend point in the current task,
+                                                                    // and clear error/cancellation status. Should be done
+                                                                    // from a cco_drop: section.
+
+void            cco_spawn(cco_task* task);                          // Lazily spawn a new concurrent task, detached.
+void            cco_spawn(cco_task* task, void* env);               // Same, env may be used as a "promise", or anything.
 void            cco_spawn(cco_task* task, void* env,
                           cco_fiber** fb_ref);                      // Same, but it may be called from main/outside `cco_async`.
-bool            cco_joined();                                       // Return true if all concurrent spawned tasks are joined.
+bool            cco_joined();                                       // Check if all concurrent spawned tasks are joined.
 
 void            cco_reset_group(cco_group* wg);                     // Reset waitgroup.
-void            cco_launch(cco_task* task, cco_group* wg);          // Spawn a new concurrent task, with a waitgroup. Does not suspend current.
-void            cco_launch(cco_task* t, cco_group* wg, void* env);  // Same, env may be used as a future, or anything.
+void            cco_launch(cco_task* task, cco_group* wg);          // Lazily spawn a new concurrent task within a waitgroup.
+void            cco_launch(cco_task* t, cco_group* wg, void* env);  // Same, env may be used as a "promise", or anything.
 
-                cco_await_all(cco_group* wg);                       // Await for all launched tasks in waitgroup to finish.
+                // If tasks were launched, all must be awaited for by using these awaiter functions:
                 cco_await_any(cco_group* wg);                       // Await for any launched tasks in waitgroup to finish.
                 cco_await_n(cco_group* wg, int n);                  // Await for n launched tasks in waitgroup to finish.
                 cco_await_cancel(cco_group* wg);                    // Cancel remaining tasks/fibers in wg and await for them.
+                cco_await_all(cco_group* wg);                       // Await for all remaining tasks in waitgroup to finish.
 
 void            cco_run_task(cco_task* task) {}                     // Run task blocking until it and spawned fibers are finished.
 void            cco_run_task(cco_task* task, void *env) {}          // Run task blocking with env data
@@ -128,38 +143,40 @@ bool            cco_flt_takewhile(bool predicate);                  // Use inste
 ## Types
 | Type name         | Type definition / usage                             | Used to represent... |
 |:------------------|:----------------------------------------------------|:---------------------|
-|`cco_status`       | **enum** `CCO_DONE`, `CCO_AWAIT`, `CCO_YIELD`       | Default set of return status from coroutines |
-|`cco_error`        | `struct { int32 code, line; const char* file; }`    | Error object for exceptions |
-|`cco_task`         | Base function-object coroutine frame type           |                      |
-|`cco_timer`        | Timer type                                          |                      |
-|`cco_semaphore`    | Semaphore type                                      |                      |
-|`cco_fiber`        | Struct type | Represent a thread-like entity within a thread |
+|`cco_status`       | **enum** `CCO_DONE`, `CCO_AWAIT`, `CCO_SUSPEND`, `CCO_YIELD` | Default set of return status from coroutines |
+|`struct cco_error` | `struct { int32_t code, line; const char* file; }`    | Error object for exceptions |
+|`cco_task`         | Enclosure/function object                           | Basic coroutine frame type |
+|`cco_timer`        | Struct type                                         | Delay timer               |
+|`cco_semaphore`    | Struct type                                         | Synchronization primitive |
+|`cco_fiber`        | `struct { int status; }`                                         | Represent a thread-like entity within a thread |
 
 ## Rules
 1. All cco-features must be called/placed in the ***cco_async*** scope.
-2. Avoid declaring local variables within a ***cco_async*** scope. They are only alive until next ***cco_suspend..***,
-***cco_yield..***, or `cco_await..`. Normally place them in the coroutine struct. Be particularly careful with
+2. Avoid declaring local variables within a ***cco_async*** scope. They are only alive until next ***cco_suspend***,
+***cco_yield..***, or ***cco_await..***. Normally place them in the coroutine struct. Be particularly careful with
 control variables in loops.
-3. Do not call ***cco_suspend\****, ***cco_yield\**** or ***cco_await\**** inside a `switch` statement. Use `if-else-if` in those cases.
+3. Do not call ***cco_suspend***, ***cco_yield..*** or ***cco_await..*** inside a `switch` statement. Use `if-else-if` in those cases.
 4. Never use regular `return` inside ***cco_async*** scope, always use ***cco_return***.
 5. Resuming a coroutine after it has returned 0 (CCO_DONE) is undefined behaviour ***if*** there is additional
 code between the ***cco_async*** scope and `return 0`.
 6. There may only be one ***cco_async*** scope per coroutine.
 
 ## Implementation and examples
-A regular coroutine may have any signature, however this implementation has specific support for
-coroutines which returns `int`, indicating CCO_DONE, CCO_AWAIT, CCO_YIELD, or a custom value.
-It should take a struct pointer as one of the parameter which must contains a state-state member named `state`.
+A plain coroutine may have any signature, however this implementation has specific support for
+coroutines which returns `int`, indicating CCO_DONE, CCO_AWAIT, CCO_SUSPEND, CCO_YIELD, or a custom int value.
+It also require a struct pointer as one of the parameters, which must contains a member of type ***cco_base*** named `base`.
 The coroutine struct should normally store all *local* variables to be used within the coroutine
-(technically those which lifetime crosses a `cco_yield..` or a `cco_await..` statement), along with
-*input* and *output* data for the coroutine.
+(technically those where its usage crosses over a ***cco_yield..***, ***cco_await..*** or a ***cco_suspend***
+statement), along with *input* and *output* data/parameters for the coroutine.
 
 Both asymmetric and symmetric coroutine control flow transfer are supported when using ***tasks***
-(closures/functors), and they may be combined.
+(closures/functors), and they may be combined. Be aware of that cleanup (if needed) is harder to ensure
+for symmetric transfer of control (***cco_yield_to***), because there is no automatic transfer back to
+the "caller"/*awaiter* when it is finished, like it is in the asymmetric case (***cco_await_task***).
 
 This implementation is not limited to support only a certain set of coroutine types,
 like generators. They operate like stackful coroutines, i.e. tasks can efficiently yield
-or await from a deeply nested coroutine call by utilizing extended `cco_task` structs described below.
+or await within deeply nested coroutines "calls".
 
 ----
 ### Generators
@@ -272,15 +289,15 @@ starts eating (because they must be waiting).
 enum {num_philosophers = 5};
 enum PhMode {ph_thinking, ph_hungry, ph_eating};
 
-// Philosopher coroutine
-struct Philosopher {
+// Philosopher coroutine: use task coroutine
+cco_task_struct (Philosopher) {
+    Philosopher_base base; // required
     int id;
     cco_timer tm;
     enum PhMode mode;
     int hunger;
     struct Philosopher* left;
     struct Philosopher* right;
-    cco_base base; // required
 };
 
 int Philosopher(struct Philosopher* self) {
@@ -312,15 +329,16 @@ int Philosopher(struct Philosopher* self) {
 }
 
 // Dining coroutine
-struct Dining {
+cco_task_struct (Dining) {
+    Dining_base base; // required
     struct Philosopher philos[num_philosophers];
-    cco_base base; // required
 };
 
 int Dining(struct Dining* self) {
     cco_async (self) {
         for (int i = 0; i < num_philosophers; ++i) {
             self->philos[i] = (struct Philosopher){
+                .base = {Philosopher},
                 .id = i + 1,
                 .left = &self->philos[(i - 1 + num_philosophers) % num_philosophers],
                 .right = &self->philos[(i + 1) % num_philosophers],
@@ -328,9 +346,9 @@ int Dining(struct Dining* self) {
         }
 
         while (1) {
-            // NB! local i OK here as it does not cross yield/await.
+            // NB! local i OK here as it does not cross yield/suspend/await.
             for (int i = 0; i < num_philosophers; ++i) {
-                Philosopher(&self->philos[i]); // resume until next yield
+                cco_resume(&self->philos[i]); // resume until next yield
             }
             cco_suspend; // return control back to caller who
                          // can do other tasks before resuming dining.
@@ -340,7 +358,7 @@ int Dining(struct Dining* self) {
     // cleanup: stop the philosphers
     for (int i = 0; i < num_philosophers; ++i) {
         cco_stop(&self->philos[i]);
-        Philosopher(&self->philos[i]); // execute philos cleanup.
+        cco_resume(&self->philos[i]); // execute philos cleanup.
     }
     puts("Dining done");
     return 0;
@@ -348,11 +366,11 @@ int Dining(struct Dining* self) {
 
 int main(void)
 {
-    struct Dining dining = {0};
+    struct Dining dining = {{Dining}};
     cco_timer tm = cco_make_timer(5.0);
     crand64_seed((uint64_t)time(NULL));
 
-    cco_run_coroutine(Dining(&dining)) {
+    cco_run_task(Dining(&dining)) {
         if (cco_timer_expired(&tm))
             cco_stop(&dining);
         cco_sleep(0.001); // do other things
@@ -363,7 +381,28 @@ int main(void)
 
 ----
 ### Tasks
-A task is a coroutine functor/enclosure. The base task type `cco_task`, contains a typesafe function pointer.
+A task is a coroutine functor/enclosure. Users must define a custom task type, which *extends* the basic ***cco_task***
+in a typesafe manner:
+```c++
+cco_task_struct (MyTask) {
+    MyTask_base base;
+    ... // other task members
+};
+```
+```c++
+// a useful convention is to use same name for the coroutine function as the struct task:
+int MyTask(struct MyTask* o) {
+    cco_async (o) {
+       ...
+    }
+    return 0;
+}
+
+int main(void) {
+    struct MyTask task = {{MyTask}}; // create the task on the stack.
+    cco_run_task(&task);
+}
+```
 
 #### Error handling with tasks
 Tasks allows for scheduling coroutines and more efficient deep nesting of coroutine calls/awaits.
@@ -375,7 +414,7 @@ and errors may be handled and recoveded higher up in the call tree in a simple, 
 
 The following example shows a task `start` which awaits `TaskA`, => awaits `TaskB`, => awaits `TaskC`. `TaskC` throws
 an error, which causes unwinding of the call stack. The error is finally handled in `TaskA`'s `cco_async` scope
-and recovered using `cco_recover_task()`. This call will resume control back to the original suspension point in the
+and recovered using `cco_recover`. This call will resume control back to the original suspension point in the
 current task. Because the "call-tree" is fixed, the coroutine frames to be called may be pre-allocated on the stack,
 which is very fast.
 
@@ -400,7 +439,7 @@ int TaskC(struct TaskC* self) {
         printf("TaskC start: {%g, %g}\n", self->x, self->y);
 
         // assume there is an error...
-        cco_task_throw(99);
+        cco_throw(99);
 
         puts("TaskC work");
         cco_suspend;
@@ -436,10 +475,10 @@ int TaskA(struct TaskA* self) {
         puts("TaskA work");
 
         cco_drop:
-        if (cco_err().code == 99) {
+        if (cco_err()->code == 99) {
             // if error not handled, will cause 'unhandled error'...
-            printf("TaskA recovered error '99' thrown on line %d\n", cco_err().line);
-            cco_recover_task();
+            printf("TaskA recovered error '99' thrown on line %d\n", cco_err()->line);
+            cco_recover;
         }
         puts("TaskA done");
     }
@@ -504,7 +543,7 @@ int TaskC(struct TaskC* self) {
         printf("TaskC start: {%g, %g}\n", self->x, self->y);
 
         // assume there is an error...
-        cco_task_throw(99);
+        cco_throw(99);
 
         puts("TaskC work");
         cco_suspend;
@@ -546,12 +585,12 @@ int TaskA(struct TaskA* self) {
         cco_env(Result *)->value += self->a; // final return value;
 
         cco_drop:
-        if (cco_err().code == 99) {
+        if (cco_err()->code == 99) {
             // if error not handled, will cause 'unhandled error'...
-            printf("TaskA recovered error '99' thrown on line %d\n", cco_err().line);
+            printf("TaskA recovered error '99' thrown on line %d\n", cco_err()->line);
 
-            cco_env(Result *)->error = cco_err().code; // set error in output
-            cco_recover_task(); // reset error to 0 and jump to past the await TaskB call.
+            cco_env(Result *)->error = cco_err()->code; // set error in output
+            cco_recover; // reset error to 0 and proceed after await TaskB call.
         }
         puts("TaskA done");
     }

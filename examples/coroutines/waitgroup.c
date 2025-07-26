@@ -60,10 +60,11 @@ int everyone(struct everyone* o) {
         }
         cco_suspend;
 
-        puts("Start");
-        //cco_cancel_fiber(o->sleep);
-        //cco_cancel_fiber(o);
-        puts("End");
+        puts("Here 1");
+        //cco_cancel(o->sleep);
+        //puts("sleep cancelled");
+        //cco_cancel(o); // => cco_throw(CCO_CANCEL);
+        puts("Here 2");
 
         cco_drop:
         puts("Await group");

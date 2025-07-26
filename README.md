@@ -3,7 +3,7 @@
 
 # STC - Smart Template Containers
 
-## Version 6.0 beta2
+## Version 6.0 beta3
 STC is a mature, comprehensive, general purpose container and algorithm library for C99/C11.
 It has excellent ergonomics and requires virtually no boilerplate code. The library adds many
 missing features to C, like common data containers, algorithms, and abstractions found in
@@ -12,6 +12,9 @@ or generic, which allows for a fully typesafe, compact, and high performance imp
 
 <details>
 <summary><b>Version 6 NEWS</b></summary>
+Apologies for the multiple API changes particularly on the coroutine and cspan module
+after V5.1. From upcoming V6.0 release, API is planned to be stable and changes will be
+made backward compatible.
 
 V6.0:
 - New powerful V2 coroutines with waitgroups, cancellation and async_drop.
@@ -21,7 +24,7 @@ V6.0:
 - Fixed #136: missing exports in hmap, #137: declare_hash_set()
 - Fixed #133: bug in vec/stack _begin() and _rbegin().
 - Fixed #129: Makefile bugs and improvements.
-- Fixed #128: bug in cstr_istarts_with(). 
+- Fixed #128: bug in cstr_istarts_with().
 - Issue #123: Added GNU print format attribute to cstr_from_fmt(), cstr_printf().
 - Improved documentation.
 
@@ -87,27 +90,29 @@ Containers
 - [***arc*** - (atomic) reference counted; shared pointer](docs/arc_api.md)
 - [***box*** - heap allocated unique pointer`](docs/box_api.md)
 - [***cbits*** - dynamic bitset](docs/cbits_api.md)
+- [***cstr*** - string type (short string optimized)](docs/cstr_api.md)
 - [***list*** - forward linked list](docs/list_api.md)
 - [***stack*** - stack type](docs/stack_api.md)
 - [***vec*** - vector type](docs/vec_api.md)
 - [***deque*** - double-ended queue](docs/deque_api.md)
 - [***queue*** - queue type](docs/queue_api.md)
 - [***pqueue*** - priority queue](docs/pqueue_api.md)
-- [***hmap*** - hashmap (unordered)](docs/hmap_api.md)
-- [***hset*** - hashset (unordered)](docs/hset_api.md)
-- [***smap*** - sorted binary tree map](docs/smap_api.md)
-- [***sset*** - sorted binary tree set](docs/sset_api.md)
-- [***cstr*** - string type (short string optimized)](docs/cstr_api.md)
+- [***hashmap*** - unordered map](docs/hmap_api.md)
+- [***hashset*** - unordered set](docs/hset_api.md)
+- [***sortedmap*** - binary tree map](docs/smap_api.md)
+- [***sortedset*** - binary tree set](docs/sset_api.md)
+
+Views
+-----
+- [***cspan*** - dynamic multi-dimensional (sub)span array view](docs/cspan_api.md)
 - [***csview*** - string view (non-zero terminated)](docs/csview_api.md)
 - [***zsview*** - zero-terminated string view](docs/zsview_api.md)
-- [***cspan*** - single and multidimensional span (view)](docs/cspan_api.md)
 
 Algorithms
 ----------
 - [***Coroutines*** - ergonomic, portable coroutines](docs/coroutine_api.md)
 - [***Sum types*** - a.k.a. variants, tagged/discriminating unions](docs/algorithm_api.md#sum-types)
 - [***Regular expressions*** - Rob Pike's Plan 9 regexp modernized!](docs/cregex_api.md)
-- [***Multi-dimensional span*** - dynamic mdspan/subspan views into arrays](docs/cspan_api.md)
 - [***for-loop abstractions*** - ranged and on containers](docs/algorithm_api.md#ranged-for-loop-control-blocks)
 - [***Misc generic algorithms*** - incl. fast qsort/binsort/lowerbound](docs/algorithm_api.md#generic-algorithms)
 - [***Random numbers*** - a very fast *PRNG* based on *SFC64*](docs/random_api.md)

@@ -18,7 +18,7 @@ int Scheduler(struct Scheduler* o) {
         while (!Tasks_is_empty(&o->tasks)) {
             o->pulled = Tasks_pull(&o->tasks);
 
-            int result = cco_resume_task(o->pulled);
+            int result = cco_resume(o->pulled);
 
             if (result == CCO_YIELD) {
                 Tasks_push(&o->tasks, o->pulled);

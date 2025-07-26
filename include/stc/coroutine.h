@@ -63,12 +63,12 @@ enum {
     CCO_STATE_DONE = -1,
     CCO_STATE_DROP = -2,
 };
-typedef enum {
+enum cco_status {
     CCO_DONE = 0,
     CCO_YIELD = 1<<12,
     CCO_SUSPEND = 1<<13,
     CCO_AWAIT = 1<<14,
-} cco_result;
+};
 #define CCO_CANCEL (1U<<30)
 
 typedef struct {
@@ -156,7 +156,7 @@ typedef struct {
         case __LINE__: if (!(until)) return CCO_AWAIT; \
     } while (0)
 
-/* cco_await_coroutine(): assumes coroutine returns a cco_result value (int) */
+/* cco_await_coroutine(): assumes coroutine returns a status value (int) */
 #define cco_await_coroutine(...) c_MACRO_OVERLOAD(cco_await_coroutine, __VA_ARGS__)
 #define cco_await_coroutine_1(corocall) cco_await_coroutine_2(corocall, CCO_DONE)
 #define cco_await_coroutine_2(corocall, awaitbits) \
@@ -168,7 +168,7 @@ typedef struct {
         } \
     } while (0)
 
-/* cco_run_coroutine(): assumes coroutine returns a cco_result value (int) */
+/* cco_run_coroutine(): assumes coroutine returns a status value (int) */
 #define cco_run_coroutine(corocall) \
     while ((1 ? (corocall) : -1) != CCO_DONE)
 
@@ -176,10 +176,10 @@ typedef struct {
 /*
  * Tasks and Fibers
  */
-typedef struct {
+struct cco_error {
     int32_t code, line;
     const char* file;
-} cco_error;
+};
 
 typedef struct cco_fiber {
     struct cco_task* task;
@@ -187,7 +187,7 @@ typedef struct cco_fiber {
     struct cco_task* parent_task;
     struct cco_fiber* next;
     struct cco_state recover_state;
-    cco_error err;
+    struct cco_error err;
     int awaitbits, status;
     cco_base base; /* is a coroutine object itself */
 } cco_fiber;
@@ -208,15 +208,15 @@ cco_task_struct(cco_task) { cco_task_base base; };
 typedef struct cco_task cco_task;
 
 #define cco_env(Tp) ((Tp)_state->fb->env)
-#define cco_err() (*(const cco_error*)&_state->fb->err)
+#define cco_err() (&_state->fb->err)
 #define cco_status() (_state->fb->status + 0)
-
+#define cco_fb() (_state->fb + 0)
 
 #define cco_cast_task(...) \
     ((void)sizeof((__VA_ARGS__)->base.func(__VA_ARGS__)), (cco_task *)(__VA_ARGS__))
 
-/* Throw an "exception"; can be catched up in the cco_await_task call tree */
-#define cco_task_throw(error_code) \
+/* Return with error and unwind await stack; must be recovered in cco_drop section */
+#define cco_throw(error_code) \
     do { \
         cco_fiber* _fb = _state->fb; \
         _fb->err.code = error_code; \
@@ -225,7 +225,9 @@ typedef struct cco_task cco_task;
         cco_return; \
     } while (0)
 
-#define cco_cancel_fiber(a_task) \
+/* Cancel job/task and unwind await stack; MAY be stopped (recovered) in cco_drop section */
+/* Equal to cco_throw(CCO_CANCEL) if a_task is the current task/fiber. */
+#define cco_cancel(a_task) \
     do { \
         cco_fiber* _fb = cco_cast_task(a_task)->base.state.fb; \
         _fb->err.code = CCO_CANCEL; \
@@ -235,7 +237,8 @@ typedef struct cco_task cco_task;
         if (_fb->task == _state->fb->task) goto _resume; \
     } while (0)
 
-#define cco_recover_task() \
+/* Recover the thrown error; to be used in cco_drop section upon handling cco_err()->code */
+#define cco_recover \
     do { \
         cco_fiber* _fb = _state->fb; \
         c_assert(_fb->err.code); \
@@ -270,7 +273,7 @@ typedef struct cco_task cco_task;
     cco_suspend; \
 } while (0)
 
-#define cco_resume_task(a_task) \
+#define cco_resume(a_task) \
     _cco_resume_task(cco_cast_task(a_task))
 
 static inline int _cco_resume_task(cco_task* task)
@@ -300,7 +303,7 @@ static inline int _cco_resume_task(cco_task* task)
 #define cco_await_any(waitgroup) cco_await_n(waitgroup, 1)
 #define cco_await_n(waitgroup, n) do { \
     (waitgroup)->await_count = (waitgroup)->launch_count - (n); \
-    if ((waitgroup)->await_count < 0) cco_task_throw(1); \
+    if ((waitgroup)->await_count < 0) cco_throw(1); \
     cco_await((waitgroup)->launch_count == (waitgroup)->await_count); \
 } while (0)
 
@@ -310,7 +313,7 @@ static inline int _cco_resume_task(cco_task* task)
         while (_top->base.parent_task) \
             _top = _top->base.parent_task; \
         if (_top->base.state.wg == (waitgroup)) \
-            cco_cancel_fiber(_top); \
+            cco_cancel(_top); \
     } \
     cco_await_all(waitgroup); \
 } while (0)
@@ -360,8 +363,8 @@ int cco_resume_current(cco_fiber* fb) {
     }
 
     if ((uint32_t)fb->err.code & ~CCO_CANCEL) { // Allow CCO_CANCEL not to trigger error.
-        fprintf(stderr, __FILE__ ": error: unhandled coroutine exception '%d'\n"
-                        "%s:%d: unhandled: cco_task_throw(%d)\n",
+        fprintf(stderr, __FILE__ ": error: unhandled coroutine error '%d'\n"
+                        "%s:%d: cco_throw(%d);\n",
                         fb->err.code, fb->err.file, fb->err.line, fb->err.code);
         exit(fb->err.code);
     }

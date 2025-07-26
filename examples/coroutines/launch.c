@@ -51,7 +51,7 @@ int taskC(struct taskC* o) {
         printf("taskC start: {%g, %g}\n", o->x, o->y);
 
         // assume there is an error...
-        cco_task_throw(99);
+        cco_throw(99);
 
         puts("taskC work");
         cco_suspend;
@@ -89,9 +89,9 @@ int taskB(struct taskB* o) {
         puts("Spawned 3 tasks.");
 
         cco_drop:
-        if (cco_err().code == 99) {
-            printf("taskA recovered error '99' thrown on line %d\n", cco_err().line);
-            cco_recover_task(); // reset error to 0 and jump to after the await call.
+        if (cco_err()->code == 99) {
+            printf("taskA recovered error '99' thrown on line %d\n", cco_err()->line);
+            cco_recover; // reset error to 0 and proceed after the await taskB call.
         }
         cco_await_all(&OUT->wg);
         puts("Joined");
