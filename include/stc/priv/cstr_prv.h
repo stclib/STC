@@ -370,7 +370,7 @@ STC_INLINE char* cstr_append_s(cstr* self, cstr s)
 } while (0);
 
 #define cstr_join_items(self, sep, ...) \
-    cstr_join_n(self, sep, c_make_array(const char*, __VA_ARGS__), c_NUMARGS(__VA_ARGS__))
+    cstr_join_n(self, sep, c_make_array(const char*, __VA_ARGS__), c_sizeof((const char*[])__VA_ARGS__)/c_sizeof(char*))
 
 STC_INLINE void cstr_join_n(cstr* self, const char* sep, const char* arr[], isize n) {
     const char* _sep = cstr_is_empty(self) ? "" : sep;

@@ -30,8 +30,8 @@ c_sumtype (Action,
     (ActionSpeak, cstr),
     (ActionQuit, bool),
     (ActionRunFunc, struct {
-        int32 (*func)(int32, int32);
-        int32 v1, v2;
+        int32_t (*func)(int32_t, int32_t);
+        int32_t v1, v2;
     })
 );
 
@@ -49,14 +49,14 @@ void action(Action* action) {
             printf("Asked to quit!\n");
         }
         c_is(ActionRunFunc, r) {
-            int32 res = r->func(r->v1, r->v2);
+            int32_t res = r->func(r->v1, r->v2);
             printf("v1: %d, v2: %d, res: %d\n", r->v1, r->v2, res);
         }
         c_otherwise assert(!"no match");
     }
 }
 
-int32 add(int32 a, int32 b) {
+int32_t add(int32_t a, int32_t b) {
     return a + b;
 }
 

@@ -42,25 +42,25 @@ a compile error is issued. Runtime bounds checks are enabled by default (define 
 SpanType        c_make(<SpanType>, {v1, v2, ...});                  // make a local 1-d cspan from values (stack memory)
 SpanType        cspan_make(<SpanType>, {v1, v2, ...});              // make a local 1-d cspan  (stack/global memory)
 SpanType        cspan_zeros(<SpanType>, N);                         // make a local 1-d fixed size cspan (stack memory)
-SpanType        cspan_from_n(ValueType* ptr, int32 n);              // create a 1-d cspan from a pointer and length
+SpanType        cspan_from_n(ValueType* ptr, int32_t n);              // create a 1-d cspan from a pointer and length
 SpanType        cspan_from_array(ValueType array[]);                // create a 1-d cspan from a C array
 SpanType        cspan_from_vec(<VecType>* cnt);                     // create a 1-d cspan from a vec or stack
 
                 // ISpan2 m = {data, cspan_shape(3, 4), cspan_strides(4, 1)}; // => ISpan2 m = cspan_md(data, 3, 4);
-int32[N]        cspan_shape(xd, ...)                                // specify dimensions for SpanTypeN constructor
+int32_t[N]      cspan_shape(xd, ...)                                // specify dimensions for SpanTypeN constructor
 cspan_tupleN    cspan_strides(xs, ...)                              // specify strides for SpanTypeN constructor
 
 int             cspan_rank(const SpanTypeN* self);                  // num dimensions; compile-time constant
 isize           cspan_size(const SpanTypeN* self);                  // return number of elements
-isize           cspan_index(const SpanTypeN* self, int32 i, j..);   // offset index at i, j,...; range checked
+isize           cspan_index(const SpanTypeN* self, int32_t i, j..); // offset index at i, j,...; range checked
 
-ValueType*      cspan_at(const SpanTypeN* self, int32 i, j..);      // get element; index range checked
+ValueType*      cspan_at(const SpanTypeN* self, int32_t i, j..);    // get element; index range checked
 ValueType*      cspan_front(const SpanTypeN* self);                 // first element pointer
 ValueType*      cspan_back(const SpanTypeN* self);                  // last element pointer
 
                 // Construct a multi-dim span
-SpanTypeN       cspan_md(ValueType* data, int32 dim1, dim2...); // c_ROWMAJOR layout
-SpanTypeN       cspan_md_layout(cspan_layout layout, ValueType* data, int32 dim1, dim2...);
+SpanTypeN       cspan_md(ValueType* data, int32_t dim1, dim2...);   // c_ROWMAJOR layout
+SpanTypeN       cspan_md_layout(cspan_layout layout, ValueType* data, int32_t dim1, dim2...);
 
                 // Transpose an md span in-place. Inverses layout and axes only.
 void            cspan_transpose(SpanTypeN* self);
@@ -75,20 +75,20 @@ bool            cspan_is_colmajor(const SpanTypeN* self);
 
                 // Construct a 1d subspan. Faster, but equal to:
                 // Span msub = cspan_slice(&ms, Span, {offset, offset+count});
-SpanType1       cspan_subspan(const SpanType1* self, isize offset, int32 count);
+SpanType1       cspan_subspan(const SpanType1* self, isize offset, int32_t count);
 
                 // Construct a 1d subspan from a 2d span.
-OutSpan1        cspan_submd2(const SpanType2* self, int32 i);
+OutSpan1        cspan_submd2(const SpanType2* self, int32_t i);
 
                 // Construct a lower rank submd. E.g. Span2 md2 = cspan_submd3(&md3, i);
                 // is equal to: Span2 md2 = cspan_slice(&md3, Span2, {i}, {c_ALL}, {c_ALL});
-OutSpan2        cspan_submd3(const SpanType3* self, int32 i);
-OutSpan1        cspan_submd3(const SpanType3* self, int32 i, int32 j);
+OutSpan2        cspan_submd3(const SpanType3* self, int32_t i);
+OutSpan1        cspan_submd3(const SpanType3* self, int32_t i, int32_t j);
 
                 // Construct a 3d, 2d or 1d subspan from a 4d span.
-OutSpan3        cspan_submd4(const SpanType4* self, int32 i);
-OutSpan2        cspan_submd4(const SpanType4* self, int32 i, int32 j);
-OutSpan1        cspan_submd4(const SpanType4* self, int32 i, int32 j, int32 k);
+OutSpan3        cspan_submd4(const SpanType4* self, int32_t i);
+OutSpan2        cspan_submd4(const SpanType4* self, int32_t i, int32_t j);
+OutSpan1        cspan_submd4(const SpanType4* self, int32_t i, int32_t j, int32_t k);
 
                 // Multi-dim span slicing function.
                 //       {i}: select i'th column. reduces output rank by one.

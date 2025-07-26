@@ -154,33 +154,35 @@
 // --------------------------------
 // c_min, c_max, c_min_n, c_max_n
 // --------------------------------
+#define _c_minmax_call(fn, T, ...) \
+   fn(c_make_array(T, {__VA_ARGS__}), c_sizeof((T[]){__VA_ARGS__})/c_sizeof(T))
 
-#define c_min32(...) c_min32_n(c_make_array(int32_t, {__VA_ARGS__}), c_NUMARGS(__VA_ARGS__))
-#define c_min(...) c_min_n(c_make_array(isize, {__VA_ARGS__}), c_NUMARGS(__VA_ARGS__))
-#define c_umin(...) c_umin_n(c_make_array(size_t, {__VA_ARGS__}), c_NUMARGS(__VA_ARGS__))
-#define c_fmin(...) c_fmin_n(c_make_array(float, {__VA_ARGS__}), c_NUMARGS(__VA_ARGS__))
-#define c_dmin(...) c_dmin_n(c_make_array(double, {__VA_ARGS__}), c_NUMARGS(__VA_ARGS__))
-#define c_max32(...) c_max32_n(c_make_array(int32_t, {__VA_ARGS__}), c_NUMARGS(__VA_ARGS__))
-#define c_max(...) c_max_n(c_make_array(isize, {__VA_ARGS__}), c_NUMARGS(__VA_ARGS__))
-#define c_umax(...) c_umax_n(c_make_array(size_t, {__VA_ARGS__}), c_NUMARGS(__VA_ARGS__))
-#define c_fmax(...) c_fmax_n(c_make_array(float, {__VA_ARGS__}), c_NUMARGS(__VA_ARGS__))
-#define c_dmax(...) c_dmax_n(c_make_array(double, {__VA_ARGS__}), c_NUMARGS(__VA_ARGS__))
+#define c_min(...) _c_minmax_call(c_min_n, isize, __VA_ARGS__)
+#define c_umin(...) _c_minmax_call(c_umin_n, size_t, __VA_ARGS__)
+#define c_min32(...) _c_minmax_call(c_min32_n, int32_t, __VA_ARGS__)
+#define c_fmin(...) _c_minmax_call(c_fmin_n, float, __VA_ARGS__)
+#define c_dmin(...) _c_minmax_call(c_dmin_n, double, __VA_ARGS__)
+#define c_max(...) _c_minmax_call(c_max_n, isize, __VA_ARGS__)
+#define c_umax(...) _c_minmax_call(c_umax_n, size_t, __VA_ARGS__)
+#define c_max32(...) _c_minmax_call(c_max32_n, int32_t, __VA_ARGS__)
+#define c_fmax(...) _c_minmax_call(c_fmax_n, float, __VA_ARGS__)
+#define c_dmax(...) _c_minmax_call(c_dmax_n, double, __VA_ARGS__)
 
-#define _c_minmax(T, fn, opr) \
-    STC_INLINE T fn(const T a[], isize n) { \
+#define _c_minmax_def(fn, T, opr) \
+    static inline T fn(const T a[], isize n) { \
         T x = a[0]; \
         for (isize i = 1; i < n; ++i) if (a[i] opr x) x = a[i]; \
         return x; \
     }
-_c_minmax(int32_t, c_min32_n, <)
-_c_minmax(isize, c_min_n, <)
-_c_minmax(size_t, c_umin_n, <)
-_c_minmax(float, c_fmin_n, <)
-_c_minmax(double, c_dmin_n, <)
-_c_minmax(int32_t, c_max32_n, >)
-_c_minmax(isize, c_max_n, >)
-_c_minmax(size_t, c_umax_n, >)
-_c_minmax(float, c_fmax_n, >)
-_c_minmax(double, c_dmax_n, >)
+_c_minmax_def(c_min32_n, int32_t, <)
+_c_minmax_def(c_min_n, isize, <)
+_c_minmax_def(c_umin_n, size_t, <)
+_c_minmax_def(c_fmin_n, float, <)
+_c_minmax_def(c_dmin_n, double, <)
+_c_minmax_def(c_max32_n, int32_t, >)
+_c_minmax_def(c_max_n, isize, >)
+_c_minmax_def(c_umax_n, size_t, >)
+_c_minmax_def(c_fmax_n, float, >)
+_c_minmax_def(c_dmax_n, double, >)
 
 #endif // STC_UTILITY_H_INCLUDED

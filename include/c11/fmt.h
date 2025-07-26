@@ -77,14 +77,12 @@ int main(void) {
 #else
   #include <alloca.h>
 #endif
-#define fmt_MACRO_OVERLOAD(name, ...) \
-    fmt_JOIN(fmt_JOIN0(name,_),fmt_NUMARGS(__VA_ARGS__))(__VA_ARGS__)
-#define fmt_JOIN0(a, b) a ## b
-#define fmt_JOIN(a, b) fmt_JOIN0(a, b)
-#define fmt_EXPAND(...) __VA_ARGS__
-// This is the way to make fmt_NUMARGS work also for MSVC++ and MSVC pre -std:c11
+#define fmt_OVERLOAD(name, ...) \
+    fmt_JOIN(name ## _,fmt_NUMARGS(__VA_ARGS__))(__VA_ARGS__)
+#define fmt_JOIN(a, b) _fmt_JOIN0(a, b)
 #define fmt_NUMARGS(...) _fmt_APPLY_ARG_N((__VA_ARGS__, _fmt_RSEQ_N))
-#define _fmt_APPLY_ARG_N(args) fmt_EXPAND(_fmt_ARG_N args)
+#define _fmt_JOIN0(a, b) a ## b
+#define _fmt_APPLY_ARG_N(args) _fmt_ARG_N args
 #define _fmt_RSEQ_N 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1,
 #define _fmt_ARG_N(_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,_12,_13,_14,_15,_16,N,...) N
 
@@ -121,7 +119,7 @@ FMT_API void       _fmt_sprint(fmt_stream*, const char* fmt, ...);
 
 #define fmt_print(...) fmt_printd(stdout, __VA_ARGS__)
 #define fmt_println(...) fmt_printd((fmt_stream*)0, __VA_ARGS__)
-#define fmt_printd(...) fmt_MACRO_OVERLOAD(fmt_printd, __VA_ARGS__)
+#define fmt_printd(...) fmt_OVERLOAD(fmt_printd, __VA_ARGS__)
 #define fmt_time(fmt, tm, MAXLEN) _fmt_time(fmt, tm, (char[MAXLEN + 1]){0}, MAXLEN + 1)
 
 #define fmt_sv        "{:.*s}"

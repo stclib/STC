@@ -245,13 +245,13 @@ its data type (payload). Because C does not have namespaces, it is recommended t
 #include <stc/cstr.h>
 
 c_sumtype (Color,
-    (ColorRgb, struct {int32 r, g, b;}),
-    (ColorHsv, struct {int32 h, s, v;})
+    (ColorRgb, struct {int32_t r, g, b;}),
+    (ColorHsv, struct {int32_t h, s, v;})
 );
 
 c_sumtype (Message,
     (MessageQuit, bool),
-    (MessageMove, struct {int32 x, y;}),
+    (MessageMove, struct {int32_t x, y;}),
     (MessageWrite, cstr),
     (MessageChangeColor, Color)
 );
@@ -709,10 +709,11 @@ default in containers unless `i_malloc`, `i_calloc`, `i_realloc`, and `i_free` a
 - void* `c_realloc`(void* old_p, isize old_sz, isize new_sz)
 - void  `c_free`(void* p, isize sz)
 
-### c_new, c_new_n, c_realloc_n, c_free_n, c_delete_n
+### c_new, c_new_n, c_new_items, c_realloc_n, c_free_n, c_delete_n
 
 - Type\* `c_new`(**Type**, value) - Allocate *and initialize* a new object on the heap with *value*.
 - Type\* `c_new_n`(**Type**, n) - Allocate an array of ***n*** new objects on the heap, *uninitialized*.
+- Type\* `c_new_items`(**Type**, {v1, v2, ...}) - Allocate an array of new initialized objects on the heap.
 - void\* `c_realloc_n`(arr, old_n, n) - Calls *c_realloc(arr, (old_n)\*c_sizeof \*(arr), (n)\*c_sizeof \*(arr))*.
 - void `c_free_n`(arr, n) - Calls *c_free(arr, (n)\*c_sizeof \*(arr))*.
 - void `c_delete_n`(**Type**, arr, n) - Calls *Type_drop(&arr[i])* and *c_free_n(arr, n)*.

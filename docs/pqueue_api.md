@@ -76,7 +76,7 @@ i_key           pqueue_X_value_clone(const pqueue_X* self, i_key value);
 #include <stdio.h>
 #include <stc/random.h>
 
-#define T PriorityQ, int32
+#define T PriorityQ, int
 #define i_cmp -c_default_cmp // min-heap
 #include <stc/pqueue.h>
 
@@ -87,15 +87,15 @@ int main(void)
 
     // Push ten million random numbers to priority queue.
     for (c_range(N/2))
-        PriorityQ_push(&numbers, (int32)(crand32_uint() >> 6));
+        PriorityQ_push(&numbers, (int)(crand32_uint() >> 6));
 
     // Add some negative ones.
-    int32 nums[] = {-231, -32, -873, -4, -343};
+    int nums[] = {-231, -32, -873, -4, -343};
     for (c_range(i, c_countof(nums)))
         PriorityQ_push(&numbers, nums[i]);
 
     for (c_range(N/2))
-        PriorityQ_push(&numbers, (int32)(crand32_uint() >> 6));
+        PriorityQ_push(&numbers, (int)(crand32_uint() >> 6));
 
     // Extract and display the fifty smallest.
     for (c_range(50)) {
