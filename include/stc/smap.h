@@ -603,5 +603,4 @@ _c_MEMB(_drop)(const Self* cself) {
 #undef _i_keyref
 #undef _i_MAP_ONLY
 #undef _i_SET_ONLY
-#include "priv/linkage2.h"
-#include "priv/template2.h"
+#include "sys/finalize.h"

@@ -382,5 +382,4 @@ _c_MEMB(_find_in)(const Self* self, _m_iter i1, _m_iter i2, _m_raw raw) {
 }
 #endif //  _i_has_eq
 #endif // i_implement
-#include "priv/linkage2.h"
-#include "priv/template2.h"
+#include "sys/finalize.h"

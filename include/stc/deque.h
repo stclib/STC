@@ -202,5 +202,4 @@ _c_MEMB(_find_in)(const Self* self, _m_iter i1, _m_iter i2, _m_raw raw) {
 }
 #endif
 #endif // IMPLEMENTATION
-#include "priv/linkage2.h"
-#include "priv/template2.h"
+#include "sys/finalize.h"

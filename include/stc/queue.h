@@ -36,5 +36,4 @@
 #endif
 #include "priv/template.h"
 #include "priv/queue_prv.h"
-#include "priv/linkage2.h"
-#include "priv/template2.h"
+#include "sys/finalize.h"

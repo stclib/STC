@@ -252,5 +252,4 @@ STC_INLINE Self _c_MEMB(_clone)(Self owned) {
 #undef _i_atomic_inc
 #undef _i_atomic_dec_and_test
 #undef _i_is_arc
-#include "priv/linkage2.h"
-#include "priv/template2.h"
+#include "sys/finalize.h"

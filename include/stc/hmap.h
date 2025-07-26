@@ -510,5 +510,4 @@ _c_MEMB(_erase_entry)(Self* self, _m_value* _val) {
 #undef _i_keyref
 #undef _i_MAP_ONLY
 #undef _i_SET_ONLY
-#include "priv/linkage2.h"
-#include "priv/template2.h"
+#include "sys/finalize.h"

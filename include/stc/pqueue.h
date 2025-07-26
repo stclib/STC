@@ -178,5 +178,4 @@ _c_MEMB(_push)(Self* self, _m_value value) {
 #endif
 
 #undef _i_sorted
-#include "priv/linkage2.h"
-#include "priv/template2.h"
+#include "sys/finalize.h"

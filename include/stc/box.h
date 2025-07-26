@@ -165,5 +165,4 @@ STC_INLINE void _c_MEMB(_assign)(Self* self, Self* owned) {
         { return i_hash(rx); }
 #endif // i_no_hash
 #undef _i_is_box
-#include "priv/linkage2.h"
-#include "priv/template2.h"
+#include "sys/finalize.h"

@@ -929,7 +929,26 @@ int main(void) {
     FMDVector_drop(&vec);
 }
 ```
+</details>
+<details>
+<summary>Extended templated containers (advanced)</summary>
 
+## Extended templated containers
+
+It is possible to extend the functionality of templated container by adding functions to them,
+while having all the input and derived/defaulted template parameters available. Below we add
+an alias function `_len()` for `_size()` in a new file "extvec.h", which can be used like stc/vec.h:
+```c++
+// extvec.h
+#define i_extend
+#include <stc/vec.h>
+
+STC_INLINE isize _c_MEMB(_len)(Self* self) {
+    return _c_MEMB(_size)(self);
+}
+
+#include <stc/sys/finalize.h>
+```
 </details>
 <details>
 <summary>Memory efficiency</summary>

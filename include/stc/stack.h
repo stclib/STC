@@ -277,5 +277,4 @@ STC_INLINE bool _c_MEMB(_eq)(const Self* self, const Self* other) {
     return true;
 }
 #endif
-#include "priv/linkage2.h"
-#include "priv/template2.h"
+#include "sys/finalize.h"

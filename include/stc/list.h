@@ -421,6 +421,5 @@ STC_DEF bool _c_MEMB(_sort)(Self* self) {
 }
 #endif // _i_has_cmp
 #endif // i_implement
-#include "priv/linkage2.h"
-#include "priv/template2.h"
 #undef _i_is_list
+#include "sys/finalize.h"
