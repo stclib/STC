@@ -81,6 +81,8 @@
 #endif
 
 #if defined i_aux && c_NUMARGS(i_aux) == 2
+  // shorthand for defining i_aux AND i_allocator as a one-liner combo.
+  #define _i_aux_alloc
   #define _i_aux_def c_GETARG(1, i_aux) aux;
   #undef i_allocator // override:
   #define i_allocator c_GETARG(2, i_aux)

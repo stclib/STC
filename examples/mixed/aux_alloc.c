@@ -8,7 +8,8 @@
 #include <stc/stack.h>
 
 #define T ListDeque, List, (c_keyclass | c_use_eq)
-#define i_aux MyAlloc*, my // shorthand: use optional second arg to define i_allocator
+// Shorthand for defining both i_aux AND i_allocator as above, in one line:
+#define i_aux MyAlloc*, my
 #include <stc/deque.h>
 
 int main(void)
