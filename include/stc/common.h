@@ -185,7 +185,9 @@ typedef const char* cstr_raw;
 #define c_each_4(it, C, start, end) \
     _c_each(it, C, start, (end).ref, _)
 
-#define c_each_n(it, C, cnt, n) \
+#define c_each_n(...) c_MACRO_OVERLOAD(c_each_n, __VA_ARGS__)
+#define c_each_n_3(it, C, cnt) c_each_n_4(it, C, cnt, INTPTR_MAX)
+#define c_each_n_4(it, C, cnt, n) \
     struct {C##_iter iter; C##_value* ref; isize size, index;} \
     it = {.iter=C##_begin(&cnt), .size=n}; (it.ref = it.iter.ref) && it.index < it.size; C##_next(&it.iter), ++it.index
 
