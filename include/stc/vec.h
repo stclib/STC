@@ -156,14 +156,21 @@ STC_INLINE void         _c_MEMB(_pop_back)(Self* self) { _c_MEMB(_pop)(self); }
 STC_INLINE Self _c_MEMB(_init)(void)
     { return c_literal(Self){0}; }
 
-STC_INLINE Self _c_MEMB(_with_size)(const isize size, _m_value null)
-    { Self cx = {0}; _c_MEMB(_resize)(&cx, size, null); return cx; }
+STC_INLINE Self _c_MEMB(_with_capacity)(isize cap)
+    { Self out = {_i_new_n(_m_value, cap), 0, cap}; return out; }
 
-STC_INLINE Self _c_MEMB(_with_capacity)(const isize cap)
-    { Self cx = {0}; _c_MEMB(_reserve)(&cx, cap); return cx; }
+STC_INLINE Self _c_MEMB(_with_size_uninit)(isize size)
+    { Self out = {_i_new_n(_m_value, size), size, size}; return out; }
 
-STC_INLINE Self _c_MEMB(_from_n)(const _m_raw* raw, isize n)
-    { Self cx = {0}; _c_MEMB(_put_n)(&cx, raw, n); return cx; }
+STC_INLINE Self _c_MEMB(_with_size)(isize size, _m_raw default_raw) {
+    Self out = {_i_new_n(_m_value, size), size, size};
+    while (size) out.data[--size] = i_keyfrom(default_raw);
+    return out;
+}
+STC_INLINE Self _c_MEMB(_from_n)(const _m_raw* raw, isize n) {
+    Self out = _c_MEMB(_with_capacity)(n);
+    _c_MEMB(_put_n)(&out, raw, n); return out;
+}
 #endif
 
 STC_INLINE void _c_MEMB(_shrink_to_fit)(Self* self)
