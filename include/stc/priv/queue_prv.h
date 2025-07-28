@@ -37,73 +37,90 @@ STC_API _m_iter         _c_MEMB(_advance)(_m_iter it, isize n);
 #define _cbuf_toidx(self, pos) (((pos) - (self)->start) & (self)->capmask)
 #define _cbuf_topos(self, idx) (((self)->start + (idx)) & (self)->capmask)
 
-STC_INLINE void         _c_MEMB(_put_n)(Self* self, const _m_raw* raw, isize n)
-                            { while (n--) _c_MEMB(_push)(self, i_keyfrom((*raw))), ++raw; }
+STC_INLINE void _c_MEMB(_put_n)(Self* self, const _m_raw* raw, isize n)
+    { while (n--) _c_MEMB(_push)(self, i_keyfrom((*raw))), ++raw; }
 
-STC_INLINE void         _c_MEMB(_value_drop)(const Self* self, _m_value* val)
-                            { (void)self; i_keydrop(val); }
+STC_INLINE void _c_MEMB(_value_drop)(const Self* self, _m_value* val)
+    { (void)self; i_keydrop(val); }
 
 #ifndef _i_aux_alloc
-STC_INLINE Self         _c_MEMB(_init)(void)
-                            { Self cx = {0}; return cx; }
+STC_INLINE Self _c_MEMB(_init)(void)
+    { Self out = {0}; return out; }
 
-STC_INLINE Self         _c_MEMB(_with_capacity)(const isize cap)
-                            { Self cx = {0}; _c_MEMB(_reserve)(&cx, cap); return cx; }
+STC_INLINE Self _c_MEMB(_with_capacity)(isize cap) {
+    cap = c_next_pow2(cap + 1);
+    Self out = {_i_new_n(_m_value, cap), 0, 0, cap - 1};
+    return out;
+}
+STC_INLINE Self _c_MEMB(_with_size_uninit)(isize size)
+    { Self out = _c_MEMB(_with_capacity)(size); out.end = size; return out; }
 
-STC_INLINE Self         _c_MEMB(_from_n)(const _m_raw* raw, isize n)
-                            { Self cx = {0}; _c_MEMB(_put_n)(&cx, raw, n); return cx; }
+STC_INLINE Self _c_MEMB(_with_size)(isize size, _m_raw default_raw) {
+    Self out = _c_MEMB(_with_capacity)(size);
+    while (out.end < size) out.cbuf[out.end++] = i_keyfrom(default_raw);
+    return out;
+}
+STC_INLINE Self _c_MEMB(_from_n)(const _m_raw* raw, isize n) {
+    Self out = _c_MEMB(_with_capacity)(n);
+    _c_MEMB(_put_n)(&out, raw, n); return out;
+}
 #endif
 
 #if !defined i_no_emplace
-STC_INLINE _m_value*    _c_MEMB(_emplace)(Self* self, _m_raw raw)
-                            { return _c_MEMB(_push)(self, i_keyfrom(raw)); }
+STC_INLINE _m_value* _c_MEMB(_emplace)(Self* self, _m_raw raw)
+    { return _c_MEMB(_push)(self, i_keyfrom(raw)); }
 #endif
 
 #if defined _i_has_eq
-STC_API bool            _c_MEMB(_eq)(const Self* self, const Self* other);
+STC_API bool _c_MEMB(_eq)(const Self* self, const Self* other);
 #endif
 
 #if !defined i_no_clone
-STC_API Self            _c_MEMB(_clone)(Self q);
-STC_INLINE _m_value     _c_MEMB(_value_clone)(const Self* self, _m_value val)
-                            { (void)self; return i_keyclone(val); }
+STC_API Self _c_MEMB(_clone)(Self q);
 
-STC_INLINE void         _c_MEMB(_copy)(Self* self, const Self* other) {
-                            if (self == other) return;
-                            _c_MEMB(_drop)(self);
-                            *self = _c_MEMB(_clone)(*other);
-                        }
+STC_INLINE _m_value _c_MEMB(_value_clone)(const Self* self, _m_value val)
+    { (void)self; return i_keyclone(val); }
+
+STC_INLINE void _c_MEMB(_copy)(Self* self, const Self* other) {
+    if (self == other) return;
+    _c_MEMB(_drop)(self);
+    *self = _c_MEMB(_clone)(*other);
+}
 #endif // !i_no_clone
 
-STC_INLINE isize        _c_MEMB(_size)(const Self* self)
-                            { return _cbuf_toidx(self, self->end); }
-STC_INLINE isize        _c_MEMB(_capacity)(const Self* self)
-                            { return self->capmask; }
-STC_INLINE bool         _c_MEMB(_is_empty)(const Self* self)
-                            { return self->start == self->end; }
-STC_INLINE _m_raw       _c_MEMB(_value_toraw)(const _m_value* pval)
-                            { return i_keytoraw(pval); }
+STC_INLINE isize _c_MEMB(_size)(const Self* self)
+    { return _cbuf_toidx(self, self->end); }
+
+STC_INLINE isize _c_MEMB(_capacity)(const Self* self)
+    { return self->capmask; }
+
+STC_INLINE bool _c_MEMB(_is_empty)(const Self* self)
+    { return self->start == self->end; }
+
+STC_INLINE _m_raw _c_MEMB(_value_toraw)(const _m_value* pval)
+    { return i_keytoraw(pval); }
 
 STC_INLINE const _m_value* _c_MEMB(_front)(const Self* self)
-                            { return self->cbuf + self->start; }
-STC_INLINE _m_value*    _c_MEMB(_front_mut)(Self* self)
-                            { return self->cbuf + self->start; }
+    { return self->cbuf + self->start; }
+
+STC_INLINE _m_value* _c_MEMB(_front_mut)(Self* self)
+    { return self->cbuf + self->start; }
 
 STC_INLINE const _m_value* _c_MEMB(_back)(const Self* self)
-                            { return self->cbuf + ((self->end - 1) & self->capmask); }
-STC_INLINE _m_value*    _c_MEMB(_back_mut)(Self* self)
-                            { return (_m_value*)_c_MEMB(_back)(self); }
+    { return self->cbuf + ((self->end - 1) & self->capmask); }
+
+STC_INLINE _m_value* _c_MEMB(_back_mut)(Self* self)
+    { return (_m_value*)_c_MEMB(_back)(self); }
 
 STC_INLINE Self _c_MEMB(_move)(Self *self) {
     Self m = *self;
-    memset(self, 0, sizeof *self);
+    self->capmask = self->start = self->end = 0;
+    self->cbuf = NULL;
     return m;
 }
 
-STC_INLINE void _c_MEMB(_take)(Self *self, Self unowned) {
-    _c_MEMB(_drop)(self);
-    *self = unowned;
-}
+STC_INLINE void _c_MEMB(_take)(Self *self, Self unowned)
+    { _c_MEMB(_drop)(self); *self = unowned; }
 
 STC_INLINE void _c_MEMB(_pop)(Self* self) { // pop_front
     c_assert(!_c_MEMB(_is_empty)(self));
