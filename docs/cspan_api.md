@@ -39,12 +39,16 @@ All index arguments are side-effect safe, e.g. `*cspan_at(&ms3, i++, j++, k++)` 
 is an error, i.e. the *span* argument itself is not side-effect safe. If the number of arguments does not match the span rank,
 a compile error is issued. Runtime bounds checks are enabled by default (define `STC_NDEBUG` or `NDEBUG` to disable).
 ```c++
-SpanType        c_make(<SpanType>, {v1, v2, ...});                  // make a local 1-d cspan from values (stack memory)
-SpanType        cspan_make(<SpanType>, {v1, v2, ...});              // make a local 1-d cspan  (stack/global memory)
-SpanType        cspan_zeros(<SpanType>, N);                         // make a local 1-d fixed size cspan (stack memory)
-SpanType        cspan_from_n(ValueType* ptr, int32_t n);              // create a 1-d cspan from a pointer and length
-SpanType        cspan_from_array(ValueType array[]);                // create a 1-d cspan from a C array
-SpanType        cspan_from_vec(<VecType>* cnt);                     // create a 1-d cspan from a vec or stack
+                // Create local cspan using stack memory
+SpanType        c_make(<SpanType>, {v1, v2, ...});                  // create a local 1-d cspan from values (stack memory)
+SpanType        cspan_make(<SpanType>, {v1, v2, ...});              // create a local 1-d cspan (on stack or global memory)
+SpanType        cspan_zeros(<SpanType>, N);                         // create a local 1-d cspan. N must be a comp-time constant
+SpanType        cspan_by_copy(const ValueType* ptr, N);             // create a local 1-d cspan. N must be a comp-time constant
+
+                // Make cspan view into existing data
+SpanType        cspan_from_n(ValueType* ptr, int32_t n);            // make a 1-d cspan view into a pointer + length
+SpanType        cspan_from_array(ValueType array[]);                // make a 1-d cspan view into a C array
+SpanType        cspan_from_vec(VecType* cnt);                       // make a 1-d cspan view into a vec or stack
 
                 // ISpan2 m = {data, cspan_shape(3, 4), cspan_strides(4, 1)}; // => ISpan2 m = cspan_md(data, 3, 4);
 int32_t[N]      cspan_shape(xd, ...)                                // specify dimensions for SpanTypeN constructor

@@ -158,17 +158,21 @@ use_cspan_tuple(5); use_cspan_tuple(6);
 use_cspan_tuple(7); use_cspan_tuple(8);
 
 
-// cspan_from_n a pointer+size
+// Construct a cspan from a pointer+size
 #define cspan_from_n(dataptr, n) \
     {.data=dataptr, \
      .shape={(_istride)(n)}, \
      .stride=c_literal(cspan_tuple1){.d={1}}}
 
-// Make a fixed size, zeroed out 1d-span (in the local lexical scope).
-#define cspan_zeros(Span, FIXED_N) \
-    ((Span)cspan_from_n((Span##_value[FIXED_N]){0}, FIXED_N))
+// Create a 1d-span in the local lexical scope. N must be a compile-time constant.
+#define cspan_by_copy(dataptr, N) \
+    cspan_from_n(memcpy((char[(N)*sizeof *(dataptr)]){0}, dataptr, (N)*sizeof *(dataptr)), N)
 
-// May make a global scope 1d-span from initializer list, else like c_make(Span, ...).
+// Create a zeroed out 1d-span in the local lexical scope. N must be a compile-time constant.
+#define cspan_zeros(Span, N) \
+    ((Span)cspan_from_n((Span##_value[N]){0}, N))
+
+// Create a global scope 1d-span from constant initializer list, otherwise like c_make(Span, ...).
 #define cspan_make(Span, ...) \
     ((Span)cspan_from_n(c_make_array(Span##_value, __VA_ARGS__), \
                         sizeof((Span##_value[])__VA_ARGS__)/sizeof(Span##_value)))
