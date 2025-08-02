@@ -40,7 +40,9 @@ See the c++ class [std::deque](https://en.cppreference.com/w/cpp/container/deque
 
 ```c++
 deque_X         deque_X_init(void);
-deque_X         deque_X_with_capacity(isize size);
+deque_X         deque_X_with_capacity(isize cap);
+deque_X         deque_X_with_size(isize size, i_keyraw value);
+deque_X         deque_X_with_size_uninit(isize size);
 
 deque_X         deque_X_clone(deque_X deque);
 void            deque_X_copy(deque_X* self, const deque_X* other);

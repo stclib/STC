@@ -117,7 +117,7 @@ void            cspan_print_complex(<SpanTypeN>, int num_decimals, SpanTypeN spa
 
 // Member functions
 
-SpanTypeN       SpanTypeN_transpose(SpanTypeN sp); // see also in-place cspan_transpose(&sp);
+SpanTypeN       SpanTypeN_transposed(SpanTypeN sp); // see also in-place cspan_transpose(&sp);
 bool            SpanTypeN_equals(SpanTypeN spx, SpanTypeN spy);
 bool            SpanTypeN_eq(const SpanTypeN* self, const SpanTypeN* other);
 

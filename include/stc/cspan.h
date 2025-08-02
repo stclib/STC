@@ -62,7 +62,10 @@ int demo2() {
 #ifndef STC_CSPAN_H_INCLUDED
 #define STC_CSPAN_H_INCLUDED
 #include "common.h"
-typedef int32_t cspan_istride, _istride;
+#ifndef STC_CSPAN_INDEX_TYPE
+    #define STC_CSPAN_INDEX_TYPE int32_t
+#endif
+typedef STC_CSPAN_INDEX_TYPE _istride;
 
 #define using_cspan use_cspan                   // [deprecated]
 #define using_cspan2 use_cspan2                 // [deprecated]

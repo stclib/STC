@@ -45,7 +45,8 @@ See the c++ class [std::stack](https://en.cppreference.com/w/cpp/container/stack
 ```c++
 stack_X         stack_X_init(void);
 stack_X         stack_X_with_capacity(isize cap);
-stack_X         stack_X_with_size(isize size, i_key fill);
+stack_X         stack_X_with_size(isize size, i_keyraw rawval);
+stack_X         stack_X_with_size_uninit(isize size);
 
 stack_X         stack_X_clone(stack_X st);
 void            stack_X_copy(stack_X* self, const stack_X* other);

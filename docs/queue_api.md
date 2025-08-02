@@ -31,7 +31,9 @@ In the following, `X` is the value of `i_key` unless `T` is defined.
 
 ```c++
 queue_X         queue_X_init(void);
-queue_X         queue_X_with_capacity(isize size);
+queue_X         queue_X_with_capacity(isize cap);
+queue_X         queue_X_with_size(isize size, i_keyraw rawval);
+queue_X         queue_X_with_size_uninit(isize size);
 
 queue_X         queue_X_clone(queue_X q);
 void            queue_X_copy(queue_X* self, const queue_X* other);

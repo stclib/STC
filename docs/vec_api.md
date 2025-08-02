@@ -41,10 +41,11 @@ See the c++ class [std::vector](https://en.cppreference.com/w/cpp/container/vect
 
 ```c++
 vec_X           vec_X_init(void);
-vec_X           vec_X_with_size(isize size, i_key null);
 vec_X           vec_X_with_capacity(isize size);
-vec_X           vec_X_clone(vec_X vec);
+vec_X           vec_X_with_size(isize size, i_keyraw rawval);
+vec_X           vec_X_with_size_uninit(isize size);
 
+vec_X           vec_X_clone(vec_X vec);
 void            vec_X_copy(vec_X* self, const vec_X* other);
 vec_X_iter      vec_X_copy_to(vec_X* self, isize idx, const i_key* arr, isize n);
 vec_X           vec_X_move(vec_X* self);                                    // move
