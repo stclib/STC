@@ -10,6 +10,7 @@ cco_task_struct (worker) {
 int worker(struct worker* o) {
     cco_async (o) {
         printf("Worker %d starting\n", o->id);
+        cco_yield;
 
         cco_await_timer(&o->tm, 1.0 + o->id/8.0);
 
@@ -51,14 +52,14 @@ int everyone(struct everyone* o) {
     cco_async (o) {
         o->sleep = c_new(struct sleeper, {{sleeper}});
         cco_spawn(o->sleep);
-        cco_suspend; // allow sleep-task to start
+        cco_yield; // allow sleep-task to start
 
         cco_reset_group(&o->wg);
         for (c_range32(i, 8)) { // NB: local i, do not yield or await inside loop.
             struct worker* work = c_new(struct worker, {.base={worker}, .id=i});
             cco_launch(work, &o->wg);
         }
-        cco_suspend;
+        cco_yield;
 
         puts("Here 1");
         //cco_cancel(o->sleep);
@@ -73,6 +74,7 @@ int everyone(struct everyone* o) {
         cco_await_n(&o->wg, 3); // await for 3 workers to finish
         puts("3 more workers done.");
         cco_await_cancel(&o->wg); // cancel and await for remaining workers to finish
+        //cco_cancel_group(&o->wg); // cancel
         //cco_await_all(&o->wg); // await for remaining workers to finish
         puts("All workers done.");
     }

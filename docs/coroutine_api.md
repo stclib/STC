@@ -32,9 +32,9 @@ scope end, and `return 0`.
 ```c++
                 cco_async (Coroutine* co) { ... }                   // The coroutine scope.
 
-                cco_suspend;                                        // Suspend execution with CCO_SUSPEND status returned.
-                cco_yield;                                          // Suspend execution with CCO_YIELD status returned.
                 cco_yield_v(status);                                // Suspend execution with custom status returned.
+                cco_yield;                                          // Suspend execution => cco_yield_v(CCO_YIELD)
+                cco_suspend;                                        // Suspend execution => cco_yield_v(CCO_SUSPEND)
                 cco_await(bool condition);                          // Suspend with CCO_AWAIT status or continue if condition is true.
                                                                     // Resumption takes place at the condition test, not after.
                 cco_drop:                                           // Label marks where cleanup of the task/coroutine frame happens.
@@ -60,24 +60,30 @@ void            cco_run_coroutine(corofunc(co)) {};                 // Run block
                 cco_task_struct(name) { <name>_base base; ... };    // Define a custom coroutine task struct; extends cco_task struct.
 
 const struct
-int             cco_status();                                       // Get current return status from last cco_resume() call.
+int             cco_status();                                       // Get current return status from last cco_invoke() call.
 <Type>*         cco_env(<Type> *);                                  // Get awaited task environment pointer, casted to <Type>*.
-cco_fiber*      cco_fb();                                           // Get current fiber.
 cco_error*      cco_err();                                          // Get error object created from cco_throw(error) call.
                                                                     // Should be handled in a cco_drop: section.
+cco_fiber*      cco_fb(cco_task* task);                             // Get task's associated fiber.
 
-int             cco_resume(cco_task* task);                         // Resume suspended task, return status.
-
-                cco_await_task(cco_task* task);                     // Await until task's resume status is CCO_DONE/0 (asymmetric "call").
+                cco_await_task(cco_task* task);                     // Await/call until task's resume status is CCO_DONE (=0).
                 cco_await_task(cco_task* task, int awaitbits);      // Await until task's resume status is in (awaitbits | CCO_DONE).
+
 void            cco_yield_to(cco_task* task);                       // Yield to task (symmetric transfer of control).
+int             cco_resume(cco_task* task);                         // Resume task until next suspension, returns status.
 
                 cco_throw(int error);                               // Throw an error. Will unwind call/await-task stack.
                                                                     // Handling of error *is* required else abort().
+
                 cco_throw(CCO_CANCEL);                              // Throw a cancellation of the current task.
                                                                     // It will silently unwind the await stack. Handling *not*
                                                                     // required, but it may be recovered in a cco_drop: section.
-                cco_cancel(cco_task* task);                         // Use for cancelling a spawned/launched task.
+                cco_cancel(cco_task* task);                         // Cancel a spawned/launched task; If task runs in the current
+                                                                    // fiber it equals cco_throw(CCO_CANCEL) (jumps to cco_drop:).
+                // The following cancel functions does not cancel themselves/current task/fiber:
+void            cco_cancel_group(cco_group* wg);                    // Cancel all cco_launch()'ed tasks in wg.
+                                                                    // Passing NULL as arg will cancel all cco_spawn()'ed tasks.
+void            cco_cancel_all();                                   // Cancel all spawned and launched tasks.
 
                 cco_recover;                                        // Resume from the original suspend point in the current task,
                                                                     // and clear error/cancellation status. Should be done
@@ -94,19 +100,23 @@ void            cco_launch(cco_task* task, cco_group* wg);          // Lazily sp
 void            cco_launch(cco_task* t, cco_group* wg, void* env);  // Same, env may be used as a "promise", or anything.
 
                 // If tasks were launched, all must be awaited for by using these awaiter functions:
+                cco_await_all(cco_group* wg);                       // Await for all remaining tasks in waitgroup to finish.
                 cco_await_any(cco_group* wg);                       // Await for any launched tasks in waitgroup to finish.
                 cco_await_n(cco_group* wg, int n);                  // Await for n launched tasks in waitgroup to finish.
+                                                                    // Negative n means await all minus n tasks.
                 cco_await_cancel(cco_group* wg);                    // Cancel remaining tasks/fibers in wg and await for them.
-                cco_await_all(cco_group* wg);                       // Await for all remaining tasks in waitgroup to finish.
+                                                                    // Shorthand for cco_cancel_group() + cco_await_all().
 
-void            cco_run_task(cco_task* task) {}                     // Run task blocking until it and spawned fibers are finished.
-void            cco_run_task(cco_task* task, void *env) {}          // Run task blocking with env data
-void            cco_run_task(fb_iter, cco_task* task, void *env) {} // Run task blocking. fb_iter reference the current fiber.
+                cco_run_task(cco_task* task) {}                     // Run task blocking until it and spawned fibers are finished.
+                cco_run_task(cco_task* task, void *env) {}          // Run task blocking with env data
+                cco_run_task(fb_iter, cco_task* task, void *env) {} // Run task blocking. fb_iter reference the current fiber.
 
 cco_fiber*      cco_new_fiber(cco_task* task);                      // Create an initial fiber from a task.
 cco_fiber*      cco_new_fiber(cco_task* task, void* env);           // Create an initial fiber from a task and env (inputs or a future).
-void            cco_run_fiber(cco_fiber** fiber_ref) {}             // Run fiber(s) blocking.
-void            cco_run_fiber(fb_iter, cco_fiber* fiber) {}         // Run fiber(s) blocking. fb_iter reference the current fiber.
+                cco_run_fiber(cco_fiber** fiber_ref) {}             // Run fiber(s) blocking.
+                cco_run_fiber(fb_iter, cco_fiber* fiber) {}         // Run fiber(s) blocking. fb_iter reference the current fiber.
+
+void            cco_cancel_fiber(cco_fiber* fiber);                 // Signal that fiber will be cancelled.
 ```
 #### Timers and time functions
 ```c++
@@ -287,7 +297,7 @@ starts eating (because they must be waiting).
 #include <stc/coroutine.h>
 
 enum {num_philosophers = 5};
-enum PhMode {ph_thinking, ph_hungry, ph_eating};
+enum PhMode {ph_THINKING, ph_HUNGRY, ph_EATING};
 
 // Philosopher coroutine: use task coroutine
 cco_task_struct (Philosopher) {
@@ -300,82 +310,73 @@ cco_task_struct (Philosopher) {
     struct Philosopher* right;
 };
 
-int Philosopher(struct Philosopher* self) {
-    double duration;
-    cco_async (self) {
+int Philosopher(struct Philosopher* o) {
+    cco_async (o) {
         while (1) {
-            duration = 1.0 + crand64_real()*2.0;
-            printf("Philosopher %d is thinking for %.0f minutes...\n", self->id, duration*10);
-            self->hunger = 0;
-            self->mode = ph_thinking;
-            cco_await_timer(&self->tm, duration);
+            double duration = 1.0 + crand64_real()*2.0;
+            printf("Philosopher %d is thinking for %.0f minutes...\n", o->id, duration*10);
+            o->hunger = 0;
+            o->mode = ph_THINKING;
+            cco_await_timer(&o->tm, duration);
 
-            printf("Philosopher %d is hungry...\n", self->id);
-            self->mode = ph_hungry;
-            cco_await(self->hunger >= self->left->hunger &&
-                      self->hunger >= self->right->hunger);
-            self->left->hunger++; // don't starve the neighbours
-            self->right->hunger++;
+            printf("Philosopher %d is hungry...\n", o->id);
+            o->mode = ph_HUNGRY;
+            cco_await(o->hunger >= o->left->hunger &&
+                      o->hunger >= o->right->hunger);
+            o->left->hunger += (o->left->mode == ph_HUNGRY); // don't starve the neighbours
+            o->right->hunger += (o->right->mode == ph_HUNGRY);
+            o->hunger = INT32_MAX;
+            o->mode = ph_EATING;
 
             duration = 0.5 + crand64_real();
-            printf("Philosopher %d is eating for %.0f minutes...\n", self->id, duration*10);
-            self->hunger = INT32_MAX;
-            self->mode = ph_eating;
-            cco_await_timer(&self->tm, duration);
+            printf("Philosopher %d is eating for %.0f minutes...\n", o->id, duration*10);
+            cco_await_timer(&o->tm, duration);
         }
+        cco_drop:
+        printf("Philosopher %d done\n", o->id);
     }
-    printf("Philosopher %d done\n", self->id);
+
     return 0;
 }
 
 // Dining coroutine
 cco_task_struct (Dining) {
     Dining_base base; // required
+    float duration;
     struct Philosopher philos[num_philosophers];
+    int i;
+    cco_timer tm;
+    cco_group wg;
 };
 
-int Dining(struct Dining* self) {
-    cco_async (self) {
+int Dining(struct Dining* o) {
+    cco_async (o) {
         for (int i = 0; i < num_philosophers; ++i) {
-            self->philos[i] = (struct Philosopher){
+            o->philos[i] = (struct Philosopher){
                 .base = {Philosopher},
                 .id = i + 1,
-                .left = &self->philos[(i - 1 + num_philosophers) % num_philosophers],
-                .right = &self->philos[(i + 1) % num_philosophers],
+                .left = &o->philos[(i - 1 + num_philosophers) % num_philosophers],
+                .right = &o->philos[(i + 1) % num_philosophers],
             };
+            cco_launch(&o->philos[i], &o->wg);
         }
+        cco_await_timer(&o->tm, o->duration);
 
-        while (1) {
-            // NB! local i OK here as it does not cross yield/suspend/await.
-            for (int i = 0; i < num_philosophers; ++i) {
-                cco_resume(&self->philos[i]); // resume until next yield
-            }
-            cco_suspend; // return control back to caller who
-                         // can do other tasks before resuming dining.
-        }
+        cco_drop:
+        cco_await_cancel(&o->wg);
+        puts("Dining done");
     }
-
-    // cleanup: stop the philosphers
-    for (int i = 0; i < num_philosophers; ++i) {
-        cco_stop(&self->philos[i]);
-        cco_resume(&self->philos[i]); // execute philos cleanup.
-    }
-    puts("Dining done");
     return 0;
 }
 
 int main(void)
 {
-    struct Dining dining = {{Dining}};
-    cco_timer tm = cco_make_timer(5.0);
-    crand64_seed((uint64_t)time(NULL));
+    struct Dining dining = {.base={Dining}, .duration=5.0f, .wg = {0}};
 
-    cco_run_task(Dining(&dining)) {
-        if (cco_timer_expired(&tm))
-            cco_stop(&dining);
-        cco_sleep(0.001); // do other things
-    }
+    crand64_seed((uint64_t)time(NULL));
+    cco_run_task(&dining);
 }
+
 ```
 </details>
 
@@ -434,15 +435,15 @@ typedef struct {
     struct TaskC C;
 } Subtasks;
 
-int TaskC(struct TaskC* self) {
-    cco_async (self) {
-        printf("TaskC start: {%g, %g}\n", self->x, self->y);
+int TaskC(struct TaskC* o) {
+    cco_async (o) {
+        printf("TaskC start: {%g, %g}\n", o->x, o->y);
 
         // assume there is an error...
         cco_throw(99);
 
         puts("TaskC work");
-        cco_suspend;
+        cco_yield;
         puts("TaskC more work");
 
         cco_drop:
@@ -451,9 +452,9 @@ int TaskC(struct TaskC* self) {
     return 0;
 }
 
-int TaskB(struct TaskB* self) {
-    cco_async (self) {
-        printf("TaskB start: %g\n", self->d);
+int TaskB(struct TaskB* o) {
+    cco_async (o) {
+        printf("TaskB start: %g\n", o->d);
 
         Subtasks* sub = cco_env(Subtasks*);
         cco_await_task(&sub->C);
@@ -465,9 +466,9 @@ int TaskB(struct TaskB* self) {
     return 0;
 }
 
-int TaskA(struct TaskA* self) {
-    cco_async (self) {
-        printf("TaskA start: %d\n", self->a);
+int TaskA(struct TaskA* o) {
+    cco_async (o) {
+        printf("TaskA start: %d\n", o->a);
 
         Subtasks* sub = cco_env(Subtasks*);
         cco_await_task(&sub->B);
@@ -485,8 +486,8 @@ int TaskA(struct TaskA* self) {
     return 0;
 }
 
-int start(cco_task* self) {
-    cco_async (self) {
+int start(cco_task* o) {
+    cco_async (o) {
         puts("start");
 
         Subtasks* sub = cco_env(Subtasks*);
@@ -538,51 +539,51 @@ cco_task_struct (TaskC) { TaskC_base base; float x, y; };
 
 typedef struct { double value; int error; } Result;
 
-int TaskC(struct TaskC* self) {
-    cco_async (self) {
-        printf("TaskC start: {%g, %g}\n", self->x, self->y);
+int TaskC(struct TaskC* o) {
+    cco_async (o) {
+        printf("TaskC start: {%g, %g}\n", o->x, o->y);
 
         // assume there is an error...
         cco_throw(99);
 
         puts("TaskC work");
-        cco_suspend;
+        cco_yield;
 
         puts("TaskC more work");
         // initial return value
-        cco_env(Result *)->value = self->x * self->y;
+        cco_env(Result *)->value = o->x * o->y;
 
         cco_drop:
         puts("TaskC done");
     }
 
-    c_free_n(self, 1);
+    c_free_n(o, 1);
     return 0;
 }
 
-int TaskB(struct TaskB* self) {
-    cco_async (self) {
-        printf("TaskB start: %g\n", self->d);
+int TaskB(struct TaskB* o) {
+    cco_async (o) {
+        printf("TaskB start: %g\n", o->d);
         cco_await_task(c_new(struct TaskC, {{TaskC}, 1.2f, 3.4f}));
 
         puts("TaskB work");
-        cco_env(Result *)->value += self->d;
+        cco_env(Result *)->value += o->d;
 
         cco_drop:
         puts("TaskB done");
     }
 
-    c_free_n(self, 1);
+    c_free_n(o, 1);
     return 0;
 }
 
-int TaskA(struct TaskA* self) {
-    cco_async (self) {
-        printf("TaskA start: %d\n", self->a);
+int TaskA(struct TaskA* o) {
+    cco_async (o) {
+        printf("TaskA start: %d\n", o->a);
         cco_await_task(c_new(struct TaskB, {{TaskB}, 3.1415}));
 
         puts("TaskA work");
-        cco_env(Result *)->value += self->a; // final return value;
+        cco_env(Result *)->value += o->a; // final return value;
 
         cco_drop:
         if (cco_err()->code == 99) {
@@ -595,12 +596,12 @@ int TaskA(struct TaskA* self) {
         puts("TaskA done");
     }
 
-    c_free_n(self, 1);
+    c_free_n(o, 1);
     return 0;
 }
 
-int start(cco_task* self) {
-    cco_async (self) {
+int start(cco_task* o) {
+    cco_async (o) {
         puts("start");
         cco_await_task(c_new(struct TaskA, {{TaskA}, 42}));
 
@@ -608,7 +609,7 @@ int start(cco_task* self) {
         puts("done");
     }
 
-    c_free_n(self, 1);
+    c_free_n(o, 1);
     return 0;
 }
 
@@ -665,54 +666,54 @@ cco_task_struct (consume) {
 };
 
 
-int produce(struct produce* self) {
-    cco_async (self) {
+int produce(struct produce* o) {
+    cco_async (o) {
         while (1) {
-            if (self->serial > self->total) {
-                if (Inventory_is_empty(&self->inventory))
+            if (o->serial > o->total) {
+                if (Inventory_is_empty(&o->inventory))
                     cco_return; // cleanup and finish
             }
-            else if (Inventory_size(&self->inventory) < self->limit) {
-                for (c_range(self->batch))
-                    Inventory_push(&self->inventory, ++self->serial);
+            else if (Inventory_size(&o->inventory) < o->limit) {
+                for (c_range(o->batch))
+                    Inventory_push(&o->inventory, ++o->serial);
 
                 printf("produced %d items, Inventory has now %d items:\n",
-                       self->batch, (int)Inventory_size(&self->inventory));
+                       o->batch, (int)Inventory_size(&o->inventory));
 
-                for (c_each(i, Inventory, self->inventory))
+                for (c_each(i, Inventory, o->inventory))
                     printf(" %2d", *i.ref);
                 puts("");
             }
 
-            cco_yield_to(self->consumer); // symmetric transfer
+            cco_yield_to(o->consumer); // symmetric transfer
         }
 
         cco_drop:
-        cco_stop(self->consumer);
-        Inventory_drop(&self->inventory);
+        cco_stop(o->consumer);
+        Inventory_drop(&o->inventory);
         puts("done producer");
     }
     return 0;
 }
 
-int consume(struct consume* self) {
-    cco_async (self) {
+int consume(struct consume* o) {
+    cco_async (o) {
         int n, sz;
         while (1) {
             n = rand() % 10;
-            sz = (int)Inventory_size(&self->producer->inventory);
+            sz = (int)Inventory_size(&o->producer->inventory);
             if (n > sz) n = sz;
 
             for (c_range(n))
-                Inventory_pop(&self->producer->inventory);
+                Inventory_pop(&o->producer->inventory);
             printf("consumed %d items\n", n);
 
-            cco_yield_to(self->producer); // symmetric transfer
+            cco_yield_to(o->producer); // symmetric transfer
         }
 
         cco_drop:
 		puts("drop consumer");
-		cco_suspend; // demo async destruction.
+		cco_yield; // demo async destruction.
         puts("done consumer");
     }
 
@@ -782,58 +783,58 @@ cco_task_struct (TaskX) {
     char id;
 };
 
-int scheduler(struct Scheduler* self) {
-    cco_async (self) {
-        while (!Tasks_is_empty(&self->tasks)) {
-            self->_pulled = Tasks_pull(&self->tasks);
+int scheduler(struct Scheduler* o) {
+    cco_async (o) {
+        while (!Tasks_is_empty(&o->tasks)) {
+            o->_pulled = Tasks_pull(&o->tasks);
 
-            cco_await_task(self->_pulled, CCO_YIELD | CCO_DONE);
+            cco_await_task(o->_pulled, CCO_YIELD | CCO_DONE);
 
             if (cco_status() == CCO_YIELD) {
-                Tasks_push(&self->tasks, self->_pulled);
+                Tasks_push(&o->tasks, o->_pulled);
             } else { // CCO_DONE
-                Tasks_value_drop(&self->tasks, &self->_pulled);
+                Tasks_value_drop(&o->tasks, &o->_pulled);
             }
         }
 
         cco_drop:
-        Tasks_drop(&self->tasks);
+        Tasks_drop(&o->tasks);
         puts("Task queue dropped");
     }
     return 0;
 }
 
-static int taskX(struct TaskX* self) {
-    cco_async (self) {
-        printf("Hello from task %c\n", self->id);
-        cco_suspend;
-        printf("%c is back doing work\n", self->id);
-        cco_suspend;
-        printf("%c is back doing more work\n", self->id);
-        cco_suspend;
+static int taskX(struct TaskX* o) {
+    cco_async (o) {
+        printf("Hello from task %c\n", o->id);
+        cco_yield;
+        printf("%c is back doing work\n", o->id);
+        cco_yield;
+        printf("%c is back doing more work\n", o->id);
+        cco_yield;
 
         cco_drop:
-        printf("%c is done\n", self->id);
+        printf("%c is done\n", o->id);
     }
 
     return 0;
 }
 
-static int TaskA(struct TaskA* self) {
-    cco_async (self) {
+static int TaskA(struct TaskA* o) {
+    cco_async (o) {
         puts("Hello from task A");
-        cco_suspend;
+        cco_yield;
 
         puts("A is back doing work");
-        cco_suspend;
+        cco_yield;
 
         puts("A adds task C");
         Tasks *_tasks = cco_env(Tasks*); // local var only alive until cco_suspend.
         Tasks_push(_tasks, cco_cast_task(c_new(struct TaskX, {.base={taskX}, .id='C'})));
-        cco_suspend;
+        cco_yield;
 
         puts("A is back doing more work");
-        cco_suspend;
+        cco_yield;
 
         cco_drop:
         puts("A is done");

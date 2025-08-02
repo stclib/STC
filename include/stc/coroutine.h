@@ -138,17 +138,17 @@ typedef struct {
         goto _resume; \
     } while (0)
 
-#define cco_yield \
-    cco_yield_v(CCO_YIELD)
-
-#define cco_suspend \
-    cco_yield_v(CCO_SUSPEND)
-
 #define cco_yield_v(status) \
     do { \
         _state->pos = __LINE__; return status; \
         case __LINE__:; \
     } while (0)
+
+#define cco_yield \
+    cco_yield_v(CCO_YIELD)
+
+#define cco_suspend \
+    cco_yield_v(CCO_SUSPEND)
 
 #define cco_await(until) \
     do { \
@@ -210,7 +210,7 @@ typedef struct cco_task cco_task;
 #define cco_env(Tp) ((Tp)_state->fb->env)
 #define cco_err() (&_state->fb->err)
 #define cco_status() (_state->fb->status + 0)
-#define cco_fb() (_state->fb + 0)
+#define cco_fb(task) ((task)->base.state.fb + 0)
 
 #define cco_cast_task(...) \
     ((void)sizeof((__VA_ARGS__)->base.func(__VA_ARGS__)), (cco_task *)(__VA_ARGS__))
@@ -225,17 +225,30 @@ typedef struct cco_task cco_task;
         cco_return; \
     } while (0)
 
+#define cco_cancel_fiber(a_fiber) \
+    do { \
+        cco_fiber* _fb1 = a_fiber; \
+        _fb1->err.code = CCO_CANCEL; \
+        _fb1->err.line = __LINE__; \
+        _fb1->err.file = __FILE__; \
+        cco_stop(_fb1->task); \
+    } while (0)
+
 /* Cancel job/task and unwind await stack; MAY be stopped (recovered) in cco_drop section */
-/* Equal to cco_throw(CCO_CANCEL) if a_task is the current task/fiber. */
+/* Equals cco_throw(CCO_CANCEL) if a_task is in current fiber. */
 #define cco_cancel(a_task) \
     do { \
-        cco_fiber* _fb = cco_cast_task(a_task)->base.state.fb; \
-        _fb->err.code = CCO_CANCEL; \
-        _fb->err.line = __LINE__; \
-        _fb->err.file = __FILE__; \
-        cco_stop(_fb->task); \
-        if (_fb->task == _state->fb->task) goto _resume; \
+        cco_fiber* _fb2 = cco_cast_task(a_task)->base.state.fb; \
+        cco_cancel_fiber(_fb2); \
+        if (_fb2 == _state->fb) goto _resume; \
     } while (0)
+
+#define cco_cancel_group(waitgroup) \
+    _cco_cancel_group(_state->fb, waitgroup)
+
+#define cco_cancel_all() \
+    for (cco_fiber *_fbi = _state->fb->next; _fbi != _state->fb; _fbi = _fbi->next) \
+        cco_cancel_fiber(_fbi) \
 
 /* Recover the thrown error; to be used in cco_drop section upon handling cco_err()->code */
 #define cco_recover \
@@ -299,30 +312,29 @@ static inline int _cco_resume_task(cco_task* task)
     _cco_spawn(cco_cast_task(task), env, _state->fb, _wg); \
 } while (0)
 
-#define cco_await_all(waitgroup) cco_await((waitgroup)->launch_count == 0)
-#define cco_await_any(waitgroup) cco_await_n(waitgroup, 1)
+#define cco_await_all(waitgroup) \
+    cco_await((waitgroup)->launch_count == 0); \
+
 #define cco_await_n(waitgroup, n) do { \
-    (waitgroup)->await_count = (waitgroup)->launch_count - (n); \
-    if ((waitgroup)->await_count < 0) cco_throw(1); \
+    const int n_ = n; \
+    (waitgroup)->await_count = n_ < 0 ? -n_ : (waitgroup)->launch_count - n_; \
     cco_await((waitgroup)->launch_count == (waitgroup)->await_count); \
 } while (0)
 
+#define cco_await_any(waitgroup) \
+    cco_await_n(waitgroup, 1)
+
 #define cco_await_cancel(waitgroup) do { \
-    for (cco_fiber *_ifb = _state->fb->next; _ifb != _state->fb; _ifb = _ifb->next) { \
-        cco_task* _top = _ifb->task; \
-        while (_top->base.parent_task) \
-            _top = _top->base.parent_task; \
-        if (_top->base.state.wg == (waitgroup)) \
-            cco_cancel(_top); \
-    } \
+    _cco_cancel_group(_state->fb, waitgroup); \
+    /* Note: current fiber must not be in the waitgroup */ \
     cco_await_all(waitgroup); \
 } while (0)
 
 #define cco_run_fiber(...) c_MACRO_OVERLOAD(cco_run_fiber, __VA_ARGS__)
 #define cco_run_fiber_1(fiber_ref) \
-    for (cco_fiber** _it_ref = fiber_ref; (*_it_ref = cco_resume_next(*_it_ref)) != NULL; )
+    for (cco_fiber** _it_ref = fiber_ref; (*_it_ref = cco_execute_next(*_it_ref)) != NULL; )
 #define cco_run_fiber_2(it, fiber) \
-    for (cco_fiber* it = fiber; (it = cco_resume_next(it)) != NULL; )
+    for (cco_fiber* it = fiber; (it = cco_execute_next(it)) != NULL; )
 
 #define cco_run_task(...) c_MACRO_OVERLOAD(cco_run_task, __VA_ARGS__)
 #define cco_run_task_1(task) cco_run_task_2(task, NULL)
@@ -334,14 +346,15 @@ static inline int _cco_resume_task(cco_task* task)
 
 extern cco_fiber* _cco_new_fiber(cco_task* task, void* env, cco_group* wg);
 extern cco_fiber* _cco_spawn(cco_task* task, void* env, cco_fiber* fb, cco_group* wg);
-extern cco_fiber* cco_resume_next(cco_fiber* prev);
-extern int        cco_resume_current(cco_fiber* co); /* coroutine */
+extern int        cco_execute(cco_fiber* fb); // is a coroutine itself
+extern cco_fiber* cco_execute_next(cco_fiber* fb);  // resume and return the next fiber
+extern void       _cco_cancel_group(cco_fiber* fb, cco_group* waitgroup);
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined i_implement || defined STC_IMPLEMENT
 #include <stdio.h>
 
-int cco_resume_current(cco_fiber* fb) {
+int cco_execute(cco_fiber* fb) {
     cco_async (fb) {
         while (1) {
             fb->parent_task = fb->task->base.parent_task;
@@ -371,17 +384,27 @@ int cco_resume_current(cco_fiber* fb) {
     return CCO_DONE;
 }
 
-cco_fiber* cco_resume_next(cco_fiber* prev) {
-    cco_fiber *curr = prev->next, *unlink;
-    int ret = cco_resume_current(curr);
+cco_fiber* cco_execute_next(cco_fiber* fb) {
+    cco_fiber *_next = fb->next, *unlinked;
+    int ret = cco_execute(_next);
 
     if (ret == CCO_DONE) {
-        unlink = curr;
-        curr = (curr == prev ? NULL : curr->next);
-        prev->next = curr;
-        c_free_n(unlink, 1);
+        unlinked = _next;
+        _next = (_next == fb ? NULL : _next->next);
+        fb->next = _next;
+        c_free_n(unlinked, 1);
     }
-    return curr;
+    return _next;
+}
+
+void _cco_cancel_group(cco_fiber* fb, cco_group* waitgroup) {
+    for (cco_fiber *fbi = fb->next; fbi != fb; fbi = fbi->next) {
+        cco_task* top = fbi->task;
+        while (top->base.parent_task)
+            top = top->base.parent_task;
+        if (top->base.state.wg == waitgroup)
+            cco_cancel_fiber(fbi);
+    }
 }
 
 cco_fiber* _cco_new_fiber(cco_task* _task, void* env, cco_group* wg) {

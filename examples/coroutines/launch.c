@@ -32,7 +32,7 @@ int myTask(struct myTask* o) {
         puts("start myTask");
         for (; o->n < o->end; ++o->n) {
             printf("myTask: %d\n", o->n);
-            cco_suspend;
+            cco_yield;
         }
 
         cco_drop:
@@ -54,7 +54,7 @@ int taskC(struct taskC* o) {
         cco_throw(99);
 
         puts("taskC work");
-        cco_suspend;
+        cco_yield;
         puts("taskC more work");
 
         // initial return value
@@ -85,7 +85,7 @@ int taskB(struct taskB* o) {
         cco_launch(c_new(struct myTask, {{myTask}, 1, 6}), &OUT->wg);
         cco_launch(c_new(struct myTask, {{myTask}, 101, 104}), &OUT->wg);
         cco_launch(c_new(struct myTask, {{myTask}, 1001, 1008}), &OUT->wg);
-        cco_suspend;
+        cco_yield;
         puts("Spawned 3 tasks.");
 
         cco_drop:
