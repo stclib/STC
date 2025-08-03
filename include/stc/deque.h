@@ -41,6 +41,8 @@
 #undef _pop
 #undef _pull
 
+#ifndef i_included
+
 STC_API _m_value*   _c_MEMB(_push_front)(Self* self, _m_value value);
 STC_API _m_iter     _c_MEMB(_insert_n)(Self* self, isize idx, const _m_value* arr, isize n);
 STC_API _m_iter     _c_MEMB(_insert_uninit)(Self* self, isize idx, isize n);
@@ -124,6 +126,8 @@ _c_MEMB(_find)(const Self* self, _m_raw raw) {
 #if defined _i_has_cmp
 #include "priv/sort_prv.h"
 #endif // _i_has_cmp
+
+#endif // i_included
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined i_implement

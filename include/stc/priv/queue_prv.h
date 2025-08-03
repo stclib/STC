@@ -22,6 +22,9 @@
  */
 
 // IWYU pragma: private
+
+#ifndef i_included
+
 #ifndef i_declared
 _c_DEFTYPES(_declare_queue, Self, i_key, _i_aux_def);
 #endif
@@ -171,6 +174,8 @@ STC_INLINE isize _c_MEMB(_index)(const Self* self, _m_iter it)
 
 STC_INLINE void _c_MEMB(_adjust_end_)(Self* self, isize n)
     { self->end = (self->end + n) & self->capmask; }
+
+#endif // i_included
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined i_implement

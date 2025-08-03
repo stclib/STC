@@ -70,6 +70,9 @@ int main(void) {
 #endif
 #define _i_sorted
 #include "priv/template.h"
+
+#ifndef i_included
+
 #ifndef i_declared
   _c_DEFTYPES(_declare_aatree, Self, i_key, i_val, _i_MAP_ONLY, _i_SET_ONLY, _i_aux_def);
 #endif
@@ -260,6 +263,8 @@ STC_INLINE Self _c_MEMB(_from_n)(const _m_raw* raw, isize n)
 STC_INLINE Self _c_MEMB(_with_capacity)(const isize cap)
     { Self cx = {0}; _c_MEMB(_reserve)(&cx, cap); return cx; }
 #endif
+
+#endif // i_included
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined i_implement

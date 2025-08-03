@@ -34,6 +34,9 @@
 #endif
 #define _i_sorted
 #include "priv/template.h"
+
+#ifndef i_included
+
 #ifndef i_declared
   _c_DEFTYPES(_declare_stack, Self, i_key, _i_aux_def);
 #endif
@@ -123,6 +126,8 @@ STC_INLINE _m_value _c_MEMB(_value_clone)(const Self* self, _m_value val)
 STC_INLINE void _c_MEMB(_emplace)(Self* self, _m_raw raw)
     { _c_MEMB(_push)(self, i_keyfrom(raw)); }
 #endif // !i_no_emplace
+
+#endif // i_included
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined i_implement
