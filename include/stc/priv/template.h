@@ -153,8 +153,6 @@
   #endif
   #if !defined i_keyfrom && defined i_keyraw
     #define i_keyfrom c_JOIN(i_keyclass, _from)
-  #elif !defined i_keyfrom && !defined i_no_clone
-    #define i_keyfrom c_JOIN(i_keyclass, _clone)
   #endif
   #if !defined i_keytoraw && defined i_keyraw
     #define i_keytoraw c_JOIN(i_keyclass, _toraw)
@@ -219,9 +217,7 @@
 #ifndef i_tag
   #define i_tag i_key
 #endif
-#if !defined i_keyfrom && defined i_keyclone && !defined i_keyraw
-  #define i_keyfrom i_keyclone
-#elif !defined i_keyfrom
+#if !defined i_keyfrom
   #define i_keyfrom c_default_clone
 #else
   #undef i_no_emplace
@@ -258,8 +254,6 @@
   #endif
   #if !defined i_valfrom && defined i_valraw
     #define i_valfrom c_JOIN(i_valclass, _from)
-  #elif !defined i_valfrom && !defined i_no_clone
-    #define i_valfrom c_JOIN(i_valclass, _clone)
   #endif
   #if !defined i_valtoraw && defined i_valraw
     #define i_valtoraw c_JOIN(i_valclass, _toraw)
@@ -274,9 +268,7 @@
   #error "Both i_valclone and i_valdrop must be defined, if any"
 #endif
 
-#if !defined i_valfrom && defined i_valclone && !defined i_valraw
-  #define i_valfrom i_valclone
-#elif !defined i_valfrom
+#if !defined i_valfrom
   #define i_valfrom c_default_clone
 #else
   #undef i_no_emplace
