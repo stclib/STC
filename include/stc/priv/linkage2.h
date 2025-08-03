@@ -34,6 +34,7 @@
 #undef i_header
 #undef i_implement
 #undef i_import
+#undef i_included
 
 #if defined __clang__ && !defined __cplusplus
   #pragma clang diagnostic pop

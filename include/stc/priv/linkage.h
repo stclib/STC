@@ -23,6 +23,10 @@
 #undef STC_API
 #undef STC_DEF
 
+#if defined(i_included)
+#define i_implement
+#define i_declared
+#endif
 #if !defined i_static && !defined STC_STATIC && (defined i_header || defined STC_HEADER  || \
                                                  defined i_implement || defined STC_IMPLEMENT)
   #define STC_API extern

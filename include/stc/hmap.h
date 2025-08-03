@@ -72,6 +72,13 @@ struct hmap_meta { uint16_t hashx:6, dist:10; }; // dist: 0=empty, 1=PSL 0, 2=PS
 #endif
 #define _i_is_hash
 #include "priv/template.h"
+
+#ifndef i_max_load_factor
+    #define i_max_load_factor 0.80f
+#endif
+
+#ifndef i_included
+
 #ifndef i_declared
   _c_DEFTYPES(_declare_htable, Self, i_key, i_val, _i_MAP_ONLY, _i_SET_ONLY, _i_aux_def);
 #endif
@@ -107,10 +114,6 @@ STC_INLINE bool         _c_MEMB(_contains)(const Self* self, _m_keyraw rkey)
                             { return self->size && _c_MEMB(_bucket_lookup_)(self, &rkey).ref; }
 STC_INLINE void         _c_MEMB(_shrink_to_fit)(Self* self)
                             { _c_MEMB(_reserve)(self, (isize)self->size); }
-
-#ifndef i_max_load_factor
-  #define i_max_load_factor 0.80f
-#endif
 
 STC_INLINE _m_result
 _c_MEMB(_insert_entry_)(Self* self, _m_keyraw rkey) {
@@ -300,6 +303,8 @@ _c_MEMB(_eq)(const Self* self, const Self* other) {
     }
     return true;
 }
+
+#endif // i_included
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined i_implement

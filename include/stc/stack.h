@@ -25,6 +25,10 @@
 
 // Stack - a simplified vec type without linear search and insert/erase inside the stack.
 
+#ifdef i_included
+#error "Stack is fully static inline"
+#endif
+
 #ifndef STC_STACK_H_INCLUDED
 #define STC_STACK_H_INCLUDED
 #include "common.h"
