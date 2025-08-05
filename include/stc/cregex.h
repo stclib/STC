@@ -110,7 +110,9 @@ int cregex_captures(const cregex* re);
 
 
 /* return CREG_OK, CREG_NOMATCH or CREG_MATCHERROR. */
-int cregex_match_pro(const cregex* re, const char* input, csview match[], int mflags);
+int cregex_match_pro2(const cregex* re, const char* input, const char* input_end, csview match[], int mflags);
+STC_INLINE int cregex_match_pro(const cregex* re, const char* input, csview match[], int mflags)
+    { return cregex_match_pro2(re, input, NULL, match, mflags); }
 
 STC_INLINE int cregex_match(const cregex* re, const char* input, csview match[])
     { return cregex_match_pro(re, input, match, CREG_DEFAULT); }
@@ -120,6 +122,9 @@ STC_INLINE int cregex_match_sv(const cregex* re, csview input, csview match[]) {
     return cregex_match_pro(re, input.buf, match, CREG_STARTEND);
 }
 
+STC_INLINE int cregex_match_sv_flags(const cregex* re, csview input, csview match[], int mflags) {
+    return cregex_match_pro2(re, input.buf, input.buf + input.size, match, mflags);
+}
 
 STC_INLINE bool cregex_is_match(const cregex* re, const char* input)
     { return cregex_match_pro(re, input, NULL, CREG_DEFAULT) == CREG_OK; }

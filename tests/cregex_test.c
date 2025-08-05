@@ -330,3 +330,13 @@ TEST(cregex, utf8_bad_string)
     EXPECT_FALSE(utf8_valid(bad));
     EXPECT_TRUE(utf8_valid_n(bad, 12));
 }
+
+TEST(cregex, match_csview_without_match_array)
+{
+    c_with (cregex re = {0}, cregex_drop(&re)) {
+        re = cregex_from("^second$");
+        const char* buffer = "only second word is in csview";
+        csview input = c_sv(buffer + 5, 6);
+        EXPECT_EQ(cregex_match_sv_flags(&re, input, NULL, CREG_DEFAULT), CREG_OK);
+    }
+}
