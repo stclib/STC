@@ -3,7 +3,7 @@
 
 # STC - Smart Template Containers
 
-## Version 6.0 beta3
+## Version 6.0 beta4
 STC is a mature, comprehensive, general purpose container and algorithm library for C99/C11.
 It has excellent ergonomics and requires virtually no boilerplate code. The library adds many
 missing features to C, like common data containers, algorithms, and abstractions found in
@@ -12,18 +12,22 @@ or generic, which allows for a fully typesafe, compact, and high performance imp
 
 <details>
 <summary><b>Version 6 NEWS</b></summary>
-Apologies for the multiple API changes particularly on the coroutine and cspan module
+Apologies for the multiple API changes particularly on the coroutine, cspan and cregex modules
 after V5.1. From upcoming V6.0 release, API is planned to be stable and changes will be
 made backward compatible.
 
 V6.0:
 - New powerful V2 coroutines with waitgroups, cancellation and async_drop.
+- Fixed #149: improved cregex API and fixed bug on word-boundary match.
+- Fixed #143: major container initialization flaw.
+- Fixed #146: regression on cstr initialization.
+- Fixed #142: regression regarding i_no_clone.
 - Fixed #138: general hash function bug.
 - Fixed queue/deque shrink_to_fit() and reserve() bugs.
 - Fixed i_aux and custom allocations bugs.
 - Fixed #136: missing exports in hmap, #137: declare_hash_set()
 - Fixed #133: bug in vec/stack _begin() and _rbegin().
-- Fixed #129: Makefile bugs and improvements.
+- Fixed #129 & #150: Makefile bugs and improvements.
 - Fixed #128: bug in cstr_istarts_with().
 - Issue #123: Added GNU print format attribute to cstr_from_fmt(), cstr_printf().
 - Improved documentation.

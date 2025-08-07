@@ -1109,8 +1109,9 @@ _regexec1(const _Reprog *progp,  /* program to run */
                 case TOK_NWBOUND:
                     ok = true; /* FALLTHRU */
                 case TOK_WBOUND:
-                    if (ok ^ (s == bol || s == j->eol || (utf8_isword(utf8_peek_at(s, -1))
-                                                        ^ utf8_isword(utf8_peek(s)))))
+                    if (ok ^ (r == 0 || s == bol || s == j->eol ||
+                              (utf8_isword(utf8_peek_at(s, -1)) ^
+                               utf8_isword(utf8_peek(s)))))
                         continue;
                     break;
                 case TOK_NCCLASS:
@@ -1294,43 +1295,46 @@ cregex_match_pro2(const cregex* re, const char* input, const char* input_end, cs
 }
 
 int
-cregex_match_aio(const char* pattern, const char* input, csview match[]) {
-    cregex re = cregex_make(pattern, CREG_DEFAULT);
+cregex_match_aio2(const char* pattern, const char* input, const char* input_end, csview match[], int flags) {
+    cregex re = cregex_make(pattern, flags);
     if (re.error != CREG_OK) return re.error;
-    int res = cregex_match_pro(&re, input, match, CREG_DEFAULT);
+    int res = cregex_match_pro2(&re, input, input_end, match, flags);
     cregex_drop(&re);
     return res;
 }
 
 cstr
-cregex_replace_sv(const cregex* re, csview input, const char* replace,
-                  int count, bool(*transform)(int, csview, cstr*), int rflags) {
+cregex_replace_pro2(const cregex* re, const char* input, const char* input_end, const char* replace,
+                    int count, bool(*transform)(int, csview, cstr*), int rflags) {
     cstr out = {0};
     cstr subst = {0};
     csview match[CREG_MAX_CAPTURES];
     int nmatch = cregex_captures(re) + 1;
     bool copy = !(rflags & CREG_STRIP);
 
-    while (count-- && cregex_match_sv(re, input, match) == CREG_OK) {
+    while (count-- && cregex_match_pro2(re, input, input_end, match, CREG_DEFAULT) == CREG_OK) {
         _build_substitution(replace, nmatch, match, transform, &subst);
-        const isize mpos = (match[0].buf - input.buf);
-        if (copy & (mpos > 0)) cstr_append_n(&out, input.buf, mpos);
+        const isize mpos = (match[0].buf - input);
+        if (copy & (mpos > 0))
+            cstr_append_n(&out, input, mpos);
         cstr_append_s(&out, subst);
-        input.buf = match[0].buf + match[0].size;
-        input.size -= mpos + match[0].size;
+        input = match[0].buf + match[0].size;
     }
-    if (copy) cstr_append_sv(&out, input);
+    if (copy) {
+        isize len = input_end ? input_end - input : c_strlen(input);
+        cstr_append_sv(&out, c_sv(input, len));
+    }
     cstr_drop(&subst);
     return out;
 }
 
 cstr
-cregex_replace_aio_sv(const char* pattern, csview input, const char* replace,
-                      int count, bool(*transform)(int, csview, cstr*), int crflags) {
+cregex_replace_aio2(const char* pattern, const char* input, const char* input_end, const char* replace,
+                    int count, bool(*transform)(int,csview,cstr*), int crflags) {
     cregex re = {0};
     if (cregex_compile_pro(&re, pattern, crflags) != CREG_OK)
         assert(0);
-    cstr out = cregex_replace_sv(&re, input, replace, count, transform, crflags);
+    cstr out = cregex_replace_pro2(&re, input, input_end, replace, count, transform, crflags);
     cregex_drop(&re);
     return out;
 }
