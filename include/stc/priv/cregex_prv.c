@@ -1198,20 +1198,12 @@ _regexec(const _Reprog *progp,    /* program to run */
      *  use user-specified starting/ending location if specified
      */
     j.starts = bol;
-    j.eol = NULL;
+    j.eol = bol_end;
 
-    if (mp && mp[0].buf) {
-        if (mflags & CREG_STARTEND)
-            j.starts = mp[0].buf, j.eol = mp[0].buf + mp[0].size;
-        else if (mflags & CREG_NEXT)
-            j.starts = mp[0].buf + mp[0].size;
-    }
-
-    /*
-     *  if bol_end is non-NULL, use it as end of input (unless input is already capped shorter)
-     */
-    if (bol_end != NULL && (j.eol == NULL || j.eol > bol_end))
-        j.eol = bol_end;
+    if ((mflags & CREG_NEXT) && mp[0].buf)
+        j.starts = mp[0].buf + mp[0].size;
+    if (j.eol && j.starts > j.eol)
+        return 0; // no match
 
     j.starttype = 0;
     j.startchar = 0;

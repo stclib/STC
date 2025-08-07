@@ -43,7 +43,6 @@ enum {
     /* match-flags */
     CREG_FULLMATCH = 1<<2, /* like start-, end-of-line anchors were in pattern: "^ ... $" */
     CREG_NEXT = 1<<3,      /* use end of previous match[0] as start of input */
-    CREG_STARTEND = 1<<4,  /* use match[0] as start+end of input */
 
     /* replace-flags */
     CREG_STRIP = 1<<5,     /* only keep the matched strings, strip rest */
@@ -83,11 +82,11 @@ typedef struct {
 
 #define c_match(it, re, str) \
     cregex_iter it = {.regex=re, .input={str}, .match={{0}}}; \
-    cregex_match_next(it.regex, it.input.buf, it.match) == CREG_OK && it.match[0].size;
+    cregex_match_pro(it.regex, it.input.buf, it.match, CREG_NEXT) == CREG_OK && it.match[0].size;
 
 #define c_match_sv(it, re, strview) \
     cregex_iter it = {.regex=re, .input=strview, .match={{0}}}; \
-    cregex_match_next_sv(it.regex, it.input, it.match) == CREG_OK && it.match[0].size;
+    cregex_match_pro_sv(it.regex, it.input, it.match, CREG_NEXT) == CREG_OK && it.match[0].size;
 
 /* compile a regex from a pattern. return CREG_OK, or negative error code on failure. */
 int cregex_compile_pro(cregex *re, const char* pattern, int cflags);
@@ -111,35 +110,22 @@ int cregex_captures(const cregex* re);
 
 /* return CREG_OK, CREG_NOMATCH or CREG_MATCHERROR. */
 int cregex_match_pro2(const cregex* re, const char* input, const char* input_end, csview match[], int mflags);
+
+STC_INLINE int cregex_match(const cregex* re, const char* input, csview match[])
+    { return cregex_match_pro2(re, input, NULL, match, CREG_DEFAULT); }
+
+STC_INLINE int cregex_match_sv(const cregex* re, csview input, csview match[])
+    { return cregex_match_pro2(re, input.buf, input.buf + input.size, match, CREG_DEFAULT); }
+
 STC_INLINE int cregex_match_pro(const cregex* re, const char* input, csview match[], int mflags)
     { return cregex_match_pro2(re, input, NULL, match, mflags); }
 
-STC_INLINE int cregex_match(const cregex* re, const char* input, csview match[])
-    { return cregex_match_pro(re, input, match, CREG_DEFAULT); }
-
-STC_INLINE int cregex_match_sv(const cregex* re, csview input, csview match[]) {
-    match[0] = input;
-    return cregex_match_pro(re, input.buf, match, CREG_STARTEND);
-}
-
-STC_INLINE int cregex_match_sv_flags(const cregex* re, csview input, csview match[], int mflags) {
-    return cregex_match_pro2(re, input.buf, input.buf + input.size, match, mflags);
-}
+STC_INLINE int cregex_match_pro_sv(const cregex* re, csview input, csview match[], int mflags)
+    { return cregex_match_pro2(re, input.buf, input.buf + input.size, match, mflags); }
 
 STC_INLINE bool cregex_is_match(const cregex* re, const char* input)
-    { return cregex_match_pro(re, input, NULL, CREG_DEFAULT) == CREG_OK; }
+    { return cregex_match_pro2(re, input, NULL, NULL, CREG_DEFAULT) == CREG_OK; }
 
-STC_INLINE int cregex_match_next_sv(const cregex* re, csview input, csview match[]) {
-    if (match[0].buf) {
-        match[0].buf += match[0].size;
-        match[0].size = input.buf + input.size - match[0].buf;
-    }
-    return cregex_match_pro(re, input.buf, match, CREG_STARTEND);
-}
-
-STC_INLINE int cregex_match_next(const cregex* re, const char* input, csview match[]) {
-    return cregex_match_pro(re, input, match, CREG_NEXT);
-}
 
 /* match + compile RE pattern */
 int cregex_match_aio(const char* pattern, const char* input, csview match[]);

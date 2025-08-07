@@ -208,14 +208,14 @@ TEST(cregex, search_all)
         int res;
         EXPECT_EQ(re.error, CREG_OK);
         input="ab,ab|,ab";
-        res = cregex_match_next(&re, input, &m);
+        res = cregex_match_pro(&re, input, &m, CREG_NEXT);
         EXPECT_EQ(M_START(m), 0);
-        res = cregex_match_next(&re, input, &m);
+        res = cregex_match_pro(&re, input, &m, CREG_NEXT);
         EXPECT_EQ(res, CREG_OK);
         EXPECT_EQ(M_START(m), 3);
-        res = cregex_match_next(&re, input, &m);
+        res = cregex_match_pro(&re, input, &m, CREG_NEXT);
         EXPECT_EQ(M_START(m), 7);
-        res = cregex_match_next(&re, input, &m);
+        res = cregex_match_pro(&re, input, &m, CREG_NEXT);
         EXPECT_NE(res, CREG_OK);
     }
 }
@@ -337,6 +337,6 @@ TEST(cregex, match_csview_without_match_array)
         re = cregex_from("^second$");
         const char* buffer = "only second word is in csview";
         csview input = c_sv(buffer + 5, 6);
-        EXPECT_EQ(cregex_match_sv_flags(&re, input, NULL, CREG_DEFAULT), CREG_OK);
+        EXPECT_EQ(cregex_match_pro_sv(&re, input, NULL, CREG_DEFAULT), CREG_OK);
     }
 }

@@ -14,7 +14,6 @@ The API is simple and includes powerful string pattern matches and replace funct
 - match-flags
     - CREG_FULLMATCH  - like start-, end-of-line anchors were in pattern: "^ ... $"
     - CREG_NEXT       - use end of previous match[0] as start of input
-    - CREG_STARTEND   - use match[0] as start + end of input
 - replace-flags
     - CREG_STRIP      - only keep the replaced matches, strip the rest
 
@@ -24,23 +23,20 @@ cregex          cregex_from(const char* pattern);
 cregex          cregex_make(const char* pattern, int cflags);
 
                 // return CREG_OK, or negative error code on failure
-int             cregex_compile(cregex *self, const char* pattern,
-                               int cflags = CREG_DEFAULT);
+int             cregex_compile(cregex *self, const char* pattern);
+int             cregex_compile_pro(cregex *self, const char* pattern, int cflags);
 
                 // num. of capture groups in regex, excluding the 0th group which is the full match
 int             cregex_captures(const cregex* self);
 
                 // Match RE. Return CREG_OK, CREG_NOMATCH, or CREG_MATCHERROR
-int             cregex_match(const cregex* re, const char* input, csview match[],
-                             int mflags = CREG_DEFAULT);
+int             cregex_match(const cregex* re, const char* input, csview match[]);
 int             cregex_match_sv(const cregex* re, csview input, csview match[]);
+int             cregex_match_pro(const cregex* re, const char* input, csview match[], int mflags);
+int             cregex_match_pro_sv(const cregex* re, csview input, csview match[], int mflags);
 
                 // Check if there are matches in input
 bool            cregex_is_match(const cregex* re, const char* input);
-
-                // Match next after previous match position
-int             cregex_match_next(const cregex* re, const char* input, csview match[]);
-int             cregex_match_next_sv(const cregex* re, csview input, csview match[]);
 
                 // All-in-one single match (compile + match + drop)
 int             cregex_match_aio(const char* pattern, const char* input, csview match[]);
