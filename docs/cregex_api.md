@@ -31,15 +31,15 @@ int             cregex_captures(const cregex* self);
 
                 // Match RE. Return CREG_OK, CREG_NOMATCH, or CREG_MATCHERROR
 int             cregex_match(const cregex* re, const char* input, csview match[]);
-int             cregex_match_sv(const cregex* re, csview input, csview match[]);
 int             cregex_match_pro(const cregex* re, const char* input, csview match[], int mflags);
-int             cregex_match_pro_sv(const cregex* re, csview input, csview match[], int mflags);
+int             cregex_match_sv(const cregex* re, csview input, csview match[], int mflags);
 
                 // Check if there are matches in input
 bool            cregex_is_match(const cregex* re, const char* input);
 
                 // All-in-one single match (compile + match + drop)
 int             cregex_match_aio(const char* pattern, const char* input, csview match[]);
+int             cregex_match_aio_sv(const char* pattern, csview input, csview match[], int mflags);
 
                 // Replace all matched instances
 cstr            cregex_replace(const cregex* re, const char* input, const char* replace);

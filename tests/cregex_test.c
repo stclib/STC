@@ -337,6 +337,6 @@ TEST(cregex, match_csview_without_match_array)
         re = cregex_from("^second$");
         const char* buffer = "only second word is in csview";
         csview input = c_sv(buffer + 5, 6);
-        EXPECT_EQ(cregex_match_pro_sv(&re, input, NULL, CREG_DEFAULT), CREG_OK);
+        EXPECT_EQ(cregex_match_sv(&re, input, NULL, CREG_DEFAULT), CREG_OK);
     }
 }
