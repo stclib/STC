@@ -29,7 +29,9 @@ else
 #	CC_VER := $(shell $(CC) -dumpversion | cut -f1 -d.)
 	BUILDDIR := build/$(shell uname)_$(CC)
 	LDFLAGS += -lm
-	ifneq ($(CC),clang)
+    # Check preprocessor macros to detect clang compiler
+	IS_CLANG_COMPILER := $(shell echo '' | $(CC) -dM -E -x c - | grep -q '__clang__' > /dev/null 2>&1 && echo 1 || echo 0)
+	ifneq ($(IS_CLANG_COMPILER),1)
 	  CFLAGS += -Wno-clobbered
 	endif
 endif
