@@ -1185,6 +1185,7 @@ _regexec2(const _Reprog *progp,    /* program to run */
 static int
 _regexec(const _Reprog *progp,    /* program to run */
     const char *bol,    /* string to run machine on */
+    const char *bol_end,/* end of string (or NULL for null-termination) */
     int ms,             /* number of elements at mp */
     _Resub mp[],        /* subexpression elements */
     int mflags)
@@ -1205,6 +1206,12 @@ _regexec(const _Reprog *progp,    /* program to run */
         else if (mflags & CREG_NEXT)
             j.starts = mp[0].buf + mp[0].size;
     }
+
+    /*
+     *  if bol_end is non-NULL, use it as end of input (unless input is already capped shorter)
+     */
+    if (bol_end != NULL && (j.eol == NULL || j.eol > bol_end))
+        j.eol = bol_end;
 
     j.starttype = 0;
     j.startchar = 0;
@@ -1285,8 +1292,8 @@ cregex_captures(const cregex* self) {
 }
 
 int
-cregex_match_pro(const cregex* re, const char* input, csview match[], int mflags) {
-    int res = _regexec(re->prog, input, cregex_captures(re) + 1, match, mflags);
+cregex_match_pro2(const cregex* re, const char* input, const char* input_end, csview match[], int mflags) {
+    int res = _regexec(re->prog, input, input_end, cregex_captures(re) + 1, match, mflags);
     switch (res) {
         case 1: return CREG_OK;
         case 0: return CREG_NOMATCH;
