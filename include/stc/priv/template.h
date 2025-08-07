@@ -54,10 +54,6 @@
   #define c_valpro        (1<<11)
 #endif
 
-#if defined i_rawclass   // [deprecated]
-  #define i_cmpclass i_rawclass
-#endif
-
 #if defined T && !defined i_type
   #define i_type T
 #endif

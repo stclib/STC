@@ -8,15 +8,15 @@ void int_drop(int* x) {
 // arc implements its own clone method using reference counting,
 // so 'i_keyclone' is not required to be defined (ignored).
 
-// Define the Arc, no need for atomic in single thread, enable default int comparisons.
-#define T Arc, int, (c_no_atomic| c_use_cmp)
+// Define the Arc, enable default int comparisons.
+#define T Arc, int, (c_use_cmp)
 #define i_keydrop int_drop  // optional, just to display the elements destroyed
-#include <stc/arc.h>        // Arc
+#include <stc/rc.h>         // no need for atomic in single thread, use rc.h
 
 #define T Arcset, Arc, (c_keypro) // arc's are "pro" types
 #include <stc/sortedset.h>  // Arcset (like: std::set<std::shared_ptr<int>>)
 
-#define T Arcvec, Arc, (c_keypro| c_use_cmp)
+#define T Arcvec, Arc, (c_keypro | c_use_cmp)
 #include <stc/vec.h>        // Arcvec (like: std::vector<std::shared_ptr<int>>)
 
 int main(void)

@@ -1,31 +1,29 @@
 #include <stdio.h>
 #include <stc/coroutine.h>
 
-cco_task_struct (taskA) {
+cco_task_struct (taskA, struct Output) {
     taskA_base base;
     int a;
 };
-cco_task_struct (taskB) {
+cco_task_struct (taskB, struct Output) {
     taskB_base base;
     double d;
 };
-cco_task_struct (taskC) {
+cco_task_struct (taskC, struct Output) {
     taskC_base base;
     float x, y;
 };
 
-cco_task_struct (myTask) {
+cco_task_struct (myTask, struct Output) {
     myTask_base base;
     int n, end;
 };
 
-typedef struct {
+struct Output {
     double value;
     int error;
     cco_group wg;
-} Output;
-
-#define OUT cco_env(Output *)
+};
 
 int myTask(struct myTask* o) {
     cco_async (o) {
@@ -58,7 +56,7 @@ int taskC(struct taskC* o) {
         puts("taskC more work");
 
         // initial return value
-        OUT->value = o->x * o->y;
+        cco_env(o)->value = o->x * o->y;
         cco_yield;
 
         cco_drop:
@@ -77,14 +75,14 @@ int taskB(struct taskB* o) {
         cco_await_task(c_new(struct taskC, {{taskC}, 1.2f, 3.4f}));
 
         puts("taskB work");
-        OUT->value += o->d;
+        cco_env(o)->value += o->d;
         cco_yield;
 
         puts("Spawning 3 tasks.");
-        cco_reset_group(&OUT->wg);
-        cco_launch(c_new(struct myTask, {{myTask}, 1, 6}), &OUT->wg);
-        cco_launch(c_new(struct myTask, {{myTask}, 101, 104}), &OUT->wg);
-        cco_launch(c_new(struct myTask, {{myTask}, 1001, 1008}), &OUT->wg);
+        cco_reset_group(&cco_env(o)->wg);
+        cco_launch(c_new(struct myTask, {{myTask}, 1, 6}), &cco_env(o)->wg);
+        cco_launch(c_new(struct myTask, {{myTask}, 101, 104}), &cco_env(o)->wg);
+        cco_launch(c_new(struct myTask, {{myTask}, 1001, 1008}), &cco_env(o)->wg);
         cco_yield;
         puts("Spawned 3 tasks.");
 
@@ -93,7 +91,7 @@ int taskB(struct taskB* o) {
             printf("taskA recovered error '99' thrown on line %d\n", cco_err()->line);
             cco_recover; // reset error to 0 and proceed after the await taskB call.
         }
-        cco_await_all(&OUT->wg);
+        cco_await_all(&cco_env(o)->wg);
         puts("Joined");
         puts("taskB done");
     }
@@ -110,7 +108,7 @@ int taskA(struct taskA* o) {
         cco_await_task(c_new(struct taskB, {{taskB}, 3.1415}));
 
         puts("taskA work");
-        OUT->value += o->a; // final return value;
+        cco_env(o)->value += o->a; // final return value;
         cco_yield;
 
         cco_drop:
@@ -125,7 +123,7 @@ int taskA(struct taskA* o) {
 
 int main(void)
 {
-    Output output = {0};
+    struct Output output = {0};
     int count = 0;
 
     puts("start");

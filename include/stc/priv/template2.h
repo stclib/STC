@@ -34,7 +34,6 @@
 #undef i_key_arcbox // [deprecated]
 #undef i_keyclass
 #undef i_cmpclass   // define i_keyraw, and bind i_cmp, i_eq, i_hash "class members"
-#undef i_rawclass   // [deprecated] for i_cmpclass
 #undef i_keyclone
 #undef i_keydrop
 #undef i_keyraw

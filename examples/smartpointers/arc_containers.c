@@ -5,9 +5,9 @@
 #define i_keydrop(p) (printf("drop name: %s\n", cstr_str(p)), cstr_drop(p))
 #include <stc/sortedmap.h>
 
-#define T Arc, Map, (c_no_atomic) // non-atomic ref. counted Map
+#define T Arc, Map
 #define i_keydrop(p) (printf("drop Arc:\n"), Map_drop(p))
-#include <stc/arc.h>
+#include <stc/rc.h> // non-atomic ref. counted Map
 
 #define T Vec, Arc, (c_keypro) // arc is a "pro" type
 #include <stc/vec.h>

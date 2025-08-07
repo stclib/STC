@@ -425,15 +425,15 @@ which is very fast.
 #include <stdio.h>
 #include <stc/coroutine.h>
 
-cco_task_struct (TaskA) { TaskA_base base; int a; };
-cco_task_struct (TaskB) { TaskB_base base; double d; };
-cco_task_struct (TaskC) { TaskC_base base; float x, y; };
+cco_task_struct (TaskA, struct Subtasks) { TaskA_base base; int a; };
+cco_task_struct (TaskB, struct Subtasks) { TaskB_base base; double d; };
+cco_task_struct (TaskC, struct Subtasks) { TaskC_base base; float x, y; };
 
-typedef struct {
+struct Subtasks {
     struct TaskA A;
     struct TaskB B;
     struct TaskC C;
-} Subtasks;
+};
 
 int TaskC(struct TaskC* o) {
     cco_async (o) {
@@ -456,8 +456,7 @@ int TaskB(struct TaskB* o) {
     cco_async (o) {
         printf("TaskB start: %g\n", o->d);
 
-        Subtasks* sub = cco_env(Subtasks*);
-        cco_await_task(&sub->C);
+        cco_await_task(&cco_env(o)->C);
         puts("TaskB work");
 
         cco_drop:
@@ -470,8 +469,7 @@ int TaskA(struct TaskA* o) {
     cco_async (o) {
         printf("TaskA start: %d\n", o->a);
 
-        Subtasks* sub = cco_env(Subtasks*);
-        cco_await_task(&sub->B);
+        cco_await_task(&cco_env(o)->B);
 
         puts("TaskA work");
 
@@ -490,8 +488,7 @@ int start(cco_task* o) {
     cco_async (o) {
         puts("start");
 
-        Subtasks* sub = cco_env(Subtasks*);
-        cco_await_task(&sub->A);
+        cco_await_task(&cco_env(o)->A);
 
         cco_drop:
         puts("done");
@@ -533,11 +530,11 @@ call/await:
 #include <stdio.h>
 #include <stc/coroutine.h>
 
-cco_task_struct (TaskA) { TaskA_base base; int a; };
-cco_task_struct (TaskB) { TaskB_base base; double d; };
-cco_task_struct (TaskC) { TaskC_base base; float x, y; };
+cco_task_struct (TaskA, struct Result) { TaskA_base base; int a; };
+cco_task_struct (TaskB, struct Result) { TaskB_base base; double d; };
+cco_task_struct (TaskC, struct Result) { TaskC_base base; float x, y; };
 
-typedef struct { double value; int error; } Result;
+struct Result { double value; int error; };
 
 int TaskC(struct TaskC* o) {
     cco_async (o) {
@@ -551,7 +548,7 @@ int TaskC(struct TaskC* o) {
 
         puts("TaskC more work");
         // initial return value
-        cco_env(Result *)->value = o->x * o->y;
+        cco_env(o)->value = o->x * o->y;
 
         cco_drop:
         puts("TaskC done");
@@ -567,7 +564,7 @@ int TaskB(struct TaskB* o) {
         cco_await_task(c_new(struct TaskC, {{TaskC}, 1.2f, 3.4f}));
 
         puts("TaskB work");
-        cco_env(Result *)->value += o->d;
+        cco_env(o)->value += o->d;
 
         cco_drop:
         puts("TaskB done");
@@ -583,14 +580,14 @@ int TaskA(struct TaskA* o) {
         cco_await_task(c_new(struct TaskB, {{TaskB}, 3.1415}));
 
         puts("TaskA work");
-        cco_env(Result *)->value += o->a; // final return value;
+        cco_env(o)->value += o->a; // final return value;
 
         cco_drop:
         if (cco_err()->code == 99) {
             // if error not handled, will cause 'unhandled error'...
             printf("TaskA recovered error '99' thrown on line %d\n", cco_err()->line);
 
-            cco_env(Result *)->error = cco_err()->code; // set error in output
+            cco_env(o)->error = cco_err()->code; // set error in output
             cco_recover; // reset error to 0 and proceed after await TaskB call.
         }
         puts("TaskA done");
@@ -618,7 +615,7 @@ int main(void)
     cco_task* task = c_new(cco_task, {{start}});
 
     int count = 0;
-    Result result = {0};
+    struct Result result = {0};
     cco_run_task(task, &result) { ++count; }
 
     printf("\nresult: %g, error: %d\n", result.value, result.error);

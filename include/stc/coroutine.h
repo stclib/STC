@@ -76,14 +76,13 @@ typedef struct {
     int await_count;
 } cco_group; // waitgroup
 
-typedef struct {
-    struct cco_state {
-        int32_t pos:24;
-        bool drop;
-        struct cco_fiber* fb;
-        cco_group* wg;
-    } state;
-} cco_base;
+#define cco_state_struct(Prefix) \
+    struct Prefix##_state { \
+        int32_t pos:24; \
+        bool drop; \
+        struct Prefix##_fiber* fb; \
+        cco_group* wg; \
+    }
 
 #define cco_is_initial(co) ((co)->base.state.pos == CCO_STATE_INIT)
 #define cco_is_done(co) ((co)->base.state.pos == CCO_STATE_DONE)
@@ -100,7 +99,7 @@ typedef struct {
 
 #define cco_async(co) \
     if (0) goto _resume; \
-    else for (struct cco_state *_state = (_cco_validate_task_struct(co), &(co)->base.state) \
+    else for (cco_state *_state = (_cco_validate_task_struct(co), (cco_state*)&(co)->base.state) \
               ; _state->pos != CCO_STATE_DONE \
               ; _state->pos = CCO_STATE_DONE, \
                 (void)(sizeof((co)->base) > sizeof(cco_base) && _state->wg ? --_state->wg->launch_count : 0)) \
@@ -110,18 +109,17 @@ typedef struct {
     _state->drop = true; /* FALLTHRU */ \
     case CCO_STATE_DROP
 #define cco_cleanup [fix: use cco_drop:]
-#define cco_finally [fix: use cco_drop:]
 #define cco_routine [fix: use cco_async]
 
 #define cco_stop(co) \
     do { \
-        struct cco_state* _s = &(co)->base.state; \
+        cco_state* _s = (cco_state*)&(co)->base.state; \
         if (!_s->drop) { _s->pos = CCO_STATE_DROP; _s->drop = true; } \
     } while (0)
 
 #define cco_reset_state(co) \
     do { \
-        struct cco_state* _s = &(co)->base.state; \
+        cco_state* _s = (cco_state*)&(co)->base.state; \
         _s->pos = CCO_STATE_INIT, _s->drop = false; \
     } while (0)
 
@@ -181,36 +179,51 @@ struct cco_error {
     const char* file;
 };
 
-typedef struct cco_fiber {
-    struct cco_task* task;
-    void* env;
-    struct cco_task* parent_task;
-    struct cco_fiber* next;
-    struct cco_state recover_state;
-    struct cco_error err;
-    int awaitbits, status;
-    cco_base base; /* is a coroutine object itself */
-} cco_fiber;
+#define cco_fiber_struct(Prefix, Env) \
+    typedef Env Prefix##_env; \
+    struct Prefix##_fiber { \
+        struct cco_task* task; \
+        Prefix##_env* env; \
+        struct cco_task* parent_task; \
+        struct cco_task_fiber* next; \
+        struct cco_task_state recover_state; \
+        struct cco_error err; \
+        int awaitbits, status; \
+        cco_base base; /* is a coroutine object itself */ \
+    }
 
 /* Define a Task struct */
-#define cco_task_struct(Task) \
+#define cco_task_struct(...) c_MACRO_OVERLOAD(cco_task_struct, __VA_ARGS__)
+#define cco_task_struct_1(Task) \
+    cco_task_struct_2(Task, uint8_t)
+
+#define cco_task_struct_2(Task, Env) \
+    cco_fiber_struct(Task, Env); \
+    cco_state_struct(Task); \
+    _cco_task_struct(Task)
+
+#define _cco_task_struct(Task) \
     struct Task; \
     typedef struct { \
         int (*func)(struct Task*); \
         int awaitbits; \
-        struct cco_state state; \
+        struct Task##_state state; \
         struct cco_task* parent_task; \
     } Task##_base; \
     struct Task
 
 /* Base cco_task type */
-cco_task_struct(cco_task) { cco_task_base base; };
+typedef cco_state_struct(cco_task) cco_state;
+typedef struct { cco_state state; } cco_base;
+cco_fiber_struct(cco_task, void);
+_cco_task_struct(cco_task) { cco_task_base base; };
+typedef struct cco_task_fiber cco_fiber;
 typedef struct cco_task cco_task;
 
-#define cco_env(Tp) ((Tp)_state->fb->env)
 #define cco_err() (&_state->fb->err)
 #define cco_status() (_state->fb->status + 0)
 #define cco_fb(task) ((task)->base.state.fb + 0)
+#define cco_env(task) (task)->base.state.fb->env
 
 #define cco_cast_task(...) \
     ((void)sizeof((__VA_ARGS__)->base.func(__VA_ARGS__)), (cco_task *)(__VA_ARGS__))
@@ -296,20 +309,23 @@ static inline int _cco_resume_task(cco_task* task)
  * cco_run_fiber()/cco_run_task(): Run fibers/tasks in parallel
  */
 #define cco_new_fiber(...) c_MACRO_OVERLOAD(cco_new_fiber, __VA_ARGS__)
-#define cco_new_fiber_1(task) cco_new_fiber_2(task, NULL)
-#define cco_new_fiber_2(task, env) _cco_new_fiber(cco_cast_task(task), env, NULL)
+#define cco_new_fiber_1(task) \
+    _cco_new_fiber(cco_cast_task(task), NULL, NULL)
+#define cco_new_fiber_2(task, env) \
+    _cco_new_fiber(cco_cast_task(task), ((void)sizeof((env) == cco_env(task)), env), NULL)
 
 #define cco_spawn(...) c_MACRO_OVERLOAD(cco_spawn, __VA_ARGS__)
 #define cco_spawn_1(task) _cco_spawn(cco_cast_task(task), NULL, _state->fb, NULL)
-#define cco_spawn_2(task, env) _cco_spawn(cco_cast_task(task), env, _state->fb, NULL)
-#define cco_spawn_3(task, env, fiber) _cco_spawn(cco_cast_task(task), env, fiber, NULL)
+#define cco_spawn_2(task, env) cco_spawn_3(task, env, _state->fb)
+#define cco_spawn_3(task, env, fiber) \
+    _cco_spawn(cco_cast_task(task), ((void)sizeof((env) == cco_env(task)), env), fiber, NULL)
 
 #define cco_reset_group(waitgroup) ((waitgroup)->launch_count = 0)
 #define cco_launch(...) c_MACRO_OVERLOAD(cco_launch, __VA_ARGS__)
 #define cco_launch_2(task, waitgroup) cco_launch_3(task, waitgroup, NULL)
 #define cco_launch_3(task, waitgroup, env) do { \
     cco_group* _wg = waitgroup; _wg->launch_count += 1; \
-    _cco_spawn(cco_cast_task(task), env, _state->fb, _wg); \
+    _cco_spawn(cco_cast_task(task), ((void)sizeof((env) == cco_env(task)), env), _state->fb, _wg); \
 } while (0)
 
 #define cco_await_all(waitgroup) \
@@ -325,19 +341,21 @@ static inline int _cco_resume_task(cco_task* task)
     cco_await_n(waitgroup, 1)
 
 #define cco_await_cancel(waitgroup) do { \
-    _cco_cancel_group(_state->fb, waitgroup); \
     /* Note: current fiber must not be in the waitgroup */ \
+    cco_cancel_group(waitgroup); \
     cco_await_all(waitgroup); \
 } while (0)
 
 #define cco_run_fiber(...) c_MACRO_OVERLOAD(cco_run_fiber, __VA_ARGS__)
 #define cco_run_fiber_1(fiber_ref) \
-    for (cco_fiber** _it_ref = fiber_ref; (*_it_ref = cco_execute_next(*_it_ref)) != NULL; )
+    for (cco_fiber** _it_ref = (cco_fiber**)((void)sizeof((fiber_ref)[0]->env), fiber_ref) \
+        ; (*_it_ref = cco_execute_next(*_it_ref)) != NULL; )
 #define cco_run_fiber_2(it, fiber) \
-    for (cco_fiber* it = fiber; (it = cco_execute_next(it)) != NULL; )
+    for (cco_fiber* it = (cco_fiber*)((void)sizeof((fiber)->env), fiber) \
+        ; (it = cco_execute_next(it)) != NULL; )
 
 #define cco_run_task(...) c_MACRO_OVERLOAD(cco_run_task, __VA_ARGS__)
-#define cco_run_task_1(task) cco_run_task_2(task, NULL)
+#define cco_run_task_1(task) cco_run_fiber_2(_it_fb, cco_new_fiber_1(task))
 #define cco_run_task_2(task, env) cco_run_fiber_2(_it_fb, cco_new_fiber_2(task, env))
 #define cco_run_task_3(it, task, env) cco_run_fiber_2(it, cco_new_fiber_2(task, env))
 
