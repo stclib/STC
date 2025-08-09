@@ -113,7 +113,6 @@ uint32_t utf8_tolower(uint32_t c) {
     if (i < n) {
         const struct CaseMapping entry = casemappings[upcase_ind[i]];
         if (entry.c1 <= c && c <= entry.c2) {
-            if (c < entry.c1) return c;
             int d = entry.m2 - entry.c2;
             if (d == 1) return c + ((entry.c2 & 1U) == (c & 1U));
             return (uint32_t)((int)c + d);
@@ -134,7 +133,6 @@ uint32_t utf8_toupper(uint32_t c) {
         const struct CaseMapping entry = casemappings[lowcase_ind[i]];
         int d = entry.m2 - entry.c2;
         if (entry.c1 + (uint32_t)d <= c && c <= entry.m2) {
-            if (c < (uint32_t)(entry.c1 + d)) return c;
             if (d == 1) return c - ((entry.m2 & 1U) == (c & 1U));
             return (uint32_t)((int)c - d);
         }
