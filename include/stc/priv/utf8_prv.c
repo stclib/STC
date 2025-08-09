@@ -86,23 +86,33 @@ bool utf8_valid_n(const char* s, isize nbytes) {
 }
 
 uint32_t utf8_casefold(uint32_t c) {
-    for (int i=0; i < casefold_len; ++i) {
+    int i = 0, j = casefold_len;
+    while (i < j) {
+        int mid = (i + j) / 2;
+        if (c < casemappings[mid].c2) j = mid;
+        else if (c == casemappings[mid].c2) i = j = mid; // leads to break
+        else i = mid + 1;
+    }
+    if (i < casefold_len && casemappings[i].c1 <= c && c <= casemappings[i].c2) {
         const struct CaseMapping entry = casemappings[i];
-        if (c <= entry.c2) {
-            if (c < entry.c1) return c;
-            int d = entry.m2 - entry.c2;
-            if (d == 1) return c + ((entry.c2 & 1U) == (c & 1U));
-            return (uint32_t)((int)c + d);
-        }
+        int d = entry.m2 - entry.c2;
+        if (d == 1) return c + ((entry.c2 & 1U) == (c & 1U));
+        return (uint32_t)((int)c + d);
     }
     return c;
 }
 
 uint32_t utf8_tolower(uint32_t c) {
-    for (int i=0; i < (int)(sizeof upcase_ind/sizeof *upcase_ind); ++i) {
+    int n = sizeof upcase_ind/sizeof *upcase_ind, i = 0, j = n;
+    while (i < j) {
+        int mid = (i + j) / 2;
+        if (c < casemappings[upcase_ind[mid]].c2) j = mid;
+        else if (c == casemappings[upcase_ind[mid]].c2) i = j = mid; // leads to break
+        else i = mid + 1;
+    }
+    if (i < n) {
         const struct CaseMapping entry = casemappings[upcase_ind[i]];
-        if (c <= entry.c2) {
-            if (c < entry.c1) return c;
+        if (entry.c1 <= c && c <= entry.c2) {
             int d = entry.m2 - entry.c2;
             if (d == 1) return c + ((entry.c2 & 1U) == (c & 1U));
             return (uint32_t)((int)c + d);
@@ -112,11 +122,17 @@ uint32_t utf8_tolower(uint32_t c) {
 }
 
 uint32_t utf8_toupper(uint32_t c) {
-    for (int i=0; i < (int)(sizeof lowcase_ind/sizeof *lowcase_ind); ++i) {
+    int n = sizeof lowcase_ind/sizeof *lowcase_ind, i = 0, j = n;
+    while (i < j) {
+        int mid = (i + j) / 2;
+        if (c < casemappings[lowcase_ind[mid]].m2) j = mid;
+        else if (c == casemappings[lowcase_ind[mid]].m2) i = j = mid; // leads to break
+        else i = mid + 1;
+    }
+    if (i < n) {
         const struct CaseMapping entry = casemappings[lowcase_ind[i]];
-        if (c <= entry.m2) {
-            int d = entry.m2 - entry.c2;
-            if (c < (uint32_t)(entry.c1 + d)) return c;
+        int d = entry.m2 - entry.c2;
+        if (entry.c1 + (uint32_t)d <= c && c <= entry.m2) {
             if (d == 1) return c - ((entry.m2 & 1U) == (c & 1U));
             return (uint32_t)((int)c - d);
         }
