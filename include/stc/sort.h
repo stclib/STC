@@ -43,10 +43,10 @@ int main(void) {
     puts("");
 
     isize idx = ints_binary_search(nums, 25, c_arraylen(nums));
-    if (idx != -1) printf("found: %d\n", nums[idx]);
+    if (idx != c_NPOS) printf("found: %d\n", nums[idx]);
 
     idx = ints_lower_bound(nums, 200, c_arraylen(nums));
-    if (idx != -1) printf("found lower 200: %d\n", nums[idx]);
+    if (idx != c_NPOS) printf("found lower 200: %d\n", nums[idx]);
 }
 
 // ex2: Test on a deque !!
@@ -66,10 +66,10 @@ int main(void) {
     puts("");
 
     isize idx = IDeq_binary_search(&nums, 25);
-    if (idx != -1) printf("found: %d\n", *IDeq_at(&nums, idx));
+    if (idx != c_NPOS) printf("found: %d\n", *IDeq_at(&nums, idx));
 
     idx = IDeq_lower_bound(&nums, 200);
-    if (idx != -1) printf("found lower 200: %d\n", *IDeq_at(&nums, idx));
+    if (idx != c_NPOS) printf("found lower 200: %d\n", *IDeq_at(&nums, idx));
 
     IDeq_drop(&nums);
 }

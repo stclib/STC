@@ -17,17 +17,17 @@ int main(void)
 
         key = 100;
         isize res = IVec_lower_bound(&vec, key);
-        if (res != -1)
+        if (res != c_NPOS)
             printf("Sorted Vec %d: lower bound: %d\n", key, vec.data[res]); // 500
 
         key = 10;
         isize it1 = IVec_lower_bound(&vec, key);
-        if (it1 != -1)
+        if (it1 != c_NPOS)
             printf("Sorted Vec %3d: lower_bound: %d\n", key, vec.data[it1]); // 30
 
         key = 600;
         isize it2 = IVec_binary_search(&vec, key);
-        if (it2 != -1)
+        if (it2 != c_NPOS)
             printf("Sorted Vec %d: bin. search: %d\n", key, vec.data[it2]); // 600
 
         for (isize i = it1; i != it2; ++i)

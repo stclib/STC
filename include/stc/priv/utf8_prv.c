@@ -85,14 +85,25 @@ bool utf8_valid_n(const char* s, isize nbytes) {
     return d.state == utf8_ACCEPT;
 }
 
+#define _binsearch(c, at, N, ret) do { \
+    int _n = N, _i = 0, _mid = _n/2; \
+    while (_n > 0) { \
+        if (at(_i + _mid) < c) { \
+            _i += _mid + 1; \
+            _n -= _mid + 1; \
+            _mid = _n*7/8; \
+        } else { \
+            _n = _mid; \
+            _mid = _n/8; \
+        } \
+    } \
+    ret = (_i >= N && c >= at(_i) ? N : _i); \
+} while (0)
+
 uint32_t utf8_casefold(uint32_t c) {
-    int i = 0, j = casefold_len;
-    while (i < j) {
-        int mid = (i + j) / 2;
-        if (c < casemappings[mid].c2) j = mid;
-        else if (c == casemappings[mid].c2) i = j = mid; // leads to break
-        else i = mid + 1;
-    }
+    #define _at_fold(idx) casemappings[idx].c2
+    int i;
+    _binsearch(c, _at_fold, casefold_len, i);
     if (i < casefold_len && casemappings[i].c1 <= c && c <= casemappings[i].c2) {
         const struct CaseMapping entry = casemappings[i];
         int d = entry.m2 - entry.c2;
@@ -103,13 +114,9 @@ uint32_t utf8_casefold(uint32_t c) {
 }
 
 uint32_t utf8_tolower(uint32_t c) {
-    int n = sizeof upcase_ind/sizeof *upcase_ind, i = 0, j = n;
-    while (i < j) {
-        int mid = (i + j) / 2;
-        if (c < casemappings[upcase_ind[mid]].c2) j = mid;
-        else if (c == casemappings[upcase_ind[mid]].c2) i = j = mid; // leads to break
-        else i = mid + 1;
-    }
+    #define _at_upper(idx) casemappings[upcase_ind[idx]].c2
+    int i, n = c_countof(upcase_ind);
+    _binsearch(c, _at_upper, n, i);
     if (i < n) {
         const struct CaseMapping entry = casemappings[upcase_ind[i]];
         if (entry.c1 <= c && c <= entry.c2) {
@@ -122,13 +129,9 @@ uint32_t utf8_tolower(uint32_t c) {
 }
 
 uint32_t utf8_toupper(uint32_t c) {
-    int n = sizeof lowcase_ind/sizeof *lowcase_ind, i = 0, j = n;
-    while (i < j) {
-        int mid = (i + j) / 2;
-        if (c < casemappings[lowcase_ind[mid]].m2) j = mid;
-        else if (c == casemappings[lowcase_ind[mid]].m2) i = j = mid; // leads to break
-        else i = mid + 1;
-    }
+    #define _at_lower(idx) casemappings[lowcase_ind[idx]].m2
+    int i, n = c_countof(lowcase_ind);
+    _binsearch(c, _at_lower, n, i);
     if (i < n) {
         const struct CaseMapping entry = casemappings[lowcase_ind[i]];
         int d = entry.m2 - entry.c2;

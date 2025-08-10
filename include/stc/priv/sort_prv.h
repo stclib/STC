@@ -118,7 +118,7 @@ _c_MEMB(_lower_bound_range)(const Self* self, const _m_raw raw, isize start, isi
             step = count/8;
         }
     }
-    return start == end ? c_NPOS : start;
+    return start >= end ? c_NPOS : start;
 }
 
 STC_DEF isize // c_NPOS = not found
