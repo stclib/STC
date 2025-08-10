@@ -97,7 +97,7 @@ bool utf8_valid_n(const char* s, isize nbytes) {
             _mid = _n/8; \
         } \
     } \
-    ret = (_i >= N && c >= at(_i) ? N : _i); \
+    ret = (_i >= N || at(_i) < c) ? N : _i; \
 } while (0)
 
 uint32_t utf8_casefold(uint32_t c) {
