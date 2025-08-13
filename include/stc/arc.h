@@ -115,24 +115,23 @@ struct _c_MEMB(_ctrl) {
     _m_value value;
     catomic_long counter;
 };
-#define ctrl ctrl1
 
 // c++: std::make_shared<_m_value>(val)
 STC_INLINE Self _c_MEMB(_make)(_m_value val) {
-    Self arc = {.ctrl1=_i_new_n(_c_MEMB(_ctrl), 1)};
-    arc.ctrl1->value = val;
-    arc.ctrl1->counter = 1;
+    Self arc = {.ctrl=_i_new_n(_c_MEMB(_ctrl), 1)};
+    arc.ctrl->value = val;
+    arc.ctrl->counter = 1;
     return arc;
 }
 
 STC_INLINE Self _c_MEMB(_toarc)(_m_value* arc_raw)
-    { Self arc = {.ctrl1=(_c_MEMB(_ctrl) *)arc_raw}; return arc; }
+    { Self arc = {.ctrl=(_c_MEMB(_ctrl) *)arc_raw}; return arc; }
 
 // destructor
 STC_INLINE void _c_MEMB(_drop)(const Self* self) {
-    if (self->ctrl1 && _i_atomic_dec_and_test(&self->ctrl1->counter)) {
+    if (self->ctrl && _i_atomic_dec_and_test(&self->ctrl->counter)) {
         i_keydrop(self->get);
-        i_free(self->ctrl1, c_sizeof *self->ctrl1);
+        i_free(self->ctrl, c_sizeof *self->ctrl);
     }
 }
 
