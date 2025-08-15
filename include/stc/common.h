@@ -296,14 +296,14 @@ STC_INLINE size_t c_hash_n(const void* key, isize len) {
     uint64_t b8; uint32_t b4;
     switch (len) {
         case 8: memcpy(&b8, key, 8); return (size_t)(b8 * 0xc6a4a7935bd1e99d);
-        case 4: memcpy(&b4, key, 4); return b4 * (size_t)0xa2ffeb2f01000193;
+        case 4: memcpy(&b4, key, 4); return b4 * FNV_BASIS;
         default: return c_basehash_n(key, len);
     }
 }
 
 STC_INLINE size_t c_hash_str(const char *str) {
     const uint8_t* msg = (const uint8_t*)str;
-    uint64_t h = FNV_BASIS;
+    size_t h = FNV_BASIS;
     while (*msg) {
         h ^= *(msg++);
         h *= FNV_PRIME;
@@ -311,11 +311,11 @@ STC_INLINE size_t c_hash_str(const char *str) {
     return h;
 }
 
-#define c_hash_mix(...) /* non-commutative hash combine! */ \
-    _chash_mix(c_make_array(size_t, {__VA_ARGS__}), sizeof((size_t[]){__VA_ARGS__})/sizeof(size_t))
+#define c_hash_mix(...) /* non-commutative hash combine */ \
+    c_hash_mix_n(c_make_array(size_t, {__VA_ARGS__}), c_sizeof((size_t[]){__VA_ARGS__})/c_sizeof(size_t))
 
-STC_INLINE size_t _chash_mix(size_t h[], size_t n) {
-    for (size_t i = 1; i < n; ++i) h[0] += h[0] ^ h[i];
+STC_INLINE size_t c_hash_mix_n(size_t h[], isize n) {
+    for (isize i = 1; i < n; ++i) h[0] += h[0] ^ h[i];
     return h[0];
 }
 

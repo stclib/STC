@@ -82,17 +82,17 @@ typedef struct {
 
 #define c_match(it, re, str) \
     cregex_iter it = {.regex=re, .input={str}, .match={{0}}}; \
-    cregex_match_pro(it.regex, it.input.buf, it.match, CREG_NEXT) == CREG_OK && it.match[0].size;
+    cregex_match(it.regex, it.input.buf, it.match, CREG_NEXT) == CREG_OK && it.match[0].size;
 
 #define c_match_sv(it, re, strview) \
     cregex_iter it = {.regex=re, .input=strview, .match={{0}}}; \
     cregex_match_sv(it.regex, it.input, it.match, CREG_NEXT) == CREG_OK && it.match[0].size;
 
 /* compile a regex from a pattern. return CREG_OK, or negative error code on failure. */
-int cregex_compile_pro(cregex *re, const char* pattern, int cflags);
+extern int cregex_compile_pro(cregex *re, const char* pattern, int cflags);
 
-STC_INLINE int cregex_compile(cregex *re, const char* pattern)
-    { return cregex_compile_pro(re, pattern, CREG_DEFAULT); }
+#define cregex_compile(...) \
+    c_ARG_4(__VA_ARGS__, cregex_compile_pro(__VA_ARGS__), cregex_compile_pro(__VA_ARGS__, CREG_DEFAULT), _too_few_args_)
 
 /* construct and return a regex from a pattern. return CREG_OK, or negative error code on failure. */
 STC_INLINE cregex cregex_make(const char* pattern, int cflags) {
@@ -103,59 +103,58 @@ STC_INLINE cregex cregex_make(const char* pattern, int cflags) {
 STC_INLINE cregex cregex_from(const char* pattern)
     { return cregex_make(pattern, CREG_DEFAULT); }
 
+/* destroy regex */
+extern void cregex_drop(cregex* re);
 
 /* number of capture groups in a regex pattern, excluding the full match capture (0) */
-int cregex_captures(const cregex* re);
+extern int cregex_captures(const cregex* re);
 
-/* external functions - rarely used as API */
-int cregex_match_pro2(const cregex* re, const char* input, const char* input_end, csview match[], int mflags);
-cstr cregex_replace_pro2(const cregex* re, const char* input, const char* input_end, const char* replace,
-                         int count, bool(*transform)(int group, csview match, cstr* out), int rflags);
-int cregex_match_aio2(const char* pattern, const char* input, const char* input_end, csview match[], int flags);
-cstr cregex_replace_aio2(const char* pattern, const char* input, const char* input_end, const char* replace,
-                         int count, bool(*transform)(int group, csview match, cstr* out), int crflags);
+/* ----- Private ----- */
 
+struct cregex_match_opt { csview* match; int flags; int _dummy; };
+struct cregex_replace_opt { int count; bool(*xform)(int group, csview match, cstr* out); int flags; int _dummy; };
+
+extern int cregex_match_opt(const cregex* re, const char* input, const char* input_end, struct cregex_match_opt opt);
+extern int cregex_match_aio_opt(const char* pattern, const char* input, const char* input_end, struct cregex_match_opt opt);
+extern cstr cregex_replace_opt(const cregex* re, const char* input, const char* input_end, const char* replace, struct cregex_replace_opt opt);
+extern cstr cregex_replace_aio_opt(const char* pattern, const char* input, const char* input_end, const char* replace, struct cregex_replace_opt opt);
+
+static inline int cregex_match_sv_opt(const cregex* re, csview sv, struct cregex_match_opt opt)
+    { return cregex_match_opt(re, sv.buf, sv.buf+sv.size, opt); }
+static inline int cregex_match_aio_sv_opt(const char* pattern, csview sv, struct cregex_match_opt opt)
+    { return cregex_match_aio_opt(pattern, sv.buf, sv.buf+sv.size, opt); }
+static inline cstr cregex_replace_sv_opt(const cregex* re, csview sv, const char* replace, struct cregex_replace_opt opt)
+    { return cregex_replace_opt(re, sv.buf, sv.buf+sv.size, replace, opt); }
+static inline cstr cregex_replace_aio_sv_opt(const char* pattern, csview sv, const char* replace, struct cregex_replace_opt opt)
+    { return cregex_replace_aio_opt(pattern, sv.buf, sv.buf+sv.size, replace, opt); }
 
 /* match: return CREG_OK, CREG_NOMATCH or CREG_MATCHERROR. */
-STC_INLINE int cregex_match(const cregex* re, const char* input, csview match[])
-    { return cregex_match_pro2(re, input, NULL, match, CREG_DEFAULT); }
-
-STC_INLINE int cregex_match_pro(const cregex* re, const char* input, csview match[], int mflags)
-    { return cregex_match_pro2(re, input, NULL, match, mflags); }
-
-STC_INLINE int cregex_match_sv(const cregex* re, csview input, csview match[], int mflags)
-    { return cregex_match_pro2(re, input.buf, input.buf + input.size, match, mflags); }
-
-STC_INLINE bool cregex_is_match(const cregex* re, const char* input)
-    { return cregex_match_pro2(re, input, NULL, NULL, CREG_DEFAULT) == CREG_OK; }
-
+#define _cregex_match(re, str, ...) cregex_match_opt(re, str, NULL, (struct cregex_match_opt){__VA_ARGS__})
+#define _cregex_match_sv(re, sv, ...) cregex_match_sv_opt(re, sv, (struct cregex_match_opt){__VA_ARGS__})
 /* all-in-one: compile RE pattern + match + free */
-STC_INLINE int cregex_match_aio(const char* pattern, const char* input, csview match[])
-    { return cregex_match_aio2(pattern, input, NULL, match, CREG_DEFAULT); }
+#define _cregex_match_aio(pattern, str, ...) cregex_match_aio_opt(pattern, str, NULL, (struct cregex_match_opt){__VA_ARGS__})
+#define _cregex_match_aio_sv(pattern, sv, ...) cregex_match_aio_sv_opt(pattern, sv, (struct cregex_match_opt){__VA_ARGS__})
 
-STC_INLINE int cregex_match_aio_sv(const char* pattern, csview input, csview match[], int mflags)
-    { return cregex_match_aio2(pattern, input.buf, input.buf+input.size, match, mflags); }
+/* replace input with a string using regular expression */
+#define _cregex_replace(re, str, replace, ...) cregex_replace_opt(re, str, NULL, replace, (struct cregex_replace_opt){__VA_ARGS__})
+#define _cregex_replace_sv(re, sv, replace, ...) cregex_replace_sv_opt(re, sv, replace, (struct cregex_replace_opt){__VA_ARGS__})
+/* all-in-one: compile RE string pattern + match + replace + free */
+#define _cregex_replace_aio(pattern, str, replace, ...) cregex_replace_aio_opt(pattern, str, NULL, replace, (struct cregex_replace_opt){__VA_ARGS__})
+#define _cregex_replace_aio_sv(pattern, sv, replace, ...) cregex_replace_aio_sv_opt(pattern, sv, replace, (struct cregex_replace_opt){__VA_ARGS__})
 
+/* ----- API functions ---- */
 
-/* replace const char* input with replace using regular expression pattern */
-STC_INLINE cstr cregex_replace(const cregex* re, const char* input, const char* replace)
-    { return cregex_replace_pro2(re, input, NULL, replace, INT32_MAX, NULL, CREG_DEFAULT); }
+#define cregex_match(...) _cregex_match(__VA_ARGS__, 0)
+#define cregex_match_sv(...) _cregex_match_sv(__VA_ARGS__, 0)
+#define cregex_match_aio(...) _cregex_match_aio(__VA_ARGS__, 0)
+#define cregex_match_aio_sv(...) _cregex_match_aio_sv(__VA_ARGS__, 0)
 
-/* replace csview input with replace using regular expression pattern */
-STC_INLINE cstr cregex_replace_sv(const cregex* re, csview input, const char* replace, int count,
-                                  bool(*transform)(int,csview,cstr*), int rflags)
-    { return cregex_replace_pro2(re, input.buf, input.buf + input.size, replace, count, transform, rflags); }
+#define cregex_is_match(re, str) (_cregex_match(re, str, 0) == CREG_OK)
 
-/* all-in-one: compile RE pattern + match + replace + free */
-STC_INLINE cstr cregex_replace_aio(const char* pattern, const char* input, const char* replace)
-    { return cregex_replace_aio2(pattern, input, NULL, replace, INT32_MAX, NULL, CREG_DEFAULT); }
-
-STC_INLINE cstr cregex_replace_aio_sv(const char* pattern, csview input, const char* replace,
-                                      int count, bool(*transform)(int,csview,cstr*), int crflags)
-    { return cregex_replace_aio2(pattern, input.buf, input.buf+input.size, replace, count, transform, crflags); }
-
-/* destroy regex */
-void cregex_drop(cregex* re);
+#define cregex_replace(...) _cregex_replace(__VA_ARGS__, 0)
+#define cregex_replace_sv(...) _cregex_replace_sv(__VA_ARGS__, 0)
+#define cregex_replace_aio(...) _cregex_replace_aio(__VA_ARGS__, 0)
+#define cregex_replace_aio_sv(...) _cregex_replace_aio_sv(__VA_ARGS__, 0)
 
 #endif // STC_CREGEX_H_INCLUDED
 
