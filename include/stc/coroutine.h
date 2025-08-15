@@ -226,6 +226,7 @@ typedef struct cco_task cco_task;
 #define cco_status() (_state->fb->status + 0)
 #define cco_fb(task) ((cco_fiber*)(task)->base.state.fb + 0)
 #define cco_env(task) (task)->base.state.fb->env
+#define cco_set_env(task, the_env) ((task)->base.state.fb->env = the_env)
 
 #define cco_cast_task(...) \
     ((void)sizeof((__VA_ARGS__)->base.func(__VA_ARGS__)), (cco_task *)(__VA_ARGS__))

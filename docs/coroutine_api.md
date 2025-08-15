@@ -91,7 +91,7 @@ cco_error*      cco_err();                                          // Get error
                                                                     // Should be handled in a cco_drop: section.
 cco_fiber*      cco_fb(cco_task* task);                             // Get fiber associated with task.
 <EnvType>*      cco_env(cco_task* task);                            // Get environment pointer, stored in the associated fiber.
-
+<EnvType>*      cco_set_env(cco_task* task, EnvType* env);          // Set environment pointer.
 
 void            cco_spawn(cco_task* task);                          // Lazily spawn a new concurrent task, detached.
 void            cco_spawn(cco_task* task, void* env);               // Same, env may be used as a "promise", or anything.
@@ -293,7 +293,7 @@ starts eating (because they must be waiting).
 <details>
 <summary>The "Dining philosophers" C implementation</summary>
 
-[ [Run this code](https://godbolt.org/z/n5Px511x5) ]
+[ [Run this code](https://godbolt.org/z/fnacafx8q) ]
 ```c++
 #include <stdio.h>
 #include <time.h>
@@ -380,7 +380,6 @@ int main(void)
     crand64_seed((uint64_t)time(NULL));
     cco_run_task(&dining);
 }
-
 ```
 </details>
 
@@ -423,7 +422,7 @@ and recovered using `cco_recover`. This call will resume control back to the ori
 current task. Because the "call-tree" is fixed, the coroutine frames to be called may be pre-allocated on the stack,
 which is very fast.
 
-[ [Run this code](https://godbolt.org/z/Yf99EKGje) ]
+[ [Run this code](https://godbolt.org/z/sfc3GKK1a) ]
 <!--{%raw%}-->
 ```c++
 #include <stdio.h>
@@ -433,6 +432,7 @@ cco_task_struct (TaskA, struct Subtasks) { TaskA_base base; int a; };
 cco_task_struct (TaskB, struct Subtasks) { TaskB_base base; double d; };
 cco_task_struct (TaskC, struct Subtasks) { TaskC_base base; float x, y; };
 cco_task_struct (start, struct Subtasks) { start_base base; };
+
 
 int TaskC(struct TaskC* o) {
     cco_async (o) {
@@ -451,11 +451,17 @@ int TaskC(struct TaskC* o) {
     return 0;
 }
 
+struct Subtasks {
+    struct TaskA task_a;
+    struct TaskB task_b;
+    struct TaskC task_c;
+};
+
 int TaskB(struct TaskB* o) {
     cco_async (o) {
         printf("TaskB start: %g\n", o->d);
 
-        cco_await_task(&cco_task(o)->task_c);
+        cco_await_task(&cco_env(o)->task_c);
         puts("TaskB work");
 
         cco_drop:
@@ -468,7 +474,7 @@ int TaskA(struct TaskA* o) {
     cco_async (o) {
         printf("TaskA start: %d\n", o->a);
 
-        cco_await_task(&cco_task(o)->task_b);
+        cco_await_task(&cco_env(o)->task_b);
 
         puts("TaskA work");
 
@@ -487,7 +493,7 @@ int start(struct start* o) {
     cco_async (o) {
         puts("start");
 
-        cco_await_task(&cco_task(o)->task_a);
+        cco_await_task(&cco_env(o)->task_a);
 
         cco_drop:
         puts("done");
@@ -495,11 +501,6 @@ int start(struct start* o) {
     return 0;
 }
 
-struct Subtasks {
-    struct TaskA task_a;
-    struct TaskB task_b;
-    struct TaskC task_c;
-};
 
 int main(void)
 {
@@ -508,7 +509,7 @@ int main(void)
         {{TaskB}, 3.1415},
         {{TaskC}, 1.2f, 3.4f},
     };
-    cco_task task = {{start}};
+    struct start task = {{start}};
 
     int count = 0;
     cco_run_task(&task, &env) { ++count; }
@@ -529,7 +530,7 @@ call/await:
 <details>
 <summary>Implementation of coroutine objects on the heap</summary>
 
-[ [Run this code](https://godbolt.org/z/GMocv3P4d) ]
+[ [Run this code](https://godbolt.org/z/b49sThzsz) ]
 <!--{%raw%}-->
 ```c++
 #include <stdio.h>
@@ -713,7 +714,7 @@ the scope in that it was created.
 <details>
 <summary>Scheduled coroutines implementation</summary>
 
-[ [Run this code](https://godbolt.org/z/rWYoY8azo) ]
+[ [Run this code](https://godbolt.org/z/vT775EofG) ]
 ```c++
 // Based on https://www.youtube.com/watch?v=8sEe-4tig_A
 #include <stdio.h>
@@ -723,13 +724,14 @@ the scope in that it was created.
 #define i_keydrop(p) c_free_n(*p, 1) // { puts("free task"); c_free_n(*p, 1); }
 #include <stc/queue.h>
 
-cco_task_struct (Scheduler) {
+// Specify Tasks as the environment pointer type:
+cco_task_struct (Scheduler, Tasks) {
     Scheduler_base base;
     cco_task* _pulled;
     Tasks tasks;
 };
 
-cco_task_struct (TaskA) {
+cco_task_struct (TaskA, Tasks) {
     TaskA_base base;
 };
 
@@ -740,6 +742,8 @@ cco_task_struct (TaskX) {
 
 int scheduler(struct Scheduler* o) {
     cco_async (o) {
+        cco_set_env(o, &o->tasks);
+
         while (!Tasks_is_empty(&o->tasks)) {
             o->_pulled = Tasks_pull(&o->tasks);
 
@@ -806,7 +810,7 @@ int main(void) {
         })
     });
 
-    cco_run_task(schedule, &schedule->tasks);
+    cco_run_task(schedule);
 
     // schedule is now cleaned up/destructed, free heap mem.
     c_free_n(schedule, 1);
