@@ -3,7 +3,7 @@
 
 # STC - Smart Template Containers
 
-## Version 6.0 beta4
+## Version 6.0 beta5
 STC is a mature, comprehensive, general purpose container and algorithm library for C99/C11.
 It has excellent ergonomics and requires virtually no boilerplate code. The library adds many
 missing features to C, like common data containers, algorithms, and abstractions found in
@@ -115,8 +115,8 @@ Views
 Algorithms
 ----------
 - [***Coroutines*** - ergonomic, portable coroutines](docs/coroutine_api.md)
-- [***Sum types*** - a.k.a. variants, tagged/discriminating unions](docs/algorithm_api.md#sum-types)
 - [***Regular expressions*** - Rob Pike's Plan 9 regexp modernized!](docs/cregex_api.md)
+- [***Sum types*** - a.k.a. variants, tagged/discriminating unions](docs/algorithm_api.md#sum-types)
 - [***for-loop abstractions*** - ranged and on containers](docs/algorithm_api.md#ranged-for-loop-control-blocks)
 - [***Misc generic algorithms*** - incl. fast qsort/binsort/lowerbound](docs/algorithm_api.md#generic-algorithms)
 - [***Random numbers*** - a very fast *PRNG* based on *SFC64*](docs/random_api.md)

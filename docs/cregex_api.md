@@ -34,34 +34,38 @@ int             cregex_captures(const cregex* self);
 
                 // Match RE. Return CREG_OK, CREG_NOMATCH, or CREG_MATCHERROR
 int             cregex_match(const cregex* re, const char* str,
-                        csview match[] = NULL, int mflags = CREG_DEFAULT);
+                        csview match[] = NULL, int flags = CREG_DEFAULT);
 int             cregex_match_sv(const cregex* re, csview sv,
-                        csview match[] = NULL, int mflags = CREG_DEFAULT);
+                        csview match[] = NULL, int flags = CREG_DEFAULT);
 
                 // Check if there are matches in input
 bool            cregex_is_match(const cregex* re, const char* str);
 
                 // All-in-one single match (compile + match + drop)
 int             cregex_match_aio(const char* pattern, const char* str,
-                        csview match[] = NULL, int mflags = CREG_DEFAULT);
+                        csview match[] = NULL, int flags = CREG_DEFAULT);
 int             cregex_match_aio_sv(const char* pattern, csview sv,
-                        csview match[] = NULL, int mflags = CREG_DEFAULT);
+                        csview match[] = NULL, int flags = CREG_DEFAULT);
 
                 // Replace count matched instances, optionally transform the replacement.
 cstr            cregex_replace(const cregex* re, const char* str, const char* replace,
-                        int count = 0 /* all */, int rflags = CREG_DEFAULT,
-                        bool(*xform)(int group, csview match, cstr* result) = NULL);
+                        int count = 0 /* all */,
+                        bool(*xform)(int group, csview match, cstr* result) = NULL,
+                        int flags = CREG_DEFAULT); /* match|replace flags */
 cstr            cregex_replace_sv(const cregex* re, csview sv, const char* replace,
-                        int count = 0 /* all */, int rflags = CREG_DEFAULT,
-                        bool(*xform)(int group, csview match, cstr* result) = NULL);
+                        int count = 0 /* all */,
+                        bool(*xform)(int group, csview match, cstr* result) = NULL,
+                        int flags = CREG_DEFAULT);
 
                 // All-in-one replacement (compile + match/replace + drop)
 cstr            cregex_replace_aio(const char* pattern, const char* str, const char* replace,
-                        int count = 0 /* all */, int cmrflags = CREG_DEFAULT,
-                        bool(*xform)(int group, csview match, cstr* result) = NULL);
+                        int count = 0 /* all */,
+                        bool(*xform)(int group, csview match, cstr* result) = NULL,
+                        int flags = CREG_DEFAULT); /* compile|match|replace flags */
 cstr            cregex_replace_aio_sv(const char* pattern, csview sv, const char* replace,
-                        int count = 0 /* all */, int cmrflags = CREG_DEFAULT,
-                        bool(*xform)(int group, csview match, cstr* result) = NULL);
+                        int count = 0 /* all */,
+                        bool(*xform)(int group, csview match, cstr* result) = NULL,
+                        int flags = CREG_DEFAULT);
 ```
 
 ### Error codes
@@ -104,7 +108,7 @@ If an error occurs ```cregex_compile``` returns a negative error code stored in 
 
 ### Getting the first match and making text replacements
 
-[ [Run this code](https://godbolt.org/z/811Yre96s) ]
+[ [Run this code](https://godbolt.org/z/cz6qfPG1E) ]
 ```c++
 #include <stc/cregex.h>
 
@@ -121,12 +125,12 @@ int main(void) {
     else
         printf("Could not match any date\n");
 
-    // Lets change all dates into US date format MM/DD/YYYY:
-    cstr us_input = cregex_replace(&re, input, "$2/$3/$1");
-    printf("%s\n", cstr_str(&us_input));
+    // Lets change all dates into US date format MM/DD/YYYY, and strip unmatched text.
+    cstr us_dates = cregex_replace(&re, input, "$2/$3/$1;", .flags=CREG_STRIP);
+    printf("%s\n", cstr_str(&us_dates));
 
     // Free allocated data
-    cstr_drop(&us_input);
+    cstr_drop(&us_dates);
     cregex_drop(&re);
 }
 ```
@@ -227,11 +231,11 @@ for (c_match(it, &re, input))
 
 The main goal of **cregex** is to be small and fast with limited but useful unicode support. In order to
 reach these goals, **cregex** currently does not support the following features (non-exhaustive list):
-- In order to limit table sizes, most general UTF8 character classes are missing, like \p{L}, \p{S},
-and most specific scripts like \p{Tibetan}. Some/all of these may be added in the future as an
-alternative source file with unicode tables to link with. Currently, only characters from from the
-Basic Multilingual Plane (BMP) are supported, which contains most commonly used characters
-(i.e. none of the "supplementary planes").
+- In order to limit table sizes, several general UTF8 character classes are missing, like \p{L}, \p{S},
+and specific scripts like \p{Tibetan}. Some/all of these may be added in the future as an
+alternative source file with unicode tables to link with. Currently, only code points from from the
+Basic Multilingual Plane (BMP) are supported, which contains all the most commonly used unicode characters,
+symbols and scripts.
 - {n, m} syntax for repeating previous token min-max times.
 - Non-capturing groups
 - Lookaround and backreferences (cannot be implemented efficiently).
