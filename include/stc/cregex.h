@@ -144,17 +144,16 @@ static inline cstr cregex_replace_aio_sv_opt(const char* pattern, csview sv, con
 
 /* ----- API functions ---- */
 
-#define cregex_match(...) _cregex_match(__VA_ARGS__, 0)
-#define cregex_match_sv(...) _cregex_match_sv(__VA_ARGS__, 0)
-#define cregex_match_aio(...) _cregex_match_aio(__VA_ARGS__, 0)
-#define cregex_match_aio_sv(...) _cregex_match_aio_sv(__VA_ARGS__, 0)
-
+#define cregex_match(...) _cregex_match(__VA_ARGS__, ._dummy=0)
+#define cregex_match_sv(...) _cregex_match_sv(__VA_ARGS__, ._dummy=0)
+#define cregex_match_aio(...) _cregex_match_aio(__VA_ARGS__, ._dummy=0)
+#define cregex_match_aio_sv(...) _cregex_match_aio_sv(__VA_ARGS__, ._dummy=0)
 #define cregex_is_match(re, str) (_cregex_match(re, str, 0) == CREG_OK)
 
-#define cregex_replace(...) _cregex_replace(__VA_ARGS__, 0)
-#define cregex_replace_sv(...) _cregex_replace_sv(__VA_ARGS__, 0)
-#define cregex_replace_aio(...) _cregex_replace_aio(__VA_ARGS__, 0)
-#define cregex_replace_aio_sv(...) _cregex_replace_aio_sv(__VA_ARGS__, 0)
+#define cregex_replace(...) _cregex_replace(__VA_ARGS__, ._dummy=0)
+#define cregex_replace_sv(...) _cregex_replace_sv(__VA_ARGS__, ._dummy=0)
+#define cregex_replace_aio(...) _cregex_replace_aio(__VA_ARGS__, ._dummy=0)
+#define cregex_replace_aio_sv(...) _cregex_replace_aio_sv(__VA_ARGS__, ._dummy=0)
 
 #endif // STC_CREGEX_H_INCLUDED
 
