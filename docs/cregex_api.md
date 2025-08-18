@@ -182,30 +182,33 @@ for (c_match(it, &re, input))
 | \E | End literal input mode | * |
 | (?i) (?-i)  | Ignore case on/off (override CREG_ICASE) | * |
 | (?s) (?-s)  | Dot matches newline on/off (override CREG_DOTALL) | * |
-| \n \t \r | Match UTF8 newline, tab, carriage return | |
-| \d \s \w | Match UTF8 digit, whitespace, alphanumeric character | |
+| \n \t \r | Newline, tab, carriage return | |
+| \d \s \w | Digit, whitespace, alphanumeric character | |
 | \D \S \W | Do not match the groups described above | |
-| \p{Cc} or \p{Cntrl} | Match UTF8 control char | * |
-| \p{Ll} or \p{Lower} | Match UTF8 lowercase letter | * |
-| \p{Lu} or \p{Upper} | Match UTF8 uppercase letter | * |
-| \p{Lt} | Match UTF8 titlecase letter | * |
-| \p{L&} | Match UTF8 cased letter (Ll Lu Lt) | * |
-| \p{Nd} or \p{Digit} | Match UTF8 decimal number | * |
-| \p{Nl} | Match UTF8 numeric letter | * |
-| \p{Pc} | Match UTF8 connector punctuation | * |
-| \p{Pd} | Match UTF8 dash punctuation | * |
-| \p{Pi} | Match UTF8 initial punctuation | * |
-| \p{Pf} | Match UTF8 final punctuation | * |
-| \p{Sc} | Match UTF8 currency symbol | * |
-| \p{Zl} | Match UTF8 line separator | * |
-| \p{Zp} | Match UTF8 paragraph separator | * |
-| \p{Zs} | Match UTF8 space separator | * |
-| \p{Alpha} | Match UTF8 alphabetic letter (L& Nl) | * |
-| \p{Alnum} | Match UTF8 alpha-numeric letter (L& Nl Nd) | * |
-| \p{Blank} | Match UTF8 blank (Zs \t) | * |
-| \p{Space} | Match UTF8 whitespace: (Zs \t\r\n\v\f] | * |
-| \p{Word} | Match UTF8 word character: (Alnum Pc) | * |
-| \p{XDigit} | Match hex number | * |
+| \p{Cc} or \p{Cntrl} | UTF8 control char | * |
+| \p{Ll} or \p{Lower} | UTF8 lowercase letter | * |
+| \p{Lu} or \p{Upper} | UTF8 uppercase letter | * |
+| \p{Lt} | Titlecase letter | * |
+| \p{L&} | Cased letter (Ll Lu Lt) | * |
+| \p{Nd} or \p{Digit} | Decimal number | * |
+| \p{Nl} | Numeric letter | * |
+| \p{Pc} | Connector punctuation | * |
+| \p{Pd} | Dash punctuation | * |
+| \p{Pe} | End/close punctuation | * |
+| \p{Pi} | Initial punctuation | * |
+| \p{Pf} | Final punctuation | * |
+| \p{Po} | Other punctuation | * |
+| \p{Ps} | Start/open punctuation | * |
+| \p{Sc} | Currency symbol | * |
+| \p{Zl} | Line separator | * |
+| \p{Zp} | Paragraph separator | * |
+| \p{Zs} | Space separator | * |
+| \p{Alpha} | Alphabetic letter (L& Nl) | * |
+| \p{Alnum} | Alpha-numeric letter (L& Nl Nd) | * |
+| \p{Blank} | Blank (Zs \t) | * |
+| \p{Space} | Whitespace: (Zs \t\r\n\v\f] | * |
+| \p{Word} | Word character: (Alnum Pc) | * |
+| \p{XDigit} | Hex number | * |
 | \p{Arabic} | Unicode script | * |
 | \p{Bengali} | Unicode script | * |
 | \p{Cyrillic} | Unicode script | * |
@@ -213,8 +216,8 @@ for (c_match(it, &re, input))
 | \p{Georgian} | Unicode script | * |
 | \p{Greek} | Unicode script | * |
 | \p{Han} | Unicode script | * |
-| \p{Hiragani} | Unicode script | * |
-| \p{Katakani} | Unicode script | * |
+| \p{Hiragana} | Unicode script | * |
+| \p{Katakana} | Unicode script | * |
 | \p{Latin} | Unicode script | * |
 | \p{Thai} | Unicode script | * |
 | \P{***Class***} | Do not match the classes described above | * |

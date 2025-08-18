@@ -147,8 +147,11 @@ enum {
     UTF_nl = UTF_GRP+2*U8G_Nl, UTF_NL, /* utf8 number letter */
     UTF_pc = UTF_GRP+2*U8G_Pc, UTF_PC, /* utf8 punct connector */
     UTF_pd = UTF_GRP+2*U8G_Pd, UTF_PD, /* utf8 punct dash */
+    UTF_pe = UTF_GRP+2*U8G_Pe, UTF_PE, /* utf8 punct dash */
     UTF_pf = UTF_GRP+2*U8G_Pf, UTF_PF, /* utf8 punct final */
     UTF_pi = UTF_GRP+2*U8G_Pi, UTF_PI, /* utf8 punct initial */
+    UTF_po = UTF_GRP+2*U8G_Po, UTF_PO, /* utf8 punct initial */
+    UTF_ps = UTF_GRP+2*U8G_Ps, UTF_PS, /* utf8 punct initial */
     UTF_sc = UTF_GRP+2*U8G_Sc, UTF_SC, /* utf8 symbol currency */
     UTF_zl = UTF_GRP+2*U8G_Zl, UTF_ZL, /* utf8 separator line */
     UTF_zp = UTF_GRP+2*U8G_Zp, UTF_ZP, /* utf8 separator paragraph */
@@ -677,7 +680,9 @@ _lexutfclass(_Parser *par, _Rune *rp)
         {"{XDigit}", 8, ASC_xd},
         {"{Lt}", 4, UTF_lt}, {"{Nl}", 4, UTF_nl},
         {"{Pc}", 4, UTF_pc}, {"{Pd}", 4, UTF_pd},
+        {"{Pe}", 4, UTF_pe},
         {"{Pf}", 4, UTF_pf}, {"{Pi}", 4, UTF_pi},
+        {"{Po}", 4, UTF_po}, {"{Ps}", 4, UTF_ps},
         {"{Zl}", 4, UTF_zl}, {"{Zp}", 4, UTF_zp},
         {"{Zs}", 4, UTF_zs}, {"{Sc}", 4, UTF_sc},
         {"{Arabic}", 8, UTF_arabic},
@@ -968,8 +973,11 @@ _runematch(_Rune s, _Rune r)
     case UTF_nl: case UTF_NL:
     case UTF_pc: case UTF_PC:
     case UTF_pd: case UTF_PD:
+    case UTF_pe: case UTF_PE:
     case UTF_pf: case UTF_PF:
     case UTF_pi: case UTF_PI:
+    case UTF_po: case UTF_PO:
+    case UTF_ps: case UTF_PS:
     case UTF_sc: case UTF_SC:
     case UTF_zl: case UTF_ZL:
     case UTF_zp: case UTF_ZP:
@@ -1001,7 +1009,7 @@ static int
 _regexec1(const _Reprog *progp,  /* program to run */
     const char *bol,    /* string to run machine on */
     _Resub *mp,         /* subexpression elements */
-    int ms,        /* number of elements at mp */
+    int ms,             /* number of elements at mp */
     _Reljunk *j,
     int mflags
 )
@@ -1014,15 +1022,10 @@ _regexec1(const _Reprog *progp,  /* program to run */
     const char *s, *p;
     _Rune r, *rp, *ep;
     int n, checkstart, match = 0;
-    int i;
 
     bool icase = progp->flags.icase;
     checkstart = j->starttype;
-    if (mp)
-        for (i=0; i<ms; i++) {
-            mp[i].buf = NULL;
-            mp[i].size = 0;
-        }
+    if (mp) memset(mp, 0, (unsigned)ms*sizeof *mp);
     j->relist[0][0].inst = NULL;
     j->relist[1][0].inst = NULL;
 
