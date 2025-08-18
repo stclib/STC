@@ -86,10 +86,10 @@ bool utf8_valid_n(const char* s, isize nbytes) {
 }
 
 uint32_t utf8_casefold(uint32_t c) {
-    #define _at_fold(idx) casemappings[idx].c2
+    #define _at_fold(idx) &casemappings[idx].c2
     int i;
-    _lowbound(c, _at_fold, casefold_len, &i);
-    if (i < casefold_len && casemappings[i].c1 <= c && c <= casemappings[i].c2) {
+    c_lowerbound(uint32_t, c, _at_fold, c_default_less, casefold_len, &i);
+    if (i < casefold_len && casemappings[i].c1 <= c) {
         const struct CaseMapping entry = casemappings[i];
         int d = entry.m2 - entry.c2;
         if (d == 1) return c + ((entry.c2 & 1U) == (c & 1U));
@@ -99,12 +99,12 @@ uint32_t utf8_casefold(uint32_t c) {
 }
 
 uint32_t utf8_tolower(uint32_t c) {
-    #define _at_upper(idx) casemappings[upcase_ind[idx]].c2
+    #define _at_upper(idx) &casemappings[upcase_ind[idx]].c2
     int i, n = c_countof(upcase_ind);
-    _lowbound(c, _at_upper, n, &i);
+    c_lowerbound(uint32_t, c, _at_upper, c_default_less, n, &i);
     if (i < n) {
         const struct CaseMapping entry = casemappings[upcase_ind[i]];
-        if (entry.c1 <= c && c <= entry.c2) {
+        if (entry.c1 <= c) {
             int d = entry.m2 - entry.c2;
             if (d == 1) return c + ((entry.c2 & 1U) == (c & 1U));
             return (uint32_t)((int)c + d);
@@ -114,13 +114,13 @@ uint32_t utf8_tolower(uint32_t c) {
 }
 
 uint32_t utf8_toupper(uint32_t c) {
-    #define _at_lower(idx) casemappings[lowcase_ind[idx]].m2
+    #define _at_lower(idx) &casemappings[lowcase_ind[idx]].m2
     int i, n = c_countof(lowcase_ind);
-    _lowbound(c, _at_lower, n, &i);
+    c_lowerbound(uint32_t, c, _at_lower, c_default_less, n, &i);
     if (i < n) {
         const struct CaseMapping entry = casemappings[lowcase_ind[i]];
         int d = entry.m2 - entry.c2;
-        if (entry.c1 + (uint32_t)d <= c && c <= entry.m2) {
+        if (entry.c1 + (uint32_t)d <= c) {
             if (d == 1) return c - ((entry.m2 & 1U) == (c & 1U));
             return (uint32_t)((int)c - d);
         }

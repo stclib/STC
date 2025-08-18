@@ -124,10 +124,11 @@ STC_INLINE int utf8_icmp(const char* s1, const char* s2) {
     return utf8_icompare(c_sv(s1, INTPTR_MAX), c_sv(s2, INTPTR_MAX));
 }
 
-#define _lowbound(c, at, N, ret) do { \
+#define c_lowerbound(T, c, at, less, N, ret) do { \
     int _n = N, _i = 0, _mid = _n/2; \
+    T _c = c; \
     while (_n > 0) { \
-        if (at(_i + _mid) < c) { \
+        if (less(at((_i + _mid)), &_c)) { \
             _i += _mid + 1; \
             _n -= _mid + 1; \
             _mid = _n*7/8; \
