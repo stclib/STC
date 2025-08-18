@@ -136,7 +136,7 @@ STC_INLINE int utf8_icmp(const char* s1, const char* s2) {
             _mid = _n/8; \
         } \
     } \
-    *(ret) = (_i >= N || at(_i) < c) ? N : _i; \
+    *(ret) = _i; \
 } while (0)
 
 #endif // STC_UTF8_PRV_H_INCLUDED

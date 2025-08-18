@@ -767,13 +767,12 @@ static const UGroup _utf8_unicode_groups[U8G_SIZE] = {
 };
 
 static bool utf8_isgroup(int group, uint32_t c) {
-    for (int j=0; j<_utf8_unicode_groups[group].nr16; ++j) {
-        if (c < _utf8_unicode_groups[group].r16[j].lo)
-            return false;
-        if (c <= _utf8_unicode_groups[group].r16[j].hi)
-            return true;
-    }
-    return false;
+    #define _at_group(idx) _utf8_unicode_groups[group].r16[idx].lo
+    int j, n = _utf8_unicode_groups[group].nr16;
+    _lowbound(c, _at_group, n, &j);
+    if (j >= n) return false;
+    if (c > _utf8_unicode_groups[group].r16[j].lo && j > 0) --j;
+    return (_utf8_unicode_groups[group].r16[j].lo <= c && c <= _utf8_unicode_groups[group].r16[j].hi);
 }
 
 #endif // STC_UCD_PRV_C_INCLUDED
