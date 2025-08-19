@@ -185,28 +185,35 @@ for (c_match(it, &re, input))
 | \n \t \r | Newline, tab, carriage return | |
 | \d \s \w | Digit, whitespace, alphanumeric character | |
 | \D \S \W | Do not match the groups described above | |
-| \p{Cc} or \p{Cntrl} | UTF8 control char | * |
+| \p{Cc} or \p{Cntrl} | UTF8 control character | * |
+| \p{L} or \p{Alpha} | UTF8 letter | * |
 | \p{Ll} or \p{Lower} | UTF8 lowercase letter | * |
 | \p{Lu} or \p{Upper} | UTF8 uppercase letter | * |
 | \p{Lt} | Titlecase letter | * |
 | \p{L&} | Cased letter (Ll Lu Lt) | * |
+| \p{Lm} | Modifier letter | * |
 | \p{Nd} or \p{Digit} | Decimal number | * |
 | \p{Nl} | Numeric letter | * |
+| \p{No} | Other number | * |
+| \p{P}  | Punctuation | * |
 | \p{Pc} | Connector punctuation | * |
 | \p{Pd} | Dash punctuation | * |
-| \p{Pe} | End/close punctuation | * |
 | \p{Pi} | Initial punctuation | * |
 | \p{Pf} | Final punctuation | * |
-| \p{Po} | Other punctuation | * |
 | \p{Ps} | Start/open punctuation | * |
+| \p{Pe} | End/close punctuation | * |
 | \p{Sc} | Currency symbol | * |
+| \p{Sm} | Math symbol | * |
+| \p{Sk} | Modifier symbol | * |
 | \p{Zl} | Line separator | * |
 | \p{Zp} | Paragraph separator | * |
 | \p{Zs} | Space separator | * |
-| \p{Alpha} | Alphabetic letter (L& Nl) | * |
-| \p{Alnum} | Alpha-numeric letter (L& Nl Nd) | * |
+| \p{Alpha} | Alphabetic letter (L) | * |
+| \p{Lower} | Lowercase letter (Ll) | * |
+| \p{Upper} | Uppercase letter (Lu) | * |
+| \p{Alnum} | Alpha-numeric letter (L Nl Nd) | * |
 | \p{Blank} | Blank (Zs \t) | * |
-| \p{Space} | Whitespace: (Zs \t\r\n\v\f] | * |
+| \p{Space} | Whitespace: (Zs \t\r\n\v\f) | * |
 | \p{Word} | Word character: (Alnum Pc) | * |
 | \p{XDigit} | Hex number | * |
 | \p{Arabic} | Unicode script | * |
@@ -221,7 +228,7 @@ for (c_match(it, &re, input))
 | \p{Latin} | Unicode script | * |
 | \p{Thai} | Unicode script | * |
 | \P{***Class***} | Do not match the classes described above | * |
-| [:alnum:] [:alpha:] [:ascii:] | Match ASCII character class. NB: only to be used inside [] brackets | * |
+| [:alnum:] [:alpha:] [:ascii:] | ASCII character class. NB: only to be used inside [] brackets | * |
 | [:blank:] [:cntrl:] [:digit:] | " | * |
 | [:graph:] [:lower:] [:print:] | " | * |
 | [:punct:] [:space:] [:upper:] | " | * |

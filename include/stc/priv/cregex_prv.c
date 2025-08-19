@@ -132,7 +132,6 @@ enum {
     ASC_lo      , ASC_LO,       /* lower */
     ASC_up      , ASC_UP,       /* upper */
     ASC_xd      , ASC_XD,       /* hex */
-    UTF_al      , UTF_AL,       /* utf8 alpha */
     UTF_an      , UTF_AN,       /* utf8 alphanumeric */
     UTF_bl      , UTF_BL,       /* utf8 blank */
     UTF_lc      , UTF_LC,       /* utf8 letter cased */
@@ -140,19 +139,24 @@ enum {
     UTF_lu      , UTF_LU,       /* utf8 letter uppercase */
     UTF_sp      , UTF_SP,       /* utf8 space */
     UTF_wr      , UTF_WR,       /* utf8 word */
-    UTF_GRP = 0x8150000,
+    UTF_GRP = 0x8150000, // odd enums = inverse:
     UTF_cc = UTF_GRP+2*U8G_Cc, UTF_CC, /* utf8 control char */
+    UTF_l  = UTF_GRP+2*U8G_L,  UTF_L,  /* utf8 letter */
+    UTF_lm = UTF_GRP+2*U8G_Lm, UTF_LM, /* utf8 letter modifier */
     UTF_lt = UTF_GRP+2*U8G_Lt, UTF_LT, /* utf8 letter titlecase */
     UTF_nd = UTF_GRP+2*U8G_Nd, UTF_ND, /* utf8 number decimal */
     UTF_nl = UTF_GRP+2*U8G_Nl, UTF_NL, /* utf8 number letter */
+    UTF_no = UTF_GRP+2*U8G_No, UTF_NO, /* utf8 number other */
+    UTF_p  = UTF_GRP+2*U8G_P,  UTF_P,  /* utf8 punctuation */
     UTF_pc = UTF_GRP+2*U8G_Pc, UTF_PC, /* utf8 punct connector */
     UTF_pd = UTF_GRP+2*U8G_Pd, UTF_PD, /* utf8 punct dash */
-    UTF_pe = UTF_GRP+2*U8G_Pe, UTF_PE, /* utf8 punct dash */
+    UTF_pe = UTF_GRP+2*U8G_Pe, UTF_PE, /* utf8 punct close */
     UTF_pf = UTF_GRP+2*U8G_Pf, UTF_PF, /* utf8 punct final */
     UTF_pi = UTF_GRP+2*U8G_Pi, UTF_PI, /* utf8 punct initial */
-    UTF_po = UTF_GRP+2*U8G_Po, UTF_PO, /* utf8 punct initial */
-    UTF_ps = UTF_GRP+2*U8G_Ps, UTF_PS, /* utf8 punct initial */
+    UTF_ps = UTF_GRP+2*U8G_Ps, UTF_PS, /* utf8 punct open */
     UTF_sc = UTF_GRP+2*U8G_Sc, UTF_SC, /* utf8 symbol currency */
+    UTF_sk = UTF_GRP+2*U8G_Sk, UTF_SK, /* utf8 symbol modifier */
+    UTF_sm = UTF_GRP+2*U8G_Sm, UTF_SM, /* utf8 symbol math */
     UTF_zl = UTF_GRP+2*U8G_Zl, UTF_ZL, /* utf8 separator line */
     UTF_zp = UTF_GRP+2*U8G_Zp, UTF_ZP, /* utf8 separator paragraph */
     UTF_zs = UTF_GRP+2*U8G_Zs, UTF_ZS, /* utf8 separator space */
@@ -670,7 +674,7 @@ static void
 _lexutfclass(_Parser *par, _Rune *rp)
 {
     static struct { const char* c; uint32_t n, r; } cls[] = {
-        {"{Alpha}", 7, UTF_al}, {"{L&}", 4, UTF_lc},
+        {"{Alpha}", 7, UTF_l}, {"{L&}", 4, UTF_lc},
         {"{Digit}", 7, UTF_nd}, {"{Nd}", 4, UTF_nd},
         {"{Lower}", 7, UTF_ll}, {"{Ll}", 4, UTF_ll},
         {"{Upper}", 7, UTF_lu}, {"{Lu}", 4, UTF_lu},
@@ -678,13 +682,16 @@ _lexutfclass(_Parser *par, _Rune *rp)
         {"{Alnum}", 7, UTF_an}, {"{Blank}", 7, UTF_bl},
         {"{Space}", 7, UTF_sp}, {"{Word}", 6, UTF_wr},
         {"{XDigit}", 8, ASC_xd},
-        {"{Lt}", 4, UTF_lt}, {"{Nl}", 4, UTF_nl},
-        {"{Pc}", 4, UTF_pc}, {"{Pd}", 4, UTF_pd},
-        {"{Pe}", 4, UTF_pe},
+        {"{L}",  3, UTF_l},  {"{Lm}", 4, UTF_lm},
+        {"{Lt}", 4, UTF_lt},
+        {"{Nl}", 4, UTF_nl}, {"{No}", 4, UTF_no},
+        {"{P}",  3, UTF_p},  {"{Pc}", 4, UTF_pc},
+        {"{Pd}", 4, UTF_pd}, {"{Pe}", 4, UTF_pe},
         {"{Pf}", 4, UTF_pf}, {"{Pi}", 4, UTF_pi},
-        {"{Po}", 4, UTF_po}, {"{Ps}", 4, UTF_ps},
+        {"{Ps}", 4, UTF_ps},
         {"{Zl}", 4, UTF_zl}, {"{Zp}", 4, UTF_zp},
         {"{Zs}", 4, UTF_zs}, {"{Sc}", 4, UTF_sc},
+        {"{Sk}", 4, UTF_sk}, {"{Sm}", 4, UTF_sm},
         {"{Arabic}", 8, UTF_arabic},
         {"{Bengali}", 9, UTF_bengali},
         {"{Cyrillic}", 10, UTF_cyrillic},
@@ -699,7 +706,7 @@ _lexutfclass(_Parser *par, _Rune *rp)
     };
     unsigned inv = (*rp == 'P');
     for (unsigned i = 0; i < (sizeof cls/sizeof *cls); ++i) {
-        if (strncmp(par->exprp, cls[i].c, (size_t)cls[i].n) == 0) {
+        if (memcmp(par->exprp, cls[i].c, (size_t)cls[i].n) == 0) {
             if (par->rune_type == TOK_IRUNE && (cls[i].r == UTF_ll || cls[i].r == UTF_lu))
                 *rp = (_Rune)(UTF_lc + inv);
             else
@@ -965,20 +972,25 @@ _runematch(_Rune s, _Rune r)
     case UTF_LL: inv = 1; case UTF_ll: return inv ^ (int)utf8_islower(r);
     case UTF_LU: inv = 1; case UTF_lu: return inv ^ (int)utf8_isupper(r);
     case UTF_LC: inv = 1; case UTF_lc: return inv ^ (int)utf8_iscased(r);
-    case UTF_AL: inv = 1; case UTF_al: return inv ^ (int)utf8_isalpha(r);
     case UTF_WR: inv = 1; case UTF_wr: return inv ^ (int)utf8_isword(r);
+    case UTF_L:  inv = 1; case UTF_l:  return inv ^ (int)utf8_isalpha(r);
+    case UTF_ND: inv = 1; case UTF_nd: return inv ^ (int)utf8_isdigit(r);
+/* isgroup: */
     case UTF_cc: case UTF_CC:
+    case UTF_lm: case UTF_LM:
     case UTF_lt: case UTF_LT:
-    case UTF_nd: case UTF_ND:
     case UTF_nl: case UTF_NL:
+    case UTF_no: case UTF_NO:
+    case UTF_p: case UTF_P:
     case UTF_pc: case UTF_PC:
     case UTF_pd: case UTF_PD:
     case UTF_pe: case UTF_PE:
     case UTF_pf: case UTF_PF:
     case UTF_pi: case UTF_PI:
-    case UTF_po: case UTF_PO:
     case UTF_ps: case UTF_PS:
     case UTF_sc: case UTF_SC:
+    case UTF_sk: case UTF_SK:
+    case UTF_sm: case UTF_SM:
     case UTF_zl: case UTF_ZL:
     case UTF_zp: case UTF_ZP:
     case UTF_zs: case UTF_ZS:
