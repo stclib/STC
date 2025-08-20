@@ -110,7 +110,7 @@ typedef struct {
 #define cco_drop /* label */ \
     _state->drop = true; /* FALLTHRU */ \
     case CCO_STATE_DROP
-#define cco_cleanup [fix: use cco_drop:]
+#define cco_finalize [fix: use cco_drop:]
 #define cco_routine [fix: use cco_async]
 
 #define cco_stop(co) \
@@ -329,10 +329,8 @@ static inline int _cco_resume_task(cco_task* task)
 #define cco_reset_group(waitgroup) ((waitgroup)->launch_count = 0)
 #define cco_launch(...) c_MACRO_OVERLOAD(cco_launch, __VA_ARGS__)
 #define cco_launch_2(task, waitgroup) cco_launch_3(task, waitgroup, NULL)
-#define cco_launch_3(task, waitgroup, env) do { \
-    cco_group* _wg = waitgroup; _wg->launch_count += 1; \
-    _cco_spawn(cco_cast_task(task), ((void)sizeof((env) == cco_env(task)), env), (cco_fiber*)_state->fb, _wg); \
-} while (0)
+#define cco_launch_3(task, waitgroup, env) \
+    _cco_spawn(cco_cast_task(task), ((void)sizeof((env) == cco_env(task)), env), (cco_fiber*)_state->fb, waitgroup)
 
 #define cco_await_all(waitgroup) \
     cco_await((waitgroup)->launch_count == 0); \
@@ -343,11 +341,14 @@ static inline int _cco_resume_task(cco_task* task)
     cco_await((waitgroup)->launch_count == (waitgroup)->await_count); \
 } while (0)
 
-#define cco_await_any(waitgroup) \
-    cco_await_n(waitgroup, 1)
-
 #define cco_await_cancel(waitgroup) do { \
     /* Note: current fiber must not be in the waitgroup */ \
+    cco_cancel_group(waitgroup); \
+    cco_await_all(waitgroup); \
+} while (0)
+
+#define cco_await_anyof(waitgroup) do { \
+    cco_await_n(waitgroup, 1); \
     cco_cancel_group(waitgroup); \
     cco_await_all(waitgroup); \
 } while (0)
@@ -440,10 +441,11 @@ cco_fiber* _cco_new_fiber(cco_task* _task, void* env, cco_group* wg) {
 
 cco_fiber* _cco_spawn(cco_task* _task, void* env, cco_fiber* fb, cco_group* wg) {
     cco_fiber* new_fb;
-    new_fb = fb->next = (fb->next == NULL ? fb : c_new(cco_fiber, {.next=fb->next}));
+    new_fb = fb->next = (fb->next ? c_new(cco_fiber, {.next=fb->next}) : fb);
     new_fb->task = _task;
-    new_fb->env = (env == NULL ? fb->env : env);
+    new_fb->env = (env ? env : fb->env);
     _task->base.state.fb = new_fb;
+    if (wg) wg->launch_count += 1;
     _task->base.state.wg = wg;
     return new_fb;
 }

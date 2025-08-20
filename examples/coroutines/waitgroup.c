@@ -69,7 +69,7 @@ int everyone(struct everyone* o) {
 
         cco_drop:
         puts("Await group");
-        cco_await_any(&o->wg); // await for any (one) launched worker to finish
+        cco_await_n(&o->wg, 1); // await for 1 launched worker to finish
         puts("1 worker done.");
         cco_await_n(&o->wg, 3); // await for 3 workers to finish
         puts("3 more workers done.");
