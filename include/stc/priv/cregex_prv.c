@@ -706,7 +706,7 @@ _lexutfclass(_Parser *par, _Rune *rp)
     };
     unsigned inv = (*rp == 'P');
     for (unsigned i = 0; i < (sizeof cls/sizeof *cls); ++i) {
-        if (memcmp(par->exprp, cls[i].c, (size_t)cls[i].n) == 0) {
+        if (strncmp(par->exprp, cls[i].c, (size_t)cls[i].n) == 0) {
             if (par->rune_type == TOK_IRUNE && (cls[i].r == UTF_ll || cls[i].r == UTF_lu))
                 *rp = (_Rune)(UTF_lc + inv);
             else
