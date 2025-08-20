@@ -348,7 +348,7 @@ static inline int _cco_resume_task(cco_task* task)
     cco_await_all(waitgroup); \
 } while (0)
 
-#define cco_await_anyof(waitgroup) do { \
+#define cco_await_any(waitgroup) do { \
     cco_await_n(waitgroup, 1); \
     cco_cancel_group(waitgroup); \
     cco_await_all(waitgroup); \

@@ -105,11 +105,11 @@ void            cco_launch(cco_task* t, cco_group* wg, void* env);  // Same, env
 
                 // If tasks were launched, all must be awaited for by using these awaiter functions:
                 cco_await_all(cco_group* wg);                       // Await for all remaining tasks in waitgroup to finish.
-                cco_await_anyof(cco_group* wg);                     // Await for any launched tasks in waitgroup to finish,
-                                                                    // and cancel the remaining.
-                cco_await_n(cco_group* wg, int n);                  // Await for n launched tasks in waitgroup to finish.
-                                                                    // Negative n means await all minus n tasks.
-                cco_await_cancel(cco_group* wg);                    // Cancel remaining tasks/fibers in wg and await for them.
+                cco_await_any(cco_group* wg);                       // Await for any launched tasks in waitgroup to
+                                                                    // finish, and cancel the remaining.
+                cco_await_n(cco_group* wg, int n);                  // Await for n launched tasks, but do *not* cancel
+                                                                    // remaining. Negative n means await (all - n) tasks.
+                cco_await_cancel(cco_group* wg);                    // Cancel remaining tasks in wg and await for them.
                                                                     // Shorthand for cco_cancel_group() + cco_await_all().
 
                 cco_run_task(cco_task* task) {}                     // Run task blocking until it and spawned fibers are finished.
