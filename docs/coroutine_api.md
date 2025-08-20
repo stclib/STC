@@ -10,7 +10,7 @@ This is a small, portable, ergonomic implementation of coroutines in C99.
 * Strong error handling and cleanup support. Users may *throw* errors and handle/recover from them up the "call stack"
 (resume from the original suspension point).
 * Asynchronous coroutine destruction/cleanup supported as standard.
-* The coroutine frames/objects will be cleaned up at the `cco_drop:` label inside the `cco_async` scope.
+* The coroutine frames/objects will be cleaned up at the `cco_finalize:` label inside the `cco_async` scope.
 This will also happen on errors thrown and on coroutine cancellation.
 * Fibers are allocated on the heap and automatically freed by the scheduler. Coroutine frames are provided
 by the user, and can be either stack or heap allocated.
@@ -37,16 +37,16 @@ scope end, and `return 0`.
                 cco_suspend;                                        // Suspend execution => cco_yield_v(CCO_SUSPEND)
                 cco_await(bool condition);                          // Suspend with CCO_AWAIT status or continue if condition is true.
                                                                     // Resumption takes place at the condition test, not after.
-                cco_drop:                                           // Label marks where cleanup of the task/coroutine frame happens.
+                cco_finalize:                                       // Label marks where cleanup of the task/coroutine frame happens.
                                                                     // Jumps to here on cco_return, cco_throw(), cco_cancel(self).
-                cco_return;                                         // Finish coroutine. Jumps to cco_drop: label. If already passed
+                cco_return;                                         // Finish coroutine. Jumps to cco_finalize: label. If already passed
                                                                     // it or label is absent, exit the cco_async scope.
-                cco_exit();                                         // Cancel current coroutine immediately (skip the cco_drop: stage).
+                cco_exit();                                         // Cancel current coroutine immediately (skip the cco_finalize: stage).
 
 bool            cco_is_active(Coroutine* co);                       // Is coroutine active/not done?.
 bool            cco_is_done(Coroutine* co);                         // Is coroutine done/not active?
 void            cco_reset_state(Coroutine* co);                     // Reset state to initial (for reuse).
-void            cco_stop(Coroutine* co);                            // Let coroutine continue at cco_drop: label on next resume.
+void            cco_stop(Coroutine* co);                            // Let coroutine continue at cco_finalize: label on next resume.
 ```
 
 #### Simplistic coroutines (non-Task types)
@@ -72,10 +72,10 @@ int             cco_resume(cco_task* task);                         // Resume ta
                                                                     // Handling of error *is* required else abort().
                 cco_throw(CCO_CANCEL);                              // Throw a cancellation of the current task.
                                                                     // It will silently unwind the await stack. Handling *not*
-                                                                    // required, but it may be recovered in a cco_drop: section.
+                                                                    // required, but it may be recovered in a cco_finalize: section.
 
                 cco_cancel(cco_task* task);                         // Cancel a spawned/launched task; If task runs in the current
-                                                                    // fiber it equals cco_throw(CCO_CANCEL) (jumps to cco_drop:).
+                                                                    // fiber it equals cco_throw(CCO_CANCEL) (jumps to cco_finalize:).
 
                 // The following cancel functions does not cancel themselves/fiber:
 void            cco_cancel_group(cco_group* wg);                    // Cancel all cco_launch()'ed tasks in wg.
@@ -84,11 +84,11 @@ void            cco_cancel_all();                                   // Cancel al
 
                 cco_recover;                                        // Recover from a cco_trow or cancel. Resume from the original
                                                                     // suspend point in the current task and clear error status.
-                                                                    // Should be done in a cco_drop: section.
+                                                                    // Should be done in a cco_finalize: section.
 
 int             cco_status();                                       // Get current return status from last cco_resume() call.
 cco_error*      cco_err();                                          // Get error object created from cco_throw(error) call.
-                                                                    // Should be handled in a cco_drop: section.
+                                                                    // Should be handled in a cco_finalize: section.
 cco_fiber*      cco_fb(cco_task* task);                             // Get fiber associated with task.
 <EnvType>*      cco_env(cco_task* task);                            // Get environment pointer, stored in the associated fiber.
 <EnvType>*      cco_set_env(cco_task* task, EnvType* env);          // Set environment pointer.
@@ -337,7 +337,7 @@ int Philosopher(struct Philosopher* o) {
             printf("Philosopher %d is eating for %.0f minutes...\n", o->id, duration*10);
             cco_await_timer(&o->tm, duration);
         }
-        cco_drop:
+        cco_finalize:
         printf("Philosopher %d done\n", o->id);
     }
 
@@ -367,7 +367,7 @@ int Dining(struct Dining* o) {
         }
         cco_await_timer(&o->tm, o->duration);
 
-        cco_drop:
+        cco_finalize:
         cco_await_cancel(&o->wg);
         puts("Dining done");
     }
@@ -446,7 +446,7 @@ int TaskC(struct TaskC* o) {
         cco_yield;
         puts("TaskC more work");
 
-        cco_drop:
+        cco_finalize:
         puts("TaskC done");
     }
     return 0;
@@ -465,7 +465,7 @@ int TaskB(struct TaskB* o) {
         cco_await_task(&cco_env(o)->task_c);
         puts("TaskB work");
 
-        cco_drop:
+        cco_finalize:
         puts("TaskB done");
     }
     return 0;
@@ -479,7 +479,7 @@ int TaskA(struct TaskA* o) {
 
         puts("TaskA work");
 
-        cco_drop:
+        cco_finalize:
         if (cco_err()->code == 99) {
             // if error not handled, will cause 'unhandled error'...
             printf("TaskA recovered error '99' thrown on line %d\n", cco_err()->line);
@@ -496,7 +496,7 @@ int start(struct start* o) {
 
         cco_await_task(&cco_env(o)->task_a);
 
-        cco_drop:
+        cco_finalize:
         puts("done");
     }
     return 0;
@@ -645,7 +645,7 @@ int produce(struct produce* o) {
             cco_yield_to(o->consumer); // symmetric transfer
         }
 
-        cco_drop:
+        cco_finalize:
         cco_stop(o->consumer);
         Inventory_drop(&o->inventory);
         puts("done producer");
@@ -668,7 +668,7 @@ int consume(struct consume* o) {
             cco_yield_to(o->producer); // symmetric transfer
         }
 
-        cco_drop:
+        cco_finalize:
 		puts("drop consumer");
 		cco_yield; // demo async destruction.
         puts("done consumer");
@@ -757,7 +757,7 @@ int scheduler(struct Scheduler* o) {
             }
         }
 
-        cco_drop:
+        cco_finalize:
         Tasks_drop(&o->tasks);
         puts("Task queue dropped");
     }
@@ -773,7 +773,7 @@ static int taskX(struct TaskX* o) {
         printf("%c is back doing more work\n", o->id);
         cco_yield;
 
-        cco_drop:
+        cco_finalize:
         printf("%c is done\n", o->id);
     }
 
@@ -795,7 +795,7 @@ static int TaskA(struct TaskA* o) {
         puts("A is back doing more work");
         cco_yield;
 
-        cco_drop:
+        cco_finalize:
         puts("A is done");
     }
     return 0;

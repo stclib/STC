@@ -14,7 +14,7 @@ int worker(struct worker* o) {
 
         cco_await_timer(&o->tm, 1.0 + o->id/8.0);
 
-        cco_drop:
+        cco_finalize:
         printf("Worker %d done: %f\n", o->id, cco_timer_elapsed(&o->tm));
     }
 
@@ -33,7 +33,7 @@ int sleeper(struct sleeper* o) {
         printf("Sleeper starting\n");
         cco_await_timer(&o->tm, 3.0);
 
-        cco_drop:
+        cco_finalize:
         printf("Sleeper done: %f\n", cco_timer_elapsed(&o->tm));
     }
 
@@ -67,7 +67,7 @@ int everyone(struct everyone* o) {
         //cco_cancel(o); // => cco_throw(CCO_CANCEL);
         puts("Here 2");
 
-        cco_drop:
+        cco_finalize:
         puts("Await group");
         cco_await_n(&o->wg, 1); // await for 1 launched worker to finish
         puts("1 worker done.");

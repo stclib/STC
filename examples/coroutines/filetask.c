@@ -31,7 +31,7 @@ int file_read(struct file_read* o)
             cco_yield;
         }
 
-        cco_drop:
+        cco_finalize:
         fclose(o->fp);
         cstr_drop(&o->line);
         puts("done file_read");
@@ -66,7 +66,7 @@ int count_line(struct count_line* o)
             cco_yield;
         }
 
-        cco_drop:
+        cco_finalize:
         cstr_drop(&o->path);
         puts("done count_line");
     }

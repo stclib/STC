@@ -107,10 +107,11 @@ typedef struct {
                 (void)(sizeof((co)->base) > sizeof(cco_base) && _state->wg ? --_state->wg->launch_count : 0)) \
         _resume: switch (_state->pos) case CCO_STATE_INIT: // thanks, @liigo!
 
-#define cco_drop /* label */ \
+#define cco_finalize /* label */ \
     _state->drop = true; /* FALLTHRU */ \
     case CCO_STATE_DROP
-#define cco_finalize [fix: use cco_drop:]
+#define cco_drop [fix: use cco_finalize:]
+#define cco_cleanup [fix: use cco_finalize:]
 #define cco_routine [fix: use cco_async]
 
 #define cco_stop(co) \
@@ -231,7 +232,7 @@ typedef struct cco_task cco_task;
 #define cco_cast_task(...) \
     ((void)sizeof((__VA_ARGS__)->base.func(__VA_ARGS__)), (cco_task *)(__VA_ARGS__))
 
-/* Return with error and unwind await stack; must be recovered in cco_drop section */
+/* Return with error and unwind await stack; must be recovered in cco_finalize section */
 #define cco_throw(error_code) \
     do { \
         cco_fiber* _fb = (cco_fiber*)_state->fb; \
@@ -250,7 +251,7 @@ typedef struct cco_task cco_task;
         cco_stop(_fb1->task); \
     } while (0)
 
-/* Cancel job/task and unwind await stack; MAY be stopped (recovered) in cco_drop section */
+/* Cancel job/task and unwind await stack; MAY be stopped (recovered) in cco_finalize section */
 /* Equals cco_throw(CCO_CANCEL) if a_task is in current fiber. */
 #define cco_cancel(a_task) \
     do { \
@@ -266,7 +267,7 @@ typedef struct cco_task cco_task;
     for (cco_fiber *_fbi = _state->fb->next; _fbi != (cco_fiber*)_state->fb; _fbi = _fbi->next) \
         cco_cancel_fiber(_fbi) \
 
-/* Recover the thrown error; to be used in cco_drop section upon handling cco_err()->code */
+/* Recover the thrown error; to be used in cco_finalize section upon handling cco_err()->code */
 #define cco_recover \
     do { \
         cco_fiber* _fb = (cco_fiber*)_state->fb; \

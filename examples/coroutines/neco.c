@@ -12,7 +12,7 @@ int ticker(struct ticktock* o) {
             cco_await_timer(&o->tm, 1.0);
             puts("tick");
         }
-        cco_drop:
+        cco_finalize:
         puts("drop tick");
     }
     return 0;
@@ -24,7 +24,7 @@ int tocker(struct ticktock* o) {
             cco_await_timer(&o->tm, 2.0);
             puts("tock");
         }
-        cco_drop:
+        cco_finalize:
         puts("drop tock");
     }
     return 0;

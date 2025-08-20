@@ -41,7 +41,7 @@ int triples_coro(struct triples* o) {
             }
         }
 
-        cco_drop:
+        cco_finalize:
         puts("done");
     }
     return 0;

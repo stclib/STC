@@ -27,7 +27,7 @@ int Scheduler(struct Scheduler* o) {
             }
         }
 
-        cco_drop:
+        cco_finalize:
         Tasks_drop(&o->tasks);
         puts("Task queue dropped");
     }
@@ -45,7 +45,7 @@ static int TaskA(struct cco_task* o) {
         cco_yield;
         puts("A is back doing even more work");
 
-        cco_drop:
+        cco_finalize:
         puts("A done");
     }
 
@@ -61,7 +61,7 @@ static int TaskB(struct cco_task* o) {
         cco_yield;
         puts("B is back doing more work");
 
-        cco_drop:
+        cco_finalize:
         puts("B done");
     }
     return 0;

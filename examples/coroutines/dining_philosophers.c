@@ -40,7 +40,7 @@ int Philosopher(struct Philosopher* o) {
             printf("Philosopher %d is eating for %.0f minutes...\n", o->id, duration*10);
             cco_await_timer(&o->tm, duration);
         }
-        cco_drop:
+        cco_finalize:
         printf("Philosopher %d done\n", o->id);
     }
 
@@ -70,7 +70,7 @@ int Dining(struct Dining* o) {
         }
         cco_await_timer(&o->tm, o->duration);
 
-        cco_drop:
+        cco_finalize:
         cco_await_cancel(&o->wg);
         puts("Dining done");
     }

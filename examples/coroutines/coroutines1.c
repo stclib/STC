@@ -35,7 +35,7 @@ int prime(struct prime* o) {
                 cco_yield_v(YIELD_PRM);
             }
         }
-        cco_drop:
+        cco_finalize:
         puts("DONE prm");
     }
     return 0;
@@ -66,7 +66,7 @@ int fibonacci(struct fibonacci* o) {
             cco_yield_v(YIELD_FIB);
         }
 
-        cco_drop:
+        cco_finalize:
         puts("DONE fib");
     }
     return 0;
@@ -94,7 +94,7 @@ int combined(struct combined* o) {
 
         cco_await_coroutine( prime(&o->prm) | fibonacci(&o->fib) );
 
-        cco_drop:
+        cco_finalize:
         puts("DONE prime and fib");
     }
     return 0;

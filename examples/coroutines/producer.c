@@ -47,7 +47,7 @@ int produce(struct produce* pr) {
             cco_yield;
         }
 
-        cco_drop:
+        cco_finalize:
         cstr_drop(&pr->text);
         puts("done producer");
     }
@@ -69,7 +69,7 @@ int consume(struct consume* co, struct produce* pr) {
             printf("consumed %s\n", cstr_str(&pr->text));
         }
 
-        cco_drop:
+        cco_finalize:
         puts("done consumer");
     }
     return 0;

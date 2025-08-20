@@ -28,7 +28,7 @@ int myTask(struct myTask* o) {
             cco_yield;
         }
 
-        cco_drop:
+        cco_finalize:
         printf("myTask %d done\n", o->n);
     }
 
@@ -60,7 +60,7 @@ int taskC(struct taskC* o) {
         cco_env(o)->value = o->x * o->y;
         cco_yield;
 
-        cco_drop:
+        cco_finalize:
         puts("taskC done");
     }
 
@@ -87,7 +87,7 @@ int taskB(struct taskB* o) {
         cco_yield;
         puts("Spawned 3 tasks.");
 
-        cco_drop:
+        cco_finalize:
         if (cco_err()->code == 99) {
             printf("taskA recovered error '99' thrown on line %d\n", cco_err()->line);
             cco_recover; // reset error to 0 and proceed after the await taskB call.
@@ -112,7 +112,7 @@ int taskA(struct taskA* o) {
         cco_env(o)->value += o->a; // final return value;
         cco_yield;
 
-        cco_drop:
+        cco_finalize:
         puts("taskA done");
     }
 

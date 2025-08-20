@@ -21,7 +21,7 @@ int file_read(struct file_read* o)
         o->line = (cstr){0};
         cco_await( !cstr_getline(&o->line, o->fp) );
 
-        cco_drop:
+        cco_finalize:
         cstr_drop(&o->line);
         if (o->fp) fclose(o->fp);
         puts("finish");

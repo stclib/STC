@@ -41,7 +41,7 @@ int produce(struct produce* o) {
             cco_yield_to(o->consumer); // symmetric transfer
         }
 
-        cco_drop:
+        cco_finalize:
         puts("stop consumer");
         cco_stop(o->consumer);
         cco_await_task(o->consumer);
@@ -66,7 +66,7 @@ int consume(struct consume* o) {
             cco_yield_to(o->producer); // symmetric transfer
         }
 
-        cco_drop:
+        cco_finalize:
         puts("consumer drop step 1");
         cco_yield;
         puts("consumer drop step 2");
