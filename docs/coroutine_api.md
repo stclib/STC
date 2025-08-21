@@ -93,15 +93,15 @@ cco_fiber*      cco_fb(cco_task* task);                             // Get fiber
 <EnvType>*      cco_env(cco_task* task);                            // Get environment pointer, stored in the associated fiber.
 <EnvType>*      cco_set_env(cco_task* task, EnvType* env);          // Set environment pointer.
 
-void            cco_spawn(cco_task* task);                          // Lazily spawn a new concurrent task, detached.
-void            cco_spawn(cco_task* task, void* env);               // Same, env may be used as a "promise", or anything.
-void            cco_spawn(cco_task* task, void* env,
+cco_fiber*      cco_spawn(cco_task* task);                          // Lazily spawn a new concurrent task, detached.
+cco_fiber*      cco_spawn(cco_task* task, void* env);               // Same, env may be used as a "promise", or anything.
+cco_fiber*      cco_spawn(cco_task* task, void* env,
                           cco_fiber** fb_ref);                      // Same, but it may be called from main/outside `cco_async`.
 bool            cco_joined();                                       // Check if all concurrent spawned tasks are joined.
 
 void            cco_reset_group(cco_group* wg);                     // Reset waitgroup.(Normally not needed).
-void            cco_launch(cco_task* task, cco_group* wg);          // Lazily spawn a new concurrent task within a waitgroup.
-void            cco_launch(cco_task* t, cco_group* wg, void* env);  // Same, env may be used as a "promise", or anything.
+cco_fiber*      cco_launch(cco_task* task, cco_group* wg);          // Lazily spawn a new concurrent task within a waitgroup.
+cco_fiber*      cco_launch(cco_task* t, cco_group* wg, void* env);  // Same, env may be used as a "promise", or anything.
 
                 // If tasks were launched, all must be awaited for by using these awaiter functions:
                 cco_await_all(cco_group* wg);                       // Await for all remaining tasks in waitgroup to finish.

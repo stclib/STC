@@ -110,7 +110,8 @@ typedef struct {
 #define cco_finalize /* label */ \
     _state->drop = true; /* FALLTHRU */ \
     case CCO_STATE_DROP
-#define cco_drop [fix: use cco_finalize:]
+
+#define cco_drop cco_finalize // [deprecated]
 #define cco_cleanup [fix: use cco_finalize:]
 #define cco_routine [fix: use cco_async]
 
