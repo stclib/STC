@@ -3,9 +3,9 @@
 
 // Use coroutine to create a fibonacci sequence generator:
 
-struct fibonacci {
+cco_task_struct (fibonacci) {
+    fibonacci_base base;
     unsigned long long value, b;
-    cco_base base;
 };
 
 int fibonacci(struct fibonacci* o) {
@@ -30,10 +30,11 @@ int fibonacci(struct fibonacci* o) {
 
 
 int main(void) {
-    struct fibonacci fib = {0};
+    struct fibonacci fib = {{fibonacci}};
     int n = 0;
 
-    cco_run_coroutine( fibonacci(&fib) ) {
+    //cco_run_task(&fib) {
+    while (cco_resume(&fib)) {
         printf("Fib(%d) = %llu\n", n++, fib.value);
 
         if (fib.value > fib.b)

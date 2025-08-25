@@ -1,13 +1,22 @@
-#!/usr/bin/sh
+#!/usr/bin/bash
 # tcc compiler: git://repo.or.cz/tinycc.git
 # run tests
 
 cd $(dirname $(realpath $0))
-cc=gcc
-if [ ! -z "$1" ]; then
-    cc=$1
+if [ -z "$CC" ]; then CC=gcc; fi
+if [ ! -z "$1" ]; then CC=$1; fi
+
+os=$(uname -s)
+if [ "$os" == "Linux" ]; then
+    platform=Linux
+elif [ "$os" == "Darwin" ]; then
+    platform=Mac
+else
+    platform=Windows
 fi
 
-$cc -O2 -Wall -I../../include *_test.c main.c -o tests.exe -lstc
-./tests.exe
-rm -f ./tests.exe
+cd ..
+make CC=$CC
+
+build/${platform}_${CC}/tests/test_all
+echo "OS=$os, CC=$CC"

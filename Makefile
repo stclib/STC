@@ -11,9 +11,8 @@ ifeq ($(origin CXX),default)
 	CXX := g++
 endif
 
-CFLAGS    ?= -std=c11 -Iinclude -MMD -O3 -Werror -Wpedantic -Wall -Wextra -Wconversion -Wno-missing-field-initializers
+CFLAGS    ?= -std=c11 -Iinclude -O3 -MMD -Werror -Wpedantic -Wall -Wextra -Wconversion -Wno-missing-field-initializers
 CXXFLAGS  ?= -std=c++20 -Iinclude -O3 -MMD -Wall
-LDFLAGS   ?= -fopenmp
 ifeq ($(CC),tcc)
   AR_RCS  ?= tcc -ar rcs
 else
@@ -25,6 +24,7 @@ RM_F      ?= rm -f
 ifeq ($(OS),Windows_NT)
 	DOTEXE := .exe
 	BUILDDIR := build/Windows_$(CC)
+	LDFLAGS += -fopenmp
 else
 #	CC_VER := $(shell $(CC) -dumpversion | cut -f1 -d.)
 	BUILDDIR := build/$(shell uname)_$(CC)
@@ -32,6 +32,7 @@ else
     # Check preprocessor macros to detect clang compiler
 	IS_CLANG_COMPILER := $(shell echo '' | $(CC) -dM -E -x c - | grep -q '__clang__' > /dev/null 2>&1 && echo 1 || echo 0)
 	ifneq ($(IS_CLANG_COMPILER),1)
+	  LDFLAGS += -fopenmp
 	  CFLAGS += -Wno-clobbered
 	endif
 endif
