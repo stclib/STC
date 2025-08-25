@@ -507,27 +507,35 @@ typedef struct { ptrdiff_t acq_count; } cco_semaphore;
       _c_LINKC int __stdcall QueryPerformanceCounter(LARGE_INTEGER*);
       //_c_LINKC int __stdcall QueryPerformanceFrequency(LARGE_INTEGER*);
     #endif
-    #define cco_timer_freq() 10000000LL /* 1/10th microseconds */
+    #ifndef cco_timer_freq
+        #define cco_timer_freq() 10000000LL /* 1/10th microseconds */
+    #endif
     //static inline long long cco_timer_freq(void) {
     //    long long quad;
     //    QueryPerformanceFrequency((LARGE_INTEGER*)&quad);
     //    return quad;
     //}
 
-    static inline long long cco_timer_ticks(void) {
-        long long quad;
-        QueryPerformanceCounter((LARGE_INTEGER*)&quad);
-        return quad;
-    }
+    #ifndef cco_timer_ticks
+        static inline long long cco_timer_ticks(void) {
+            long long quad;
+            QueryPerformanceCounter((LARGE_INTEGER*)&quad);
+            return quad;
+        }
+    #endif
 #else
-    #include <sys/time.h>
-    #define cco_timer_freq() 1000000LL
+    #ifndef cco_timer_freq
+        #define cco_timer_freq() 1000000LL
+    #endif
 
-    static inline long long cco_timer_ticks(void) { /* microseconds */
-        struct timeval tv;
-        gettimeofday(&tv, NULL);
-        return tv.tv_sec*cco_timer_freq() + tv.tv_usec;
-    }
+    #ifndef cco_timer_ticks
+        #include <sys/time.h>
+        static inline long long cco_timer_ticks(void) { /* microseconds */
+            struct timeval tv;
+            gettimeofday(&tv, NULL);
+            return tv.tv_sec*cco_timer_freq() + tv.tv_usec;
+        }
+    #endif
 #endif
 
 typedef struct { double duration; long long start_time; } cco_timer;
