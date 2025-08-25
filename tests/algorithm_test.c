@@ -92,9 +92,9 @@ TEST(algorithm, c_filter)
     IVec_drop(&vec);
 }
 
-// TEST c_sumtype:
+// TEST tagged_union:
 
-c_sumtype (Action,
+c_union (Action,
     (ActionSpeak, cstr),
     (ActionQuit, bool),
     (ActionRunFunc, struct {
@@ -128,7 +128,7 @@ static int add(int a, int b) {
     return a + b;
 }
 
-TEST(algorithm, c_sumtype) {
+TEST(algorithm, c_union) {
     Action act1 = c_variant(ActionSpeak, cstr_from("Hello"));
     Action act2 = c_variant(ActionQuit, 1);
     Action act3 = c_variant(ActionRunFunc, {add, 5, 6});

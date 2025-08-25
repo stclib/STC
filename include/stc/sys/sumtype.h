@@ -26,7 +26,7 @@
 #include <stc/cstr.h>
 #include <stc/algorithm.h>
 
-c_sumtype (Action,
+c_union (Action,
     (ActionSpeak, cstr),
     (ActionQuit, bool),
     (ActionRunFunc, struct {
@@ -95,7 +95,7 @@ int main(void) {
 #define _c_vartuple_type(T, Tag, ...) typedef __VA_ARGS__ Tag##_type; typedef T Tag##_sumtype;
 #define _c_vartuple_var(T, Tag, ...) struct { enum enum_##T tag; Tag##_type get; } Tag;
 
-#define c_sumtype(T, ...) \
+#define c_union(T, ...) \
     typedef union T T; \
     enum enum_##T { c_EVAL(c_LOOP(_c_vartuple_tag, T, _c_enum_1 __VA_ARGS__, (0),)) }; \
     c_EVAL(c_LOOP(_c_vartuple_type, T,  __VA_ARGS__, (0),)) \
@@ -103,6 +103,7 @@ int main(void) {
         struct { enum enum_##T tag; } _any_; \
         c_EVAL(c_LOOP(_c_vartuple_var, T, __VA_ARGS__, (0),)) \
     }
+#define c_sumtype c_union
 
 #if defined STC_HAS_TYPEOF && STC_HAS_TYPEOF
     #define c_when(varptr) \
@@ -165,7 +166,7 @@ int main(void) {
 #define c_get_if(varptr, Tag) \
     (c_is_variant(varptr, Tag) ? &(varptr)->Tag.get : NULL)
 
-#define c_variant_index(varptr) \
+#define c_variant_id(varptr) \
     ((int)(varptr)->_any_.tag)
 
 #endif // STC_SUMTYPE_H_INCLUDED

@@ -143,59 +143,60 @@ int main(void) {
 ```
 </details>
 
-## Sum types
+## Tagged unions
 
-This is a tiny, robust and fully typesafe implementation of sum types. They work
+This is a tiny, robust and fully typesafe implementation of tagged unions. They work
 similarly as in Zig, Odin and Rust, and is just as easy and safe to use.
 Each tuple/parentesized field is an enum (tag) with an associated data type (payload),
-called a *variant* of the sum type. The sum type itself is a **union** type.
+called a *variant* of the sum type. The type itself is a **union** type, aka. a sum type.
 
 <details>
-<summary><b>Sum types</b> - aka <i>variants</i> or <i>tagged unions</i></summary>
+<summary><b>c_union</b> - tagged union</summary>
 
 Synopsis:
 ```c++
 // Define a sum type
-c_sumtype (SumType,
-    (VariantTagA, VariantTypeA),
-    (VariantTagB, VariantTypeB),
-    (VariantTagC, VariantTagB_type), // use same payload type as VariantTagB
+c_union (SumType,
+    (EnumTagA, UnionTypeA),
+    (EnumTagB, UnionTypeB),
+    (EnumTagC, EnumTagB_type),                          // use same payload type as EnumTagB
     ...
-    (VariantTagN, VariantTypeN),     // optional final comma
+    (EnumTagN, UnionTypeN),                             // (final comma is optional)
 );
 
-SumType           c_variant(VariantTag tag, VariantType value); // Sum type constructor
-bool              c_is_variant(SumType* obj, VariantTag tag);   // Does obj hold VariantType?
-VariantTag_type*  c_get_if(SumType* obj, VariantTag tag);       // NULL if obj does does not hold the tag.
-int               c_variant_index(SumType* obj);                // (for debug only)
+SumType       c_variant(EnumTag tag, UnionType value);  // Construct a tagged union variant.
+bool          c_is_variant(SumType* obj, EnumTag tag);  // Does obj hold tag?
+EnumTag_type* c_get_if(SumType* obj, EnumTag tag);      // NULL if obj does does not hold the tag.
+int           c_variant_id(SumType* obj);               // (mainly for debugging)
 
-// Use a sum type (1)
+// Use a sum type
 c_when (SumType* obj) {
-    c_is(VariantTagA, VariantTagA_type* x)
+    c_is(EnumTagA, EnumTagA_type* x)
         ActionA(x);
-    c_is_same(VariantTagB, VariantTagC, VariantTagD)       // same payload types (checked)
-        ActionBCD(obj->VariantTagB.var);
-    c_is(VariantTagX) c_or_is(VariantTagY)                 // different payload types
+    c_is_same(EnumTagB, EnumTagC, EnumTagD)             // same payload types (checked)
+        ActionBCD(obj->EnumTagB.var);
+    c_is(EnumTagX) c_or_is(EnumTagY)                    // different payload types
         ActionXY();
-    c_otherwise                                            // optional, removes exhaustiveness-check
+    c_otherwise                                         // optional, silence exhaustiveness-check
         ActionElse(obj);
 }
 
-// Use a sum type (2)
-if (c_is(SumType* obj, VariantTagA, VariantTagA_type* x))
-    ActionA(x);
+// Use a single sum type (*)
+if (c_is(SumType* obj, EnumTagX, EnumTagX_type* x))
+    ActionX(x);
 ```
 The **c_when** statement is exhaustive. The compiler will give a warning if not all variants are
-covered by **c_is** (requires `-Wall` or `-Wswitch` gcc/clang compiler flag). The first enum value
-is deliberately set to `__LINE__*1000` in order to easier detect zero or not initialized variants.
+covered by **c_is** (requires `-Wall` or `-Wswitch` gcc/clang compiler flag). The first enum tag
+is deliberately set to `__LINE__*1000` in order to easier detect zero/un-initialized variants
+and distinguish between types (can be inspected with c_variant_id()).
 
 * Note: The `x` variables in the synopsis are "auto" type declared/defined - see examples.
 * Caveat 1: `c_when()` and `if (c_is())` behaves like a one-iteration loop; i.e, the use of `continue`
   and `break` will just break out of its block (meaning not out of any outer loop/switch).
 * Caveat 2: Sum types will generally not work in coroutines because the `x` variable is local and therefore
 will not be preserved across `cco_suspend` / `cco_yield..` / `cco_await..`.
-* Caveat 3: The second usage (2), `c_is(obj, TAG, x)` can only be used isolated in an if-statement, like
-in the _drop() function of Example 2 below.
+* Caveat 3: The second usage (*), `c_is(obj, TAG, x)` may only be used isolated in an if-statement, like
+shown or in the _drop() function of Example 2 below.
 
 ### Example 1
 
@@ -204,7 +205,7 @@ in the _drop() function of Example 2 below.
 #include <stdio.h>
 #include <stc/algorithm.h>
 
-c_sumtype (Tree,
+c_union (Tree,
     (Empty, bool),
     (Leaf, int),
     (Node, struct {int value; Tree *left, *right;})
@@ -244,12 +245,12 @@ its data type (payload). Because C does not have namespaces, it is recommended t
 #include <stc/algorithm.h>
 #include <stc/cstr.h>
 
-c_sumtype (Color,
+c_union (Color,
     (ColorRgb, struct {int32_t r, g, b;}),
     (ColorHsv, struct {int32_t h, s, v;})
 );
 
-c_sumtype (Message,
+c_union (Message,
     (MessageQuit, bool),
     (MessageMove, struct {int32_t x, y;}),
     (MessageWrite, cstr),

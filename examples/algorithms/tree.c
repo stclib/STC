@@ -3,7 +3,7 @@
 #include <stc/algorithm.h>
 #include <stc/types.h>
 
-c_sumtype (Tree,
+c_union (Tree,
     (TreeEmpty, bool),
     (TreeLeaf, int),
     (TreeNode, struct { int value; Tree *left, *right; })
