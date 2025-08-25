@@ -38,7 +38,7 @@ scope end, and `return 0`.
                 cco_await(bool condition);                          // Suspend with CCO_AWAIT status or continue if condition is true.
                                                                     // Resumption takes place at the condition test, not after.
                 cco_finalize:                                       // Label marks where cleanup of the task/coroutine frame happens.
-                                                                    // Jumps to here on cco_return, cco_throw(), cco_cancel(self).
+                                                                    // Jumps here on cco_return, cco_throw(), cco_cancel_task(self).
                 cco_return;                                         // Finish coroutine. Jumps to cco_finalize: label. If already passed
                                                                     // it or label is absent, exit the cco_async scope.
                 cco_exit();                                         // Cancel current coroutine immediately (skip the cco_finalize: stage).
@@ -74,12 +74,17 @@ int             cco_resume(cco_task* task);                         // Resume ta
                                                                     // It will silently unwind the await stack. Handling *not*
                                                                     // required, but it may be recovered in a cco_finalize: section.
 
-                cco_cancel(cco_task* task);                         // Cancel a spawned/launched task; If task runs in the current
+                cco_cancel_task(cco_task* task);                    // Cancel a spawned/launched task; If task runs in the current
                                                                     // fiber it equals cco_throw(CCO_CANCEL) (jumps to cco_finalize:).
+                cco_await_cancel_task(cco_task* task);              // Cancel and await for task to finalize async.
+                                                                    // Shorthand for cco_cancel_task() + cco_await_task().
 
-                // The following cancel functions does not cancel themselves/fiber:
+                // The following cancel functions does not cancel themselves:
 void            cco_cancel_group(cco_group* wg);                    // Cancel all cco_launch()'ed tasks in wg.
                                                                     // Passing NULL as arg will cancel all cco_spawn()'ed tasks.
+                cco_await_cancel_group(cco_group* wg);              // Cancel and await for remaining tasks in wg.
+                                                                    // Shorthand for cco_cancel_group() + cco_await_all().
+
 void            cco_cancel_all();                                   // Cancel all spawned and launched tasks.
 
                 cco_recover;                                        // Recover from a cco_trow or cancel. Resume from the original
@@ -109,8 +114,6 @@ cco_fiber*      cco_launch(cco_task* t, cco_group* wg, void* env);  // Same, env
                                                                     // finish, and cancel the remaining.
                 cco_await_n(cco_group* wg, int n);                  // Await for n launched tasks, but do *not* cancel
                                                                     // remaining. Negative n means await (all - n) tasks.
-                cco_await_cancel(cco_group* wg);                    // Cancel remaining tasks in wg and await for them.
-                                                                    // Shorthand for cco_cancel_group() + cco_await_all().
 
                 cco_run_task(cco_task* task) {}                     // Run task blocking until it and spawned fibers are finished.
                 cco_run_task(cco_task* task, void *env) {}          // Run task blocking with env data
@@ -240,7 +243,7 @@ Notice that `Gen` now becomes the "container", while `Gen_iter` is the coroutine
 <details>
 <summary>Iterable generator coroutine implementation</summary>
 
-[ [Run this code](https://godbolt.org/z/fhh9b95Wh) ]
+[ [Run this code](https://godbolt.org/z/4EhPGv7cG) ]
 ```c++
 #include <stdio.h>
 #include <stc/coroutine.h>
@@ -260,9 +263,10 @@ int Gen_next(Gen_iter* it) {
     cco_async (it) {
         for (*it->ref = it->g->start; *it->ref < it->g->end; ++*it->ref)
             cco_yield;
-    }
 
-    it->ref = NULL; // stop
+        cco_finalize:
+        it->ref = NULL; // stop
+    }
     return 0;
 }
 
@@ -294,7 +298,7 @@ starts eating (because they must be waiting).
 <details>
 <summary>The "Dining philosophers" C implementation</summary>
 
-[ [Run this code](https://godbolt.org/z/fnacafx8q) ]
+[ [Run this code](https://godbolt.org/z/s9o1efEr8) ]
 ```c++
 #include <stdio.h>
 #include <time.h>
@@ -368,7 +372,7 @@ int Dining(struct Dining* o) {
         cco_await_timer(&o->tm, o->duration);
 
         cco_finalize:
-        cco_await_cancel(&o->wg);
+        cco_await_cancel_group(&o->wg);
         puts("Dining done");
     }
     return 0;
@@ -423,7 +427,7 @@ and recovered using `cco_recover`. This call will resume control back to the ori
 current task. Because the "call-tree" is fixed, the coroutine frames to be called may be pre-allocated on the stack,
 which is very fast.
 
-[ [Run this code](https://godbolt.org/z/sfc3GKK1a) ]
+[ [Run this code](https://godbolt.org/z/ad15G1rxj) ]
 <!--{%raw%}-->
 ```c++
 #include <stdio.h>
@@ -600,7 +604,7 @@ the following example:
 <details>
 <summary>Producer-consumer coroutine implementation</summary>
 
-[ [Run this code](https://godbolt.org/z/7Tfa7WP7s) ]
+[ [Run this code](https://godbolt.org/z/hn6hG4PYb) ]
 ```c++
 #include <time.h>
 #include <stdio.h>
@@ -669,8 +673,8 @@ int consume(struct consume* o) {
         }
 
         cco_finalize:
-		puts("drop consumer");
-		cco_yield; // demo async destruction.
+        puts("drop consumer");
+        cco_yield; // demo async destruction.
         puts("done consumer");
     }
 
@@ -715,7 +719,7 @@ the scope in that it was created.
 <details>
 <summary>Scheduled coroutines implementation</summary>
 
-[ [Run this code](https://godbolt.org/z/vT775EofG) ]
+[ [Run this code](https://godbolt.org/z/hj78Ms4Gf) ]
 ```c++
 // Based on https://www.youtube.com/watch?v=8sEe-4tig_A
 #include <stdio.h>

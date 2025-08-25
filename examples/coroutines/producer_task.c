@@ -43,8 +43,7 @@ int produce(struct produce* o) {
 
         cco_finalize:
         puts("stop consumer");
-        cco_stop(o->consumer);
-        cco_await_task(o->consumer);
+        cco_await_cancel_task(o->consumer);
         Inventory_drop(&o->inv);
         puts("producer dropped");
     }

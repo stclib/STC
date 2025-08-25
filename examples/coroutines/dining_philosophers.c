@@ -71,7 +71,7 @@ int Dining(struct Dining* o) {
         cco_await_timer(&o->tm, o->duration);
 
         cco_finalize:
-        cco_await_cancel(&o->wg);
+        cco_await_cancel_group(&o->wg);
         puts("Dining done");
     }
     return 0;

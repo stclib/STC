@@ -200,7 +200,7 @@ shown or in the _drop() function of Example 2 below.
 
 ### Example 1
 
-[ [Run this code](https://godbolt.org/z/PEvjGff3E) ]
+[ [Run this code](https://godbolt.org/z/Y9hYM8We1) ]
 ```c++
 #include <stdio.h>
 #include <stc/algorithm.h>
@@ -238,7 +238,7 @@ int main(void) {
 This example has two sum types. The `MessageChangeColor` variant uses the `Color` sum type as
 its data type (payload). Because C does not have namespaces, it is recommended to prefix the variant names with the sum type name, as with regular enums.
 
-[ [Run this code](https://godbolt.org/z/b5dG1vrGY) ]
+[ [Run this code](https://godbolt.org/z/bM9q9h397) ]
 ```c++
 // https://doc.rust-lang.org/book/ch18-03-pattern-syntax.html#destructuring-enums
 #include <stdio.h>
