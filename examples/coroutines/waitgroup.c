@@ -75,7 +75,7 @@ int everyone(struct everyone* o) {
         puts("3 more workers done.");
         cco_await_cancel_group(&o->wg); // cancel and await for remaining workers to finish
         //cco_cancel_group(&o->wg); // cancel
-        //cco_await_all(&o->wg); // await for remaining workers to finish
+        //cco_await_group(&o->wg); // await for remaining workers to finish
         puts("All workers done.");
     }
 

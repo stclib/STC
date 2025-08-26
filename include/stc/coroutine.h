@@ -340,7 +340,7 @@ static inline int _cco_resume_task(cco_task* task)
 #define cco_launch_3(task, waitgroup, env) \
     _cco_spawn(cco_cast_task(task), ((void)sizeof((env) == cco_env(task)), env), (cco_fiber*)_state->fb, waitgroup)
 
-#define cco_await_all(waitgroup) \
+#define cco_await_group(waitgroup) \
     cco_await((waitgroup)->launch_count == 0); \
 
 #define cco_await_n(waitgroup, n) do { \
@@ -350,15 +350,14 @@ static inline int _cco_resume_task(cco_task* task)
 } while (0)
 
 #define cco_await_cancel_group(waitgroup) do { \
-    /* Note: current fiber must not be in the waitgroup */ \
     cco_cancel_group(waitgroup); \
-    cco_await_all(waitgroup); \
+    cco_await_group(waitgroup); \
 } while (0)
 
 #define cco_await_any(waitgroup) do { \
     cco_await_n(waitgroup, 1); \
     cco_cancel_group(waitgroup); \
-    cco_await_all(waitgroup); \
+    cco_await_group(waitgroup); \
 } while (0)
 
 #define cco_run_fiber(...) c_MACRO_OVERLOAD(cco_run_fiber, __VA_ARGS__)

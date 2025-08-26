@@ -28,12 +28,12 @@ scope end, and `return 0`.
 
 ## Methods and statements
 
-#### Coroutine basics (both simplistic and tasks)
+#### Coroutine Basics (both simple and tasks)
 ```c++
                 cco_async (Coroutine* co) {...}                     // The coroutine scope.
 
-                cco_yield_v(status);                                // Suspend execution with custom status returned.
                 cco_yield;                                          // Suspend execution => cco_yield_v(CCO_YIELD)
+                cco_yield_v(status);                                // Suspend execution with custom status returned.
                 cco_suspend;                                        // Suspend execution => cco_yield_v(CCO_SUSPEND)
                 cco_await(bool condition);                          // Suspend with CCO_AWAIT status or continue if condition is true.
                                                                     // Resumption takes place at the condition test, not after.
@@ -46,74 +46,81 @@ scope end, and `return 0`.
 bool            cco_is_active(Coroutine* co);                       // Is coroutine active/not done?.
 bool            cco_is_done(Coroutine* co);                         // Is coroutine done/not active?
 void            cco_reset_state(Coroutine* co);                     // Reset state to initial (for reuse).
-void            cco_stop(Coroutine* co);                            // Let coroutine continue at cco_finalize: label on next resume.
+void            cco_stop(Coroutine* co);                            // Coroutine continues at label cco_finalize if present,
+                                                                    // otherwise it exits the cco_async scope on next resume.
 ```
 
-#### Simplistic coroutines (non-Task types)
+#### Simple Coroutines (non-Task types)
 ```c++
                 cco_await_coroutine(corofunc(co));                  // Await for coroutine to finish, else suspend with CCO_AWAIT.
                 cco_await_coroutine(corofunc(co), int awaitbits);   // Await until coroutine resume status is in (awaitbits | CCO_DONE).
                 cco_run_coroutine(corofunc(co)) {};                 // Run blocking until coroutine is finished.
 ```
 
-#### Tasks (coroutine function-objects) and fibers (green thread-like entity within a system thread)
+#### Tasks (coroutine function-objects) and Fibers (green thread-like entity within a system thread)
 ```c++
                 cco_task_struct(name) {<name>_base base; ...};      // Define a custom coroutine task struct; extends cco_task struct.
                 cco_task_struct(name, EnvType) {<name>_base base; ...}; // Also specify the value type of the pointer returned from cco_env().
 
-                cco_await_task(cco_task* task);                     // Await/call until task's resume status is CCO_DONE (=0).
-                cco_await_task(cco_task* task, int awaitbits);      // Await until task's resume status is in (awaitbits | CCO_DONE).
-
-                cco_yield_to(cco_task* task);                       // Yield to task (symmetric transfer of control).
+                cco_yield_to(cco_task* task);                       // Yield to another task (symmetric transfer of control).
 int             cco_resume(cco_task* task);                         // Resume task until next suspension, returns status.
-                                                                    // Normally done by cco_run_task() driver function or a scheduler.
+                                                                    // Normally called by cco_run_task() driver function or a scheduler.
 
                 cco_throw(int error);                               // Throw an error. Will unwind call/await-task stack.
                                                                     // Handling of error *is* required else abort().
                 cco_throw(CCO_CANCEL);                              // Throw a cancellation of the current task.
                                                                     // It will silently unwind the await stack. Handling *not*
                                                                     // required, but it may be recovered in a cco_finalize: section.
-
-                cco_cancel_task(cco_task* task);                    // Cancel a spawned/launched task; If task runs in the current
-                                                                    // fiber it equals cco_throw(CCO_CANCEL) (jumps to cco_finalize:).
-                cco_await_cancel_task(cco_task* task);              // Cancel and await for task to finalize async.
-                                                                    // Shorthand for cco_cancel_task() + cco_await_task().
-
-                // The following cancel functions does not cancel themselves:
-void            cco_cancel_group(cco_group* wg);                    // Cancel all cco_launch()'ed tasks in wg.
-                                                                    // Passing NULL as arg will cancel all cco_spawn()'ed tasks.
-                cco_await_cancel_group(cco_group* wg);              // Cancel and await for remaining tasks in wg.
-                                                                    // Shorthand for cco_cancel_group() + cco_await_all().
-
-void            cco_cancel_all();                                   // Cancel all spawned and launched tasks.
-
-                cco_recover;                                        // Recover from a cco_trow or cancel. Resume from the original
+                cco_recover;                                        // Recover from a cco_throw() or cancellation. Resume from the original
                                                                     // suspend point in the current task and clear error status.
                                                                     // Should be done in a cco_finalize: section.
-
+```
+#### Task Accessors
+```c++
 int             cco_status();                                       // Get current return status from last cco_resume() call.
 cco_error*      cco_err();                                          // Get error object created from cco_throw(error) call.
                                                                     // Should be handled in a cco_finalize: section.
 cco_fiber*      cco_fb(cco_task* task);                             // Get fiber associated with task.
 <EnvType>*      cco_env(cco_task* task);                            // Get environment pointer, stored in the associated fiber.
 <EnvType>*      cco_set_env(cco_task* task, EnvType* env);          // Set environment pointer.
+```
+#### Task and Waitgroup Cancellation
+```c++
+                cco_cancel_task(cco_task* task);                    // Cancel a spawned/launched task; If task runs in the current
+                                                                    // fiber it equals cco_throw(CCO_CANCEL) (jumps to cco_finalize:).
+void            cco_cancel_fiber(cco_fiber* fiber);                 // Signal that fiber will be cancelled upon next suspension point.
+void            cco_cancel_group(cco_group* wg);                    // Cancel all launched tasks in the waitgroup, *except* the current.
+                                                                    // Passing NULL as arg will cancel all non-group spawned tasks.
+void            cco_cancel_all();                                   // Cancel all spawned and launched tasks, *except* the current.
+```
+#### Awaiting Tasks and Waitgroups
+```c++
+                cco_await_task(cco_task* task);                     // Await/call until task's resume status is CCO_DONE (=0).
+                cco_await_task(cco_task* task, int awaitbits);      // Await until task's resume status is in (awaitbits | CCO_DONE).
+                cco_await_cancel_task(cco_task* task);              // Cancel and await for task to finalize async.
+                                                                    // Shorthand for cco_cancel_task() + cco_await_task().
 
+                // If tasks were launched, all must be awaited for by using these awaiter functions:
+                cco_await_group(cco_group* wg);                     // Await for all (remaining) tasks in waitgroup to finish.
+                cco_await_any(cco_group* wg);                       // Await for any one launched task in waitgroup to
+                                                                    // finish, and cancel the remaining.
+                cco_await_cancel_group(cco_group* wg);              // Cancel all tasks in wg, and await for them to finalize.
+                                                                    // Shorthand for cco_cancel_group() + cco_await_group().
+                cco_await_n(cco_group* wg, int n);                  // Await for n launched tasks, but do *not* cancel
+                                                                    // remaining. Negative n means await (all - n) tasks.
+```
+#### Spawning and Launching New Tasks
+```c++
 cco_fiber*      cco_spawn(cco_task* task);                          // Lazily spawn a new concurrent task, detached.
 cco_fiber*      cco_spawn(cco_task* task, void* env);               // Same, env may be used as a "promise", or anything.
 cco_fiber*      cco_spawn(cco_task* task, void* env,
                           cco_fiber** fb_ref);                      // Same, but it may be called from main/outside `cco_async`.
-bool            cco_joined();                                       // Check if all concurrent spawned tasks are joined.
+bool            cco_joined();                                       // Check if all concurrent spawned/launched tasks are joined.
 
 void            cco_reset_group(cco_group* wg);                     // Reset waitgroup.(Normally not needed).
 cco_fiber*      cco_launch(cco_task* task, cco_group* wg);          // Lazily spawn a new concurrent task within a waitgroup.
 cco_fiber*      cco_launch(cco_task* t, cco_group* wg, void* env);  // Same, env may be used as a "promise", or anything.
 
-                // If tasks were launched, all must be awaited for by using these awaiter functions:
-                cco_await_all(cco_group* wg);                       // Await for all remaining tasks in waitgroup to finish.
-                cco_await_any(cco_group* wg);                       // Await for any launched tasks in waitgroup to
-                                                                    // finish, and cancel the remaining.
-                cco_await_n(cco_group* wg, int n);                  // Await for n launched tasks, but do *not* cancel
-                                                                    // remaining. Negative n means await (all - n) tasks.
 
                 cco_run_task(cco_task* task) {}                     // Run task blocking until it and spawned fibers are finished.
                 cco_run_task(cco_task* task, void *env) {}          // Run task blocking with env data
@@ -123,10 +130,8 @@ cco_fiber*      cco_new_fiber(cco_task* task);                      // Create an
 cco_fiber*      cco_new_fiber(cco_task* task, void* env);           // Create an initial fiber from a task and env (inputs or a future).
                 cco_run_fiber(cco_fiber** fiber_ref) {}             // Run fiber(s) blocking.
                 cco_run_fiber(fb_iter, cco_fiber* fiber) {}         // Run fiber(s) blocking. fb_iter reference the current fiber.
-
-void            cco_cancel_fiber(cco_fiber* fiber);                 // Signal that fiber will be cancelled.
 ```
-#### Timers and time functions
+#### Timers and Time Functions
 ```c++
 void            cco_start_timer(cco_timer* tm, double sec);         // Start timer with seconds duration.
 void            cco_restart_timer(cco_timer* tm);                   // Restart timer with previous duration.
@@ -134,10 +139,6 @@ bool            cco_timer_expired(cco_timer* tm);                   // Return tr
 double          cco_timer_elapsed(cco_timer* tm);                   // Return elapsed seconds.
 double          cco_timer_remaining(cco_timer* tm);                 // Return remaining seconds.
                 cco_await_timer(cco_timer* tm, double sec);         // Start timer with duration and await for it to expire.
-
-double          cco_time(void);                                     // Return seconds since 1970-01-01_00:00 UTC (usec precision).
-void            cco_sleep(double sec);                              // Sleep for seconds (msec or usec precision).
-
 ```
 #### Semaphores
 ```c++
@@ -147,7 +148,7 @@ void            cco_acquire_semaphore(cco_semaphore* sem);          // if (count
 void            cco_release_semaphore(cco_semaphore* sem);          // "Signal" the semaphore (count += 1)
                 cco_await_semaphore(cco_semaphore* sem);            // Await for the semaphore count > 0, then count -= 1
 ```
-#### Interoperability with fb_iterators and filters
+#### Interoperability with fb_iterators and Filters
 ```c++
                 // Container fb_iteration within coroutines
                 for (cco_each(fb_iter_name, CntType, cnt)) ...;          // Use an existing fb_iterator (stored in coroutine object)
@@ -568,7 +569,7 @@ int job_start(struct job_start* o) {
         cco_launch(c_new(struct job1, {{job1}}), &o->wg);
         cco_await_timer(&o->tm, 0.1);
         puts("Ping");
-        cco_await_all(&o->wg);
+        cco_await_group(&o->wg);
         puts("Ping");
         cco_await_timer(&o->tm, 0.2);
     }
