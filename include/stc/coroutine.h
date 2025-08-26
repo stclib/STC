@@ -341,7 +341,7 @@ static inline int _cco_resume_task(cco_task* task)
     _cco_spawn(cco_cast_task(task), ((void)sizeof((env) == cco_env(task)), env), (cco_fiber*)_state->fb, waitgroup)
 
 #define cco_await_group(waitgroup) \
-    cco_await((waitgroup)->launch_count == 0); \
+    cco_await((waitgroup)->launch_count == 0)
 
 #define cco_await_n(waitgroup, n) do { \
     const int n_ = n; \

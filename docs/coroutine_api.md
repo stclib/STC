@@ -536,7 +536,7 @@ call/await:
 <details>
 <summary>Implementation of coroutine objects on the heap</summary>
 
-[ [Run this code](https://godbolt.org/z/b49sThzsz) ]
+[ [Run this code](https://godbolt.org/z/79TdE8Gv3) ]
 <!--{%raw%}-->
 ```c++
 #include <stdio.h>
@@ -605,7 +605,7 @@ the following example:
 <details>
 <summary>Producer-consumer coroutine implementation</summary>
 
-[ [Run this code](https://godbolt.org/z/hn6hG4PYb) ]
+[ [Run this code](https://godbolt.org/z/rTcxfM6h3) ]
 ```c++
 #include <time.h>
 #include <stdio.h>
@@ -651,7 +651,7 @@ int produce(struct produce* o) {
         }
 
         cco_finalize:
-        cco_stop(o->consumer);
+        cco_await_cancel_task(o->consumer);
         Inventory_drop(&o->inventory);
         puts("done producer");
     }
