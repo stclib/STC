@@ -174,13 +174,11 @@ STC_INLINE bool csview_iends_with(csview sv, const char* str) {
     isize n = c_strlen(str);
     return n <= sv.size && !utf8_icmp(sv.buf + sv.size - n, str);
 }
-
 #endif // STC_CSVIEW_H_INCLUDED
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if defined STC_IMPLEMENT || defined i_implement
-#ifndef STC_CSVIEW_C_INCLUDED
-#define STC_CSVIEW_C_INCLUDED
+#if (defined STC_IMPLEMENT || defined i_implement) && !defined STC_CSVIEW_IMPLEMENT
+#define STC_CSVIEW_IMPLEMENT
 
 csview_iter csview_advance(csview_iter it, isize u8pos) {
     int inc = 1;
@@ -238,9 +236,8 @@ csview_iter csview_u8_at(csview sv, isize u8pos) {
     c_assert(sv.buf != end);
     return c_literal(csview_iter){.u8 = {sv, end}};
 }
-#endif // STC_CSVIEW_C_INCLUDED
-#endif // i_implement
+#endif // IMPLEMENT
 
 #if defined i_import
-  #include "priv/utf8_prv.c"
+#include "priv/utf8_prv.c"
 #endif

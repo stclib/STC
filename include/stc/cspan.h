@@ -392,7 +392,8 @@ STC_API bool _cspan_is_layout(cspan_layout layout, const _istride shape[], const
 #endif // STC_CSPAN_H_INCLUDED
 
 /* --------------------- IMPLEMENTATION --------------------- */
-#if defined i_implement
+#if defined i_implement && !defined STC_CSPAN_IMPLEMENT
+#define STC_CSPAN_IMPLEMENT
 
 STC_DEF bool _cspan_is_layout(cspan_layout layout, const _istride shape[], const _istride strides[], int rank) {
     _istride tmpshape[16]; // 16 = "max" rank

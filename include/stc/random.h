@@ -220,10 +220,8 @@ STC_INLINE int64_t crand32_uniform(crand32_uniform_dist* d)
 #endif // STC_RANDOM_H_INCLUDED
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if defined i_implement
-
-#ifndef STC_RANDOM_C_INCLUDED
-#define STC_RANDOM_C_INCLUDED
+#if defined i_implement && !defined STC_RANDOM_IMPLEMENT
+#define STC_RANDOM_IMPLEMENT
 #include <math.h>
 
 STC_DEF double
@@ -246,6 +244,5 @@ crand64_normal_r(crand64* rng, uint64_t stream, crand64_normal_dist* d) {
 STC_DEF double crand64_normal(crand64_normal_dist* d)
     { return crand64_normal_r(_stc64(), 1, d); }
 
-#endif // STC_RANDOM_C_INCLUDED
-#endif // i_implement
+#endif // IMPLEMENT
 #include "priv/linkage2.h"
