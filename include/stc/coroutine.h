@@ -249,6 +249,7 @@ typedef struct cco_task cco_task;
         _fb1->err.code = CCO_CANCEL; \
         _fb1->err.line = __LINE__; \
         _fb1->err.file = __FILE__; \
+        cco_stop(_fb1->task); \
     } while (0)
 
 /* Cancel job/task and unwind await stack; MAY be stopped (recovered) in cco_finalize section */
@@ -504,13 +505,15 @@ int cco_execute(cco_fiber* fb) {
         while (1) {
             fb->parent_task = fb->task->base.parent_task;
             fb->awaitbits = fb->task->base.awaitbits;
-            fb->status = fb->task->base.func(fb->task); // resume
-            // Note: if fb->status == CCO_DONE, fb->task may already be destructed.
-            if (fb->err.code && (fb->status == CCO_DONE || !fb->task->base.state.drop)) {
-                fb->task = fb->parent_task;
-                if (fb->task == NULL)
-                    break;
-                fb->recover_state = fb->task->base.state;
+            fb->status = cco_resume(fb->task);
+            if (fb->err.code) {
+                // Note: if fb->status == CCO_DONE, fb->task may already be destructed.
+                if (fb->status == CCO_DONE) {
+                    fb->task = fb->parent_task;
+                    if (fb->task == NULL)
+                        break;
+                    fb->recover_state = fb->task->base.state;
+                }
                 cco_stop(fb->task);
                 continue;
             }
