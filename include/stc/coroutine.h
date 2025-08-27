@@ -515,6 +515,7 @@ int cco_execute(cco_fiber* fb) {
                     fb->recover_state = fb->task->base.state;
                 }
                 cco_stop(fb->task);
+                cco_suspend;
                 continue;
             }
             if (!((fb->status & ~fb->awaitbits) || (fb->task = fb->parent_task) != NULL))

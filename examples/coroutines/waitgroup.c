@@ -64,16 +64,17 @@ int everyone(struct everyone* o) {
         puts("Here 1");
         //cco_cancel_task(o->sleep);
         //puts("sleep cancelled");
-        //cco_cancel_task(o); // => cco_throw(CCO_CANCEL);
+        //cco_throw(CCO_CANCEL);
         puts("Here 2");
 
         cco_finalize:
-        puts("Await group");
+        puts("Await one");
         cco_await_n(&o->wg, 1); // await for 1 launched worker to finish
         puts("1 worker done.");
-        cco_await_n(&o->wg, 3); // await for 3 workers to finish
-        puts("3 more workers done.");
-        cco_await_cancel_group(&o->wg); // cancel and await for remaining workers to finish
+        cco_await_n(&o->wg, 3); // await for 3 more workers to finish
+        puts("3 more workers done");
+        cco_await_group(&o->wg); // await for remaining workers to finish
+        //cco_await_cancel_group(&o->wg); // cancel + cco_await_group()
         puts("All workers done.");
     }
 
