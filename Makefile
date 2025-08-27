@@ -63,6 +63,7 @@ fast:
 
 all: $(PROGRAMS)
 	@echo
+	@$(TEST_EXE)
 
 $(PROGRAMS): $(LIB_PATH)
 

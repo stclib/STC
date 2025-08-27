@@ -62,7 +62,7 @@ void recursive_matrix_product(Mat A, Mat B, OutMat C) {
 #include <stc/random.h>
 
 int main(int argc, char* argv[]) {
-    int M = 512, P, N;
+    int M = 128, P, N;
     if (argc > 1)
         M = atoi(argv[1]);
     if (argc > 3) {
