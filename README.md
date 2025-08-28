@@ -3,7 +3,7 @@
 
 # STC - Smart Template Containers
 
-## Version 6.0 RC2
+## Version 6.0 RC3
 STC is a mature, comprehensive, general purpose container and algorithm library for C99/C11.
 It has excellent ergonomics and requires virtually no boilerplate code. The library adds many
 missing features to C, like common data containers, algorithms, and abstractions found in
@@ -17,7 +17,7 @@ after V5.1. From upcoming V6.0 release, API is planned to be stable and changes 
 made backward compatible.
 
 V6.0:
-- New powerful V2 coroutines with waitgroups, cancellation and async_drop.
+- New powerful V2 coroutines with waitgroups, cancellation and async finalization.
 - Fixed #149: improved cregex API and fixed bug on word-boundary match.
 - Fixed #143: major container initialization flaw.
 - Fixed #146: regression on cstr initialization.
