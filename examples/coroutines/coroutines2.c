@@ -95,8 +95,8 @@ int main(void) {
     fib = (struct fibonacci){{fibonacci}, .count=12};
 
     cco_fiber* fb = c_new(cco_fiber, 0);
-    cco_spawn(&prm, NULL, fb);
-    cco_spawn(&fib, NULL, fb);
+    cco_spawn(&prm, NULL, NULL, fb);
+    cco_spawn(&fib, NULL, NULL, fb);
 
     cco_run_fiber(&fb) {
         switch (fb->status) {

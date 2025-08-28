@@ -66,7 +66,7 @@ int Dining(struct Dining* o) {
                 .left = &o->philos[(i - 1 + num_philosophers) % num_philosophers],
                 .right = &o->philos[(i + 1) % num_philosophers],
             };
-            cco_launch(&o->philos[i], &o->wg);
+            cco_spawn(&o->philos[i], &o->wg);
         }
         cco_await_timer(&o->tm, o->duration);
 

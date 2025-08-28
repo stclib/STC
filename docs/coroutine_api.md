@@ -60,7 +60,7 @@ void            cco_stop(Coroutine* co);                            // Coroutine
 #### Tasks (coroutine function-objects) and Fibers (green thread-like entity within a system thread)
 ```c++
                 cco_task_struct(name) {<name>_base base; ...};      // Define a custom coroutine task struct; extends cco_task struct.
-                cco_task_struct(name, EnvType) {<name>_base base; ...}; // Also specify the value type of the pointer returned from cco_env().
+                cco_task_struct(name, EnvT) {<name>_base base; ...}; // Also specify value type of pointer returned from cco_env(). Default: void.
 
                 cco_yield_to(cco_task* task);                       // Yield to another task (symmetric transfer of control).
 int             cco_resume(cco_task* task);                         // Resume task until next suspension, returns status.
@@ -81,8 +81,8 @@ int             cco_status();                                       // Get curre
 cco_error*      cco_err();                                          // Get error object created from cco_throw(error) call.
                                                                     // Should be handled in a cco_finalize: section.
 cco_fiber*      cco_fb(cco_task* task);                             // Get fiber associated with task.
-<EnvType>*      cco_env(cco_task* task);                            // Get environment pointer, stored in the associated fiber.
-<EnvType>*      cco_set_env(cco_task* task, EnvType* env);          // Set environment pointer.
+<EnvT>*         cco_env(cco_task* task);                            // Get environment pointer, stored in the associated fiber.
+<EnvT>*         cco_set_env(cco_task* task, EnvT* env);             // Set environment pointer.
 ```
 #### Task and Waitgroup Cancellation
 ```c++
@@ -109,27 +109,24 @@ void            cco_cancel_all();                                   // Cancel al
                 cco_await_n(cco_group* wg, int n);                  // Await for n launched tasks, but do *not* cancel
                                                                     // remaining. Negative n means await (all - n) tasks.
 ```
-#### Spawning and Launching New Tasks
+#### Spawning New Tasks
 ```c++
-cco_fiber*      cco_spawn(cco_task* task);                          // Lazily spawn a new concurrent task, detached.
-cco_fiber*      cco_spawn(cco_task* task, void* env);               // Same, env may be used as a "promise", or anything.
-cco_fiber*      cco_spawn(cco_task* task, void* env,
-                          cco_fiber** fb_ref);                      // Same, but it may be called from main/outside `cco_async`.
-bool            cco_joined();                                       // Check if all concurrent spawned/launched tasks are joined.
-
 void            cco_reset_group(cco_group* wg);                     // Reset waitgroup.(Normally not needed).
-cco_fiber*      cco_launch(cco_task* task, cco_group* wg);          // Lazily spawn a new concurrent task within a waitgroup.
-cco_fiber*      cco_launch(cco_task* t, cco_group* wg, void* env);  // Same, env may be used as a "promise", or anything.
+cco_fiber*      cco_spawn(cco_task* tsk, cco_group* wg);            // Lazily launch/spawn a new concurrent task within a waitgroup.
+cco_fiber*      cco_spawn(cco_task* tsk, cco_group* wg, EnvT* env); // Variable env may be used as a "promise", or point to input.
+cco_fiber*      cco_spawn(cco_task* tsk, cco_group* wg, EnvT* env,  // This may be called from main or outside `cco_async` scope.
+                           cco_fiber* fiber);
 
+                cco_run_task(cco_task* tsk) {}                      // Run task blocking until it and spawned fibers are finished.
+                cco_run_task(cco_task* tsk, void *env) {}           // Run task blocking with env data
+                cco_run_task(fb_iter, cco_task* tsk, void *env) {}  // Run task blocking. fb_iter reference the current fiber.
 
-                cco_run_task(cco_task* task) {}                     // Run task blocking until it and spawned fibers are finished.
-                cco_run_task(cco_task* task, void *env) {}          // Run task blocking with env data
-                cco_run_task(fb_iter, cco_task* task, void *env) {} // Run task blocking. fb_iter reference the current fiber.
-
-cco_fiber*      cco_new_fiber(cco_task* task);                      // Create an initial fiber from a task.
-cco_fiber*      cco_new_fiber(cco_task* task, void* env);           // Create an initial fiber from a task and env (inputs or a future).
-                cco_run_fiber(cco_fiber** fiber_ref) {}             // Run fiber(s) blocking.
+cco_fiber*      cco_new_fiber(cco_task* tsk);                       // Create an initial fiber from a task.
+cco_fiber*      cco_new_fiber(cco_task* tsk, void* env);            // Create an initial fiber from a task and env (inputs or a future).
+                cco_run_fiber(cco_fiber** fiber_ref) {}             // Run fiber(s) blocking. Note it takes a (cco_fiber **) as arg.
                 cco_run_fiber(fb_iter, cco_fiber* fiber) {}         // Run fiber(s) blocking. fb_iter reference the current fiber.
+
+bool            cco_joined();                                       // Check if all concurrent spawned/launched tasks are joined.
 ```
 #### Timers and Time Functions
 ```c++
@@ -368,7 +365,7 @@ int Dining(struct Dining* o) {
                 .left = &o->philos[(i - 1 + num_philosophers) % num_philosophers],
                 .right = &o->philos[(i + 1) % num_philosophers],
             };
-            cco_launch(&o->philos[i], &o->wg);
+            cco_spawn(&o->philos[i], &o->wg);
         }
         cco_await_timer(&o->tm, o->duration);
 
@@ -566,7 +563,7 @@ int job1(struct job1* o) {
 
 int job_start(struct job_start* o) {
     cco_async (o) {
-        cco_launch(c_new(struct job1, {{job1}}), &o->wg);
+        cco_spawn(c_new(struct job1, {{job1}}), &o->wg);
         cco_await_timer(&o->tm, 0.1);
         puts("Ping");
         cco_await_group(&o->wg);
@@ -583,7 +580,7 @@ int main(void)
     cco_fiber* fb = c_new(cco_fiber, {0});
 
     struct job_start* js = c_new(struct job_start, {{job_start}});
-    cco_spawn(js, NULL, fb);
+    cco_spawn(js, NULL, NULL, fb);
     cco_run_fiber(&fb);
 }
 ```

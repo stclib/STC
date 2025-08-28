@@ -81,9 +81,9 @@ int taskB(struct taskB* o) {
 
         puts("Spawning 3 tasks.");
         cco_reset_group(&cco_env(o)->wg);
-        cco_launch(c_new(struct myTask, {{myTask}, 1, 6}), &cco_env(o)->wg);
-        cco_launch(c_new(struct myTask, {{myTask}, 101, 104}), &cco_env(o)->wg);
-        cco_launch(c_new(struct myTask, {{myTask}, 1001, 1008}), &cco_env(o)->wg);
+        cco_spawn(c_new(struct myTask, {{myTask}, 1, 6}), &cco_env(o)->wg);
+        cco_spawn(c_new(struct myTask, {{myTask}, 101, 104}), &cco_env(o)->wg);
+        cco_spawn(c_new(struct myTask, {{myTask}, 1001, 1008}), &cco_env(o)->wg);
         cco_yield;
         puts("Spawned 3 tasks.");
 

@@ -57,7 +57,7 @@ int everyone(struct everyone* o) {
         cco_reset_group(&o->wg);
         for (c_range32(i, 8)) { // NB: local i, do not yield or await inside loop.
             struct worker* work = c_new(struct worker, {.base={worker}, .id=i});
-            cco_launch(work, &o->wg);
+            cco_spawn(work, &o->wg);
         }
         cco_yield;
 
