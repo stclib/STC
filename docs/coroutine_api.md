@@ -5,7 +5,7 @@ This is a small, portable, ergonomic implementation of coroutines in C99.
 
 * Stackless, fully typesafe coroutines.
 * Supports spawning of concurrent tasks using ***fibers/green threads***, managed by the internal scheduler.
-* Supports launching of concurrent tasks associated with a ***waitgroup***, and later await for them to finish.
+* Tasks may be associated with a ***waitgroup***, which must be awaited for to finish.
 * Supports both ***asymmetric/structured concurrency*** and ***symmetric transfer*** of control between coroutines.
 * Strong error handling and cleanup support. Users may *throw* errors and handle/recover from them up the "call stack"
 (resume from the original suspension point).
@@ -81,17 +81,17 @@ int             cco_status();                                       // Get curre
 cco_error*      cco_err();                                          // Get error object created from cco_throw(error) call.
                                                                     // Should be handled in a cco_finalize: section.
 cco_fiber*      cco_fb(cco_task* task);                             // Get fiber associated with task.
-<EnvT>*         cco_env(cco_task* task);                            // Get environment pointer, stored in the associated fiber.
-<EnvT>*         cco_set_env(cco_task* task, EnvT* env);             // Set environment pointer.
+EnvT*           cco_env(cco_task* task);                            // Get environment pointer, stored in the associated fiber.
+EnvT*           cco_set_env(cco_task* task, EnvT* env);             // Set environment pointer.
 ```
 #### Task and Waitgroup Cancellation
 ```c++
-                cco_cancel_task(cco_task* task);                    // Cancel a spawned/launched task; If task runs in the current
+                cco_cancel_task(cco_task* task);                    // Cancel a spawned task; If task runs in the current
                                                                     // fiber it equals cco_throw(CCO_CANCEL) (jumps to cco_finalize:).
 void            cco_cancel_fiber(cco_fiber* fiber);                 // Signal that fiber will be cancelled upon next suspension point.
-void            cco_cancel_group(cco_group* wg);                    // Cancel all launched tasks in the waitgroup, *except* the current.
+void            cco_cancel_group(cco_group* wg);                    // Cancel all spawned tasks in the waitgroup, *except* the current.
                                                                     // Passing NULL as arg will cancel all non-group spawned tasks.
-void            cco_cancel_all();                                   // Cancel all spawned and launched tasks, *except* the current.
+void            cco_cancel_all();                                   // Cancel all spawned tasks, *except* the current.
 ```
 #### Awaiting Tasks and Waitgroups
 ```c++
@@ -100,34 +100,35 @@ void            cco_cancel_all();                                   // Cancel al
                 cco_await_cancel_task(cco_task* task);              // Cancel and await for task to finalize async.
                                                                     // Shorthand for cco_cancel_task() + cco_await_task().
 
-                // If tasks were launched, all must be awaited for by using these awaiter functions:
+                // If tasks were spawned, all must be awaited for by using these awaiter functions:
                 cco_await_group(cco_group* wg);                     // Await for all (remaining) tasks in waitgroup to finish.
-                cco_await_any(cco_group* wg);                       // Await for any one launched task in waitgroup to
+                cco_await_any(cco_group* wg);                       // Await for any one spawned task in waitgroup to
                                                                     // finish, and cancel the remaining.
                 cco_await_cancel_group(cco_group* wg);              // Cancel all tasks in wg, and await for them to finalize.
                                                                     // Shorthand for cco_cancel_group() + cco_await_group().
-                cco_await_n(cco_group* wg, int n);                  // Await for n launched tasks, but do *not* cancel
+                cco_await_n(cco_group* wg, int n);                  // Await for n spawned tasks, but do *not* cancel
                                                                     // remaining. Negative n means await (all - n) tasks.
 ```
-#### Spawning New Tasks
+#### Spawning and Running Tasks
+The `EnvT` type used below is by default `void`, but can be specified in *cco_task_struct()* definition.
 ```c++
 void            cco_reset_group(cco_group* wg);                     // Reset waitgroup.(Normally not needed).
-cco_fiber*      cco_spawn(cco_task* tsk);                           // Lazily launch/spawn a new concurrent task, detatched.
-cco_fiber*      cco_spawn(cco_task* tsk, cco_group* wg);            // Lazily launch/spawn a new concurrent task within a waitgroup.
+cco_fiber*      cco_spawn(cco_task* tsk);                           // Lazily spawn a new concurrent task, detatched.
+cco_fiber*      cco_spawn(cco_task* tsk, cco_group* wg);            // Lazily spawn a new concurrent task within a waitgroup.
 cco_fiber*      cco_spawn(cco_task* tsk, cco_group* wg, EnvT* env); // Variable env may be used as a "promise", or point to input.
 cco_fiber*      cco_spawn(cco_task* tsk, cco_group* wg, EnvT* env,  // This may be called from main or outside `cco_async` scope.
                            cco_fiber* fiber);
 
                 cco_run_task(cco_task* tsk) {}                      // Run task blocking until it and spawned fibers are finished.
-                cco_run_task(cco_task* tsk, void *env) {}           // Run task blocking with env data
-                cco_run_task(fb_iter, cco_task* tsk, void *env) {}  // Run task blocking. fb_iter reference the current fiber.
+                cco_run_task(cco_task* tsk, EnvT *env) {}           // Run task blocking with env data
+                cco_run_task(fb_iter, cco_task* tsk, EnvT *env) {}  // Run task blocking. fb_iter reference the current fiber.
 
 cco_fiber*      cco_new_fiber(cco_task* tsk);                       // Create an initial fiber from a task.
-cco_fiber*      cco_new_fiber(cco_task* tsk, void* env);            // Create an initial fiber from a task and env (inputs or a future).
+cco_fiber*      cco_new_fiber(cco_task* tsk, EnvT* env);            // Create an initial fiber from a task and env (inputs or a future).
                 cco_run_fiber(cco_fiber** fiber_ref) {}             // Run fiber(s) blocking. Note it takes a (cco_fiber **) as arg.
                 cco_run_fiber(fb_iter, cco_fiber* fiber) {}         // Run fiber(s) blocking. fb_iter reference the current fiber.
 
-bool            cco_joined();                                       // Check if all concurrent spawned/launched tasks are joined.
+bool            cco_joined();                                       // Check if all concurrent spawned tasks are joined.
 ```
 #### Timers and Time Functions
 ```c++
