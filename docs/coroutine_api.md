@@ -112,6 +112,7 @@ void            cco_cancel_all();                                   // Cancel al
 #### Spawning New Tasks
 ```c++
 void            cco_reset_group(cco_group* wg);                     // Reset waitgroup.(Normally not needed).
+cco_fiber*      cco_spawn(cco_task* tsk);                           // Lazily launch/spawn a new concurrent task, detatched.
 cco_fiber*      cco_spawn(cco_task* tsk, cco_group* wg);            // Lazily launch/spawn a new concurrent task within a waitgroup.
 cco_fiber*      cco_spawn(cco_task* tsk, cco_group* wg, EnvT* env); // Variable env may be used as a "promise", or point to input.
 cco_fiber*      cco_spawn(cco_task* tsk, cco_group* wg, EnvT* env,  // This may be called from main or outside `cco_async` scope.
@@ -296,7 +297,7 @@ starts eating (because they must be waiting).
 <details>
 <summary>The "Dining philosophers" C implementation</summary>
 
-[ [Run this code](https://godbolt.org/z/s9o1efEr8) ]
+[ [Run this code](https://godbolt.org/z/vz5rbE7W4) ]
 ```c++
 #include <stdio.h>
 #include <time.h>
@@ -533,7 +534,7 @@ call/await:
 <details>
 <summary>Implementation of coroutine objects on the heap</summary>
 
-[ [Run this code](https://godbolt.org/z/79TdE8Gv3) ]
+[ [Run this code](https://godbolt.org/z/1j31oPv3W) ]
 <!--{%raw%}-->
 ```c++
 #include <stdio.h>
