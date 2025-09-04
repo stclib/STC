@@ -102,12 +102,12 @@ void            cco_cancel_all();                                   // Cancel al
 
                 // If tasks were spawned, all must be awaited for by using these awaiter functions:
                 cco_await_group(cco_group* wg);                     // Await for all (remaining) tasks in waitgroup to finish.
+                                                                    // Does not await for current task/fiber,
                 cco_await_any(cco_group* wg);                       // Await for any one spawned task in waitgroup to
                                                                     // finish, and cancel the remaining.
                 cco_await_cancel_group(cco_group* wg);              // Cancel all tasks in wg, and await for them to finalize.
                                                                     // Shorthand for cco_cancel_group() + cco_await_group().
-                cco_await_n(cco_group* wg, int n);                  // Await for n spawned tasks, but do *not* cancel
-                                                                    // remaining. Negative n means await (all - n) tasks.
+                cco_await_n(cco_group* wg, int n);                  // Awaits for n spawned tasks. Does *not* cancel the remaining.
 ```
 #### Spawning and Running Tasks
 The `EnvT` type used below is by default `void`, but can be specified in *cco_task_struct()* definition.

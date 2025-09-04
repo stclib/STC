@@ -188,6 +188,7 @@ struct cco_error {
     struct Prefix##_fiber { \
         struct cco_task* task; \
         Prefix##_env* env; \
+        cco_group* wgcurr; \
         struct cco_task* parent_task; \
         struct cco_task_fiber* next; \
         struct cco_task_state recover_state; \
@@ -330,31 +331,39 @@ static inline int _cco_resume_task(cco_task* task)
 
 #define cco_reset_group(wg) ((wg)->spawn_count = 0)
 #define cco_spawn(...) c_MACRO_OVERLOAD(cco_spawn, __VA_ARGS__)
-#define cco_spawn_1(task) _cco_spawn(cco_cast_task(task), NULL, NULL, (cco_fiber*)_state->fb)
-#define cco_spawn_2(task, wg) cco_spawn_3(task, wg, NULL)
-#define cco_spawn_3(task, wg, env) \
-    _cco_spawn(cco_cast_task(task), wg, ((void)sizeof((env) == cco_env(task)), env), (cco_fiber*)_state->fb)
+#define cco_spawn_1(task) cco_spawn_4(task, NULL, NULL, _state->fb)
+#define cco_spawn_2(task, wg) cco_spawn_4(task, wg, NULL, _state->fb)
+#define cco_spawn_3(task, wg, env) cco_spawn_4(task, wg, env, _state->fb)
 #define cco_spawn_4(task, wg, env, fiber) \
-    _cco_spawn(cco_cast_task(task), wg, ((void)sizeof((env) == cco_env(task)), env), (cco_fiber*)((void)sizeof((fiber)->parent_task), fiber))
+    _cco_spawn(cco_cast_task(task), wg, ((void)sizeof((env) == cco_env(task)), env), \
+               (cco_fiber*)((void)sizeof((fiber)->parent_task), fiber))
 
-#define cco_await_group(waitgroup) \
-    cco_await((waitgroup)->spawn_count == 0)
+#define cco_await_group(waitgroup) do { \
+    cco_task* top = _state->fb->task; \
+    while (top->base.parent_task) \
+        top = top->base.parent_task; \
+    _state->fb->wgcurr = waitgroup; \
+    /* wait until spawn_count = 1 to not wait for itself to finish, else until it is 0 */ \
+    _state->fb->wgcurr->await_count = (top->base.state.wg == _state->fb->wgcurr); \
+    cco_await(_state->fb->wgcurr->spawn_count == _state->fb->wgcurr->await_count); \
+} while (0)
 
 #define cco_await_n(waitgroup, n) do { \
-    const int n_ = n; \
-    (waitgroup)->await_count = n_ < 0 ? -n_ : (waitgroup)->spawn_count - n_; \
-    cco_await((waitgroup)->spawn_count == (waitgroup)->await_count); \
+    _state->fb->wgcurr = waitgroup; \
+    _state->fb->wgcurr->await_count = _state->fb->wgcurr->spawn_count - (n); \
+    cco_await(_state->fb->wgcurr->spawn_count == _state->fb->wgcurr->await_count); \
 } while (0)
 
 #define cco_await_cancel_group(waitgroup) do { \
-    cco_cancel_group(waitgroup); \
-    cco_await_group(waitgroup); \
+    cco_group* wg = waitgroup; \
+    cco_cancel_group(wg); \
+    cco_await_group(wg); \
 } while (0)
 
 #define cco_await_any(waitgroup) do { \
     cco_await_n(waitgroup, 1); \
-    cco_cancel_group(waitgroup); \
-    cco_await_group(waitgroup); \
+    cco_cancel_group(_state->fb->wgcurr); \
+    cco_await_group(_state->fb->wgcurr); \
 } while (0)
 
 #define cco_run_fiber(...) c_MACRO_OVERLOAD(cco_run_fiber, __VA_ARGS__)
