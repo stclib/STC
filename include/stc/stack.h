@@ -152,8 +152,10 @@ STC_INLINE void _c_MEMB(_pop)(Self* self)
 STC_INLINE _m_value _c_MEMB(_pull)(Self* self)
     { c_assert(self->size); return self->data[--self->size]; }
 
+#ifdef _i_has_put
 STC_INLINE void _c_MEMB(_put_n)(Self* self, const _m_raw* raw, isize n)
     { while (n--) _c_MEMB(_push)(self, i_keyfrom((*raw))), ++raw; }
+#endif
 
 #if !defined _i_aux_alloc && !defined i_capacity
 STC_INLINE Self _c_MEMB(_init)(void)
@@ -170,10 +172,13 @@ STC_INLINE Self _c_MEMB(_with_size)(isize size, _m_raw default_raw) {
     while (size) out.data[--size] = i_keyfrom(default_raw);
     return out;
 }
+
+#ifdef _i_has_put
 STC_INLINE Self _c_MEMB(_from_n)(const _m_raw* raw, isize n) {
     Self out = _c_MEMB(_with_capacity)(n);
     _c_MEMB(_put_n)(&out, raw, n); return out;
 }
+#endif
 #endif
 
 STC_INLINE const _m_value* _c_MEMB(_at)(const Self* self, isize idx)

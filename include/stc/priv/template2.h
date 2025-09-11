@@ -63,6 +63,7 @@
 #undef i_no_emplace
 #undef i_declared
 
+#undef _i_has_put
 #undef _i_aux_def
 #undef _i_has_cmp
 #undef _i_has_eq

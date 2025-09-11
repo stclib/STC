@@ -37,8 +37,10 @@ STC_API _m_iter         _c_MEMB(_advance)(_m_iter it, isize n);
 #define _cbuf_toidx(self, pos) (((pos) - (self)->start) & (self)->capmask)
 #define _cbuf_topos(self, idx) (((self)->start + (idx)) & (self)->capmask)
 
+#ifdef _i_has_put
 STC_INLINE void _c_MEMB(_put_n)(Self* self, const _m_raw* raw, isize n)
     { while (n--) _c_MEMB(_push)(self, i_keyfrom((*raw))), ++raw; }
+#endif
 
 STC_INLINE void _c_MEMB(_value_drop)(const Self* self, _m_value* val)
     { (void)self; i_keydrop(val); }
@@ -60,10 +62,13 @@ STC_INLINE Self _c_MEMB(_with_size)(isize size, _m_raw default_raw) {
     while (out.end < size) out.cbuf[out.end++] = i_keyfrom(default_raw);
     return out;
 }
+
+#ifdef _i_has_put
 STC_INLINE Self _c_MEMB(_from_n)(const _m_raw* raw, isize n) {
     Self out = _c_MEMB(_with_capacity)(n);
     _c_MEMB(_put_n)(&out, raw, n); return out;
 }
+#endif
 #endif
 
 #if !defined i_no_emplace

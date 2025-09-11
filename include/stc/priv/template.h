@@ -129,15 +129,16 @@
   #define i_cmpclass c_JOIN(i_keypro, _raw)
 #endif
 
+#define _i_has_put
+
 #if defined i_cmpclass
   #define i_keyraw i_cmpclass
-  #if !(defined i_key || defined i_keyclass)
-    #define i_key i_cmpclass
-  #endif
 #elif defined i_keyclass && !defined i_keyraw
   // Special: When only i_keyclass is defined, also define i_cmpclass to the same.
   // Do not define i_keyraw here, otherwise _from() / _toraw() is expected to exist.
   #define i_cmpclass i_key
+#elif defined i_keyraw
+  #undef _i_has_put
 #endif
 
 // Bind to i_key "class members": _clone, _drop, _from and _toraw (when conditions are met).
@@ -217,7 +218,7 @@
 #ifndef i_tag
   #define i_tag i_key
 #endif
-#if !defined i_keyfrom
+#ifndef i_keyfrom
   #define i_keyfrom c_default_clone
 #else
   #undef i_no_emplace
@@ -268,8 +269,11 @@
   #error "Both i_valclone and i_valdrop must be defined, if any"
 #endif
 
-#if !defined i_valfrom
+#ifndef i_valfrom
   #define i_valfrom c_default_clone
+  #ifdef i_valraw
+    #undef _i_has_put
+  #endif
 #else
   #undef i_no_emplace
 #endif

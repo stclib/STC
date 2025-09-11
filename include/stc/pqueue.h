@@ -43,8 +43,10 @@ STC_API void        _c_MEMB(_make_heap)(Self* self);
 STC_API void        _c_MEMB(_erase_at)(Self* self, isize idx);
 STC_API _m_value*   _c_MEMB(_push)(Self* self, _m_value value);
 
+#ifdef _i_has_put
 STC_INLINE void _c_MEMB(_put_n)(Self* self, const _m_raw* raw, isize n)
-    { while (n--) _c_MEMB(_push)(self, i_keyfrom(*raw++)); }
+    { while (n--) _c_MEMB(_push)(self, i_keyfrom((*raw))), ++raw; }
+#endif
 
 STC_INLINE bool _c_MEMB(_reserve)(Self* self, const isize cap) {
     if (cap != self->size && cap <= self->capacity) return true;
@@ -59,8 +61,10 @@ STC_INLINE void _c_MEMB(_shrink_to_fit)(Self* self)
 STC_INLINE Self _c_MEMB(_init)(void)
     { return c_literal(Self){0}; }
 
+#ifdef _i_has_put
 STC_INLINE Self _c_MEMB(_from_n)(const _m_raw* raw, isize n)
     { Self cx = {0}; _c_MEMB(_put_n)(&cx, raw, n); return cx; }
+#endif
 
 STC_INLINE Self _c_MEMB(_with_capacity)(const isize cap)
     { Self cx = {0}; _c_MEMB(_reserve)(&cx, cap); return cx; }

@@ -139,12 +139,16 @@ STC_INLINE _m_value*    _c_MEMB(_emplace)(Self* self, _m_raw raw)
                             { return _c_MEMB(_push_back)(self, i_keyfrom(raw)); }
 #endif // !i_no_emplace
 
+#ifdef _i_has_put
 STC_INLINE void         _c_MEMB(_put_n)(Self* self, const _m_raw* raw, isize n)
-                            { while (n--) _c_MEMB(_push_back)(self, i_keyfrom(*raw++)); }
+                            { while (n--) _c_MEMB(_push_back)(self, i_keyfrom((*raw))), ++raw; }
+#endif
 #ifndef _i_aux_alloc
 STC_INLINE Self         _c_MEMB(_init)(void) { return c_literal(Self){0}; }
+#ifdef _i_has_put
 STC_INLINE Self         _c_MEMB(_from_n)(const _m_raw* raw, isize n)
                             { Self cx = {0}; _c_MEMB(_put_n)(&cx, raw, n); return cx; }
+#endif
 #endif
 STC_INLINE bool         _c_MEMB(_reserve)(Self* self, isize n) { (void)(self + n); return true; }
 STC_INLINE bool         _c_MEMB(_is_empty)(const Self* self) { return self->last == NULL; }

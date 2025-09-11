@@ -229,7 +229,7 @@ STC_INLINE _m_value* _c_MEMB(_push)(Self* self, _m_value _val) {
     return _res.ref;
 }
 
-#ifdef _i_is_map
+#if defined _i_is_map && defined _i_has_put
 STC_INLINE _m_result _c_MEMB(_put)(Self* self, _m_keyraw rkey, _m_rmapped rmapped) {
     #ifdef i_no_emplace
         return _c_MEMB(_insert_or_assign)(self, rkey, rmapped);
@@ -239,6 +239,7 @@ STC_INLINE _m_result _c_MEMB(_put)(Self* self, _m_keyraw rkey, _m_rmapped rmappe
 }
 #endif
 
+#ifdef _i_has_put
 STC_INLINE void _c_MEMB(_put_n)(Self* self, const _m_raw* raw, isize n) {
     while (n--)
         #if defined _i_is_set && defined i_no_emplace
@@ -249,13 +250,16 @@ STC_INLINE void _c_MEMB(_put_n)(Self* self, const _m_raw* raw, isize n) {
             _c_MEMB(_put)(self, raw->first, raw->second), ++raw;
         #endif
 }
+#endif
 
 #ifndef _i_aux_alloc
 STC_INLINE Self _c_MEMB(_init)(void)
     { Self cx = {0}; return cx; }
 
+#ifdef _i_has_put
 STC_INLINE Self _c_MEMB(_from_n)(const _m_raw* raw, isize n)
     { Self cx = {0}; _c_MEMB(_put_n)(&cx, raw, n); return cx; }
+#endif
 
 STC_INLINE Self _c_MEMB(_with_capacity)(const isize cap)
     { Self cx = {0}; _c_MEMB(_reserve)(&cx, cap); return cx; }
