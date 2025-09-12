@@ -53,8 +53,8 @@ int main(void)
     Persons_push(&vec, PBox_clone(p));
     Persons_push(&vec, PBox_clone(q));
 
-    for (c_each(i, Persons, vec))
-        printf("%s %s\n", cstr_str(&i.ref->get->name), cstr_str(&i.ref->get->last));
+    for (c_each_item(e, Persons, vec))
+        printf("%s %s\n", cstr_str(&e->get->name), cstr_str(&e->get->last));
     puts("");
 
     // Look-up Audrey! Create a temporary Person for lookup.

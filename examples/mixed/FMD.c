@@ -51,10 +51,10 @@ int main(void) {
         vec.aux.activeField = field;
         FMDVector_sort(&vec);
 
-        for (c_each(i, FMDVector, vec)) {
+        for (c_each_item(e, FMDVector, vec)) {
             fmt_println("{:30}{:30}{:10}{:10}",
-                        cstr_str(&i.ref->fileName), cstr_str(&i.ref->directory),
-                        i.ref->size, i.ref->lastWriteTime);
+                        cstr_str(&e->fileName), cstr_str(&e->directory),
+                        e->size, e->lastWriteTime);
         }
         puts("");
     }

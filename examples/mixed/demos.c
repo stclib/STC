@@ -137,17 +137,17 @@ void mapdemo1(void)
 void mapdemo2(void)
 {
     SImap nums = {0};
-    SImap_emplace_or_assign(&nums, "Hello", 64);
-    SImap_emplace_or_assign(&nums, "Groovy", 121);
-    SImap_emplace_or_assign(&nums, "Groovy", 200); // overwrite previous
+    SImap_put(&nums, "Hello", 64);
+    SImap_put(&nums, "Groovy", 121);
+    SImap_put(&nums, "Groovy", 200); // overwrite previous
 
     // iterate the map:
     for (SImap_iter i = SImap_begin(&nums); i.ref; SImap_next(&i))
         printf("long: %s: %d\n", cstr_str(&i.ref->first), i.ref->second);
 
     // or rather use the short form:
-    for (c_each(i, SImap, nums))
-        printf("short: %s: %d\n", cstr_str(&i.ref->first), i.ref->second);
+    for (c_each_kv(k, v, SImap, nums))
+        printf("short: %s: %d\n", cstr_str(k), *v);
 
     SImap_drop(&nums);
 }
@@ -163,16 +163,16 @@ void mapdemo3(void)
     Strmap_emplace(&table, "Sunny", "day");
 
     Strmap_iter it = Strmap_find(&table, "Make");
-    for (c_each(i, Strmap, table))
-        printf("entry: %s: %s\n", cstr_str(&i.ref->first), cstr_str(&i.ref->second));
+    for (c_each_kv(k, v, Strmap, table))
+        printf("entry: %s: %s\n", cstr_str(k), cstr_str(v));
 
     printf("size %d: remove: Make: %s\n", (int)Strmap_size(&table), cstr_str(&it.ref->second));
     //Strmap_erase(&table, "Make");
     Strmap_erase_at(&table, it);
 
     printf("size %d\n", (int)Strmap_size(&table));
-    for (c_each(i, Strmap, table))
-        printf("entry: %s: %s\n", cstr_str(&i.ref->first), cstr_str(&i.ref->second));
+    for (c_each_kv(k, v, Strmap, table))
+        printf("entry: %s: %s\n", cstr_str(k), cstr_str(v));
 
     Strmap_drop(&table); // frees key and value cstrs, and hash table.
 }

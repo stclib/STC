@@ -48,8 +48,8 @@ int main(void)
     IdMap_insert(&idnames, 110, cstr_lit("World"));
     IdMap_insert(&idnames, 120, cstr_from_fmt("Howdy, -%d-", year));
 
-    for (c_each(i, IdMap, idnames))
-        printf("%d: %s\n", i.ref->first, cstr_str(&i.ref->second));
+    for (c_each_kv(k, v, IdMap, idnames))
+        printf("%d: %s\n", *k, cstr_str(v));
     puts("");
     IdMap_drop(&idnames);
 
@@ -80,8 +80,8 @@ int main(void)
     vec_ip pairs1 = c_make(vec_ip, {{5, 6}, {3, 4}, {1, 2}, {7, 8}});
     vec_ip_sort(&pairs1);
 
-    for (c_each(i, vec_ip, pairs1))
-        printf("(%d %d) ", i.ref->x, i.ref->y);
+    for (c_each_item(e, vec_ip, pairs1))
+        printf("(%d %d) ", e->x, e->y);
     puts("");
     vec_ip_drop(&pairs1);
 
@@ -90,8 +90,8 @@ int main(void)
     list_ip pairs2 = c_make(list_ip, {{5, 6}, {3, 4}, {1, 2}, {7, 8}});
     list_ip_sort(&pairs2);
 
-    for (c_each(i, list_ip, pairs2))
-        printf("(%d %d) ", i.ref->x, i.ref->y);
+    for (c_each_item(e, list_ip, pairs2))
+        printf("(%d %d) ", e->x, e->y);
     puts("");
     list_ip_drop(&pairs2);
 }

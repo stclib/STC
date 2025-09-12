@@ -50,8 +50,9 @@ int main(void)
     puts("Pythagorean triples.\nGet all triples with c < 40, using for c_each:");
     int n=0;
     for (c_each(i, Triple, triple)) {
-        if (i.ref->c < 40)
-            printf("%u: (%d, %d, %d)\n", n++, i.ref->a, i.ref->b, i.ref->c);
+        Triple* t = i.ref;
+        if (t->c < 40)
+            printf("%u: (%d, %d, %d)\n", n++, t->a, t->b, t->c);
         else
             cco_stop(&i);
     }

@@ -22,7 +22,7 @@ int main(void)
 
     for (c_range(i, 30, 90, 2)) printf(" %d", (int)i);
 
-    puts("\n\nc_forlist:");
+    puts("\n\nfor c_items:");
     for (c_items(i, int, {12, 23, 453, 65, 676}))
         printf(" %d", *i.ref);
     puts("");
@@ -34,15 +34,19 @@ int main(void)
     IVec vec = c_make(IVec, {12, 23, 453, 65, 113, 215, 676, 34, 67, 20, 27, 66, 189, 45, 280, 199});
     IMap map = c_make(IMap, {{12, 23}, {453, 65}, {676, 123}, {34, 67}});
 
-    puts("\n\nc_foreach:");
+    puts("\n\nfor c_each:");
     for (c_each(i, IVec, vec))
         printf(" %d", *i.ref);
 
-    puts("\n\nc_foreach in map:");
+    puts("\n\nfor c_each in a map:");
     for (c_each(i, IMap, map))
         printf(" (%d %d)", i.ref->first, i.ref->second);
 
-    puts("\n\nc_forpair:");
+    puts("\n\nfor c_each_item:");
+    for (c_each_item(e, IMap, map))
+        printf(" (%d %d)", e->first, e->second);
+
+    puts("\n\nfor c_each_kv:");
     for (c_each_kv(key, val, IMap, map))
         printf(" (%d %d)", *key, *val);
 

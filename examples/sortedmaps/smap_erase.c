@@ -8,8 +8,8 @@
 
 void printmap(mymap m)
 {
-    for (c_each(elem, mymap, m))
-        printf(" [%d, %s]", elem.ref->first, cstr_str(&elem.ref->second));
+    for (c_each_kv(k, v, mymap, m))
+        printf(" [%d, %s]", *k, cstr_str(v));
     printf("\nsize() == %" c_ZI "\n\n", mymap_size(&m));
 }
 
@@ -46,8 +46,8 @@ int main(void)
     mymap_iter it2 = mymap_find(&m2, mymap_back(&m2)->first);
 
     puts("to remove:");
-    for (c_each(i, mymap, it1, it2))
-        printf(" [%d, %s]", i.ref->first, cstr_str(&i.ref->second));
+    for (c_each_kv(k, v, mymap, it1, it2))
+        printf(" [%d, %s]", *k, cstr_str(v));
     puts("");
     // The 2nd member function removes elements
     // in the range [First, Last)

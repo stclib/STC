@@ -22,18 +22,18 @@ int main(void)
 
         // printing map gquiz1
         printf("\nThe map gquiz1 is :\n\tKEY\tELEMENT\n");
-        for (c_each(itr, Mymap, gquiz1))
-            printf("\t%d\t%d\n", itr.ref->first, itr.ref->second);
+        for (c_each_kv(k, v, Mymap, gquiz1))
+            printf("\t%d\t%d\n", *k, *v);
         printf("\n");
 
         // assigning the elements from gquiz1 to gquiz2
-        for (c_each(i, Mymap, gquiz1))
-            Mymap_insert(&gquiz2, i.ref->first, i.ref->second);
+        for (c_each_kv(k, v, Mymap, gquiz1))
+            Mymap_insert(&gquiz2, *k, *v);
 
         // print all elements of the map gquiz2
         printf("\nThe map gquiz2 is :\n\tKEY\tELEMENT\n");
-        for (c_each(itr, Mymap, gquiz2))
-            printf("\t%d\t%d\n", itr.ref->first, itr.ref->second);
+        for (c_each_kv(k, v, Mymap, gquiz2))
+            printf("\t%d\t%d\n", *k, *v);
         printf("\n");
 
         // remove all elements up to element with key=3 in gquiz2
@@ -41,16 +41,16 @@ int main(void)
         printf("\tKEY\tELEMENT\n");
         Mymap_erase_range(&gquiz2, Mymap_begin(&gquiz2),
                                    Mymap_find(&gquiz2, 3));
-        for (c_each(itr, Mymap, gquiz2))
-            printf("\t%d\t%d\n", itr.ref->first, itr.ref->second);
+        for (c_each_kv(k, v, Mymap, gquiz2))
+            printf("\t%d\t%d\n", *k, *v);
         printf("\n");
 
         // remove all elements with key = 4
         int num = Mymap_erase(&gquiz2, 4);
         printf("\ngquiz2.erase(4) : %d removed\n", num);
         printf("\tKEY\tELEMENT\n");
-        for (c_each(itr, Mymap, gquiz2))
-            printf("\t%d\t%d\n", itr.ref->first, itr.ref->second);
+        for (c_each_kv(k, v, Mymap, gquiz2))
+            printf("\t%d\t%d\n", *k, *v);
         printf("\n");
 
         // lower bound and upper bound for map gquiz1 key = 5

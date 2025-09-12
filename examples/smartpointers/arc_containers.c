@@ -55,15 +55,15 @@ int main(void)
         Map_emplace_or_assign(vec.data[1].get, "SHARED", 2021);
 
         puts("VEC");
-        for (c_each(i, Vec, vec)) {
-            for (c_each_kv(name, year, Map, *i.ref->get))
+        for (c_each_item(e, Vec, vec)) {
+            for (c_each_kv(name, year, Map, *e->get))
                 printf(" %s:%d", cstr_str(name), *year);
             puts("");
         }
 
         puts("LIST");
-        for (c_each(i, List, list)) {
-            for (c_each_kv(name, year, Map, *i.ref->get))
+        for (c_each_item(e, List, list)) {
+            for (c_each_kv(name, year, Map, *e->get))
                 printf(" %s:%d", cstr_str(name), *year);
             puts("");
         }

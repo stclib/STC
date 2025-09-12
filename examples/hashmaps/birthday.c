@@ -47,10 +47,10 @@ void test_distribution(void)
     for (c_each(i, hmap_uu, map)) sum += i.ref->second;
     sum /= (uint64_t)map.size;
 
-    for (c_each(i, hmap_uu, map)) {
+    for (c_each_kv(k, v, hmap_uu, map)) {
         printf("%4" PRIu32 ": %" PRIu64 " - %" PRIu64 ": %11.8f\n",
-                i.ref->first, i.ref->second, sum,
-                (1.0 - (double)i.ref->second / (double)sum));
+                *k, *v, sum,
+                (1.0 - (double)*v / (double)sum));
     }
 
     hmap_uu_drop(&map);

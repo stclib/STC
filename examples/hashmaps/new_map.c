@@ -32,10 +32,12 @@ typedef struct Point { int x, y; } Point;
 
 int main(void)
 {
-    hmap_pnt pmap = c_make(hmap_pnt, {{{42, 14}, 1}, {{32, 94}, 2}, {{62, 81}, 3}});
+    hmap_pnt pmap = c_make(hmap_pnt, {
+        {{42, 14}, 1}, {{32, 94}, 2}, {{62, 81}, 3}
+    });
 
-    for (c_each(i, hmap_pnt, pmap))
-        printf(" (%d, %d: %d)", i.ref->first.x, i.ref->first.y, i.ref->second);
+    for (c_each_kv(k, v, hmap_pnt, pmap))
+        printf(" (%d, %d: %d)", k->x, k->y, *v);
     puts("");
 
     hmap_cstr smap = c_make(hmap_cstr, {
@@ -54,8 +56,8 @@ int main(void)
     hmap_int_insert(&map, 456, 654);
     hmap_int_insert(&map, 789, 987);
 
-    for (c_each(i, hset_cstr, sset))
-        printf(" %s\n", cstr_str(i.ref));
+    for (c_each_item(s, hset_cstr, sset))
+        printf(" %s\n", cstr_str(s));
 
     hmap_int_drop(&map);
     hset_cstr_drop(&sset);

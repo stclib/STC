@@ -14,14 +14,14 @@
 void add(Departments* deps, const char* name, const char* email, const char* dep)
 {
     People *people = &Departments_emplace(deps, dep, People_init()).ref->second;
-    People_emplace_or_assign(people, name, email);
+    People_put(people, name, email);
 }
 
 int contains(Departments* map, const char* name)
 {
     int count = 0;
-    for (c_each(i, Departments, *map))
-        if (People_contains(&i.ref->second, name))
+    for (c_each_item(e, Departments, *map))
+        if (People_contains(&e->second, name))
             ++count;
     return count;
 }

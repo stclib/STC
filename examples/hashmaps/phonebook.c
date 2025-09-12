@@ -29,8 +29,8 @@
 
 void print_phone_book(StrMap phone_book)
 {
-    for (c_each(i, StrMap, phone_book))
-        printf("%s\t- %s\n", cstr_str(&i.ref->first), cstr_str(&i.ref->second));
+    for (c_each_kv(k, v, StrMap, phone_book))
+        printf("%s\t- %s\n", cstr_str(k), cstr_str(v));
 }
 
 int main(void)
