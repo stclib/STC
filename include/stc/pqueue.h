@@ -43,7 +43,7 @@ STC_API void        _c_MEMB(_make_heap)(Self* self);
 STC_API void        _c_MEMB(_erase_at)(Self* self, isize idx);
 STC_API _m_value*   _c_MEMB(_push)(Self* self, _m_value value);
 
-#ifdef _i_has_put
+#ifndef _i_no_put
 STC_INLINE void _c_MEMB(_put_n)(Self* self, const _m_raw* raw, isize n)
     { while (n--) _c_MEMB(_push)(self, i_keyfrom((*raw))), ++raw; }
 #endif
@@ -61,7 +61,7 @@ STC_INLINE void _c_MEMB(_shrink_to_fit)(Self* self)
 STC_INLINE Self _c_MEMB(_init)(void)
     { return c_literal(Self){0}; }
 
-#ifdef _i_has_put
+#ifndef _i_no_put
 STC_INLINE Self _c_MEMB(_from_n)(const _m_raw* raw, isize n)
     { Self cx = {0}; _c_MEMB(_put_n)(&cx, raw, n); return cx; }
 #endif
@@ -111,7 +111,7 @@ STC_INLINE void _c_MEMB(_pop)(Self* self)
 STC_INLINE _m_value _c_MEMB(_pull)(Self* self)
     { _m_value v = self->data[0]; _c_MEMB(_erase_at)(self, 0); return v; }
 
-#if !defined i_no_clone
+#ifndef i_no_clone
 STC_API Self _c_MEMB(_clone)(Self q);
 
 STC_INLINE void _c_MEMB(_copy)(Self *self, const Self* other) {
@@ -123,7 +123,7 @@ STC_INLINE _m_value _c_MEMB(_value_clone)(const Self* self, _m_value val)
     { (void)self; return i_keyclone(val); }
 #endif // !i_no_clone
 
-#if !defined i_no_emplace
+#ifndef i_no_emplace
 STC_INLINE void _c_MEMB(_emplace)(Self* self, _m_raw raw)
     { _c_MEMB(_push)(self, i_keyfrom(raw)); }
 #endif // !i_no_emplace
@@ -148,7 +148,7 @@ _c_MEMB(_make_heap)(Self* self) {
         _c_MEMB(_sift_down_)(self, k, n);
 }
 
-#if !defined i_no_clone
+#ifndef i_no_clone
 STC_DEF Self _c_MEMB(_clone)(Self q) {
     Self out = q, *self = &out; (void)self;
     out.capacity = out.size = 0; out.data = NULL;

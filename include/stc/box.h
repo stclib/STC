@@ -140,7 +140,7 @@ STC_INLINE void _c_MEMB(_assign)(Self* self, Self* owned) {
     owned->get = NULL;
 }
 
-#if !defined i_no_clone
+#ifndef i_no_clone
     STC_INLINE Self _c_MEMB(_clone)(Self other) {
         if (other.get == NULL) return other;
         Self out = {_i_new_n(_m_value, 1)};

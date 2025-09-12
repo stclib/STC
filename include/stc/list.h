@@ -115,7 +115,7 @@ STC_API void            _c_MEMB(_erase_after_node)(Self* self, _m_node* ref);
 STC_INLINE _m_node*     _c_MEMB(_get_node)(_m_value* pval) { return _clist_tonode(pval); }
 STC_INLINE _m_node*     _c_MEMB(_unlink_front_node)(Self* self)
                             { return _c_MEMB(_unlink_after_node)(self, self->last); }
-#if !defined i_no_clone
+#ifndef i_no_clone
 STC_API Self            _c_MEMB(_clone)(Self cx);
 STC_INLINE _m_value     _c_MEMB(_value_clone)(const Self* self, _m_value val)
                             { (void)self; return i_keyclone(val); }
@@ -128,7 +128,7 @@ _c_MEMB(_copy)(Self *self, const Self* other) {
 }
 #endif // !i_no_clone
 
-#if !defined i_no_emplace
+#ifndef i_no_emplace
 STC_INLINE _m_value*    _c_MEMB(_emplace_back)(Self* self, _m_raw raw)
                             { return _c_MEMB(_push_back)(self, i_keyfrom(raw)); }
 STC_INLINE _m_value*    _c_MEMB(_emplace_front)(Self* self, _m_raw raw)
@@ -139,17 +139,19 @@ STC_INLINE _m_value*    _c_MEMB(_emplace)(Self* self, _m_raw raw)
                             { return _c_MEMB(_push_back)(self, i_keyfrom(raw)); }
 #endif // !i_no_emplace
 
-#ifdef _i_has_put
+#ifndef _i_no_put
 STC_INLINE void         _c_MEMB(_put_n)(Self* self, const _m_raw* raw, isize n)
                             { while (n--) _c_MEMB(_push_back)(self, i_keyfrom((*raw))), ++raw; }
 #endif
+
 #ifndef _i_aux_alloc
-STC_INLINE Self         _c_MEMB(_init)(void) { return c_literal(Self){0}; }
-#ifdef _i_has_put
-STC_INLINE Self         _c_MEMB(_from_n)(const _m_raw* raw, isize n)
-                            { Self cx = {0}; _c_MEMB(_put_n)(&cx, raw, n); return cx; }
+    STC_INLINE Self         _c_MEMB(_init)(void) { return c_literal(Self){0}; }
+    #ifndef _i_no_put
+    STC_INLINE Self         _c_MEMB(_from_n)(const _m_raw* raw, isize n)
+                                { Self cx = {0}; _c_MEMB(_put_n)(&cx, raw, n); return cx; }
+    #endif
 #endif
-#endif
+
 STC_INLINE bool         _c_MEMB(_reserve)(Self* self, isize n) { (void)(self + n); return true; }
 STC_INLINE bool         _c_MEMB(_is_empty)(const Self* self) { return self->last == NULL; }
 STC_INLINE void         _c_MEMB(_clear)(Self* self) { _c_MEMB(_drop)(self); }
@@ -231,7 +233,7 @@ STC_INLINE bool _c_MEMB(_eq)(const Self* self, const Self* other) {
 // -------------------------- IMPLEMENTATION -------------------------
 #if defined i_implement
 
-#if !defined i_no_clone
+#ifndef i_no_clone
 STC_DEF Self
 _c_MEMB(_clone)(Self lst) {
     Self out = lst, *self = &out; (void)self; // may be used by i_keyclone via i_aux

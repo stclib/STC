@@ -90,12 +90,14 @@ typedef _i_SET_ONLY( _m_keyraw )
         _i_MAP_ONLY( struct { _m_keyraw first; _m_rmapped second; } )
         _m_raw;
 
-#if !defined i_no_emplace
+#ifndef i_no_emplace
 STC_API _m_result       _c_MEMB(_emplace)(Self* self, _m_keyraw rkey _i_MAP_ONLY(, _m_rmapped rmapped));
 #endif // !i_no_emplace
-#if !defined i_no_clone
+
+#ifndef i_no_clone
 STC_API Self            _c_MEMB(_clone)(Self tree);
 #endif // !i_no_clone
+
 STC_API void            _c_MEMB(_drop)(const Self* cself);
 STC_API bool            _c_MEMB(_reserve)(Self* self, isize cap);
 STC_API _m_value*       _c_MEMB(_find_it)(const Self* self, _m_keyraw rkey, _m_iter* out);
@@ -149,7 +151,7 @@ STC_INLINE void _c_MEMB(_take)(Self *self, Self unowned) {
     *self = unowned;
 }
 
-#if !defined i_no_clone
+#ifndef i_no_clone
 STC_INLINE _m_value _c_MEMB(_value_clone)(const Self* self, _m_value _val) {
     (void)self;
     *_i_keyref(&_val) = i_keyclone((*_i_keyref(&_val)));
@@ -229,7 +231,7 @@ STC_INLINE _m_value* _c_MEMB(_push)(Self* self, _m_value _val) {
     return _res.ref;
 }
 
-#if defined _i_is_map && defined _i_has_put
+#if defined _i_is_map && !defined _i_no_put
 STC_INLINE _m_result _c_MEMB(_put)(Self* self, _m_keyraw rkey, _m_rmapped rmapped) {
     #ifdef i_no_emplace
         return _c_MEMB(_insert_or_assign)(self, rkey, rmapped);
@@ -239,7 +241,7 @@ STC_INLINE _m_result _c_MEMB(_put)(Self* self, _m_keyraw rkey, _m_rmapped rmappe
 }
 #endif
 
-#ifdef _i_has_put
+#ifndef _i_no_put
 STC_INLINE void _c_MEMB(_put_n)(Self* self, const _m_raw* raw, isize n) {
     while (n--)
         #if defined _i_is_set && defined i_no_emplace
@@ -256,7 +258,7 @@ STC_INLINE void _c_MEMB(_put_n)(Self* self, const _m_raw* raw, isize n) {
 STC_INLINE Self _c_MEMB(_init)(void)
     { Self cx = {0}; return cx; }
 
-#ifdef _i_has_put
+#ifndef _i_no_put
 STC_INLINE Self _c_MEMB(_from_n)(const _m_raw* raw, isize n)
     { Self cx = {0}; _c_MEMB(_put_n)(&cx, raw, n); return cx; }
 #endif
@@ -355,7 +357,7 @@ _c_MEMB(_new_node_)(Self* self, int level) {
         return _res;
     }
 
-    #if !defined i_no_emplace
+    #ifndef i_no_emplace
     STC_DEF _m_result
     _c_MEMB(_emplace_or_assign)(Self* self, _m_keyraw rkey, _m_rmapped rmapped) {
         _m_result _res = _c_MEMB(_insert_entry_)(self, rkey);
@@ -548,7 +550,7 @@ _c_MEMB(_erase_range)(Self* self, _m_iter it1, _m_iter it2) {
     }
 }
 
-#if !defined i_no_clone
+#ifndef i_no_clone
 STC_DEF int32_t
 _c_MEMB(_clone_r_)(Self* self, _m_node* src, int32_t sn) {
     if (sn == 0)
@@ -570,7 +572,7 @@ _c_MEMB(_clone)(Self tree) {
 }
 #endif // !i_no_clone
 
-#if !defined i_no_emplace
+#ifndef i_no_emplace
 STC_DEF _m_result
 _c_MEMB(_emplace)(Self* self, _m_keyraw rkey _i_MAP_ONLY(, _m_rmapped rmapped)) {
     _m_result res = _c_MEMB(_insert_entry_)(self, rkey);

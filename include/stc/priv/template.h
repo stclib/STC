@@ -129,16 +129,16 @@
   #define i_cmpclass c_JOIN(i_keypro, _raw)
 #endif
 
-#define _i_has_put
-
 #if defined i_cmpclass
   #define i_keyraw i_cmpclass
 #elif defined i_keyclass && !defined i_keyraw
-  // Special: When only i_keyclass is defined, also define i_cmpclass to the same.
-  // Do not define i_keyraw here, otherwise _from() / _toraw() is expected to exist.
+  // When only i_keyclass is defined, we also define i_cmpclass to the same.
+  // We do not define i_keyraw here, otherwise _from() / _toraw() is expected to exist.
   #define i_cmpclass i_key
-#elif defined i_keyraw
-  #undef _i_has_put
+#elif defined i_keyraw && !defined i_keyfrom
+  // Define _i_no_put when i_keyfrom is not explicitly defined and i_keyraw is.
+  // In this case, i_keytoraw needs to be defined (may be done later in this file).
+  #define _i_no_put
 #endif
 
 // Bind to i_key "class members": _clone, _drop, _from and _toraw (when conditions are met).
@@ -272,7 +272,7 @@
 #ifndef i_valfrom
   #define i_valfrom c_default_clone
   #ifdef i_valraw
-    #undef _i_has_put
+    #define _i_no_put
   #endif
 #else
   #undef i_no_emplace

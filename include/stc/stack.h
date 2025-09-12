@@ -36,50 +36,48 @@
 #endif
 #include "priv/template.h"
 #ifndef i_declared
-#if c_NUMARGS(i_type) == 4
-  #define i_capacity i_val
-#endif
-#ifdef i_capacity
-  #define i_no_clone
-  _c_DEFTYPES(declare_stack_fixed, Self, i_key, i_capacity);
-#else
-  _c_DEFTYPES(_declare_stack, Self, i_key, _i_aux_def);
-#endif
+    #if c_NUMARGS(i_type) == 4
+      #define i_capacity i_val
+    #endif
+    #ifdef i_capacity
+      #define i_no_clone
+      _c_DEFTYPES(declare_stack_fixed, Self, i_key, i_capacity);
+    #else
+      _c_DEFTYPES(_declare_stack, Self, i_key, _i_aux_def);
+    #endif
 #endif
 typedef i_keyraw _m_raw;
 
 #ifdef i_capacity
-STC_INLINE void _c_MEMB(_init)(Self* news)
-    { news->size = 0; }
+    STC_INLINE void _c_MEMB(_init)(Self* news)
+        { news->size = 0; }
 
-STC_INLINE isize _c_MEMB(_capacity)(const Self* self)
-    { (void)self; return i_capacity; }
+    STC_INLINE isize _c_MEMB(_capacity)(const Self* self)
+        { (void)self; return i_capacity; }
 
-STC_INLINE bool _c_MEMB(_reserve)(Self* self, isize n)
-    { (void)self; return n <= i_capacity; }
-
+    STC_INLINE bool _c_MEMB(_reserve)(Self* self, isize n)
+        { (void)self; return n <= i_capacity; }
 #else
-
-STC_INLINE Self _c_MEMB(_move)(Self *self) {
-    Self m = *self;
-    self->capacity = self->size = 0;
-    self->data = NULL;
-    return m;
-}
-
-STC_INLINE isize _c_MEMB(_capacity)(const Self* self)
-    { return self->capacity; }
-
-STC_INLINE bool _c_MEMB(_reserve)(Self* self, isize n) {
-    if (n > self->capacity || (n && n == self->size)) {
-        _m_value *d = (_m_value *)_i_realloc_n(self->data, self->capacity, n);
-        if (d == NULL)
-            return false;
-        self->data = d;
-        self->capacity = n;
+    STC_INLINE Self _c_MEMB(_move)(Self *self) {
+        Self m = *self;
+        self->capacity = self->size = 0;
+        self->data = NULL;
+        return m;
     }
-    return self->data != NULL;
-}
+
+    STC_INLINE isize _c_MEMB(_capacity)(const Self* self)
+        { return self->capacity; }
+
+    STC_INLINE bool _c_MEMB(_reserve)(Self* self, isize n) {
+        if (n > self->capacity || (n && n == self->size)) {
+            _m_value *d = (_m_value *)_i_realloc_n(self->data, self->capacity, n);
+            if (d == NULL)
+                return false;
+            self->data = d;
+            self->capacity = n;
+        }
+        return self->data != NULL;
+    }
 #endif // i_capacity
 
 STC_INLINE void _c_MEMB(_clear)(Self* self) {
@@ -152,33 +150,33 @@ STC_INLINE void _c_MEMB(_pop)(Self* self)
 STC_INLINE _m_value _c_MEMB(_pull)(Self* self)
     { c_assert(self->size); return self->data[--self->size]; }
 
-#ifdef _i_has_put
+#ifndef _i_no_put
 STC_INLINE void _c_MEMB(_put_n)(Self* self, const _m_raw* raw, isize n)
     { while (n--) _c_MEMB(_push)(self, i_keyfrom((*raw))), ++raw; }
 #endif
 
 #if !defined _i_aux_alloc && !defined i_capacity
-STC_INLINE Self _c_MEMB(_init)(void)
-    { Self out = {0}; return out; }
+    STC_INLINE Self _c_MEMB(_init)(void)
+        { Self out = {0}; return out; }
 
-STC_INLINE Self _c_MEMB(_with_capacity)(isize cap)
-    { Self out = {_i_new_n(_m_value, cap), 0, cap}; return out; }
+    STC_INLINE Self _c_MEMB(_with_capacity)(isize cap)
+        { Self out = {_i_new_n(_m_value, cap), 0, cap}; return out; }
 
-STC_INLINE Self _c_MEMB(_with_size_uninit)(isize size)
-    { Self out = {_i_new_n(_m_value, size), size, size}; return out; }
+    STC_INLINE Self _c_MEMB(_with_size_uninit)(isize size)
+        { Self out = {_i_new_n(_m_value, size), size, size}; return out; }
 
-STC_INLINE Self _c_MEMB(_with_size)(isize size, _m_raw default_raw) {
-    Self out = {_i_new_n(_m_value, size), size, size};
-    while (size) out.data[--size] = i_keyfrom(default_raw);
-    return out;
-}
+    STC_INLINE Self _c_MEMB(_with_size)(isize size, _m_raw default_raw) {
+        Self out = {_i_new_n(_m_value, size), size, size};
+        while (size) out.data[--size] = i_keyfrom(default_raw);
+        return out;
+    }
 
-#ifdef _i_has_put
-STC_INLINE Self _c_MEMB(_from_n)(const _m_raw* raw, isize n) {
-    Self out = _c_MEMB(_with_capacity)(n);
-    _c_MEMB(_put_n)(&out, raw, n); return out;
-}
-#endif
+    #ifndef _i_no_put
+    STC_INLINE Self _c_MEMB(_from_n)(const _m_raw* raw, isize n) {
+        Self out = _c_MEMB(_with_capacity)(n);
+        _c_MEMB(_put_n)(&out, raw, n); return out;
+    }
+    #endif
 #endif
 
 STC_INLINE const _m_value* _c_MEMB(_at)(const Self* self, isize idx)
@@ -187,12 +185,12 @@ STC_INLINE const _m_value* _c_MEMB(_at)(const Self* self, isize idx)
 STC_INLINE _m_value* _c_MEMB(_at_mut)(Self* self, isize idx)
     { c_assert(c_uless(idx, self->size)); return self->data + idx; }
 
-#if !defined i_no_emplace
+#ifndef i_no_emplace
 STC_INLINE _m_value* _c_MEMB(_emplace)(Self* self, _m_raw raw)
     { return _c_MEMB(_push)(self, i_keyfrom(raw)); }
 #endif // !i_no_emplace
 
-#if !defined i_no_clone
+#ifndef i_no_clone
 STC_INLINE Self _c_MEMB(_clone)(Self stk) {
     Self out = stk, *self = &out; (void)self; // i_keyclone may use self via i_aux
     out.data = NULL; out.size = out.capacity = 0;
@@ -283,5 +281,5 @@ STC_INLINE bool _c_MEMB(_eq)(const Self* self, const Self* other) {
     }
     return true;
 }
-#endif
+#endif // _i_has_eq
 #include "sys/finalize.h"
