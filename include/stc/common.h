@@ -185,6 +185,10 @@ typedef const char* cstr_raw;
 #define c_each_4(it, C, start, end) \
     _c_each(it, C, start, (end).ref, _)
 
+#define c_each_item(v, C, cnt) \
+    C##_value* v = (C##_value*)&v; v; ) \
+    for (C##_iter v##_it = C##_begin(&cnt); (v = v##_it.ref); C##_next(&v##_it)
+
 #define c_each_n(...) c_MACRO_OVERLOAD(c_each_n, __VA_ARGS__)
 #define c_each_n_3(it, C, cnt) c_each_n_4(it, C, cnt, INTPTR_MAX)
 #define c_each_n_4(it, C, cnt, n) \
