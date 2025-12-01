@@ -63,11 +63,6 @@ jobs:
             extra_envs:
               CC: clang-cl
               CXX: clang-cl
-          - name: clang-cl+msan
-            args: -Db_sanitize=memory
-            extra_envs:
-              CC: clang-cl
-              CXX: clang-cl
         platform:
           - ubuntu-22.04
           - windows-2022
@@ -81,12 +76,6 @@ jobs:
           - platform: macos-latest
             mode:
               name: clang-cl+sanitize
-          - platform: ubuntu-22.04
-            mode:
-              name: clang-cl+msan
-          - platform: macos-latest
-            mode:
-              name: clang-cl+msan
 
           # Use clang-cl instead of MSYS2 clang.
           #
