@@ -32,8 +32,7 @@ jobs:
               CXX: clang++
 
           - name: sanitize
-            args: >-
-              "-Db_sanitize=address,undefined"
+            args: -Dtests=enabled "-Db_sanitize=address,undefined"
             extra_envs: {}
 
           # This is for MSVC, which only supports AddressSanitizer.
@@ -44,8 +43,7 @@ jobs:
               ASAN_OPTIONS: report_globals=0:halt_on_error=1:abort_on_error=1:print_summary=1
 
           - name: clang+sanitize
-            args: >-
-              "-Db_sanitize=address,undefined"
+            args: -Dtests=enabled "-Db_sanitize=address,undefined"
             extra_envs:
               CC: clang
               CXX: clang++
@@ -57,9 +55,13 @@ jobs:
 
           # default clang on GitHub hosted runners is from MSYS2.
           # Use Visual Studio supplied clang-cl instead.
+          - name: clang-cl
+            args: -Dtests=enabled
+            extra_envs:
+              CC: clang-cl
+              CXX: clang-cl
           - name: clang-cl+sanitize
-            args: >-
-              "-Db_sanitize=address,undefined"
+            args: -Dtests=enabled "-Db_sanitize=address,undefined"
             extra_envs:
               CC: clang-cl
               CXX: clang-cl
@@ -70,6 +72,12 @@ jobs:
 
         exclude:
           # clang-cl only makes sense on windows.
+          - platform: ubuntu-22.04
+            mode:
+              name: clang-cl
+          - platform: macos-latest
+            mode:
+              name: clang-cl
           - platform: ubuntu-22.04
             mode:
               name: clang-cl+sanitize
