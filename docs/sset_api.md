@@ -60,8 +60,10 @@ i_key*          sset_X_find_it(const sset_X* self, i_keyraw rkey, sset_X_iter* o
 sset_X_iter     sset_X_lower_bound(const sset_X* self, i_keyraw rkey);               // find closest entry >= rkey
 
 sset_X_result   sset_X_insert(sset_X* self, i_key key);
+sset_X_result   sset_X_emplace(sset_X* self, i_keyraw rkey);                         // like insert(); only for i_key != i_keyraw
+
 sset_X_result   sset_X_push(sset_X* self, i_key key);                                // alias for insert()
-sset_X_result   sset_X_emplace(sset_X* self, i_keyraw rkey);
+sset_X_result   sset_X_put(sset_X* self, i_keyraw rkey);                             // like emplace(); also for i_key == i_keyraw
 
 int             sset_X_erase(sset_X* self, i_keyraw rkey);
 sset_X_iter     sset_X_erase_at(sset_X* self, sset_X_iter it);                       // return iter after it

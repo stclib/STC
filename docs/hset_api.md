@@ -57,8 +57,10 @@ X_value*        hset_X_get_mut(hset_X* self, i_keyraw rkey);             // muta
 hset_X_iter     hset_X_find(const hset_X* self, i_keyraw rkey);
 
 hset_X_result   hset_X_insert(hset_X* self, i_key key);
-hset_X_result   hset_X_push(hset_X* self, i_key key);                    // alias for insert.
-hset_X_result   hset_X_emplace(hset_X* self, i_keyraw rkey);
+hset_X_result   hset_X_emplace(hset_X* self, i_keyraw rkey);             // like insert(); only for i_key != i_keyraw
+
+hset_X_result   hset_X_push(hset_X* self, i_key key);                    // alias for insert()
+hset_X_result   hset_X_put(hset_X* self, i_keyraw rkey);                 // like emplace(); also for i_key == i_keyraw
 
 int             hset_X_erase(hset_X* self, i_keyraw rkey);               // return 0 or 1
 hset_X_iter     hset_X_erase_at(hset_X* self, hset_X_iter it);           // return iter after it

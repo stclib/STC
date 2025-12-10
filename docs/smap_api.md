@@ -81,13 +81,14 @@ smap_X_iter     smap_X_lower_bound(const smap_X* self, i_keyraw rkey);          
 i_key*          smap_X_front(const smap_X* self);
 i_key*          smap_X_back(const smap_X* self);
 
-smap_X_result   smap_X_insert(smap_X* self, i_key key, i_val mapped);                    // no change if key in map
-smap_X_result   smap_X_insert_or_assign(smap_X* self, i_key key, i_val mapped);          // always update mapped
-smap_X_result   smap_X_push(smap_X* self, i_key entry);                                  // similar to insert()
-smap_X_result   smap_X_put(smap_X* self, i_keyraw rkey, i_valraw rmapped);               // like emplace_or_assign()
+smap_X_result   smap_X_put(smap_X* self, i_keyraw rkey, i_valraw rmapped);               // alias for emplace_or_assign() / insert_or_assign()
+smap_X_result   smap_X_push(smap_X* self, smap_X_value entry);                           // always assign entry (i_key/i_val pair)
 
-smap_X_result   smap_X_emplace(smap_X* self, i_keyraw rkey, i_valraw rmapped);           // no change if rkey in map
-smap_X_result   smap_X_emplace_or_assign(smap_X* self, i_keyraw rkey, i_valraw rmapped); // always update rmapped
+smap_X_result   smap_X_insert_or_assign(smap_X* self, i_key key, i_val mapped);          // always assign mapped
+smap_X_result   smap_X_insert(smap_X* self, i_key key, i_val mapped);                    // no change if key is in map
+
+smap_X_result   smap_X_emplace_or_assign(smap_X* self, i_keyraw rkey, i_valraw rmapped); // always assign mapped, only for i_keyraw != i_key
+smap_X_result   smap_X_emplace(smap_X* self, i_keyraw rkey, i_valraw rmapped);           // no change if key is in map, only for i_keyraw != i_key
 
 int             smap_X_erase(smap_X* self, i_keyraw rkey);
 smap_X_iter     smap_X_erase_at(smap_X* self, smap_X_iter it);                           // returns iter after it
