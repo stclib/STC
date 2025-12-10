@@ -21,9 +21,9 @@ TEST(hashmap, mapdemo2)
 {
     SImap nums = {0};
     SImap_clear(&nums);
-    SImap_emplace_or_assign(&nums, "Hello", 64);
-    SImap_emplace_or_assign(&nums, "Groovy", 121);
-    SImap_emplace_or_assign(&nums, "Groovy", 200); // overwrite previous
+    SImap_put(&nums, "Hello", 64);
+    SImap_put(&nums, "Groovy", 121);
+    SImap_put(&nums, "Groovy", 200); // overwrite previous
 
     EXPECT_EQ(200, *SImap_at(&nums, "Groovy"));
     EXPECT_EQ(64, *SImap_at(&nums, "Hello"));

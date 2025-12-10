@@ -727,7 +727,7 @@ hmap_cstr_emplace(&map, "Hello", "world");
 hmap_cstr_emplace(&map, "Hello", "again");
 // No cstr was constructed because "Hello" was already in the map.
 
-hmap_cstr_emplace_or_assign(&map, "Hello", "there");
+hmap_cstr_put(&map, "Hello", "there");
 // Only cstr_lit("there") constructed. "world" was destructed and replaced.
 
 hmap_cstr_insert(&map, cstr_lit("Hello"), cstr_lit("you"));

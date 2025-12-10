@@ -68,7 +68,7 @@ int main(void)
     puts("");
 
     for (c_each(e, vec_ii, v))
-        smap_ii_insert_or_assign(&m2, e.ref->first, e.ref->second);
+        smap_ii_put(&m2, e.ref->first, e.ref->second);
 
     puts("The modified key and mapped values of m2 are:");
     for (c_each(e, smap_ii, m2))

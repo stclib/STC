@@ -37,7 +37,7 @@ int main(void) {
 
     SMap_value *v = SMap_get(&m, "Testing five"); // NULL
     double num = *SMap_at(&m, "Testing one");
-    SMap_emplace_or_assign(&m, "Testing three", 1000.0); // update
+    SMap_put(&m, "Testing three", 1000.0); // update
     SMap_erase(&m, "Testing two");
 
     for (c_each(i, SMap, m))

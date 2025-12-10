@@ -49,10 +49,10 @@ int main(void)
         map = List_push_back(&list, Arc_from(Map_clone(*vec.data[1].get)))->get;
 
         // Add one more element to the cloned map:
-        Map_emplace_or_assign(map, "CLONED", 2021);
+        Map_put(map, "CLONED", 2021);
 
         // Add one more element to the shared map:
-        Map_emplace_or_assign(vec.data[1].get, "SHARED", 2021);
+        Map_put(vec.data[1].get, "SHARED", 2021);
 
         puts("VEC");
         for (c_each_item(e, Vec, vec)) {

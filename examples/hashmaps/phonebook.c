@@ -60,7 +60,7 @@ int main(void)
     printf("\nPhone book after erasing Tariq and Elliott:\n");
     print_phone_book(phone_book);
 
-    StrMap_emplace_or_assign(&phone_book, "Zak Byers", "(555) 396-188");
+    StrMap_put(&phone_book, "Zak Byers", "(555) 396-188");
 
     printf("\nPhone book after update phone of Zak Byers:\n");
     print_phone_book(phone_book);

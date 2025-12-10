@@ -205,9 +205,9 @@ int main(void)
     IdMap idnames = c_make(IdMap, {{100, "Red"}, {110, "Blue"}});
 
     // Assign/overwrite an existing mapped value with a const char*
-    IdMap_emplace_or_assign(&idnames, 110, "White");
+    IdMap_put(&idnames, 110, "White");
 
-    // Insert (or assign) a new cstr
+    // Insert (or assign) a new cstr object
     IdMap_insert_or_assign(&idnames, 120, cstr_from_fmt("#%08x", col));
 
     // emplace() adds only when key does not already exist:

@@ -29,7 +29,7 @@ int main(void) {
     else
         printf("Don't have Daniel's number.");
 
-    StrMap_emplace_or_assign(&contacts, "Daniel", "164-6743");
+    StrMap_put(&contacts, "Daniel", "164-6743");
 
     if ((v = StrMap_get(&contacts, "Ashley")))
         printf("Calling Ashley: %s\n", call(cstr_str(&v->second)));

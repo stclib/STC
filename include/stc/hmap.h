@@ -36,7 +36,7 @@ int main(void) {
 
     icmap_value* v = icmap_get(&m, 10);   // NULL
     char val = *icmap_at(&m, 5);          // 'a'
-    icmap_emplace_or_assign(&m, 5, 'd');  // update
+    icmap_put(&m, 5, 'd');  // update
     icmap_erase(&m, 8);
 
     for (c_each(i, icmap, m))
