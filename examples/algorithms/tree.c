@@ -6,7 +6,7 @@
 c_union (Tree,
     (TreeEmpty, bool),
     (TreeLeaf, int),
-    (TreeNode, struct { int value; Tree *left, *right; })
+    (TreeNode, struct { int value; Tree *left, *right; }),
 );
 
 void Tree_drop(Tree* self) {
@@ -27,7 +27,7 @@ int tree_sum(Tree* tree) {
     }
     return -1;
 }
-
+/*
 int main(void) {
     Tree* tree =
     &c_variant(TreeNode, {1,
@@ -39,4 +39,19 @@ int main(void) {
     });
 
     printf("sum = %d\n", tree_sum(tree));
+}
+*/
+
+int main(void) {
+    Tree* tree = 
+    c_new(Tree, c_variant(TreeNode, {1,
+        c_new(Tree, c_variant(TreeNode, {2,
+            c_new(Tree, c_variant(TreeLeaf, 3)),
+            c_new(Tree, c_variant(TreeLeaf, 4))
+        })),
+        c_new(Tree, c_variant(TreeLeaf, 5))
+    }));
+    
+    printf("sum = %d\n", tree_sum(tree));
+    Tree_drop(tree);
 }

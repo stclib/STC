@@ -2,7 +2,7 @@
 #include <stc/cregex.h>
 #include <stc/csview.h>
 
-#define T Fvec, float
+#define T Fvec, double
 #include <stc/stack.h>
 
 int main(void)
@@ -21,10 +21,10 @@ int main(void)
 
     // extract and convert all numbers in str to floats
     for (c_match(i, &re, str))
-        Fvec_push(&vec, (float)atof(i.match[0].buf));
+        Fvec_push(&vec, atof(i.match[0].buf));
 
     for (c_each(i, Fvec, vec))
-        printf("  %g\n", (double)*i.ref);
+        printf("  %g\n", *i.ref);
 
     // extracts the numbers only to a comma separated string.
     cstr nums = cregex_replace_sv(&re, csview_from(str), " $0,", .flags=CREG_STRIP);

@@ -60,7 +60,7 @@ void            cco_stop(Coroutine* co);                            // Coroutine
 #### Tasks (coroutine function-objects) and Fibers (green thread-like entity within a system thread)
 ```c++
                 cco_task_struct(name) {<name>_base base; ...};      // Define a custom coroutine task struct; extends cco_task struct.
-                cco_task_struct(name, EnvT) {<name>_base base; ...}; // Also specify value type of pointer returned from cco_env(). Default: void.
+                cco_task_struct(name, Env) {<name>_base base; ...}; // Also specify value type of pointer returned from cco_env(). Default: void.
 
                 cco_yield_to(cco_task* task);                       // Yield to another task (symmetric transfer of control).
 int             cco_resume(cco_task* task);                         // Resume task until next suspension, returns status.
@@ -80,9 +80,9 @@ int             cco_resume(cco_task* task);                         // Resume ta
 int             cco_status();                                       // Get current return status from last cco_resume() call.
 cco_error*      cco_err();                                          // Get error object created from cco_throw(error) call.
                                                                     // Should be handled in a cco_finalize: section.
-cco_fiber*      cco_fb(cco_task* task);                             // Get fiber associated with task.
-EnvT*           cco_env(cco_task* task);                            // Get environment pointer, stored in the associated fiber.
-EnvT*           cco_set_env(cco_task* task, EnvT* env);             // Set environment pointer.
+cco_fiber*      cco_fib(cco_task* task);                            // Get fiber associated with task.
+Env*            cco_env(cco_task* task);                             // Get environment pointer, stored in the associated fiber.
+Env*            cco_set_env(cco_task* task, Env* env);               // Set environment pointer.
 ```
 #### Task and Waitgroup Cancellation
 ```c++
@@ -91,7 +91,7 @@ EnvT*           cco_set_env(cco_task* task, EnvT* env);             // Set envir
 void            cco_cancel_fiber(cco_fiber* fiber);                 // Signal that fiber will be cancelled upon next suspension point.
 void            cco_cancel_group(cco_group* wg);                    // Cancel all spawned tasks in the waitgroup, *except* the current.
                                                                     // Passing NULL as arg will cancel all non-group spawned tasks.
-void            cco_cancel_all();                                   // Cancel all spawned tasks, *except* the current.
+void            cco_cancel_all();                                   // Cancel all spawned tasks/fibers, *except* the current.
 ```
 #### Awaiting Tasks and Waitgroups
 ```c++
@@ -101,30 +101,30 @@ void            cco_cancel_all();                                   // Cancel al
                                                                     // Shorthand for cco_cancel_task() + cco_await_task().
 
                 // If tasks were spawned, all must be awaited for by using these awaiter functions:
-                cco_await_group(cco_group* wg);                     // Await for all (remaining) tasks in waitgroup to finish.
-                                                                    // Does not await for current task/fiber,
-                cco_await_any(cco_group* wg);                       // Await for any one spawned task in waitgroup to
+                cco_await_all_of(cco_group* wg);                    // Await for all (remaining) tasks in waitgroup to finish,
+                                                                    // *except* for the current task/fiber if part of wg.
+                cco_await_any_of(cco_group* wg);                    // Await for any one spawned task in waitgroup to
                                                                     // finish, and cancel the remaining.
                 cco_await_cancel_group(cco_group* wg);              // Cancel all tasks in wg, and await for them to finalize.
-                                                                    // Shorthand for cco_cancel_group() + cco_await_group().
+                                                                    // Shorthand for cco_cancel_group() + cco_await_all_of().
                 cco_await_n(cco_group* wg, int n);                  // Awaits for n spawned tasks. Does *not* cancel the remaining.
 ```
 #### Spawning and Running Tasks
-The `EnvT` type used below is by default `void`, but can be specified in *cco_task_struct()* definition.
+The `Env` type used below is by default `void`, but can be specified in *cco_task_struct()* definition.
 ```c++
 void            cco_reset_group(cco_group* wg);                     // Reset waitgroup.(Normally not needed).
 cco_fiber*      cco_spawn(cco_task* tsk);                           // Lazily spawn a new concurrent task, detatched.
 cco_fiber*      cco_spawn(cco_task* tsk, cco_group* wg);            // Lazily spawn a new concurrent task within a waitgroup.
-cco_fiber*      cco_spawn(cco_task* tsk, cco_group* wg, EnvT* env); // Variable env may be used as a "promise", or point to input.
-cco_fiber*      cco_spawn(cco_task* tsk, cco_group* wg, EnvT* env,  // This may be called from main or outside `cco_async` scope.
+cco_fiber*      cco_spawn(cco_task* tsk, cco_group* wg, Env* env);  // Variable env may be used to point to input data or result.
+cco_fiber*      cco_spawn(cco_task* tsk, cco_group* wg, Env* env,   // This may be called from main or outside `cco_async` scope.
                            cco_fiber* fiber);
 
                 cco_run_task(cco_task* tsk) {}                      // Run task blocking until it and spawned fibers are finished.
-                cco_run_task(cco_task* tsk, EnvT *env) {}           // Run task blocking with env data
-                cco_run_task(fb_iter, cco_task* tsk, EnvT *env) {}  // Run task blocking. fb_iter reference the current fiber.
+                cco_run_task(cco_task* tsk, Env *env) {}            // Run task blocking with env data
+                cco_run_task(fb_iter, cco_task* tsk, Env *env) {}   // Run task blocking. fb_iter reference the current fiber.
 
 cco_fiber*      cco_new_fiber(cco_task* tsk);                       // Create an initial fiber from a task.
-cco_fiber*      cco_new_fiber(cco_task* tsk, EnvT* env);            // Create an initial fiber from a task and env (inputs or a future).
+cco_fiber*      cco_new_fiber(cco_task* tsk, Env* env);             // Create an initial fiber from a task and env (inputs or a future).
                 cco_run_fiber(cco_fiber** fiber_ref) {}             // Run fiber(s) blocking. Note it takes a (cco_fiber **) as arg.
                 cco_run_fiber(fb_iter, cco_fiber* fiber) {}         // Run fiber(s) blocking. fb_iter reference the current fiber.
 
@@ -568,7 +568,7 @@ int job_start(struct job_start* o) {
         cco_spawn(c_new(struct job1, {{job1}}), &o->wg);
         cco_await_timer(&o->tm, 0.1);
         puts("Ping");
-        cco_await_group(&o->wg);
+        cco_await_all_of(&o->wg);
         puts("Ping");
         cco_await_timer(&o->tm, 0.2);
     }
