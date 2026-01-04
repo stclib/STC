@@ -37,11 +37,11 @@
 #include "priv/template.h"
 #ifndef i_declared
     #if c_NUMARGS(i_type) == 4
-      #define i_capacity i_val
+      #define i_capacity c_GETARG(4, i_type)
     #endif
     #ifdef i_capacity
       #define i_no_clone
-      _c_DEFTYPES(declare_stack_fixed, Self, i_key, i_capacity);
+      _c_DEFTYPES(_declare_inplace_stack, Self, i_key, i_capacity, _i_aux_def);
     #else
       _c_DEFTYPES(_declare_stack, Self, i_key, _i_aux_def);
     #endif
@@ -177,6 +177,11 @@ STC_INLINE void _c_MEMB(_put_n)(Self* self, const _m_raw* raw, isize n)
         _c_MEMB(_put_n)(&out, raw, n); return out;
     }
     #endif
+#elif defined i_capacity && !defined _i_no_put
+    STC_INLINE Self _c_MEMB(_from_n)(const _m_raw* raw, isize n) {
+        Self out; out.size = 0;
+        _c_MEMB(_put_n)(&out, raw, n); return out;
+    }
 #endif
 
 STC_INLINE const _m_value* _c_MEMB(_at)(const Self* self, isize idx)

@@ -64,15 +64,13 @@
 #if defined i_type && c_NUMARGS(i_type) > 1
   #define Self c_GETARG(1, i_type)
   #define i_key c_GETARG(2, i_type)
-  #if c_NUMARGS(i_type) == 3
-    #if defined _i_is_map
-      #define i_val c_GETARG(3, i_type)
-    #else
-      #define i_opt c_GETARG(3, i_type)
-    #endif
-  #elif c_NUMARGS(i_type) == 4
+  #ifdef _i_is_map
     #define i_val c_GETARG(3, i_type)
-    #define i_opt c_GETARG(4, i_type)
+    #if c_NUMARGS(i_type) == 4
+      #define i_opt c_GETARG(4, i_type)+0
+    #endif
+  #elif c_NUMARGS(i_type) >= 3
+    #define i_opt c_GETARG(3, i_type)+0
   #endif
 #elif !defined Self && defined i_type
   #define Self i_type

@@ -5,12 +5,13 @@
 declare_queue(queue_pnt, struct Point);
 
 typedef struct Point { int x, y; } Point;
-#define T queue_pnt, Point
-#define i_declared
+
+#define T queue_pnt, struct Point, (c_declared)
 #include <stc/queue.h>
 
 #define T IntQ, int
 #include <stc/queue.h>
+
 
 int main(void) {
     int n = 50000000;

@@ -11,28 +11,23 @@ See the c++ class [std::stack](https://en.cppreference.com/w/cpp/container/stack
 ## Header file and declaration
 
 ```c++
-#define T <ct>, <kt>[,<op>] // define both T and i_key types
-#define T <ct>              // container type name (default: stack_{i_key})
-#define i_capacity <CAP>    // define an inplace stack (on the stack) with CAP capacity.
+#define T <ct>, <kt>[, <op>[, <CAP>]] // <op> may be empty
+#define i_capacity <CAP> // make it an inplace stack (using runtime stack-memory) with CAP capacity.
 // One of the following:
-#define i_key <kt>       // key type
-#define i_capacity <CAP> // define an inplace stack (on the stack) with CAP capacity.
-#define i_keyclass <kt>  // key type, and bind <kt>_clone() and <kt>_drop() function names
-#define i_keypro <kt>    // "pro" key type, use for `cstr`, `arc`, and `box` types.
-                         // Defines i_keyclass = <kt>, i_cmpclass = <kt>_raw
-
-// Use alone or combined with i_keyclass:
+#define i_key <kt>       // container type name (default: stack_{kt})
 #define i_cmpclass <ct>  // comparison "class". <ct>, aka `raw` defaults to <kt>
-                         // binds <ct>_cmp(),  <ct>_eq(),  <ct>_hash() member functions.
-#define i_opt            // enable optional properties, see ...
+                         // binds <ct>_cmp(), <ct>_hash() member functions.
+#define i_keyclass <kt>  // key type, additionally bind <kt>_clone() and <kt>_drop() function names
+#define i_keypro <kt>    // "pro" key type, use for built-in `cstr`, `arc`, and `box` types.
+                         // Defines i_keyclass = <kt>, i_cmpclass = <kt>_raw
 
 // Override or define when not "class" or "pro" is used:
 #define i_keydrop <fn>   // destroy value func - defaults to empty destruct
 #define i_keyclone <fn>  // REQUIRED IF i_keydrop defined
-
 #define i_cmp <fn>       // three-way compare two i_keyraw*
 #define i_less <fn>      // less comparison. Alternative to i_cmp
 #define i_eq <fn>        // equality comparison. Implicitly defined with i_cmp, but not i_less.
+#define i_opt <op>       // enable optional properties/traits.
 
 #include <stc/stack.h>
 ```

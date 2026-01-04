@@ -210,10 +210,10 @@ typedef union {
         AUXDEF \
     } SELF
 
-#define declare_stack_fixed(SELF, VAL, CAP) \
+#define _declare_inplace_stack(SELF, VAL, CAP, AUXDEF) \
     typedef VAL SELF##_value; \
     typedef struct { SELF##_value *ref, *end; } SELF##_iter; \
-    typedef struct SELF { SELF##_value data[CAP]; ptrdiff_t size; } SELF
+    typedef struct SELF { ptrdiff_t size; SELF##_value data[CAP]; AUXDEF } SELF
 
 #define _declare_stack(SELF, VAL, AUXDEF) \
     typedef VAL SELF##_value; \

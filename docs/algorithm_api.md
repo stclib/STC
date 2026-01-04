@@ -9,7 +9,7 @@ descriptive and reduces chances of making mistakes. It is generally easier to re
 <details>
 <summary><b>c_each</b> - Ranged sequence iteration</summary>
 
-### c_each, c_each_reverse, c_each_n, c_each_kv
+### c_each, c_each_reverse, c_each_n, c_each_item, c_each_kv
 ```c++
 #include <stc/common.h>
 ```
@@ -21,6 +21,7 @@ descriptive and reduces chances of making mistakes. It is generally easier to re
 | for (`c_each_reverse`(it, **CntType**, container)) | Iteratate elements in reverse: *vec, deque, queue, stack* |
 | for (`c_each_reverse`(it, **CntType**, it1, it2))` | Iteratate range [it1, it2) elements in reverse. |
 | for (`c_each_n`(it, **CntType**, container, n))    | Iteratate `n` first elements. Index variable is `{it}_index`. |
+| for (`c_each_item`(elem, **CntType**, container))  | Iterate container with "structured binding" |
 | for (`c_each_kv`(key, val, **CntType**, container))| Iterate maps with "structured binding" |
 <!--{%raw%}-->
 [ [Run this code](https://godbolt.org/z/xK8s5cKc9) ]
@@ -48,6 +49,10 @@ for (c_each(i, IMap, iter, IMap_end(&map)))
 for (c_each_n(i, IMap, map, 3))
     printf(" %zd:(%d %d)", i.index, i.ref->first, i.ref->second);
 // 0:(3 2) 1:(5 4) 2:(7 3)
+
+// iterate any container using "structured binding" of the item:
+for (c_each_item(v, IMap, map))
+    printf(" (%d %d)", v->first, v->second);
 
 // iterate a map using "structured binding" of the key and val pair:
 for (c_each_kv(id, count, IMap, map))

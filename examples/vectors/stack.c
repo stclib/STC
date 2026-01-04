@@ -1,10 +1,10 @@
 
 #include <stdio.h>
 
-#define T IVec, int, 100, (c_use_cmp)
+#define T IVec, int, (c_use_cmp), 100
 #include <stc/stack.h>
 
-#define T CVec, char, 100, (0)
+#define T CVec, char,, 100
 #include <stc/stack.h>
 
 int main(void) {
