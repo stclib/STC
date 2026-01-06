@@ -157,14 +157,6 @@ typedef ptrdiff_t       isize;
 #define c_default_toraw(vp)     (*(vp))
 #define c_default_drop(vp)      ((void) (vp))
 
-// non-owning char pointer
-typedef const char* cstr_raw;
-#define cstr_raw_cmp(x, y)      strcmp(*(x), *(y))
-#define cstr_raw_eq(x, y)       (cstr_raw_cmp(x, y) == 0)
-#define cstr_raw_hash(vp)       c_hash_str(*(vp))
-#define cstr_raw_clone(v)       (v)
-#define cstr_raw_drop(vp)       ((void)vp)
-
 // Control block macros
 
 // [deprecated]:

@@ -23,8 +23,8 @@ Value* vp = Arc_move(&a1).get; // a1 will now be NULL
 Arc a2 = Arc_toarc(vp);
 c_drop(Arc, &a1, &a2);
 ```
-- ***arc type 2*** occupies the size of two pointers, however it may also be constructed from a existing unmanaged
-pointer. Enable it by `#define T Arc, key, (c_arc2)`
+- ***arc type 2*** occupies the size of two pointers, however it may also be constructed from an existing unmanaged
+pointer. Enable it by `#define T Arc, key, (c_use_arc2)`
 - When defining a container with shared pointer elements, add *c_keypro*/*valpro*: `#define T MyVec, MyArc, (c_keypro)`
 
 See similar c++ class [std::shared_ptr](https://en.cppreference.com/w/cpp/memory/shared_ptr) for a functional reference, or Rust [std::sync::Arc](https://doc.rust-lang.org/std/sync/struct.Arc.html) / [std::rc::Rc](https://doc.rust-lang.org/std/rc/struct.Rc.html).
@@ -32,29 +32,31 @@ See similar c++ class [std::shared_ptr](https://en.cppreference.com/w/cpp/memory
 ## Header file and declaration
 
 ```c++
-#define T <ct>,<kt>[,<op>] // shorthand
-#define T <ct>           // arc container type name
-// One of the following:
-#define i_key <t>        // key type
-#define i_keyclass <t>   // key type, and bind <t>_clone() and <t>_drop() function names
-#define i_keypro <t>     // key "pro" type, use for cstr, arc, box types
+#define T <ct>, <kt>[, (<opt>)] // shorthand for defining arc name, i_key, and i_opt
+// Common <opt> traits:
+//   c_keycomp  - Key type <kt> is a comparable;
+//                Binds <kt>_cmp(), <kt>_hash() "member" function names.
+//   c_keyclass - Additionally binds <kt>_clone() and <kt>_drop() function names.
+//                All containers used as keys themselves can be specified with the c_keyclass trait.
+//   c_keypro   - "Pro" key type, use e.g. for built-in `cstr`, `zsview`, `arc`, and `box` as keys.
+//                These support conversion to/from a "raw" input type (such as const char*) when
+//                using <ct>_emplace*() functions, and may do optimized lookups via the raw type.
+//   c_use_arc2 - Use arc2 instead of arc. It occupies two pointers, but may be constructed from an existing pointer.
+//   c_use_cmp  - Enable comparison.
+//   c_no_atomic - Non-atomic reference counting, like Rust Rc.
+//
+// To apply multiple traits, specify e.g. (c_keyclass | c_no_atomic | c_use_cmp) as <opt>.
 
-#define i_use_cmp        // may be defined instead of i_cmp when i_key is an integral/native-type.
-#define i_cmp <fn>       // three-way element comparison. If not specified, pointer comparison is used.
-                         // Note that containers of arcs will derive i_cmp from the i_key type
-                         // when using arc in containers specified with i_keypro <arc-type>.
-#define i_less <fn>      // less comparison. Alternative to i_cmp
-#define i_eq <fn>        // equality comparison. Implicitly defined with i_cmp, but not i_less.
+// Alternative to defining T:
+#define i_key <kt> // define key type. container type name <ct> defaults to arc_<kt>.
 
-#define i_keydrop <fn>   // destroy element func - defaults to empty destruct
-#define i_keyclone <fn>  // REQUIRED if i_keydrop is defined, unless 'i_opt c_no_clone' is defined.
+// Override/define when not the <opt> traits are specified:
+#define i_keydrop <fn>   // Destroy-element function - defaults to empty destruct
+#define i_keyclone <fn>  // Required if i_keydrop is defined
+#define i_cmp <fn>       // Three-way compare two i_keyraw*
+#define i_less <fn>      // Less comparison. Alternative to i_cmp
+#define i_eq <fn>        // Equality comparison. Implicitly defined with i_cmp, but not with i_less.
 
-#define i_keyraw <t>     // conversion type (lookup): defaults to {i_key}
-#define i_keytoraw <fn>  // conversion func i_key* => i_keyraw: REQUIRED IF i_keyraw defined.
-#define i_keyfrom <fn>   // from-raw func.
-
-#define i_no_atomic      // Non-atomic reference counting, like Rust Rc.
-#define i_opt c_no_atomic // Same as above, but can combine other options on one line with |.
 #include <stc/arc.h>
 ```
 When defining a container with **arc** elements, specify `#define i_keypro <arc-type>` instead of `i_key`.

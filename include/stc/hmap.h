@@ -70,7 +70,7 @@ struct hmap_meta { uint16_t hashx:6, dist:10; }; // dist: 0=empty, 1=PSL 0, 2=PS
   #define _i_SET_ONLY c_true
   #define _i_keyref(vp) (vp)
 #endif
-#define _i_is_hash
+#define _i_hasher
 #include "priv/template.h"
 #ifndef i_declared
   _c_DEFTYPES(_declare_htable, Self, i_key, i_val, _i_MAP_ONLY, _i_SET_ONLY, _i_aux_def);
@@ -509,7 +509,7 @@ _c_MEMB(_erase_entry)(Self* self, _m_value* _val) {
 #undef i_max_load_factor
 #undef _i_is_set
 #undef _i_is_map
-#undef _i_is_hash
+#undef _i_hasher
 #undef _i_keyref
 #undef _i_MAP_ONLY
 #undef _i_SET_ONLY

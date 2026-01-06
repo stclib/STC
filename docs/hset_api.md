@@ -7,27 +7,32 @@ A **hset** is an associative container that contains a set of unique objects of 
 ## Header file and declaration
 
 ```c++
-#define T <ct>,<kt>[,<op>] // shorthand for defining T, i_key, i_opt
-#define T <ct>           // container type name (default: hset_{i_key})
-// One of the following:
-#define i_key <t>        // key type
-#define i_keyclass <t>   // key type, and bind <t>_clone() and <t>_drop() function names
-#define i_keypro <t>     // key "pro" type, use for cstr, arc, box types
+#define T <ct>, <kt>[, (<opt>)] // shorthand for defining set name, i_key, and i_opt
+// Common <opt> traits:
+//   c_keycomp  - Key type <kt> is a comparable;
+//                Binds <kt>_cmp(), <kt>_eq(), <kt>_hash() "member" function names.
+//   c_keyclass - Additionally binds <kt>_clone() and <kt>_drop() function names.
+//                All containers used as keys themselves can be specified with the c_keyclass trait.
+//   c_keypro   - "Pro" key type, use e.g. for built-in `cstr`, `zsview`, `arc`, and `box` as i_key.
+//                These support conversion to/from a "raw" input type (such as const char*) when
+//                using <ct>_emplace*() functions, and may do optimized lookups via the raw type.
+//   c_use_eq   - Enable equality comparison of the container itself.
 
-#define i_hash <fn>      // hash func i_keyraw*: REQUIRED IF i_keyraw is non-pod type
-#define i_eq <fn>        // equality comparison two i_keyraw*: REQUIRED IF i_keyraw is a
-                         // non-integral type. Three-way i_cmp may be specified instead.
-#define i_keydrop <fn>   // destroy key func: defaults to empty destruct
-#define i_keyclone <fn>  // clone func: REQUIRED IF i_keydrop defined
+// Alternative to defining T:
+#define i_key <t>             // define key type. container type name <ct> defaults to hset_<kt>.
 
-#define i_keyraw <t>     // conversion "raw" type - defaults to i_key
-#define i_keyfrom <fn>   // conversion func i_keyraw => i_key - defaults to plain copy
-#define i_keytoraw <fn>  // conversion func i_key* => i_keyraw - defaults to plain copy
+// Override/define when not the <opt> traits are specified:
+#define i_hash <fn>           // hash func i_keyraw*: Required if i_keyraw is non-pod type
+#define i_eq or i_cmp <fn>    // equality comparison. i_eq is implicitly defined from i_cmp.
+#define i_keydrop <fn>        // destroy key func - defaults to empty destruct
+#define i_keyclone <fn>       // Required if i_keydrop is defined
+#define i_valdrop <fn>        // destroy value func - defaults to empty destructor
+#define i_valclone <fn>       // Required if i_valdrop is defined
 
 #include <stc/hashset.h>
 ```
 - In the following, `X` is the value of `i_key` unless `T` is defined.
-- **emplace**-functions are only available when `i_keyraw` is implicitly or explicitly defined.
+- **emplace**-functions are only available when `i_keyraw` is implicitly or explicitly defined (e.g. via c_keypro).
 
 ## Methods
 

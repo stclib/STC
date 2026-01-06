@@ -35,6 +35,11 @@
 #define             zsview_drop(self) c_default_drop(self)
 #define             zsview_toraw(self) (self)->str
 
+typedef             const char* zsview_raw;
+#define             zsview_raw_cmp(x, y)      strcmp(*(x), *(y))
+#define             zsview_raw_eq(x, y)       (zsview_raw_cmp(x, y) == 0)
+#define             zsview_raw_hash(vp)       c_hash_str(*(vp))
+
 STC_INLINE zsview   zsview_from(const char* str)
                         { return c_literal(zsview){str, c_strlen(str)}; }
 STC_INLINE void     zsview_clear(zsview* self) { *self = c_zv(""); }

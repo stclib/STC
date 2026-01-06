@@ -56,7 +56,7 @@ typedef i_keyraw _m_raw;
         { (void)self; return i_capacity; }
 
     STC_INLINE bool _c_MEMB(_reserve)(Self* self, isize n)
-        { (void)self; return n <= i_capacity; }
+        { (void)self; c_assert(n <= i_capacity); return true; }
 #else
     STC_INLINE Self _c_MEMB(_move)(Self *self) {
         Self m = *self;

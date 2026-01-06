@@ -24,8 +24,8 @@
  *
  * The difference between arc and arc2 is that arc only takes up one pointer,
  * whereas arc2 uses two. arc cannot be constructed from an already allocated pointer,
- * which arc2 may. To use arc2, specify the `(c_arc2)` option after the key type, e.g.:
- * #define T MyArc, MyType, (c_arc2 | c_no_atomic)
+ * which arc2 may. To use arc2, specify the `(c_use_arc2)` option after the key type, e.g.:
+ * #define T MyArc, MyType, (c_use_arc2 | c_no_atomic)
  */
 /*
 #include <stc/cstr.h>
@@ -102,7 +102,7 @@ typedef i_keyraw _m_raw;
   #define _i_atomic_dec_and_test(v) !(--*(v))
 #endif
 
-#if c_OPTION(c_arc2)
+#if c_OPTION(c_use_arc2)
   #define i_arc2
 #endif
 #if !(defined i_arc2 || defined STC_USE_ARC2)

@@ -59,19 +59,19 @@ void            cco_stop(Coroutine* co);                            // Coroutine
 
 #### Tasks (coroutine function-objects) and Fibers (green thread-like entity within a system thread)
 ```c++
-                cco_task_struct(name) {<name>_base base; ...};      // Define a custom coroutine task struct; extends cco_task struct.
+                cco_task_struct(name) {<name>_base base; ...};      // Define a custom coroutine task struct; "Extends" cco_task struct.
                 cco_task_struct(name, Env) {<name>_base base; ...}; // Also specify value type of pointer returned from cco_env(). Default: void.
 
                 cco_yield_to(cco_task* task);                       // Yield to another task (symmetric transfer of control).
-int             cco_resume(cco_task* task);                         // Resume task until next suspension, returns status.
+int             cco_resume(cco_task* task);                         // Resume task until it suspends (blocking). Return status.
                                                                     // Normally called by cco_run_task() driver function or a scheduler.
 
                 cco_throw(int error);                               // Throw an error. Will unwind call/await-task stack.
-                                                                    // Handling of error *is* required else abort().
+                                                                    // Handling of error required in cco_finalize:, else abort().
                 cco_throw(CCO_CANCEL);                              // Throw a cancellation of the current task.
                                                                     // It will silently unwind the await stack. Handling *not*
                                                                     // required, but it may be recovered in a cco_finalize: section.
-                cco_recover;                                        // Recover from a cco_throw() or cancellation. Resume from the original
+                cco_recover;                                        // Recover from a cco_throw() or cancellation. Resume from the
                                                                     // suspend point in the current task and clear error status.
                                                                     // Should be done in a cco_finalize: section.
 ```

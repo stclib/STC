@@ -34,9 +34,9 @@ V6.0:
 
 V5.1:
 - Specifying containers with non-trivial element types can now be done with a single `#define`
-prior to including the container (using `c_keyclass`, `c_keypro`, and `c_cmpclass` option *traits*).
+prior to including the container (using `c_keyclass`, `c_keypro`, and `c_keycomp` option *traits*).
 - Users may now define `T` as a shorthand for `i_type`.
-- Replaced **arc** with a new implementation which take up only one pointer. Previous arc is now available as a traits option (c_arc2). The new **arc** may not be constructed from an object pointer, for that use **arc2**.
+- Replaced **arc** with a new implementation which take up only one pointer. Previous arc is now available as a traits option (c_use_arc2). The new **arc** may not be constructed from an object pointer, for that use **arc2**.
 - Updated and fixed bugs in **cregex** to handle invalid utf8 strings.
 - Some breaking changes in cspan API.
 - Several other smaller improvements and bug fixes.
@@ -514,35 +514,40 @@ The associated/bound member functions are only required to be implemented if the
 actually needs them. Trait flags works as boolean properties, and may be combined using 
 the `|` operator, conventionally enclosed in parentheses. The complete list of *trait flags*:
 
-  - **c_cmpclass** - specifies that *KeyType* has comparison/hash functions, but not _clone() or _drop().
-  - **c_keyclass** - specifies that *KeyType* has _clone() and _drop() functions, and comparison/hash functionality.
-  - **c_valclass** - specifies that *ValType* has _clone() and _drop() functions.
-  - **c_keypro** - specifies that *KeyType* has _clone() and _drop() functions, along with comparison/hash functions
-  using type *KeyType*_raw, and convertion functions between *KeyType* and *KeyType*_raw.
-  - **c_valpro** - like `c_valclass`, but also binds member _from(), which converts from *ValType*_raw to *ValType*
-  specifically for the _emplace\* container functions.
-  - **c_use_cmp** - enables `<` comparison of integral types, or uses the _cmp() member for "pro/class" element types.
-  - **c_use_eq** - enable `==` on integral types, or the _eq() member for "pro/class" element types.
-  - **c_no_clone** - disable clone functionality for container
-  - **c_no_atomic** - used with **arc** type, do simple fast reference counting instead of thread safe atomic.
-  - **c_no_hash** - use default hash function if `c_cmpclass` is specified and container is hashmap/set.
-  - **c_declared** - container type was predeclared (not needed for C23)
+  - **c_keycomp** - specifies that *KeyType* has comparison/hash member functions _cmp() and _hash().
+  - **c_keyclass** - specifies that *KeyType* additionally has _clone() and _drop() functions.
+  - **c_valclass** - specifies that *ValType* has _clone() and _drop() functions (comparison not relevant).
+  - **c_keypro** - specifies that *KeyType* has _clone() and _drop() functions, _cmp() and _hash() functions, however using type *KeyType*_raw, and functions converting between *KeyType* and *KeyType*_raw.
+  - **c_valpro** - like `c_valclass`, but also expects member _from(), which converts from *ValType*_raw to *ValType*, specifically for the _emplace\*() container functions.
+
+  Other traits that can be combined with the `|` operator:
+  - **c_use_cmp** - enables sort/seach for vector-like type, using `<` comparison on integral types, or _cmp() for c_keypro/c_keyclass/c_keycomp elements.
+  - **c_use_eq** - enables equality function using `==` on integral types, or the _eq() member for "pro/class/cmp" elements.
+  - **c_no_clone** - disable clone functionality for container.
+  - **c_no_atomic** - used with **arc** type, do simple fast reference counting instead of thread safe atomics.
+  - **c_no_hash** - use default hash function if `c_keycomp` is specified and container is hashmap/hashset.
+  - **c_declared** - container type was predeclared (not needed for C23).
 
  #### What traits to use on container element types in STC?
   - ***cstr***, ***arc***, ***box*** as elements: `c_keypro` (or `c_valpro` for maps)
   - all remaining templated containers used as elements: `c_keyclass` (or `c_valclass` for maps)
-  - ***csview***, ***zsview*** as elements: `c_cmpclass`
+  - ***csview***, ***zsview*** as elements: `c_keycomp`
 
-When `c_cmpclass` / `c_keyclass` is specified, the following KeyType member functions are expected:
+When `c_keycomp` trait is specified, the following KeyType member functions names are bound:
+```c++
+int         KeyType_cmp(const KeyType* x, const KeyType* y);  // c_keycomp, or c_keyclass
+bool        KeyType_eq(const KeyType* x, const KeyType* y);   // c_keycomp, or (c_keyclass | c_use_eq)
+size_t      KeyType_hash(const KeyType* kp);                  // c_keycomp, or (c_keyclass | c_use_eq)
+```
+NB: The above functions are expected for container types that requires them, without specifying the traits.
+
+When `c_keyclass` trait is specified, the following KeyType member functions names are bound:
 ```c++
 KeyType     KeyType_clone(KeyType k);                         // c_keyclass
 void        KeyType_drop(KeyType* kp);                        // c_keyclass
-int         KeyType_cmp(const KeyType* x, const KeyType* y);  // c_cmpclass, c_keyclass
-bool        KeyType_eq(const KeyType* x, const KeyType* y);   // c_cmpclass, c_keyclass, only if also c_use_eq
-size_t      KeyType_hash(const KeyType* kp);                  // c_cmpclass, c_keyclass
 ```
 
-When `c_valclass` is specified, the following ValType member functions are expected:
+When `c_valclass` trait is specified, the following ValType member functions names are bound:
 ```c++
 ValType     ValType_clone(ValType v);                         // c_valclass
 void        ValType_drop(ValType* vp);                        // c_valclass
@@ -550,27 +555,25 @@ void        ValType_drop(ValType* vp);                        // c_valclass
 
 **Notes**:
 - **c_use_cmp** is only required to be specified for **vec**, **stack**, **deque**, **list**,
-as sorting and linear seach are not enabled by default. Maps/sets/priority queues must always
-have member comparison functions defined.
+as sorting and linear seach are not enabled by default. Maps/sets/priority queues expects member comparison functions defined.
 - Comparison uses `<` and `==` operators by default, whereas when **c_keyclass/c_keypro** are specified
 it uses the _cmp() member function by default. However the _cmp() member is also used for
 equality comparison, so in order to use the _eq() member, **c_use_eq** must be specified!
 - For plain structs (PODs), define `i_cmp` / `i_eq` / `i_hash` macros when needed, or make it
 into a "keyclass" (or even "keypro") by defining required member functions.
 
-When `c_keypro` is specified, the following KeyType member functions are expected:
+When `c_keypro` is specified, the following KeyType member functions names are bound:
 ```c++
 KeyType     KeyType_clone(KeyType k);                                      // c_keypro
 void        KeyType_drop(KeyType* kp);                                     // c_keypro
 KeyType     KeyType_from(KeyType_raw r);                                   // c_keypro
 KeyType_raw KeyType_toraw(const KeyType* kp);                              // c_keypro
-
 int         KeyType_raw_cmp(const KeyType_raw* rx, const KeyType_raw* ry); // c_keypro
-bool        KeyType_raw_eq(const KeyType_raw* rx, const KeyType_raw* ry);  // c_keypro, only if also c_use_eq
+bool        KeyType_raw_eq(const KeyType_raw* rx, const KeyType_raw* ry);  // (c_keypro | c_use_eq)
 size_t      KeyType_raw_hash(const KeyType_raw* rp);                       // c_keypro, unless c_no_hash
 ```
 
-When `c_valpro` is specified: ValType element member functions expected to be defined:
+When `c_valpro` is specified: ValType element member functions names are bound:
 ```c++
 ValType     ValType_clone(ValType k);                                      // c_valpro
 void        ValType_drop(ValType* kp);                                     // c_valpro
@@ -601,33 +604,36 @@ Only `i_key` is strictly required to be defined for simple non-maps:
 - `i_valraw` *RawValType* - Alternative mapped type. Defaults to *ValType*
 - `i_valfrom` *Func* - Create a *ValType* instance from a *RawValType*.
 - `i_valtoraw` *Func* - Conversion from *ValType\** to *RawValType*.
+</details>
 
----
-### Details on traits template parameters (internal)
+<details>
+<summary>Details on traits template parameters</summary>
+
+### Details on traits template parameters
 Normally it is simplest to specify the traits template parameters via the *Traits* argument to `T`,
-however they can be specified as separate template parameters as well. Specifically, `i_cmpclass`
-can be specified as a different type than `i_key` (**c_cmpclass** always makes it equal to `i_key`).
+however they can be specified as separate template parameters as well. Specifically, `i_keycomp`
+can be specified as a different type than `i_key` (**c_keycomp** always makes it equal to `i_key`).
 This enables a container to be associated with an additional alternative "raw" input key/val-type,
 and one may specify convertion functions between them. Specifically the string, **cstr** and smart
 pointers, **box** and **arc** uses this to enhance ergonmics, but every container may gain efficiency
 and usage enhancements from this general built-in mechanism.
 
-- `i_cmpclass` *RawType* - Defines ***i_keyraw*** and binds ***i_cmp***, ***i_eq***, and ***i_hash*** to
+- `i_keycomp` *RawType* - Defines ***i_keyraw*** and binds ***i_cmp***, ***i_eq***, and ***i_hash*** to
 *RawType_cmp()*, *RawType_eq()*, and *RawType_hash()* comparison functions/macro names. In addition
 ***i_keyfrom***, ***i_keytoraw*** are bound to conversion functions *KeyType_from(RawType\*)* and *KeyType_toraw()*.
     - If neither ***i_key*** nor ***i_keyclass*** are defined, ***i_key*** will be defined as *RawType*. In this case,
     ***i_keyfrom***, ***i_keytoraw*** are bound to default pass-through conversion macros.
-    - Useful alone for containers of views (like csview) - may use **c_cmpclass** option in that case.
+    - Useful alone for containers of views (like csview) - may use **c_keycomp** option in that case.
 - `i_keyclass` *KeyType*
     - Defines ***i_key*** and binds ***i_keyclone***, ***i_keydrop*** to *KeyType_clone()* and *KeyType_drop()*
     function/macro names.
-    - Unless `i_cmpclass` or `i_keyraw` are also specified, comparison functions associated with ***i_cmpclass*** are
+    - Unless `i_keycomp` or `i_keyraw` are also specified, comparison functions associated with ***i_keycomp*** are
     also bound.
     - Use with container of containers, or in general when the element type has *_clone()* and *_drop()*
     "member" functions.
 - `i_keypro` *KeyType* - Use with "pro"-element types, i.e. library types like **cstr**, **box** and **arc**.
-It combines the ***i_keyclass*** and ***i_cmpclass*** properties. Defining ***i_keypro*** is equal to defining
-    - ***i_cmpclass*** *KeyType_raw*.
+It combines the ***i_keyclass*** and ***i_keycomp*** properties. Defining ***i_keypro*** is equal to defining
+    - ***i_keycomp*** *KeyType_raw*.
     - ***i_keyclass*** *KeyType*
     - I.e. `i_key`, `i_keyclone`, `i_keydrop`, `i_keyraw`, `i_keyfrom`, `i_keytoraw`, `i_cmp`, `i_eq`, `i_hash`
     will all be textually bound to function names. See the vikings.c example on how to create and instantiate
@@ -647,8 +653,8 @@ It combines the ***i_keyclass*** and ***i_cmpclass*** properties. Defining ***i_
 - `i_valraw` *RawType* - Emplace-function argument "raw" type. Defaults to *i_val*.
 - `i_valfrom` *Func(r)* - Conversion func from a *i_valraw* to return a *i_val* type.
 - `i_valtoraw` *Func(p)*  - Conversion func from a *i_val* pointer to a *i_valraw* type.
-
 </details>
+
 <details>
 <summary>Specifying comparison parameters</summary>
 
@@ -680,7 +686,7 @@ with **emplace**, e.g. *vec_X_emplace_back()*. This is an ergonimic alternative 
 other elements using dynamic memory or shared resources.
 
 The **emplace** methods ***construct*** / ***clone*** the given raw-type element when it is added
-to the container (specified normally using i_keypro/i_valpro or i_cmpclass or the c_-option variants).
+to the container (specified normally using i_keypro/i_valpro or i_keycomp or the c_-option variants).
 In contrast, the *non-emplace* methods ***moves*** the element into the container.
 
 **Note**: For containers with integral/trivial element types, or when neither `i_keyraw/i_valraw` is defined,

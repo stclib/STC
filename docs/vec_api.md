@@ -12,29 +12,34 @@ See the c++ class [std::vector](https://en.cppreference.com/w/cpp/container/vect
 ## Header file and declaration
 
 ```c++
-#define T <ct>,<kt>[,<op>] // shorthand for defining T, i_key, i_opt
-#define T <ct>           // container type name (default: vec_{i_key})
-// One of the following:
-#define i_key <t>        // key type
-#define i_keyclass <t>   // key type, and bind <t>_clone() and <t>_drop() function names
-#define i_keypro <t>     // key "pro" type, use for cstr, arc, box types
+#define T <ct>, <kt>[, (<opt>)] // shorthand for defining vec name, i_key and i_opt
+// Common <opt> traits:
+//   c_keycomp  - Key type <kt> is a comparable;
+//                Binds <kt>_cmp(), <kt>_hash() "member" function names.
+//   c_keyclass - Additionally binds <kt>_clone() and <kt>_drop() function names.
+//                All containers used as keys themselves can be specified with the c_keyclass trait.
+//   c_keypro   - "Pro" key type, use e.g. for built-in `cstr`, `zsview`, `arc`, and `box` as keys.
+//                These support conversion to/from a "raw" input type (such as const char*) when
+//                using <ct>_emplace*() functions, and may do optimized lookups via the raw type.
+//   c_use_cmp  - Enable element sorting. It implies c_use_eq as well.
+//   c_use_eq   - Enable <kt>_eq() for linear search and equality comparison of the container itself.
+//
+// To enable multiple traits, specify e.g. (c_keyclass | c_use_cmp) as <opt>.
 
-// Use alone or combined with i_keyclass:
-#define i_cmpclass <ct>  // Comparison "class". <ct>, aka `raw` defaults to <kt>
-                         // Bind <ct>_cmp(),  <ct>_eq(),  <ct>_hash() member functions.
+// Alternative to defining T:
+#define i_key <kt> // define key type. container type name <ct> defaults to vec_<kt>.
 
-// Override or define when not "class" or "pro" is used:
-#define i_keydrop <fn>   // Destroy element func - defaults to empty destruct
-#define i_keyclone <fn>  // Clone element func (required when i_keydrop is defined)
-
+// Override/define when not the <opt> traits are specified:
+#define i_keydrop <fn>   // Destroy-element function - defaults to empty destruct
+#define i_keyclone <fn>  // Required if i_keydrop is defined
 #define i_cmp <fn>       // Three-way compare two i_keyraw*
 #define i_less <fn>      // Less comparison. Alternative to i_cmp
-#define i_eq <fn>        // Equality comparison. Implicitly defined with i_cmp, but not i_less.
+#define i_eq <fn>        // Equality comparison. Implicitly defined with i_cmp, but not with i_less.
 
 #include <stc/vec.h>
 ```
-- Defining either `i_use_cmp`, `i_less` or `i_cmp` will enable sorting, binary_search and lower_bound
-- **emplace**-functions are only available when `i_keyraw` is implicitly or explicitly defined.
+- Defining either `i_use_cmp`, `i_less` or `i_cmp` enables sort(), binary_search() and lower_bound().
+- **emplace**-functions are only available when `i_keyraw` is implicitly or explicitly defined (e.g. via c_keypro).
 - In the following, `X` is the value of `i_key` unless `T` is defined.
 
 ## Methods

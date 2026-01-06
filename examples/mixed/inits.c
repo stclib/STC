@@ -12,10 +12,10 @@ inline static int IPair_cmp(const IPair* a, const IPair* b) {
     return c ? c : c_default_cmp(&a->y, &b->y);
 }
 
-#define T vec_ip, IPair, (c_cmpclass)
+#define T vec_ip, IPair, (c_keycomp)
 #include <stc/vec.h>
 
-#define T list_ip, IPair, (c_cmpclass)
+#define T list_ip, IPair, (c_keycomp)
 #include <stc/list.h>
 
 #define T PriorityQ, float

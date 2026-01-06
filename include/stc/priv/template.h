@@ -42,20 +42,21 @@
   #define c_OPTION(flag)  ((i_opt) & (flag))
   #define c_declared      (1<<0)
   #define c_no_atomic     (1<<1)
-  #define c_arc2          (1<<2)
+  #define c_use_arc2      (1<<2)
   #define c_no_clone      (1<<3)
   #define c_no_hash       (1<<4)
   #define c_use_cmp       (1<<5)
   #define c_use_eq        (1<<6)
-  #define c_cmpclass      (1<<7)
+  #define c_keycomp       (1<<7)
   #define c_keyclass      (1<<8)
   #define c_valclass      (1<<9)
   #define c_keypro        (1<<10)
   #define c_valpro        (1<<11)
+  #define c_cmpclass      c_keycomp // [deprecated]
 #endif
 
-#if defined i_rawclass   // [deprecated]
-  #define i_cmpclass i_rawclass
+#if defined i_cmpclass   // [deprecated]
+  #define i_keycomp i_cmpclass
 #endif
 
 #if defined T && !defined i_type
@@ -111,8 +112,8 @@
 #if c_OPTION(c_valclass)
   #define i_valclass i_val
 #endif
-#if c_OPTION(c_cmpclass)
-  #define i_cmpclass i_key
+#if c_OPTION(c_keycomp)
+  #define i_keycomp i_key
   #define i_use_cmp
 #endif
 #if c_OPTION(c_keypro)
@@ -124,15 +125,14 @@
 
 #if defined i_keypro
   #define i_keyclass i_keypro
-  #define i_cmpclass c_JOIN(i_keypro, _raw)
+  #define i_keycomp c_JOIN(i_keypro, _raw)
 #endif
 
-#if defined i_cmpclass
-  #define i_keyraw i_cmpclass
+#if defined i_keycomp
+  #define i_keyraw i_keycomp
 #elif defined i_keyclass && !defined i_keyraw
-  // When only i_keyclass is defined, we also define i_cmpclass to the same.
-  // We do not define i_keyraw here, otherwise _from() / _toraw() is expected to exist.
-  #define i_cmpclass i_key
+  // Also bind comparisons functions when c_keyclass is specified.
+  #define i_keycomp i_key
 #elif defined i_keyraw && !defined i_keyfrom
   // Define _i_no_put when i_keyfrom is not explicitly defined and i_keyraw is.
   // In this case, i_keytoraw needs to be defined (may be done later in this file).
@@ -166,23 +166,23 @@
   #define _i_has_eq
 #endif
 
-// Bind to i_cmpclass "class members": _cmp, _eq and _hash (when conditions are met).
-#if defined i_cmpclass
+// Bind to i_keycomp "class members": _cmp, _eq and _hash (when conditions are met).
+#if defined i_keycomp
   #if !(defined i_cmp || defined i_less) && (defined i_use_cmp || defined _i_sorted)
-    #define i_cmp c_JOIN(i_cmpclass, _cmp)
+    #define i_cmp c_JOIN(i_keycomp, _cmp)
   #endif
-  #if !defined i_eq && (defined i_use_eq || defined i_hash || defined _i_is_hash)
-    #define i_eq c_JOIN(i_cmpclass, _eq)
+  #if !defined i_eq && (defined i_use_eq || defined i_hash || defined _i_hasher)
+    #define i_eq c_JOIN(i_keycomp, _eq)
   #endif
   #if !(defined i_hash || defined i_no_hash)
-    #define i_hash c_JOIN(i_cmpclass, _hash)
+    #define i_hash c_JOIN(i_keycomp, _hash)
   #endif
 #endif
 
 #if !defined i_key
   #error "No i_key defined"
-#elif defined i_keyraw && !(c_OPTION(c_cmpclass) || defined i_keytoraw)
-  #error "If i_cmpclass / i_keyraw is defined, i_keytoraw must be defined too"
+#elif defined i_keyraw && !(c_OPTION(c_keycomp) || defined i_keytoraw)
+  #error "If i_keycomp / i_keyraw is defined, i_keytoraw must be defined too"
 #elif !defined i_no_clone && (defined i_keyclone ^ defined i_keydrop)
   #error "Both i_keyclone and i_keydrop must be defined, if any (unless i_no_clone defined)."
 #elif defined i_from || defined i_drop

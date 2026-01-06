@@ -16,7 +16,7 @@ int Point_cmp(const Point* a, const Point* b) {
     return c ? c : a->y - b->y;
 }
 
-#define T PntMap, Point, int, (c_cmpclass | c_declared)
+#define T PntMap, Point, int, (c_keycomp | c_declared)
 #include <stc/sortedmap.h>
 
 // cstr => cstr map

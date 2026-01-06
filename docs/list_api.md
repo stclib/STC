@@ -22,29 +22,34 @@ See the c++ class [std::list](https://en.cppreference.com/w/cpp/container/list) 
 ## Header file and declaration
 
 ```c++
-#define T <ct>,<kt>[,<op>] // shorthand for defining T, i_key, i_opt
-#define T <ct>           // list container type name (default: list_{i_key})
-// One of the following:
-#define i_key <t>        // key type
-#define i_keyclass <t>   // key type, and bind <t>_clone() and <t>_drop() function names
-#define i_keypro <t>     // key "pro" type, use for cstr, arc, box types
+#define T <ct>, <kt>[, (<opt>)] // shorthand for defining list name, i_key, and i_opt
+// Common <opt> traits:
+//   c_keycomp  - Key type <kt> is a comparable;
+//                Binds <kt>_cmp(), <kt>_hash() "member" function names.
+//   c_keyclass - Additionally binds <kt>_clone() and <kt>_drop() function names.
+//                All containers used as keys themselves can be specified with the c_keyclass trait.
+//   c_keypro   - "Pro" key type, use e.g. for built-in `cstr`, `zsview`, `arc`, and `box` as keys.
+//                These support conversion to/from a "raw" input type (such as const char*) when
+//                using <ct>_emplace*() functions, and may do optimized lookups via the raw type.
+//   c_use_cmp  - Enable element sorting. It implies c_use_eq as well.
+//   c_use_eq   - Enable <kt>_eq() for linear search and equality comparison of the container itself.
+//
+// To enable multiple traits, specify e.g. (c_keyclass | c_use_cmp) as <opt>.
 
-#define i_keydrop <fn>   // destroy value func - defaults to empty destruct
-#define i_keyclone <fn>  // REQUIRED IF i_keydrop defined
+// Alternative to defining T:
+#define i_key <kt> // define key type. container type name <ct> defaults to list_<kt>.
 
-#define i_use_cmp        // may be defined instead of i_cmp when i_key is an integral/native-type.
-#define i_cmp <fn>       // three-way compare two i_keyraw*
-#define i_less <fn>      // less comparison. Alternative to i_cmp
-#define i_eq <fn>        // equality comparison. Implicitly defined with i_cmp, but not i_less.
+// Override/define when not the <opt> traits are specified:
+#define i_keydrop <fn>   // Destroy-element function - defaults to empty destruct
+#define i_keyclone <fn>  // Required if i_keydrop is defined
+#define i_cmp <fn>       // Three-way compare two i_keyraw*
+#define i_less <fn>      // Less comparison. Alternative to i_cmp
+#define i_eq <fn>        // Equality comparison. Implicitly defined with i_cmp, but not with i_less.
 
-#define i_keyraw <t>     // conversion "raw" type (default: {i_key})
-#define i_cmpclass <t>   // conversion "raw class". binds <t>_cmp(),  <t>_eq(),  <t>_hash()
-#define i_keytoraw <fn>  // conversion func i_key* => i_keyraw
-#define i_keyfrom <fn>   // conversion func i_keyraw => i_key
 #include <stc/list.h>
 ```
 - Defining either `i_use_cmp`, `i_less` or `i_cmp` will enable sorting
-- **emplace**-functions are only available when `i_keyraw` is implicitly or explicitly defined.
+- **emplace**-functions are only available when `i_keyraw` is implicitly or explicitly defined (e.g. via c_keypro).
 - In the following, `X` is the value of `i_key` unless `T` is defined.
 
 ## Methods
