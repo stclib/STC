@@ -12,9 +12,7 @@ c_union (Tree,
 void Tree_drop(Tree* self) {
     if (c_is(self, TreeNode, n)) {
         Tree_drop(n->left);
-        free(n->left);
         Tree_drop(n->right);
-        free(n->right);
     }
     free(self);
 }

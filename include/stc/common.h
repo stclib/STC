@@ -179,7 +179,7 @@ typedef ptrdiff_t       isize;
 
 #define c_each_ref(v, C, cnt) \
     C##_value* v = (C##_value*)&v; v; ) \
-    for (C##_iter v##_it = C##_begin(&cnt); (v = v##_it.ref); C##_next(&v##_it)
+    for (C##_iter v##_itr_ = C##_begin(&cnt); (v = v##_itr_.ref); C##_next(&v##_itr_)
 #define c_each_item(...) c_each_ref(__VA_ARGS__) // [deprecated]
 
 #define c_each_n(...) c_MACRO_OVERLOAD(c_each_n, __VA_ARGS__)
