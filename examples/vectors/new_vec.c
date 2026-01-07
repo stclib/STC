@@ -30,7 +30,7 @@ int main(void)
 
     vec_pnt_sort(&my.pntvec);
 
-    for (c_each_item(e, vec_pnt, my.pntvec))
+    for (c_each_ref(e, vec_pnt, my.pntvec))
         printf(" (%d %d)", e->x, e->y);
     puts("");
 

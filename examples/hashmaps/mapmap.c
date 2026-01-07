@@ -20,7 +20,7 @@ void add(Departments* deps, const char* name, const char* email, const char* dep
 int contains(Departments* map, const char* name)
 {
     int count = 0;
-    for (c_each_item(e, Departments, *map))
+    for (c_each_ref(e, Departments, *map))
         if (People_contains(&e->second, name))
             ++count;
     return count;

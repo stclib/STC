@@ -80,7 +80,7 @@ int main(void)
     vec_ip pairs1 = c_make(vec_ip, {{5, 6}, {3, 4}, {1, 2}, {7, 8}});
     vec_ip_sort(&pairs1);
 
-    for (c_each_item(e, vec_ip, pairs1))
+    for (c_each_ref(e, vec_ip, pairs1))
         printf("(%d %d) ", e->x, e->y);
     puts("");
     vec_ip_drop(&pairs1);
@@ -90,7 +90,7 @@ int main(void)
     list_ip pairs2 = c_make(list_ip, {{5, 6}, {3, 4}, {1, 2}, {7, 8}});
     list_ip_sort(&pairs2);
 
-    for (c_each_item(e, list_ip, pairs2))
+    for (c_each_ref(e, list_ip, pairs2))
         printf("(%d %d) ", e->x, e->y);
     puts("");
     list_ip_drop(&pairs2);

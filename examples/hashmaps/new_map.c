@@ -56,7 +56,7 @@ int main(void)
     hmap_int_insert(&map, 456, 654);
     hmap_int_insert(&map, 789, 987);
 
-    for (c_each_item(s, hset_cstr, sset))
+    for (c_each_ref(s, hset_cstr, sset))
         printf(" %s\n", cstr_str(s));
 
     hmap_int_drop(&map);

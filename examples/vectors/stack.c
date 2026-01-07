@@ -13,16 +13,16 @@ int main(void) {
 
     IVec_sort(&stack);
 
-    for (c_range(i, 101))
+    for (c_range(i, 100))
         IVec_push(&stack, (int)(i*i));
 
-    printf("%d\n", *IVec_top(&stack));
+    printf("top: %d\n", *IVec_top(&stack));
 
     for (c_range(i, 90))
         IVec_pop(&stack);
 
-    for (c_each(i, IVec, stack))
-        printf(" %d", *i.ref);
+    for (c_each_ref(i, IVec, stack))
+        printf(" %d", *i);
     puts("");
     printf("top: %d\n", *IVec_top(&stack));
 

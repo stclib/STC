@@ -42,8 +42,8 @@ int main(void)
     for (c_each(i, IMap, map))
         printf(" (%d %d)", i.ref->first, i.ref->second);
 
-    puts("\n\nfor c_each_item:");
-    for (c_each_item(e, IMap, map))
+    puts("\n\nfor c_each_ref:");
+    for (c_each_ref(e, IMap, map))
         printf(" (%d %d)", e->first, e->second);
 
     puts("\n\nfor c_each_kv:");
