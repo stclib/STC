@@ -9,14 +9,13 @@ A **hset** is an associative container that contains a set of unique objects of 
 ```c++
 #define T <ct>, <kt>[, (<opt>)] // shorthand for defining set name, i_key, and i_opt
 // Common <opt> traits:
-//   c_keycomp  - Key type <kt> is a comparable;
-//                Binds <kt>_cmp(), <kt>_eq(), <kt>_hash() "member" function names.
+//   c_keycomp  - Key type <kt> is a comparable struct;
+//                Binds <kt>_eq(), <kt>_hash() "member" function names.
 //   c_keyclass - Additionally binds <kt>_clone() and <kt>_drop() function names.
 //                All containers used as keys themselves can be specified with the c_keyclass trait.
 //   c_keypro   - "Pro" key type, use e.g. for built-in `cstr`, `zsview`, `arc`, and `box` as i_key.
 //                These support conversion to/from a "raw" input type (such as const char*) when
 //                using <ct>_emplace*() functions, and may do optimized lookups via the raw type.
-//   c_use_eq   - Enable equality comparison of the container itself.
 
 // Alternative to defining T:
 #define i_key <t>             // define key type. container type name <ct> defaults to hset_<kt>.
@@ -26,13 +25,11 @@ A **hset** is an associative container that contains a set of unique objects of 
 #define i_eq or i_cmp <fn>    // equality comparison. i_eq is implicitly defined from i_cmp.
 #define i_keydrop <fn>        // destroy key func - defaults to empty destruct
 #define i_keyclone <fn>       // Required if i_keydrop is defined
-#define i_valdrop <fn>        // destroy value func - defaults to empty destructor
-#define i_valclone <fn>       // Required if i_valdrop is defined
 
 #include <stc/hashset.h>
 ```
 - In the following, `X` is the value of `i_key` unless `T` is defined.
-- **emplace**-functions are only available when `i_keyraw` is implicitly or explicitly defined (e.g. via c_keypro).
+- **emplace**-functions are only available when `i_keyraw` is explicitly or implicitly defined (e.g. via c_keypro).
 
 ## Methods
 

@@ -17,26 +17,28 @@ See similar c++ class [std::unique_ptr](https://en.cppreference.com/w/cpp/memory
 ```c++
 #define T <ct>, <kt>[, (<opt>)] // shorthand for defining box name, i_key, and i_opt
 // Common <opt> traits:
-//   c_keycomp  - Key type <kt> is a comparable;
+//   c_keycomp  - Key type <kt> is a comparable struct;
 //                Binds <kt>_cmp(), <kt>_hash() "member" function names.
 //   c_keyclass - Additionally binds <kt>_clone() and <kt>_drop() function names.
 //                All containers used as keys themselves can be specified with the c_keyclass trait.
 //   c_keypro   - "Pro" key type, use e.g. for built-in `cstr`, `zsview`, `arc`, and `box` as keys.
 //                These support conversion to/from a "raw" input type (such as const char*) when
 //                using <ct>_emplace*() functions, and may do optimized lookups via the raw type.
-//   c_use_cmp  - Enable comparison
+//   c_use_cmp  - Enable comparison <kt>_cmp() function.
+//                If <kt> is a primitive type, operators '<' and '==' are used by default.
+//   c_use_eq   - Enable optimized <kt>_eq() and for equality comparison of the container itself.
 //
 // To apply multiple traits, specify e.g. (c_keyclass | c_use_cmp) as <opt>.
 
 // Alternative to defining T:
-#define i_key <kt> // define key type. container type name <ct> defaults to box_<kt>.
+#define i_key <kt>       // Key type. Container type name <ct> defaults to box_<kt>.
 
 // Override/define when not the <opt> traits are specified:
+#define i_cmp <fn>       // Three-way comparison of two i_key (or i_keyraw)
+#define i_less <fn>      // Alternative less-comparison. i_cmp is deduced from i_less.
+#define i_eq <fn>        // Optional equality comparison, otherwise deduced from given i_cmp.
 #define i_keydrop <fn>   // Destroy-element function - defaults to empty destruct
 #define i_keyclone <fn>  // Required if i_keydrop is defined
-#define i_cmp <fn>       // Three-way compare two i_keyraw*
-#define i_less <fn>      // Less comparison. Alternative to i_cmp
-#define i_eq <fn>        // Equality comparison. Implicitly defined with i_cmp, but not with i_less.
 
 #include <stc/box.h>
 ```
