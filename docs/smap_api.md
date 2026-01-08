@@ -98,6 +98,7 @@ smap_X_iter     smap_X_end(const smap_X* self);
 void            smap_X_next(smap_X_iter* iter);
 smap_X_iter     smap_X_advance(smap_X_iter it, isize n);
 
+bool            smap_X_eq(const smap_X* c1, const smap_X* c2);
 i_key           smap_X_value_clone(const smap_X* self, i_key val);
 smap_X_raw      smap_X_value_toraw(const i_key* pval);
 void            smap_X_value_drop(i_key* pval);

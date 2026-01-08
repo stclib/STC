@@ -279,12 +279,16 @@ STC_INLINE _m_iter _c_MEMB(_find)(const Self* self, _m_raw raw)
     { return _c_MEMB(_find_in)(self, _c_MEMB(_begin)(self), _c_MEMB(_end)(self), raw); }
 
 STC_INLINE bool _c_MEMB(_eq)(const Self* self, const Self* other) {
+#ifdef _i_is_trivial
+    return c_memcmp(self->data, other->data, self->size*c_sizeof(_m_value)) == 0;
+#else
     if (self->size != other->size) return false;
     for (isize i = 0; i < self->size; ++i) {
         const _m_raw _rx = i_keytoraw((self->data+i)), _ry = i_keytoraw((other->data+i));
         if (!(i_eq((&_rx), (&_ry)))) return false;
     }
     return true;
+#endif
 }
 #endif // _i_has_eq
 #include "sys/finalize.h"

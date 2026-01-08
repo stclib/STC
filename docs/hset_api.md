@@ -72,6 +72,7 @@ hset_X_iter     hset_X_begin(const hset_X* self);
 hset_X_iter     hset_X_end(const hset_X* self);
 void            hset_X_next(hset_X_iter* it);
 
+bool            hset_X_eq(const hset_X* c1, const hset_X* c2);
 hset_X_value    hset_X_value_clone(const hset_X* self, hset_X_value val);
 ```
 

@@ -60,6 +60,7 @@ void            pqueue_X_pop(pqueue_X* self);
 i_key           pqueue_X_pull(const pqueue_X* self);
 void            pqueue_X_erase_at(pqueue_X* self, isize idx);
 
+bool            pqueue_X_eq(const pqueue_X* c1, const pqueue_X* c2); // equality comp.
 i_key           pqueue_X_value_clone(const pqueue_X* self, i_key value);
 ```
 

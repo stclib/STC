@@ -75,6 +75,7 @@ sset_X_iter     sset_X_begin(const sset_X* self);
 sset_X_iter     sset_X_end(const sset_X* self);
 void            sset_X_next(sset_X_iter* it);
 
+bool            sset_X_eq(const sset_X* c1, const sset_X* c2);
 i_key           sset_X_value_clone(const sset_X* self, i_key val);
 ```
 

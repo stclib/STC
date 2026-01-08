@@ -10,7 +10,7 @@ See the c++ class [std::queue](https://en.cppreference.com/w/cpp/container/queue
 #define T <ct>, <kt>[, (<opt>)] // shorthand for defining queue name, i_key, and i_opt
 // Common <opt> traits:
 //   c_keycomp  - Key type <kt> is a comparable;
-//                Binds <kt>_cmp() "member" function name.
+//                Binds <kt>_less() (and <kt>_cmp()) "member" function names.
 //   c_keyclass - Binds <kt>_clone() and <kt>_drop() function names.
 //                All containers used as keys themselves can be specified with the c_keyclass trait.
 //   c_keypro   - "Pro" key type, use e.g. for built-in `cstr`, `zsview`, `arc`, and `box` as i_key.

@@ -128,6 +128,21 @@ STC_INLINE void _c_MEMB(_emplace)(Self* self, _m_raw raw)
     { _c_MEMB(_push)(self, i_keyfrom(raw)); }
 #endif // !_i_no_emplace
 
+#ifdef _i_has_eq
+STC_INLINE bool _c_MEMB(_eq)(const Self* self, const Self* other) {
+#ifdef _i_is_trivial
+    return c_memcmp(self->data, other->data, self->size*c_sizeof(_m_value)) == 0;
+#else
+    if (self->size != other->size) return false;
+    for (isize i = 0; i < self->size; ++i) {
+        const _m_raw _rx = i_keytoraw((self->data+i)), _ry = i_keytoraw((other->data+i));
+        if (!(i_eq((&_rx), (&_ry)))) return false;
+    }
+    return true;
+#endif
+}
+#endif // _i_has_eq
+
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined i_implement
 

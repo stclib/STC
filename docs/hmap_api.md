@@ -96,6 +96,7 @@ hmap_X_iter     hmap_X_end(const hmap_X* self);
 void            hmap_X_next(hmap_X_iter* it);
 hmap_X_iter     hmap_X_advance(hmap_X_iter it, hmap_X_ssize n);
 
+bool            hmap_X_eq(const hmap_X* c1, const hmap_X* c2);
 hmap_X_value    hmap_X_value_clone(const hmap_X* self, hmap_X_value val);
 hmap_X_raw      hmap_X_value_toraw(hmap_X_value* pval);
 ```
