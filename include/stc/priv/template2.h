@@ -66,6 +66,7 @@
 #undef _i_aux_def
 #undef _i_has_cmp
 #undef _i_has_eq
+#undef _i_has_default_eq
 #undef _i_prefix
 #undef _i_template
 #undef Self

@@ -198,6 +198,7 @@
   #define i_eq(x, y) (i_cmp(x, y)) == 0
 #elif !defined i_eq
   #define i_eq(x, y) *x == *y // works for integral types
+  #define _i_has_default_eq
 #endif
 #if !defined i_less && defined i_cmp
   #define i_less(x, y) (i_cmp(x, y)) < 0
