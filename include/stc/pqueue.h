@@ -123,10 +123,10 @@ STC_INLINE _m_value _c_MEMB(_value_clone)(const Self* self, _m_value val)
     { (void)self; return i_keyclone(val); }
 #endif // !i_no_clone
 
-#ifndef i_no_emplace
+#ifndef _i_no_emplace
 STC_INLINE void _c_MEMB(_emplace)(Self* self, _m_raw raw)
     { _c_MEMB(_push)(self, i_keyfrom(raw)); }
-#endif // !i_no_emplace
+#endif // !_i_no_emplace
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined i_implement

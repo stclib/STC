@@ -72,7 +72,7 @@ STC_INLINE void _c_MEMB(_value_drop)(const Self* self, _m_value* val)
     #endif
 #endif
 
-#ifndef i_no_emplace
+#ifndef _i_no_emplace
 STC_INLINE _m_value* _c_MEMB(_emplace)(Self* self, _m_raw raw)
     { return _c_MEMB(_push)(self, i_keyfrom(raw)); }
 #endif

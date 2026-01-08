@@ -58,10 +58,11 @@
 #undef i_use_eq
 #undef i_no_hash
 #undef i_no_clone
-#undef i_no_emplace
 #undef i_declared
 
 #undef _i_no_put
+#undef _i_no_emplace
+#undef _i_is_trivial
 #undef _i_aux_def
 #undef _i_has_cmp
 #undef _i_has_eq

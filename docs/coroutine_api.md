@@ -165,7 +165,7 @@ bool            cco_flt_takewhile(bool predicate);                  // Use inste
 |`struct cco_error` | `struct { int32_t code, line; const char* file; }`    | Error object for exceptions |
 |`cco_task`         | Enclosure/function object                           | Basic coroutine frame type |
 |`cco_timer`        | Struct type                                         | Delay timer               |
-|`cco_semaphore`    | Struct type                                         | Synchronization primitive |
+|`cco_semaphore`    | Struct type                                         | Synchronization basic |
 |`cco_fiber`        | `struct { int status; }`                                         | Represent a thread-like entity within a thread |
 
 ## Rules

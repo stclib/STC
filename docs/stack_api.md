@@ -14,7 +14,7 @@ See the c++ class [std::stack](https://en.cppreference.com/w/cpp/container/stack
 #define T <ct>, <kt>[, (<opt>)[, <CAP>]] // shorthand for defining stack name, i_key, and i_opt
 // <CAP>: If given, stack becomes an inplace stack using runtime stack memory only with CAP capacity.
 // Common <opt> traits:
-//   c_keycomp  - Key type <kt> is a comparable struct;
+//   c_keycomp  - Key <kt> is a comparable typedef'ed type.
 //                Binds <kt>_cmp() "member" function name.
 //   c_keyclass - Additionally binds <kt>_clone() and <kt>_drop() function names.
 //                All containers used as keys themselves can be specified with the c_keyclass trait.
@@ -22,7 +22,7 @@ See the c++ class [std::stack](https://en.cppreference.com/w/cpp/container/stack
 //                These support conversion to/from a "raw" input type (such as const char*) when
 //                using <ct>_emplace*() functions, and may do optimized lookups via the raw type.
 //   c_use_cmp  - Enable element sorting. It implies c_use_eq as well.
-//                If <kt> is a primitive type, operators '<' and '==' are used by default.
+//                If <kt> is a basic type, operators '<' and '==' are used by default.
 //   c_use_eq   - Enable <kt>_eq() for optimized linear search
 //                and equality comparison of the container itself.
 //

@@ -211,7 +211,8 @@
   #define i_hash c_default_hash
 #endif
 
-#define i_no_emplace
+#define _i_no_emplace
+#define _i_is_trivial
 
 #ifndef i_tag
   #define i_tag i_key
@@ -219,7 +220,7 @@
 #ifndef i_keyfrom
   #define i_keyfrom c_default_clone
 #else
-  #undef i_no_emplace
+  #undef _i_no_emplace
 #endif
 #ifndef i_keyraw
   #define i_keyraw i_key
@@ -232,6 +233,8 @@
 #endif
 #ifndef i_keydrop
   #define i_keydrop c_default_drop
+#else
+  #undef _i_is_trivial
 #endif
 
 #if defined _i_is_map // ---- process hashmap/sortedmap value i_val, ... ----
@@ -273,7 +276,7 @@
     #define _i_no_put
   #endif
 #else
-  #undef i_no_emplace
+  #undef _i_no_emplace
 #endif
 #ifndef i_valraw
   #define i_valraw i_val
@@ -286,6 +289,8 @@
 #endif
 #ifndef i_valdrop
   #define i_valdrop c_default_drop
+#else
+  #undef _i_is_trivial
 #endif
 
 #endif // !_i_is_map

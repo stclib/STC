@@ -125,7 +125,7 @@ _c_MEMB(_insert_entry_)(Self* self, _m_keyraw rkey) {
 
 #ifdef _i_is_map
     STC_API _m_result _c_MEMB(_insert_or_assign)(Self* self, _m_key key, _m_mapped mapped);
-    #ifndef i_no_emplace
+    #ifndef _i_no_emplace
     STC_API _m_result _c_MEMB(_emplace_or_assign)(Self* self, _m_keyraw rkey, _m_rmapped rmapped);
     #endif
 
@@ -155,7 +155,7 @@ _c_MEMB(_insert_entry_)(Self* self, _m_keyraw rkey) {
     }
 #endif // !i_no_clone
 
-#ifndef i_no_emplace
+#ifndef _i_no_emplace
     STC_INLINE _m_result
     _c_MEMB(_emplace)(Self* self, _m_keyraw rkey _i_MAP_ONLY(, _m_rmapped rmapped)) {
         _m_result _res = _c_MEMB(_insert_entry_)(self, rkey);
@@ -165,7 +165,7 @@ _c_MEMB(_insert_entry_)(Self* self, _m_keyraw rkey) {
         }
         return _res;
     }
-#endif // !i_no_emplace
+#endif // !_i_no_emplace
 
 STC_INLINE _m_raw _c_MEMB(_value_toraw)(const _m_value* val) {
     return _i_SET_ONLY( i_keytoraw(val) )
@@ -211,7 +211,7 @@ STC_INLINE _m_value* _c_MEMB(_push)(Self* self, _m_value _val) {
 #ifndef _i_no_put
 #ifdef _i_is_map
 STC_INLINE _m_result _c_MEMB(_put)(Self* self, _m_keyraw rkey, _m_rmapped rmapped) {
-    #ifdef i_no_emplace
+    #ifdef _i_no_emplace
         return _c_MEMB(_insert_or_assign)(self, rkey, rmapped);
     #else
         return _c_MEMB(_emplace_or_assign)(self, rkey, rmapped);
@@ -221,7 +221,7 @@ STC_INLINE _m_result _c_MEMB(_put)(Self* self, _m_keyraw rkey, _m_rmapped rmappe
 
 STC_INLINE void _c_MEMB(_put_n)(Self* self, const _m_raw* raw, isize n) {
     while (n--)
-        #if defined _i_is_set && defined i_no_emplace
+        #if defined _i_is_set && defined _i_no_emplace
             _c_MEMB(_insert)(self, *raw++);
         #elif defined _i_is_set
             _c_MEMB(_emplace)(self, *raw++);
@@ -363,7 +363,7 @@ STC_DEF void _c_MEMB(_clear)(Self* self) {
         return _res;
     }
 
-    #ifndef i_no_emplace
+    #ifndef _i_no_emplace
     STC_DEF _m_result
     _c_MEMB(_emplace_or_assign)(Self* self, _m_keyraw rkey, _m_rmapped rmapped) {
         _m_result _res = _c_MEMB(_insert_entry_)(self, rkey);
@@ -376,7 +376,7 @@ STC_DEF void _c_MEMB(_clear)(Self* self) {
         _res.ref->second = i_valfrom(rmapped);
         return _res;
     }
-    #endif // !i_no_emplace
+    #endif // !_i_no_emplace
 #endif // _i_is_map
 
 STC_DEF _m_result

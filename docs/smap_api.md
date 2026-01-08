@@ -17,7 +17,7 @@ See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) fo
 ```c++
 #define T <ct>, <kt>, <vt>[, (<opt>)] // shorthand for defining map name, i_key, i_val, and i_opt
 // Common <opt> traits:
-//   c_keycomp  - Key type <kt> is a comparable struct;
+//   c_keycomp  - Key <kt> is a comparable typedef'ed type.
 //                Binds <kt>_cmp() "member" function name.
 //   c_keyclass - Additionally binds <kt>_clone() and <kt>_drop() function names.
 //                All containers used as keys themselves can be specified with the c_keyclass trait.
@@ -212,8 +212,8 @@ int main(void)
     // emplace() adds only when key does not already exist:
     IdMap_emplace(&idnames, 100, "Green"); // ignored
 
-    for (c_each(i, IdMap, idnames))
-        printf("%d: %s\n", i.ref->first, cstr_str(&i.ref->second));
+    for (c_each_kv(id, name, IdMap, idnames))
+        printf("%d: %s\n", *id, cstr_str(name));
 
     IdMap_drop(&idnames);
 }

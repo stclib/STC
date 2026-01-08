@@ -14,7 +14,7 @@ See the c++ class [std::vector](https://en.cppreference.com/w/cpp/container/vect
 ```c++
 #define T <ct>, <kt>[, (<opt>)] // shorthand for defining vec name, i_key and i_opt
 // Common <opt> traits:
-//   c_keycomp  - Key type <kt> is a comparable struct;
+//   c_keycomp  - Key <kt> is a comparable typedef'ed type.
 //                Binds <kt>_cmp() "member" function name.
 //   c_keyclass - Additionally binds <kt>_clone() and <kt>_drop() function names.
 //                All containers used as keys themselves can be specified with the c_keyclass trait.
@@ -22,7 +22,7 @@ See the c++ class [std::vector](https://en.cppreference.com/w/cpp/container/vect
 //                These support conversion to/from a "raw" input type (such as const char*) when
 //                using <ct>_emplace*() functions, and may do optimized lookups via the raw type.
 //   c_use_cmp  - Enable element sorting. It implies c_use_eq as well.
-//                If <kt> is a primitive type, operators '<' and '==' are used by default.
+//                If <kt> is a basic type, operators '<' and '==' are used by default.
 //   c_use_eq   - Enable <kt>_eq() for linear search and equality comparison of the container itself.
 //
 // To enable multiple traits, specify e.g. (c_keyclass | c_use_cmp) as <opt>.

@@ -190,10 +190,10 @@ STC_INLINE const _m_value* _c_MEMB(_at)(const Self* self, isize idx)
 STC_INLINE _m_value* _c_MEMB(_at_mut)(Self* self, isize idx)
     { c_assert(c_uless(idx, self->size)); return self->data + idx; }
 
-#ifndef i_no_emplace
+#ifndef _i_no_emplace
 STC_INLINE _m_value* _c_MEMB(_emplace)(Self* self, _m_raw raw)
     { return _c_MEMB(_push)(self, i_keyfrom(raw)); }
-#endif // !i_no_emplace
+#endif // !_i_no_emplace
 
 #ifndef i_no_clone
 STC_INLINE Self _c_MEMB(_clone)(Self stk) {

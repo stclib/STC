@@ -19,7 +19,7 @@ See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/contain
 ```c++
 #define T <ct>, <kt>, <vt>[, (<opt>)] // shorthand for defining map name, i_key, i_val, and i_opt
 // Common <opt> traits:
-//   c_keycomp  - Key type <kt> is a comparable struct;
+//   c_keycomp  - Key <kt> is a comparable typedef'ed type.
 //                Binds <kt>_eq(), <kt>_hash() "member" function names.
 //   c_keyclass - Additionally binds <kt>_clone() and <kt>_drop() function names.
 //                All containers used as keys can be specified with the c_keyclass trait.

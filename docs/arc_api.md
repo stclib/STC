@@ -34,7 +34,7 @@ See similar c++ class [std::shared_ptr](https://en.cppreference.com/w/cpp/memory
 ```c++
 #define T <ct>, <kt>[, (<opt>)] // shorthand for defining arc name, i_key, and i_opt
 // Common <opt> traits:
-//   c_keycomp  - Key type <kt> is a comparable struct;
+//   c_keycomp  - Key <kt> is a comparable typedef'ed type.
 //                Binds <kt>_cmp(), <kt>_hash() "member" function names.
 //   c_keyclass - Additionally binds <kt>_clone() and <kt>_drop() function names.
 //                All containers used as keys themselves can be specified with the c_keyclass trait.
@@ -42,7 +42,7 @@ See similar c++ class [std::shared_ptr](https://en.cppreference.com/w/cpp/memory
 //                These support conversion to/from a "raw" input type (such as const char*) when
 //                using <ct>_emplace*() functions, and may do optimized lookups via the raw type.
 //   c_use_cmp  - Enable comparison <kt>_cmp() function.
-//                If <kt> is a primitive type, operators '<' and '==' are used by default.
+//                If <kt> is a basic type, operators '<' and '==' are used by default.
 //   c_use_eq   - Enable optimized <kt>_eq() and for equality comparison of the container itself.
 //   c_use_arc2 - Use arc2 instead of arc. It occupies two pointers, but may be constructed
 //                from an existing pointer.

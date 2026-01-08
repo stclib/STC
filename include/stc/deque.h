@@ -95,7 +95,7 @@ _c_MEMB(_erase_range)(Self* self, _m_iter it1, _m_iter it2) {
     return it1;
 }
 
-#ifndef i_no_emplace
+#ifndef _i_no_emplace
 STC_API _m_iter
 _c_MEMB(_emplace_n)(Self* self, isize idx, const _m_raw* raw, isize n);
 
@@ -179,7 +179,7 @@ _c_MEMB(_insert_n)(Self* self, const isize idx, const _m_value* arr, const isize
     return it;
 }
 
-#ifndef i_no_emplace
+#ifndef _i_no_emplace
 STC_DEF _m_iter
 _c_MEMB(_emplace_n)(Self* self, const isize idx, const _m_raw* raw, const isize n) {
     _m_iter it = _c_MEMB(_insert_uninit)(self, idx, n);

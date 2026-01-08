@@ -128,7 +128,7 @@ _c_MEMB(_copy)(Self *self, const Self* other) {
 }
 #endif // !i_no_clone
 
-#ifndef i_no_emplace
+#ifndef _i_no_emplace
 STC_INLINE _m_value*    _c_MEMB(_emplace_back)(Self* self, _m_raw raw)
                             { return _c_MEMB(_push_back)(self, i_keyfrom(raw)); }
 STC_INLINE _m_value*    _c_MEMB(_emplace_front)(Self* self, _m_raw raw)
@@ -137,7 +137,7 @@ STC_INLINE _m_iter      _c_MEMB(_emplace_at)(Self* self, _m_iter it, _m_raw raw)
                             { return _c_MEMB(_insert_at)(self, it, i_keyfrom(raw)); }
 STC_INLINE _m_value*    _c_MEMB(_emplace)(Self* self, _m_raw raw)
                             { return _c_MEMB(_push_back)(self, i_keyfrom(raw)); }
-#endif // !i_no_emplace
+#endif // !_i_no_emplace
 
 #ifndef _i_no_put
 STC_INLINE void         _c_MEMB(_put_n)(Self* self, const _m_raw* raw, isize n)
