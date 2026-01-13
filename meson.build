@@ -145,7 +145,8 @@ flex_exe = find_program('flex', 'win_flex', required: get_option('checkscoped'))
 if flex_exe.found()
   lex_src = custom_target(
     'checkscoped_lex',
-    command: [flex_exe, '-o', '@OUTPUT@', files('src/checkscoped.l')],
+    command: [flex_exe, '-o', '@OUTPUT@', '@INPUT@'],
+    input: 'src/checkscoped.l',
     output: 'lex.yy.c',
   )
   checkscoped_exe = executable(
@@ -160,16 +161,9 @@ root = not meson.is_subproject()
 subdir('tests')
 subdir('examples')
 
-if root
-  datadir = get_option('datadir')
-  docdir = get_option('docdir')
-  if docdir == ''
-    docdir = datadir / 'doc' / meson.project_name()
-  endif
-
-  install_subdir(
-    'docs',
-    install_dir: docdir,
-    strip_directory: true,
-  )
-endif
+install_subdir(
+  'docs',
+  install_dir: get_option('datadir') / 'doc' / meson.project_name(),
+  install_tag: 'doc',
+  strip_directory: true,
+)
