@@ -58,14 +58,14 @@
 #define c_reverse_array(array, n) do { \
     typedef struct { char d[sizeof 0[array]]; } _etype; \
     _etype* _arr = (_etype *)(array); \
-    for (isize _i = 0, _j = (n) - 1; _i < _j; ++_i, --_j) \
+    for (isize_t _i = 0, _j = (n) - 1; _i < _j; ++_i, --_j) \
         c_swap(_arr + _i, _arr + _j); \
 } while (0)
 
 // Compiles with vec, stack, and deque, and cspan container types:
 #define c_reverse(CntType, self) do { \
     CntType* _self = self; \
-    for (isize _i = 0, _j = CntType##_size(_self) - 1; _i < _j; ++_i, --_j) \
+    for (isize_t _i = 0, _j = CntType##_size(_self) - 1; _i < _j; ++_i, --_j) \
         c_swap(CntType##_at_mut(_self, _i), CntType##_at_mut(_self, _j)); \
 } while (0)
 
@@ -90,7 +90,7 @@
 // Use with: stack, vec, deque, queue:
 #define c_eraseremove_if(C, cnt_ptr, pred) do { \
     C* _cnt = cnt_ptr; \
-    isize _n = 0; \
+    isize_t _n = 0; \
     const C##_value* value; \
     C##_iter _i, _it = C##_begin(_cnt); \
     while ((value = _it.ref) && !(pred)) \
@@ -157,30 +157,30 @@
 #define _c_minmax_call(fn, T, ...) \
    fn(c_make_array(T, {__VA_ARGS__}), c_sizeof((T[]){__VA_ARGS__})/c_sizeof(T))
 
-#define c_min(...) _c_minmax_call(c_min_n, isize, __VA_ARGS__)
+#define c_min(...) _c_minmax_call(c_min_n, isize_t, __VA_ARGS__)
 #define c_umin(...) _c_minmax_call(c_umin_n, size_t, __VA_ARGS__)
 #define c_min32(...) _c_minmax_call(c_min32_n, int32_t, __VA_ARGS__)
 #define c_fmin(...) _c_minmax_call(c_fmin_n, float, __VA_ARGS__)
 #define c_dmin(...) _c_minmax_call(c_dmin_n, double, __VA_ARGS__)
-#define c_max(...) _c_minmax_call(c_max_n, isize, __VA_ARGS__)
+#define c_max(...) _c_minmax_call(c_max_n, isize_t, __VA_ARGS__)
 #define c_umax(...) _c_minmax_call(c_umax_n, size_t, __VA_ARGS__)
 #define c_max32(...) _c_minmax_call(c_max32_n, int32_t, __VA_ARGS__)
 #define c_fmax(...) _c_minmax_call(c_fmax_n, float, __VA_ARGS__)
 #define c_dmax(...) _c_minmax_call(c_dmax_n, double, __VA_ARGS__)
 
 #define _c_minmax_def(fn, T, opr) \
-    static inline T fn(const T a[], isize n) { \
+    static inline T fn(const T a[], isize_t n) { \
         T x = a[0]; \
-        for (isize i = 1; i < n; ++i) if (a[i] opr x) x = a[i]; \
+        for (isize_t i = 1; i < n; ++i) if (a[i] opr x) x = a[i]; \
         return x; \
     }
 _c_minmax_def(c_min32_n, int32_t, <)
-_c_minmax_def(c_min_n, isize, <)
+_c_minmax_def(c_min_n, isize_t, <)
 _c_minmax_def(c_umin_n, size_t, <)
 _c_minmax_def(c_fmin_n, float, <)
 _c_minmax_def(c_dmin_n, double, <)
 _c_minmax_def(c_max32_n, int32_t, >)
-_c_minmax_def(c_max_n, isize, >)
+_c_minmax_def(c_max_n, isize_t, >)
 _c_minmax_def(c_umax_n, size_t, >)
 _c_minmax_def(c_fmax_n, float, >)
 _c_minmax_def(c_dmax_n, double, >)

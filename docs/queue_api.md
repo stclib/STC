@@ -37,9 +37,9 @@ In the following, `X` is the value of `i_key` unless `T` is defined.
 
 ```c++
 queue_X         queue_X_init(void);
-queue_X         queue_X_with_capacity(isize cap);
-queue_X         queue_X_with_size(isize size, i_keyraw rawval);
-queue_X         queue_X_with_size_uninit(isize size);
+queue_X         queue_X_with_capacity(isize_t cap);
+queue_X         queue_X_with_size(isize_t size, i_keyraw rawval);
+queue_X         queue_X_with_size_uninit(isize_t size);
 
 queue_X         queue_X_clone(queue_X q);
 void            queue_X_copy(queue_X* self, const queue_X* other);
@@ -48,11 +48,11 @@ queue_X         queue_X_move(queue_X* self);                       // move
 void            queue_X_drop(const queue_X* self);                 // destructor
 
 void            queue_X_clear(queue_X* self);
-bool            queue_X_reserve(queue_X* self, isize cap);
+bool            queue_X_reserve(queue_X* self, isize_t cap);
 void            queue_X_shrink_to_fit(queue_X* self);
 
-isize           queue_X_size(const queue_X* self);
-isize           queue_X_capacity(const queue_X* self);
+isize_t         queue_X_size(const queue_X* self);
+isize_t         queue_X_capacity(const queue_X* self);
 bool            queue_X_is_empty(const queue_X* self);
 
 i_key*          queue_X_front(const queue_X* self);
@@ -66,7 +66,7 @@ i_key           queue_X_pull(queue_X* self);                       // move out l
 queue_X_iter    queue_X_begin(const queue_X* self);
 queue_X_iter    queue_X_end(const queue_X* self);
 void            queue_X_next(queue_X_iter* it);
-queue_X_iter    queue_X_advance(queue_X_iter it, isize n);
+queue_X_iter    queue_X_advance(queue_X_iter it, isize_t n);
 
 bool            queue_X_eq(const queue_X* c1, const queue_X* c2);  //  require i_eq/i_cmp/i_less.
 i_key           queue_X_value_clone(const queue_X* self, i_key value);

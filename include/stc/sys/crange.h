@@ -46,9 +46,9 @@ int main(void)
 #include "../priv/linkage.h"
 #include "../common.h"
 
-// crange: isize range -----
+// crange: isize_t range -----
 
-typedef isize crange_value;
+typedef isize_t crange_value;
 typedef struct { crange_value start, end, step, value; } crange;
 typedef struct { crange_value *ref, end, step; } crange_iter;
 
@@ -71,7 +71,7 @@ STC_INLINE void crange_next(crange_iter* it) {
 }
 
 STC_INLINE crange_iter crange_advance(crange_iter it, size_t n) {
-    if ((it.step > 0) == ((*it.ref += it.step*(isize)n) > it.end))
+    if ((it.step > 0) == ((*it.ref += it.step*(isize_t)n) > it.end))
         it.ref = NULL;
     return it;
 }

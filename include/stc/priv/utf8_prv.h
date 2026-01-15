@@ -40,28 +40,28 @@ STC_INLINE int utf8_chr_size(const char *s) {
 }
 
 /* number of codepoints in the utf8 string s */
-STC_INLINE isize utf8_count(const char *s) {
-    isize size = 0;
+STC_INLINE isize_t utf8_count(const char *s) {
+    isize_t size = 0;
     while (*s)
         size += (*++s & 0xC0) != 0x80;
     return size;
 }
 
-STC_INLINE isize utf8_count_n(const char *s, isize nbytes) {
-    isize size = 0;
+STC_INLINE isize_t utf8_count_n(const char *s, isize_t nbytes) {
+    isize_t size = 0;
     while ((nbytes-- != 0) & (*s != 0)) {
         size += (*++s & 0xC0) != 0x80;
     }
     return size;
 }
 
-STC_INLINE const char* utf8_at(const char *s, isize u8pos) {
+STC_INLINE const char* utf8_at(const char *s, isize_t u8pos) {
     while ((u8pos > 0) & (*s != 0))
         u8pos -= (*++s & 0xC0) != 0x80;
     return s;
 }
 
-STC_INLINE const char* utf8_offset(const char* s, isize u8pos) {
+STC_INLINE const char* utf8_offset(const char* s, isize_t u8pos) {
     int inc = 1;
     if (u8pos < 0) u8pos = -u8pos, inc = -1;
     while (u8pos && *s)
@@ -69,10 +69,10 @@ STC_INLINE const char* utf8_offset(const char* s, isize u8pos) {
     return s;
 }
 
-STC_INLINE isize utf8_to_index(const char* s, isize u8pos)
+STC_INLINE isize_t utf8_to_index(const char* s, isize_t u8pos)
     { return utf8_at(s, u8pos) - s; }
 
-STC_INLINE csview utf8_subview(const char *s, isize u8pos, isize u8len) {
+STC_INLINE csview utf8_subview(const char *s, isize_t u8pos, isize_t u8len) {
     csview span;
     span.buf = utf8_at(s, u8pos);
     span.size = utf8_to_index(span.buf, u8len);
@@ -91,11 +91,11 @@ extern const uint8_t utf8_dtab[]; /* utf8code.c */
 #define utf8_REJECT 12
 
 extern bool     utf8_valid(const char* s);
-extern bool     utf8_valid_n(const char* s, isize nbytes);
+extern bool     utf8_valid_n(const char* s, isize_t nbytes);
 extern int      utf8_encode(char *out, uint32_t c);
 extern int      utf8_decode_codepoint(utf8_decode_t* d, const char* s, const char* end);
 extern int      utf8_icompare(const csview s1, const csview s2);
-extern uint32_t utf8_peek_at(const char* s, isize u8offset);
+extern uint32_t utf8_peek_at(const char* s, isize_t u8offset);
 extern uint32_t utf8_casefold(uint32_t c);
 extern uint32_t utf8_tolower(uint32_t c);
 extern uint32_t utf8_toupper(uint32_t c);

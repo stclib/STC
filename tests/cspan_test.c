@@ -146,8 +146,8 @@ TEST_TEARDOWN(cspan_cube, fixt) {
 
 
 TEST_F(cspan_cube, slice3, fixt) {
-    int64 n = Stack_size(&fixt->stack);
-    int64 sum = 0;
+    int64_t n = Stack_size(&fixt->stack);
+    int64_t sum = 0;
 
     // iterate each 3d tile in sequence
     for (c_each(tile, Tiles, fixt->tiles))

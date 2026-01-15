@@ -85,7 +85,7 @@ for (c_items(i, const char*, {"Hello", "crazy", "world"}))
 <summary><b>c_range</b> - Integer range iteration</summary>
 
 ### c_range, c_range32, c_range_t
-- `c_range`: abstraction for iterating sequence of integers. Like python's **for** *i* **in** *range()* loop. Uses `isize` (*ptrdiff_t*) as control variable.
+- `c_range`: abstraction for iterating sequence of integers. Like python's **for** *i* **in** *range()* loop. Uses `isize_t` (*ptrdiff_t*) as control variable.
 - `c_range32` is like *c_range*, but uses `int32_t` as control variable.
 - `c_range_t` is like *c_range*, but takes an additional ***type*** for the control variable as first argument.
 
@@ -542,19 +542,19 @@ and **deque** when either `i_use_cmp`, `i_cmp` or `i_less` is defined.
 - Linked **list** may also be sorted, i.e. only *X_sort()* is available.
 ```c++
                 // Sort c-arrays by defining T and include "stc/sort.h":
-void            X_sort(const X array[], isize len);
-isize           X_lower_bound(const X array[], i_key key, isize len);
-isize           X_binary_search(const X array[], i_key key, isize len);
+void            X_sort(const X array[], isize_t len);
+isize_t         X_lower_bound(const X array[], i_key key, isize_t len);
+isize_t         X_binary_search(const X array[], i_key key, isize_t len);
 
                 // or random access containers when `i_less`, `i_cmp` is defined:
 void            X_sort(X* self);
-isize           X_lower_bound(const X* self, i_key key);
-isize           X_binary_search(const X* self, i_key key);
+isize_t         X_lower_bound(const X* self, i_key key);
+isize_t         X_binary_search(const X* self, i_key key);
 
                 // functions for sub ranges:
-void            X_sort_lowhigh(X* self, isize low, isize high);
-isize           X_lower_bound_range(const X* self, i_key key, isize start, isize end);
-isize           X_binary_search_range(const X* self, i_key key, isize start, isize end);
+void            X_sort_lowhigh(X* self, isize_t low, isize_t high);
+isize_t         X_lower_bound_range(const X* self, i_key key, isize_t start, isize_t end);
+isize_t         X_binary_search_range(const X* self, i_key key, isize_t start, isize_t end);
 ```
 `T` may be customized in the normal way, along with comparison function `i_cmp` or `i_less`.
 
@@ -663,7 +663,7 @@ int main(void)
 ### crange, crange32, c_iota
 An integer sequence generator type, similar to [boost::irange](https://www.boost.org/doc/libs/release/libs/range/doc/html/range/reference/ranges/irange.html).
 
-- `crange` uses `isize` (ptrdiff_t) as control variable
+- `crange` uses `isize_t` (ptrdiff_t) as control variable
 - `crange32` is like *crange*, but uses `int32_t` as control variable, which may be faster.
 
 ```c++
@@ -679,7 +679,7 @@ crange&     c_iota(start);                  // l-value; NB! otherwise like crang
 crange&     c_iota(start, stop);            // l-value; otherwise like crange_make(start, stop)
 crange&     c_iota(start, stop, step);      // l-value; otherwise like crange_make(start, stop, step)
 ```
- The **crange_value** type is *isize*. Variables *start*, *stop*, and *step* are of type *crange_value*.
+ The **crange_value** type is *isize_t*. Variables *start*, *stop*, and *step* are of type *crange_value*.
 
 [ [Run this code](https://godbolt.org/z/6aaq6qTro) ]
 ```c++
@@ -710,10 +710,10 @@ Memory allocator wrappers which uses signed sizes. Note that the signatures for
 *c_realloc()* and *c_free()* have an extra size parameter. These will be used as
 default in containers unless `i_malloc`, `i_calloc`, `i_realloc`, and `i_free` are user defined. See
 [Per container-instance customization](../README.md#per-container-instance-customization)
-- void* `c_malloc`(isize sz)
-- void* `c_calloc`(isize n, isize sz)
-- void* `c_realloc`(void* old_p, isize old_sz, isize new_sz)
-- void  `c_free`(void* p, isize sz)
+- void* `c_malloc`(isize_t sz)
+- void* `c_calloc`(isize_t n, isize_t sz)
+- void* `c_realloc`(void* old_p, isize_t old_sz, isize_t new_sz)
+- void  `c_free`(void* p, isize_t sz)
 
 ### c_new, c_new_n, c_new_items, c_realloc_n, c_free_n, c_delete_n
 
@@ -744,7 +744,7 @@ c_swap(&x, &y);
 Return number of elements in an array. array must not be a pointer!
 ```c++
 int array[] = {1, 2, 3, 4};
-isize n = c_countof(array);
+isize_t n = c_countof(array);
 ```
 
 Type-safe casting a from const (pointer):

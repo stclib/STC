@@ -38,7 +38,7 @@ See the c++ class [std::set](https://en.cppreference.com/w/cpp/container/set) fo
 
 ```c++
 sset_X          sset_X_init(void);
-sset_X          sset_X_with_capacity(isize cap);
+sset_X          sset_X_with_capacity(isize_t cap);
 
 sset_X          sset_X_clone(sset_x set);
 void            sset_X_copy(sset_X* self, const sset_X* other);
@@ -47,12 +47,12 @@ sset_X          sset_X_move(sset_X* self);                                      
 void            sset_X_drop(const sset_X* self);                                     // destructor
 
 void            sset_X_clear(sset_X* self);
-bool            sset_X_reserve(sset_X* self, isize cap);
+bool            sset_X_reserve(sset_X* self, isize_t cap);
 void            sset_X_shrink_to_fit(sset_X* self);
 
 bool            sset_X_is_empty(const sset_X* self);
-isize           sset_X_size(const sset_X* self);
-isize           sset_X_capacity(const sset_X* self);
+isize_t         sset_X_size(const sset_X* self);
+isize_t         sset_X_capacity(const sset_X* self);
 
 const i_key*    sset_X_get(const sset_X* self, i_keyraw rkey);                       // const get
 i_key*          sset_X_get_mut(sset_X* self, i_keyraw rkey);                         // return NULL if not found

@@ -16,21 +16,21 @@ int main(void)
         IVec_sort(&vec);
 
         key = 100;
-        isize res = IVec_lower_bound(&vec, key);
+        isize_t res = IVec_lower_bound(&vec, key);
         if (res != c_NPOS)
             printf("Sorted Vec %d: lower bound: %d\n", key, vec.data[res]); // 500
 
         key = 10;
-        isize it1 = IVec_lower_bound(&vec, key);
+        isize_t it1 = IVec_lower_bound(&vec, key);
         if (it1 != c_NPOS)
             printf("Sorted Vec %3d: lower_bound: %d\n", key, vec.data[it1]); // 30
 
         key = 600;
-        isize it2 = IVec_binary_search(&vec, key);
+        isize_t it2 = IVec_binary_search(&vec, key);
         if (it2 != c_NPOS)
             printf("Sorted Vec %d: bin. search: %d\n", key, vec.data[it2]); // 600
 
-        for (isize i = it1; i != it2; ++i)
+        for (isize_t i = it1; i != it2; ++i)
             printf(" %d\n", vec.data[i]);
 
         puts("");

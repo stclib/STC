@@ -42,7 +42,7 @@ int main(void) {
         printf(" %d", nums[i]);
     puts("");
 
-    isize idx = ints_binary_search(nums, 25, c_arraylen(nums));
+    isize_t idx = ints_binary_search(nums, 25, c_arraylen(nums));
     if (idx != c_NPOS) printf("found: %d\n", nums[idx]);
 
     idx = ints_lower_bound(nums, 200, c_arraylen(nums));
@@ -65,7 +65,7 @@ int main(void) {
         printf(" %d", *i.ref);
     puts("");
 
-    isize idx = IDeq_binary_search(&nums, 25);
+    isize_t idx = IDeq_binary_search(&nums, 25);
     if (idx != c_NPOS) printf("found: %d\n", *IDeq_at(&nums, idx));
 
     idx = IDeq_lower_bound(&nums, 200);

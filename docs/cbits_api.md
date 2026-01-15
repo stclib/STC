@@ -24,40 +24,40 @@ All cbits definitions and prototypes are available by including a single header 
 
 ```c++
 cbits           cbits_from(const char* str);
-cbits           cbits_with_size(isize size, bool value);                // size must be <= N if N is defined
-cbits           cbits_with_pattern(isize size, size_t pattern);
+cbits           cbits_with_size(isize_t size, bool value);              // size must be <= N if N is defined
+cbits           cbits_with_pattern(isize_t size, size_t pattern);
 cbits           cbits_clone(cbits other);
 
 void            cbits_clear(cbits* self);
 void            cbits_copy(cbits* self, const cbits* other);
-bool            cbits_resize(cbits* self, isize size, bool value);      // NB! only for dynamic bitsets!
+bool            cbits_resize(cbits* self, isize_t size, bool value);    // NB! only for dynamic bitsets!
 void            cbits_drop(cbits* self);
 
 cbits*          cbits_take(cbits* self, const cbits* other);            // give other to self
 cbits           cbits_move(cbits* self);                                // transfer self to caller
 
-isize           cbits_size(const cbits* self);
-isize           cbits_count(const cbits* self);                         // count number of bits set
+isize_t         cbits_size(const cbits* self);
+isize_t         cbits_count(const cbits* self);                         // count number of bits set
 
-bool            cbits_test(const cbits* self, isize i);
-bool            cbits_at(const cbits* self, isize i);                   // cbits_test() with bounds check.
+bool            cbits_test(const cbits* self, isize_t i);
+bool            cbits_at(const cbits* self, isize_t i);                 // cbits_test() with bounds check.
 bool            cbits_subset_of(const cbits* self, const cbits* other); // is set a subset of other?
 bool            cbits_disjoint(const cbits* self, const cbits* other);  // no common bits
-char*           cbits_to_str(const cbits* self, char* str, isize start, isize stop);
+char*           cbits_to_str(const cbits* self, char* str, isize_t start, isize_t stop);
 
 void            cbits_print(const cbits* self);
 void            cbits_print(const cbits* self, FILE* fp);
-void            cbits_print(const cbits* self, FILE* fp, isize start, isize stop);
+void            cbits_print(const cbits* self, FILE* fp, isize_t start, isize_t stop);
 void            cbits_print(TYPE Bits, const Bits* self, FILE* fp);     // for fixed size bitsets
-void            cbits_print(TYPE Bits, const Bits* self, FILE* fp, isize start, isize stop);
+void            cbits_print(TYPE Bits, const Bits* self, FILE* fp, isize_t start, isize_t stop);
 
-void            cbits_set(cbits* self, isize i);
-void            cbits_reset(cbits* self, isize i);
-void            cbits_set_value(cbits* self, isize i, bool value);
+void            cbits_set(cbits* self, isize_t i);
+void            cbits_reset(cbits* self, isize_t i);
+void            cbits_set_value(cbits* self, isize_t i, bool value);
 void            cbits_set_all(cbits* self, bool value);
 void            cbits_set_pattern(cbits* self, size_t pattern);
 void            cbits_flip_all(cbits* self);
-void            cbits_flip(cbits* self, isize i);
+void            cbits_flip(cbits* self, isize_t i);
 
 void            cbits_intersect(cbits* self, const cbits* other);
 void            cbits_union(cbits* self, const cbits* other);
@@ -78,19 +78,19 @@ void            cbits_xor(cbits* self, const cbits* other);             // set o
 #include <math.h>
 #include <time.h>
 
-cbits sieveOfEratosthenes(isize n)
+cbits sieveOfEratosthenes(isize_t n)
 {
     cbits bits = cbits_with_size(n/2, true);
-    isize q = (isize)sqrt(n);
+    isize_t q = (isize_t)sqrt(n);
 
-    for (isize i = 3; i <= q; i += 2) {
-        for (isize j = i; j < n; j += 2) {
+    for (isize_t i = 3; i <= q; i += 2) {
+        for (isize_t j = i; j < n; j += 2) {
             if (cbits_test(&bits, j/2)) {
                 i = j;
                 break;
             }
         }
-        for (isize j = i*i; j < n; j += i*2)
+        for (isize_t j = i*i; j < n; j += i*2)
             cbits_reset(&bits, j/2);
     }
     return bits;
@@ -98,18 +98,18 @@ cbits sieveOfEratosthenes(isize n)
 
 int main(void)
 {
-    isize n = 100000000;
+    isize_t n = 100000000;
     printf("computing prime numbers up to %" c_ZI "\n", n);
 
     clock_t t1 = clock();
     cbits primes = sieveOfEratosthenes(n + 1);
-    isize nprimes = cbits_count(&primes);
+    isize_t nprimes = cbits_count(&primes);
     t1 = clock() - t1;
 
     printf("number of primes: %" c_ZI ", time: %f\n", nprimes, (float)t1/CLOCKS_PER_SEC);
 
     printf(" 2");
-    for (isize i = 3; i < 1000; i += 2)
+    for (isize_t i = 3; i < 1000; i += 2)
        if (cbits_test(&primes, i/2)) printf(" %" c_ZI, i);
     puts("");
 

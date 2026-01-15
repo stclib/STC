@@ -32,7 +32,7 @@ int main(void)
 
     // Print the gaussian bar chart
     for (c_each_kv(index, count, SortedMap, hist)) {
-        int n = (int)round(2.5 * Scale * StdDev * (*count) / (isize)N);
+        int n = (int)round(2.5 * Scale * StdDev * (*count) / (isize_t)N);
         if (n > 0) {
             printf("%4d ", *index);
             while (n--) printf("*");

@@ -6,7 +6,7 @@ int main(void)
     cstr str = cstr_lit("We think in generalities, but we live in details.");
     csview sv = cstr_sv(&str);
     csview sv1 = csview_subview(sv, 3, 5);                 // "think"
-    isize pos = csview_find(sv, "live");                   // position of "live"
+    isize_t pos = csview_find(sv, "live");                   // position of "live"
     csview sv2 = csview_subview(sv, pos, 4);               // "live"
     csview sv3 = csview_subview_pro(sv, -8, 7);            // "details"
     printf(c_svfmt ", " c_svfmt ", " c_svfmt "\n",

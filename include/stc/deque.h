@@ -42,18 +42,18 @@
 #undef _pull
 
 STC_API _m_value*   _c_MEMB(_push_front)(Self* self, _m_value value);
-STC_API _m_iter     _c_MEMB(_insert_n)(Self* self, isize idx, const _m_value* arr, isize n);
-STC_API _m_iter     _c_MEMB(_insert_uninit)(Self* self, isize idx, isize n);
-STC_API void        _c_MEMB(_erase_n)(Self* self, isize idx, isize n);
+STC_API _m_iter     _c_MEMB(_insert_n)(Self* self, isize_t idx, const _m_value* arr, isize_t n);
+STC_API _m_iter     _c_MEMB(_insert_uninit)(Self* self, isize_t idx, isize_t n);
+STC_API void        _c_MEMB(_erase_n)(Self* self, isize_t idx, isize_t n);
 
 STC_INLINE const _m_value*
-_c_MEMB(_at)(const Self* self, isize idx) {
+_c_MEMB(_at)(const Self* self, isize_t idx) {
     c_assert(c_uless(idx, _c_MEMB(_size)(self)));
     return self->cbuf + _cbuf_topos(self, idx);
 }
 
 STC_INLINE _m_value*
-_c_MEMB(_at_mut)(Self* self, isize idx)
+_c_MEMB(_at_mut)(Self* self, isize_t idx)
     { return (_m_value*)_c_MEMB(_at)(self, idx); }
 
 STC_INLINE _m_value*
@@ -75,7 +75,7 @@ STC_INLINE _m_value _c_MEMB(_pull_back)(Self* self) { // move back out of deque
 
 STC_INLINE _m_iter
 _c_MEMB(_insert_at)(Self* self, _m_iter it, const _m_value val) {
-    isize idx = _cbuf_toidx(self, it.pos);
+    isize_t idx = _cbuf_toidx(self, it.pos);
     return _c_MEMB(_insert_n)(self, idx, &val, 1);
 }
 
@@ -88,8 +88,8 @@ _c_MEMB(_erase_at)(Self* self, _m_iter it) {
 
 STC_INLINE _m_iter
 _c_MEMB(_erase_range)(Self* self, _m_iter it1, _m_iter it2) {
-    isize idx1 = _cbuf_toidx(self, it1.pos);
-    isize idx2 = _cbuf_toidx(self, it2.pos);
+    isize_t idx1 = _cbuf_toidx(self, it1.pos);
+    isize_t idx2 = _cbuf_toidx(self, it2.pos);
     _c_MEMB(_erase_n)(self, idx1, idx2 - idx1);
     if (it1.pos == self->end) it1.ref = NULL;
     return it1;
@@ -97,7 +97,7 @@ _c_MEMB(_erase_range)(Self* self, _m_iter it1, _m_iter it2) {
 
 #ifndef _i_no_emplace
 STC_API _m_iter
-_c_MEMB(_emplace_n)(Self* self, isize idx, const _m_raw* raw, isize n);
+_c_MEMB(_emplace_n)(Self* self, isize_t idx, const _m_raw* raw, isize_t n);
 
 STC_INLINE _m_value*
 _c_MEMB(_emplace_front)(Self* self, const _m_raw raw)
@@ -130,7 +130,7 @@ _c_MEMB(_find)(const Self* self, _m_raw raw) {
 
 STC_DEF _m_value*
 _c_MEMB(_push_front)(Self* self, _m_value value) {
-    isize start = (self->start - 1) & self->capmask;
+    isize_t start = (self->start - 1) & self->capmask;
     if (start == self->end) { // full
         if (!_c_MEMB(_reserve)(self, self->capmask + 3)) // => 2x expand
             return NULL;
@@ -143,19 +143,19 @@ _c_MEMB(_push_front)(Self* self, _m_value value) {
 }
 
 STC_DEF void
-_c_MEMB(_erase_n)(Self* self, const isize idx, const isize n) {
-    const isize len = _c_MEMB(_size)(self);
+_c_MEMB(_erase_n)(Self* self, const isize_t idx, const isize_t n) {
+    const isize_t len = _c_MEMB(_size)(self);
     c_assert(idx + n <= len);
-    for (isize i = idx + n - 1; i >= idx; --i)
+    for (isize_t i = idx + n - 1; i >= idx; --i)
         i_keydrop(_c_MEMB(_at_mut)(self, i));
-    for (isize i = idx, j = i + n; j < len; ++i, ++j)
+    for (isize_t i = idx, j = i + n; j < len; ++i, ++j)
         *_c_MEMB(_at_mut)(self, i) = *_c_MEMB(_at)(self, j);
     self->end = (self->end - n) & self->capmask;
 }
 
 STC_DEF _m_iter
-_c_MEMB(_insert_uninit)(Self* self, const isize idx, const isize n) {
-    const isize len = _c_MEMB(_size)(self);
+_c_MEMB(_insert_uninit)(Self* self, const isize_t idx, const isize_t n) {
+    const isize_t len = _c_MEMB(_size)(self);
     _m_iter it = {._s=self};
     if (len + n >= self->capmask)
         if (!_c_MEMB(_reserve)(self, len + n)) // minimum 2x expand
@@ -166,24 +166,24 @@ _c_MEMB(_insert_uninit)(Self* self, const isize idx, const isize n) {
 
     if (it.pos < self->end) // common case because of reserve policy
         c_memmove(it.ref + n, it.ref, (len - idx)*c_sizeof *it.ref);
-    else for (isize i = len - 1, j = i + n; i >= idx; --i, --j)
+    else for (isize_t i = len - 1, j = i + n; i >= idx; --i, --j)
         *_c_MEMB(_at_mut)(self, j) = *_c_MEMB(_at)(self, i);
     return it;
 }
 
 STC_DEF _m_iter
-_c_MEMB(_insert_n)(Self* self, const isize idx, const _m_value* arr, const isize n) {
+_c_MEMB(_insert_n)(Self* self, const isize_t idx, const _m_value* arr, const isize_t n) {
     _m_iter it = _c_MEMB(_insert_uninit)(self, idx, n);
-    for (isize i = idx, j = 0; j < n; ++i, ++j)
+    for (isize_t i = idx, j = 0; j < n; ++i, ++j)
         *_c_MEMB(_at_mut)(self, i) = arr[j];
     return it;
 }
 
 #ifndef _i_no_emplace
 STC_DEF _m_iter
-_c_MEMB(_emplace_n)(Self* self, const isize idx, const _m_raw* raw, const isize n) {
+_c_MEMB(_emplace_n)(Self* self, const isize_t idx, const _m_raw* raw, const isize_t n) {
     _m_iter it = _c_MEMB(_insert_uninit)(self, idx, n);
-    for (isize i = idx, j = 0; j < n; ++i, ++j)
+    for (isize_t i = idx, j = 0; j < n; ++i, ++j)
         *_c_MEMB(_at_mut)(self, i) = i_keyfrom(raw[j]);
     return it;
 }
