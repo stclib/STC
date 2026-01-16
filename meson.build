@@ -1,13 +1,13 @@
 project(
   'stc',
   'c',
-  version: '5.0-dev',
+  version: '6.0-rc3',
   license: 'MIT',
   default_options: ['c_std=c11', 'warning_level=3', 'default_library=static'],
   meson_version: '>=1.1',
 )
 
-stcversion = 5
+stcversion = 6
 cc = meson.get_compiler('c')
 
 if cc.get_argument_syntax() == 'gcc'
@@ -64,13 +64,6 @@ else
     soversion: stcversion,
     include_directories: inc,
     install: true,
-  )
-
-  import('pkgconfig').generate(
-    stc_lib,
-    name: 'stc',
-    description: 'A modern, user friendly, generic, type-safe and fast C99 container library.',
-    url: 'https://github.com/stclib/STC',
   )
 endif
 
@@ -141,11 +134,22 @@ stc_dep = declare_dependency(
 
 meson.override_dependency('stc', stc_dep)
 
+pkgconfig = import('pkgconfig', required: false)
+if pkgconfig.found()
+  pkgconfig.generate(
+    stc_lib,
+    name: 'stc',
+    description: 'A modern, user friendly, generic, type-safe and fast C99 container library.',
+    url: 'https://github.com/stclib/STC',
+  )
+endif
+
 flex_exe = find_program('flex', 'win_flex', required: get_option('checkscoped'))
 if flex_exe.found()
   lex_src = custom_target(
     'checkscoped_lex',
-    command: [flex_exe, '-o', '@OUTPUT@', files('src/checkscoped.l')],
+    command: [flex_exe, '-o', '@OUTPUT@', '@INPUT@'],
+    input: 'src/checkscoped.l',
     output: 'lex.yy.c',
   )
   checkscoped_exe = executable(
@@ -160,16 +164,9 @@ root = not meson.is_subproject()
 subdir('tests')
 subdir('examples')
 
-if root
-  datadir = get_option('datadir')
-  docdir = get_option('docdir')
-  if docdir == ''
-    docdir = datadir / 'doc' / meson.project_name()
-  endif
-
-  install_subdir(
-    'docs',
-    install_dir: docdir,
-    strip_directory: true,
-  )
-endif
+install_subdir(
+  'docs',
+  install_dir: get_option('datadir') / 'doc' / meson.project_name(),
+  install_tag: 'doc',
+  strip_directory: true,
+)
