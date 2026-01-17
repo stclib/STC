@@ -12,8 +12,8 @@ typedef struct {
 // Point => int map
 typedef struct Point { int x, y; } Point;
 int Point_cmp(const Point* a, const Point* b) {
-    int c = a->x - b->x;
-    return c ? c : a->y - b->y;
+    int c = c_default_cmp(&a->x, &b->x);
+    return c ? c : c_default_cmp(&a->y, &b->y);
 }
 
 #define T PntMap, Point, int, (c_keycomp | c_declared)

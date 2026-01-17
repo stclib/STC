@@ -48,11 +48,16 @@ point_index(const point* p)
 }
 
 int
-point_key_cmp(const point* a, const point* b)
+point_cmp(const point* a, const point* b)
 {
     int i = point_index(a);
     int j = point_index(b);
-    return (i == j) ? 0 : (i < j) ? -1 : 1;
+    return (i > j) - (i < j);
+}
+bool
+point_eq(const point* a, const point* b)
+{
+    return point_index(a) == point_index(b);
 }
 
 #define T pqueue_pnt, point
@@ -62,12 +67,10 @@ point_key_cmp(const point* a, const point* b)
 #define T deque_pnt, point
 #include <stc/deque.h>
 
-#define T smap_pcost, point,int
-#define i_cmp point_key_cmp
+#define T smap_pcost, point, int, (c_keycomp)
 #include <stc/sortedmap.h>
 
-#define T smap_pstep, point,point
-#define i_cmp point_key_cmp
+#define T smap_pstep, point, point, (c_keycomp)
 #include <stc/sortedmap.h>
 
 

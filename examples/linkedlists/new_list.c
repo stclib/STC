@@ -13,13 +13,15 @@ typedef struct {
 #include <stc/list.h>
 
 typedef struct Point { int x, y; } Point;
-int point_cmp(const Point* a, const Point* b) {
+int Point_cmp(const Point* a, const Point* b) {
     int c = a->x - b->x;
     return c ? c : a->y - b->y;
 }
+bool Point_eq(const Point* a, const Point* b) {
+    return a->x == b->x && a->y == b->y;
+}
 
-#define T list_pnt, Point, (c_declared)
-#define i_cmp point_cmp
+#define T list_pnt, Point, (c_keycomp | c_declared)
 #include <stc/list.h>
 
 // use < and == operators for comparison

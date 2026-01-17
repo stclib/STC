@@ -11,6 +11,9 @@ inline static int IPair_cmp(const IPair* a, const IPair* b) {
     int c = c_default_cmp(&a->x, &b->x);
     return c ? c : c_default_cmp(&a->y, &b->y);
 }
+inline static bool IPair_eq(const IPair* a, const IPair* b) {
+    return a->x == b->x && a->y == b->y;
+}
 
 #define T vec_ip, IPair, (c_keycomp)
 #include <stc/vec.h>

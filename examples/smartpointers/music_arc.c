@@ -32,8 +32,11 @@ typedef struct {
     const char* title;
 } SongView;
 
-inline static bool SongView_cmp(const SongView* xw, const SongView* yw)
+inline static int SongView_cmp(const SongView* xw, const SongView* yw)
     { int c = strcmp(xw->artist, yw->artist); return c ? c : strcmp(xw->title, yw->title); }
+
+inline static bool SongView_eq(const SongView* xw, const SongView* yw)
+    { return SongView_cmp(xw, yw) == 0; }
 
 inline static size_t SongView_hash(const SongView* xw)
     { return c_hash_mix(c_hash_str(xw->artist), c_hash_str(xw->title)); }
