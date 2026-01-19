@@ -69,7 +69,7 @@
 #endif
 #if defined i_valclass           // [deprecated]
   #define i_class_val i_valclass
-#elif defined i_keypro           // [deprecated]
+#elif defined i_valpro           // [deprecated]
   #define i_pro_val i_valpro
 #endif
 
