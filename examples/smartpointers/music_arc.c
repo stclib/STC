@@ -45,7 +45,7 @@ inline static size_t SongView_hash(const SongView* xw)
 // Define the shared pointer type SongArc and conversion functions to SongView:
 // "c_keyclass" binds Song_clone(), Song_drop()
 // "c_keycomp" specifies the type/view to convert to/from and binds _cmp, _eq, _hash functions.
-#define T SongArc, Song, (c_keyclass | c_use_cmp) // also enable _cmp/_hash for arc keycmp (SongView).
+#define T SongArc, Song, (c_keyclass | c_use_eq) // also enable _cmp/_hash for arc keycmp (SongView).
 #define i_keycomp SongView
 #define i_keytoraw(x) ((SongView){.artist=cstr_str(&x->artist), .title=cstr_str(&x->title)})
 #define i_keyfrom(sw) ((Song){.artist=cstr_from(sw.artist), .title=cstr_from(sw.title)})

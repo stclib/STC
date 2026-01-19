@@ -1,6 +1,6 @@
 #include "ctest.h"
 
-#define T IDeq, int, (c_use_cmp)
+#define T IDeq, int, (c_use_eq)
 #include <stc/deque.h>
 
 

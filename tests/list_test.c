@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "ctest.h"
 
-#define T IList, int, (c_use_cmp)
+#define T IList, int, (c_use_comp)
 #include <stc/list.h>
 
 

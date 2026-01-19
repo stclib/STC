@@ -71,7 +71,7 @@ void vectordemo2(void)
     Strvec_drop(&names);
 }
 
-#define T Intlist, int, (c_use_cmp)
+#define T Intlist, int, (c_use_comp)
 #include <stc/list.h>
 
 void listdemo1(void)

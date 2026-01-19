@@ -46,6 +46,7 @@
   #define c_no_clone      (1<<3)
   #define c_use_cmp       (1<<5)
   #define c_use_eq        (1<<6)
+  #define c_use_comp      (c_use_cmp | c_use_eq)
   #define c_keycomp       (1<<7)
   #define c_keyclass      (1<<8)
   #define c_valclass      (1<<9)
@@ -111,6 +112,7 @@
 #if c_OPTION(c_keycomp)
   #define i_keycomp i_key
   #define i_use_cmp
+  #define i_use_eq
 #endif
 #if c_OPTION(c_keypro)
   #define i_keypro i_key
@@ -158,8 +160,7 @@
 #if defined i_use_cmp || defined i_cmp || defined i_less || defined _i_sorted
   #define _i_has_cmp
 #endif
-#if defined i_use_cmp || defined i_use_eq || defined i_eq || \
-    defined i_hash || defined _i_hasher
+#if defined i_use_eq || defined i_eq || defined i_hash || defined _i_hasher
   #define _i_has_eq
 #endif
 

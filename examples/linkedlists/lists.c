@@ -3,7 +3,7 @@
 #include <stc/algorithm.h>
 #include <stc/random.h>
 
-#define T DList, double, (c_use_cmp)
+#define T DList, double, (c_use_comp)
 #include <stc/list.h>
 
 int main(void) {
