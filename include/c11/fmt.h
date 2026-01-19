@@ -26,7 +26,7 @@ void        fmt_close(fmt_stream* ss);
 * C11 or higher required.
 * MAX 12 arguments after fmt string.
 * Define FMT_IMPLEMENT, STC_IMPLEMENT or i_implement prior to #include in one translation unit.
-* (c) operamint, 2022-2025, MIT License.
+* (c) operamint, 2022-2026, MIT License.
 -----------------------------------------------------------------------------------
 #define i_implement
 #include "c11/fmt.h"
