@@ -2,7 +2,7 @@
 // https://docs.microsoft.com/en-us/cpp/standard-library/map-class?view=msvc-160#example-17
 #include <stc/cstr.h>
 
-#define T smap_istr, int, cstr, (c_valpro)
+#define T smap_istr, int, cstr, (c_pro_val)
 #include <stc/sortedmap.h>
 
 #define T vec_istr, smap_istr_raw

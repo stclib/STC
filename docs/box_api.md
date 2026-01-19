@@ -6,7 +6,7 @@ and `i_keydrop` macros specified. Use *box_X_clone(p)* to make a deep copy, whic
 `i_keyclone` macro if defined. Note that a box set to NULL is consider uninitialized, and
 cannot be e.g. cloned or dropped.
 
-When declaring a container of **box** elements, define `i_keypro` with the
+When declaring a container of **box** elements, define `i_pro_key` with the
 box type instead of defining `i_key`. This will auto-define `i_keydrop`, `i_keyclone`, and `i_cmp` using
 functions defined by the specified **box**.
 
@@ -17,18 +17,19 @@ See similar c++ class [std::unique_ptr](https://en.cppreference.com/w/cpp/memory
 ```c++
 #define T <ct>, <kt>[, (<opt>)] // shorthand for defining box name, i_key, and i_opt
 // Common <opt> traits:
-//   c_keycomp  - Key <kt> is a comparable typedef'ed type.
-//                Binds <kt>_cmp(), <kt>_hash() "member" function names.
-//   c_keyclass - Additionally binds <kt>_clone() and <kt>_drop() function names.
-//                All containers used as keys themselves can be specified with the c_keyclass trait.
-//   c_keypro   - "Pro" key type, use e.g. for built-in `cstr`, `zsview`, `arc`, and `box` as keys.
+//   c_comp_key  - Key <kt> is a comparable typedef'ed type.
+//                 Binds <kt>_cmp(), <kt>_hash() "member" function names.
+//   c_class_key - Additionally binds <kt>_clone() and <kt>_drop() function names.
+//                 All containers used as keys themselves can be specified with the c_class_key trait.
+//   c_pro_key   - "Pro" key type, use e.g. for built-in `cstr`, `zsview`, `arc`, and `box` as keys.
 //                These support conversion to/from a "raw" input type (such as const char*) when
 //                using <ct>_emplace*() functions, and may do optimized lookups via the raw type.
+//   c_use_eq   - Enable optimized <kt>_eq() and for equality comparison of the container itself.
 //   c_use_cmp  - Enable comparison <kt>_cmp() function.
 //                If <kt> is a basic type, operators '<' and '==' are used by default.
-//   c_use_eq   - Enable optimized <kt>_eq() and for equality comparison of the container itself.
+//   c_use_comp - Enable both <kt>_cmp() and <kt>_eq() for sorting and linear search
 //
-// To apply multiple traits, specify e.g. (c_keyclass | c_use_cmp) as <opt>.
+// To apply multiple traits, specify e.g. (c_class_key | c_use_cmp) as <opt>.
 
 // Alternative to defining T:
 #define i_key <kt>       // Key type. Container type name <ct> defaults to box_<kt>.
@@ -99,11 +100,11 @@ void int_drop(int* x) {
 #include <stc/box.h>
 
 // ISet : std::set<std::unique_ptr<int>>
-#define T ISet, IBox, (c_keypro) // box is a "pro"-type
+#define T ISet, IBox, (c_pro_key) // box is a "pro"-type
 #include <stc/sortedset.h>
 
 // IVec : std::vector<std::unique_ptr<int>>
-#define T IVec, IBox, (c_keypro)
+#define T IVec, IBox, (c_pro_key)
 #include <stc/vec.h>
 
 

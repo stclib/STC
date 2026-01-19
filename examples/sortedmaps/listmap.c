@@ -3,12 +3,12 @@
 
 // Multimap entries
 #include <stc/cstr.h>
-#define i_keypro cstr
+#define i_pro_key cstr
 #include <stc/list.h>
 
 // Map of int => list_cstr.
 // "valclass" bind list_cstr_clone() and list_cstr_drop()
-#define T Multimap, int, list_cstr, (c_valclass)
+#define T Multimap, int, list_cstr, (c_class_val)
 #define i_cmp -c_default_cmp // like std::greater<int>
 #include <stc/sortedmap.h>
 

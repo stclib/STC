@@ -40,7 +40,7 @@ void Person_drop(Person* p) {
     c_drop(cstr, &p->name, &p->email);
 }
 
-#define T PBox, Person, (c_keyclass) // bind Person clone+drop fn's
+#define T PBox, Person, (c_class_key) // bind Person clone+drop fn's
 #include <stc/box.h>
 
 int main(void) {

@@ -9,13 +9,13 @@ A **hset** is an associative container that contains a set of unique objects of 
 ```c++
 #define T <ct>, <kt>[, (<opt>)] // shorthand for defining set name, i_key, and i_opt
 // Common <opt> traits:
-//   c_keycomp  - Key <kt> is a comparable typedef'ed type.
-//                Binds <kt>_eq(), <kt>_hash() "member" function names.
-//   c_keyclass - Additionally binds <kt>_clone() and <kt>_drop() function names.
-//                All containers used as keys themselves can be specified with the c_keyclass trait.
-//   c_keypro   - "Pro" key type, use e.g. for built-in `cstr`, `zsview`, `arc`, and `box` as i_key.
-//                These support conversion to/from a "raw" input type (such as const char*) when
-//                using <ct>_emplace*() functions, and may do optimized lookups via the raw type.
+//   c_comp_key  - Key <kt> is a comparable typedef'ed type.
+//                 Binds <kt>_eq(), <kt>_hash() "member" function names.
+//   c_class_key - Additionally binds <kt>_clone() and <kt>_drop() function names.
+//                 All containers used as keys themselves can be specified with the c_class_key trait.
+//   c_pro_key   - "Pro" key type, use e.g. for built-in `cstr`, `zsview`, `arc`, and `box` as i_key.
+//                 These support conversion to/from a "raw" input type (such as const char*) when
+//                 using <ct>_emplace*() functions, and may do optimized lookups via the raw type.
 
 // Alternative to defining T:
 #define i_key <t>             // define key type. container type name <ct> defaults to hset_<kt>.
@@ -29,7 +29,7 @@ A **hset** is an associative container that contains a set of unique objects of 
 #include <stc/hashset.h>
 ```
 - In the following, `X` is the value of `i_key` unless `T` is defined.
-- **emplace**-functions are only available when `i_keyraw` is explicitly or implicitly defined (e.g. via c_keypro).
+- **emplace**-functions are only available when `i_keyraw` is explicitly or implicitly defined (e.g. via c_pro_key).
 
 ## Methods
 
@@ -93,7 +93,7 @@ hset_X_value    hset_X_value_clone(const hset_X* self, hset_X_value val);
 ```c++
 #include <stc/cstr.h>
 
-#define T Strings, cstr, (c_keypro)
+#define T Strings, cstr, (c_pro_key)
 #include <stc/hashset.h>
 
 int main(void)

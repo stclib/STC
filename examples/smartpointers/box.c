@@ -32,11 +32,11 @@ void Person_drop(Person* p) {
 
 // "class" binds _clone, _drop functions.
 // "use_cmp" binds _cmp, _hash functions.
-#define T PBox, Person, (c_keyclass | c_use_cmp)
+#define T PBox, Person, (c_class_key | c_use_cmp)
 #include <stc/box.h>
 
 // box, arc, and cstr types are "pro"-types.
-#define T Persons, PBox, (c_keypro)
+#define T Persons, PBox, (c_pro_key)
 #include <stc/sortedset.h>
 
 int main(void)

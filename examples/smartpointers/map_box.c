@@ -6,7 +6,7 @@
 #include <stc/box.h> // unique_ptr<long> alike.
 
 // hashmap of cstr => IBox (both cstr and box are "pro")
-#define T Boxmap, cstr, IBox, (c_keypro | c_valpro)
+#define T Boxmap, cstr, IBox, (c_pro_key | c_pro_val)
 #include <stc/hashmap.h>
 
 

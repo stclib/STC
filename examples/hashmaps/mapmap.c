@@ -2,12 +2,12 @@
 #include <stc/cstr.h>
 
 // People: map cstr -> cstr. (name -> email)
-#define T People, cstr, cstr, (c_keypro | c_valpro)
+#define T People, cstr, cstr, (c_pro_key | c_pro_val)
 #define i_keydrop(p) (printf("kdrop: %s\n", cstr_str(p)), cstr_drop(p)) // override
 #include <stc/hashmap.h>
 
 // Departments: map cstr -> People. People is a map and has _clone, _drop, therefore a "class".
-#define T Departments, cstr, People, (c_keypro | c_valclass)
+#define T Departments, cstr, People, (c_pro_key | c_class_val)
 #include <stc/hashmap.h>
 
 

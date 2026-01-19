@@ -1,7 +1,7 @@
 // https://doc.rust-lang.org/rust-by-example/std/hash.html
 #include <stdio.h>
 #include <stc/cstr.h>
-#define T StrMap, cstr, cstr, (c_keypro | c_valpro)
+#define T StrMap, cstr, cstr, (c_pro_key | c_pro_val)
 #include <stc/hashmap.h>
 
 const char* call(const char* number) {

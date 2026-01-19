@@ -1,7 +1,6 @@
 // https://doc.rust-lang.org/std/collections/struct.HashMap.html
 #include <stc/cstr.h>
-#define i_keypro cstr
-#define i_valpro cstr
+#define T hmap_cstr, cstr, cstr, (c_pro_key|c_pro_val)
 #include <stc/hashmap.h>
 
 // Type inference lets us omit an explicit type signature (which

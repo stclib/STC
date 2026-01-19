@@ -36,7 +36,7 @@ typedef struct MyStruct {
 #define i_key float
 #include <stc/vec.h>
 
-#define i_keypro cstr // cstr is a "pro"-type
+#define i_pro_key cstr // cstr is a "pro"-type
 #include <stc/vec.h>
 
 #define T vec_i32, int32_t, (c_declared)

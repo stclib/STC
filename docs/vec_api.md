@@ -14,18 +14,19 @@ See the c++ class [std::vector](https://en.cppreference.com/w/cpp/container/vect
 ```c++
 #define T <ct>, <kt>[, (<opt>)] // shorthand for defining vec name, i_key and i_opt
 // Common <opt> traits:
-//   c_keycomp  - Key <kt> is a comparable typedef'ed type.
-//                Binds <kt>_cmp() "member" function name.
-//   c_keyclass - Additionally binds <kt>_clone() and <kt>_drop() function names.
-//                All containers used as keys themselves can be specified with the c_keyclass trait.
-//   c_keypro   - "Pro" key type, use e.g. for built-in `cstr`, `zsview`, `arc`, and `box` as keys.
+//   c_comp_key  - Key <kt> is a comparable typedef'ed type.
+//                 Binds <kt>_cmp() "member" function name.
+//   c_class_key - Additionally binds <kt>_clone() and <kt>_drop() function names.
+//                 All containers used as keys themselves can be specified with the c_class_key trait.
+//   c_pro_key   - "Pro" key type, use e.g. for built-in `cstr`, `zsview`, `arc`, and `box` as keys.
 //                These support conversion to/from a "raw" input type (such as const char*) when
 //                using <ct>_emplace*() functions, and may do optimized lookups via the raw type.
-//   c_use_cmp  - Enable element sorting. It implies c_use_eq as well.
-//                If <kt> is a basic type, operators '<' and '==' are used by default.
 //   c_use_eq   - Enable <kt>_eq() for linear search and equality comparison of the container itself.
+//   c_use_cmp  - Enable element sorting using <kt>_cmp().
+//                If <kt> is a basic type, operators '<' and '==' are used by default.
+//   c_use_comp - Enable both <kt>_cmp() and <kt>_eq() for sorting and linear search
 //
-// To enable multiple traits, specify e.g. (c_keyclass | c_use_cmp) as <opt>.
+// To enable multiple traits, specify e.g. (c_class_key | c_use_cmp) as <opt>.
 
 // Alternative to defining T:
 #define i_key <kt>       // Key type. Container type name <ct> defaults to vec_<kt>.
@@ -40,7 +41,7 @@ See the c++ class [std::vector](https://en.cppreference.com/w/cpp/container/vect
 #include <stc/vec.h>
 ```
 - Defining either `i_use_cmp`, `i_less` or `i_cmp` enables sort(), binary_search() and lower_bound().
-- **emplace**-functions are only available when `i_keyraw` is explicitly or implicitly defined (e.g. via c_keypro).
+- **emplace**-functions are only available when `i_keyraw` is explicitly or implicitly defined (e.g. via c_pro_key).
 - In the following, `X` is the value of `i_key` unless `T` is defined.
 
 ## Methods
@@ -169,7 +170,7 @@ int main(void)
 #include <stdio.h>
 #include <stc/cstr.h>
 
-#define i_keypro cstr
+#define i_pro_key cstr
 #include <stc/vec.h>
 
 int main(void) {
@@ -220,12 +221,12 @@ void User_drop(User* self) {
 }
 
 // Declare a managed, clonable vector of users.
-// c_keyclass: User is a "class" and binds the _clone(), _drop(), and _cmp() functions.
+// c_class_key: User is a "class" and binds the _clone(), _drop(), and _cmp() functions.
 // c_use_cmp:  Sorting/searching a vec is only enabled by either directly specifying an
 //             i_cmp function or by specifying c_use_cmp. In this case i_cmp is indirectly
-//             bound to User_cmp because c_keyclass was specified, otherwise it is assumed that
+//             bound to User_cmp because c_class_key was specified, otherwise it is assumed that
 //             i_key is a built-in type that works with < and == operators).
-#define T Users, User, (c_keyclass | c_use_cmp)
+#define T Users, User, (c_class_key | c_use_cmp)
 #include <stc/vec.h>
 
 int main(void) {

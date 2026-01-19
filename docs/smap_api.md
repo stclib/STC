@@ -17,18 +17,17 @@ See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) fo
 ```c++
 #define T <ct>, <kt>, <vt>[, (<opt>)] // shorthand for defining map name, i_key, i_val, and i_opt
 // Common <opt> traits:
-//   c_keycomp  - Key <kt> is a comparable typedef'ed type.
-//                Binds <kt>_cmp() "member" function name.
-//   c_keyclass - Additionally binds <kt>_clone() and <kt>_drop() function names.
-//                All containers used as keys themselves can be specified with the c_keyclass trait.
-//   c_keypro   - "Pro" key type, use e.g. for built-in `cstr`, `zsview`, `arc`, and `box` as i_key.
-//                These support conversion to/from a "raw" input type (such as const char*) when
-//                using <ct>_emplace*() functions, and may do optimized lookups via the raw type.
-//   c_valclass - Only binds <vt>_clone() and <vt>_drop() function names.
-//   c_valpro   - "Pro" val type, use e.g. for built-in `cstr`, `zsview`, `arc`, and `box` as i_val.
-//                These support conversion to/from a "raw" input type (such as const char*) when
-//                using <ct>_emplace*() functions.
-//   c_use_eq   - Enable optimized <kt>_eq() and for equality comparison of the container itself.
+//   c_comp_key  - Key <kt> is a comparable typedef'ed type.
+//                 Binds <kt>_cmp() "member" function name.
+//   c_class_key - Additionally binds <kt>_clone() and <kt>_drop() function names.
+//                 All containers used as keys themselves can be specified with the c_class_key trait.
+//   c_pro_key   - "Pro" key type, use e.g. for built-in `cstr`, `zsview`, `arc`, and `box` as i_key.
+//                 These support conversion to/from a "raw" input type (such as const char*) when
+//                 using <ct>_emplace*() functions, and may do optimized lookups via the raw type.
+//   c_class_val - Only binds <vt>_clone() and <vt>_drop() function names.
+//   c_pro_val   - "Pro" val type, use e.g. for built-in `cstr`, `zsview`, `arc`, and `box` as i_val.
+//                 These support conversion to/from a "raw" input type (such as const char*) when
+//                 using <ct>_emplace*() functions.
 
 // Alternative to defining T:
 #define i_key <t>        // define key type. container type name <ct> defaults to smap_<kt>.
@@ -46,7 +45,7 @@ See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) fo
 #include <stc/sortedmap.h>
 ```
 - In the following, `X` is the value of `i_key` unless `T` is defined.
-- **emplace**-functions are only available when `i_keyraw`/`i_valraw` are implicitly or explicitly defined (e.g. via c_keypro).
+- **emplace**-functions are only available when `i_keyraw`/`i_valraw` are implicitly or explicitly defined (e.g. via c_pro_key).
 
 ## Methods
 
@@ -123,8 +122,8 @@ void            smap_X_value_drop(i_key* pval);
 ```c++
 #include <stc/cstr.h>
 
-#define i_keypro cstr // special macro for i_key = cstr
-#define i_valpro cstr // ditto
+#define i_pro_key cstr // special macro for i_key = cstr
+#define i_pro_val cstr // ditto
 #include <stc/sortedmap.h>
 
 int main(void)
@@ -161,7 +160,7 @@ Translate a
 [ [Run this code](https://godbolt.org/z/anabce8ox) ]
 ```c++
 #include <stc/cstr.h>
-#define T strmap, cstr, cstr, (c_keypro | c_valpro)
+#define T strmap, cstr, cstr, (c_pro_key | c_pro_val)
 #include <stc/sortedmap.h>
 
 static void print_node(const strmap_value* node) {
@@ -188,7 +187,7 @@ int main(void)
 ```
 
 ### Example 3
-This example uses a smap with cstr as mapped value. Note the `i_valpro` usage.
+This example uses a smap with cstr as mapped value. Note the `i_pro_val` usage.
 
 [ [Run this code](https://godbolt.org/z/PTW9h9b56) ]
 <!--{%raw%}-->
@@ -196,7 +195,7 @@ This example uses a smap with cstr as mapped value. Note the `i_valpro` usage.
 #include <stc/cstr.h>
 
 
-#define T IdMap, int, cstr, (c_valpro)
+#define T IdMap, int, cstr, (c_pro_val)
 #include <stc/sortedmap.h>
 
 int main(void)

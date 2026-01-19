@@ -50,7 +50,7 @@ void vectordemo1(void)
     Vec64_drop(&bignums);
 }
 
-#define T Strvec, cstr, (c_keypro | c_use_cmp)
+#define T Strvec, cstr, (c_pro_key | c_use_cmp)
 #include <stc/vec.h>
 
 void vectordemo2(void)
@@ -131,7 +131,7 @@ void mapdemo1(void)
     Intmap_drop(&nums);
 }
 
-#define T SImap, cstr, int, (c_keypro)
+#define T SImap, cstr, int, (c_pro_key)
 #include <stc/hashmap.h>
 
 void mapdemo2(void)
@@ -152,7 +152,7 @@ void mapdemo2(void)
     SImap_drop(&nums);
 }
 
-#define T Strmap, cstr, cstr, (c_keypro|c_valpro)
+#define T Strmap, cstr, cstr, (c_pro_key|c_pro_val)
 #include <stc/hashmap.h>
 
 void mapdemo3(void)

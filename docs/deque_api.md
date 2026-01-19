@@ -12,18 +12,19 @@ See the c++ class [std::deque](https://en.cppreference.com/w/cpp/container/deque
 ```c++
 #define T <ct>, <kt>[, (<opt>)] // shorthand for defining deque name, i_key, and i_opt
 // Common <opt> traits:
-//   c_keycomp  - Key <kt> is a comparable typedef'ed type.
-//                Binds <kt>_cmp() "member" function name.
-//   c_keyclass - Additionally binds <kt>_clone() and <kt>_drop() function names.
-//                All containers used as keys themselves can be specified with the c_keyclass trait.
-//   c_keypro   - "Pro" key type, use e.g. for built-in `cstr`, `zsview`, `arc`, and `box` as keys.
+//   c_comp_key  - Key <kt> is a comparable typedef'ed type.
+//                 Binds <kt>_cmp() "member" function name.
+//   c_class_key - Additionally binds <kt>_clone() and <kt>_drop() function names.
+//                 All containers used as keys themselves can be specified with the c_class_key trait.
+//   c_pro_key   - "Pro" key type, use e.g. for built-in `cstr`, `zsview`, `arc`, and `box` as keys.
 //                These support conversion to/from a "raw" input type (such as const char*) when
 //                using <ct>_emplace*() functions, and may do optimized lookups via the raw type.
+//   c_use_eq   - Enable <kt>_eq() for linear search and equality comparison of the container itself.
 //   c_use_cmp  - Enable element sorting with  <kt>_cmp() function. Implies c_use_eq.
 //                If <kt> is a basic type, operators '<' and '==' are used by default.
-//   c_use_eq   - Enable <kt>_eq() for linear search and equality comparison of the container itself.
+//   c_use_comp - Enable both <kt>_cmp() and <kt>_eq() for sorting and linear search
 //
-// To enable multiple traits, specify e.g. (c_keyclass | c_use_cmp) as <opt>.
+// To enable multiple traits, specify e.g. (c_class_key | c_use_cmp) as <opt>.
 
 // Alternative to defining T:
 #define i_key <kt>       // Key type. Container type name <ct> defaults to deque_<kt>.
@@ -38,7 +39,7 @@ See the c++ class [std::deque](https://en.cppreference.com/w/cpp/container/deque
 #include <stc/deque.h>
 ```
 - Defining either `i_use_cmp`, `i_less` or `i_cmp` enables sort(), binary_search() and lower_bound().
-- **emplace**-functions are only available when `i_keyraw` is explicitly or implicitly defined (e.g. via c_keypro).
+- **emplace**-functions are only available when `i_keyraw` is explicitly or implicitly defined (e.g. via c_pro_key).
 - In the following, `X` is the value of `i_key` unless `T` is defined.
 
 ## Methods

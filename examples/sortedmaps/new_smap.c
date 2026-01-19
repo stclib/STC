@@ -20,15 +20,15 @@ bool Point_eq(const Point* a, const Point* b) {
     return a->x == b->x && a->y == b->y;
 }
 
-#define T PntMap, Point, int, (c_keycomp | c_declared)
+#define T PntMap, Point, int, (c_comp_key | c_declared)
 #include <stc/sortedmap.h>
 
 // cstr => cstr map
-#define T StrMap, cstr, cstr, (c_keypro | c_valpro)
+#define T StrMap, cstr, cstr, (c_pro_key | c_pro_val)
 #include <stc/sortedmap.h>
 
 // cstr set
-#define T StrSet, cstr, (c_keypro)
+#define T StrSet, cstr, (c_pro_key)
 #include <stc/sortedset.h>
 
 

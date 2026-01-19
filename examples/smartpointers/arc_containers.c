@@ -1,7 +1,7 @@
 // Create a vec and a list of shared pointers to maps,
 // and demonstrate sharing and cloning of maps.
 #include <stc/cstr.h>
-#define T Map, cstr, int, (c_keypro)
+#define T Map, cstr, int, (c_pro_key)
 #define i_keydrop(p) (printf("drop name: %s\n", cstr_str(p)), cstr_drop(p))
 #include <stc/sortedmap.h>
 
@@ -9,10 +9,10 @@
 #define i_keydrop(p) (printf("drop Arc:\n"), Map_drop(p))
 #include <stc/arc.h>
 
-#define T Vec, Arc, (c_keypro) // arc is a "pro" type
+#define T Vec, Arc, (c_pro_key) // arc is a "pro" type
 #include <stc/vec.h>
 
-#define T List, Arc, (c_keypro)
+#define T List, Arc, (c_pro_key)
 #include <stc/list.h>
 
 int main(void)

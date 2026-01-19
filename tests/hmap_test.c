@@ -14,7 +14,7 @@ TEST(hashmap, mapdemo1)
     Intmap_drop(&nums);
 }
 
-#define T SImap, cstr, int, (c_keypro)
+#define T SImap, cstr, int, (c_pro_key)
 #include <stc/hashmap.h>
 
 TEST(hashmap, mapdemo2)
@@ -32,7 +32,7 @@ TEST(hashmap, mapdemo2)
 }
 
 
-#define T Strmap, cstr, cstr, (c_keypro | c_valpro)
+#define T Strmap, cstr, cstr, (c_pro_key | c_pro_val)
 #include <stc/hashmap.h>
 
 TEST(hashmap, mapdemo3)

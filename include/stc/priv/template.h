@@ -47,16 +47,30 @@
   #define c_use_cmp       (1<<5)
   #define c_use_eq        (1<<6)
   #define c_use_comp      (c_use_cmp | c_use_eq)
-  #define c_keycomp       (1<<7)
-  #define c_keyclass      (1<<8)
-  #define c_valclass      (1<<9)
-  #define c_keypro        (1<<10)
-  #define c_valpro        (1<<11)
-  #define c_cmpclass      c_keycomp // [deprecated]
-#endif
+  #define c_comp_key      (1<<7)
+  #define c_class_key     (1<<8)
+  #define c_class_val     (1<<9)
+  #define c_pro_key       (1<<10)
+  #define c_pro_val       (1<<11)
 
-#if defined i_cmpclass   // [deprecated]
-  #define i_keycomp i_cmpclass
+  #define c_keycomp  c_comp_key  // [deprecated]
+  #define c_cmpclass c_comp_key  // [deprecated]
+  #define c_keyclass c_class_key // [deprecated]
+  #define c_valclass c_class_val // [deprecated]
+  #define c_keypro   c_pro_key   // [deprecated]
+  #define c_valpro   c_pro_val   // [deprecated]
+#endif
+#ifdef i_keycomp                 // [deprecated]
+  #define i_comp_key i_keycomp
+#elif defined i_keyclass         // [deprecated]
+  #define i_class_key i_keyclass
+#elif defined i_keypro           // [deprecated]
+  #define i_pro_key i_keypro
+#endif
+#if defined i_valclass           // [deprecated]
+  #define i_class_val i_valclass
+#elif defined i_keypro           // [deprecated]
+  #define i_pro_val i_valpro
 #endif
 
 #if defined T && !defined i_type
@@ -103,34 +117,34 @@
 #if c_OPTION(c_no_clone) || defined _i_is_arc
   #define i_no_clone
 #endif
-#if c_OPTION(c_keyclass)
-  #define i_keyclass i_key
+#if c_OPTION(c_class_key)
+  #define i_class_key i_key
 #endif
-#if c_OPTION(c_valclass)
-  #define i_valclass i_val
+#if c_OPTION(c_class_val)
+  #define i_class_val i_val
 #endif
-#if c_OPTION(c_keycomp)
-  #define i_keycomp i_key
+#if c_OPTION(c_comp_key)
+  #define i_comp_key i_key
   #define i_use_cmp
   #define i_use_eq
 #endif
-#if c_OPTION(c_keypro)
-  #define i_keypro i_key
+#if c_OPTION(c_pro_key)
+  #define i_pro_key i_key
 #endif
-#if c_OPTION(c_valpro)
-  #define i_valpro i_val
-#endif
-
-#if defined i_keypro
-  #define i_keyclass i_keypro
-  #define i_keycomp c_JOIN(i_keypro, _raw)
+#if c_OPTION(c_pro_val)
+  #define i_pro_val i_val
 #endif
 
-#if defined i_keycomp
-  #define i_keyraw i_keycomp
-#elif defined i_keyclass && !defined i_keyraw
-  // Also bind comparisons functions when c_keyclass is specified.
-  #define i_keycomp i_key
+#if defined i_pro_key
+  #define i_class_key i_pro_key
+  #define i_comp_key c_JOIN(i_pro_key, _raw)
+#endif
+
+#if defined i_comp_key
+  #define i_keyraw i_comp_key
+#elif defined i_class_key && !defined i_keyraw
+  // Also bind comparisons functions when c_class_key is specified.
+  #define i_comp_key i_key
 #elif defined i_keyraw && !defined i_keyfrom
   // Define _i_no_put when i_keyfrom is not explicitly defined and i_keyraw is.
   // In this case, i_keytoraw needs to be defined (may be done later in this file).
@@ -138,21 +152,21 @@
 #endif
 
 // Bind to i_key "class members": _clone, _drop, _from and _toraw (when conditions are met).
-#if defined i_keyclass
+#if defined i_class_key
   #ifndef i_key
-    #define i_key i_keyclass
+    #define i_key i_class_key
   #endif
   #if !defined i_keyclone && !defined i_no_clone
-    #define i_keyclone c_JOIN(i_keyclass, _clone)
+    #define i_keyclone c_JOIN(i_class_key, _clone)
   #endif
   #ifndef i_keydrop
-    #define i_keydrop c_JOIN(i_keyclass, _drop)
+    #define i_keydrop c_JOIN(i_class_key, _drop)
   #endif
   #if !defined i_keyfrom && defined i_keyraw
-    #define i_keyfrom c_JOIN(i_keyclass, _from)
+    #define i_keyfrom c_JOIN(i_class_key, _from)
   #endif
   #if !defined i_keytoraw && defined i_keyraw
-    #define i_keytoraw c_JOIN(i_keyclass, _toraw)
+    #define i_keytoraw c_JOIN(i_class_key, _toraw)
   #endif
 #endif
 
@@ -164,23 +178,23 @@
   #define _i_has_eq
 #endif
 
-// Bind to i_keycomp "class members": _cmp, _eq and _hash (when conditions are met).
-#if defined i_keycomp
+// Bind to i_comp_key "class members": _cmp, _eq and _hash (when conditions are met).
+#if defined i_comp_key
   #if !(defined i_cmp || defined i_less) && defined _i_has_cmp
-    #define i_cmp c_JOIN(i_keycomp, _cmp)
+    #define i_cmp c_JOIN(i_comp_key, _cmp)
   #endif
   #if !defined i_eq && defined _i_has_eq
-    #define i_eq c_JOIN(i_keycomp, _eq)
+    #define i_eq c_JOIN(i_comp_key, _eq)
   #endif
   #if !(defined i_hash || defined i_no_hash)
-    #define i_hash c_JOIN(i_keycomp, _hash)
+    #define i_hash c_JOIN(i_comp_key, _hash)
   #endif
 #endif
 
 #if !defined i_key
   #error "No i_key defined"
-#elif defined i_keyraw && !(c_OPTION(c_keycomp) || defined i_keytoraw)
-  #error "If i_keycomp / i_keyraw is defined, i_keytoraw must be defined too"
+#elif defined i_keyraw && !(c_OPTION(c_comp_key) || defined i_keytoraw)
+  #error "If i_comp_key / i_keyraw is defined, i_keytoraw must be defined too"
 #elif !defined i_no_clone && (defined i_keyclone ^ defined i_keydrop)
   #error "Both i_keyclone and i_keydrop must be defined, if any (unless i_no_clone defined)."
 #elif defined i_from || defined i_drop
@@ -236,26 +250,26 @@
 
 #if defined _i_is_map // ---- process hashmap/sortedmap value i_val, ... ----
 
-#if defined i_valpro
-  #define i_valclass i_valpro
-  #define i_valraw c_JOIN(i_valpro, _raw)
+#if defined i_pro_val
+  #define i_class_val i_pro_val
+  #define i_valraw c_JOIN(i_pro_val, _raw)
 #endif
 
-#ifdef i_valclass
+#ifdef i_class_val
   #ifndef i_val
-    #define i_val i_valclass
+    #define i_val i_class_val
   #endif
   #if !defined i_valclone && !defined i_no_clone
-    #define i_valclone c_JOIN(i_valclass, _clone)
+    #define i_valclone c_JOIN(i_class_val, _clone)
   #endif
   #ifndef i_valdrop
-    #define i_valdrop c_JOIN(i_valclass, _drop)
+    #define i_valdrop c_JOIN(i_class_val, _drop)
   #endif
   #if !defined i_valfrom && defined i_valraw
-    #define i_valfrom c_JOIN(i_valclass, _from)
+    #define i_valfrom c_JOIN(i_class_val, _from)
   #endif
   #if !defined i_valtoraw && defined i_valraw
-    #define i_valtoraw c_JOIN(i_valclass, _toraw)
+    #define i_valtoraw c_JOIN(i_class_val, _toraw)
   #endif
 #endif
 

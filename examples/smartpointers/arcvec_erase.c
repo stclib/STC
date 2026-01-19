@@ -9,7 +9,7 @@ void show_drop(int* x) { printf("drop: %d\n", *x); }
 #include <stc/arc.h>        // Shared pointer to int
 
 // arc is "pro", enable search/sort
-#define T Vec, Arc, (c_keypro | c_use_comp)
+#define T Vec, Arc, (c_pro_key | c_use_comp)
 #include <stc/vec.h>        // Vec: vec<Arc>
 
 

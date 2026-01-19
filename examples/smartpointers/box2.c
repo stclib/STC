@@ -20,7 +20,7 @@ typedef struct {
 #include <stc/box.h>
 
 // Box in box: (box is a "pro" key-type)
-#define T BoxBoxPoint, BoxPoint, (c_keypro)
+#define T BoxBoxPoint, BoxPoint, (c_pro_key)
 #include <stc/box.h>
 
 Point origin(void) {

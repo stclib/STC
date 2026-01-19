@@ -43,7 +43,7 @@ Viking_raw Viking_toraw(const Viking* vp) {
 }
 
 // Define the map. Viking is now a "pro"-type:
-#define T Players, Viking, int, (c_keypro)
+#define T Players, Viking, int, (c_pro_key)
 #include <stc/hashmap.h>
 
 int main(void)

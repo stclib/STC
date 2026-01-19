@@ -6,7 +6,7 @@
 #include <stc/box.h>
 
 // hashmap<cstr, boxlong>
-#define T Magicmap, cstr, boxlong, (c_keypro | c_valpro)
+#define T Magicmap, cstr, boxlong, (c_pro_key | c_pro_val)
 #include <stc/hashmap.h>
 
 int main(void)

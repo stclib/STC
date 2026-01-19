@@ -21,10 +21,10 @@
 
 // Program to emulates the phone book.
 #include <stc/cstr.h>
-#define T StrMap, cstr, cstr, (c_keypro | c_valpro)
+#define T StrMap, cstr, cstr, (c_pro_key | c_pro_val)
 #include <stc/hashmap.h>
 
-#define T StrSet, cstr, (c_keypro)
+#define T StrSet, cstr, (c_pro_key)
 #include <stc/hashset.h>
 
 void print_phone_book(StrMap phone_book)

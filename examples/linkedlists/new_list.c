@@ -21,7 +21,7 @@ bool Point_eq(const Point* a, const Point* b) {
     return a->x == b->x && a->y == b->y;
 }
 
-#define T list_pnt, Point, (c_keycomp | c_declared)
+#define T list_pnt, Point, (c_comp_key | c_declared)
 #include <stc/list.h>
 
 // use < and == operators for comparison
@@ -31,7 +31,7 @@ bool Point_eq(const Point* a, const Point* b) {
 void MyStruct_drop(MyStruct* s);
 
 // exclude cloning support because of class/drop:
-#define T MyList, MyStruct, (c_keyclass | c_no_clone)
+#define T MyList, MyStruct, (c_class_key | c_no_clone)
 #include <stc/list.h>
 
 void MyStruct_drop(MyStruct* s) {

@@ -1,6 +1,6 @@
 #include <stc/cstr.h>
-#define i_keypro cstr
-#define i_valpro cstr
+#define i_pro_key cstr
+#define i_pro_val cstr
 #include <stc/hashmap.h>
 
 int main(void)

@@ -21,12 +21,12 @@ typedef struct Point { int x, y; } Point;
 #include <stc/hashmap.h>
 
 // cstr => cstr map
-#define i_keypro cstr
-#define i_valpro cstr
+#define i_pro_key cstr
+#define i_pro_val cstr
 #include <stc/hashmap.h>
 
 // string set
-#define i_keypro cstr
+#define i_pro_key cstr
 #include <stc/hashset.h>
 
 

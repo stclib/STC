@@ -10,14 +10,13 @@ See the c++ class [std::set](https://en.cppreference.com/w/cpp/container/set) fo
 ```c++
 #define T <ct>, <kt>[, (<opt>)] // shorthand for defining set name, i_key, and i_opt
 // Common <opt> traits:
-//   c_keycomp  - Key <kt> is a comparable typedef'ed type.
-//                Binds <kt>_cmp() "member" function name.
-//   c_keyclass - Additionally binds <kt>_clone() and <kt>_drop() function names.
-//                All containers used as keys themselves can be specified with the c_keyclass trait.
-//   c_keypro   - "Pro" key type, use e.g. for built-in `cstr`, `zsview`, `arc`, and `box` as i_key.
-//                These support conversion to/from a "raw" input type (such as const char*) when
-//                using <ct>_emplace*() functions, and may do optimized lookups via the raw type.
-//   c_use_eq   - Enable optimized <kt>_eq() and for equality comparison of the container itself.
+//   c_comp_key  - Key <kt> is a comparable typedef'ed type.
+//                 Binds <kt>_cmp() "member" function name.
+//   c_class_key - Additionally binds <kt>_clone() and <kt>_drop() function names.
+//                 All containers used as keys themselves can be specified with the c_class_key trait.
+//   c_pro_key   - "Pro" key type, use e.g. for built-in `cstr`, `zsview`, `arc`, and `box` as i_key.
+//                 These support conversion to/from a "raw" input type (such as const char*) when
+//                 using <ct>_emplace*() functions, and may do optimized lookups via the raw type.
 
 // Alternative to defining T:
 #define i_key <t>              // define key type. container type name <ct> defaults to sset_<kt>.
@@ -32,7 +31,7 @@ See the c++ class [std::set](https://en.cppreference.com/w/cpp/container/set) fo
 #include <stc/sortedset.h>
 ```
 - In the following, `X` is the value of `i_key` unless `T` is defined.
-- **emplace**-functions are only available when `i_keyraw` is explicitly or implicitly defined (e.g. via c_keypro).
+- **emplace**-functions are only available when `i_keyraw` is explicitly or implicitly defined (e.g. via c_pro_key).
 
 ## Methods
 
@@ -95,7 +94,7 @@ i_key           sset_X_value_clone(const sset_X* self, i_key val);
 ```c++
 #include <stc/cstr.h>
 
-#define T SSet, cstr, (c_keypro)
+#define T SSet, cstr, (c_pro_key)
 #include <stc/sortedset.h>
 
 int main(void)

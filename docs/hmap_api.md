@@ -19,17 +19,17 @@ See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/contain
 ```c++
 #define T <ct>, <kt>, <vt>[, (<opt>)] // shorthand for defining map name, i_key, i_val, and i_opt
 // Common <opt> traits:
-//   c_keycomp  - Key <kt> is a comparable typedef'ed type.
-//                Binds <kt>_eq(), <kt>_hash() "member" function names.
-//   c_keyclass - Additionally binds <kt>_clone() and <kt>_drop() function names.
-//                All containers used as keys can be specified with the c_keyclass trait.
-//   c_keypro   - "Pro" key type, use e.g. for built-in `cstr`, `zsview`, `arc`, and `box` as i_key.
-//                These support conversion to/from a "raw" input type (such as const char*) when
-//                using <ct>_emplace*() functions, and may do optimized lookups via the raw type.
-//   c_valclass - Only binds <vt>_clone() and <vt>_drop() function names.
-//   c_valpro   - "Pro" val type, use e.g. for built-in `cstr`, `zsview`, `arc`, and `box` as i_val.
-//                These support conversion to/from a "raw" input type (such as const char*) when
-//                using <ct>_emplace*() functions.
+//   c_comp_key  - Key <kt> is a comparable typedef'ed type.
+//                 Binds <kt>_eq(), <kt>_hash() "member" function names.
+//   c_class_key - Additionally binds <kt>_clone() and <kt>_drop() function names.
+//                 All containers used as keys can be specified with the c_class_key trait.
+//   c_pro_key   - "Pro" key type, use e.g. for built-in `cstr`, `zsview`, `arc`, and `box` as i_key.
+//                 These support conversion to/from a "raw" input type (such as const char*) when
+//                 using <ct>_emplace*() functions, and may do optimized lookups via the raw type.
+//   c_class_val - Only binds <vt>_clone() and <vt>_drop() function names.
+//   c_pro_val   - "Pro" val type, use e.g. for built-in `cstr`, `zsview`, `arc`, and `box` as i_val.
+//                 These support conversion to/from a "raw" input type (such as const char*) when
+//                 using <ct>_emplace*() functions.
 
 // Alternative to defining T:
 #define i_key <t>        // Key type. Container type name <ct> defaults to hmap_<kt>.
@@ -48,7 +48,7 @@ See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/contain
 #include <stc/hashmap.h>
 ```
 - In the following, `X` is the value of `i_key` unless `T` is defined.
-- **emplace**-functions are only available when `i_keyraw`/`i_valraw` are implicitly or explicitly defined (e.g. via c_keypro).
+- **emplace**-functions are only available when `i_keyraw`/`i_valraw` are implicitly or explicitly defined (e.g. via c_pro_key).
 ## Methods
 
 ```c++
@@ -133,7 +133,7 @@ bool            c_memcmp_eq(const i_keyraw* a, const i_keyraw* b);    // !memcmp
 ```c++
 #include <stc/cstr.h>
 
-#define T hmap_cstr, cstr, cstr, (c_keypro | c_valpro)
+#define T hmap_cstr, cstr, cstr, (c_pro_key | c_pro_val)
 #include <stc/hashmap.h>
 
 int main(void)
@@ -255,7 +255,7 @@ void Viking_drop(Viking* vp) {
 }
 
 // binds the four Viking_xxxx() functions above
-#define T Vikings, Viking, int, (c_keyclass)
+#define T Vikings, Viking, int, (c_class_key)
 #include <stc/hashmap.h>
 
 int main(void)
@@ -333,7 +333,7 @@ Viking_raw Viking_toraw(const Viking* vp) {
 }
 
 // Define the map. Viking is now a "pro"-type:
-#define T Vikings, Viking, int, (c_keypro)
+#define T Vikings, Viking, int, (c_pro_key)
 #include <stc/hashmap.h>
 
 int main(void)

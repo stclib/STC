@@ -1,7 +1,7 @@
 #include <errno.h>
 #include <stc/cstr.h>
 
-#define i_keypro cstr
+#define i_pro_key cstr
 #include <stc/vec.h>
 
 vec_cstr read_file(const char* name)

@@ -46,7 +46,7 @@ void Person_drop(Person* p) {
     cstr_drop(&p->last);
 }
 
-#define T ArcPers, Person, (c_keyclass)  // clone, drop, cmp, hash
+#define T ArcPers, Person, (c_class_key)  // clone, drop, cmp, hash
 #include <stc/arc.h>
 
 int main(void) {

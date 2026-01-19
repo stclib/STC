@@ -16,7 +16,7 @@ typedef struct { enum FMDActive activeField; bool reverse; } FMDVectorSorting;
 int FileMetaData_cmp(const FMDVectorSorting*, const FileMetaData*, const FileMetaData*);
 void FileMetaData_drop(FileMetaData*);
 
-#define T FMDVector, FileMetaData, (c_keyclass | c_no_clone)
+#define T FMDVector, FileMetaData, (c_class_key | c_no_clone)
 #define i_aux FMDVectorSorting
 #define i_cmp(x, y) FileMetaData_cmp(&self->aux, x, y)
 #define i_eq(x, y) FileMetaData_cmp(&self->aux, x, y) == 0

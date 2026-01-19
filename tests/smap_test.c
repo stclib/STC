@@ -3,7 +3,7 @@
 
 // map_erase.c
 // From C++ example: https://docs.microsoft.com/en-us/cpp/standard-library/map-class?view=msvc-160#example-16
-#define T Mymap, int, cstr, (c_use_eq | c_valpro)
+#define T Mymap, int, cstr, (c_use_eq | c_pro_val)
 #include <stc/sortedmap.h>
 
 TEST(sortedmap, erase)

@@ -1,9 +1,9 @@
 #include <stc/cstr.h>
 
-#define T IdMap, int, cstr, (c_valpro)   // Map of int => cstr
+#define T IdMap, int, cstr, (c_pro_val)   // Map of int => cstr
 #include <stc/hashmap.h>
 
-#define T NationMap, cstr, int, (c_keypro)  // Map of cstr => int
+#define T NationMap, cstr, int, (c_pro_key)  // Map of cstr => int
 #include <stc/hashmap.h>
 
 typedef struct {int x, y;} IPair;
@@ -15,10 +15,10 @@ inline static bool IPair_eq(const IPair* a, const IPair* b) {
     return a->x == b->x && a->y == b->y;
 }
 
-#define T vec_ip, IPair, (c_keycomp)
+#define T vec_ip, IPair, (c_comp_key)
 #include <stc/vec.h>
 
-#define T list_ip, IPair, (c_keycomp)
+#define T list_ip, IPair, (c_comp_key)
 #include <stc/list.h>
 
 #define T PriorityQ, float

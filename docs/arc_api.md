@@ -25,7 +25,7 @@ c_drop(Arc, &a1, &a2);
 ```
 - ***arc type 2*** occupies the size of two pointers, however it may also be constructed from an existing unmanaged
 pointer. Enable it by `#define T Arc, key, (c_use_arc2)`
-- When defining a container with shared pointer elements, add *c_keypro*/*valpro*: `#define T MyVec, MyArc, (c_keypro)`
+- When defining a container with shared pointer elements, add *c_pro_key*/*valpro*: `#define T MyVec, MyArc, (c_pro_key)`
 
 See similar c++ class [std::shared_ptr](https://en.cppreference.com/w/cpp/memory/shared_ptr) for a functional reference, or Rust [std::sync::Arc](https://doc.rust-lang.org/std/sync/struct.Arc.html) / [std::rc::Rc](https://doc.rust-lang.org/std/rc/struct.Rc.html).
 
@@ -34,21 +34,22 @@ See similar c++ class [std::shared_ptr](https://en.cppreference.com/w/cpp/memory
 ```c++
 #define T <ct>, <kt>[, (<opt>)] // shorthand for defining arc name, i_key, and i_opt
 // Common <opt> traits:
-//   c_keycomp  - Key <kt> is a comparable typedef'ed type.
+//   c_comp_key  - Key <kt> is a comparable typedef'ed type.
 //                Binds <kt>_cmp(), <kt>_hash() "member" function names.
-//   c_keyclass - Additionally binds <kt>_clone() and <kt>_drop() function names.
-//                All containers used as keys themselves can be specified with the c_keyclass trait.
-//   c_keypro   - "Pro" key type, use e.g. for built-in `cstr`, `zsview`, `arc`, and `box` as keys.
+//   c_class_key - Additionally binds <kt>_clone() and <kt>_drop() function names.
+//                All containers used as keys themselves can be specified with the c_class_key trait.
+//   c_pro_key   - "Pro" key type, use e.g. for built-in `cstr`, `zsview`, `arc`, and `box` as keys.
 //                These support conversion to/from a "raw" input type (such as const char*) when
 //                using <ct>_emplace*() functions, and may do optimized lookups via the raw type.
+//   c_use_eq   - Enable optimized <kt>_eq() and for equality comparison of the container itself.
 //   c_use_cmp  - Enable comparison <kt>_cmp() function.
 //                If <kt> is a basic type, operators '<' and '==' are used by default.
-//   c_use_eq   - Enable optimized <kt>_eq() and for equality comparison of the container itself.
+//   c_use_comp - Enable both <kt>_cmp() and <kt>_eq() for sorting and linear search
 //   c_use_arc2 - Use arc2 instead of arc. It occupies two pointers, but may be constructed
 //                from an existing pointer.
 //   c_no_atomic - Non-atomic reference counting, like Rust Rc.
 //
-// To apply multiple traits, specify e.g. (c_keyclass | c_no_atomic | c_use_cmp) as <opt>.
+// To apply multiple traits, specify e.g. (c_class_key | c_no_atomic | c_use_cmp) as <opt>.
 
 // Alternative to defining T:
 #define i_key <kt>       // Key type. Container type name <ct> defaults to arc_<kt>.
@@ -62,7 +63,7 @@ See similar c++ class [std::shared_ptr](https://en.cppreference.com/w/cpp/memory
 
 #include <stc/arc.h>
 ```
-When defining a container with **arc** elements, specify `#define i_keypro <arc-type>` instead of `i_key`.
+When defining a container with **arc** elements, specify `#define i_pro_key <arc-type>` instead of `i_key`.
 
 In the following, `X` is the value of `i_key` unless `T` is defined.
 
@@ -114,15 +115,15 @@ bool            arc_X_value_eq(const i_key* x, const i_key* y);
 // Show elements dropped.
 #include <stc/cstr.h>
 
-#define T Map, cstr, int, (c_keypro) // cstr is a "pro" type
+#define T Map, cstr, int, (c_pro_key) // cstr is a "pro" type
 #define i_keydrop(p) (printf("  drop name: %s\n", cstr_str(p)), cstr_drop(p))
 #include <stc/sortedmap.h>
 
 // keyclass binds _clone & _drop:
-#define T Arc, Map, (c_keyclass) // (Atomic) Ref. Counted pointer
+#define T Arc, Map, (c_class_key) // (Atomic) Ref. Counted pointer
 #include <stc/arc.h>   // try to switch to box.h!
 
-#define T Stack, Arc, (c_keypro) // arc is "pro"
+#define T Stack, Arc, (c_pro_key) // arc is "pro"
 #include <stc/stack.h>
 
 int main(void)

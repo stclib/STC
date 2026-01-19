@@ -35,11 +35,11 @@ void Person_drop(Person* p) {
 
 // binds Person_clone, Person_drop, enable search/sort
 // Person is a "pro" type (has Person_raw conversion type):
-#define T PersArc, Person, (c_keypro | c_use_eq)
+#define T PersArc, Person, (c_pro_key | c_use_eq)
 #include <stc/arc.h>
 
 // Arcs and Boxes are always "pro" types:
-#define T Persons, PersArc, (c_keypro | c_use_eq)
+#define T Persons, PersArc, (c_pro_key | c_use_eq)
 #include <stc/vec.h>
 
 

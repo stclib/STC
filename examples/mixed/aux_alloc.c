@@ -7,7 +7,7 @@
 #define i_allocator my // explicitly define allocator prefix.
 #include <stc/stack.h>
 
-#define T ListDeque, List, (c_keyclass | c_use_eq)
+#define T ListDeque, List, (c_class_key | c_use_eq)
 // Shorthand for defining both i_aux AND i_allocator as above, in one line:
 #define i_aux MyAlloc*, my
 #include <stc/deque.h>

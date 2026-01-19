@@ -26,7 +26,7 @@
 #include <stdio.h>
 #include <stc/cstr.h>
 
-#define T SMap, cstr, double, (c_keypro)  // Sorted map<cstr, double>
+#define T SMap, cstr, double, (c_pro_key)  // Sorted map<cstr, double>
 #include <stc/sortedmap.h>
 
 int main(void) {

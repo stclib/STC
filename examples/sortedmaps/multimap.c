@@ -41,12 +41,12 @@ void       OlympicLoc_drop(OlympicLoc* self);
 
 // Create a list<OlympicLoc>, can be sorted by year.
 // "class" binds _clone() and _drop().
-#define T list_OL, OlympicLoc, (c_keyclass | c_use_cmp)
+#define T list_OL, OlympicLoc, (c_class_key | c_use_cmp)
 #include <stc/list.h>
 
 // Create a smap<cstr, list_OL> where key is country name
 // "valclass" binds list_OL_clone, list_OL_drop
-#define T smap_OL, cstr, list_OL, (c_keypro | c_valclass)
+#define T smap_OL, cstr, list_OL, (c_pro_key | c_class_val)
 #include <stc/sortedmap.h>
 
 

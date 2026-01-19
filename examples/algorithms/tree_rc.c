@@ -11,7 +11,7 @@ c_union (Tree,
 );
 void Tree_drop(Tree*);
 
-#define T TreeRc, Tree, (c_declared | c_keyclass)
+#define T TreeRc, Tree, (c_declared | c_class_key)
 #include <stc/rc.h>
 
 void Tree_drop(Tree* self) {

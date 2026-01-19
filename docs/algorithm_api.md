@@ -401,7 +401,7 @@ Erase linearily in containers using a predicate. `value` is a pointer to each el
 #define T List, int, (c_use_eq)
 #include <stc/list.h>
 
-#define T Map, cstr, int, (c_keypro)
+#define T Map, cstr, int, (c_pro_key)
 #include <stc/sortedmap.h>
 
 int main(void)
@@ -632,7 +632,7 @@ c_with (pthread_mutex_lock(&lock), pthread_mutex_unlock(&lock))
 #include <errno.h>
 #include <stc/cstr.h>
 
-#define i_keypro cstr
+#define i_pro_key cstr
 #include <stc/vec.h>
 
 // receiver should check errno variable
@@ -763,7 +763,7 @@ int* ip = c_const_cast(int*, cs);  // issues a warning!
 <summary>Predefined template parameter functions</summary>
 ### Predefined template parameter functions
 
-**cstr_raw** - Non-owning `const char*` "class" element type: `#define i_keyclass cstr_raw`
+**cstr_raw** - Non-owning `const char*` "class" element type: `#define i_class_key cstr_raw`
 ```c++
 typedef         const char* cstr_raw;
 int             cstr_raw_cmp(const cstr_raw* x, const cstr_raw* y);

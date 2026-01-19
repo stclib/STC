@@ -67,10 +67,10 @@ point_eq(const point* a, const point* b)
 #define T deque_pnt, point
 #include <stc/deque.h>
 
-#define T smap_pcost, point, int, (c_keycomp)
+#define T smap_pcost, point, int, (c_comp_key)
 #include <stc/sortedmap.h>
 
-#define T smap_pstep, point, point, (c_keycomp)
+#define T smap_pstep, point, point, (c_comp_key)
 #include <stc/sortedmap.h>
 
 

@@ -13,15 +13,15 @@
 #include <stc/stack.h>
 
 // container as elements is "class"; has _clone() and _drop() "members"
-#define T StackList, FloatStack, (c_keyclass)
+#define T StackList, FloatStack, (c_class_key)
 #include <stc/list.h>
 
 // same, but StackList is the mapped value type, not the key:
-#define T ListMap, int, StackList, (c_valclass)
+#define T ListMap, int, StackList, (c_class_val)
 #include <stc/hashmap.h>
 
 // cstr is "pro"; has _clone, _drop, _cmp, _hash, _toraw, and _from.
-#define T MapMap, cstr, ListMap, (c_keypro | c_valclass)
+#define T MapMap, cstr, ListMap, (c_pro_key | c_class_val)
 #include <stc/hashmap.h>
 
 

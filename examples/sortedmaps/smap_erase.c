@@ -3,7 +3,7 @@
 #include <stc/cstr.h>
 #include <stdio.h>
 
-#define T mymap, int, cstr, (c_valpro)
+#define T mymap, int, cstr, (c_pro_val)
 #include <stc/sortedmap.h>
 
 void printmap(mymap m)

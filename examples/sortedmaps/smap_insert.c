@@ -9,7 +9,7 @@
 
 #include <stc/cstr.h>
 
-#define T smap_istr, int, cstr, (c_valpro) // Map of int => cstr
+#define T smap_istr, int, cstr, (c_pro_val) // Map of int => cstr
 #include <stc/sortedmap.h>
 
 void print_ii(smap_ii map) {

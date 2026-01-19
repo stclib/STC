@@ -1,7 +1,7 @@
 // https://iq.opengenus.org/containers-cpp-stl/
 // C program to demonstrate various function of stc hset
 #include <stc/cstr.h>
-#define i_keypro cstr
+#define i_pro_key cstr
 #include <stc/hset.h>
 
 int main(void)

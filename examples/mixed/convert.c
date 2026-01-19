@@ -1,14 +1,14 @@
 #include <stc/cstr.h>
 #include <stc/algorithm.h>
 
-#define i_keypro cstr // key = cstr
-#define i_valpro cstr
+#define i_pro_key cstr // key = cstr
+#define i_pro_val cstr
 #include <stc/hashmap.h>
 
-#define i_keypro cstr
+#define i_pro_key cstr
 #include <stc/vec.h>
 
-#define i_keypro cstr
+#define i_pro_key cstr
 #include <stc/list.h>
 
 int main(void)
