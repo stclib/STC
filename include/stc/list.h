@@ -100,7 +100,7 @@ STC_API _m_iter         _c_MEMB(_erase_at)(Self* self, _m_iter it);
 STC_API _m_iter         _c_MEMB(_erase_range)(Self* self, _m_iter it1, _m_iter it2);
 #if defined _i_has_eq
 STC_API _m_iter         _c_MEMB(_find_in)(const Self* self, _m_iter it1, _m_iter it2, _m_raw val);
-STC_API isize           _c_MEMB(_remove)(Self* self, _m_raw val);
+STC_API isize_t         _c_MEMB(_remove)(Self* self, _m_raw val);
 #endif
 #if defined _i_has_cmp
 STC_API bool            _c_MEMB(_sort)(Self* self);
@@ -140,19 +140,19 @@ STC_INLINE _m_value*    _c_MEMB(_emplace)(Self* self, _m_raw raw)
 #endif // !_i_no_emplace
 
 #ifndef _i_no_put
-STC_INLINE void         _c_MEMB(_put_n)(Self* self, const _m_raw* raw, isize n)
+STC_INLINE void         _c_MEMB(_put_n)(Self* self, const _m_raw* raw, isize_t n)
                             { while (n--) _c_MEMB(_push_back)(self, i_keyfrom((*raw))), ++raw; }
 #endif
 
 #ifndef _i_aux_alloc
     STC_INLINE Self         _c_MEMB(_init)(void) { return c_literal(Self){0}; }
     #ifndef _i_no_put
-    STC_INLINE Self         _c_MEMB(_from_n)(const _m_raw* raw, isize n)
+    STC_INLINE Self         _c_MEMB(_from_n)(const _m_raw* raw, isize_t n)
                                 { Self cx = {0}; _c_MEMB(_put_n)(&cx, raw, n); return cx; }
     #endif
 #endif
 
-STC_INLINE bool         _c_MEMB(_reserve)(Self* self, isize n) { (void)(self + n); return true; }
+STC_INLINE bool         _c_MEMB(_reserve)(Self* self, isize_t n) { (void)(self + n); return true; }
 STC_INLINE bool         _c_MEMB(_is_empty)(const Self* self) { return self->last == NULL; }
 STC_INLINE void         _c_MEMB(_clear)(Self* self) { _c_MEMB(_drop)(self); }
 STC_INLINE _m_value*    _c_MEMB(_push)(Self* self, _m_value value)
@@ -177,9 +177,9 @@ STC_INLINE void _c_MEMB(_take)(Self *self, Self unowned) {
     *self = unowned;
 }
 
-STC_INLINE isize
+STC_INLINE isize_t
 _c_MEMB(_count)(const Self* self) {
-    isize n = 1; const _m_node *node = self->last;
+    isize_t n = 1; const _m_node *node = self->last;
     if (node == NULL) return 0;
     while ((node = node->next) != self->last) ++n;
     return n;
@@ -383,9 +383,9 @@ _c_MEMB(_find_in)(const Self* self, _m_iter it1, _m_iter it2, _m_raw val) {
     it2.ref = NULL; return it2;
 }
 
-STC_DEF isize
+STC_DEF isize_t
 _c_MEMB(_remove)(Self* self, _m_raw val) {
-    isize n = 0;
+    isize_t n = 0;
     _m_node *prev = self->last, *node;
     if (prev) do {
         node = prev->next;
@@ -404,12 +404,12 @@ _c_MEMB(_remove)(Self* self, _m_raw val) {
 #include "priv/sort_prv.h"
 
 STC_DEF bool _c_MEMB(_sort)(Self* self) {
-    isize len = 0, cap = 0;
+    isize_t len = 0, cap = 0;
     _m_value *arr = NULL, *p = NULL;
     _m_node* keep;
     for (c_each(i, Self, *self)) {
         if (len == cap) {
-            isize cap_n = cap + cap/2 + 8;
+            isize_t cap_n = cap + cap/2 + 8;
             if ((p = (_m_value *)_i_realloc_n(arr, cap, cap_n)) == NULL)
                 goto done;
             arr = p, cap = cap_n;

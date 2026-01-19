@@ -53,7 +53,7 @@ See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/contain
 
 ```c++
 hmap_X          hmap_X_init(void);
-hmap_X          hmap_X_with_capacity(isize cap);
+hmap_X          hmap_X_with_capacity(isize_t cap);
 
 hmap_X          hmap_X_clone(hmap_x map);
 void            hmap_X_copy(hmap_X* self, const hmap_X* other);
@@ -63,13 +63,13 @@ void            hmap_X_drop(const hmap_X* self);                                
 
 void            hmap_X_clear(hmap_X* self);
 float           hmap_X_max_load_factor(const hmap_X* self);                              // default: 0.85f
-bool            hmap_X_reserve(hmap_X* self, isize size);
+bool            hmap_X_reserve(hmap_X* self, isize_t size);
 void            hmap_X_shrink_to_fit(hmap_X* self);
 
 bool            hmap_X_is_empty(const hmap_X* self );
-isize           hmap_X_size(const hmap_X* self);
-isize           hmap_X_capacity(const hmap_X* self);                                     // buckets * max_load_factor
-isize           hmap_X_bucket_count(const hmap_X* self);                                 // num. of allocated buckets
+isize_t         hmap_X_size(const hmap_X* self);
+isize_t         hmap_X_capacity(const hmap_X* self);                                     // buckets * max_load_factor
+isize_t         hmap_X_bucket_count(const hmap_X* self);                                 // num. of allocated buckets
 
 const i_val*    hmap_X_at(const hmap_X* self, i_keyraw rkey);                            // rkey must be in map
 i_val*          hmap_X_at_mut(hmap_X* self, i_keyraw rkey);                              // mutable at
@@ -102,10 +102,10 @@ hmap_X_raw      hmap_X_value_toraw(hmap_X_value* pval);
 ```
 Free helper functions:
 ```c++
-size_t          c_hash_n(const void *data, isize n);                  // generic hash function of n bytes
+size_t          c_hash_n(const void *data, isize_t n);                // generic hash function of n bytes
 size_t          c_hash_str(const char *str);                          // string hash function, uses strlen()
 size_t          c_hash_mix(size_t h1, size_t h2, ...);                // mix/combine computed hashes
-isize           c_next_pow2(isize k);                                 // get next power of 2 >= k
+isize_t         c_next_pow2(isize_t k);                               // get next power of 2 >= k
 
 // hash/equal template default functions:
 size_t          c_default_hash(const T *obj);                         // alias for c_hash_n(obj, sizeof *obj)

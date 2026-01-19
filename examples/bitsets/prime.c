@@ -4,18 +4,18 @@
 #include <stc/cbits.h>
 #include <stc/algorithm.h>
 
-cbits sieveOfEratosthenes(isize n)
+cbits sieveOfEratosthenes(isize_t n)
 {
     cbits bits = cbits_with_size(n/2 + 1, true);
-    isize q = (isize)sqrt((double) n) + 1;
-    for (isize i = 3; i < q; i += 2) {
-        for (isize j = i; j < n; j += 2) {
+    isize_t q = (isize_t)sqrt((double) n) + 1;
+    for (isize_t i = 3; i < q; i += 2) {
+        for (isize_t j = i; j < n; j += 2) {
             if (cbits_test(&bits, j/2)) {
                 i = j;
                 break;
             }
         }
-        for (isize j = i*i; j < n; j += i*2)
+        for (isize_t j = i*i; j < n; j += i*2)
             cbits_reset(&bits, j/2);
     }
     return bits;

@@ -80,7 +80,7 @@ typedef struct _Reprog
     _Reinst  *startinst;     /* start pc */
     _Reflags flags;
     int nsubids;
-    isize allocsize;
+    isize_t allocsize;
     _Reclass cclass[_NCLASS]; /* .data */
     _Reinst  firstinst[];    /* .text : originally 5 elements? */
 } _Reprog;
@@ -365,7 +365,7 @@ typedef struct _Parser
     bool lastwasand;     /* Last token was _operand */
     short nbra;
     short nclass;
-    isize instcap;
+    isize_t instcap;
     _Rune yyrune;         /* last lex'd rune */
     _Reclass *yyclassp;   /* last lex'd class */
     _Reclass* classp;
@@ -570,9 +570,9 @@ _optimize(_Parser *par, _Reprog *pp)
         return pp;
 
     intptr_t ipp = (intptr_t)pp; // convert pointer to integer!
-    isize new_allocsize = c_sizeof(_Reprog) + (par->freep - pp->firstinst)*c_sizeof(_Reinst);
+    isize_t new_allocsize = c_sizeof(_Reprog) + (par->freep - pp->firstinst)*c_sizeof(_Reinst);
     _Reprog *npp = (_Reprog *)c_realloc(pp, pp->allocsize, new_allocsize);
-    isize diff = (intptr_t)npp - ipp;
+    isize_t diff = (intptr_t)npp - ipp;
 
     if ((npp == NULL) | (diff == 0))
         return (_Reprog *)ipp;
@@ -878,8 +878,8 @@ _regcomp1(_Reprog *pp, _Parser *par, const char *s, int cflags)
     _Token token;
 
     /* get memory for the program. estimated max usage */
-    isize instcap = 5 + 6*c_strlen(s);
-    isize new_allocsize = c_sizeof(_Reprog) + instcap*c_sizeof(_Reinst);
+    isize_t instcap = 5 + 6*c_strlen(s);
+    isize_t new_allocsize = c_sizeof(_Reprog) + instcap*c_sizeof(_Reinst);
     pp = (_Reprog *)c_realloc(pp, pp ? pp->allocsize : 0, new_allocsize);
     if (pp == NULL) {
         par->error = CREG_OUTOFMEMORY;
@@ -1183,7 +1183,7 @@ _regexec2(const _Reprog *progp,    /* program to run */
     _Relist *relists;
 
     /* mark space */
-    isize sz = 2 * _BIGLISTSIZE*c_sizeof(_Relist);
+    isize_t sz = 2 * _BIGLISTSIZE*c_sizeof(_Relist);
     relists = (_Relist *)c_malloc(sz);
     if (relists == NULL)
         return -1;
@@ -1249,7 +1249,7 @@ static void
 _build_substitution(const char* replace, int nmatch, const csview match[],
                     bool(*transform)(int, csview, cstr*), cstr* subst) {
     cstr_buf mbuf = cstr_getbuf(subst);
-    isize len = 0, cap = mbuf.cap;
+    isize_t len = 0, cap = mbuf.cap;
     char* dst = mbuf.data;
     cstr tr_str = {0};
 
@@ -1329,14 +1329,14 @@ cstr cregex_replace_opt(const cregex* re, const char* input, const char* input_e
 
     while (--opt.count && cregex_match_opt(re, input, input_end, mopt) == CREG_OK) {
         _build_substitution(replace, nmatch, match, opt.xform, &subst);
-        const isize mpos = (match[0].buf - input);
+        const isize_t mpos = (match[0].buf - input);
         if (copy & (mpos > 0))
             cstr_append_n(&out, input, mpos);
         cstr_append_s(&out, subst);
         input = match[0].buf + match[0].size;
     }
     if (copy) {
-        isize len = input_end ? input_end - input : c_strlen(input);
+        isize_t len = input_end ? input_end - input : c_strlen(input);
         cstr_append_sv(&out, c_sv(input, len));
     }
     cstr_drop(&subst);

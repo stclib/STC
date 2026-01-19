@@ -48,41 +48,41 @@ See the c++ class [std::vector](https://en.cppreference.com/w/cpp/container/vect
 
 ```c++
 vec_X           vec_X_init(void);
-vec_X           vec_X_with_capacity(isize size);
-vec_X           vec_X_with_size(isize size, i_keyraw rawval);
-vec_X           vec_X_with_size_uninit(isize size);
+vec_X           vec_X_with_capacity(isize_t size);
+vec_X           vec_X_with_size(isize_t size, i_keyraw rawval);
+vec_X           vec_X_with_size_uninit(isize_t size);
 
 vec_X           vec_X_clone(vec_X vec);
 void            vec_X_copy(vec_X* self, const vec_X* other);
-vec_X_iter      vec_X_copy_to(vec_X* self, isize idx, const i_key* arr, isize n);
+vec_X_iter      vec_X_copy_to(vec_X* self, isize_t idx, const i_key* arr, isize_t n);
 vec_X           vec_X_move(vec_X* self);                                    // move
 void            vec_X_take(vec_X* self, vec_X unowned);                     // take ownership of unowned
 void            vec_X_drop(const vec_X* self);                              // destructor
 
 void            vec_X_clear(vec_X* self);
-bool            vec_X_reserve(vec_X* self, isize cap);
-bool            vec_X_resize(vec_X* self, isize size, i_key null);
+bool            vec_X_reserve(vec_X* self, isize_t cap);
+bool            vec_X_resize(vec_X* self, isize_t size, i_key null);
 void            vec_X_shrink_to_fit(vec_X* self);
 
 bool            vec_X_is_empty(const vec_X* self);
-isize           vec_X_size(const vec_X* self);
-isize           vec_X_capacity(const vec_X* self);
+isize_t         vec_X_size(const vec_X* self);
+isize_t         vec_X_capacity(const vec_X* self);
 
 vec_X_iter      vec_X_find(const vec_X* self, i_keyraw raw);
 vec_X_iter      vec_X_find_in(vec_X_iter i1, vec_X_iter i2, i_keyraw raw);  // return vec_X_end() if not found
 
-const i_key*    vec_X_at(const vec_X* self, isize idx);
+const i_key*    vec_X_at(const vec_X* self, isize_t idx);
 const i_key*    vec_X_front(const vec_X* self);
 const i_key*    vec_X_back(const vec_X* self);
 
-i_key*          vec_X_at_mut(vec_X* self, isize idx);                       // return mutable at idx
+i_key*          vec_X_at_mut(vec_X* self, isize_t idx);                     // return mutable at idx
 i_key*          vec_X_front_mut(vec_X* self);
 i_key*          vec_X_back_mut(vec_X* self);
 
                 // Requires either i_use_cmp, i_cmp or i_less defined:
 void            vec_X_sort(vec_X* self);                                    // quicksort from sort.h
-isize           vec_X_lower_bound(const vec_X* self, const i_keyraw raw);   // return c_NPOS if not found
-isize           vec_X_binary_search(const vec_X* self, const i_keyraw raw); // return c_NPOS if not found
+isize_t         vec_X_lower_bound(const vec_X* self, const i_keyraw raw);   // return c_NPOS if not found
+isize_t         vec_X_binary_search(const vec_X* self, const i_keyraw raw); // return c_NPOS if not found
 
 i_key*          vec_X_push(vec_X* self, i_key value);
 i_key*          vec_X_push_back(vec_X* self, i_key value);                  // alias for push
@@ -93,14 +93,14 @@ void            vec_X_pop(vec_X* self);                                     // d
 void            vec_X_pop_back(vec_X* self);                                // alias for pop
 i_key           vec_X_pull(vec_X* self);                                    // move out last element
 
-vec_X_iter      vec_X_insert_n(vec_X* self, isize idx, const i_key arr[], isize n); // move values
+vec_X_iter      vec_X_insert_n(vec_X* self, isize_t idx, const i_key arr[], isize_t n); // move values
 vec_X_iter      vec_X_insert_at(vec_X* self, vec_X_iter it, i_key value);   // move value
-vec_X_iter      vec_X_insert_uninit(vec_X* self, isize idx, isize n);       // return iter at idx
+vec_X_iter      vec_X_insert_uninit(vec_X* self, isize_t idx, isize_t n);   // return iter at idx
 
-vec_X_iter      vec_X_emplace_n(vec_X* self, isize idx, const i_keyraw raw[], isize n);
+vec_X_iter      vec_X_emplace_n(vec_X* self, isize_t idx, const i_keyraw raw[], isize_t n);
 vec_X_iter      vec_X_emplace_at(vec_X* self, vec_X_iter it, i_keyraw raw);
 
-vec_X_iter      vec_X_erase_n(vec_X* self, isize idx, isize n);
+vec_X_iter      vec_X_erase_n(vec_X* self, isize_t idx, isize_t n);
 vec_X_iter      vec_X_erase_at(vec_X* self, vec_X_iter it);
 vec_X_iter      vec_X_erase_range(vec_X* self, vec_X_iter it1, vec_X_iter it2);
 

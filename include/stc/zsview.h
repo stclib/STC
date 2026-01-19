@@ -45,15 +45,15 @@ STC_INLINE zsview   zsview_from(const char* str)
 STC_INLINE void     zsview_clear(zsview* self) { *self = c_zv(""); }
 STC_INLINE csview   zsview_sv(zsview zs) { return c_sv_2(zs.str, zs.size); }
 
-STC_INLINE isize    zsview_size(zsview zs) { return zs.size; }
+STC_INLINE isize_t  zsview_size(zsview zs) { return zs.size; }
 STC_INLINE bool     zsview_is_empty(zsview zs) { return zs.size == 0; }
 
 STC_INLINE bool zsview_equals(zsview zs, const char* str) {
-    isize n = c_strlen(str);
+    isize_t n = c_strlen(str);
     return zs.size == n && !c_memcmp(zs.str, str, n);
 }
 
-STC_INLINE isize zsview_find(zsview zs, const char* search) {
+STC_INLINE isize_t zsview_find(zsview zs, const char* search) {
     const char* res = strstr(zs.str, search);
     return res ? (res - zs.str) : c_NPOS;
 }
@@ -62,27 +62,27 @@ STC_INLINE bool zsview_contains(zsview zs, const char* str)
     { return zsview_find(zs, str) != c_NPOS; }
 
 STC_INLINE bool zsview_starts_with(zsview zs, const char* str) {
-    isize n = c_strlen(str);
+    isize_t n = c_strlen(str);
     return n <= zs.size && !c_memcmp(zs.str, str, n);
 }
 
 STC_INLINE bool zsview_ends_with(zsview zs, const char* str) {
-    isize n = c_strlen(str);
+    isize_t n = c_strlen(str);
     return n <= zs.size && !c_memcmp(zs.str + zs.size - n, str, n);
 }
 
-STC_INLINE zsview zsview_from_pos(zsview zs, isize pos) {
+STC_INLINE zsview zsview_from_pos(zsview zs, isize_t pos) {
     if (pos > zs.size) pos = zs.size;
     zs.str += pos; zs.size -= pos; return zs;
 }
 
-STC_INLINE csview zsview_subview(zsview zs, isize pos, isize len) {
+STC_INLINE csview zsview_subview(zsview zs, isize_t pos, isize_t len) {
     c_assert(((size_t)pos <= (size_t)zs.size) & (len >= 0));
     if (pos + len > zs.size) len = zs.size - pos;
     return c_literal(csview){zs.str + pos, len};
 }
 
-STC_INLINE zsview zsview_tail(zsview zs, isize len) {
+STC_INLINE zsview zsview_tail(zsview zs, isize_t len) {
     c_assert(len >= 0);
     if (len > zs.size) len = zs.size;
     zs.str += zs.size - len; zs.size = len;
@@ -91,10 +91,10 @@ STC_INLINE zsview zsview_tail(zsview zs, isize len) {
 
 /* utf8 */
 
-STC_INLINE zsview zsview_u8_from_pos(zsview zs, isize u8pos)
+STC_INLINE zsview zsview_u8_from_pos(zsview zs, isize_t u8pos)
     { return zsview_from_pos(zs, utf8_to_index(zs.str, u8pos)); }
 
-STC_INLINE zsview zsview_u8_tail(zsview zs, isize u8len) {
+STC_INLINE zsview zsview_u8_tail(zsview zs, isize_t u8len) {
     const char* p = &zs.str[zs.size];
     while (u8len && p != zs.str)
         u8len -= (*--p & 0xC0) != 0x80;
@@ -102,17 +102,17 @@ STC_INLINE zsview zsview_u8_tail(zsview zs, isize u8len) {
     return zs;
 }
 
-STC_INLINE csview zsview_u8_subview(zsview zs, isize u8pos, isize u8len)
+STC_INLINE csview zsview_u8_subview(zsview zs, isize_t u8pos, isize_t u8len)
     { return utf8_subview(zs.str, u8pos, u8len); }
 
-STC_INLINE zsview_iter zsview_u8_at(zsview zs, isize u8pos) {
+STC_INLINE zsview_iter zsview_u8_at(zsview zs, isize_t u8pos) {
     csview sv;
     sv.buf = utf8_at(zs.str, u8pos);
     sv.size = utf8_chr_size(sv.buf);
     return c_literal(zsview_iter){.chr = sv};
 }
 
-STC_INLINE isize zsview_u8_size(zsview zs)
+STC_INLINE isize_t zsview_u8_size(zsview zs)
     { return utf8_count(zs.str); }
 
 STC_INLINE bool zsview_u8_valid(zsview zs) // requires linking with utf8 symbols
@@ -134,7 +134,7 @@ STC_INLINE void zsview_next(zsview_iter* it) {
     if (*it->ref == '\0') it->ref = NULL;
 }
 
-STC_INLINE zsview_iter zsview_advance(zsview_iter it, isize u8pos) {
+STC_INLINE zsview_iter zsview_advance(zsview_iter it, isize_t u8pos) {
     it.ref = utf8_offset(it.ref, u8pos);
     it.chr.size = utf8_chr_size(it.ref);
     if (*it.ref == '\0') it.ref = NULL;
@@ -167,7 +167,7 @@ STC_INLINE bool zsview_istarts_with(zsview zs, const char* str)
     { return c_strlen(str) <= zs.size && !utf8_icmp(zs.str, str); }
 
 STC_INLINE bool zsview_iends_with(zsview zs, const char* str) {
-    isize n = c_strlen(str);
+    isize_t n = c_strlen(str);
     return n <= zs.size && !utf8_icmp(zs.str + zs.size - n, str);
 }
 

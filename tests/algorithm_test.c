@@ -59,7 +59,7 @@ TEST(algorithm, c_filter)
     #define f_is_even(v) ((v & 1) == 0)
     #define f_is_odd(v) ((v & 1) == 1)
 
-    isize sum = 0;
+    isize_t sum = 0;
     c_filter(IVec, vec
          , c_flt_skipwhile(f_is_odd(*value))
         && c_flt_skip(1)
@@ -71,11 +71,11 @@ TEST(algorithm, c_filter)
 
     uint64_t hash = 0;
     c_filter(IVec, vec, hash = c_hash_mix(hash, (uint64_t)*value));
-    EXPECT_EQ(658, (isize)hash);
+    EXPECT_EQ(658, (isize_t)hash);
 
     hash = 0;
     c_filter_reverse(IVec, vec, hash = c_hash_mix(hash, (uint64_t)*value));
-    EXPECT_EQ(10897, (isize)hash);
+    EXPECT_EQ(10897, (isize_t)hash);
 
     sum = 0;
     c_filter(IVec, vec, sum += *value);

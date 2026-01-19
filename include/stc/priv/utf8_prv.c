@@ -66,7 +66,7 @@ int utf8_encode(char *out, uint32_t c) {
     return 0;
 }
 
-uint32_t utf8_peek_at(const char* s, isize offset) {
+uint32_t utf8_peek_at(const char* s, isize_t offset) {
     return utf8_peek(utf8_offset(s, offset));
 }
 
@@ -77,7 +77,7 @@ bool utf8_valid(const char* s) {
     return d.state == utf8_ACCEPT;
 }
 
-bool utf8_valid_n(const char* s, isize nbytes) {
+bool utf8_valid_n(const char* s, isize_t nbytes) {
     utf8_decode_t d = {.state=0};
     for (; nbytes-- != 0; ++s)
         if ((utf8_decode(&d, (uint8_t)*s) == utf8_REJECT) | (*s == '\0'))
@@ -146,7 +146,7 @@ int utf8_decode_codepoint(utf8_decode_t* d, const char* s, const char* end) { //
 int utf8_icompare(const csview s1, const csview s2) {
     utf8_decode_t d1 = {.state=0}, d2 = {.state=0};
     const char *e1 = s1.buf + s1.size, *e2 = s2.buf + s2.size;
-    isize j1 = 0, j2 = 0;
+    isize_t j1 = 0, j2 = 0;
     while ((j1 < s1.size) & (j2 < s2.size)) {
         if (s2.buf[j2] == '\0') return s1.buf[j1];
 

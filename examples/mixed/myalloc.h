@@ -5,19 +5,19 @@
 #include <stc/common.h>
 
 typedef struct {
-    isize bytes;
+    isize_t bytes;
 } MyAlloc;
 
-static inline void* MyMalloc(MyAlloc* m, isize sz)
+static inline void* MyMalloc(MyAlloc* m, isize_t sz)
     { m->bytes += sz; return c_malloc(sz); }
 
-static inline void* MyCalloc(MyAlloc* m, isize nitems, isize item_sz)
+static inline void* MyCalloc(MyAlloc* m, isize_t nitems, isize_t item_sz)
     { m->bytes += nitems * item_sz; return c_calloc(nitems, item_sz); }
 
-static inline void* MyRealloc(MyAlloc* m, void* p, isize old_sz, isize sz)
+static inline void* MyRealloc(MyAlloc* m, void* p, isize_t old_sz, isize_t sz)
     { m->bytes += sz - old_sz; return c_realloc(p, old_sz, sz); }
 
-static inline void MyFree(MyAlloc* m, void* p, isize sz)
+static inline void MyFree(MyAlloc* m, void* p, isize_t sz)
     { m->bytes -= sz; c_free(p, sz); }
 
 #define my_malloc(sz)              MyMalloc(self->aux, sz)

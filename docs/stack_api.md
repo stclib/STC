@@ -49,9 +49,9 @@ See the c++ class [std::stack](https://en.cppreference.com/w/cpp/container/stack
 
 ```c++
 stack_X         stack_X_init(void);
-stack_X         stack_X_with_capacity(isize cap);
-stack_X         stack_X_with_size(isize size, i_keyraw rawval);
-stack_X         stack_X_with_size_uninit(isize size);
+stack_X         stack_X_with_capacity(isize_t cap);
+stack_X         stack_X_with_size(isize_t size, i_keyraw rawval);
+stack_X         stack_X_with_size_uninit(isize_t size);
 
 stack_X         stack_X_clone(stack_X st);
 void            stack_X_copy(stack_X* self, const stack_X* other);
@@ -60,37 +60,37 @@ void            stack_X_take(stack_X* self, stack_X unowned);                   
 void            stack_X_drop(const stack_X* self);                              // destructor
 
 void            stack_X_clear(stack_X* self);
-bool            stack_X_reserve(stack_X* self, isize n);
+bool            stack_X_reserve(stack_X* self, isize_t n);
 void            stack_X_shrink_to_fit(stack_X* self);
 
-isize           stack_X_size(const stack_X* self);
-isize           stack_X_capacity(const stack_X* self);
+isize_t         stack_X_size(const stack_X* self);
+isize_t         stack_X_capacity(const stack_X* self);
 bool            stack_X_is_empty(const stack_X* self);
 
 stack_X_iter    stack_X_find(const stack_X* self, i_keyraw raw);                 // requires c_use_cmp flag in decl.
 stack_X_iter    stack_X_find_in(stack_X_iter i1, stack_X_iter i2, i_keyraw raw); // return stack_X_end() if not found
 
-const i_key*    stack_X_at(const stack_X* self, isize idx);
+const i_key*    stack_X_at(const stack_X* self, isize_t idx);
 const i_key*    stack_X_top(const stack_X* self);
 const i_key*    stack_X_front(const stack_X* self);
 const i_key*    stack_X_back(const stack_X* self);
 
-i_key*          stack_X_at_mut(stack_X* self, isize idx);
+i_key*          stack_X_at_mut(stack_X* self, isize_t idx);
 i_key*          stack_X_top_mut(stack_X* self);
 i_key*          stack_X_front_mut(stack_X* self);
 i_key*          stack_X_back_mut(stack_X* self);
 
 i_key*          stack_X_push(stack_X* self, i_key value);
 i_key*          stack_X_emplace(stack_X* self, i_keyraw raw);
-i_key*          stack_X_append_uninit(stack_X* self, isize n);
+i_key*          stack_X_append_uninit(stack_X* self, isize_t n);
 
 void            stack_X_pop(stack_X* self);                                     // destroy last element
 i_key           stack_X_pull(stack_X* self);                                    // move out last element
 
 // Requires either i_use_cmp, i_cmp or i_less defined:
 void            stack_X_sort(stack_X* self);                                    // quicksort from sort.h
-isize           stack_X_lower_bound(const stack_X* self, const i_keyraw raw);   // return c_NPOS if not found
-isize           stack_X_binary_search(const stack_X* self, const i_keyraw raw); // return c_NPOS if not found
+isize_t         stack_X_lower_bound(const stack_X* self, const i_keyraw raw);   // return c_NPOS if not found
+isize_t         stack_X_binary_search(const stack_X* self, const i_keyraw raw); // return c_NPOS if not found
 
 stack_X_iter    stack_X_begin(const stack_X* self);
 stack_X_iter    stack_X_end(const stack_X* self);

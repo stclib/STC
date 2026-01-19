@@ -445,9 +445,9 @@ for (c_each(it, MyInts, ints)) *it.ref += 42;
 
 - Functions defined for most container types:
     - Cnt_init() -> Cnt
-    - Cnt_with_capacity(isize capacity) -> Cnt
-    - Cnt_from_n(Cnt_value[], isize n) -> Cnt
-    - Cnt_reserve(Cnt*, isize capacity)
+    - Cnt_with_capacity(isize_t capacity) -> Cnt
+    - Cnt_from_n(Cnt_value[], isize_t n) -> Cnt
+    - Cnt_reserve(Cnt*, isize_t capacity)
     - Cnt_move(Cnt*) -> Cnt
     - Cnt_take(Cnt*, Cnt unowned)
     - Cnt_copy(Cnt*, const Cnt* other)
@@ -455,21 +455,21 @@ for (c_each(it, MyInts, ints)) *it.ref += 42;
     - Cnt_drop(Cnt*)
     - Cnt_value_drop(Cnt_value*)
     - Cnt_value_toraw(Cnt_value*) -> Cnt_raw
-    - Cnt_capacity(Cnt*) -> isize
-    - Cnt_size(Cnt*) -> isize
+    - Cnt_capacity(Cnt*) -> isize_t
+    - Cnt_size(Cnt*) -> isize_t
     - Cnt_is_empty(Cnt*) -> bool
-    - Cnt_put_n(Cnt*, Cnt_value[], isize n)
+    - Cnt_put_n(Cnt*, Cnt_value[], isize_t n)
     - Cnt_push(Cnt*, Cnt_value)
     - Cnt_emplace(Cnt*, Cnt_raw)
     - Cnt_erase_at(Cnt*, Cnt_iter)
-    - Cnt_at(Cnt*, isize index OR Cnt_raw) -> Cnt_value*
+    - Cnt_at(Cnt*, isize_t index OR Cnt_raw) -> Cnt_value*
     - Cnt_find(Cnt*, Cnt_raw) -> Cnt_iter
     - Cnt_front(Cnt*) -> Cnt_value*
     - Cnt_back(Cnt*) -> Cnt_value*
     - Cnt_begin(Cnt*) -> Cnt_iter
     - Cnt_end(Cnt*) -> Cnt_iter
     - Cnt_next(Cnt_iter*)
-    - Cnt_advance(Cnt_iter, isize n) -> Cnt_iter
+    - Cnt_advance(Cnt_iter, isize_t n) -> Cnt_iter
 </details>
 <details>
 <summary>Defining template parameters</summary>
@@ -886,7 +886,7 @@ Another example is to sort struct elements by the *active field* and *reverse* f
 typedef struct {
     cstr fileName;
     cstr directory;
-    isize size;
+    isize_t size;
     time_t lastWriteTime;
 }  FileMetaData;
 
@@ -955,7 +955,7 @@ an alias function `_len()` for `_size()` in a new file "extvec.h", which can be 
 #define i_extend
 #include <stc/vec.h>
 
-STC_INLINE isize _c_MEMB(_len)(Self* self) {
+STC_INLINE isize_t _c_MEMB(_len)(Self* self) {
     return _c_MEMB(_size)(self);
 }
 
@@ -968,11 +968,11 @@ STC_INLINE isize _c_MEMB(_len)(Self* self) {
 ## Memory efficiency
 
 STC is generally very memory efficient. Memory usage for the different containers:
-- **cstr**, **vec**, **stack**, **pqueue**: 1 pointer, 2 isize + memory for elements.
-- **csview**, 1 pointer, 1 isize. Does not own data!
+- **cstr**, **vec**, **stack**, **pqueue**: 1 pointer, 2 isize_t + memory for elements.
+- **csview**, 1 pointer, 1 isize_t. Does not own data!
 - **cspan**, 1 pointer and 2 \* dimension \* int32_t. Does not own data!
 - **list**: Type size: 1 pointer. Each node allocates a struct to store its value and a next pointer.
-- **deque**, **queue**:  Type size: 2 pointers, 2 isize. Otherwise like *vec*.
+- **deque**, **queue**:  Type size: 2 pointers, 2 isize_t. Otherwise like *vec*.
 - **hmap/hset**: Type size: 2 pointers, 2 int32_t (default). *hmap* uses one table of keys+value, and one table of precomputed hash-value/used bucket, which occupies only one byte per bucket. The closed hashing has a default max load factor of 85%, and hash table scales by 1.5x when reaching that.
 - **smap/sset**: Type size: 1 pointer. *smap* manages its own ***array of tree-nodes*** for allocation efficiency. Each node uses two 32-bit ints for child nodes, and one byte for `level`, but has ***no parent node***.
 - **arc**: Type size: 1 pointer, 1 long for the shared reference counter + memory for the shared element.

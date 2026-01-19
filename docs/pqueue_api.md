@@ -36,7 +36,7 @@ In the following, `X` is the value of `i_key` unless `T` is defined.
 
 ```c++
 pqueue_X        pqueue_X_init(void);                                // create empty pri-queue.
-pqueue_X        pqueue_X_with_capacity(isize cap);
+pqueue_X        pqueue_X_with_capacity(isize_t cap);
 
 pqueue_X        pqueue_X_clone(pqueue_X pq);
 void            pqueue_X_copy(pqueue_X* self, const pqueue_X* other);
@@ -45,10 +45,10 @@ pqueue_X        pqueue_X_move(pqueue_X* self);                      // move
 void            pqueue_X_drop(const pqueue_X* self);                // destructor
 
 void            pqueue_X_clear(pqueue_X* self);
-bool            pqueue_X_reserve(pqueue_X* self, isize n);
+bool            pqueue_X_reserve(pqueue_X* self, isize_t n);
 void            pqueue_X_shrink_to_fit(pqueue_X* self);
 
-isize           pqueue_X_size(const pqueue_X* self);
+isize_t         pqueue_X_size(const pqueue_X* self);
 bool            pqueue_X_is_empty(const pqueue_X* self);
 const i_key*    pqueue_X_top(const pqueue_X* self);
 
@@ -58,7 +58,7 @@ void            pqueue_X_emplace(pqueue_X* self, i_keyraw raw);     // converts 
 
 void            pqueue_X_pop(pqueue_X* self);
 i_key           pqueue_X_pull(const pqueue_X* self);
-void            pqueue_X_erase_at(pqueue_X* self, isize idx);
+void            pqueue_X_erase_at(pqueue_X* self, isize_t idx);
 
 bool            pqueue_X_eq(const pqueue_X* c1, const pqueue_X* c2); // equality comp.
 i_key           pqueue_X_value_clone(const pqueue_X* self, i_key value);
@@ -84,7 +84,7 @@ i_key           pqueue_X_value_clone(const pqueue_X* self, i_key value);
 
 int main(void)
 {
-    isize N = 10000000;
+    isize_t N = 10000000;
     PriorityQ numbers = {0};
 
     // Push ten million random numbers to priority queue.

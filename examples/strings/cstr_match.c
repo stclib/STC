@@ -6,7 +6,7 @@ int main(void)
 {
     cstr str = cstr_lit("The quick brown fox jumps over the lazy dog.JPG");
 
-    isize pos = cstr_find_at(&str, 0, "brown");
+    isize_t pos = cstr_find_at(&str, 0, "brown");
     printf("%" c_ZI " [%s]\n", pos, pos == c_NPOS ? "<NULL>" : cstr_str(&str) + pos);
     printf("equals: %d\n", cstr_equals(&str, "The quick brown fox jumps over the lazy dog.JPG"));
     printf("contains 'umps ove': %d\n", cstr_contains(&str, "umps ove"));

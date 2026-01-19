@@ -40,15 +40,15 @@
 typedef i_keyraw _m_raw;
 
 STC_API void        _c_MEMB(_make_heap)(Self* self);
-STC_API void        _c_MEMB(_erase_at)(Self* self, isize idx);
+STC_API void        _c_MEMB(_erase_at)(Self* self, isize_t idx);
 STC_API _m_value*   _c_MEMB(_push)(Self* self, _m_value value);
 
 #ifndef _i_no_put
-STC_INLINE void _c_MEMB(_put_n)(Self* self, const _m_raw* raw, isize n)
+STC_INLINE void _c_MEMB(_put_n)(Self* self, const _m_raw* raw, isize_t n)
     { while (n--) _c_MEMB(_push)(self, i_keyfrom((*raw))), ++raw; }
 #endif
 
-STC_INLINE bool _c_MEMB(_reserve)(Self* self, const isize cap) {
+STC_INLINE bool _c_MEMB(_reserve)(Self* self, const isize_t cap) {
     if (cap != self->size && cap <= self->capacity) return true;
     _m_value *d = (_m_value *)_i_realloc_n(self->data, self->capacity, cap);
     return d ? (self->data = d, self->capacity = cap, true) : false;
@@ -62,16 +62,16 @@ STC_INLINE Self _c_MEMB(_init)(void)
     { return c_literal(Self){0}; }
 
 #ifndef _i_no_put
-STC_INLINE Self _c_MEMB(_from_n)(const _m_raw* raw, isize n)
+STC_INLINE Self _c_MEMB(_from_n)(const _m_raw* raw, isize_t n)
     { Self cx = {0}; _c_MEMB(_put_n)(&cx, raw, n); return cx; }
 #endif
 
-STC_INLINE Self _c_MEMB(_with_capacity)(const isize cap)
+STC_INLINE Self _c_MEMB(_with_capacity)(const isize_t cap)
     { Self cx = {0}; _c_MEMB(_reserve)(&cx, cap); return cx; }
 #endif
 
 STC_INLINE void _c_MEMB(_clear)(Self* self) {
-    isize i = self->size; self->size = 0;
+    isize_t i = self->size; self->size = 0;
     while (i--) { i_keydrop((self->data + i)); }
 }
 
@@ -93,13 +93,13 @@ STC_INLINE void _c_MEMB(_take)(Self *self, Self unowned) {
     *self = unowned;
 }
 
-STC_INLINE isize _c_MEMB(_size)(const Self* q)
+STC_INLINE isize_t _c_MEMB(_size)(const Self* q)
     { return q->size; }
 
 STC_INLINE bool _c_MEMB(_is_empty)(const Self* q)
     { return !q->size; }
 
-STC_INLINE isize _c_MEMB(_capacity)(const Self* q)
+STC_INLINE isize_t _c_MEMB(_capacity)(const Self* q)
     { return q->capacity; }
 
 STC_INLINE const _m_value* _c_MEMB(_top)(const Self* self)
@@ -134,7 +134,7 @@ STC_INLINE bool _c_MEMB(_eq)(const Self* self, const Self* other) {
     return c_memcmp(self->data, other->data, self->size*c_sizeof(_m_value)) == 0;
 #else
     if (self->size != other->size) return false;
-    for (isize i = 0; i < self->size; ++i) {
+    for (isize_t i = 0; i < self->size; ++i) {
         const _m_raw _rx = i_keytoraw((self->data+i)), _ry = i_keytoraw((other->data+i));
         if (!(i_eq((&_rx), (&_ry)))) return false;
     }
@@ -147,9 +147,9 @@ STC_INLINE bool _c_MEMB(_eq)(const Self* self, const Self* other) {
 #if defined i_implement
 
 STC_DEF void
-_c_MEMB(_sift_down_)(Self* self, const isize idx, const isize n) {
+_c_MEMB(_sift_down_)(Self* self, const isize_t idx, const isize_t n) {
     _m_value t, *arr = self->data - 1;
-    for (isize r = idx, c = idx*2; c <= n; c *= 2) {
+    for (isize_t r = idx, c = idx*2; c <= n; c *= 2) {
         c += i_less((&arr[c]), (&arr[c + (c < n)]));
         if (!(i_less((&arr[r]), (&arr[c])))) return;
         t = arr[r], arr[r] = arr[c], arr[r = c] = t;
@@ -158,8 +158,8 @@ _c_MEMB(_sift_down_)(Self* self, const isize idx, const isize n) {
 
 STC_DEF void
 _c_MEMB(_make_heap)(Self* self) {
-    isize n = self->size;
-    for (isize k = n/2; k != 0; --k)
+    isize_t n = self->size;
+    for (isize_t k = n/2; k != 0; --k)
         _c_MEMB(_sift_down_)(self, k, n);
 }
 
@@ -176,9 +176,9 @@ STC_DEF Self _c_MEMB(_clone)(Self q) {
 #endif
 
 STC_DEF void
-_c_MEMB(_erase_at)(Self* self, const isize idx) {
+_c_MEMB(_erase_at)(Self* self, const isize_t idx) {
     i_keydrop((self->data + idx));
-    const isize n = --self->size;
+    const isize_t n = --self->size;
     self->data[idx] = self->data[n];
     _c_MEMB(_sift_down_)(self, idx + 1, n);
 }
@@ -188,7 +188,7 @@ _c_MEMB(_push)(Self* self, _m_value value) {
     if (self->size == self->capacity)
         _c_MEMB(_reserve)(self, self->size*3/2 + 4);
     _m_value *arr = self->data - 1; /* base 1 */
-    isize c = ++self->size;
+    isize_t c = ++self->size;
     for (; c > 1 && (i_less((&arr[c/2]), (&value))); c /= 2)
         arr[c] = arr[c/2];
     arr[c] = value;

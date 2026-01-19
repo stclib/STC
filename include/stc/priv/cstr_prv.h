@@ -37,26 +37,26 @@
 #endif
 
 enum  { cstr_s_cap = sizeof(cstr_buf) - 2 };
-#define cstr_s_size(s)          ((isize)(s)->sml.size)
+#define cstr_s_size(s)          ((isize_t)(s)->sml.size)
 #define cstr_s_set_size(s, len) ((s)->sml.data[(s)->sml.size = (uint8_t)(len)] = 0)
 #define cstr_s_data(s)          (s)->sml.data
 
 #if defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
     #define byte_rotl_(x, b)       ((x) << (b)*8 | (x) >> (sizeof(x) - (b))*8)
-    #define cstr_l_cap(s)          (isize)(~byte_rotl_((s)->lon.ncap, sizeof((s)->lon.ncap) - 1))
+    #define cstr_l_cap(s)          (isize_t)(~byte_rotl_((s)->lon.ncap, sizeof((s)->lon.ncap) - 1))
     #define cstr_l_set_cap(s, cap) ((s)->lon.ncap = ~byte_rotl_((uintptr_t)(cap), 1))
 #else
-    #define cstr_l_cap(s)          (isize)(~(s)->lon.ncap)
+    #define cstr_l_cap(s)          (isize_t)(~(s)->lon.ncap)
     #define cstr_l_set_cap(s, cap) ((s)->lon.ncap = ~(uintptr_t)(cap))
 #endif
-#define cstr_l_size(s)          (isize)((s)->lon.size)
+#define cstr_l_size(s)          (isize_t)((s)->lon.size)
 #define cstr_l_set_size(s, len) ((s)->lon.data[(s)->lon.size = (uintptr_t)(len)] = 0)
 #define cstr_l_data(s)          (s)->lon.data
 #define cstr_l_drop(s)          c_free((s)->lon.data, cstr_l_cap(s) + 1)
 
 #define cstr_is_long(s)         ((s)->sml.size >= 128)
-extern  char* _cstr_init(cstr* self, isize len, isize cap);
-extern  char* _cstr_internal_move(cstr* self, isize pos1, isize pos2);
+extern  char* _cstr_init(cstr* self, isize_t len, isize_t cap);
+extern  char* _cstr_internal_move(cstr* self, isize_t pos1, isize_t pos2);
 
 /**************************** PUBLIC API **********************************/
 
@@ -74,23 +74,23 @@ extern  cstr        cstr_from_fmt(const char* fmt, ...) c_GNUATTR(format(printf,
 
 extern  void        cstr_drop(const cstr* self);
 extern  cstr*       cstr_take(cstr* self, const cstr s);
-extern  char*       cstr_reserve(cstr* self, isize cap);
+extern  char*       cstr_reserve(cstr* self, isize_t cap);
 extern  void        cstr_shrink_to_fit(cstr* self);
-extern  char*       cstr_resize(cstr* self, isize size, char value);
-extern  isize       cstr_find_at(const cstr* self, isize pos, const char* search);
-extern  isize       cstr_find_sv(const cstr* self, csview search);
-extern  char*       cstr_assign_n(cstr* self, const char* str, isize len);
-extern  char*       cstr_append_n(cstr* self, const char* str, isize len);
-extern  isize       cstr_append_fmt(cstr* self, const char* fmt, ...) c_GNUATTR(format(printf, 2, 3));
-extern  char*       cstr_append_uninit(cstr *self, isize len);
+extern  char*       cstr_resize(cstr* self, isize_t size, char value);
+extern  isize_t     cstr_find_at(const cstr* self, isize_t pos, const char* search);
+extern  isize_t     cstr_find_sv(const cstr* self, csview search);
+extern  char*       cstr_assign_n(cstr* self, const char* str, isize_t len);
+extern  char*       cstr_append_n(cstr* self, const char* str, isize_t len);
+extern  isize_t     cstr_append_fmt(cstr* self, const char* fmt, ...) c_GNUATTR(format(printf, 2, 3));
+extern  char*       cstr_append_uninit(cstr *self, isize_t len);
 
 extern  bool        cstr_getdelim(cstr *self, int delim, FILE *fp);
-extern  void        cstr_erase(cstr* self, isize pos, isize len);
-extern  isize       cstr_printf(cstr* self, const char* fmt, ...) c_GNUATTR(format(printf, 2, 3));
-extern  isize       cstr_vfmt(cstr* self, isize start, const char* fmt, va_list args);
+extern  void        cstr_erase(cstr* self, isize_t pos, isize_t len);
+extern  isize_t     cstr_printf(cstr* self, const char* fmt, ...) c_GNUATTR(format(printf, 2, 3));
+extern  isize_t     cstr_vfmt(cstr* self, isize_t start, const char* fmt, va_list args);
 extern  size_t      cstr_hash(const cstr *self);
 extern  bool        cstr_u8_valid(const cstr* self);
-extern  void        cstr_u8_erase(cstr* self, isize u8pos, isize u8len);
+extern  void        cstr_u8_erase(cstr* self, isize_t u8pos, isize_t u8len);
 
 STC_INLINE cstr_buf cstr_getbuf(cstr* s) {
     return cstr_is_long(s) ? c_literal(cstr_buf){s->lon.data, cstr_l_size(s), cstr_l_cap(s)}
@@ -105,7 +105,7 @@ STC_INLINE csview cstr_sv(const cstr* s) {
                            : c_literal(csview){s->sml.data, cstr_s_size(s)};
 }
 
-STC_INLINE cstr cstr_from_n(const char* str, const isize len) {
+STC_INLINE cstr cstr_from_n(const char* str, const isize_t len) {
     cstr s;
     c_memcpy(_cstr_init(&s, len, len), str, len);
     return s;
@@ -120,13 +120,13 @@ STC_INLINE cstr cstr_from_sv(csview sv)
 STC_INLINE cstr cstr_from_zv(zsview zv)
     { return cstr_from_n(zv.str, zv.size); }
 
-STC_INLINE cstr cstr_with_size(const isize size, const char value) {
+STC_INLINE cstr cstr_with_size(const isize_t size, const char value) {
     cstr s;
     c_memset(_cstr_init(&s, size, size), value, size);
     return s;
 }
 
-STC_INLINE cstr cstr_with_capacity(const isize cap) {
+STC_INLINE cstr cstr_with_capacity(const isize_t cap) {
     cstr s;
     _cstr_init(&s, 0, cap);
     return s;
@@ -145,7 +145,7 @@ STC_INLINE cstr cstr_clone(cstr s) {
 
 #define SSO_CALL(s, call) (cstr_is_long(s) ? cstr_l_##call : cstr_s_##call)
 
-STC_INLINE void _cstr_set_size(cstr* self, isize len)
+STC_INLINE void _cstr_set_size(cstr* self, isize_t len)
     { SSO_CALL(self, set_size(self, len)); }
 
 STC_INLINE void cstr_clear(cstr* self)
@@ -160,29 +160,29 @@ STC_INLINE const char* cstr_str(const cstr* self)
 STC_INLINE const char* cstr_toraw(const cstr* self)
     { return SSO_CALL(self, data(self)); }
 
-STC_INLINE isize cstr_size(const cstr* self)
+STC_INLINE isize_t cstr_size(const cstr* self)
     { return SSO_CALL(self, size(self)); }
 
 STC_INLINE bool cstr_is_empty(const cstr* self)
     { return cstr_size(self) == 0; }
 
-STC_INLINE isize cstr_capacity(const cstr* self)
+STC_INLINE isize_t cstr_capacity(const cstr* self)
     { return cstr_is_long(self) ? cstr_l_cap(self) : cstr_s_cap; }
 
-STC_INLINE isize cstr_to_index(const cstr* self, cstr_iter it)
+STC_INLINE isize_t cstr_to_index(const cstr* self, cstr_iter it)
     { return it.ref - cstr_str(self); }
 
-STC_INLINE cstr cstr_from_s(cstr s, isize pos, isize len)
+STC_INLINE cstr cstr_from_s(cstr s, isize_t pos, isize_t len)
     { return cstr_from_n(cstr_str(&s) + pos, len); }
 
-STC_INLINE csview cstr_subview(const cstr* self, isize pos, isize len) {
+STC_INLINE csview cstr_subview(const cstr* self, isize_t pos, isize_t len) {
     csview sv = cstr_sv(self);
     c_assert(((size_t)pos <= (size_t)sv.size) & (len >= 0));
     if (pos + len > sv.size) len = sv.size - pos;
     return c_literal(csview){sv.buf + pos, len};
 }
 
-STC_INLINE zsview cstr_tail(const cstr* self, isize len) {
+STC_INLINE zsview cstr_tail(const cstr* self, isize_t len) {
     c_assert(len >= 0);
     csview sv = cstr_sv(self);
     if (len > sv.size) len = sv.size;
@@ -191,16 +191,16 @@ STC_INLINE zsview cstr_tail(const cstr* self, isize len) {
 
 // BEGIN utf8 functions =====
 
-STC_INLINE cstr cstr_u8_from(const char* str, isize u8pos, isize u8len)
+STC_INLINE cstr cstr_u8_from(const char* str, isize_t u8pos, isize_t u8len)
     { str = utf8_at(str, u8pos); return cstr_from_n(str, utf8_to_index(str, u8len)); }
 
-STC_INLINE isize cstr_u8_size(const cstr* self)
+STC_INLINE isize_t cstr_u8_size(const cstr* self)
     { return utf8_count(cstr_str(self)); }
 
-STC_INLINE isize cstr_u8_to_index(const cstr* self, isize u8pos)
+STC_INLINE isize_t cstr_u8_to_index(const cstr* self, isize_t u8pos)
     { return utf8_to_index(cstr_str(self), u8pos); }
 
-STC_INLINE zsview cstr_u8_tail(const cstr* self, isize u8len) {
+STC_INLINE zsview cstr_u8_tail(const cstr* self, isize_t u8len) {
     csview sv = cstr_sv(self);
     const char* p = &sv.buf[sv.size];
     while (u8len && p != sv.buf)
@@ -208,10 +208,10 @@ STC_INLINE zsview cstr_u8_tail(const cstr* self, isize u8len) {
     return c_literal(zsview){p, sv.size - (p - sv.buf)};
 }
 
-STC_INLINE csview cstr_u8_subview(const cstr* self, isize u8pos, isize u8len)
+STC_INLINE csview cstr_u8_subview(const cstr* self, isize_t u8pos, isize_t u8len)
     { return utf8_subview(cstr_str(self), u8pos, u8len); }
 
-STC_INLINE cstr_iter cstr_u8_at(const cstr* self, isize u8pos) {
+STC_INLINE cstr_iter cstr_u8_at(const cstr* self, isize_t u8pos) {
     csview sv;
     sv.buf = utf8_at(cstr_str(self), u8pos);
     sv.size = utf8_chr_size(sv.buf);
@@ -235,7 +235,7 @@ STC_INLINE void cstr_next(cstr_iter* it) {
     if (*it->ref == '\0') it->ref = NULL;
 }
 
-STC_INLINE cstr_iter cstr_advance(cstr_iter it, isize u8pos) {
+STC_INLINE cstr_iter cstr_advance(cstr_iter it, isize_t u8pos) {
     it.ref = utf8_offset(it.ref, u8pos);
     it.chr.size = utf8_chr_size(it.ref);
     if (*it.ref == '\0') it.ref = NULL;
@@ -268,13 +268,13 @@ STC_INLINE void cstr_uppercase(cstr* self)
 
 STC_INLINE bool cstr_istarts_with(const cstr* self, const char* sub) {
     csview sv = cstr_sv(self);
-    isize len = c_strlen(sub);
+    isize_t len = c_strlen(sub);
     return len <= sv.size && !utf8_icompare((sv.size = len, sv), c_sv(sub, len));
 }
 
 STC_INLINE bool cstr_iends_with(const cstr* self, const char* sub) {
     csview sv = cstr_sv(self);
-    isize len = c_strlen(sub);
+    isize_t len = c_strlen(sub);
     return len <= sv.size && !utf8_icmp(sv.buf + sv.size - len, sub);
 }
 
@@ -305,7 +305,7 @@ STC_INLINE bool cstr_equals(const cstr* self, const char* str)
 STC_INLINE bool cstr_equals_sv(const cstr* self, csview sv)
     { return sv.size == cstr_size(self) && !c_memcmp(cstr_str(self), sv.buf, sv.size); }
 
-STC_INLINE isize cstr_find(const cstr* self, const char* search) {
+STC_INLINE isize_t cstr_find(const cstr* self, const char* search) {
     const char *str = cstr_str(self), *res = strstr((char*)str, search);
     return res ? (res - str) : c_NPOS;
 }
@@ -378,11 +378,11 @@ STC_INLINE char* cstr_append_s(cstr* self, cstr s)
 #define cstr_join_items(self, sep, ...) \
     cstr_join_n(self, sep, c_make_array(const char*, __VA_ARGS__), c_sizeof((const char*[])__VA_ARGS__)/c_sizeof(char*))
 
-STC_INLINE void cstr_join_n(cstr* self, const char* sep, const char* arr[], isize n) {
+STC_INLINE void cstr_join_n(cstr* self, const char* sep, const char* arr[], isize_t n) {
     const char* _sep = cstr_is_empty(self) ? "" : sep;
     while (n--) { cstr_append(self, _sep); cstr_append(self, *arr++); _sep = sep; }
 }
-STC_INLINE void cstr_join_sn(cstr* self, const char* sep, const cstr arr[], isize n) {
+STC_INLINE void cstr_join_sn(cstr* self, const char* sep, const cstr arr[], isize_t n) {
     const char* _sep = cstr_is_empty(self) ? "" : sep;
     while (n--) { cstr_append(self, _sep); cstr_append_s(self, *arr++); _sep = sep; }
 }
@@ -398,26 +398,26 @@ STC_INLINE void cstr_replace(cstr* self, const char* search, const char* repl)
     { cstr_replace_nfirst(self, search, repl, INT32_MAX); }
 
 
-STC_INLINE void cstr_replace_at_sv(cstr* self, isize pos, isize len, const csview repl) {
+STC_INLINE void cstr_replace_at_sv(cstr* self, isize_t pos, isize_t len, const csview repl) {
     char* d = _cstr_internal_move(self, pos + len, pos + repl.size);
     c_memcpy(d + pos, repl.buf, repl.size);
 }
-STC_INLINE void cstr_replace_at(cstr* self, isize pos, isize len, const char* repl)
+STC_INLINE void cstr_replace_at(cstr* self, isize_t pos, isize_t len, const char* repl)
     { cstr_replace_at_sv(self, pos, len, c_sv(repl, c_strlen(repl))); }
 
-STC_INLINE void cstr_u8_replace(cstr* self, isize u8pos, isize u8len, const char* repl) {
+STC_INLINE void cstr_u8_replace(cstr* self, isize_t u8pos, isize_t u8len, const char* repl) {
     const char* s = cstr_str(self); csview span = utf8_subview(s, u8pos, u8len);
     cstr_replace_at(self, span.buf - s, span.size, repl);
 }
 
 
-STC_INLINE void cstr_insert_sv(cstr* self, isize pos, csview sv)
+STC_INLINE void cstr_insert_sv(cstr* self, isize_t pos, csview sv)
     { cstr_replace_at_sv(self, pos, 0, sv); }
 
-STC_INLINE void cstr_insert(cstr* self, isize pos, const char* str)
+STC_INLINE void cstr_insert(cstr* self, isize_t pos, const char* str)
     { cstr_replace_at_sv(self, pos, 0, c_sv(str, c_strlen(str))); }
 
-STC_INLINE void cstr_u8_insert(cstr* self, isize u8pos, const char* str)
+STC_INLINE void cstr_u8_insert(cstr* self, isize_t u8pos, const char* str)
     { cstr_insert(self, utf8_to_index(cstr_str(self), u8pos), str); }
 
 STC_INLINE bool cstr_getline(cstr *self, FILE *fp)

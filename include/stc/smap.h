@@ -99,7 +99,7 @@ STC_API Self            _c_MEMB(_clone)(Self tree);
 #endif // !i_no_clone
 
 STC_API void            _c_MEMB(_drop)(const Self* cself);
-STC_API bool            _c_MEMB(_reserve)(Self* self, isize cap);
+STC_API bool            _c_MEMB(_reserve)(Self* self, isize_t cap);
 STC_API _m_value*       _c_MEMB(_find_it)(const Self* self, _m_keyraw rkey, _m_iter* out);
 STC_API _m_iter         _c_MEMB(_lower_bound)(const Self* self, _m_keyraw rkey);
 STC_API _m_value*       _c_MEMB(_front)(const Self* self);
@@ -111,8 +111,8 @@ STC_API _m_iter         _c_MEMB(_begin)(const Self* self);
 STC_API void            _c_MEMB(_next)(_m_iter* it);
 
 STC_INLINE bool         _c_MEMB(_is_empty)(const Self* self) { return self->size == 0; }
-STC_INLINE isize        _c_MEMB(_size)(const Self* self) { return self->size; }
-STC_INLINE isize        _c_MEMB(_capacity)(const Self* self) { return self->capacity; }
+STC_INLINE isize_t      _c_MEMB(_size)(const Self* self) { return self->size; }
+STC_INLINE isize_t      _c_MEMB(_capacity)(const Self* self) { return self->capacity; }
 STC_INLINE _m_iter      _c_MEMB(_find)(const Self* self, _m_keyraw rkey)
                             { _m_iter it; _c_MEMB(_find_it)(self, rkey, &it); return it; }
 STC_INLINE bool         _c_MEMB(_contains)(const Self* self, _m_keyraw rkey)
@@ -241,7 +241,7 @@ STC_INLINE _m_result _c_MEMB(_put)(Self* self, _m_keyraw rkey, _m_rmapped rmappe
 }
 #endif // _i_is_map
 
-STC_INLINE void _c_MEMB(_put_n)(Self* self, const _m_raw* raw, isize n) {
+STC_INLINE void _c_MEMB(_put_n)(Self* self, const _m_raw* raw, isize_t n) {
     while (n--)
         #if defined _i_is_set && defined _i_no_emplace
             _c_MEMB(_insert)(self, *raw++);
@@ -258,11 +258,11 @@ STC_INLINE Self _c_MEMB(_init)(void)
     { Self cx = {0}; return cx; }
 
 #ifndef _i_no_put
-STC_INLINE Self _c_MEMB(_from_n)(const _m_raw* raw, isize n)
+STC_INLINE Self _c_MEMB(_from_n)(const _m_raw* raw, isize_t n)
     { Self cx = {0}; _c_MEMB(_put_n)(&cx, raw, n); return cx; }
 #endif
 
-STC_INLINE Self _c_MEMB(_with_capacity)(const isize cap)
+STC_INLINE Self _c_MEMB(_with_capacity)(const isize_t cap)
     { Self cx = {0}; _c_MEMB(_reserve)(&cx, cap); return cx; }
 #endif
 
@@ -296,7 +296,7 @@ _c_MEMB(_begin)(const Self* self) {
 }
 
 STC_DEF bool
-_c_MEMB(_reserve)(Self* self, const isize cap) {
+_c_MEMB(_reserve)(Self* self, const isize_t cap) {
     if (cap <= self->capacity)
         return false;
     _m_node* nodes = (_m_node*)_i_realloc_n(self->nodes, self->capacity + 1, cap + 1);

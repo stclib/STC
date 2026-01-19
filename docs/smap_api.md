@@ -51,7 +51,7 @@ See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) fo
 
 ```c++
 smap_X          smap_X_init(void);
-sset_X          smap_X_with_capacity(isize cap);
+sset_X          smap_X_with_capacity(isize_t cap);
 
 smap_X          smap_X_clone(smap_x map);
 void            smap_X_copy(smap_X* self, const smap_X* other);
@@ -60,12 +60,12 @@ smap_X          smap_X_move(smap_X* self);                                      
 void            smap_X_drop(const smap_X* self);                                         // destructor
 
 void            smap_X_clear(smap_X* self);
-bool            smap_X_reserve(smap_X* self, isize cap);
+bool            smap_X_reserve(smap_X* self, isize_t cap);
 void            smap_X_shrink_to_fit(smap_X* self);
 
 bool            smap_X_is_empty(const smap_X* self);
-isize           smap_X_size(const smap_X* self);
-isize           smap_X_capacity(const smap_X* self);
+isize_t         smap_X_size(const smap_X* self);
+isize_t         smap_X_capacity(const smap_X* self);
 
 const X_mapped* smap_X_at(const smap_X* self, i_keyraw rkey);                            // rkey must be in map
 X_mapped*       smap_X_at_mut(smap_X* self, i_keyraw rkey);                              // mutable at
@@ -95,7 +95,7 @@ smap_X_iter     smap_X_erase_range(smap_X* self, smap_X_iter it1, smap_X_iter it
 smap_X_iter     smap_X_begin(const smap_X* self);
 smap_X_iter     smap_X_end(const smap_X* self);
 void            smap_X_next(smap_X_iter* iter);
-smap_X_iter     smap_X_advance(smap_X_iter it, isize n);
+smap_X_iter     smap_X_advance(smap_X_iter it, isize_t n);
 
 bool            smap_X_eq(const smap_X* c1, const smap_X* c2);
 i_key           smap_X_value_clone(const smap_X* self, i_key val);

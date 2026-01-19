@@ -68,7 +68,7 @@ void            list_X_drop(const list_X* self);                                
 void            list_X_clear(list_X* self);
 
 bool            list_X_is_empty(const list_X* list);
-isize           list_X_count(const list_X* list);                                 // size() in O(n) time
+isize_t         list_X_count(const list_X* list);                                 // size() in O(n) time
 
 list_X_iter     list_X_find(const list_X* self, i_keyraw raw);
 list_X_iter     list_X_find_in(list_X_iter it1, list_X_iter it2, i_keyraw raw);
@@ -93,7 +93,7 @@ list_X_iter     list_X_emplace_at(list_X* self, list_X_iter it, i_keyraw raw);
 void            list_X_pop_front(list_X* self);
 list_X_iter     list_X_erase_at(list_X* self, list_X_iter it);                    // return iter after it
 list_X_iter     list_X_erase_range(list_X* self, list_X_iter it1, list_X_iter it2);
-isize           list_X_remove(list_X* self, i_keyraw raw);                        // removes all matches
+isize_t         list_X_remove(list_X* self, i_keyraw raw);                        // removes all matches
 
 list_X          list_X_split_off(list_X* self, list_X_iter i1, list_X_iter i2);   // split off [i1, i2)
 list_X_iter     list_X_splice(list_X* self, list_X_iter it, list_X* other);       // return updated valid it

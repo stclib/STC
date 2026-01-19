@@ -6,7 +6,7 @@
 typedef struct {
     cstr fileName;
     cstr directory;
-    isize size;
+    isize_t size;
     time_t lastWriteTime;
 }  FileMetaData;
 

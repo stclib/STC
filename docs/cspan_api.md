@@ -21,8 +21,8 @@ including each container. This works well mainly because cspan is a non-owning t
 #include <stc/cspan.h>
 use_cspan(SpanType, ValueType);                      // Define a 1-d span with ValueType elements.
 use_cspan(SpanTypeN, ValueType, RANK);               // Define multi-dimensional span with RANK.
-                                                       // RANK is the number (constant) of dimensions
-                                                       // Has no equality test support.
+                                                     // RANK is the number (constant) of dimensions
+                                                     // Has no equality test support.
 use_cspan_with_eq(SpanType, ValueType, eq);          // Define a 1-d span with equality function support
 use_cspan_with_eq(SpanTypeN, ValueType, eq, RANK);   // Define span with equality function support
 
@@ -55,8 +55,8 @@ int32_t[N]      cspan_shape(xd, ...)                                // specify d
 cspan_tupleN    cspan_strides(xs, ...)                              // specify strides for SpanTypeN constructor
 
 int             cspan_rank(const SpanTypeN* self);                  // num dimensions; compile-time constant
-isize           cspan_size(const SpanTypeN* self);                  // return number of elements
-isize           cspan_index(const SpanTypeN* self, int32_t i, j..); // offset index at i, j,...; range checked
+isize_t         cspan_size(const SpanTypeN* self);                  // return number of elements
+isize_t         cspan_index(const SpanTypeN* self, int32_t i, j..); // offset index at i, j,...; range checked
 
 ValueType*      cspan_at(const SpanTypeN* self, int32_t i, j..);    // get element; index range checked
 ValueType*      cspan_front(const SpanTypeN* self);                 // first element pointer
@@ -79,7 +79,7 @@ bool            cspan_is_colmajor(const SpanTypeN* self);
 
                 // Construct a 1d subspan. Faster, but equal to:
                 // Span msub = cspan_slice(&ms, Span, {offset, offset+count});
-SpanType1       cspan_subspan(const SpanType1* self, isize offset, int32_t count);
+SpanType1       cspan_subspan(const SpanType1* self, isize_t offset, int32_t count);
 
                 // Construct a 1d subspan from a 2d span.
 OutSpan1        cspan_submd2(const SpanType2* self, int32_t i);

@@ -27,18 +27,18 @@ _c_DEFTYPES(_declare_queue, Self, i_key, _i_aux_def);
 #endif
 typedef i_keyraw _m_raw;
 
-STC_API bool            _c_MEMB(_reserve)(Self* self, const isize cap);
+STC_API bool            _c_MEMB(_reserve)(Self* self, const isize_t cap);
 STC_API void            _c_MEMB(_clear)(Self* self);
 STC_API void            _c_MEMB(_drop)(const Self* cself);
 STC_API _m_value*       _c_MEMB(_push)(Self* self, _m_value value); // push_back
 STC_API void            _c_MEMB(_shrink_to_fit)(Self *self);
-STC_API _m_iter         _c_MEMB(_advance)(_m_iter it, isize n);
+STC_API _m_iter         _c_MEMB(_advance)(_m_iter it, isize_t n);
 
 #define _cbuf_toidx(self, pos) (((pos) - (self)->start) & (self)->capmask)
 #define _cbuf_topos(self, idx) (((self)->start + (idx)) & (self)->capmask)
 
 #ifndef _i_no_put
-STC_INLINE void _c_MEMB(_put_n)(Self* self, const _m_raw* raw, isize n)
+STC_INLINE void _c_MEMB(_put_n)(Self* self, const _m_raw* raw, isize_t n)
     { while (n--) _c_MEMB(_push)(self, i_keyfrom((*raw))), ++raw; }
 #endif
 
@@ -49,23 +49,23 @@ STC_INLINE void _c_MEMB(_value_drop)(const Self* self, _m_value* val)
     STC_INLINE Self _c_MEMB(_init)(void)
         { Self out = {0}; return out; }
 
-    STC_INLINE Self _c_MEMB(_with_capacity)(isize cap) {
+    STC_INLINE Self _c_MEMB(_with_capacity)(isize_t cap) {
         cap = c_next_pow2(cap + 1);
         Self out = {_i_new_n(_m_value, cap), 0, 0, cap - 1};
         return out;
     }
 
-    STC_INLINE Self _c_MEMB(_with_size_uninit)(isize size)
+    STC_INLINE Self _c_MEMB(_with_size_uninit)(isize_t size)
         { Self out = _c_MEMB(_with_capacity)(size); out.end = size; return out; }
 
-    STC_INLINE Self _c_MEMB(_with_size)(isize size, _m_raw default_raw) {
+    STC_INLINE Self _c_MEMB(_with_size)(isize_t size, _m_raw default_raw) {
         Self out = _c_MEMB(_with_capacity)(size);
         while (out.end < size) out.cbuf[out.end++] = i_keyfrom(default_raw);
         return out;
     }
 
     #ifndef _i_no_put
-    STC_INLINE Self _c_MEMB(_from_n)(const _m_raw* raw, isize n) {
+    STC_INLINE Self _c_MEMB(_from_n)(const _m_raw* raw, isize_t n) {
         Self out = _c_MEMB(_with_capacity)(n);
         _c_MEMB(_put_n)(&out, raw, n); return out;
     }
@@ -94,10 +94,10 @@ STC_INLINE void _c_MEMB(_copy)(Self* self, const Self* other) {
 }
 #endif // !i_no_clone
 
-STC_INLINE isize _c_MEMB(_size)(const Self* self)
+STC_INLINE isize_t _c_MEMB(_size)(const Self* self)
     { return _cbuf_toidx(self, self->end); }
 
-STC_INLINE isize _c_MEMB(_capacity)(const Self* self)
+STC_INLINE isize_t _c_MEMB(_capacity)(const Self* self)
     { return self->capmask; }
 
 STC_INLINE bool _c_MEMB(_is_empty)(const Self* self)
@@ -136,7 +136,7 @@ STC_INLINE void _c_MEMB(_pop)(Self* self) { // pop_front
 
 STC_INLINE _m_value _c_MEMB(_pull)(Self* self) { // move front out of queue
     c_assert(!_c_MEMB(_is_empty)(self));
-    isize s = self->start;
+    isize_t s = self->start;
     self->start = (s + 1) & self->capmask;
     return self->cbuf[s];
 }
@@ -148,7 +148,7 @@ STC_INLINE _m_iter _c_MEMB(_begin)(const Self* self) {
 }
 
 STC_INLINE _m_iter _c_MEMB(_rbegin)(const Self* self) {
-    isize pos = (self->end - 1) & self->capmask;
+    isize_t pos = (self->end - 1) & self->capmask;
     return c_literal(_m_iter){
         .ref=_c_MEMB(_is_empty)(self) ? NULL : self->cbuf + pos,
         .pos=pos, ._s=self};
@@ -172,18 +172,18 @@ STC_INLINE void _c_MEMB(_rnext)(_m_iter* it) {
     else it->ref += (it->pos = it->_s->capmask);
 }
 
-STC_INLINE isize _c_MEMB(_index)(const Self* self, _m_iter it)
+STC_INLINE isize_t _c_MEMB(_index)(const Self* self, _m_iter it)
     { return _cbuf_toidx(self, it.pos); }
 
-STC_INLINE void _c_MEMB(_adjust_end_)(Self* self, isize n)
+STC_INLINE void _c_MEMB(_adjust_end_)(Self* self, isize_t n)
     { self->end = (self->end + n) & self->capmask; }
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined i_implement
 
-STC_DEF _m_iter _c_MEMB(_advance)(_m_iter it, isize n) {
-    isize len = _c_MEMB(_size)(it._s);
-    isize pos = it.pos, idx = _cbuf_toidx(it._s, pos);
+STC_DEF _m_iter _c_MEMB(_advance)(_m_iter it, isize_t n) {
+    isize_t len = _c_MEMB(_size)(it._s);
+    isize_t pos = it.pos, idx = _cbuf_toidx(it._s, pos);
     it.pos = (pos + n) & it._s->capmask;
     it.ref += it.pos - pos;
     if (!c_uless(idx + n, len)) it.ref = NULL;
@@ -205,15 +205,15 @@ _c_MEMB(_drop)(const Self* cself) {
 }
 
 STC_DEF bool
-_c_MEMB(_reserve)(Self* self, const isize cap) {
-    isize oldpow2 = self->capmask + (self->capmask & 1); // handle capmask = 0
-    isize newpow2 = c_next_pow2(cap + 1);
+_c_MEMB(_reserve)(Self* self, const isize_t cap) {
+    isize_t oldpow2 = self->capmask + (self->capmask & 1); // handle capmask = 0
+    isize_t newpow2 = c_next_pow2(cap + 1);
     if (newpow2 <= oldpow2)
         return self->cbuf != NULL;
     _m_value* d = (_m_value *)_i_realloc_n(self->cbuf, oldpow2, newpow2);
     if (d == NULL)
         return false;
-    isize head = oldpow2 - self->start;
+    isize_t head = oldpow2 - self->start;
     if (self->start <= self->end)       // [..S########E....|................]
         ;
     else if (head < self->end) {        // [#######E.....S##|.............s!!]
@@ -230,7 +230,7 @@ _c_MEMB(_reserve)(Self* self, const isize cap) {
 
 STC_DEF _m_value*
 _c_MEMB(_push)(Self* self, _m_value value) { // push_back
-    isize end = (self->end + 1) & self->capmask;
+    isize_t end = (self->end + 1) & self->capmask;
     if (end == self->start) { // full
         if (!_c_MEMB(_reserve)(self, self->capmask + 3)) // => 2x expand
             return NULL;
@@ -244,15 +244,15 @@ _c_MEMB(_push)(Self* self, _m_value value) { // push_back
 
 STC_DEF void
 _c_MEMB(_shrink_to_fit)(Self *self) {
-    isize sz = _c_MEMB(_size)(self);
-    isize newpow2 = c_next_pow2(sz + 1);
+    isize_t sz = _c_MEMB(_size)(self);
+    isize_t newpow2 = c_next_pow2(sz + 1);
     if (newpow2 > self->capmask)
         return;
     if (self->start <= self->end) {
         c_memmove(self->cbuf, self->cbuf + self->start, sz*c_sizeof *self->cbuf);
         self->start = 0, self->end = sz;
     } else {
-        isize n = self->capmask - self->start + 1;
+        isize_t n = self->capmask - self->start + 1;
         c_memmove(self->cbuf + (newpow2 - n), self->cbuf + self->start, n*c_sizeof *self->cbuf);
         self->start = newpow2 - n;
     }
@@ -267,7 +267,7 @@ _c_MEMB(_clone)(Self q) {
     out.start = 0; out.end = _c_MEMB(_size)(&q);
     out.capmask = c_next_pow2(out.end + 1) - 1;
     out.cbuf = _i_new_n(_m_value, out.capmask + 1);
-    isize i = 0;
+    isize_t i = 0;
     if (out.cbuf)
         for (c_each(it, Self, q))
             out.cbuf[i++] = i_keyclone((*it.ref));
