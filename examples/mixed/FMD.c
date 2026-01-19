@@ -19,6 +19,7 @@ void FileMetaData_drop(FileMetaData*);
 #define T FMDVector, FileMetaData, (c_keyclass | c_no_clone)
 #define i_aux FMDVectorSorting
 #define i_cmp(x, y) FileMetaData_cmp(&self->aux, x, y)
+#define i_eq(x, y) FileMetaData_cmp(&self->aux, x, y) == 0
 #include <stc/stack.h>
 // --------------
 

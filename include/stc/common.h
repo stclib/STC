@@ -32,16 +32,11 @@
 #include <string.h>
 #include <assert.h>
 
-typedef ptrdiff_t       isize;
-#ifndef STC_NO_INT_DEFS
-    typedef int8_t      int8;
-    typedef uint8_t     uint8;
-    typedef int16_t     int16;
-    typedef uint16_t    uint16;
-    typedef int32_t     int32;
-    typedef uint32_t    uint32;
-    typedef int64_t     int64;
-    typedef uint64_t    uint64;
+#ifndef ISIZE_MAX
+    typedef ptrdiff_t   isize_t;
+    typedef isize_t     isize; // [deprecated]
+    #define ISIZE_MIN   PTRDIFF_MIN
+    #define ISIZE_MAX   PTRDIFF_MAX
 #endif
 #if !defined STC_HAS_TYPEOF && (_MSC_FULL_VER >= 193933428 || \
     defined __GNUC__ || defined __clang__ || defined __TINYC__)
@@ -116,7 +111,7 @@ typedef ptrdiff_t       isize;
 #define c_free_n(ptr, n) c_free(ptr, (n)*c_sizeof *(ptr))
 #define c_realloc_n(ptr, old_n, n) c_realloc(ptr, (old_n)*c_sizeof *(ptr), (n)*c_sizeof *(ptr))
 #define c_delete_n(T, ptr, n) do { \
-    T* _tp = ptr; isize _n = n, _i = _n; \
+    T* _tp = ptr; isize_t _n = n, _i = _n; \
     while (_i--) T##_drop((_tp + _i)); \
     c_free(_tp, _n*c_sizeof(T)); \
 } while (0)
@@ -130,19 +125,19 @@ typedef ptrdiff_t       isize;
 #define c_container_of(p, C, m) ((C*)((char*)(1 ? (p) : &((C*)0)->m) - offsetof(C, m)))
 #define c_const_cast(Tp, p)     ((Tp)(1 ? (p) : (Tp)0))
 #define c_litstrlen(literal)    (c_sizeof("" literal) - 1)
-#define c_countof(a)            (isize)(sizeof(a)/sizeof 0[a])
+#define c_countof(a)            (isize_t)(sizeof(a)/sizeof 0[a])
 #define c_arraylen(a)           c_countof(a) // [deprecated]?
 
 // expect signed ints to/from these (use with gcc -Wconversion)
-#define c_sizeof                (isize)sizeof
-#define c_strlen(s)             (isize)strlen(s)
+#define c_sizeof                (isize_t)sizeof
+#define c_strlen(s)             (isize_t)strlen(s)
 #define c_strncmp(a, b, ilen)   strncmp(a, b, c_i2u_size(ilen))
 #define c_memcpy(d, s, ilen)    memcpy(d, s, c_i2u_size(ilen))
 #define c_memmove(d, s, ilen)   memmove(d, s, c_i2u_size(ilen))
 #define c_memset(d, val, ilen)  memset(d, val, c_i2u_size(ilen))
 #define c_memcmp(a, b, ilen)    memcmp(a, b, c_i2u_size(ilen))
 // library internal, but may be useful in user code:
-#define c_u2i_size(u)           (isize)(1 ? (u) : (size_t)1) // warns if u is signed
+#define c_u2i_size(u)           (isize_t)(1 ? (u) : (size_t)1) // warns if u is signed
 #define c_i2u_size(i)           (size_t)(1 ? (i) : -1)       // warns if i is unsigned
 #define c_uless(a, b)           ((size_t)(a) < (size_t)(b))
 #define c_safe_cast(T, From, x) ((T)(1 ? (x) : (From){0}))
@@ -185,7 +180,7 @@ typedef ptrdiff_t       isize;
 #define c_each_n(...) c_MACRO_OVERLOAD(c_each_n, __VA_ARGS__)
 #define c_each_n_3(it, C, cnt) c_each_n_4(it, C, cnt, INTPTR_MAX)
 #define c_each_n_4(it, C, cnt, n) \
-    struct {C##_iter iter; C##_value* ref; isize size, index;} \
+    struct {C##_iter iter; C##_value* ref; isize_t size, index;} \
     it = {.iter=C##_begin(&cnt), .size=n}; (it.ref = it.iter.ref) && it.index < it.size; C##_next(&it.iter), ++it.index
 
 #define c_each_reverse(...) c_MACRO_OVERLOAD(c_each_reverse, __VA_ARGS__)
@@ -226,10 +221,10 @@ typedef ptrdiff_t       isize;
     ; (_c_inc_##i > 0) == (i <= _c_end_##i) ; i += _c_inc_##i
 
 #define c_range(...) c_MACRO_OVERLOAD(c_range, __VA_ARGS__)
-#define c_range_1(stop) c_range_t_4(isize, _c_i1, 0, stop)
-#define c_range_2(i, stop) c_range_t_4(isize, i, 0, stop)
-#define c_range_3(i, start, stop) c_range_t_4(isize, i, start, stop)
-#define c_range_4(i, start, stop, step) c_range_t_5(isize, i, start, stop, step)
+#define c_range_1(stop) c_range_t_4(isize_t, _c_i1, 0, stop)
+#define c_range_2(i, stop) c_range_t_4(isize_t, i, 0, stop)
+#define c_range_3(i, start, stop) c_range_t_4(isize_t, i, start, stop)
+#define c_range_4(i, start, stop, step) c_range_t_5(isize_t, i, start, stop, step)
 
 #define c_range32(...) c_MACRO_OVERLOAD(c_range32, __VA_ARGS__)
 #define c_range32_2(i, stop) c_range_t_4(int32_t, i, 0, stop)
@@ -260,7 +255,7 @@ typedef ptrdiff_t       isize;
 
 // General functions
 
-STC_INLINE void* c_safe_memcpy(void* dst, const void* src, isize size)
+STC_INLINE void* c_safe_memcpy(void* dst, const void* src, isize_t size)
     { return dst ? memcpy(dst, src, (size_t)size) : NULL; }
 
 #if INTPTR_MAX == INT64_MAX
@@ -271,7 +266,7 @@ STC_INLINE void* c_safe_memcpy(void* dst, const void* src, isize size)
     #define FNV_PRIME 0x01000193
 #endif
 
-STC_INLINE size_t c_basehash_n(const void* key, isize len) {
+STC_INLINE size_t c_basehash_n(const void* key, isize_t len) {
     const uint8_t* msg = (const uint8_t*)key;
     size_t h = FNV_BASIS, block = 0;
 
@@ -289,7 +284,7 @@ STC_INLINE size_t c_basehash_n(const void* key, isize len) {
     return h;
 }
 
-STC_INLINE size_t c_hash_n(const void* key, isize len) {
+STC_INLINE size_t c_hash_n(const void* key, isize_t len) {
     uint64_t b8; uint32_t b4;
     switch (len) {
         case 8: memcpy(&b8, key, 8); return (size_t)(b8 * 0xc6a4a7935bd1e99d);
@@ -311,8 +306,8 @@ STC_INLINE size_t c_hash_str(const char *str) {
 #define c_hash_mix(...) /* non-commutative hash combine */ \
     c_hash_mix_n(c_make_array(size_t, {__VA_ARGS__}), c_sizeof((size_t[]){__VA_ARGS__})/c_sizeof(size_t))
 
-STC_INLINE size_t c_hash_mix_n(size_t h[], isize n) {
-    for (isize i = 1; i < n; ++i) h[0] += h[0] ^ h[i];
+STC_INLINE size_t c_hash_mix_n(size_t h[], isize_t n) {
+    for (isize_t i = 1; i < n; ++i) h[0] += h[0] ^ h[i];
     return h[0];
 }
 
@@ -327,7 +322,7 @@ STC_INLINE size_t c_hash_mix_n(size_t h[], isize n) {
 } while (0)
 
 // get next power of two
-STC_INLINE isize c_next_pow2(isize n) {
+STC_INLINE isize_t c_next_pow2(isize_t n) {
     n--;
     n |= n >> 1, n |= n >> 2;
     n |= n >> 4, n |= n >> 8;
@@ -338,7 +333,7 @@ STC_INLINE isize c_next_pow2(isize n) {
     return n + 1;
 }
 
-STC_INLINE char* c_strnstrn(const char *str, isize slen, const char *needle, isize nlen) {
+STC_INLINE char* c_strnstrn(const char *str, isize_t slen, const char *needle, isize_t nlen) {
     if (nlen == 0) return (char *)str;
     if (nlen > slen) return NULL;
     slen -= nlen;

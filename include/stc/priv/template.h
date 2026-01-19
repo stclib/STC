@@ -44,7 +44,6 @@
   #define c_no_atomic     (1<<1)
   #define c_use_arc2      (1<<2)
   #define c_no_clone      (1<<3)
-  #define c_no_hash       (1<<4)
   #define c_use_cmp       (1<<5)
   #define c_use_eq        (1<<6)
   #define c_keycomp       (1<<7)
@@ -93,9 +92,6 @@
 
 #if c_OPTION(c_declared)
   #define i_declared
-#endif
-#if c_OPTION(c_no_hash)
-  #define i_no_hash
 #endif
 #if c_OPTION(c_use_cmp)
   #define i_use_cmp
@@ -159,19 +155,20 @@
 #endif
 
 // Define when container has support for sorting (cmp) and linear search (eq)
-#if defined i_use_cmp || defined i_cmp || defined i_less
+#if defined i_use_cmp || defined i_cmp || defined i_less || defined _i_sorted
   #define _i_has_cmp
 #endif
-#if defined i_use_cmp || defined i_cmp || defined i_use_eq || defined i_eq
+#if defined i_use_cmp || defined i_use_eq || defined i_eq || \
+    defined i_hash || defined _i_hasher
   #define _i_has_eq
 #endif
 
 // Bind to i_keycomp "class members": _cmp, _eq and _hash (when conditions are met).
 #if defined i_keycomp
-  #if !(defined i_cmp || defined i_less) && (defined i_use_cmp || defined _i_sorted)
+  #if !(defined i_cmp || defined i_less) && defined _i_has_cmp
     #define i_cmp c_JOIN(i_keycomp, _cmp)
   #endif
-  #if !defined i_eq && (defined i_use_eq || defined i_hash || defined _i_hasher)
+  #if !defined i_eq && defined _i_has_eq
     #define i_eq c_JOIN(i_keycomp, _eq)
   #endif
   #if !(defined i_hash || defined i_no_hash)
@@ -194,9 +191,7 @@
 #endif
 
 // Fill in missing i_eq, i_less, i_cmp functions with defaults.
-#if !defined i_eq && defined i_cmp
-  #define i_eq(x, y) (i_cmp(x, y)) == 0
-#elif !defined i_eq
+#if !defined i_eq
   #define i_eq(x, y) *x == *y // works for integral types
   #define _i_has_default_eq
 #endif

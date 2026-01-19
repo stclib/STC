@@ -15,6 +15,9 @@ int Person_cmp(const Person* a, const Person* b) {
     int c = cstr_cmp(&a->name, &b->name);
     return c ? c : cstr_cmp(&a->last, &b->last);
 }
+bool Person_eq(const Person* a, const Person* b) {
+    return Person_cmp(a, b) == 0;
+}
 
 Person Person_clone(Person p) {
     p.name = cstr_clone(p.name);

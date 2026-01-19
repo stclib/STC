@@ -35,6 +35,7 @@ struct OlympicsData { int year; const char *city, *country, *date; } ol_data[] =
 typedef struct { int year; cstr city, date; } OlympicLoc;
 
 int        OlympicLoc_cmp(const OlympicLoc* a, const OlympicLoc* b);
+bool       OlympicLoc_eq(const OlympicLoc* a, const OlympicLoc* b);
 OlympicLoc OlympicLoc_clone(OlympicLoc loc);
 void       OlympicLoc_drop(OlympicLoc* self);
 
@@ -48,8 +49,13 @@ void       OlympicLoc_drop(OlympicLoc* self);
 #define T smap_OL, cstr, list_OL, (c_keypro | c_valclass)
 #include <stc/sortedmap.h>
 
+
 int OlympicLoc_cmp(const OlympicLoc* a, const OlympicLoc* b) {
     return a->year - b->year;
+}
+
+bool OlympicLoc_eq(const OlympicLoc* a, const OlympicLoc* b) {
+    return a->year == b->year;
 }
 
 OlympicLoc OlympicLoc_clone(OlympicLoc loc) {

@@ -15,9 +15,11 @@ int Person_raw_cmp(const Person_raw* a, const Person_raw* b) {
     int c = strcmp(a->name, b->name);
     return c ? c : strcmp(a->last, b->last);
 }
+bool Person_raw_eq(const Person_raw* a, const Person_raw* b)
+    { return Person_raw_cmp(a, b) == 0; }
 
 size_t Person_raw_hash(const Person_raw* a)
-    { return c_hash_str(a->name) ^ c_hash_str(a->last); }
+    { return c_hash_mix(c_hash_str(a->name), c_hash_str(a->last)); }
 
 Person Person_clone(Person p) {
     p.name = cstr_clone(p.name);

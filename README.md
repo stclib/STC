@@ -525,7 +525,6 @@ the `|` operator, conventionally enclosed in parentheses. The complete list of *
   - **c_use_eq** - enables equality function using `==` on integral types, or the _eq() member for "pro/class/cmp" elements.
   - **c_no_clone** - disable clone functionality for container.
   - **c_no_atomic** - used with **arc** type, do simple fast reference counting instead of thread safe atomics.
-  - **c_no_hash** - use default hash function if `c_keycomp` is specified and container is hashmap/hashset.
   - **c_declared** - container type was predeclared (not needed for C23).
 
  #### What traits to use on container element types in STC?
@@ -570,7 +569,7 @@ KeyType     KeyType_from(KeyType_raw r);                                   // c_
 KeyType_raw KeyType_toraw(const KeyType* kp);                              // c_keypro
 int         KeyType_raw_cmp(const KeyType_raw* rx, const KeyType_raw* ry); // c_keypro
 bool        KeyType_raw_eq(const KeyType_raw* rx, const KeyType_raw* ry);  // (c_keypro | c_use_eq)
-size_t      KeyType_raw_hash(const KeyType_raw* rp);                       // c_keypro, unless c_no_hash
+size_t      KeyType_raw_hash(const KeyType_raw* rp);                       // c_keypro
 ```
 
 When `c_valpro` is specified: ValType element member functions names are bound:
