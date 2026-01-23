@@ -12,17 +12,18 @@ See the c++ class [std::deque](https://en.cppreference.com/w/cpp/container/deque
 ```c++
 #define T <ct>, <kt>[, (<opt>)] // shorthand for defining deque name, i_key, and i_opt
 // Common <opt> traits:
-//   c_comp_key  - Key <kt> is a comparable typedef'ed type.
-//                 Binds <kt>_cmp() "member" function name.
+//   c_compare_key - Key type <kt> is a comparable typedef'ed type. Auto-enables c_use_compare.
+//                Binds <kt>_cmp(), <kt>_eq() "member" function names.
 //   c_class_key - Additionally binds <kt>_clone() and <kt>_drop() function names.
-//                 All containers used as keys themselves can be specified with the c_class_key trait.
-//   c_pro_key   - "Pro" key type, use e.g. for built-in `cstr`, `zsview`, `arc`, and `box` as keys.
+//                E.g., if <kt> is any STC container, c_class_key trait should be specified.
+//   c_pro_key   - "Pro" key type, use e.g. for built-in `cstr`, `zsview`, `rc`, `arc`, `box` as keys.
 //                These support conversion to/from a "raw" input type (such as const char*) when
 //                using <ct>_emplace*() functions, and may do optimized lookups via the raw type.
-//   c_use_eq   - Enable <kt>_eq() for linear search and equality comparison of the container itself.
-//   c_use_cmp  - Enable element sorting with  <kt>_cmp() function. Implies c_use_eq.
-//                If <kt> is a basic type, operators '<' and '==' are used by default.
-//   c_use_comp - Enable both <kt>_cmp() and <kt>_eq() for sorting and linear search
+//   c_use_eq   - Enable equality <kt>_eq() for _find() and <ct>_eq() for the container itself.
+//                Uses operator '==' unless *c_compare/class/pro*_key was also specified.
+//   c_use_cmp  - Enable 3-way comparison <kt>_cmp() function for _sort().
+//                Uses operators '<', '>' unless *c_compare/class/pro*_key was also specified.
+//   c_use_compare - Shorthand for (c_use_cmp | c_use_eq).
 //
 // To enable multiple traits, specify e.g. (c_class_key | c_use_cmp) as <opt>.
 

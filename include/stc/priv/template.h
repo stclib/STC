@@ -46,30 +46,34 @@
   #define c_no_clone      (1<<3)
   #define c_use_cmp       (1<<5)
   #define c_use_eq        (1<<6)
-  #define c_use_comp      (c_use_cmp | c_use_eq)
-  #define c_comp_key      (1<<7)
+  #define c_use_compare   (c_use_cmp | c_use_eq)
+  #define c_compare_key   (1<<7)
   #define c_class_key     (1<<8)
   #define c_class_val     (1<<9)
   #define c_pro_key       (1<<10)
   #define c_pro_val       (1<<11)
 
-  #define c_keycomp  c_comp_key  // [deprecated]
-  #define c_cmpclass c_comp_key  // [deprecated]
-  #define c_keyclass c_class_key // [deprecated]
-  #define c_valclass c_class_val // [deprecated]
-  #define c_keypro   c_pro_key   // [deprecated]
-  #define c_valpro   c_pro_val   // [deprecated]
+  #define c_use_comp c_use_compare // [deprecated]
+  #define c_comp_key c_compare_key // [deprecated]
+  #define c_keycomp  c_compare_key // [deprecated]
+  #define c_cmpclass c_compare_key // [deprecated]
+  #define c_keyclass c_class_key   // [deprecated]
+  #define c_valclass c_class_val   // [deprecated]
+  #define c_keypro   c_pro_key     // [deprecated]
+  #define c_valpro   c_pro_val     // [deprecated]
 #endif
-#ifdef i_keycomp                 // [deprecated]
-  #define i_comp_key i_keycomp
-#elif defined i_keyclass         // [deprecated]
+#ifdef i_keycomp                   // [deprecated]
+  #define i_compare_key i_keycomp
+#elif defined i_comp_key           // [deprecated]
+  #define i_compare_key i_comp_key
+#elif defined i_keyclass           // [deprecated]
   #define i_class_key i_keyclass
-#elif defined i_keypro           // [deprecated]
+#elif defined i_keypro             // [deprecated]
   #define i_pro_key i_keypro
 #endif
-#if defined i_valclass           // [deprecated]
+#if defined i_valclass             // [deprecated]
   #define i_class_val i_valclass
-#elif defined i_valpro           // [deprecated]
+#elif defined i_valpro             // [deprecated]
   #define i_pro_val i_valpro
 #endif
 
@@ -123,8 +127,8 @@
 #if c_OPTION(c_class_val)
   #define i_class_val i_val
 #endif
-#if c_OPTION(c_comp_key)
-  #define i_comp_key i_key
+#if c_OPTION(c_compare_key)
+  #define i_compare_key i_key
   #define i_use_cmp
   #define i_use_eq
 #endif
@@ -137,14 +141,14 @@
 
 #if defined i_pro_key
   #define i_class_key i_pro_key
-  #define i_comp_key c_JOIN(i_pro_key, _raw)
+  #define i_compare_key c_JOIN(i_pro_key, _raw)
 #endif
 
-#if defined i_comp_key
-  #define i_keyraw i_comp_key
+#if defined i_compare_key
+  #define i_keyraw i_compare_key
 #elif defined i_class_key && !defined i_keyraw
   // Also bind comparisons functions when c_class_key is specified.
-  #define i_comp_key i_key
+  #define i_compare_key i_key
 #elif defined i_keyraw && !defined i_keyfrom
   // Define _i_no_put when i_keyfrom is not explicitly defined and i_keyraw is.
   // In this case, i_keytoraw needs to be defined (may be done later in this file).
@@ -178,23 +182,23 @@
   #define _i_has_eq
 #endif
 
-// Bind to i_comp_key "class members": _cmp, _eq and _hash (when conditions are met).
-#if defined i_comp_key
+// Bind to i_compare_key "class members": _cmp, _eq and _hash (when conditions are met).
+#if defined i_compare_key
   #if !(defined i_cmp || defined i_less) && defined _i_has_cmp
-    #define i_cmp c_JOIN(i_comp_key, _cmp)
+    #define i_cmp c_JOIN(i_compare_key, _cmp)
   #endif
   #if !defined i_eq && defined _i_has_eq
-    #define i_eq c_JOIN(i_comp_key, _eq)
+    #define i_eq c_JOIN(i_compare_key, _eq)
   #endif
   #if !(defined i_hash || defined i_no_hash)
-    #define i_hash c_JOIN(i_comp_key, _hash)
+    #define i_hash c_JOIN(i_compare_key, _hash)
   #endif
 #endif
 
 #if !defined i_key
   #error "No i_key defined"
-#elif defined i_keyraw && !(c_OPTION(c_comp_key) || defined i_keytoraw)
-  #error "If i_comp_key / i_keyraw is defined, i_keytoraw must be defined too"
+#elif defined i_keyraw && !(c_OPTION(c_compare_key) || defined i_keytoraw)
+  #error "If i_compare_key / i_keyraw is defined, i_keytoraw must be defined too"
 #elif !defined i_no_clone && (defined i_keyclone ^ defined i_keydrop)
   #error "Both i_keyclone and i_keydrop must be defined, if any (unless i_no_clone defined)."
 #elif defined i_from || defined i_drop

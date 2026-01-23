@@ -11,7 +11,7 @@ enum PhMode {ph_THINKING, ph_HUNGRY, ph_EATING};
 cco_task_struct (Philosopher) {
     Philosopher_base base; // required
     int id;
-    cco_timer tm;
+    cco_timer timer;
     enum PhMode mode;
     int hunger;
     struct Philosopher* left;
@@ -25,7 +25,7 @@ int Philosopher(struct Philosopher* o) {
             printf("Philosopher %d is thinking for %.0f minutes...\n", o->id, duration*10);
             o->hunger = 0;
             o->mode = ph_THINKING;
-            cco_await_timer(&o->tm, duration);
+            cco_await_timer(&o->timer, duration);
 
             printf("Philosopher %d is hungry...\n", o->id);
             o->mode = ph_HUNGRY;
@@ -38,7 +38,7 @@ int Philosopher(struct Philosopher* o) {
 
             duration = 0.5 + crand64_real();
             printf("Philosopher %d is eating for %.0f minutes...\n", o->id, duration*10);
-            cco_await_timer(&o->tm, duration);
+            cco_await_timer(&o->timer, duration);
         }
         cco_finalize:
         printf("Philosopher %d done\n", o->id);
@@ -53,8 +53,8 @@ cco_task_struct (Dining) {
     float duration;
     struct Philosopher philos[num_philosophers];
     int i;
-    cco_timer tm;
-    cco_group wg;
+    cco_timer timer;
+    cco_group group;
 };
 
 int Dining(struct Dining* o) {
@@ -66,12 +66,12 @@ int Dining(struct Dining* o) {
                 .left = &o->philos[(i - 1 + num_philosophers) % num_philosophers],
                 .right = &o->philos[(i + 1) % num_philosophers],
             };
-            cco_spawn(&o->philos[i], &o->wg);
+            cco_spawn(&o->philos[i], &o->group);
         }
-        cco_await_timer(&o->tm, o->duration);
+        cco_await_timer(&o->timer, o->duration);
 
         cco_finalize:
-        cco_await_cancel_group(&o->wg);
+        cco_await_cancel_group(&o->group);
         puts("Dining done");
     }
     return 0;
@@ -79,7 +79,7 @@ int Dining(struct Dining* o) {
 
 int main(void)
 {
-    struct Dining dining = {.base={Dining}, .duration=5.0f, .wg = {0}};
+    struct Dining dining = {.base={Dining}, .duration=5.0f, .group = {0}};
 
     crand64_seed((uint64_t)time(NULL));
     cco_run_task(&dining);

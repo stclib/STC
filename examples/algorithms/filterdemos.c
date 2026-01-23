@@ -74,7 +74,7 @@ fn main() {
 }
 */
 // Bind and enable csview comparison functions for vec.
-#define T SVec, csview, (c_comp_key)
+#define T SVec, csview, (c_compare_key)
 #include <stc/vec.h>
 
 void demo3(void)

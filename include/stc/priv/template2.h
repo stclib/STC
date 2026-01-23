@@ -28,7 +28,7 @@
 #undef i_opt
 #undef i_capacity
 
-#undef i_comp_key  // define i_keyraw, and bind i_cmp, i_eq, i_hash "class members"
+#undef i_compare_key  // define i_keyraw, and bind i_cmp, i_eq, i_hash "class members"
 #undef i_class_key
 #undef i_pro_key
 #undef i_cmpclass  // [deprecated]
@@ -61,7 +61,6 @@
 
 #undef i_use_cmp
 #undef i_use_eq
-#undef i_use_comp
 #undef i_no_hash
 #undef i_no_clone
 #undef i_declared

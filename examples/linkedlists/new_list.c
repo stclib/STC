@@ -21,7 +21,7 @@ bool Point_eq(const Point* a, const Point* b) {
     return a->x == b->x && a->y == b->y;
 }
 
-#define T list_pnt, Point, (c_comp_key | c_declared)
+#define T list_pnt, Point, (c_compare_key | c_declared)
 #include <stc/list.h>
 
 // use < and == operators for comparison

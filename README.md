@@ -521,7 +521,7 @@ the `|` operator, conventionally enclosed in parentheses. The complete list of *
   - **c_pro_val** - like `c_class_val`, but also expects member _from(), which converts from *ValType*_raw to *ValType*, specifically for the _emplace\*() container functions.
 
   Other traits that can be combined with the `|` operator:
-  - **c_use_cmp** - enables sort/seach for vector-like type, using `<` comparison on integral types, or _cmp() for c_pro_key/c_class_key/c_comp_key elements.
+  - **c_use_cmp** - enables sort/seach for vector-like type, using `<` comparison on integral types, or _cmp() for c_pro_key/c_class_key/c_compare_key elements.
   - **c_use_eq** - enables equality function using `==` on integral types, or the _eq() member for "pro/class/cmp" elements.
   - **c_no_clone** - disable clone functionality for container.
   - **c_no_atomic** - used with **arc** type, do simple fast reference counting instead of thread safe atomics.

@@ -10,11 +10,11 @@ See the c++ class [std::set](https://en.cppreference.com/w/cpp/container/set) fo
 ```c++
 #define T <ct>, <kt>[, (<opt>)] // shorthand for defining set name, i_key, and i_opt
 // Common <opt> traits:
-//   c_comp_key  - Key <kt> is a comparable typedef'ed type.
+//   c_compare_key - Key type <kt> is a comparable typedef'ed type.
 //                 Binds <kt>_cmp() "member" function name.
 //   c_class_key - Additionally binds <kt>_clone() and <kt>_drop() function names.
 //                 All containers used as keys themselves can be specified with the c_class_key trait.
-//   c_pro_key   - "Pro" key type, use e.g. for built-in `cstr`, `zsview`, `arc`, and `box` as i_key.
+//   c_pro_key   - "Pro" key type, use e.g. for built-in `cstr`, `zsview`, `rc`, `arc`, `box` as i_key.
 //                 These support conversion to/from a "raw" input type (such as const char*) when
 //                 using <ct>_emplace*() functions, and may do optimized lookups via the raw type.
 

@@ -9,11 +9,11 @@ See the c++ class [std::queue](https://en.cppreference.com/w/cpp/container/queue
 ```c++
 #define T <ct>, <kt>[, (<opt>)] // shorthand for defining queue name, i_key, and i_opt
 // Common <opt> traits:
-//   c_comp_key  - Key type <kt> is a comparable;
+//   c_compare_key - Key type <kt> is a comparable;
 //                Binds <kt>_less() (and <kt>_cmp()) "member" function names.
 //   c_class_key - Binds <kt>_clone() and <kt>_drop() function names.
 //                All containers used as keys themselves can be specified with the c_class_key trait.
-//   c_pro_key   - "Pro" key type, use e.g. for built-in `cstr`, `zsview`, `arc`, and `box` as i_key.
+//   c_pro_key   - "Pro" key type, use e.g. for built-in `cstr`, `zsview`, `rc`, `arc`, `box` as i_key.
 //                These support conversion to/from a "raw" input type (such as const char*) when
 //                using <ct>_emplace*() functions.
 

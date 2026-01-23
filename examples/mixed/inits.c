@@ -7,6 +7,7 @@
 #include <stc/hashmap.h>
 
 typedef struct {int x, y;} IPair;
+
 inline static int IPair_cmp(const IPair* a, const IPair* b) {
     int c = c_default_cmp(&a->x, &b->x);
     return c ? c : c_default_cmp(&a->y, &b->y);
@@ -15,10 +16,10 @@ inline static bool IPair_eq(const IPair* a, const IPair* b) {
     return a->x == b->x && a->y == b->y;
 }
 
-#define T vec_ip, IPair, (c_comp_key)
+#define T vec_ip, IPair, (c_compare_key)
 #include <stc/vec.h>
 
-#define T list_ip, IPair, (c_comp_key)
+#define T list_ip, IPair, (c_compare_key)
 #include <stc/list.h>
 
 #define T PriorityQ, float
