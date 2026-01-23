@@ -8,7 +8,6 @@ cco_task_struct (taskA, struct Output) {
 cco_task_struct (taskB, struct Output) {
     taskB_base base;
     double d;
-    cco_group grp;
 };
 cco_task_struct (taskC, struct Output) {
     taskC_base base;
@@ -80,19 +79,18 @@ int taskB(struct taskB* o) {
         cco_yield;
 
         puts("Spawning 3 tasks.");
-        cco_reset_group(&o->grp);
-        cco_spawn(c_new(struct myTask, {{myTask}, 1, 6}), &o->grp);
-        cco_spawn(c_new(struct myTask, {{myTask}, 101, 104}), &o->grp);
-        cco_spawn(c_new(struct myTask, {{myTask}, 1001, 1008}), &o->grp);
+        cco_spawn(c_new(struct myTask, {{myTask}, 1, 6}));
+        cco_spawn(c_new(struct myTask, {{myTask}, 101, 104}));
+        cco_spawn(c_new(struct myTask, {{myTask}, 1001, 1008}));
         cco_yield;
         puts("Spawned 3 tasks.");
 
         cco_finalize:
-        if (cco_err()->code == 99) {
-            printf("taskA recovered error '99' thrown on line %d\n", cco_err()->line);
+        if (cco_error()->code == 99) {
+            printf("taskA recovered error '99' thrown on line %d\n", cco_error()->line);
             cco_recover; // reset error to 0 and proceed after the await taskB call.
         }
-        cco_await_all_of(&o->grp);
+        cco_await_all();
         puts("Joined");
         puts("taskB done");
     }

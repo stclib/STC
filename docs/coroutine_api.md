@@ -78,20 +78,22 @@ int             cco_resume(cco_task* task);                         // Resume ta
 #### Task Accessors
 ```c++
 int             cco_status();                                       // Get current return status from last cco_resume() call.
-cco_error*      cco_err();                                          // Get error object created from cco_throw(error) call.
+cco_error*      cco_error();                                        // Get error object created from cco_throw(error) call.
                                                                     // Should be handled in a cco_finalize: section.
 cco_fiber*      cco_fib(cco_task* task);                            // Get fiber associated with task.
-Env*            cco_env(cco_task* task);                             // Get environment pointer, stored in the associated fiber.
-Env*            cco_set_env(cco_task* task, Env* env);               // Set environment pointer.
+Env*            cco_env(cco_task* task);                            // Get environment pointer, stored in the associated fiber.
+Env*            cco_set_env(cco_task* task, Env* env);              // Set environment pointer.
 ```
-#### Task and Waitgroup Cancellation
+#### Task/Fiber and Waitgroup Cancellation
 ```c++
-                cco_cancel_task(cco_task* task);                    // Cancel a spawned task; If task runs in the current
+                cco_cancel_task(cco_task* task);                    // Cancel a spawned task+fiber; If task runs in the current
                                                                     // fiber it equals cco_throw(CCO_CANCEL) (jumps to cco_finalize:).
 void            cco_cancel_fiber(cco_fiber* fiber);                 // Signal that fiber will be cancelled upon next suspension point.
+void            cco_cancel_fibers();                                // Signal that all fibers will be cancelled upon their next
+                                                                    // suspension point.
+void            cco_cancel_scope();                                 // Cancel all tasks+fibers spawned in the current scope.
 void            cco_cancel_group(cco_group* wg);                    // Cancel all spawned tasks in the waitgroup, *except* the current.
                                                                     // Passing NULL as arg will cancel all non-group spawned tasks.
-void            cco_cancel_all();                                   // Cancel all spawned tasks/fibers, *except* the current.
 ```
 #### Awaiting Tasks and Waitgroups
 ```c++
@@ -99,20 +101,25 @@ void            cco_cancel_all();                                   // Cancel al
                 cco_await_task(cco_task* task, int awaitbits);      // Await until task's resume status is in (awaitbits | CCO_DONE).
                 cco_await_cancel_task(cco_task* task);              // Cancel and await for task to finalize async.
                                                                     // Shorthand for cco_cancel_task() + cco_await_task().
+                // Await spawned tasks from current scope:
+                cco_await_all();                                    // Await for all (remaining) tasks spawned in current scope to finish.
+                cco_await_any();                                    // Await for any one spawned task to finish, cancel remaining.
+                cco_await_cancel_scope();                           // Cancel all tasks in scope, and await for them to finalize.
+                                                                    // Shorthand for cco_cancel_scope() + cco_await_all().
+                cco_await_n(int n);                                 // Awaits for n spawned tasks. Does *not* cancel the remaining.
 
-                // If tasks were spawned, all must be awaited for by using these awaiter functions:
+                // Await spawned tasks in a specific (wait)group (for making nested await scopes):
                 cco_await_all_of(cco_group* wg);                    // Await for all (remaining) tasks in waitgroup to finish,
-                                                                    // *except* for the current task/fiber if part of wg.
                 cco_await_any_of(cco_group* wg);                    // Await for any one spawned task in waitgroup to
                                                                     // finish, and cancel the remaining.
                 cco_await_cancel_group(cco_group* wg);              // Cancel all tasks in wg, and await for them to finalize.
                                                                     // Shorthand for cco_cancel_group() + cco_await_all_of().
-                cco_await_n(cco_group* wg, int n);                  // Awaits for n spawned tasks. Does *not* cancel the remaining.
+                cco_await_n(cco_group* wg, int n);                  // Awaits for n spawned tasks in wg. Does *not* cancel the remaining.
 ```
 #### Spawning and Running Tasks
 The `Env` type used below is by default `void`, but can be specified in *cco_task_struct()* definition.
 ```c++
-void            cco_reset_group(cco_group* wg);                     // Reset waitgroup.(Normally not needed).
+void            cco_reset_group(cco_group* wg);                     // Reset waitgroup (normally not needed).
 cco_fiber*      cco_spawn(cco_task* tsk);                           // Lazily spawn a new concurrent task, detatched.
 cco_fiber*      cco_spawn(cco_task* tsk, cco_group* wg);            // Lazily spawn a new concurrent task within a waitgroup.
 cco_fiber*      cco_spawn(cco_task* tsk, cco_group* wg, Env* env);  // Variable env may be used to point to input data or result.
@@ -484,9 +491,9 @@ int TaskA(struct TaskA* o) {
         puts("TaskA work");
 
         cco_finalize:
-        if (cco_err()->code == 99) {
+        if (cco_error()->code == 99) {
             // if error not handled, will cause 'unhandled error'...
-            printf("TaskA recovered error '99' thrown on line %d\n", cco_err()->line);
+            printf("TaskA recovered error '99' thrown on line %d\n", cco_error()->line);
             cco_recover;
         }
         puts("TaskA done");
