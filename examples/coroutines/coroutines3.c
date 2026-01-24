@@ -93,10 +93,10 @@ int combined(struct combined* o) {
         puts("\nCONCURRENT:");
         o->prm = (struct prime){.base={prime}, .count=8};
         o->fib = (struct fibonacci){.base={fibonacci}, .count=12};
+
         cco_spawn(&o->prm);
         cco_spawn(&o->fib);
-
-        cco_await(cco_joined());
+        cco_await_all();
 
         cco_finalize:
         puts("DONE prime and fib");

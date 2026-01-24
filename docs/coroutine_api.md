@@ -103,7 +103,7 @@ void            cco_cancel_group(cco_group* wg);                    // Cancel al
                                                                     // Shorthand for cco_cancel_task() + cco_await_task().
                 // Await spawned tasks from current scope:
                 cco_await_all();                                    // Await for all (remaining) tasks spawned in current scope to finish.
-                cco_await_any();                                    // Await for any one spawned task to finish, cancel remaining.
+                cco_await_any();                                    // Await for any one spawned task to finish. Remaining are cancelled.
                 cco_await_cancel_scope();                           // Cancel all tasks in scope, and await for them to finalize.
                                                                     // Shorthand for cco_cancel_scope() + cco_await_all().
                 cco_await_n(int n);                                 // Awaits for n spawned tasks. Does *not* cancel the remaining.
@@ -128,14 +128,12 @@ cco_fiber*      cco_spawn(cco_task* tsk, cco_group* wg, Env* env,   // This may 
 
                 cco_run_task(cco_task* tsk) {}                      // Run task blocking until it and spawned fibers are finished.
                 cco_run_task(cco_task* tsk, Env *env) {}            // Run task blocking with env data
-                cco_run_task(fb_iter, cco_task* tsk, Env *env) {}   // Run task blocking. fb_iter reference the current fiber.
+                cco_run_task(fib_iter, cco_task* tsk, Env *env) {}  // Run task blocking. fib_iter reference the current fiber.
 
 cco_fiber*      cco_new_fiber(cco_task* tsk);                       // Create an initial fiber from a task.
 cco_fiber*      cco_new_fiber(cco_task* tsk, Env* env);             // Create an initial fiber from a task and env (inputs or a future).
                 cco_run_fiber(cco_fiber** fiber_ref) {}             // Run fiber(s) blocking. Note it takes a (cco_fiber **) as arg.
-                cco_run_fiber(fb_iter, cco_fiber* fiber) {}         // Run fiber(s) blocking. fb_iter reference the current fiber.
-
-bool            cco_joined();                                       // Check if all concurrent spawned tasks are joined.
+                cco_run_fiber(fib_iter, cco_fiber* fiber) {}        // Run fiber(s) blocking. fib_iter reference the current fiber.
 ```
 #### Timers and Time Functions
 ```c++

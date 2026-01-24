@@ -153,7 +153,7 @@ typedef struct {
 #define cco_suspend \
     cco_yield_v(CCO_SUSPEND)
 
-#define cco_await(until) cco_await_LBL(until, 0)    
+#define cco_await(until) cco_await_LBL(until, 0)
 #define cco_await_LBL(until, N) \
     do { \
         _cco_st->pos = __LINE__ + N; /* FALLTHRU */ \
@@ -348,8 +348,28 @@ static inline int _cco_resume_task(cco_task* task)
     _cco_spawn(cco_cast_task(a_task), a_group, ((void)sizeof((env) == cco_env(a_task)), env), \
                (cco_fiber*)((void)sizeof((fiber)->parent_task), fiber))
 
-               
+
 #define cco_await_n(...) c_MACRO_OVERLOAD(cco_await_n, __VA_ARGS__)
+#define cco_await_n_1(n) do { /* does not cancel remaining */ \
+    _cco_taskbase()->t_group.await_count = _cco_taskbase()->t_group.spawn_count - (n); \
+    cco_await(_cco_taskbase()->t_group.spawn_count == _cco_taskbase()->t_group.await_count); \
+} while (0)
+
+#define cco_await_all() \
+    cco_await(_cco_taskbase()->t_group.spawn_count == 0);
+
+#define cco_await_any() do { /* await 1; cancel remaining */ \
+     cco_await_n_1(1); \
+     cco_cancel_scope(); \
+     cco_await_LBL(_cco_taskbase()->t_group.spawn_count == 0, 100000); /* await_all() */ \
+} while (0)
+
+#define cco_await_cancel_scope() do { \
+    cco_cancel_scope(); \
+    cco_await_all(); \
+} while (0)
+
+
 #define cco_await_n_2(a_group, n) do { /* does not cancel remaining */ \
     _cco_st->fib->w_group = a_group; \
     _cco_st->fib->w_group->await_count = _cco_st->fib->w_group->spawn_count - (n); \
@@ -364,33 +384,13 @@ static inline int _cco_resume_task(cco_task* task)
 #define cco_await_any_of(a_group) do { /* await 1; cancel remaining */ \
     cco_await_n_2(a_group, 1); \
     cco_cancel_group(_cco_st->fib->w_group); \
-    cco_await_all_of(_cco_st->fib->w_group); \
+    cco_await_LBL(_cco_st->fib->w_group->spawn_count == 0, 100000); /* await_all() */ \
 } while (0)
 
 #define cco_await_cancel_group(a_group) do { \
     cco_group* _grp = a_group; \
     cco_cancel_group(_grp); \
     cco_await_all_of(_grp); \
-} while (0)
-
-
-#define cco_await_n_1(n) do { /* does not cancel remaining */ \
-    _cco_taskbase()->t_group.await_count = _cco_taskbase()->t_group.spawn_count - (n); \
-    cco_await(_cco_taskbase()->t_group.spawn_count == _cco_taskbase()->t_group.await_count); \
-} while (0)
-
-#define cco_await_all() \
-    cco_await(_cco_taskbase()->t_group.spawn_count == 0);
-
-#define cco_await_any() do { /* await 1; cancel remaining */ \
-     cco_await_n_1(1); \
-     cco_cancel_scope(); \
-     cco_await_LBL(_cco_taskbase()->t_group.spawn_count == 0, 1); /* await_all() */ \
-} while (0)
-
-#define cco_await_cancel_scope() do { \
-    cco_cancel_scope(); \
-    cco_await_all(); \
 } while (0)
 
 
@@ -406,9 +406,6 @@ static inline int _cco_resume_task(cco_task* task)
 #define cco_run_task_1(a_task) cco_run_fiber_2(_fibit, cco_new_fiber_1(a_task))
 #define cco_run_task_2(a_task, env) cco_run_fiber_2(_fibit, cco_new_fiber_2(a_task, env))
 #define cco_run_task_3(it, a_task, env) cco_run_fiber_2(it, cco_new_fiber_2(a_task, env))
-
-#define cco_joined() \
-    ((cco_fiber*)_cco_st->fib == _cco_st->fib->next)
 
 extern int        cco_execute(cco_fiber* fib); // is a coroutine itself
 extern cco_fiber* cco_execute_next(cco_fiber* fib);  // resume the next fiber and return it
