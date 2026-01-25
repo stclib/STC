@@ -52,28 +52,23 @@ int maintask(struct maintask* o) {
         cco_spawn(o->sleep);
         cco_suspend; // allow sleep-task to start
 
-        cco_reset_group(&o->group);
         for (c_range32(i, 8)) { // NB: local i, do not yield or await inside loop.
             struct worker* work = c_new(struct worker, {.base={worker}, .id=i});
             cco_spawn(work, &o->group);
         }
+        // Start workers:
         cco_suspend;
 
-        puts("Here 1");
-        //cco_cancel_task(o->sleep);
-        //puts("sleep cancelled");
-        //cco_throw(CCO_CANCEL);
-        puts("Here 2");
-
         cco_finalize:
-        puts("Await one");
+        puts("Await 1");
         cco_await_n(&o->group, 1); // await for 1 launched worker to finish
         puts("1 worker done.");
         cco_await_n(&o->group, 3); // await for 3 more workers to finish
         puts("3 more workers done");
         cco_await_all_of(&o->group); // await for remaining workers to finish
-        //cco_await_cancel_group(&o->group); // cancel + cco_await_all_of()
+        // cancel them instead: cco_await_cancel_group(&o->group);
         puts("All workers done.");
+        cco_await_all(); // await sleeper.
     }
 
     c_free_n(o, 1);
