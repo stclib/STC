@@ -42,33 +42,32 @@ int sleeper(struct sleeper* o) {
 
 cco_task_struct (maintask) {
     maintask_base base;
-    struct sleeper* sleep;
-    cco_group group;
+    cco_group workers;
 };
 
 int maintask(struct maintask* o) {
     cco_async (o) {
-        o->sleep = c_new(struct sleeper, {.base={sleeper}});
-        cco_spawn(o->sleep);
+        struct sleeper* sleep = c_new(struct sleeper, {.base={sleeper}});
+        cco_spawn(sleep, cco_wg()); // use default waitgroup
         cco_suspend; // allow sleep-task to start
 
         for (c_range32(i, 8)) { // NB: local i, do not yield or await inside loop.
             struct worker* work = c_new(struct worker, {.base={worker}, .id=i});
-            cco_spawn(work, &o->group);
+            cco_spawn(work, &o->workers);
         }
         // Start workers:
         cco_suspend;
 
         cco_finalize:
         puts("Await 1");
-        cco_await_n(1, &o->group); // await for 1 launched worker to finish
+        cco_await_n(1, &o->workers); // await for 1 launched worker to finish
         puts("1 worker done.");
-        cco_await_n(3, &o->group); // await for 3 more workers to finish
+        cco_await_n(3, &o->workers); // await for 3 more workers to finish
         puts("3 more workers done");
-        cco_await_all_of(&o->group); // await for remaining workers to finish
+        cco_await_all(&o->workers); // await for remaining workers to finish
         // cancel them instead: cco_await_cancel_all_of(&o->group);
         puts("All workers done.");
-        cco_await_all(); // await sleeper.
+        cco_await_all(cco_wg()); // await sleeper.
     }
 
     c_free_n(o, 1);

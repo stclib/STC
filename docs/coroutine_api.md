@@ -76,12 +76,13 @@ int             cco_resume(cco_task* task);                         // Resume ta
                                                                     // Should be done in a cco_finalize: section.
                 cco_shutdown_on_failure(bool flag);                 // Control cancellation of other fibers on error in a spawned task.
 ```
-#### Task Accessors
+#### Accessors
 ```c++
+cco_group*      cco_wg();                                           // Get the default waitgroup to be used for spawning tasks.
 int             cco_status();                                       // Get current return status from last cco_resume() call.
 cco_error*      cco_error();                                        // Get error object created from cco_throw(error) call.
                                                                     // Should be handled in a cco_finalize: section.
-cco_fiber*      cco_fib(cco_task* task);                            // Get fiber associated with task.
+cco_fiber*      cco_task_fiber(cco_task* task);                     // Get fiber associated with task.
 Env*            cco_env(cco_task* task);                            // Get environment pointer, stored in the associated fiber.
 Env*            cco_set_env(cco_task* task, Env* env);              // Set environment pointer.
 ```
@@ -90,8 +91,7 @@ Env*            cco_set_env(cco_task* task, Env* env);              // Set envir
                 cco_cancel_task(cco_task* task);                    // Cancel a spawned task+fiber; If task runs in the current
                                                                     // fiber it equals cco_throw(cco_CANCEL) (jumps to cco_finalize:).
 void            cco_cancel_fiber(cco_fiber* fiber);                 // Signal that fiber will be cancelled upon next suspension point.
-void            cco_cancel_all();                                   // Cancel all tasks/fibers spawned from the current task.
-void            cco_cancel_all_of(cco_group* wg);                   // Cancel all spawned tasks in the waitgroup.
+void            cco_cancel_all(cco_group* wg);                      // Cancel all spawned tasks in the waitgroup.
 ```
 #### Awaiting Tasks and Waitgroups
 ```c++
@@ -99,30 +99,22 @@ void            cco_cancel_all_of(cco_group* wg);                   // Cancel al
                 cco_await_task(cco_task* task, int awaitbits);      // Await until task's resume status is in (awaitbits | cco_DONE).
                 cco_await_cancel_task(cco_task* task);              // Cancel and await for task to finalize async.
                                                                     // Shorthand for cco_cancel_task() + cco_await_task().
-                // Await spawned tasks from current scope:
-                cco_await_all();                                    // Await for all (remaining) tasks spawned in current task.
-                cco_await_any();                                    // Await for any one spawned task to finish. Remaining are cancelled.
-                cco_await_cancel_all();                             // Cancel all spawned tasks, and await for them to finalize.
-                                                                    // Shorthand for cco_cancel_all() + cco_await_all().
-                cco_await_n(int n);                                 // Awaits for n spawned tasks. Does *not* cancel the remaining.
-
                 // Await spawned tasks in a specific (wait)group (for making nested await scopes):
-                cco_await_all_of(cco_group* wg);                    // Await for all (remaining) tasks in waitgroup to finish,
-                cco_await_any_of(cco_group* wg);                    // Await for any one spawned task in waitgroup to
+                cco_await_all(cco_group* wg);                       // Await for all (remaining) tasks in waitgroup to finish,
+                cco_await_any(cco_group* wg);                       // Await for any one spawned task in waitgroup to
                                                                     // finish, and cancel the remaining.
-                cco_await_cancel_all_of(cco_group* wg);             // Cancel all tasks in wg, and await for them to finalize.
-                                                                    // Shorthand for cco_cancel_all_of() + cco_await_all_of().
+                cco_await_cancel_all(cco_group* wg);                // Cancel all tasks in wg, and await for them to finalize.
+                                                                    // Shorthand for cco_cancel_all(wg) + cco_await_all(wg).
                 cco_await_n(int n, cco_group* wg);                  // Awaits for n spawned tasks in wg. Does *not* cancel the remaining.
 ```
 #### Spawning and Running Tasks
 The `Env` type used below is by default `void`, but can be specified in *cco_task_struct()* definition.
 ```c++
 void            cco_reset_group(cco_group* wg);                     // Reset waitgroup (normally not needed).
-cco_fiber*      cco_spawn(cco_task* tsk);                           // Lazily spawn a new concurrent task, detatched.
 cco_fiber*      cco_spawn(cco_task* tsk, cco_group* wg);            // Lazily spawn a new concurrent task within a waitgroup.
 cco_fiber*      cco_spawn(cco_task* tsk, cco_group* wg, Env* env);  // Variable env may be used to point to input data or result.
 cco_fiber*      cco_spawn(cco_task* tsk, cco_group* wg, Env* env,   // This may be called from main or outside `cco_async` scope.
-                           cco_fiber* fiber);
+                          cco_fiber* fiber);
 
                 cco_run_task(cco_task* tsk) {}                      // Run task blocking until it and spawned fibers are finished.
                 cco_run_task(cco_task* tsk, Env *env) {}            // Run task blocking with env data
@@ -375,7 +367,7 @@ int Dining(struct Dining* o) {
         cco_await_timer(&o->tm, o->duration);
 
         cco_finalize:
-        cco_await_cancel_all_of(&o->wg);
+        cco_await_cancel_all(&o->wg);
         puts("Dining done");
     }
     return 0;
@@ -571,7 +563,7 @@ int job_start(struct job_start* o) {
         cco_spawn(c_new(struct job1, {{job1}}), &o->wg);
         cco_await_timer(&o->tm, 0.1);
         puts("Ping");
-        cco_await_all_of(&o->wg);
+        cco_await_all(&o->wg);
         puts("Ping");
         cco_await_timer(&o->tm, 0.2);
     }

@@ -79,9 +79,9 @@ int taskB(struct taskB* o) {
         cco_yield;
 
         puts("Spawning 3 tasks.");
-        cco_spawn(c_new(struct myTask, {{myTask}, 1, 6}));
-        cco_spawn(c_new(struct myTask, {{myTask}, 101, 104}));
-        cco_spawn(c_new(struct myTask, {{myTask}, 1001, 1008}));
+        cco_spawn(c_new(struct myTask, {{myTask}, 1, 6}), cco_wg());
+        cco_spawn(c_new(struct myTask, {{myTask}, 101, 104}), cco_wg());
+        cco_spawn(c_new(struct myTask, {{myTask}, 1001, 1008}), cco_wg());
         cco_yield;
         puts("Spawned 3 tasks.");
 
@@ -90,7 +90,7 @@ int taskB(struct taskB* o) {
             printf("taskA recovered error '99' thrown on line %d\n", cco_error()->line);
             cco_recover; // reset error to 0 and proceed after the await taskB call.
         }
-        cco_await_all();
+        cco_await_all(cco_wg());
         puts("Joined");
         puts("taskB done");
     }
