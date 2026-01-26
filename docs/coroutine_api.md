@@ -32,10 +32,10 @@ scope end, and `return 0`.
 ```c++
                 cco_async (Coroutine* co) {...}                     // The coroutine scope.
 
-                cco_yield;                                          // Suspend execution => cco_yield_v(CCO_YIELD)
+                cco_yield;                                          // Suspend execution => cco_yield_v(cco_YIELD)
                 cco_yield_v(status);                                // Suspend execution with custom status returned.
-                cco_suspend;                                        // Suspend execution => cco_yield_v(CCO_SUSPEND)
-                cco_await(bool condition);                          // Suspend with CCO_AWAIT status or continue if condition is true.
+                cco_suspend;                                        // Suspend execution => cco_yield_v(cco_SUSPEND)
+                cco_await(bool condition);                          // Suspend with cco_AWAIT status or continue if condition is true.
                                                                     // Resumption takes place at the condition test, not after.
                 cco_finalize:                                       // Label marks where cleanup of the task/coroutine frame happens.
                                                                     // Jumps here on cco_return, cco_throw(), cco_cancel_task(self).
@@ -52,8 +52,8 @@ void            cco_stop(Coroutine* co);                            // Coroutine
 
 #### Simple Coroutines (non-Task types)
 ```c++
-                cco_await_coroutine(corofunc(co));                  // Await for coroutine to finish, else suspend with CCO_AWAIT.
-                cco_await_coroutine(corofunc(co), int awaitbits);   // Await until coroutine resume status is in (awaitbits | CCO_DONE).
+                cco_await_coroutine(corofunc(co));                  // Await for coroutine to finish, else suspend with cco_AWAIT.
+                cco_await_coroutine(corofunc(co), int awaitbits);   // Await until coroutine resume status is in (awaitbits | cco_DONE).
                 cco_run_coroutine(corofunc(co)) {};                 // Run blocking until coroutine is finished.
 ```
 
@@ -68,12 +68,13 @@ int             cco_resume(cco_task* task);                         // Resume ta
 
                 cco_throw(int error);                               // Throw an error. Will unwind call/await-task stack.
                                                                     // Handling of error required in cco_finalize:, else abort().
-                cco_throw(CCO_CANCEL);                              // Throw a cancellation of the current task.
+                cco_throw(cco_CANCEL);                              // Throw a cancellation of the current task.
                                                                     // It will silently unwind the await stack. Handling *not*
                                                                     // required, but it may be recovered in a cco_finalize: section.
                 cco_recover;                                        // Recover from a cco_throw() or cancellation. Resume from the
                                                                     // suspend point in the current task and clear error status.
                                                                     // Should be done in a cco_finalize: section.
+                cco_shutdown_on_failure(bool flag);                 // Control cancellation of other fibers on error in a spawned task.
 ```
 #### Task Accessors
 ```c++
@@ -87,34 +88,31 @@ Env*            cco_set_env(cco_task* task, Env* env);              // Set envir
 #### Task/Fiber and Waitgroup Cancellation
 ```c++
                 cco_cancel_task(cco_task* task);                    // Cancel a spawned task+fiber; If task runs in the current
-                                                                    // fiber it equals cco_throw(CCO_CANCEL) (jumps to cco_finalize:).
+                                                                    // fiber it equals cco_throw(cco_CANCEL) (jumps to cco_finalize:).
 void            cco_cancel_fiber(cco_fiber* fiber);                 // Signal that fiber will be cancelled upon next suspension point.
-void            cco_cancel_fibers();                                // Signal that all fibers will be cancelled upon their next
-                                                                    // suspension point.
-void            cco_cancel_scope();                                 // Cancel all tasks+fibers spawned in the current scope.
-void            cco_cancel_group(cco_group* wg);                    // Cancel all spawned tasks in the waitgroup, *except* the current.
-                                                                    // Passing NULL as arg will cancel all non-group spawned tasks.
+void            cco_cancel_all();                                   // Cancel all tasks/fibers spawned from the current task.
+void            cco_cancel_all_of(cco_group* wg);                   // Cancel all spawned tasks in the waitgroup.
 ```
 #### Awaiting Tasks and Waitgroups
 ```c++
-                cco_await_task(cco_task* task);                     // Await/call until task's resume status is CCO_DONE (=0).
-                cco_await_task(cco_task* task, int awaitbits);      // Await until task's resume status is in (awaitbits | CCO_DONE).
+                cco_await_task(cco_task* task);                     // Await/call until task's resume status is cco_DONE (=0).
+                cco_await_task(cco_task* task, int awaitbits);      // Await until task's resume status is in (awaitbits | cco_DONE).
                 cco_await_cancel_task(cco_task* task);              // Cancel and await for task to finalize async.
                                                                     // Shorthand for cco_cancel_task() + cco_await_task().
                 // Await spawned tasks from current scope:
-                cco_await_all();                                    // Await for all (remaining) tasks spawned in current scope to finish.
+                cco_await_all();                                    // Await for all (remaining) tasks spawned in current task.
                 cco_await_any();                                    // Await for any one spawned task to finish. Remaining are cancelled.
-                cco_await_cancel_scope();                           // Cancel all tasks in scope, and await for them to finalize.
-                                                                    // Shorthand for cco_cancel_scope() + cco_await_all().
+                cco_await_cancel_all();                             // Cancel all spawned tasks, and await for them to finalize.
+                                                                    // Shorthand for cco_cancel_all() + cco_await_all().
                 cco_await_n(int n);                                 // Awaits for n spawned tasks. Does *not* cancel the remaining.
 
                 // Await spawned tasks in a specific (wait)group (for making nested await scopes):
                 cco_await_all_of(cco_group* wg);                    // Await for all (remaining) tasks in waitgroup to finish,
                 cco_await_any_of(cco_group* wg);                    // Await for any one spawned task in waitgroup to
                                                                     // finish, and cancel the remaining.
-                cco_await_cancel_group(cco_group* wg);              // Cancel all tasks in wg, and await for them to finalize.
-                                                                    // Shorthand for cco_cancel_group() + cco_await_all_of().
-                cco_await_n(cco_group* wg, int n);                  // Awaits for n spawned tasks in wg. Does *not* cancel the remaining.
+                cco_await_cancel_all_of(cco_group* wg);             // Cancel all tasks in wg, and await for them to finalize.
+                                                                    // Shorthand for cco_cancel_all_of() + cco_await_all_of().
+                cco_await_n(int n, cco_group* wg);                  // Awaits for n spawned tasks in wg. Does *not* cancel the remaining.
 ```
 #### Spawning and Running Tasks
 The `Env` type used below is by default `void`, but can be specified in *cco_task_struct()* definition.
@@ -166,7 +164,7 @@ bool            cco_flt_takewhile(bool predicate);                  // Use inste
 ## Types
 | Type name         | Type definition / usage                             | Used to represent... |
 |:------------------|:----------------------------------------------------|:---------------------|
-|`cco_status`       | **enum** `CCO_DONE`, `CCO_AWAIT`, `CCO_SUSPEND`, `CCO_YIELD` | Default set of return status from coroutines |
+|`cco_status`       | **enum** `cco_DONE`, `cco_AWAIT`, `cco_SUSPEND`, `cco_YIELD` | Default set of return status from coroutines |
 |`struct cco_error` | `struct { int32_t code, line; const char* file; }`    | Error object for exceptions |
 |`cco_task`         | Enclosure/function object                           | Basic coroutine frame type |
 |`cco_timer`        | Struct type                                         | Delay timer               |
@@ -180,13 +178,13 @@ bool            cco_flt_takewhile(bool predicate);                  // Use inste
 control variables in loops.
 3. Do not call ***cco_suspend***, ***cco_yield..*** or ***cco_await..*** inside a `switch` statement. Use `if-else-if` in those cases.
 4. Never use regular `return` inside ***cco_async*** scope, always use ***cco_return***.
-5. Resuming a coroutine after it has returned 0 (CCO_DONE) is undefined behaviour ***if*** there is additional
+5. Resuming a coroutine after it has returned 0 (cco_DONE) is undefined behaviour ***if*** there is additional
 code between the ***cco_async*** scope and `return 0`.
 6. There may only be one ***cco_async*** scope per coroutine.
 
 ## Implementation and examples
 A plain coroutine may have any signature, however this implementation has specific support for
-coroutines which returns `int`, indicating CCO_DONE, CCO_AWAIT, CCO_SUSPEND, CCO_YIELD, or a custom int value.
+coroutines which returns `int`, indicating cco_DONE, cco_AWAIT, cco_SUSPEND, cco_YIELD, or a custom int value.
 It also require a struct pointer as one of the parameters, which must contains a member of type ***cco_base*** named `base`.
 The coroutine struct should normally store all *local* variables to be used within the coroutine
 (technically those where its usage crosses over a ***cco_yield..***, ***cco_await..*** or a ***cco_suspend***
@@ -377,7 +375,7 @@ int Dining(struct Dining* o) {
         cco_await_timer(&o->tm, o->duration);
 
         cco_finalize:
-        cco_await_cancel_group(&o->wg);
+        cco_await_cancel_all_of(&o->wg);
         puts("Dining done");
     }
     return 0;
@@ -714,8 +712,8 @@ The task-objects have the added benefit that coroutines can be managed by a sche
 which is useful when dealing with large numbers of coroutines (like in simulations).
 Below is a simple coroutine scheduler using a queue. It sends the suspended coroutines
 to the end of the queue, and resumes the coroutine in the front.
-Note that the scheduler awaits the next CCO_YIELD to be returned, not *only* the default CCO_DONE
-(in the code below, `| CCO_DONE` is redundant and only to show how to await for multiple/custom bit-values).
+Note that the scheduler awaits the next cco_YIELD to be returned, not *only* the default cco_DONE
+(in the code below, `| cco_DONE` is redundant and only to show how to await for multiple/custom bit-values).
 
 The example heap allocates the coroutine frames on a queue, so that the scheduler can pick the next coroutine to
 execute from a pool of coroutines. This also allows it to run on a different thread/scope that may outlive
@@ -757,11 +755,11 @@ int scheduler(struct Scheduler* o) {
         while (!Tasks_is_empty(&o->tasks)) {
             o->_pulled = Tasks_pull(&o->tasks);
 
-            cco_await_task(o->_pulled, CCO_YIELD | CCO_DONE);
+            cco_await_task(o->_pulled, cco_YIELD | cco_DONE);
 
-            if (cco_status() == CCO_YIELD) {
+            if (cco_status() == cco_YIELD) {
                 Tasks_push(&o->tasks, o->_pulled);
-            } else { // CCO_DONE
+            } else { // cco_DONE
                 Tasks_value_drop(&o->tasks, &o->_pulled);
             }
         }

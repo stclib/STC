@@ -39,6 +39,7 @@ int Philosopher(struct Philosopher* o) {
             duration = 0.5 + crand64_real();
             printf("Philosopher %d is eating for %.0f minutes...\n", o->id, duration*10);
             cco_await_timer(&o->timer, duration);
+            if (o->id == 3) { puts("CANCELED"); cco_throw(cco_CANCEL); } // example of failure
         }
         cco_finalize:
         printf("Philosopher %d done\n", o->id);
@@ -66,12 +67,14 @@ int Dining(struct Dining* o) {
                 .left = &o->philos[(i - 1 + num_philosophers) % num_philosophers],
                 .right = &o->philos[(i + 1) % num_philosophers],
             };
-            cco_spawn(&o->philos[i], &o->group);
+            cco_spawn(&o->philos[i]);
         }
+
+        cco_shutdown_on_failure(true);
         cco_await_timer(&o->timer, o->duration);
 
         cco_finalize:
-        cco_await_cancel_group(&o->group);
+        cco_await_cancel_all();
         puts("Dining done");
     }
     return 0;
@@ -79,7 +82,7 @@ int Dining(struct Dining* o) {
 
 int main(void)
 {
-    struct Dining dining = {.base={Dining}, .duration=5.0f, .group = {0}};
+    struct Dining dining = {.base={Dining}, .duration=8.0f};
 
     crand64_seed((uint64_t)time(NULL));
     cco_run_task(&dining);

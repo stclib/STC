@@ -21,7 +21,7 @@ int nested(struct nested* o) {
 
         if (o->level == 3) {
             puts("CANCEL");
-            cco_throw(CCO_CANCEL);
+            cco_throw(cco_CANCEL);
         }
         cco_await_timer(&o->tm, 0.2);
 

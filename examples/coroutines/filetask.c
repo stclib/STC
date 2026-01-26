@@ -59,9 +59,9 @@ int count_line(struct count_line* o)
         o->reader.path = cstr_str(&o->path);
 
         while (true) {
-            // await for next CCO_YIELD (or CCO_DONE) in file_read()
-            cco_await_task(&o->reader, CCO_YIELD);
-            if (cco_status() == CCO_DONE) break;
+            // await for next cco_YIELD (or cco_DONE) in file_read()
+            cco_await_task(&o->reader, cco_YIELD);
+            if (cco_status() == cco_DONE) break;
             o->lineCount += 1;
             cco_yield;
         }

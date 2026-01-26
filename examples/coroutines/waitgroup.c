@@ -61,12 +61,12 @@ int maintask(struct maintask* o) {
 
         cco_finalize:
         puts("Await 1");
-        cco_await_n(&o->group, 1); // await for 1 launched worker to finish
+        cco_await_n(1, &o->group); // await for 1 launched worker to finish
         puts("1 worker done.");
-        cco_await_n(&o->group, 3); // await for 3 more workers to finish
+        cco_await_n(3, &o->group); // await for 3 more workers to finish
         puts("3 more workers done");
         cco_await_all_of(&o->group); // await for remaining workers to finish
-        // cancel them instead: cco_await_cancel_group(&o->group);
+        // cancel them instead: cco_await_cancel_all_of(&o->group);
         puts("All workers done.");
         cco_await_all(); // await sleeper.
     }

@@ -40,7 +40,7 @@ int produce(struct produce* pr) {
     cco_async (pr) {
         pr->text = cstr_init();
         while (true) {
-            cco_await_coroutine(next_value(&pr->next), CCO_YIELD);
+            cco_await_coroutine(next_value(&pr->next), cco_YIELD);
             cstr_printf(&pr->text, "item %d", pr->next.val);
             print_time();
             printf("produced %s\n", cstr_str(&pr->text));
@@ -64,7 +64,7 @@ int consume(struct consume* co, struct produce* pr) {
    cco_async (co) {
         for (co->i = 1; co->i <= co->n; ++co->i) {
             printf("consumer #%d\n", co->i);
-            cco_await_coroutine(produce(pr), CCO_YIELD);
+            cco_await_coroutine(produce(pr), cco_YIELD);
             print_time();
             printf("consumed %s\n", cstr_str(&pr->text));
         }
