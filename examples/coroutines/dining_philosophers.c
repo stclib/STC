@@ -8,7 +8,7 @@ enum {num_philosophers = 5};
 enum PhMode {ph_THINKING, ph_HUNGRY, ph_EATING};
 
 // Philosopher coroutine: use task coroutine
-cco_task_struct (Philosopher) {
+cco_task_struct (Philosopher, cco_timer) { // cco_env(o) => cco_timer*.
     Philosopher_base base; // required
     int id;
     cco_timer timer;
@@ -22,12 +22,12 @@ int Philosopher(struct Philosopher* o) {
     cco_async (o) {
         while (1) {
             double duration = 1.0 + crand64_real()*2.0;
-            printf("Philosopher %d is thinking for %.0f minutes...\n", o->id, duration*10);
+            printf("%4.1f: Philosopher %d is thinking for %.1f minutes...\n", 10*cco_timer_elapsed(cco_env(o)), o->id, duration*10);
             o->hunger = 0;
             o->mode = ph_THINKING;
             cco_await_timer(&o->timer, duration);
 
-            printf("Philosopher %d is hungry...\n", o->id);
+            printf("%4.1f: Philosopher %d is hungry...\n", 10*cco_timer_elapsed(cco_env(o)), o->id);
             o->mode = ph_HUNGRY;
             cco_await(o->hunger >= o->left->hunger &&
                       o->hunger >= o->right->hunger);
@@ -37,9 +37,9 @@ int Philosopher(struct Philosopher* o) {
             o->mode = ph_EATING;
 
             duration = 0.5 + crand64_real();
-            printf("Philosopher %d is eating for %.0f minutes...\n", o->id, duration*10);
+            printf("%4.1f: Philosopher %d is eating for %.1f minutes...\n", 10*cco_timer_elapsed(cco_env(o)), o->id, duration*10);
             cco_await_timer(&o->timer, duration);
-            //if (o->id == 3) { puts("CANCELED"); cco_throw(cco_CANCEL); } // example of failure
+            //if (o->id == 3) { puts("CANCELED Ph 3"); cco_throw(cco_CANCEL); } // example of failure
         }
         cco_finalize:
         printf("Philosopher %d done\n", o->id);
@@ -67,22 +67,25 @@ int Dining(struct Dining* o) {
                 .left = &o->philos[(i - 1 + num_philosophers) % num_philosophers],
                 .right = &o->philos[(i + 1) % num_philosophers],
             };
-            cco_spawn(&o->philos[i], cco_wg());
+            cco_spawn(&o->philos[i], cco_wg(), &o->timer); // pass Env* type
         }
 
-        cco_shutdown_on_failure(true, cco_wg());
+        //cco_enable_child_errors(true, cco_wg());
         cco_await_timer(&o->timer, o->duration);
-
+        
         cco_finalize:
+        //switch (cco_error()->code) { 
+        //    case cco_CHILD_ERROR: cco_error()->code = 0; break;
+        //}
         cco_await_cancel_all(cco_wg());
-        puts("Dining done");
+        printf("Dining time of %.1f minutes is over.\n", cco_timer_elapsed(&o->timer)*10);
     }
     return 0;
 }
 
 int main(void)
 {
-    struct Dining dining = {.base={Dining}, .duration=8.0f};
+    struct Dining dining = {.base={Dining}, .duration=6.0f};
 
     crand64_seed((uint64_t)time(NULL));
     cco_run_task(&dining);

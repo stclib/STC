@@ -74,7 +74,7 @@ int             cco_resume(cco_task* task);                         // Resume ta
                 cco_recover;                                        // Recover from a cco_throw() or cancellation. Resume from the
                                                                     // suspend point in the current task and clear error status.
                                                                     // Should be done in a cco_finalize: section.
-                cco_shutdown_on_failure(bool flag);                 // Control cancellation of other fibers on error in a spawned task.
+void            cco_enable_child_errors(bool flag, cco_group* wg);  // Promote failures in spawned child tasks.
 ```
 #### Accessors
 ```c++
