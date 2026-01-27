@@ -123,7 +123,7 @@ typedef struct {
     else for (_cco_state(co)* _cco_st = (_cco_validate_task_struct(co), (_cco_state(co)*) &(co)->base.state) \
               ; _cco_st->pos != cco_STATE_DONE \
               ; _cco_st->pos = cco_STATE_DONE, \
-                (void)(sizeof((co)->base) > sizeof(cco_base) && _cco_st->group ? --_cco_st->group->spawn_count : 0)) \
+                (void)(sizeof((co)->base) > sizeof(cco_base) && --_cco_st->group->spawn_count)) \
         _resume_lbl: switch (_cco_st->pos) case cco_STATE_INIT: // thanks, @liigo!
 
 #define cco_finalize /* label */ \
@@ -325,8 +325,10 @@ typedef struct cco_task cco_task;
         cco_fiber* _fib = (cco_fiber*)_cco_st->fib; \
         _wt_task->base.awaitbits = (_awaitbits); \
         _wt_task->base.parent_task = _fib->task; \
-        _fib->task = _wt_task; \
         _wt_task->base.state.fib = _fib; \
+        _wt_task->base.state.group = &_cco_taskbase()->tsk_group; \
+        _cco_taskbase()->tsk_group.spawn_count = 1; \
+        _fib->task = _wt_task; \
     } \
     cco_suspend; \
 } while (0)
@@ -338,8 +340,10 @@ typedef struct cco_task cco_task;
         cco_fiber* _fib = (cco_fiber*)_cco_st->fib; \
         _to_task->base.awaitbits = _fib->task->base.awaitbits; \
         _to_task->base.parent_task = NULL; \
-        _fib->task = _to_task; \
         _to_task->base.state.fib = _fib; \
+        _to_task->base.state.group = &_cco_taskbase()->tsk_group; \
+        _cco_taskbase()->tsk_group.spawn_count = 1; \
+        _fib->task = _to_task; \
     } \
     cco_suspend; \
 } while (0)
@@ -546,6 +550,8 @@ cco_fiber* _cco_spawn(cco_task* task, cco_group* wg, void* env, cco_fiber* fib) 
 cco_fiber* _cco_new_fiber(cco_task* task, void* env) {
     cco_fiber* new_fb = c_new(cco_fiber, {.task=task, .env=env});
     task->base.state.fib = new_fb->next = new_fb;
+    task->base.state.group = &task->base.tsk_group;
+    task->base.tsk_group.spawn_count = 1;
     return new_fb;
 }
 
