@@ -125,7 +125,7 @@ void            deque_X_value_drop(i_key* pval);
 
 ## Examples
 
-[ [Run this code](https://godbolt.org/z/1TTT68fv5) ]
+[ [Run this code](https://godbolt.org/z/GWoKfKzd6) ]
 ```c++
 #define T Deque, int32_t
 #include <stc/deque.h>

@@ -166,7 +166,7 @@ int main(void)
 ```
 ### Example 2
 
-[ [Run this code](https://godbolt.org/z/c7e3q5v14) ]
+[ [Run this code](https://godbolt.org/z/fxYj5T7cb) ]
 ```c++
 #include <stdio.h>
 #include <stc/cstr.h>
@@ -181,7 +181,7 @@ int main(void) {
     vec_cstr_emplace(&names, "Joe");
     cstr_assign(&names.data[1], "Jake"); // replace "Joe".
 
-    cstr tmp = cstr_from_fmt("%d elements so far", vec_cstr_size(&names));
+    cstr tmp = cstr_from_fmt("%d elements so far", (int)vec_cstr_size(&names));
 
     // vec_cstr_emplace() only accept const char*, so use push():
     vec_cstr_push(&names, tmp); // tmp is "moved" to names (must not be dropped).

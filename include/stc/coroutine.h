@@ -544,8 +544,8 @@ cco_fiber* _cco_spawn(cco_task* task, cco_group* wg, void* env, cco_fiber* fib) 
     new_fb->task = task;
     new_fb->env = (env ? env : fib->env);
     task->base.state.fib = fib->next = new_fb;
-    task->base.state.group = wg ? wg : &task->base.tsk_group;
-    task->base.state.group->spawn_count += 1;
+    task->base.state.group = wg;
+    if (wg) wg->spawn_count += 1;
     return new_fb;
 }
 

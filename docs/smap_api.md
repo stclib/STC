@@ -118,7 +118,7 @@ void            smap_X_value_drop(i_key* pval);
 
 ## Examples
 
-[ [Run this code](https://godbolt.org/z/q1EjeKx4b) ]
+[ [Run this code](https://godbolt.org/z/PxqWzG5Mc) ]
 ```c++
 #include <stc/cstr.h>
 
@@ -157,7 +157,7 @@ Translate a
 [C++ example using *insert* and *emplace*](https://en.cppreference.com/w/cpp/container/map/try_emplace)
  to STC:
 
-[ [Run this code](https://godbolt.org/z/anabce8ox) ]
+[ [Run this code](https://godbolt.org/z/5G6vhvGqo) ]
 ```c++
 #include <stc/cstr.h>
 #define T strmap, cstr, cstr, (c_pro_key | c_pro_val)
@@ -189,7 +189,7 @@ int main(void)
 ### Example 3
 This example uses a smap with cstr as mapped value. Note the `i_pro_val` usage.
 
-[ [Run this code](https://godbolt.org/z/PTW9h9b56) ]
+[ [Run this code](https://godbolt.org/z/zK1v5jdcM) ]
 <!--{%raw%}-->
 ```c++
 #include <stc/cstr.h>
@@ -223,7 +223,7 @@ int main(void)
 ### Example 4
 Demonstrate smap with plain-old-data key type Vec3i and int as mapped type: smap<Vec3i, int>.
 
-[ [Run this code](https://godbolt.org/z/os54jhqrj) ]
+[ [Run this code](https://godbolt.org/z/za77Eq4ac) ]
 ```c++
 #include <stdio.h>
 typedef struct { int x, y, z; } Vec3i;

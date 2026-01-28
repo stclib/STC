@@ -424,7 +424,7 @@ and recovered using `cco_recover`. This call will resume control back to the ori
 current task. Because the "call-tree" is fixed, the coroutine frames to be called may be pre-allocated on the stack,
 which is very fast.
 
-[ [Run this code](https://godbolt.org/z/ad15G1rxj) ]
+[ [Run this code](https://godbolt.org/z/G6bY1szdj) ]
 <!--{%raw%}-->
 ```c++
 #include <stdio.h>
@@ -532,7 +532,7 @@ call/await:
 <details>
 <summary>Implementation of coroutine objects on the heap</summary>
 
-[ [Run this code](https://godbolt.org/z/1j31oPv3W) ]
+[ [Run this code](https://godbolt.org/z/8sTnhcazf) ]
 <!--{%raw%}-->
 ```c++
 #include <stdio.h>
@@ -546,7 +546,6 @@ cco_task_struct (job1) {
 cco_task_struct (job_start) {
     job_start_base base;
     cco_timer tm;
-    cco_group wg;
 };
 
 
@@ -562,10 +561,10 @@ int job1(struct job1* o) {
 
 int job_start(struct job_start* o) {
     cco_async (o) {
-        cco_spawn(c_new(struct job1, {{job1}}), &o->wg);
+        cco_spawn(c_new(struct job1, {{job1}}), cco_wg());
         cco_await_timer(&o->tm, 0.1);
         puts("Ping");
-        cco_await_all(&o->wg);
+        cco_await_all(cco_wg());
         puts("Ping");
         cco_await_timer(&o->tm, 0.2);
     }
@@ -716,7 +715,7 @@ the scope in that it was created.
 <details>
 <summary>Scheduled coroutines implementation</summary>
 
-[ [Run this code](https://godbolt.org/z/hj78Ms4Gf) ]
+[ [Run this code](https://godbolt.org/z/W8x8ex9TK) ]
 ```c++
 // Based on https://www.youtube.com/watch?v=8sEe-4tig_A
 #include <stdio.h>

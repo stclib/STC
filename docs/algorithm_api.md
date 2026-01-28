@@ -24,7 +24,7 @@ descriptive and reduces chances of making mistakes. It is generally easier to re
 | for (`c_each_ref`(elem, **CntType**, container))   | Iterate container with "structured binding" |
 | for (`c_each_kv`(key, val, **CntType**, container))| Iterate maps with "structured binding" |
 <!--{%raw%}-->
-[ [Run this code](https://godbolt.org/z/xK8s5cKc9) ]
+[ [Run this code](https://godbolt.org/z/GKzeq6v6n) ]
 ```c++
 #define T IMap, int, int
 #include <stc/sortedmap.h>
@@ -243,7 +243,7 @@ int main(void) {
 This example has two sum types. The `MessageChangeColor` variant uses the `Color` sum type as
 its data type (payload). Because C does not have namespaces, it is recommended to prefix the variant names with the sum type name, as with regular enums.
 
-[ [Run this code](https://godbolt.org/z/bM9q9h397) ]
+[ [Run this code](https://godbolt.org/z/c8EqnGs3n) ]
 ```c++
 // https://doc.rust-lang.org/book/ch18-03-pattern-syntax.html#destructuring-enums
 #include <stdio.h>
@@ -310,7 +310,7 @@ These work on any container. *c_make()* may also be used for **cspan** views.
 - **c_put_items** - push (raw) values onto any container from an initializer list
 - **c_drop** - drop (destroy) multiple containers of the same type
 
-[ [Run this code](https://godbolt.org/z/TadM4zeeb) ]
+[ [Run this code](https://godbolt.org/z/qojq5Pv5z) ]
 <!--{%raw%}-->
 ```c++
 #include <stdio.h>
@@ -388,7 +388,7 @@ Erase linearily in containers using a predicate. `value` is a pointer to each el
 - void `c_erase_if`(**CntType**, cnt_ptr, pred). Use with ***list**, ***hmap***, ***hset***, ***smap***, and ***sset***.
 - void `c_eraseremove_if`(**CntType**, cnt_ptr, pred). Use with ***stack***, ***vec***, ***deque***, and ***queue*** only.
 
-[ [Run this code](https://godbolt.org/z/rYoPM34Y9) ]
+[ [Run this code](https://godbolt.org/z/8hvPfqv49) ]
 <!--{%raw%}-->
 ```c++
 #include <stdio.h>

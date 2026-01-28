@@ -89,7 +89,7 @@ hset_X_value    hset_X_value_clone(const hset_X* self, hset_X_value val);
 | `hset_X_iter`      | `struct { hset_X_value *ref; ... }`              | Iterator type               |
 
 ## Example
-[ [Run this code](https://godbolt.org/z/orjMvjznz) ]
+[ [Run this code](https://godbolt.org/z/zxdYYnPYf) ]
 ```c++
 #include <stc/cstr.h>
 
