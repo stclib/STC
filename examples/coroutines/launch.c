@@ -1,15 +1,15 @@
 #include <stdio.h>
 #include <stc/coroutine.h>
 
-cco_task_struct (taskA, struct Output) {
+cco_task_struct (taskA, struct Output*) {
     taskA_base base;
     int a;
 };
-cco_task_struct (taskB, struct Output) {
+cco_task_struct (taskB, struct Output*) {
     taskB_base base;
     double d;
 };
-cco_task_struct (taskC, struct Output) {
+cco_task_struct (taskC, struct Output*) {
     taskC_base base;
     float x, y;
 };
@@ -56,7 +56,8 @@ int taskC(struct taskC* o) {
         puts("taskC more work");
 
         // initial return value
-        cco_env(o)->value = o->x * o->y;
+        {struct Output* e = cco_env(o);
+         e->value = o->x + o->y;}
         cco_yield;
 
         cco_finalize:
@@ -75,7 +76,8 @@ int taskB(struct taskB* o) {
         cco_await_task(c_new(struct taskC, {{taskC}, 1.2f, 3.4f}));
 
         puts("taskB work");
-        cco_env(o)->value += o->d;
+        {struct Output* e = cco_env(o);
+         e->value += o->d;} // accumulate return value
         cco_yield;
 
         puts("Spawning 3 tasks.");
@@ -107,7 +109,8 @@ int taskA(struct taskA* o) {
         cco_await_task(c_new(struct taskB, {{taskB}, 3.1415}));
 
         puts("taskA work");
-        cco_env(o)->value += o->a; // final return value;
+        {struct Output* e = cco_env(o);
+         e->value = o->a;} // final return value;
         cco_yield;
 
         cco_finalize:

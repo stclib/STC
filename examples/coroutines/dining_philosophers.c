@@ -8,7 +8,7 @@ enum {num_philosophers = 5};
 enum PhMode {ph_THINKING, ph_HUNGRY, ph_EATING};
 
 // Philosopher coroutine: use task coroutine
-cco_task_struct (Philosopher, cco_timer) { // cco_env(o) => cco_timer*.
+cco_task_struct (Philosopher, cco_timer*) { // optional: make cco_env(o) return cco_timer*
     Philosopher_base base; // required
     int id;
     cco_timer timer;
@@ -39,7 +39,11 @@ int Philosopher(struct Philosopher* o) {
             duration = 0.5 + crand64_real();
             printf("%4.1f: Philosopher %d is eating for %.1f minutes...\n", 10*cco_timer_elapsed(cco_env(o)), o->id, duration*10);
             cco_await_timer(&o->timer, duration);
-            //if (o->id == 3) { puts("CANCELED Ph 3"); cco_throw(cco_CANCEL); } // example of failure
+
+            if (o->id == 3) { // For demonstration purpose:
+                // CANCELING after philosopher 3 has eaten.
+                cco_throw(cco_CANCEL, o->id);
+            }
         }
         cco_finalize:
         printf("Philosopher %d done\n", o->id);
@@ -67,16 +71,19 @@ int Dining(struct Dining* o) {
                 .left = &o->philos[(i - 1 + num_philosophers) % num_philosophers],
                 .right = &o->philos[(i + 1) % num_philosophers],
             };
-            cco_spawn(&o->philos[i], cco_wg(), &o->timer); // pass Env* type
+            cco_spawn(&o->philos[i], cco_wg(), &o->timer); // pass in cco_env().
         }
 
-        //cco_enable_child_errors(true, cco_wg());
+        cco_promote_child_errors(true, cco_wg());
         cco_await_timer(&o->timer, o->duration);
         
         cco_finalize:
-        //switch (cco_error()->code) { 
-        //    case cco_CHILD_ERROR: cco_error()->code = 0; break;
-        //}
+        switch (cco_error()->code) {
+            case cco_CHILD_ERROR:
+                printf("Philosopher %d CANCELED the dining.\n", (int)cco_error()->info);
+                break;
+        }
+        cco_error()->code = 0;
         cco_await_cancel_all(cco_wg());
         printf("Dining time of %.1f minutes is over.\n", cco_timer_elapsed(&o->timer)*10);
     }

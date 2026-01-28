@@ -206,11 +206,12 @@ struct cco_error {
     intptr_t info;
 };
 
-#define cco_fiber_struct(Prefix, Env) \
-    typedef Env Prefix##_env; \
+#define cco_fiber_struct(Prefix, EnvPtr) \
+    typedef int Prefix##_env_ptr_check[sizeof((EnvPtr)0 == (void*)0)]; \
+    typedef EnvPtr Prefix##_env_ptr; \
     struct Prefix##_fiber { \
         struct cco_task* task; \
-        Prefix##_env* env; \
+        Prefix##_env_ptr env; \
         cco_group* tmp_group; \
         struct cco_task* parent_task; \
         struct cco_task_fiber *next, *parent; \
@@ -223,10 +224,10 @@ struct cco_error {
 /* Define a Task struct */
 #define cco_task_struct(...) c_MACRO_OVERLOAD(cco_task_struct, __VA_ARGS__)
 #define cco_task_struct_1(Task) \
-    cco_task_struct_2(Task, void)
+    cco_task_struct_2(Task, void*)
 
-#define cco_task_struct_2(Task, Env) \
-    cco_fiber_struct(Task, Env); \
+#define cco_task_struct_2(Task, EnvPtr) \
+    cco_fiber_struct(Task, EnvPtr); \
     cco_state_struct(Task); \
     _cco_task_struct(Task)
 
@@ -246,7 +247,7 @@ typedef cco_state_struct(cco_task) cco_state;
 typedef struct { cco_state state; } cco_base;
 
 /* Base cco_task type */
-cco_fiber_struct(cco_task, void);
+cco_fiber_struct(cco_task, void*);
 _cco_task_struct(cco_task) { cco_task_base base; };
 
 typedef struct cco_task_fiber cco_fiber;
@@ -265,7 +266,7 @@ typedef struct cco_task cco_task;
 #define cco_env(a_task) ((a_task)->base.state.fib->env)
 #define cco_set_env(a_task, the_env) ((a_task)->base.state.fib->env = the_env)
 
-#define cco_enable_child_errors(flag, wg) \
+#define cco_promote_child_errors(flag, wg) \
     (void)((wg)->child_errors = (flag))
 
 #define cco_cast_task(...) \

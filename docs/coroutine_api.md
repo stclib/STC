@@ -59,8 +59,8 @@ void            cco_stop(Coroutine* co);                            // Coroutine
 
 #### Tasks (coroutine function-objects) and Fibers (green thread-like entity within a system thread)
 ```c++
-                cco_task_struct(name) {<name>_base base; ...};      // Define a custom coroutine task struct; "Extends" cco_task struct.
-                cco_task_struct(name, Env) {<name>_base base; ...}; // Also specify value type of pointer returned from cco_env(). Default: void.
+                cco_task_struct(name) {<name>_base base; ..};       // Define a custom coroutine task struct; "Extends" cco_task struct.
+                cco_task_struct(name, EnvPtr) {<name>_base base; ..}; // Also specify value type of pointer returned from cco_env(). Default: void.
 
                 cco_yield_to(cco_task* task);                       // Yield to another task (symmetric transfer of control).
 int             cco_resume(cco_task* task);                         // Resume task until it suspends (blocking). Return status.
@@ -71,10 +71,12 @@ int             cco_resume(cco_task* task);                         // Resume ta
                 cco_throw(cco_CANCEL);                              // Throw a cancellation of the current task.
                                                                     // It will silently unwind the await stack. Handling *not*
                                                                     // required, but it may be recovered in a cco_finalize: section.
-                cco_recover;                                        // Recover from a cco_throw() or cancellation. Resume from the
-                                                                    // suspend point in the current task and clear error status.
-                                                                    // Should be done in a cco_finalize: section.
-void            cco_enable_child_errors(bool flag, cco_group* wg);  // Promote failures in spawned child tasks.
+                cco_recover;                                        // Recover upstream from a cco_throw() or cancellation. Resumes from
+                                                                    // the suspend point in the current task and clears error status,
+                                                                    // cco_error()->code = 0. Should be handled in cco_finalize section.
+void            cco_promote_child_errors(bool flag, cco_group* wg); // Catch failure in any spawned child task. Jumps to cco_finalize
+                                                                    // label, and sets cco_CHILD_ERROR, which must be handled.
+                                                                    // See the dining_philosophers.c example.
 ```
 #### Accessors
 ```c++
@@ -428,10 +430,10 @@ which is very fast.
 #include <stdio.h>
 #include <stc/coroutine.h>
 
-cco_task_struct (TaskA, struct Subtasks) { TaskA_base base; int a; };
-cco_task_struct (TaskB, struct Subtasks) { TaskB_base base; double d; };
-cco_task_struct (TaskC, struct Subtasks) { TaskC_base base; float x, y; };
-cco_task_struct (start, struct Subtasks) { start_base base; };
+cco_task_struct (TaskA, struct Subtasks*) { TaskA_base base; int a; };
+cco_task_struct (TaskB, struct Subtasks*) { TaskB_base base; double d; };
+cco_task_struct (TaskC, struct Subtasks*) { TaskC_base base; float x, y; };
+cco_task_struct (start, struct Subtasks*) { start_base base; };
 
 
 int TaskC(struct TaskC* o) {
@@ -725,13 +727,13 @@ the scope in that it was created.
 #include <stc/queue.h>
 
 // Specify Tasks as the environment pointer type:
-cco_task_struct (Scheduler, Tasks) {
+cco_task_struct (Scheduler, Tasks*) {
     Scheduler_base base;
     cco_task* _pulled;
     Tasks tasks;
 };
 
-cco_task_struct (TaskA, Tasks) {
+cco_task_struct (TaskA, Tasks*) {
     TaskA_base base;
 };
 
