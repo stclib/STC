@@ -69,13 +69,11 @@ enum cco_status {
     cco_SUSPEND = 1<<13,
     cco_AWAIT   = 1<<14,
 };
-#define cco_CANCEL (1U<<30)
-#define cco_CHILD_ERROR ((1U<<30) - 1)
+#define cco_CANCEL   (1U<<30)
+#define cco_SHUTDOWN (1U<<29)
+#define cco_NOTIFY   ((1U<<29) - 1)
 
 enum cco_deprecated {
-    CCO_STATE_INIT = cco_STATE_INIT, // [deprecated]
-    CCO_STATE_DONE = cco_STATE_DONE, // [deprecated]
-    CCO_STATE_DROP = cco_STATE_DROP, // [deprecated]
     CCO_DONE       = cco_DONE,       // [deprecated]
     CCO_YIELD      = cco_YIELD,      // [deprecated]
     CCO_SUSPEND    = cco_SUSPEND,    // [deprecated]
@@ -93,7 +91,7 @@ enum cco_deprecated {
 typedef struct {
     int32_t await_count;
     int32_t spawn_count:24;
-    uint8_t child_errors:8;
+    uint8_t on_error:8;
 } cco_group;
 
 #define cco_state_struct(Prefix) \
@@ -101,7 +99,7 @@ typedef struct {
         int32_t pos:24; \
         bool drop; \
         struct Prefix##_fiber* fib; \
-        cco_group* group; \
+        cco_group* parent_wg; \
     }
 
 #define cco_is_initial(co) ((co)->base.state.pos == cco_STATE_INIT)
@@ -124,7 +122,7 @@ typedef struct {
     else for (_cco_state(co)* _cco_st = (_cco_validate_task_struct(co), (_cco_state(co)*) &(co)->base.state) \
               ; _cco_st->pos != cco_STATE_DONE \
               ; _cco_st->pos = cco_STATE_DONE, \
-                (void)(sizeof((co)->base) > sizeof(cco_base) && (_cco_st->group? --_cco_st->group->spawn_count : 0))) \
+                (void)(sizeof((co)->base) > sizeof(cco_base) && (_cco_st->parent_wg? --_cco_st->parent_wg->spawn_count : 0))) \
         _resume_lbl: switch (_cco_st->pos) case cco_STATE_INIT: // thanks, @liigo!
 
 #define cco_finalize /* label */ \
@@ -212,7 +210,7 @@ struct cco_error {
     struct Prefix##_fiber { \
         struct cco_task* task; \
         Prefix##_env_ptr env; \
-        cco_group* tmp_group; \
+        cco_group* temp_wg; \
         struct cco_task* parent_task; \
         struct cco_task_fiber *next, *parent; \
         struct cco_task_state recover_state; \
@@ -238,7 +236,7 @@ struct cco_error {
         int awaitbits; \
         struct Task##_state state; \
         struct cco_task* parent_task; \
-        cco_group tsk_group; \
+        cco_group task_wg; \
     } Task##_base; \
     struct Task
 
@@ -258,16 +256,19 @@ typedef struct cco_task cco_task;
 
 #define cco_status() (_cco_st->fib->status + 0)
 #define cco_error() (&_cco_st->fib->error)
-#define cco_wg() (&_cco_taskbase()->tsk_group)
-#define cco_spawner_wg() (_cco_st->group + 0)
-#define cco_spawner_fiber() (_cco_taskbase()->state.fib->parent + 0)
+#define cco_error_code() (_cco_st->fib->error.code + 0)
+#define cco_clear_error() (c_assert((uint32_t)_cco_st->fib->error.code & ~cco_SHUTDOWN), _cco_st->fib->error.code = 0)
+#define cco_wg() (&_cco_taskbase()->task_wg)
+#define cco_parent_wg() (_cco_st->parent_wg + 0)
+#define cco_parent_fiber() (_cco_taskbase()->state.fib->parent + 0)
 #define cco_task_fiber() ((cco_fiber*)_cco_taskbase()->state.fib + 0)
 
 #define cco_env(a_task) ((a_task)->base.state.fib->env)
 #define cco_set_env(a_task, the_env) ((a_task)->base.state.fib->env = the_env)
 
-#define cco_promote_child_errors(flag, wg) \
-    (void)((wg)->child_errors = (flag))
+enum cco_error_action { cco_SET_NOTIFY = 1, cco_SET_SHUTDOWN = 2 };
+#define cco_on_child_error(mode, wg) \
+    do { uint32_t _m = mode; c_assert(_m <= 2); (wg)->on_error = (uint8_t)_m; } while (0)
 
 #define cco_cast_task(...) \
     ((void)sizeof((__VA_ARGS__)->base.func(__VA_ARGS__)), (cco_task *)(__VA_ARGS__))
@@ -296,14 +297,15 @@ typedef struct cco_task cco_task;
 
 /* Return with error and unwind await stack; must be recovered in cco_finalize section */
 #define cco_throw(...) c_MACRO_OVERLOAD(cco_throw, __VA_ARGS__)
-#define cco_throw_1(error_code) cco_throw_2(error_code, 0)
-#define cco_throw_2(error_code, info_data) \
+#define cco_throw_1(err_code) cco_throw_2(err_code, 0)
+#define cco_throw_2(err_code, info_data) \
     do { \
         cco_fiber* _fib = (cco_fiber*)_cco_st->fib; \
-        _fib->error = (struct cco_error){error_code, __LINE__, __FILE__, info_data}; \
-        if (_cco_st->group && _cco_st->group->child_errors && _fib->parent) { \
-            _fib->parent->error = _fib->error; \
-            _fib->parent->error.code = cco_CHILD_ERROR; \
+        _fib->error = (struct cco_error){err_code, __LINE__, __FILE__, info_data}; \
+        int _err = cco_SHUTDOWN; \
+        if (_cco_st->parent_wg && _fib->parent) switch (_cco_st->parent_wg->on_error) { \
+            case cco_SET_SHUTDOWN: _cco_cancel_all(_fib, _cco_st->parent_wg); _err = cco_SHUTDOWN; /* FALLTHRU */ \
+            case cco_SET_NOTIFY: _fib->parent->error = _fib->error; _fib->parent->error.code = _err; \
         } \
         cco_return; \
     } while (0)
@@ -312,9 +314,9 @@ typedef struct cco_task cco_task;
 #define cco_recover \
     do { \
         cco_fiber* _fib = (cco_fiber*)_cco_st->fib; \
-        c_assert(_fib->error.code); \
-        _fib->task->base.state = _fib->recover_state; \
+        c_assert((uint32_t)_fib->error.code & ~cco_SHUTDOWN); \
         _fib->error.code = 0; \
+        _fib->task->base.state = _fib->recover_state; \
         goto _resume_lbl; \
     } while (0)
 
@@ -328,8 +330,8 @@ typedef struct cco_task cco_task;
         _wt_task->base.awaitbits = (_awaitbits); \
         _wt_task->base.parent_task = _fib->task; \
         _wt_task->base.state.fib = _fib; \
-        _wt_task->base.state.group = &_cco_taskbase()->tsk_group; \
-        _cco_taskbase()->tsk_group.spawn_count = 1; \
+        _wt_task->base.state.parent_wg = &_cco_taskbase()->task_wg; \
+        _cco_taskbase()->task_wg.spawn_count = 1; \
         _fib->task = _wt_task; \
     } \
     cco_suspend; \
@@ -343,8 +345,8 @@ typedef struct cco_task cco_task;
         _to_task->base.awaitbits = _fib->task->base.awaitbits; \
         _to_task->base.parent_task = NULL; \
         _to_task->base.state.fib = _fib; \
-        _to_task->base.state.group = &_cco_taskbase()->tsk_group; \
-        _cco_taskbase()->tsk_group.spawn_count = 1; \
+        _to_task->base.state.parent_wg = &_cco_taskbase()->task_wg; \
+        _cco_taskbase()->task_wg.spawn_count = 1; \
         _fib->task = _to_task; \
     } \
     cco_suspend; \
@@ -380,20 +382,20 @@ static inline int _cco_resume_task(cco_task* task)
 } while (0)
 
 #define cco_await_n(n, a_group) do { /* does not cancel remaining */ \
-    _cco_st->fib->tmp_group = a_group; \
-    _cco_st->fib->tmp_group->await_count = _cco_st->fib->tmp_group->spawn_count - (n); \
-    cco_await(_cco_st->fib->tmp_group->spawn_count == _cco_st->fib->tmp_group->await_count); \
+    _cco_st->fib->temp_wg = a_group; \
+    _cco_st->fib->temp_wg->await_count = _cco_st->fib->temp_wg->spawn_count - (n); \
+    cco_await(_cco_st->fib->temp_wg->spawn_count == _cco_st->fib->temp_wg->await_count); \
 } while (0)
 
 #define cco_await_all(a_group) do { \
-    _cco_st->fib->tmp_group = a_group; \
-    cco_await(_cco_st->fib->tmp_group->spawn_count == 0); \
+    _cco_st->fib->temp_wg = a_group; \
+    cco_await(_cco_st->fib->temp_wg->spawn_count == 0); \
 } while (0)
 
 #define cco_await_any(a_group) do { /* await 1; cancel remaining */ \
-    cco_await_n_2(1, a_group); \
-    cco_cancel_all(_cco_st->fib->tmp_group); \
-    cco_await_OFFSET(_cco_st->fib->tmp_group->spawn_count == 0, 100000); /* await_all() */ \
+    cco_await_n(1, a_group); \
+    cco_cancel_all(_cco_st->fib->temp_wg); \
+    cco_await_OFFSET(_cco_st->fib->temp_wg->spawn_count == 0, 100000); /* await_all() */ \
 } while (0)
 
 #define cco_await_cancel_all(a_group) do { \
@@ -544,7 +546,7 @@ cco_fiber* _cco_spawn(cco_task* task, cco_group* wg, void* env, cco_fiber* fib) 
     new_fb->task = task;
     new_fb->env = (env ? env : fib->env);
     task->base.state.fib = fib->next = new_fb;
-    task->base.state.group = wg;
+    task->base.state.parent_wg = wg;
     if (wg) wg->spawn_count += 1;
     return new_fb;
 }
@@ -559,7 +561,7 @@ void _cco_cancel_all(cco_fiber* fib, cco_group* wg) {
     for (cco_fiber *fit = fib->next; fit != fib; fit = fit->next) {
         cco_task* cur = fit->task;
         do {
-            if (cur->base.state.group == wg) {   
+            if (cur->base.state.parent_wg == wg) {   
                 fit->error.code = cco_CANCEL;
                 break;
             }
@@ -605,11 +607,11 @@ int cco_execute(cco_fiber* fib) {
         }
     }
 
-    if ((uint32_t)fib->error.code & ~cco_CANCEL) { // Allow cco_CANCEL not to trigger error.
+    if ((uint32_t)fib->error.code & ~(cco_CANCEL | cco_SHUTDOWN)) { // Allow cco_CANCEL not to trigger error.
         fprintf(stderr, __FILE__ ": error: unhandled coroutine error '%d'\n"
                         "%s:%d: cco_throw(%d);\n",
                         fib->error.code, fib->error.file, fib->error.line, fib->error.code);
-        exit(fib->error.code);
+        exit(-128);
     }
     return cco_DONE;
 }

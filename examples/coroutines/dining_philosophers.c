@@ -74,16 +74,15 @@ int Dining(struct Dining* o) {
             cco_spawn(&o->philos[i], cco_wg(), &o->timer); // pass in cco_env().
         }
 
-        cco_promote_child_errors(true, cco_wg());
+        cco_on_child_error(cco_SET_SHUTDOWN, cco_wg());
         cco_await_timer(&o->timer, o->duration);
-        
+
         cco_finalize:
         switch (cco_error()->code) {
-            case cco_CHILD_ERROR:
+            case cco_SHUTDOWN:
                 printf("Philosopher %d CANCELED the dining.\n", (int)cco_error()->info);
                 break;
         }
-        cco_error()->code = 0;
         cco_await_cancel_all(cco_wg());
         printf("Dining time of %.1f minutes is over.\n", cco_timer_elapsed(&o->timer)*10);
     }
