@@ -118,14 +118,14 @@ typedef struct {
 #endif
 
 #define cco_async(co) \
-    if (0) goto _resume_lbl; \
-    else for (_cco_state(co)* _cco_st = (_cco_validate_task_struct(co), (_cco_state(co)*) &(co)->base.state) \
+    for (_cco_state(co)* _cco_st = (_cco_validate_task_struct(co), (_cco_state(co)*) &(co)->base.state) \
               ; _cco_st->pos != cco_STATE_DONE \
               ; _cco_st->pos = cco_STATE_DONE, \
                 (void)(sizeof((co)->base) > sizeof(cco_base) && (_cco_st->parent_wg? --_cco_st->parent_wg->spawn_count : 0))) \
         _resume_lbl: switch (_cco_st->pos) case cco_STATE_INIT: // thanks, @liigo!
 
 #define cco_finalize /* label */ \
+    if (0) { goto _resume_lbl; } \
     _cco_st->drop = true; /* FALLTHRU */ \
     case cco_STATE_DROP
 
@@ -161,7 +161,7 @@ typedef struct {
 #define cco_yield_v(status) cco_yield_v_OFFSET(status, 0)
 #define cco_yield_v_OFFSET(status, N) \
     do { \
-        _cco_st->pos = __LINE__ + N; return status; \
+        _cco_st->pos = __LINE__ + N; return status; /* never */ goto _resume_lbl; \
         case __LINE__ + N:; \
     } while (0)
 
@@ -175,7 +175,7 @@ typedef struct {
 #define cco_await_OFFSET(until, N) \
     do { \
         _cco_st->pos = __LINE__ + N; /* FALLTHRU */ \
-        case __LINE__ + N: if (!(until)) return cco_AWAIT; \
+        case __LINE__ + N: if (!(until)) { return cco_AWAIT; /* never */ goto _resume_lbl; } \
     } while (0)
     
 /* cco_await_coroutine(): assumes coroutine returns a status value (int) */
@@ -186,7 +186,7 @@ typedef struct {
         _cco_st->pos = __LINE__; /* FALLTHRU */ \
         case __LINE__: { \
             int _res = corocall; \
-            if (_res & ~(awaitbits)) return _res; \
+            if (_res & ~(awaitbits)) { return _res; /* never */ goto _resume_lbl; } \
         } \
     } while (0)
 
