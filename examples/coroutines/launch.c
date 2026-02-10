@@ -24,7 +24,7 @@ int myTask(struct myTask* o) {
     cco_async (o) {
         for (o->n = 1; o->n <= 3; ++o->n) {
             if (o->id == 101 && o->n == 3)
-               cco_throw(cco_CANCEL); // Demo: throwing an error in one of the spawned tasks.
+               ; // cco_throw(cco_CANCEL); // Demo: throwing an error in one of the spawned tasks.
 
             printf("myTask %d: step %d\n", o->id, o->n);
             cco_yield;
@@ -59,12 +59,12 @@ int taskC(struct taskC* o) {
         {struct Output* e = cco_env(o);
          e->value = o->x + o->y;}
         cco_yield;
-
+        
         cco_finalize:
         switch (cco_error_code()) {
             case 99:
                 printf("taskC error '99' thrown on line %d\n", cco_error()->line);
-                //cco_recover; // reset error to 0 and proceed after the await taskC call.
+                //cco_recover; // Demo: recover error here and resume after the cco_throw().
         }
         puts("taskC done");
     }
@@ -95,7 +95,7 @@ int taskB(struct taskB* o) {
         cco_finalize:
         if (cco_error()->code == 99) {
             printf("taskB recovered error '99' thrown on line %d\n", cco_error()->line);
-            cco_recover; // reset error to 0 and proceed after the await taskB call.
+            cco_recover; // Demo: recover error and resume after the await taskC call.
         }
         cco_await_all(cco_wg());
         puts("Joined");

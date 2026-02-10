@@ -307,23 +307,11 @@ enum cco_error_action { _cco_SET_PROPAGATE = 1, _cco_SET_SHUTDOWN = 2 };
 #define cco_throw_1(err_code) cco_throw_2(err_code, 0)
 #define cco_throw_2(err_code, info_data) \
     do { \
-        cco_fiber* _fib = (cco_fiber*)_cco_st->fib; \
-        _fib->error = (struct cco_error){err_code, __LINE__, __FILE__, info_data}; \
-        _fib->recover_state = *(cco_state*)_cco_st; \
-        _fib->recover_state.pos = __LINE__; \
-        if (_fib->parent) { \
-            cco_task* _tsk = _cco_gettask(); \
-            while (_tsk->base.parent_task) _tsk = _tsk->base.parent_task; \
-            _fib->parent->recover_state = _fib->parent->task->base.state; \
-            int _err = cco_PROPAGATE; \
-            switch (_tsk->base.state.parent_wg->on_error) { \
-                case _cco_SET_SHUTDOWN: _cco_cancel_all(_fib, _tsk->base.state.parent_wg); _err = cco_SHUTDOWN; /* FALLTHRU */ \
-                case _cco_SET_PROPAGATE: _fib->parent->error = _fib->error; _fib->parent->error.code = _err; \
-            } \
-        } \
+        _cco_throw(err_code, info_data, _cco_gettask(), __FILE__, __LINE__); \
         cco_return; \
         case __LINE__:; \
     } while (0)
+void _cco_throw(int32_t err_code, intptr_t info_data, cco_task* tsk, const char* file, int32_t line);
 
 /* Recover the thrown error; to be used in cco_finalize section upon handling cco_error()->code */
 #define cco_recover \
@@ -334,37 +322,27 @@ enum cco_error_action { _cco_SET_PROPAGATE = 1, _cco_SET_SHUTDOWN = 2 };
         goto _resume_lbl; \
     } while (0)
 
+
 /* Asymmetric coroutine await/call */
 #define cco_await_task(...) c_MACRO_OVERLOAD(cco_await_task, __VA_ARGS__)
 #define cco_await_task_1(a_task) cco_await_task_2(a_task, cco_DONE)
-#define cco_await_task_2(a_task, _awaitbits) do { \
-    {   (void)sizeof(cco_env(a_task) == _cco_st->fib->env); \
-        cco_task* _wt_task = cco_cast_task(a_task); \
-        cco_fiber* _fib = (cco_fiber*)_cco_st->fib; \
-        _wt_task->base.awaitbits = (_awaitbits); \
-        _wt_task->base.parent_task = _fib->task; \
-        _wt_task->base.state.fib = _fib; \
-        _cco_getbase()->task_wg.spawn_count = 1; \
-        _wt_task->base.state.parent_wg = &_cco_getbase()->task_wg; \
-        _fib->task = _wt_task; \
-    } \
-    cco_suspend; \
-} while (0)
+#define cco_await_task_2(a_task, _awaitbits) \
+    do { \
+        (void)sizeof(cco_env(a_task) == _cco_st->fib->env); \
+        _cco_await_task(cco_cast_task(a_task), _awaitbits, _cco_gettask()); \
+        cco_suspend; \
+    } while (0)
+void _cco_await_task(cco_task* tsk, int32_t awaitbits, cco_task* caller);
 
 /* Symmetric coroutine flow of control transfer */
-#define cco_yield_to(a_task) do { \
-    {   (void)sizeof(cco_env(a_task) == _cco_st->fib->env); \
-        cco_task* _to_task = cco_cast_task(a_task); \
-        cco_fiber* _fib = (cco_fiber*)_cco_st->fib; \
-        _to_task->base.awaitbits = _fib->task->base.awaitbits; \
-        _to_task->base.parent_task = NULL; \
-        _to_task->base.state.fib = _fib; \
-        _cco_getbase()->task_wg.spawn_count = 1; \
-        _to_task->base.state.parent_wg = &_cco_getbase()->task_wg; \
-        _fib->task = _to_task; \
-    } \
-    cco_suspend; \
-} while (0)
+#define cco_yield_to(a_task) \
+    do { \
+        (void)sizeof(cco_env(a_task) == _cco_st->fib->env); \
+        _cco_yield_to(cco_cast_task(a_task), _cco_gettask()); \
+        cco_suspend; \
+    } while (0)
+void _cco_yield_to(cco_task* tsk, cco_task* caller);
+
 
 #define cco_resume(a_task) \
     _cco_resume_task(cco_cast_task(a_task))
@@ -554,6 +532,46 @@ static inline double cco_timer_remaining(cco_timer* tm) {
 #if (defined i_implement || defined STC_IMPLEMENT) && !defined STC_COROUTINE_IMPLEMENT
 #define STC_COROUTINE_IMPLEMENT
 #include <stdio.h>
+
+void _cco_await_task(cco_task* tsk, int32_t _awaitbits, cco_task* caller) {
+    cco_fiber* fib = caller->base.state.fib;
+    tsk->base.awaitbits = _awaitbits;
+    tsk->base.parent_task = fib->task;
+    tsk->base.state.fib = fib;
+    caller->base.task_wg.spawn_count = 1;
+    tsk->base.state.parent_wg = &caller->base.task_wg;
+    fib->task = tsk;
+}
+
+void _cco_yield_to(cco_task* tsk, cco_task* caller) {
+    cco_fiber* fib = caller->base.state.fib;
+    tsk->base.awaitbits = fib->task->base.awaitbits;
+    tsk->base.parent_task = NULL;
+    tsk->base.state.fib = fib;
+    caller->base.task_wg.spawn_count = 1;
+    tsk->base.state.parent_wg = &caller->base.task_wg;
+    fib->task = tsk;
+}
+
+void _cco_throw(int32_t err_code, intptr_t info_data, cco_task* caller, const char* file, int32_t line) {
+    cco_fiber* fib = caller->base.state.fib;
+    fib->error = (struct cco_error){err_code, line, file, info_data};
+    fib->recover_state = caller->base.state;
+    fib->recover_state.pos = line & 0x7FFFFF; // 23 bits for line number
+    if (fib->parent) {
+        while (caller->base.parent_task) caller = caller->base.parent_task;
+        fib->parent->recover_state = fib->parent->task->base.state;
+        int32_t err = cco_PROPAGATE;
+        switch (caller->base.state.parent_wg->on_error) {
+            case _cco_SET_SHUTDOWN:
+                _cco_cancel_all(fib, caller->base.state.parent_wg);
+                err = cco_SHUTDOWN; /* FALLTHRU */
+            case _cco_SET_PROPAGATE:
+                fib->parent->error = fib->error;
+                fib->parent->error.code = err;
+        }
+    }
+}
 
 cco_fiber* _cco_spawn(cco_task* task, cco_group* wg, void* env, cco_fiber* fib) {
     cco_fiber* new_fb = fib->next ? c_new(cco_fiber, {.next = fib->next, .parent = fib}) : fib;
