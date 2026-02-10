@@ -74,11 +74,12 @@ int Dining(struct Dining* o) {
             cco_spawn(&o->philos[i], cco_wg(), &o->timer); // pass in cco_env().
         }
 
-        cco_on_child_error(cco_SET_SHUTDOWN, cco_wg());
+        cco_on_child_error(cco_SHUTDOWN, cco_wg());
         cco_await_timer(&o->timer, o->duration);
+        puts("Time's up! Stopping dining...");  
 
         cco_finalize:
-        switch (cco_error()->code) {
+        switch (cco_error_code()) {
             case cco_SHUTDOWN:
                 printf("Philosopher %d CANCELED the dining.\n", (int)cco_error()->info);
                 break;

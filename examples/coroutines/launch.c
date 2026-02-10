@@ -17,23 +17,23 @@ cco_task_struct (taskC, struct Output*) {
 
 cco_task_struct (myTask) {
     myTask_base base;
-    int n, end;
+    int id, n;
 };
 
 int myTask(struct myTask* o) {
     cco_async (o) {
-        puts("start myTask");
-        for (; o->n < o->end; ++o->n) {
-            printf("myTask: %d\n", o->n);
+        for (o->n = 1; o->n <= 3; ++o->n) {
+            if (o->id == 101 && o->n == 3)
+               cco_throw(cco_CANCEL); // Demo: throwing an error in one of the spawned tasks.
+
+            printf("myTask %d: step %d\n", o->id, o->n);
             cco_yield;
         }
 
         cco_finalize:
-        printf("myTask %d done\n", o->n);
+        printf("myTask %d done:\n", o->id);
     }
 
-
-    puts("FREE myTask");
     c_free_n(o, 1);
     return 0;
 }
@@ -49,7 +49,7 @@ int taskC(struct taskC* o) {
         printf("taskC start: {%g, %g}\n", o->x, o->y);
 
         // assume there is an error...
-        cco_throw(99);
+        //cco_throw(99); // Demo: throwing an error in an awaiting task.
 
         puts("taskC work");
         cco_yield;
@@ -61,10 +61,14 @@ int taskC(struct taskC* o) {
         cco_yield;
 
         cco_finalize:
+        switch (cco_error_code()) {
+            case 99:
+                printf("taskC error '99' thrown on line %d\n", cco_error()->line);
+                //cco_recover; // reset error to 0 and proceed after the await taskC call.
+        }
         puts("taskC done");
     }
 
-    puts("FREE taskC");
     c_free_n(o, 1);
     return 0;
 }
@@ -81,15 +85,16 @@ int taskB(struct taskB* o) {
         cco_yield;
 
         puts("Spawning 3 tasks.");
-        cco_spawn(c_new(struct myTask, {{myTask}, 1, 6}), cco_wg());
-        cco_spawn(c_new(struct myTask, {{myTask}, 101, 104}), cco_wg());
-        cco_spawn(c_new(struct myTask, {{myTask}, 1001, 1008}), cco_wg());
+        cco_on_child_error(cco_SHUTDOWN, cco_wg()); // set error handler for the spawned tasks.
+        cco_spawn(c_new(struct myTask, {{myTask}, 100}), cco_wg());
+        cco_spawn(c_new(struct myTask, {{myTask}, 101}), cco_wg());
+        cco_spawn(c_new(struct myTask, {{myTask}, 102}), cco_wg());
         cco_yield;
         puts("Spawned 3 tasks.");
 
         cco_finalize:
         if (cco_error()->code == 99) {
-            printf("taskA recovered error '99' thrown on line %d\n", cco_error()->line);
+            printf("taskB recovered error '99' thrown on line %d\n", cco_error()->line);
             cco_recover; // reset error to 0 and proceed after the await taskB call.
         }
         cco_await_all(cco_wg());
@@ -97,7 +102,6 @@ int taskB(struct taskB* o) {
         puts("taskB done");
     }
 
-    puts("FREE taskB");
     c_free_n(o, 1);
     return 0;
 }
@@ -117,7 +121,6 @@ int taskA(struct taskA* o) {
         puts("taskA done");
     }
 
-    puts("FREE taskA");
     c_free_n(o, 1);
     return 0;
 }

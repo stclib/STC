@@ -74,7 +74,7 @@ int             cco_resume(cco_task* task);                         // Resume ta
                 cco_recover;                                        // Recover upstream from a cco_throw() or cancellation. Resumes from
                                                                     // the suspend point in the current task and clears error status,
                                                                     // cco_error()->code = 0. Should be handled in cco_finalize section.
-void            cco_on_child_error(bool flag, cco_group* wg);       // Catch failure in any spawned child task. Jumps to cco_finalize
+void            cco_on_child_error(int flag, cco_group* wg);        // Catch failure in any spawned child task. Jumps to cco_finalize
                                                                     // label, and sets cco_SHUTDOWN, which must be handled.
                                                                     // See the dining_philosophers.c example.
 ```
