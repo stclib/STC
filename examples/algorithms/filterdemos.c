@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <stc/cstr.h>
 #include <stc/csview.h>
 #include <stc/algorithm.h>
@@ -47,15 +46,15 @@ fn main() {
 void demo2(void)
 {
     IVec vector = {0};
-    c_filter(crange, c_iota(0), true     // Infinite range of integers
+    c_filter(crange, c_iota(1), true     // Infinite range of integers
         && c_flt_skipwhile(*value != 11) // Skip initial numbers unequal 11
         && (*value % 2) != 0             // Collect odd numbers
-        && (c_flt_map(*value * *value),  // Square each number
-            IVec_push(&vector, (int)*value),  // Populate output IVec
-            c_flt_take(5))               // Only take five numbers
+        && (c_flt_take(5),               // Only take five numbers
+            c_flt_map(*value * *value),  // Square each number
+            IVec_push(&vector, (int)*value)) // Populate output IVec
     );
-    for (c_each(i, IVec, vector))
-        printf(" %d", *i.ref);           // Print result
+    for (c_each_ref(i, IVec, vector))
+        printf(" %d", *i);           // Print result
     puts("");
     IVec_drop(&vector);
 }

@@ -25,6 +25,6 @@ int main(void) {
         c_variant(Event_MouseMove, {3, 1}),
     })){
         int result = process_event(*evt.ref);
-        printf("Event Result: %d\n", result);
+        printf("Event %d result: %d\n", c_variant_id(evt.ref), result);
     }
 }

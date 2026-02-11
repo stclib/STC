@@ -24,7 +24,7 @@ int myTask(struct myTask* o) {
     cco_async (o) {
         for (o->n = 1; o->n <= 3; ++o->n) {
             if (o->id == 101 && o->n == 3)
-               ; // cco_throw(cco_CANCEL); // Demo: throwing an error in one of the spawned tasks.
+               cco_throw(cco_CANCEL); // Demo: throwing an error in one of the spawned tasks.
 
             printf("myTask %d: step %d\n", o->id, o->n);
             cco_yield;
@@ -49,7 +49,7 @@ int taskC(struct taskC* o) {
         printf("taskC start: {%g, %g}\n", o->x, o->y);
 
         // assume there is an error...
-        //cco_throw(99); // Demo: throwing an error in an awaiting task.
+        cco_throw(99); // Demo: throwing an error in an awaiting task.
 
         puts("taskC work");
         cco_yield;
@@ -84,24 +84,26 @@ int taskB(struct taskB* o) {
          e->value += o->d;} // accumulate return value
         cco_yield;
 
-        puts("Spawning 3 tasks.");
+        puts("Spawning 3 tasks");
         cco_on_child_error(cco_SHUTDOWN, cco_wg()); // set error handler for the spawned tasks.
         cco_spawn(c_new(struct myTask, {{myTask}, 100}), cco_wg());
         cco_spawn(c_new(struct myTask, {{myTask}, 101}), cco_wg());
         cco_spawn(c_new(struct myTask, {{myTask}, 102}), cco_wg());
-        cco_yield;
         puts("Spawned 3 tasks.");
+        cco_await_all(cco_wg());
 
         cco_finalize:
-        if (cco_error()->code == 99) {
-            printf("taskB recovered error '99' thrown on line %d\n", cco_error()->line);
-            cco_recover; // Demo: recover error and resume after the await taskC call.
+        switch (cco_error_code()) {
+            case 99:
+                printf("taskB recovered error '99' thrown on line %d\n", cco_error()->line);
+                cco_recover; // Demo: recover error and resume after the await_task(taskC) call.
+            case cco_SHUTDOWN:
+                printf("taskB was shut down by a child on line %d\n", cco_error()->line);
+                cco_recover; // Demo: recover error and resume the await_all call.
+                break;
         }
-        cco_await_all(cco_wg());
-        puts("Joined");
-        puts("taskB done");
     }
-
+    puts("taskB done");
     c_free_n(o, 1);
     return 0;
 }

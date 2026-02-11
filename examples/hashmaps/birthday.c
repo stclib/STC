@@ -10,7 +10,7 @@ static uint64_t seed = 12345;
 
 static void test_repeats(void)
 {
-    enum {BITS = 46, BITS_TEST = BITS/2 + 2};
+    enum {BITS = 46, BITS_TEST = BITS/2};
     static const isize_t N = (isize_t)(1ull << BITS_TEST);
     static const uint64_t mask = (1ull << BITS) - 1;
 
