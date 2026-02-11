@@ -15,23 +15,23 @@ cco_task_struct (taskC, struct Output*) {
 };
 
 
-cco_task_struct (myTask) {
-    myTask_base base;
-    int id, n;
+cco_task_struct (subTask) {
+    subTask_base base;
+    int id, step;
 };
 
-int myTask(struct myTask* o) {
+int subTask(struct subTask* o) {
     cco_async (o) {
-        for (o->n = 1; o->n <= 3; ++o->n) {
-            if (o->id == 101 && o->n == 3)
-               cco_throw(cco_CANCEL); // Demo: throwing an error in one of the spawned tasks.
+        for (o->step = 1; o->step <= 3; ++o->step) {
+            if (o->id == 102 && o->step == 3)
+               cco_throw(cco_CANCEL, o->id); // Demo: throwing an error in one of the spawned tasks.
 
-            printf("myTask %d: step %d\n", o->id, o->n);
+            printf("subTask %d: step %d\n", o->id, o->step);
             cco_yield;
         }
 
         cco_finalize:
-        printf("myTask %d done:\n", o->id);
+        printf("subTask %d done:\n", o->id);
     }
 
     c_free_n(o, 1);
@@ -61,10 +61,10 @@ int taskC(struct taskC* o) {
         cco_yield;
         
         cco_finalize:
-        switch (cco_error_code()) {
+        switch (cco_error().code) {
             case 99:
-                printf("taskC error '99' thrown on line %d\n", cco_error()->line);
-                //cco_recover; // Demo: recover error here and resume after the cco_throw().
+                printf("taskC error '99' thrown in %s:%d\n", cco_error().file, cco_error().line);
+                //cco_recover; // Recover from error here and resume after the cco_throw().
         }
         puts("taskC done");
     }
@@ -86,24 +86,25 @@ int taskB(struct taskB* o) {
 
         puts("Spawning 3 tasks");
         cco_on_child_error(cco_SHUTDOWN, cco_wg()); // set error handler for the spawned tasks.
-        cco_spawn(c_new(struct myTask, {{myTask}, 100}), cco_wg());
-        cco_spawn(c_new(struct myTask, {{myTask}, 101}), cco_wg());
-        cco_spawn(c_new(struct myTask, {{myTask}, 102}), cco_wg());
+        cco_spawn(c_new(struct subTask, {{subTask}, 101}), cco_wg());
+        cco_spawn(c_new(struct subTask, {{subTask}, 102}), cco_wg());
+        cco_spawn(c_new(struct subTask, {{subTask}, 103}), cco_wg());
         puts("Spawned 3 tasks.");
         cco_await_all(cco_wg());
+        puts("All spawned tasks done.");
 
         cco_finalize:
-        switch (cco_error_code()) {
+        switch (cco_error().code) {
             case 99:
-                printf("taskB recovered error '99' thrown on line %d\n", cco_error()->line);
-                cco_recover; // Demo: recover error and resume after the await_task(taskC) call.
+                printf("taskB recovered error '99' thrown in %s:%d\n", cco_error().file, cco_error().line);
+                cco_recover; // Recover from error and resume at the cco_await_task(taskC) call.
             case cco_SHUTDOWN:
-                printf("taskB was shut down by a child on line %d\n", cco_error()->line);
-                cco_recover; // Demo: recover error and resume the await_all call.
-                break;
+                printf("taskB was shut down by child %d in %s:%d\n", (int)cco_error().info, cco_error().file, cco_error().line);
+                cco_recover; // Recover from error and resume at the cco_await_all() call.
         }
+        puts("taskB done");
     }
-    puts("taskB done");
+
     c_free_n(o, 1);
     return 0;
 }

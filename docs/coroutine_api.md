@@ -73,7 +73,7 @@ int             cco_resume(cco_task* task);                         // Resume ta
                                                                     // required, but it may be recovered in a cco_finalize: section.
                 cco_recover;                                        // Recover upstream from a cco_throw() or cancellation. Resumes from
                                                                     // the suspend point in the current task and clears error status,
-                                                                    // cco_error()->code = 0. Should be handled in cco_finalize section.
+                                                                    // cco_error().code = 0. Should be handled in cco_finalize section.
 void            cco_on_child_error(int flag, cco_group* wg);        // Catch failure in any spawned child task. Jumps to cco_finalize
                                                                     // label, and sets cco_SHUTDOWN, which must be handled.
                                                                     // See the dining_philosophers.c example.
@@ -82,7 +82,7 @@ void            cco_on_child_error(int flag, cco_group* wg);        // Catch fai
 ```c++
 cco_group*      cco_wg();                                           // Get the default waitgroup to be used for spawning tasks.
 int             cco_status();                                       // Get current return status from last cco_resume() call.
-cco_error*      cco_error();                                        // Get error object created from cco_throw(error) call.
+cco_error_t     cco_error();                                        // Get error object created from cco_throw(error) call.
                                                                     // Should be handled in a cco_finalize: section.
 cco_fiber*      cco_task_fiber(cco_task* task);                     // Get fiber associated with task.
 Env*            cco_env(cco_task* task);                            // Get environment pointer, stored in the associated fiber.
@@ -481,9 +481,9 @@ int TaskA(struct TaskA* o) {
         puts("TaskA work");
 
         cco_finalize:
-        if (cco_error()->code == 99) {
+        if (cco_error().code == 99) {
             // if error not handled, will cause 'unhandled error'...
-            printf("TaskA recovered error '99' thrown on line %d\n", cco_error()->line);
+            printf("TaskA recovered error '99' thrown on line %d\n", cco_error().line);
             cco_recover;
         }
         puts("TaskA done");

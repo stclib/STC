@@ -79,9 +79,9 @@ int Dining(struct Dining* o) {
         puts("Time's up! Stopping dining...");  
 
         cco_finalize:
-        switch (cco_error_code()) {
+        switch (cco_error().code) {
             case cco_SHUTDOWN:
-                printf("Philosopher %d CANCELED the dining.\n", (int)cco_error()->info);
+                printf("Philosopher %d CANCELED the dining.\n", (int)cco_error().info);
                 break;
         }
         cco_await_cancel_all(cco_wg());
