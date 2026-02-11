@@ -256,23 +256,23 @@ typedef struct cco_task cco_task;
 #define _cco_gettask() \
     c_container_of((cco_state*)_cco_st, cco_task, base.state)
 
-#define cco_status() (_cco_st->fib->status + 0)
 #define cco_fib() ((cco_fiber*)_cco_st->fib + 0)
-#define cco_parent_fib() (_cco_st->fib->parent + 0)
+#define cco_parent_fib() (cco_fib()->parent + 0)
+#define cco_status() (cco_fib()->status + 0)
 #define cco_error() (*(const cco_error_t*)&cco_fib()->error)
-#define cco_clear_error() (_cco_st->fib->error.code = 0)
+#define cco_clear_error() (cco_fib()->error.code = 0)
 #define cco_wg() (&_cco_getbase()->default_wg)
 #define cco_parent_wg() (_cco_st->parent_wg + 0)
 
 #define cco_env(a_task) ((a_task)->base.state.fib->env)
 #define cco_set_env(a_task, the_env) ((a_task)->base.state.fib->env = the_env)
 
-enum cco_error_action { _cco_SET_NOTIFY = 1, _cco_SET_SHUTDOWN = 2 };
-#define cco_on_child_error(mode, wg) \
-    switch (mode) { \
+enum _cco_error_action { _cco_SET_NOTIFY = 1, _cco_SET_SHUTDOWN = 2 };
+#define cco_on_child_error(error, wg) \
+    switch (error) { \
         case cco_NOTIFY: (wg)->on_error = _cco_SET_NOTIFY; break; \
         case cco_SHUTDOWN: (wg)->on_error = _cco_SET_SHUTDOWN; break; \
-        case 0: break; \
+        case 0: (wg)->on_error = 0; break; \
         default: c_assert(false); \
     }
 
@@ -292,12 +292,12 @@ enum cco_error_action { _cco_SET_NOTIFY = 1, _cco_SET_SHUTDOWN = 2 };
 #define cco_cancel_task(a_task) \
     do { \
         cco_task* _tsk1 = cco_cast_task(a_task); \
-        cco_cancel_fiber(_tsk1->base.state.fib); /*stop given task */ \
-        cco_stop(_tsk1);            /* cancel and stop active task */ \
+        cco_cancel_fiber(_tsk1->base.state.fib); /* cancel/stop active task */ \
+        cco_stop(_tsk1); /* also stop given task */ \
     } while (0)
 
 #define cco_cancel_all(a_group) \
-    _cco_cancel_all((cco_fiber*)_cco_st->fib, a_group)
+    _cco_cancel_all(cco_fib(), a_group)
 
 
 /* Return with error and unwind await stack; must be recovered in cco_finalize section */
@@ -315,7 +315,7 @@ void _cco_throw(int32_t err_code, intptr_t info_data, cco_task* tsk, const char*
 /* Recover the thrown error; to be used in cco_finalize section upon handling cco_error()->code */
 #define cco_recover \
     do { \
-        cco_fiber* _fib = (cco_fiber*)_cco_st->fib; \
+        cco_fiber* _fib = cco_fib(); \
         _fib->error.code = 0; \
         _fib->task->base.state = _fib->recover_state; \
         goto _resume_lbl; \
@@ -377,26 +377,26 @@ static inline int _cco_resume_task(cco_task* task)
 
 
 #define cco_await_cancel_task(a_task) do { \
-    cco_task* _task = cco_cast_task(a_task); \
-    cco_cancel_task(_task); \
-    cco_await_task(_task); \
+    cco_task* _tsk2 = cco_cast_task(a_task); \
+    cco_cancel_task(_tsk2); \
+    cco_await_task(_tsk2); \
 } while (0)
 
 #define cco_await_n(n, a_group) do { /* does not cancel remaining */ \
-    _cco_st->fib->tmp_wg = a_group; \
-    _cco_st->fib->tmp_wg->await_count = _cco_st->fib->tmp_wg->spawn_count - (n); \
-    cco_await(_cco_st->fib->tmp_wg->spawn_count == _cco_st->fib->tmp_wg->await_count); \
+    cco_fib()->tmp_wg = a_group; \
+    cco_fib()->tmp_wg->await_count = cco_fib()->tmp_wg->spawn_count - (n); \
+    cco_await(cco_fib()->tmp_wg->spawn_count == cco_fib()->tmp_wg->await_count); \
 } while (0)
 
 #define cco_await_all(a_group) do { \
-    _cco_st->fib->tmp_wg = a_group; \
-    cco_await(_cco_st->fib->tmp_wg->spawn_count == 0); \
+    cco_fib()->tmp_wg = a_group; \
+    cco_await(cco_fib()->tmp_wg->spawn_count == 0); \
 } while (0)
 
 #define cco_await_any(a_group) do { /* await 1; cancel remaining */ \
     cco_await_n(1, a_group); \
-    cco_cancel_all(_cco_st->fib->tmp_wg); \
-    cco_await_OFFSET(_cco_st->fib->tmp_wg->spawn_count == 0, 100000); /* await_all() */ \
+    cco_cancel_all(cco_fib()->tmp_wg); \
+    cco_await_OFFSET(cco_fib()->tmp_wg->spawn_count == 0, 100000); /* await_all() */ \
 } while (0)
 
 #define cco_await_cancel_all(a_group) do { \
