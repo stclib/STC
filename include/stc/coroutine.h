@@ -210,7 +210,7 @@ typedef struct {
     struct Prefix##_fiber { \
         struct cco_task* task; \
         Prefix##_env_ptr env; \
-        cco_group* tmp_wg; \
+        cco_group *tmp_wg, *failed_wg; \
         struct cco_task* cur_parent_task; \
         struct cco_task_fiber *next, *parent; \
         struct cco_task_state recover_state; \
@@ -297,7 +297,7 @@ enum _cco_error_action { _cco_SET_NOTIFY = 1, _cco_SET_SHUTDOWN = 2 };
     } while (0)
 
 #define cco_cancel_all(a_group) \
-    _cco_cancel_all(cco_fib(), a_group)
+    _cco_cancel_all(cco_fib(), a_group, __FILE__, __LINE__)
 
 
 /* Return with error and unwind await stack; must be recovered in cco_finalize section */
@@ -424,7 +424,7 @@ extern cco_fiber* cco_execute_next(cco_fiber* fib);  // resume the next fiber an
 
 extern cco_fiber* _cco_new_fiber(cco_task* task, void* env);
 extern cco_fiber* _cco_spawn(cco_task* task, cco_group* wg, void* env, cco_fiber* fib);
-extern void       _cco_cancel_all(cco_fiber* fib, cco_group* wg);
+extern void       _cco_cancel_all(cco_fiber* fib, cco_group* wg, const char* file, int32_t line);
 
 /*
  * Iterate containers with already defined iterator (prefer to use in coroutines only):
@@ -550,15 +550,7 @@ void _cco_throw(int32_t err_code, intptr_t info_data, cco_task* caller, const ch
     if (fib->parent) {
         fib->parent->recover_state = fib->parent->task->base.state;
         while (caller->base.parent_task) caller = caller->base.parent_task;
-        int32_t err = cco_NOTIFY;
-        switch (caller->base.state.parent_wg->on_error) {
-            case _cco_SET_SHUTDOWN:
-                _cco_cancel_all(fib, caller->base.state.parent_wg);
-                err = cco_SHUTDOWN; /* FALLTHRU */
-            case _cco_SET_NOTIFY:
-                fib->parent->error = fib->error;
-                fib->parent->error.code = err;
-        }
+        fib->failed_wg = caller->base.state.parent_wg;
     }
 }
 
@@ -578,12 +570,12 @@ cco_fiber* _cco_new_fiber(cco_task* task, void* env) {
     return new_fb;
 }
 
-void _cco_cancel_all(cco_fiber* fib, cco_group* wg) {
+void _cco_cancel_all(cco_fiber* fib, cco_group* wg, const char* file, int32_t line) {
     for (cco_fiber *fit = fib->next; fit != fib; fit = fit->next) {
         cco_task* tsk = fit->task;
         do {
-            if (tsk->base.state.parent_wg == wg) {   
-                fit->error.code = cco_CANCEL;
+            if (tsk->base.state.parent_wg == wg) {
+                fit->error = (cco_error_t){cco_CANCEL, line, file};
                 cco_stop(tsk);
                 break;
             }
@@ -615,8 +607,20 @@ int cco_execute(cco_fiber* fib) {
                 // Note: if fib->status == cco_DONE, fib->task may already be destructed.
                 if (fib->status == cco_DONE) {
                     fib->task = fib->cur_parent_task;
-                    if (fib->task == NULL)
+                    if (fib->task == NULL) {
+                        if (fib->failed_wg) {
+                            int32_t err = cco_NOTIFY;
+                            switch (fib->failed_wg->on_error) {
+                                case _cco_SET_SHUTDOWN:
+                                    _cco_cancel_all(fib, fib->failed_wg, fib->error.file, fib->error.line);
+                                    err = cco_SHUTDOWN; /* FALLTHRU */
+                                case _cco_SET_NOTIFY:
+                                    fib->parent->error = fib->error;
+                                    fib->parent->error.code = err;
+                            }
+                        }
                         break;
+                    }
                     fib->recover_state = fib->task->base.state;
                 }
                 cco_stop(fib->task);

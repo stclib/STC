@@ -23,14 +23,20 @@ cco_task_struct (subTask) {
 int subTask(struct subTask* o) {
     cco_async (o) {
         for (o->step = 1; o->step <= 3; ++o->step) {
-            if (o->id == 102 && o->step == 3)
+            if (o->id == 102 && o->step == 3) {
                cco_throw(cco_CANCEL, o->id); // Demo: throwing an error in one of the spawned tasks.
+            }
 
             printf("subTask %d: step %d\n", o->id, o->step);
             cco_yield;
         }
 
         cco_finalize:
+        switch (cco_error().code) {
+            case cco_CANCEL:;
+                printf("subTask %d recovered from throw in %s:%d\n", o->id, cco_error().file, cco_error().line);
+                cco_recover;
+        }
         printf("subTask %d done:\n", o->id);
     }
 
@@ -84,7 +90,6 @@ int taskB(struct taskB* o) {
          e->value += o->d;} // accumulate return value
         cco_yield;
 
-        puts("Spawning 3 tasks");
         cco_on_child_error(cco_SHUTDOWN, cco_wg()); // set error handler for the spawned tasks.
         cco_spawn(c_new(struct subTask, {{subTask}, 101}), cco_wg());
         cco_spawn(c_new(struct subTask, {{subTask}, 102}), cco_wg());
