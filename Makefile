@@ -40,7 +40,7 @@ endif
 OBJ_DIR   := $(BUILDDIR)
 
 LIB_NAME  := stc
-LIB_LIST  := cstr_core cstr_io cstr_utf8 cregex csview cspan fmt random stc_core
+LIB_LIST  := cstr_core cstr_misc cstr_io cstr_utf8 cregex csview cspan fmt random stc_core
 LIB_SRCS  := $(LIB_LIST:%=src/%.c)
 LIB_OBJS  := $(LIB_SRCS:%.c=$(OBJ_DIR)/%.o)
 LIB_DEPS  := $(LIB_SRCS:%.c=$(OBJ_DIR)/%.d)

@@ -71,7 +71,7 @@ enum cco_status {
 };
 #define cco_CANCEL   (1U<<30)
 #define cco_SHUTDOWN (1U<<29)
-#define cco_NOTIFY   ((1U<<29) - 1)
+#define cco_NOTIFY   ((1U<<29) + 1)
 
 enum cco_deprecated {
     CCO_DONE       = cco_DONE,       // [deprecated]
@@ -107,19 +107,19 @@ typedef struct {
 #define cco_is_active(co) ((co)->base.state.pos != cco_STATE_DONE)
 
 #if defined STC_HAS_TYPEOF && STC_HAS_TYPEOF
-    #define _cco_state(co) __typeof__((co)->base.state)
+    #define _cco_state_t(co) __typeof__((co)->base.state)
     #define _cco_validate_task_struct(co) \
         c_static_assert(/* error: co->base not first member in task struct */ \
                         sizeof((co)->base) == sizeof(cco_base) || \
                         offsetof(__typeof__(*(co)), base) == 0)
 #else
-    #define _cco_state(co) cco_state
+    #define _cco_state_t(co) cco_state
     #define _cco_validate_task_struct(co) (void)0
 #endif
 
 #define cco_async(co) \
     if (0) goto _resume_lbl; \
-    else for (_cco_state(co)* _cco_st = (_cco_validate_task_struct(co), (_cco_state(co)*) &(co)->base.state) \
+    else for (_cco_state_t(co)* _cco_st = (_cco_validate_task_struct(co), (_cco_state_t(co)*) &(co)->base.state) \
               ; _cco_st->pos != cco_STATE_DONE \
               ; _cco_st->pos = cco_STATE_DONE, \
                 (void)(sizeof((co)->base) > sizeof(cco_base) && (_cco_st->parent_wg? --_cco_st->parent_wg->spawn_count : 0))) \
@@ -276,15 +276,15 @@ enum _cco_error_action { _cco_SET_NOTIFY = 1, _cco_SET_SHUTDOWN = 2 };
         default: c_assert(false); \
     }
 
-#define cco_cast_task(...) \
-    ((void)sizeof((__VA_ARGS__)->base.func(__VA_ARGS__)), (cco_task *)(__VA_ARGS__))
+#define cco_cast_task(tsk) \
+    ((void)sizeof((tsk)->base.func(tsk)), (cco_task *)(tsk))
+#define cco_cast_fib(fib) \
+    ((void)sizeof((fib)->cur_parent_task), (cco_fiber *)(fib))
 
 #define cco_cancel_fiber(a_fiber) \
     do { \
-        cco_fiber* _fb1 = (cco_fiber*)((void)sizeof((a_fiber)->env), a_fiber); \
-        _fb1->error.code = cco_CANCEL; \
-        _fb1->error.line = __LINE__; \
-        _fb1->error.file = __FILE__; \
+        cco_fiber* _fb1 = cco_cast_fib(a_fiber); \
+        _fb1->error = (cco_error_t){cco_CANCEL, __LINE__, __FILE__}; \
         cco_stop(_fb1->task); \
     } while (0)
 
@@ -372,9 +372,9 @@ static inline int _cco_resume_task(cco_task* task)
 #define cco_spawn_2(a_task, a_group) cco_spawn_4(a_task, a_group, NULL, _cco_st->fib)
 #define cco_spawn_3(a_task, a_group, _env) cco_spawn_4(a_task, a_group, _env, _cco_st->fib)
 #define cco_spawn_4(a_task, a_group, _env, _fib) \
-    _cco_spawn(cco_cast_task(a_task), a_group, ((void)sizeof((_env) == cco_env(a_task)), _env), \
-               (cco_fiber*)((void)sizeof((_fib)->env), _fib))
-
+    _cco_spawn(cco_cast_task(a_task), a_group, \
+               ((void)sizeof((_env) == cco_env(a_task)), _env), \
+               cco_cast_fib(_fib))
 
 #define cco_await_cancel_task(a_task) do { \
     cco_task* _tsk2 = cco_cast_task(a_task); \
@@ -408,11 +408,10 @@ static inline int _cco_resume_task(cco_task* task)
 
 #define cco_run_fiber(...) c_MACRO_OVERLOAD(cco_run_fiber, __VA_ARGS__)
 #define cco_run_fiber_1(fiber_ref) \
-    for (cco_fiber** _it_ref = (cco_fiber**)((void)sizeof(0[fiber_ref]->env), fiber_ref) \
+    for (cco_fiber** _it_ref = ((void)sizeof(0[fiber_ref]->cur_parent_task), (cco_fiber**)fiber_ref) \
         ; (*_it_ref = cco_execute_next(*_it_ref)) != NULL; )
 #define cco_run_fiber_2(it, fiber) \
-    for (cco_fiber* it = (cco_fiber*)((void)sizeof((fiber)->env), fiber) \
-        ; (it = cco_execute_next(it)) != NULL; )
+    for (cco_fiber* it = cco_cast_fib(fiber); (it = cco_execute_next(it)) != NULL; )
 
 #define cco_run_task(...) c_MACRO_OVERLOAD(cco_run_task, __VA_ARGS__)
 #define cco_run_task_1(a_task) cco_run_fiber_2(_fibit, cco_new_fiber_1(a_task))

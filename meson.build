@@ -34,6 +34,7 @@ libsrc = files(
   'src/cregex.c',
   'src/cspan.c',
   'src/cstr_core.c',
+  'src/cstr_misc.c',
   'src/cstr_io.c',
   'src/cstr_utf8.c',
   'src/csview.c',

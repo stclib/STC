@@ -39,6 +39,7 @@
 
 #if defined i_implement || \
     defined STC_CSTR_CORE || \
+    defined STC_CSTR_MISC || \
     defined STC_CSTR_IO || \
     defined STC_CSTR_UTF8
   #include "priv/cstr_prv.c"

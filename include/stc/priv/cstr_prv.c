@@ -48,18 +48,6 @@ isize_t cstr_find_sv(const cstr* self, csview search) {
     return res ? (res - sv.buf) : c_NPOS;
 }
 
-char* _cstr_internal_move(cstr* self, const isize_t pos1, const isize_t pos2) {
-    cstr_buf b = cstr_getbuf(self);
-    if (pos1 != pos2) {
-        const isize_t newlen = (b.size + pos2 - pos1);
-        if (newlen > b.cap)
-            b.data = cstr_reserve(self, b.size*3/2 + pos2 - pos1);
-        c_memmove(&b.data[pos2], &b.data[pos1], b.size - pos1);
-        _cstr_set_size(self, newlen);
-    }
-    return b.data;
-}
-
 char* _cstr_init(cstr* self, const isize_t len, const isize_t cap) {
     if (cap > cstr_s_cap) {
         self->lon.data = (char *)c_malloc(cap + 1);
@@ -130,27 +118,19 @@ char* cstr_append_n(cstr* self, const char* str, const isize_t len) {
     return b.data;
 }
 
-cstr cstr_from_replace(csview in, csview search, csview repl, int32_t count) {
-    cstr out = cstr_init();
-    isize_t from = 0; char* res;
-    if (count == 0) count = INT32_MAX;
-    if (search.size)
-        while (count-- && (res = c_strnstrn(in.buf + from, in.size - from, search.buf, search.size))) {
-            const isize_t pos = (res - in.buf);
-            cstr_append_n(&out, in.buf + from, pos - from);
-            cstr_append_n(&out, repl.buf, repl.size);
-            from = pos + search.size;
-        }
-    cstr_append_n(&out, in.buf + from, in.size - from);
-    return out;
-}
-
 void cstr_erase(cstr* self, const isize_t pos, isize_t len) {
     cstr_buf b = cstr_getbuf(self);
     if (len > b.size - pos) len = b.size - pos;
     c_memmove(&b.data[pos], &b.data[pos + len], b.size - (pos + len));
     _cstr_set_size(self, b.size - len);
 }
+#endif // STC_CSTR_CORE_C_INCLUDED
+
+
+// ------------------- STC_CSTR_MISC --------------------
+#if !defined STC_CSTR_MISC_C_INCLUDED && \
+    (defined i_implement || defined STC_CSTR_MISC)
+#define STC_CSTR_MISC_C_INCLUDED
 
 void cstr_shrink_to_fit(cstr* self) {
     cstr_buf b = cstr_getbuf(self);
@@ -165,7 +145,35 @@ void cstr_shrink_to_fit(cstr* self) {
         c_free(b.data, b.cap + 1);
     }
 }
-#endif // STC_CSTR_CORE_C_INCLUDED
+
+char* _cstr_internal_move(cstr* self, const isize_t pos1, const isize_t pos2) {
+    cstr_buf b = cstr_getbuf(self);
+    if (pos1 != pos2) {
+        const isize_t newlen = (b.size + pos2 - pos1);
+        if (newlen > b.cap)
+            b.data = cstr_reserve(self, b.size*3/2 + pos2 - pos1);
+        c_memmove(&b.data[pos2], &b.data[pos1], b.size - pos1);
+        _cstr_set_size(self, newlen);
+    }
+    return b.data;
+}
+
+cstr cstr_from_replace(csview in, csview search, csview repl, int32_t count) {
+    cstr out = cstr_init();
+    isize_t from = 0; char* res;
+    if (count == 0) count = INT32_MAX;
+    if (search.size)
+        while (count-- && (res = c_strnstrn(in.buf + from, in.size - from, search.buf, search.size))) {
+            const isize_t pos = (res - in.buf);
+            cstr_append_n(&out, in.buf + from, pos - from);
+            cstr_append_n(&out, repl.buf, repl.size);
+            from = pos + search.size;
+        }
+    cstr_append_n(&out, in.buf + from, in.size - from);
+    return out;
+}
+#endif // STC_CSTR_MISC_C_INCLUDED
+
 
 // ------------------- STC_CSTR_IO --------------------
 #if !defined STC_CSTR_IO_C_INCLUDED && \
