@@ -109,6 +109,16 @@ void            cco_cancel_all(cco_group* wg);                      // Cancel al
                                                                     // Shorthand for cco_cancel_all(wg) + cco_await_all(wg).
                 cco_await_n(int n, cco_group* wg);                  // Awaits for n spawned tasks in wg. Does *not* cancel the remaining.
 ```
+#### Channels
+A channel represents a communication syncronization point for collaborating tasks. One of the tasks should own/store
+the channel, but communication can go both ways. **Note**: both the sending and receiving values must reference a persistant
+storage (i.e. a constant and/or expression using variables stored in a task).
+```c++
+                cco_channel_t(Type)                                 // A channel type.
+                cco_await_put(cco_channel_t(Type)* ch, Type value); // Put data into a channel (may wait for its turn).
+                cco_await_get(cco_channel_t(Type)* ch, Type* valp); // Get (waits for) data put in the channel by another task.
+```
+
 #### Spawning and Running Tasks
 The `Env` type used below is by default `void`, but can be specified in *cco_task_struct()* definition.
 ```c++

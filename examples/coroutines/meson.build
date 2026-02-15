@@ -1,4 +1,5 @@
 foreach sample : [
+  'channels',
   'cointerleave',
   'coread',
   'coroutines1',

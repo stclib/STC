@@ -463,6 +463,29 @@ typedef struct { ptrdiff_t acq_count; } cco_semaphore;
 
 
 /*
+ * Channel
+ */
+
+#define cco_channel_t(T) struct { bool written; T value; }
+
+#define cco_await_get(chan, _val_ptr) \
+    do { \
+        cco_await((chan)->written); \
+        *(_val_ptr) = (chan)->value; \
+        (chan)->written = false; \
+        cco_yield_v_OFFSET(cco_SUSPEND, 100000); \
+    } while (0)
+
+#define cco_await_put(chan, _val) \
+    do { \
+        cco_await(!(chan)->written); \
+        (chan)->value = _val; \
+        (chan)->written = true; \
+        cco_await_OFFSET(!(chan)->written, 100000); \
+    } while (0)
+
+
+/*
  * Timer
  */
 
