@@ -434,7 +434,7 @@ and recovered using `cco_recover`. This call will resume control back to the ori
 current task. Because the "call-tree" is fixed, the coroutine frames to be called may be pre-allocated on the stack,
 which is very fast.
 
-[ [Run this code](https://godbolt.org/z/G6bY1szdj) ]
+[ [Run this code](https://godbolt.org/z/bs4vexb7T) ]
 <!--{%raw%}-->
 ```c++
 #include <stdio.h>
