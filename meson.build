@@ -106,6 +106,7 @@ install_headers(
 install_headers(
   'include/stc/sys/crange.h',
   'include/stc/sys/filter.h',
+  'include/stc/sys/finalize.h',
   'include/stc/sys/sumtype.h',
   'include/stc/sys/utility.h',
   subdir: 'stc/sys',
