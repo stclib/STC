@@ -3,6 +3,7 @@ foreach sample : [
   'regex2',
   'regex_match',
   'regex_replace',
+  'multiline',
 ]
   test(
     sample,

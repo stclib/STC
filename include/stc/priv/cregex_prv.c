@@ -70,6 +70,7 @@ typedef struct _Reinst
 typedef struct {
     bool icase;
     bool dotall;
+    bool multln;
 } _Reflags;
 
 /*
@@ -361,8 +362,10 @@ typedef struct _Parser
     short cursubid;      /* id of current subexpression */
     int error;
     _Reflags flags;
-    int dot_type;
-    int rune_type;
+    int dot_type;  /* dot also match newline or not */
+    int rune_type; /* cased / ignore case TOK_RUNE */
+    int boi_type;  /* begin of input */
+    int eoi_type;  /* end of input */
     bool litmode;
     bool lastwasand;     /* Last token was _operand */
     short nbra;
@@ -763,8 +766,8 @@ _lex(_Parser *par)
     case '?': return TOK_QUEST;
     case '+': return TOK_PLUS;
     case '|': return TOK_OR;
-    case '^': return TOK_BOS; // TOK_BOL;
-    case '$': return TOK_EOZ; // TOK_EOL;
+    case '^': return par->boi_type;
+    case '$': return par->eoi_type;
     case '.': return par->dot_type;
     case '[': return _bldcclass(par);
     case '(':
@@ -776,6 +779,9 @@ _lex(_Parser *par)
                 case '-': enable = 0; break;
                 case 's': par->dot_type = enable ? TOK_ANYNL : TOK_ANY; break;
                 case 'i': par->rune_type = enable ? TOK_IRUNE : TOK_RUNE; break;
+                case 'm': if (enable) par->boi_type = TOK_BOL, par->eoi_type = TOK_EOL;
+                          else        par->boi_type = TOK_BOS, par->eoi_type = TOK_EOS;
+                          break;
                 default: _rcerror(par, CREG_UNKNOWNOPERATOR); return 0;
             }
         }
@@ -890,6 +896,7 @@ _regcomp1(_Reprog *pp, _Parser *par, const char *s, int cflags)
     pp->allocsize = new_allocsize;
     pp->flags.icase = (cflags & CREG_ICASE) != 0;
     pp->flags.dotall = (cflags & CREG_DOTALL) != 0;
+    pp->flags.multln = (cflags & CREG_MULTILINE) != 0;
     par->instcap = instcap;
     par->freep = pp->firstinst;
     par->classp = pp->cclass;
@@ -902,6 +909,8 @@ _regcomp1(_Reprog *pp, _Parser *par, const char *s, int cflags)
     par->flags = pp->flags;
     par->rune_type = pp->flags.icase ? TOK_IRUNE : TOK_RUNE;
     par->dot_type = pp->flags.dotall ? TOK_ANYNL : TOK_ANY;
+    if (pp->flags.multln) par->boi_type = TOK_BOL, par->eoi_type = TOK_EOL;
+    else                  par->boi_type = TOK_BOS, par->eoi_type = TOK_EOS;
     par->litmode = false;
     par->exprp = s;
     par->nclass = 0;

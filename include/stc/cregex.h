@@ -39,10 +39,11 @@ enum {
     /* compile-flags */
     CREG_DOTALL = 1<<0,    /* dot matches newline too */
     CREG_ICASE = 1<<1,     /* ignore case */
+    CREG_MULTILINE = 1<<2, /* multi-line input, ^=bol $=eol */
 
     /* match-flags */
-    CREG_FULLMATCH = 1<<2, /* like start-, end-of-line anchors were in pattern: "^ ... $" */
-    CREG_NEXT = 1<<3,      /* use end of previous match[0] as start of input */
+    CREG_FULLMATCH = 1<<3, /* like start-, end-of-line anchors were in pattern: "^ ... $" */
+    CREG_NEXT = 1<<4,      /* use end of previous match[0] as start of input */
 
     /* replace-flags */
     CREG_STRIP = 1<<5,     /* only keep the matched strings, strip rest */

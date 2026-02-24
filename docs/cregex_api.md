@@ -11,6 +11,7 @@ The API is simple and includes powerful string pattern matches and replace funct
 - compile-flags
     - CREG_DOTALL     - dot matches newline too: can be set/overridden by (?s) and (?-s) in the RE
     - CREG_ICASE      - ignore case mode: can be set/overridden by (?i) and (?-i) in the RE
+    - CREG_MULTILINE  - multi-line mode: can be set/overridden by (?m) at the start of the RE
 - match-flags
     - CREG_FULLMATCH  - like start-, end-of-line anchors were in pattern: "^ ... $"
     - CREG_NEXT       - use end of previous match[0] as start of input
@@ -171,17 +172,18 @@ for (c_match(it, &re, input))
 | [***chars***] | Match any character inside the brackets. Ranges like a-z may also be used | |
 | \[^***chars***\] | Match any character not inside the bracket. | |
 | \x{***hex***} | Match UTF8 character/codepoint given as a hex number | * |
-| ^ | Start of line anchor | |
-| $ | End of line anchor | |
-| \A | Start of input anchor | * |
-| \Z | End of input anchor | * |
-| \z | End of input including optional newline | * |
+| ^ | Start of input anchor - See also CREG_MULTILINE | |
+| $ | End of input anchor - See also CREG_MULTILINE | |
+| \A | Start of string anchor | * |
+| \Z | End of string with optional trailing newline anchor | * |
+| \z | End of string anchor | * |
 | \b | UTF8 word boundary anchor | * |
 | \B | Not UTF8 word boundary | * |
 | \Q | Start literal input mode | * |
 | \E | End literal input mode | * |
-| (?i) (?-i)  | Ignore case on/off (override CREG_ICASE) | * |
-| (?s) (?-s)  | Dot matches newline on/off (override CREG_DOTALL) | * |
+| (?i) (?-i) | Ignore case on/off (override CREG_ICASE) | * |
+| (?s) (?-s) | Dot matches `\n` on/off (override CREG_DOTALL) | * |
+| (?m) (?-m) | `^` also matches char after `\n`, `$` also matches `\n` (override CREG_MULTILINE) | * |
 | \n \t \r | Newline, tab, carriage return | |
 | \d \s \w | Digit, whitespace, alphanumeric character | |
 | \D \S \W | Do not match the groups described above | |
@@ -239,16 +241,11 @@ for (c_match(it, &re, input))
 
 ## Limitations
 
-The main goal of **cregex** is to be small and fast with limited but useful unicode support. In order to
-reach these goals, **cregex** currently does not support the following features (non-exhaustive list):
-- In order to limit table sizes, several general UTF8 character classes are missing, like \p{L}, \p{S},
-and specific scripts like \p{Tibetan}. Some/all of these may be added in the future as an
-alternative source file with unicode tables to link with. Currently, only code points from from the
-Basic Multilingual Plane (BMP) are supported, which contains all the most commonly used unicode characters,
-symbols and scripts.
+The main goal of **cregex** is to be small and fast with useful unicode support. In order to
+reach these goals, **cregex** currently does not support the following features:
+- In order to limit table sizes, some large UTF8 character classes are missing, like all symbols \p{S},
+and specific scripts like \p{Tibetan}. Only code points from the Basic Multilingual Plane (BMP)
+are matched from the supported classes.
 - {n, m} syntax for repeating previous token min-max times.
 - Non-capturing groups
 - Lookaround and backreferences (cannot be implemented efficiently).
-
-If you need a more feature complete, but bigger library, use [RE2 with C-wrapper](https://github.com/google/re2)
-which uses the same type of regex engine as **cregex**, or use [PCRE2](https://www.pcre.org/).
