@@ -780,7 +780,7 @@ _lex(_Parser *par)
                 case 's': par->dot_type = enable ? TOK_ANYNL : TOK_ANY; break;
                 case 'i': par->rune_type = enable ? TOK_IRUNE : TOK_RUNE; break;
                 case 'm': if (enable) par->boi_type = TOK_BOL, par->eoi_type = TOK_EOL;
-                          else        par->boi_type = TOK_BOS, par->eoi_type = TOK_EOS;
+                          else        par->boi_type = TOK_BOS, par->eoi_type = TOK_EOZ;
                           break;
                 default: _rcerror(par, CREG_UNKNOWNOPERATOR); return 0;
             }
@@ -910,7 +910,7 @@ _regcomp1(_Reprog *pp, _Parser *par, const char *s, int cflags)
     par->rune_type = pp->flags.icase ? TOK_IRUNE : TOK_RUNE;
     par->dot_type = pp->flags.dotall ? TOK_ANYNL : TOK_ANY;
     if (pp->flags.multln) par->boi_type = TOK_BOL, par->eoi_type = TOK_EOL;
-    else                  par->boi_type = TOK_BOS, par->eoi_type = TOK_EOS;
+    else                  par->boi_type = TOK_BOS, par->eoi_type = TOK_EOZ;
     par->litmode = false;
     par->exprp = s;
     par->nclass = 0;
@@ -1127,10 +1127,10 @@ _regexec1(const _Reprog *progp,  /* program to run */
                 case TOK_EOL:
                     if (r == '\n') continue; /* FALLTHRU */
                 case TOK_EOS:
-                    if (s == j->eol || r == 0) continue;
+                    if (r == 0 || s == j->eol) continue;
                     break;
                 case TOK_EOZ:
-                    if (s == j->eol || r == 0 || (r == '\n' && s[1] == 0)) continue;
+                    if (r == 0 || s == j->eol || (r == '\n' && s[1] == 0)) continue;
                     break;
                 case TOK_NWBOUND:
                     ok = true; /* FALLTHRU */
