@@ -53,7 +53,7 @@ TEST(cspan, slice2) {
         for (c_range32(i, 10 * 20 * 30))
             Stack_push(&stack, i);
 
-        Span3 ms3 = cspan_md(stack.data, 10, 20, 30);
+        Span3 ms3 = cspan_md(&stack.at[0], 10, 20, 30);
         ms3 = cspan_slice(&ms3, Span3, {1,4}, {3,7}, {20,24});
 
         int sum = 0;
@@ -83,14 +83,14 @@ TEST(cspan, equality) {
         2, 2, 4, 5, 6,
         3, 1, 7, 8, 9,
     });
-    Span2 base2 = cspan_md(base.data, 6, 5);
+    Span2 base2 = cspan_md(&base.at[0], 6, 5);
 
     Span test = c_make(Span, {
         1, 2, 3,
         4, 5, 6,
         7, 8, 9,
     });
-    Span2 test2 = cspan_md(test.data, 3, 3);
+    Span2 test2 = cspan_md(&test.at[0], 3, 3);
 
     //puts(""); cspan_print(Span2, cspan_slice(&base2, Span2, {0, 3}, {1, 4}), "%d");
 
@@ -126,7 +126,7 @@ TEST_SETUP(cspan_cube, fixt) {
     for (c_range32(i, N))
         Stack_push(&fixt->stack, i+1);
 
-    Span3 ms3 = cspan_md(fixt->stack.data, CUBE, CUBE, CUBE);
+    Span3 ms3 = cspan_md(&fixt->stack.at[0], CUBE, CUBE, CUBE);
 
     for (c_range(i, 0, ms3.shape[0], TSIZE)) {
         for (c_range(j, 0, ms3.shape[1], TSIZE)) {

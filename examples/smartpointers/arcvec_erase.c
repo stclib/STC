@@ -19,17 +19,17 @@ int main(void)
     printf("elm size: %d\n", (int)sizeof(Arc));
 
     // clone the second 2012 and push it back.
-    // note: cloning make sure that vec.data[2] has ref count 2.
-    Vec_push(&vec, Arc_clone(vec.data[2]));  // => share vec.data[2]
-    Vec_emplace(&vec, *vec.data[2].get);     // => deep-copy vec.data[2]
+    // note: cloning make sure that vec.at[2] has ref count 2.
+    Vec_push(&vec, Arc_clone(vec.at[2]));  // => share vec.at[2]
+    Vec_emplace(&vec, *vec.at[2].get);     // => deep-copy vec.at[2]
 
     printf("vec before erase :");
     for (c_each(i, Vec, vec))
         printf(" %d", *i.ref->get);
 
-    printf("\nerase vec.data[2]; or first matching value depending on compare.\n");
+    printf("\nerase vec.at[2]; or first matching value depending on compare.\n");
     Vec_iter it;
-    it = Vec_find(&vec, *vec.data[2].get);
+    it = Vec_find(&vec, *vec.at[2].get);
     if (it.ref)
         Vec_erase_at(&vec, it);
 

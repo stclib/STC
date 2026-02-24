@@ -33,7 +33,7 @@ int main(void)
     ListMap* lmap = &MapMap_emplace(&mmap, "first", ListMap_init()).ref->second;
     StackList* list = &ListMap_insert(lmap, 42, StackList_init()).ref->second;
     FloatStack* stack = StackList_push_back(list, FloatStack_with_size(10, 42));
-    stack->data[3] = 3.1415927f;
+    stack->at[3] = 3.1415927f;
 
     // Access the data entry
     const ListMap* lmap_p = MapMap_at(&mmap, "first");
@@ -41,10 +41,10 @@ int main(void)
     const FloatStack* stack_p = StackList_back(list_p);
 
     printf("value is: %g\n",
-        stack_p->data[3] // pi
+        stack_p->at[3] // pi
     );
     printf("directly: %g\n",
-        StackList_back(ListMap_at(MapMap_at(&mmap, "first"), 42))->data[3] // pi
+        StackList_back(ListMap_at(MapMap_at(&mmap, "first"), 42))->at[3] // pi
     );
 
     // Free everything

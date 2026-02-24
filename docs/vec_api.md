@@ -121,7 +121,7 @@ vec_X_raw       vec_X_value_drop(vec_X_value* pval);
 
 | Type name         | Type definition                  | Used to represent...  |
 |:------------------|:---------------------------------|:----------------------|
-| `vec_X`           | `struct { vec_X_value* data; }`  | The vec type          |
+| `vec_X`           | `struct { vec_X_value* at; isize_t size; ...}`    | The vec type          |
 | `vec_X_value`     | `i_key`                          | The vec value type    |
 | `vec_X_raw`       | `i_keyraw`                       | The raw value type    |
 | `vec_X_iter`      | `struct { vec_X_value* ref; }`   | The iterator type     |

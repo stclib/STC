@@ -95,7 +95,7 @@ typedef STC_CSPAN_INDEX_TYPE _istride;
     typedef T Self##_value; \
     typedef T Self##_raw; \
     typedef struct { \
-        Self##_value *data; \
+        Self##_value *at; \
         _istride shape[RANK]; \
         cspan_tuple##RANK stride; \
     } Self; \
@@ -109,13 +109,13 @@ typedef STC_CSPAN_INDEX_TYPE _istride;
     STC_INLINE Self Self##_slice_(Self##_value* d, const _istride shape[], const _istride stri[], \
                                   const isize_t args[][3], const int rank) { \
         Self s; int outrank; \
-        s.data = d + _cspan_slice(s.shape, s.stride.d, &outrank, shape, stri, args, rank); \
+        s.at = d + _cspan_slice(s.shape, s.stride.d, &outrank, shape, stri, args, rank); \
         c_assert(outrank == RANK); \
         return s; \
     } \
     STC_INLINE Self##_iter Self##_begin(const Self* self) { \
         return c_literal(Self##_iter){ \
-            .ref=RANK==1 && self->shape[0]==0 ? NULL : self->data, ._s=self}; \
+            .ref=RANK==1 && self->shape[0]==0 ? NULL : self->at, ._s=self}; \
     } \
     STC_INLINE Self##_iter Self##_end(const Self* self) { \
         (void)self; \
@@ -163,7 +163,7 @@ use_cspan_tuple(7); use_cspan_tuple(8);
 
 // Construct a cspan from a pointer+size
 #define cspan_from_n(dataptr, n) \
-    {.data=dataptr, \
+    {.at=dataptr, \
      .shape={(_istride)(n)}, \
      .stride=c_literal(cspan_tuple1){.d={1}}}
 
@@ -186,11 +186,11 @@ use_cspan_tuple(7); use_cspan_tuple(8);
 
 // Make 1d-span from a vec or stack container.
 #define cspan_from_vec(container) \
-    cspan_from_n((container)->data, (container)->size)
+    cspan_from_n(&(container)->at[0], (container)->size)
 
 // Make a 1d-sub-span from a 1d-span
 #define cspan_subspan(self, offset, count) \
-    {.data=cspan_at(self, offset), \
+    {.at=cspan_at(self, offset), \
      .shape={(_istride)(count)}, \
      .stride=(self)->stride}
 
@@ -198,9 +198,9 @@ use_cspan_tuple(7); use_cspan_tuple(8);
 //
 #define cspan_size(self) _cspan_size((self)->shape, cspan_rank(self))
 #define cspan_rank(self) c_arraylen((self)->shape) // constexpr
-#define cspan_at(self, ...) ((self)->data + cspan_index(self, __VA_ARGS__))
-#define cspan_front(self) ((self)->data)
-#define cspan_back(self) ((self)->data + cspan_size(self) - 1)
+#define cspan_at(self, ...) ((self)->at + cspan_index(self, __VA_ARGS__))
+#define cspan_front(self) (&(self)->at[0])
+#define cspan_back(self) ((self)->at + cspan_size(self) - 1)
 
 #define cspan_index(...) cspan_index_fn(__VA_ARGS__, c_COMMA_N(cspan_index_3d), c_COMMA_N(cspan_index_2d), \
                                                      c_COMMA_N(cspan_index_1d),)(__VA_ARGS__)
@@ -238,7 +238,7 @@ typedef enum {c_ROWMAJOR, c_COLMAJOR, c_STRIDED} cspan_layout;
 #define cspan_strides(...) {.d={__VA_ARGS__}}
 
 #define cspan_md_layout(layout, dataptr, ...) \
-    {.data=dataptr, \
+    {.at=dataptr, \
      .shape={__VA_ARGS__}, \
      .stride=*(c_JOIN(cspan_tuple,c_NUMARGS(__VA_ARGS__))*) \
              _cspan_shape2stride(layout, c_make_array(_istride, {__VA_ARGS__}), c_NUMARGS(__VA_ARGS__))}
@@ -263,7 +263,7 @@ typedef enum {c_ROWMAJOR, c_COLMAJOR, c_STRIDED} cspan_layout;
 #define c_ALL 0,c_END
 
 #define cspan_slice(self, Outspan, ...) \
-    Outspan##_slice_((self)->data, (self)->shape, (self)->stride.d, \
+    Outspan##_slice_(&(self)->at[0], (self)->shape, (self)->stride.d, \
                      c_make_array2d(const isize_t, 3, {__VA_ARGS__}), \
                      (c_static_assert(cspan_rank(self) == sizeof((isize_t[][3]){__VA_ARGS__})/sizeof(isize_t[3])), cspan_rank(self)))
 
@@ -275,31 +275,31 @@ typedef enum {c_ROWMAJOR, c_COLMAJOR, c_STRIDED} cspan_layout;
 //           Span2 ms2 = cspan_slice(&ms3, Span2, {1}, {c_ALL}, {c_ALL});
 //           Span2 ms2 = cspan_submd3(&ms3, 1); // Same as line above, optimized.
 #define cspan_submd2(self, x) \
-    {.data=cspan_at(self, x, 0), \
+    {.at=cspan_at(self, x, 0), \
      .shape={(self)->shape[1]}, \
      .stride=c_literal(cspan_tuple1){.d={(self)->stride.d[1]}}}
 
 #define cspan_submd3(...) c_MACRO_OVERLOAD(cspan_submd3, __VA_ARGS__)
 #define cspan_submd3_2(self, x) \
-    {.data=cspan_at(self, x, 0, 0), \
+    {.at=cspan_at(self, x, 0, 0), \
      .shape={(self)->shape[1], (self)->shape[2]}, \
      .stride=c_literal(cspan_tuple2){.d={(self)->stride.d[1], (self)->stride.d[2]}}}
 #define cspan_submd3_3(self, x, y) \
-    {.data=cspan_at(self, x, y, 0), \
+    {.at=cspan_at(self, x, y, 0), \
      .shape={(self)->shape[2]}, \
      .stride=c_literal(cspan_tuple1){.d={(self)->stride.d[2]}}}
 
 #define cspan_submd4(...) c_MACRO_OVERLOAD(cspan_submd4, __VA_ARGS__)
 #define cspan_submd4_2(self, x) \
-    {.data=cspan_at(self, x, 0, 0, 0), \
+    {.at=cspan_at(self, x, 0, 0, 0), \
      .shape={(self)->shape[1], (self)->shape[2], (self)->shape[3]}, \
      .stride=c_literal(cspan_tuple3){.d={(self)->stride.d[1], (self)->stride.d[2], (self)->stride.d[3]}}}
 #define cspan_submd4_3(self, x, y) \
-    {.data=cspan_at(self, x, y, 0, 0), \
+    {.at=cspan_at(self, x, y, 0, 0), \
      .shape={(self)->shape[2], (self)->shape[3]}, \
      .stride=c_literal(cspan_tuple2){.d={(self)->stride.d[2], (self)->stride.d[3]}}}
 #define cspan_submd4_4(self, x, y, z) \
-    {.data=cspan_at(self, x, y, z, 0), \
+    {.at=cspan_at(self, x, y, z, 0), \
      .shape={(self)->shape[3]}, \
      .stride=c_literal(cspan_tuple1){.d={(self)->stride.d[3]}}}
 

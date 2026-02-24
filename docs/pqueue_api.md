@@ -68,7 +68,7 @@ i_key           pqueue_X_value_clone(const pqueue_X* self, i_key value);
 
 | Type name         | Type definition                      | Used to represent...    |
 |:------------------|:-------------------------------------|:------------------------|
-| `pqueue_X`        | `struct {pqueue_X_value* data; ...}` | The pqueue type          |
+| `pqueue_X`        | `struct {pqueue_X_value* at; isize_t size; ...}` | The pqueue type          |
 | `pqueue_X_value`  | `i_key`                              | The pqueue element type  |
 
 ## Example

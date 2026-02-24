@@ -41,18 +41,18 @@ int main(void)
         Map_emplace(map, "Tracy", 2003);
 
         // Share two Maps from the vec with the list using emplace (clone the arc):
-        List_push_back(&list, Arc_clone(vec.data[0]));
-        List_push_back(&list, Arc_clone(vec.data[1]));
+        List_push_back(&list, Arc_clone(vec.at[0]));
+        List_push_back(&list, Arc_clone(vec.at[1]));
 
         // Clone (deep copy) a Map from the vec to the list
         // List will contain two shared and two unshared maps.
-        map = List_push_back(&list, Arc_from(Map_clone(*vec.data[1].get)))->get;
+        map = List_push_back(&list, Arc_from(Map_clone(*vec.at[1].get)))->get;
 
         // Add one more element to the cloned map:
         Map_put(map, "CLONED", 2021);
 
         // Add one more element to the shared map:
-        Map_put(vec.data[1].get, "SHARED", 2021);
+        Map_put(vec.at[1].get, "SHARED", 2021);
 
         puts("VEC");
         for (c_each_ref(e, Vec, vec)) {

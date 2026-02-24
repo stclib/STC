@@ -115,7 +115,7 @@ TEST(sortedmap, insert)
     Pairvec_push(&v, (Pairvec_value){44, 311});
 
     // Inserting the following vector data into m2:
-    Intmap_put_n(&m2, v.data, Pairvec_size(&v));
+    Intmap_put_n(&m2, &v.at[0], Pairvec_size(&v));
 
     // The modified key and mapped values of m2 are:
     Intmap_take(&res, c_make(Intmap, {{41, 262}, {42, 277}, {43, 294}, {44, 311}, {45, 330}}));

@@ -78,9 +78,9 @@ int main(int argc, char* argv[]) {
     for (c_each_n(i, Data, values, M*P + P*N))
         *i.ref = (Data_value)((crand64_real() - 0.5)*10.0);
 
-    Mat a = cspan_md(values.data, M, P);
-    Mat b = cspan_md(values.data + M*P, P, N);
-    OutMat c = cspan_md(values.data + M*P + P*N, M, N);
+    Mat a = cspan_md(&values.at[0], M, P);
+    Mat b = cspan_md(&values.at[0] + M*P, P, N);
+    OutMat c = cspan_md(&values.at[0] + M*P + P*N, M, N);
 
     clock_t t = clock();
 

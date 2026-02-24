@@ -37,14 +37,14 @@ void vectordemo1(void)
     for (int i = 10; i <= 100; i += 10)
         Vec64_push(&bignums, i * i);
 
-    printf("erase - %d: %lld\n", 3, bignums.data[3]);
+    printf("erase - %d: %lld\n", 3, bignums.at[3]);
     Vec64_erase_n(&bignums, 3, 1); // erase index 3
 
     Vec64_pop(&bignums);           // erase the last
     Vec64_erase_n(&bignums, 0, 1); // erase the first
 
     for (c_range(i, Vec64_size(&bignums))) {
-        printf("%d: %lld\n", (int)i, bignums.data[i]);
+        printf("%d: %lld\n", (int)i, bignums.at[i]);
     }
 
     Vec64_drop(&bignums);
@@ -60,8 +60,8 @@ void vectordemo2(void)
     Strvec_emplace_back(&names, "Joe");
     Strvec_emplace_back(&names, "Chris");
 
-    cstr_assign(&names.data[1], "Jane"); // replace Joe
-    printf("names[1]: %s\n", cstr_str(&names.data[1]));
+    cstr_assign(&names.at[1], "Jane"); // replace Joe
+    printf("names[1]: %s\n", cstr_str(&names.at[1]));
 
     Strvec_sort(&names);               // Sort the array
 

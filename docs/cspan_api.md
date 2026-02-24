@@ -131,7 +131,7 @@ void            SpanTypeN_next(SpanTypeN_iter* it);
 |:------------------|:----------------------------------------------------|:---------------------|
 | `cspan_istride`   | `int32_t`                                           | Stride / Index type  |
 | SpanTypeN_value   | `ValueType`                                         | Element value type   |
-| SpanTypeN         | `struct { ValueType *data; cspan_istride shape[N]; .. }`| SpanType with rank N |
+| SpanTypeN         | `struct { ValueType *at; cspan_istride shape[N]; ...}`| SpanType with rank N |
 | cspan_tupleN      | `struct { cspan_istride d[N]; }`                    | Strides for each rank |
 | `cspan_layout`    | `enum { c_ROWMAJOR, c_COLMAJOR, c_STRIDED }`        | Multi-dim layout     |
 | `c_ALL`           | `cspan_slice(&md, Mat, {1,3}, {c_ALL})`             | Full extent          |

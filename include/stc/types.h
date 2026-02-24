@@ -213,11 +213,11 @@ typedef union {
 #define _declare_inplace_stack(SELF, VAL, CAP, AUXDEF) \
     typedef VAL SELF##_value; \
     typedef struct { SELF##_value *ref, *end; } SELF##_iter; \
-    typedef struct SELF { ptrdiff_t size; SELF##_value data[CAP]; AUXDEF } SELF
+    typedef struct SELF { ptrdiff_t size; SELF##_value at[CAP]; AUXDEF } SELF
 
 #define _declare_stack(SELF, VAL, AUXDEF) \
     typedef VAL SELF##_value; \
     typedef struct { SELF##_value *ref, *end; } SELF##_iter; \
-    typedef struct SELF { SELF##_value *data; ptrdiff_t size, capacity; AUXDEF } SELF
+    typedef struct SELF { SELF##_value *at; ptrdiff_t size, capacity; AUXDEF } SELF
 
 #endif // STC_TYPES_H_INCLUDED

@@ -4,8 +4,8 @@ use_cspan3(Span, int);
 
 int main(void)
 {
-    Span3 md3 = cspan_md(cspan_zeros(Span, 3*4*5).data, 3, 4, 5);
-    for (c_range32(i, 3*4*5)) md3.data[i] = i;
+    Span3 md3 = cspan_md(&cspan_zeros(Span, 3*4*5).at[0], 3, 4, 5);
+    for (c_range32(i, 3*4*5)) md3.at[i] = i;
 
     Span2 tmp2 = cspan_submd3(&md3, 2);
     cspan_transpose(&tmp2);
@@ -13,9 +13,9 @@ int main(void)
 
     Span2 sliced = cspan_slice(&md3, Span2, {c_ALL}, {c_ALL}, {0});
 
-    Span2 img = cspan_md(md3.data, 6, 10);
-    Span2 half = {img.data, cspan_shape(img.shape[0]/2, img.shape[1]/2),
-                            cspan_strides(img.stride.d[0]*2, img.stride.d[1]*2)};
+    Span2 img = cspan_md(&md3.at[0], 6, 10);
+    Span2 half = {&img.at[0], cspan_shape(img.shape[0]/2, img.shape[1]/2),
+                              cspan_strides(img.stride.d[0]*2, img.stride.d[1]*2)};
 
     Span2 half_tr = Span2_transposed(half);
 

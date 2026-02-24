@@ -50,8 +50,8 @@ STC_INLINE void _c_MEMB(_put_n)(Self* self, const _m_raw* raw, isize_t n)
 
 STC_INLINE bool _c_MEMB(_reserve)(Self* self, const isize_t cap) {
     if (cap != self->size && cap <= self->capacity) return true;
-    _m_value *d = (_m_value *)_i_realloc_n(self->data, self->capacity, cap);
-    return d ? (self->data = d, self->capacity = cap, true) : false;
+    _m_value *d = (_m_value *)_i_realloc_n(self->at, self->capacity, cap);
+    return d ? (self->at = d, self->capacity = cap, true) : false;
 }
 
 STC_INLINE void _c_MEMB(_shrink_to_fit)(Self* self)
@@ -72,19 +72,19 @@ STC_INLINE Self _c_MEMB(_with_capacity)(const isize_t cap)
 
 STC_INLINE void _c_MEMB(_clear)(Self* self) {
     isize_t i = self->size; self->size = 0;
-    while (i--) { i_keydrop((self->data + i)); }
+    while (i--) { i_keydrop((self->at + i)); }
 }
 
 STC_INLINE void _c_MEMB(_drop)(const Self* cself) {
     Self* self = (Self*)cself;
     _c_MEMB(_clear)(self);
-    _i_free_n(self->data, self->capacity);
+    _i_free_n(self->at, self->capacity);
 }
 
 STC_INLINE Self _c_MEMB(_move)(Self *self) {
     Self m = *self;
     self->size = self->capacity = 0;
-    self->data = NULL;
+    self->at = NULL;
     return m;
 }
 
@@ -103,13 +103,13 @@ STC_INLINE isize_t _c_MEMB(_capacity)(const Self* q)
     { return q->capacity; }
 
 STC_INLINE const _m_value* _c_MEMB(_top)(const Self* self)
-    { return &self->data[0]; }
+    { return &self->at[0]; }
 
 STC_INLINE void _c_MEMB(_pop)(Self* self)
     { c_assert(!_c_MEMB(_is_empty)(self)); _c_MEMB(_erase_at)(self, 0); }
 
 STC_INLINE _m_value _c_MEMB(_pull)(Self* self)
-    { _m_value v = self->data[0]; _c_MEMB(_erase_at)(self, 0); return v; }
+    { _m_value v = self->at[0]; _c_MEMB(_erase_at)(self, 0); return v; }
 
 #ifndef i_no_clone
 STC_API Self _c_MEMB(_clone)(Self q);
@@ -131,11 +131,11 @@ STC_INLINE void _c_MEMB(_emplace)(Self* self, _m_raw raw)
 #ifdef _i_has_eq
 STC_INLINE bool _c_MEMB(_eq)(const Self* self, const Self* other) {
 #ifdef _i_has_default_eq
-    return c_memcmp(self->data, other->data, self->size*c_sizeof(_m_value)) == 0;
+    return c_memcmp(self->at, other->at, self->size*c_sizeof(_m_value)) == 0;
 #else
     if (self->size != other->size) return false;
     for (isize_t i = 0; i < self->size; ++i) {
-        const _m_raw _rx = i_keytoraw((self->data+i)), _ry = i_keytoraw((other->data+i));
+        const _m_raw _rx = i_keytoraw((self->at+i)), _ry = i_keytoraw((other->at+i));
         if (!(i_eq((&_rx), (&_ry)))) return false;
     }
     return true;
@@ -148,7 +148,7 @@ STC_INLINE bool _c_MEMB(_eq)(const Self* self, const Self* other) {
 
 STC_DEF void
 _c_MEMB(_sift_down_)(Self* self, const isize_t idx, const isize_t n) {
-    _m_value t, *arr = self->data - 1;
+    _m_value t, *arr = self->at - 1;
     for (isize_t r = idx, c = idx*2; c <= n; c *= 2) {
         c += i_less((&arr[c]), (&arr[c + (c < n)]));
         if (!(i_less((&arr[r]), (&arr[c])))) return;
@@ -166,20 +166,20 @@ _c_MEMB(_make_heap)(Self* self) {
 #ifndef i_no_clone
 STC_DEF Self _c_MEMB(_clone)(Self q) {
     Self out = q, *self = &out; (void)self;
-    out.capacity = out.size = 0; out.data = NULL;
+    out.capacity = out.size = 0; out.at = NULL;
     _c_MEMB(_reserve)(&out, q.size);
     out.size = q.size;
     for (c_range(i, q.size))
-        out.data[i] = i_keyclone(q.data[i]);
+        out.at[i] = i_keyclone(q.at[i]);
     return out;
 }
 #endif
 
 STC_DEF void
 _c_MEMB(_erase_at)(Self* self, const isize_t idx) {
-    i_keydrop((self->data + idx));
+    i_keydrop((self->at + idx));
     const isize_t n = --self->size;
-    self->data[idx] = self->data[n];
+    self->at[idx] = self->at[n];
     _c_MEMB(_sift_down_)(self, idx + 1, n);
 }
 
@@ -187,7 +187,7 @@ STC_DEF _m_value*
 _c_MEMB(_push)(Self* self, _m_value value) {
     if (self->size == self->capacity)
         _c_MEMB(_reserve)(self, self->size*3/2 + 4);
-    _m_value *arr = self->data - 1; /* base 1 */
+    _m_value *arr = self->at - 1; /* base 1 */
     isize_t c = ++self->size;
     for (; c > 1 && (i_less((&arr[c/2]), (&value))); c /= 2)
         arr[c] = arr[c/2];

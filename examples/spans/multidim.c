@@ -14,7 +14,7 @@ int main(void)
     ISpan ms1 = cspan_from_vec(&vec);
 
     // Create a 3D mdspan 2 x 3 x 4
-    ISpan3 ms3 = cspan_md(vec.data, 2, 3, 4);
+    ISpan3 ms3 = cspan_md(&vec.at[0], 2, 3, 4);
 
     puts("ms3:");
     cspan_print(ISpan3, "%d", ms3);

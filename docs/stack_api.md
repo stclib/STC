@@ -106,7 +106,7 @@ void            stack_X_value_drop(vec_X_value* pval);
 
 | Type name          | Type definition                     | Used to represent...        |
 |:-------------------|:------------------------------------|:----------------------------|
-| `stack_X`          | `struct { stack_value *data; ... }` | The stack type             |
+| `stack_X`          | `struct { stack_value *at; isize_t size; ...}` | The stack type             |
 | `stack_X_value`    | `i_key`                             | The stack element type     |
 | `stack_X_raw`      | `i_keyraw`                          | stack raw value type       |
 | `stack_X_iter`     | `struct { stack_value *ref; }`      | stack iterator             |
