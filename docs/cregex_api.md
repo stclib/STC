@@ -146,8 +146,8 @@ if (cregex_match_aio(pattern, input, match))
 To iterate multiple matches in an input string, you may use
 ```c++
 csview match[5] = {0};
-while (cregex_match_next(&re, input, match) == CREG_OK)
-    for (int k = 1; i <= cregex_captures(&re); ++k)
+while (cregex_match(&re, input, match, .flags=CREG_NEXT) == CREG_OK)
+    for (int k = 1; k <= cregex_captures(&re); ++k)
         printf("submatch %d: " c_svfmt "\n", k, c_svarg(match[k]));
 ```
 There is also a `c_match` macro which simplifies this:
@@ -187,14 +187,14 @@ for (c_match(it, &re, input))
 | \n \t \r | Newline, tab, carriage return | |
 | \d \s \w | Digit, whitespace, alphanumeric character | |
 | \D \S \W | Do not match the groups described above | |
-| \p{Cc} or \p{Cntrl} | UTF8 control character | * |
-| \p{L} or \p{Alpha} | UTF8 letter | * |
-| \p{Ll} or \p{Lower} | UTF8 lowercase letter | * |
-| \p{Lu} or \p{Upper} | UTF8 uppercase letter | * |
+| \p{Cc} | UTF8 control character | * |
+| \p{L} | UTF8 letter | * |
+| \p{Ll} | UTF8 lowercase letter | * |
+| \p{Lu} | UTF8 uppercase letter | * |
 | \p{Lt} | Titlecase letter | * |
 | \p{L&} | Cased letter (Ll Lu Lt) | * |
 | \p{Lm} | Modifier letter | * |
-| \p{Nd} or \p{Digit} | Decimal number | * |
+| \p{Nd} | Decimal number | * |
 | \p{Nl} | Numeric letter | * |
 | \p{No} | Other number | * |
 | \p{P}  | Punctuation | * |
@@ -211,12 +211,14 @@ for (c_match(it, &re, input))
 | \p{Zp} | Paragraph separator | * |
 | \p{Zs} | Space separator | * |
 | \p{Alpha} | Alphabetic letter (L) | * |
-| \p{Lower} | Lowercase letter (Ll) | * |
-| \p{Upper} | Uppercase letter (Lu) | * |
 | \p{Alnum} | Alpha-numeric letter (L Nl Nd) | * |
 | \p{Blank} | Blank (Zs \t) | * |
-| \p{Space} | Whitespace: (Zs \t\r\n\v\f) | * |
-| \p{Word} | Word character: (Alnum Pc) | * |
+| \p{Cntrl} | Control character  (Cc) | * |
+| \p{Digit} | Number \d or (Nd) | * |
+| \p{Lower} | Lowercase letter (Ll) | * |
+| \p{Space} | Whitespace: \s or (Zs \t\r\n\v\f) | * |
+| \p{Upper} | Uppercase letter (Lu) | * |
+| \p{Word} | Word character: \w or (Alnum Pc) | * |
 | \p{XDigit} | Hex number | * |
 | \p{Arabic} | Unicode script | * |
 | \p{Bengali} | Unicode script | * |
