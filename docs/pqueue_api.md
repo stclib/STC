@@ -50,14 +50,14 @@ void            pqueue_X_shrink_to_fit(pqueue_X* self);
 
 isize_t         pqueue_X_size(const pqueue_X* self);
 bool            pqueue_X_is_empty(const pqueue_X* self);
-const i_key*    pqueue_X_top(const pqueue_X* self);
+const i_key*    pqueue_X_top(const pqueue_X* self);                 // return reference to top element
 
 void            pqueue_X_make_heap(pqueue_X* self);                 // heapify the vector.
 void            pqueue_X_push(pqueue_X* self, i_key value);
-void            pqueue_X_emplace(pqueue_X* self, i_keyraw raw);     // converts from raw to value.
+void            pqueue_X_emplace(pqueue_X* self, i_keyraw raw);     // convert raw to value and push.
 
-void            pqueue_X_pop(pqueue_X* self);
-i_key           pqueue_X_pull(pqueue_X* self);
+void            pqueue_X_pop(pqueue_X* self);                       // pop and drop top element
+i_key           pqueue_X_pull(pqueue_X* self);                      // move top element out of pqueue
 
 i_key           pqueue_X_pushpull(pqueue_X* self, i_key value);     // push, then pull (optimized).
 i_key           pqueue_X_exchange(pqueue_X* self, i_key value);     // pull, then push (optimized).
