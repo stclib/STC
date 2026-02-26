@@ -54,10 +54,13 @@ const i_key*    pqueue_X_top(const pqueue_X* self);
 
 void            pqueue_X_make_heap(pqueue_X* self);                 // heapify the vector.
 void            pqueue_X_push(pqueue_X* self, i_key value);
-void            pqueue_X_emplace(pqueue_X* self, i_keyraw raw);     // converts from raw
+void            pqueue_X_emplace(pqueue_X* self, i_keyraw raw);     // converts from raw to value.
 
 void            pqueue_X_pop(pqueue_X* self);
-i_key           pqueue_X_pull(const pqueue_X* self);
+i_key           pqueue_X_pull(pqueue_X* self);
+
+i_key           pqueue_X_pushpull(pqueue_X* self, i_key value);     // push, then pull (optimized).
+i_key           pqueue_X_exchange(pqueue_X* self, i_key value);     // pull, then push (optimized).
 void            pqueue_X_erase_at(pqueue_X* self, isize_t idx);
 
 bool            pqueue_X_eq(const pqueue_X* c1, const pqueue_X* c2); // equality comp.

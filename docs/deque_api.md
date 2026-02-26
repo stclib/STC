@@ -65,6 +65,7 @@ bool            deque_X_is_empty(const deque_X* self);
 isize_t         deque_X_size(const deque_X* self);
 isize_t         deque_X_capacity(const deque_X* self);
 
+bool            deque_X_contains(const vec_X* self, i_keyraw raw);
 deque_X_iter    deque_X_find(const deque_X* self, i_keyraw raw);
 deque_X_iter    deque_X_find_in(deque_X_iter i1, deque_X_iter i2, i_keyraw raw); // return vec_X_end() if not found
 

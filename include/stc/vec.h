@@ -249,9 +249,11 @@ STC_INLINE void _c_MEMB(_adjust_end_)(Self* self, isize_t n)
     { self->size += n; }
 
 #if defined _i_has_eq
-STC_INLINE _m_iter _c_MEMB(_find)(const Self* self, _m_raw raw) {
-    return _c_MEMB(_find_in)(self, _c_MEMB(_begin)(self), _c_MEMB(_end)(self), raw);
-}
+STC_INLINE _m_iter _c_MEMB(_find)(const Self* self, _m_raw raw)
+    { return _c_MEMB(_find_in)(self, _c_MEMB(_begin)(self), _c_MEMB(_end)(self), raw); }
+
+STC_INLINE bool _c_MEMB(_contains)(const Self* self, _m_raw raw)
+    { return _c_MEMB(_find)(self, raw).ref != NULL; }
 
 STC_INLINE bool _c_MEMB(_eq)(const Self* self, const Self* other) {
 #ifdef _i_has_default_eq

@@ -278,6 +278,9 @@ STC_INLINE _m_iter _c_MEMB(_find_in)(const Self* self, _m_iter i1, _m_iter i2, _
 STC_INLINE _m_iter _c_MEMB(_find)(const Self* self, _m_raw raw)
     { return _c_MEMB(_find_in)(self, _c_MEMB(_begin)(self), _c_MEMB(_end)(self), raw); }
 
+STC_INLINE bool _c_MEMB(_contains)(const Self* self, _m_raw raw)
+    { return _c_MEMB(_find)(self, raw).ref != NULL; }
+
 STC_INLINE bool _c_MEMB(_eq)(const Self* self, const Self* other) {
 #ifdef _i_has_default_eq
     return c_memcmp(self->data, other->data, self->size*c_sizeof(_m_value)) == 0;
