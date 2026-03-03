@@ -12,32 +12,33 @@ fox   109    false\n\
 typedef struct {csview anim; int id; bool ok; } Field;
 
 static inline bool Field_eq(const Field* a, const Field* b)
-	{ return csview_eq(&a->anim, &b->anim) && a->id == b->id && a->ok == b->ok; }
+    { return csview_eq(&a->anim, &b->anim) && a->id == b->id && a->ok == b->ok; }
 
 #define T Fields, Field
 #define i_eq Field_eq
 #include <stc/stack.h>
 
 int main(void) {
-	cregex re = cregex_from("(?m)^\\s*(\\S+)\\s+([0-9]+)\\s+(true|false)\\s*$");
-	c_assert(!re.error);
-	Fields fields = {0};
+    cregex re = cregex_from("(?m)^\\s*(\\S+)\\s+([0-9]+)\\s+(true|false)\\s*$");
+    c_assert(!re.error);
+    Fields fields = {0};
 
-	for (c_match(c, &re, hay)) {
-		Fields_push(&fields, (Field){c.match[1], atoi(c.match[2].buf), c.match[3].buf[0] == 't'});
-	}
+    for (c_match(c, &re, hay)) {
+        Fields_push(&fields, (Field){c.match[1], atoi(c.match[2].buf), c.match[3].buf[0] == 't'});
+    }
 
-	Fields answer = c_make(Fields, {
-	    {c_sv("rabbit"), 54, true},
-	    {c_sv("groundhog"), 2, true},
-	    {c_sv("fox"), 109, false},
-	});
-	c_assert(Fields_eq(&fields, &answer));
-	
-	for (c_each_ref(e, Fields, fields))
-		printf(c_svfmt ", %d, %s\n", c_svarg(e->anim), e->id, e->ok?"true":"false");
+    Fields answer = c_make(Fields, {
+        {c_sv("rabbit"), 54, true},
+        {c_sv("groundhog"), 2, true},
+        {c_sv("fox"), 109, false},
+    });
+    c_assert(Fields_eq(&fields, &answer));
+    
+    for (c_each_ref(e, Fields, fields))
+        printf(c_svfmt ", %d, %s\n", c_svarg(e->anim), e->id, e->ok?"true":"false");
 
-	c_drop(Fields, &fields, &answer);
+    c_drop(Fields, &fields, &answer);
+    cregex_drop(&re);
 }
 
 /*

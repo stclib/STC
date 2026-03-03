@@ -69,6 +69,7 @@ bool            vec_X_is_empty(const vec_X* self);
 isize_t         vec_X_size(const vec_X* self);
 isize_t         vec_X_capacity(const vec_X* self);
 
+bool            vec_X_contains(const vec_X* self, i_keyraw raw);
 vec_X_iter      vec_X_find(const vec_X* self, i_keyraw raw);
 vec_X_iter      vec_X_find_in(vec_X_iter i1, vec_X_iter i2, i_keyraw raw);  // return vec_X_end() if not found
 

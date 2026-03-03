@@ -67,6 +67,7 @@ isize_t         stack_X_size(const stack_X* self);
 isize_t         stack_X_capacity(const stack_X* self);
 bool            stack_X_is_empty(const stack_X* self);
 
+bool            stack_X_contains(const vec_X* self, i_keyraw raw);
 stack_X_iter    stack_X_find(const stack_X* self, i_keyraw raw);                 // requires c_use_cmp flag in decl.
 stack_X_iter    stack_X_find_in(stack_X_iter i1, stack_X_iter i2, i_keyraw raw); // return stack_X_end() if not found
 
