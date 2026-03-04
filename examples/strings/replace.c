@@ -12,8 +12,8 @@ int main(void)
     cstr s = cstr_from(base);                          // "this is a test string."
     cstr m = cstr_clone(s);
 
-    cstr_append(&m, cstr_str(&m));
-    cstr_append(&m, cstr_str(&m));
+    cstr_append_s(&m, m);
+    cstr_append_s(&m, m);
     printf("%s\n", cstr_str(&m));
 
     cstr_replace_at(&s, 9, 5, s2);                     // "this is an example string." (1)

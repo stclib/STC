@@ -92,7 +92,7 @@ STC_INLINE zsview zsview_tail(zsview zs, isize_t len) {
 /* utf8 */
 
 STC_INLINE zsview zsview_u8_from_pos(zsview zs, isize_t u8pos)
-    { return zsview_from_pos(zs, utf8_to_index(zs.str, u8pos)); }
+    { return zsview_from_pos(zs, cutf8_to_index(zs.str, u8pos)); }
 
 STC_INLINE zsview zsview_u8_tail(zsview zs, isize_t u8len) {
     const char* p = &zs.str[zs.size];
@@ -103,25 +103,25 @@ STC_INLINE zsview zsview_u8_tail(zsview zs, isize_t u8len) {
 }
 
 STC_INLINE csview zsview_u8_subview(zsview zs, isize_t u8pos, isize_t u8len)
-    { return utf8_subview(zs.str, u8pos, u8len); }
+    { return cutf8_subview(zs.str, u8pos, u8len); }
 
 STC_INLINE zsview_iter zsview_u8_at(zsview zs, isize_t u8pos) {
     csview sv;
-    sv.buf = utf8_at(zs.str, u8pos);
-    sv.size = utf8_chr_size(sv.buf);
+    sv.buf = cutf8_at(zs.str, u8pos);
+    sv.size = cutf8_chr_size(sv.buf);
     return c_literal(zsview_iter){.chr = sv};
 }
 
 STC_INLINE isize_t zsview_u8_size(zsview zs)
-    { return utf8_count(zs.str); }
+    { return cutf8_count(zs.str); }
 
 STC_INLINE bool zsview_u8_valid(zsview zs) // requires linking with utf8 symbols
-    { return utf8_valid_n(zs.str, zs.size); }
+    { return cutf8_valid_n(zs.str, zs.size); }
 
 /* utf8 iterator */
 
 STC_INLINE zsview_iter zsview_begin(const zsview* self) {
-    zsview_iter it = {.chr = {self->str, utf8_chr_size(self->str)}}; return it;
+    zsview_iter it = {.chr = {self->str, cutf8_chr_size(self->str)}}; return it;
 }
 
 STC_INLINE zsview_iter zsview_end(const zsview* self) {
@@ -130,13 +130,13 @@ STC_INLINE zsview_iter zsview_end(const zsview* self) {
 
 STC_INLINE void zsview_next(zsview_iter* it) {
     it->ref += it->chr.size;
-    it->chr.size = utf8_chr_size(it->ref);
+    it->chr.size = cutf8_chr_size(it->ref);
     if (*it->ref == '\0') it->ref = NULL;
 }
 
 STC_INLINE zsview_iter zsview_advance(zsview_iter it, isize_t u8pos) {
-    it.ref = utf8_offset(it.ref, u8pos);
-    it.chr.size = utf8_chr_size(it.ref);
+    it.ref = cutf8_offset(it.ref, u8pos);
+    it.chr.size = cutf8_chr_size(it.ref);
     if (*it.ref == '\0') it.ref = NULL;
     return it;
 }
@@ -153,22 +153,22 @@ STC_INLINE bool zsview_eq(const zsview* x, const zsview* y)
     { return x->size == y->size && !c_memcmp(x->str, y->str, x->size); }
 
 STC_INLINE int zsview_icmp(const zsview* x, const zsview* y)
-    { return utf8_icmp(x->str, y->str); }
+    { return cutf8_icmp(x->str, y->str); }
 
 STC_INLINE bool zsview_ieq(const zsview* x, const zsview* y)
-    { return x->size == y->size && !utf8_icmp(x->str, y->str); }
+    { return x->size == y->size && !cutf8_icmp(x->str, y->str); }
 
 /* ---- case insensitive ---- */
 
 STC_INLINE bool zsview_iequals(zsview zs, const char* str)
-    { return c_strlen(str) == zs.size && !utf8_icmp(zs.str, str); }
+    { return c_strlen(str) == zs.size && !cutf8_icmp(zs.str, str); }
 
 STC_INLINE bool zsview_istarts_with(zsview zs, const char* str)
-    { return c_strlen(str) <= zs.size && !utf8_icmp(zs.str, str); }
+    { return c_strlen(str) <= zs.size && !cutf8_icmp(zs.str, str); }
 
 STC_INLINE bool zsview_iends_with(zsview zs, const char* str) {
     isize_t n = c_strlen(str);
-    return n <= zs.size && !utf8_icmp(zs.str + zs.size - n, str);
+    return n <= zs.size && !cutf8_icmp(zs.str + zs.size - n, str);
 }
 
 #endif // STC_ZSVIEW_H_INCLUDED

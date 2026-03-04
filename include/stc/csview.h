@@ -107,7 +107,7 @@ STC_INLINE csview csview_tail(csview sv, isize_t len)
 
 /* utf8 iterator */
 STC_INLINE csview_iter csview_begin(const csview* self) {
-    csview_iter it = {.u8 = {{self->buf, utf8_chr_size(self->buf)},
+    csview_iter it = {.u8 = {{self->buf, cutf8_chr_size(self->buf)},
                              self->buf + self->size}};
     return it;
 }
@@ -116,19 +116,19 @@ STC_INLINE csview_iter csview_end(const csview* self) {
 }
 STC_INLINE void csview_next(csview_iter* it) {
     it->ref += it->chr.size;
-    it->chr.size = utf8_chr_size(it->ref);
+    it->chr.size = cutf8_chr_size(it->ref);
     if (it->ref == it->u8.end) it->ref = NULL;
 }
 
 /* utf8 */
 STC_INLINE csview csview_u8_from(const char* str, isize_t u8pos, isize_t u8len)
-    { return utf8_subview(str, u8pos, u8len); }
+    { return cutf8_subview(str, u8pos, u8len); }
 
 STC_INLINE isize_t csview_u8_size(csview sv)
-    { return utf8_count_n(sv.buf, sv.size); }
+    { return cutf8_count_n(sv.buf, sv.size); }
 
 STC_INLINE bool csview_u8_valid(csview sv) // requires linking with utf8 symbols
-    { return utf8_valid_n(sv.buf, sv.size); }
+    { return cutf8_valid_n(sv.buf, sv.size); }
 
 #define c_fortoken(...) for (c_token(__VA_ARGS__)) // [deprecated]
 
@@ -154,7 +154,7 @@ STC_INLINE bool csview_eq(const csview* x, const csview* y)
 /* ---- case insensitive ---- */
 
 STC_INLINE bool csview_iequals_sv(csview sv1, csview sv2)
-    { return sv1.size == sv2.size && !utf8_icompare(sv1, sv2); }
+    { return sv1.size == sv2.size && !cutf8_icompare(sv1, sv2); }
 
 STC_INLINE bool csview_iequals(csview sv, const char* str)
     { return csview_iequals_sv(sv, c_sv(str, c_strlen(str))); }
@@ -163,16 +163,16 @@ STC_INLINE bool csview_ieq(const csview* x, const csview* y)
     { return csview_iequals_sv(*x, *y); }
 
 STC_INLINE int csview_icmp(const csview* x, const csview* y)
-    { return utf8_icompare(*x, *y); }
+    { return cutf8_icompare(*x, *y); }
 
 STC_INLINE bool csview_istarts_with(csview sv, const char* str) {
     isize_t n = c_strlen(str);
-    return n <= sv.size && !utf8_icompare(sv, c_sv(str, n));
+    return n <= sv.size && !cutf8_icompare(sv, c_sv(str, n));
 }
 
 STC_INLINE bool csview_iends_with(csview sv, const char* str) {
     isize_t n = c_strlen(str);
-    return n <= sv.size && !utf8_icmp(sv.buf + sv.size - n, str);
+    return n <= sv.size && !cutf8_icmp(sv.buf + sv.size - n, str);
 }
 #endif // STC_CSVIEW_H_INCLUDED
 
@@ -186,7 +186,7 @@ csview_iter csview_advance(csview_iter it, isize_t u8pos) {
     while (u8pos && it.ref != it.u8.end)
         u8pos -= (*(it.ref += inc) & 0xC0) != 0x80;
     if (it.ref == it.u8.end) it.ref = NULL;
-    else it.chr.size = utf8_chr_size(it.ref);
+    else it.chr.size = cutf8_chr_size(it.ref);
     return it;
 }
 
@@ -232,7 +232,7 @@ csview_iter csview_u8_at(csview sv, isize_t u8pos) {
     const char *end = &sv.buf[sv.size];
     while ((u8pos > 0) & (sv.buf != end))
         u8pos -= (*++sv.buf & 0xC0) != 0x80;
-    sv.size = utf8_chr_size(sv.buf);
+    sv.size = cutf8_chr_size(sv.buf);
     c_assert(sv.buf != end);
     return c_literal(csview_iter){.u8 = {sv, end}};
 }

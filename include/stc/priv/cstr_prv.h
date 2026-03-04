@@ -192,13 +192,13 @@ STC_INLINE zsview cstr_tail(const cstr* self, isize_t len) {
 // BEGIN utf8 functions =====
 
 STC_INLINE cstr cstr_u8_from(const char* str, isize_t u8pos, isize_t u8len)
-    { str = utf8_at(str, u8pos); return cstr_from_n(str, utf8_to_index(str, u8len)); }
+    { str = cutf8_at(str, u8pos); return cstr_from_n(str, cutf8_to_index(str, u8len)); }
 
 STC_INLINE isize_t cstr_u8_size(const cstr* self)
-    { return utf8_count(cstr_str(self)); }
+    { return cutf8_count(cstr_str(self)); }
 
 STC_INLINE isize_t cstr_u8_to_index(const cstr* self, isize_t u8pos)
-    { return utf8_to_index(cstr_str(self), u8pos); }
+    { return cutf8_to_index(cstr_str(self), u8pos); }
 
 STC_INLINE zsview cstr_u8_tail(const cstr* self, isize_t u8len) {
     csview sv = cstr_sv(self);
@@ -209,12 +209,12 @@ STC_INLINE zsview cstr_u8_tail(const cstr* self, isize_t u8len) {
 }
 
 STC_INLINE csview cstr_u8_subview(const cstr* self, isize_t u8pos, isize_t u8len)
-    { return utf8_subview(cstr_str(self), u8pos, u8len); }
+    { return cutf8_subview(cstr_str(self), u8pos, u8len); }
 
 STC_INLINE cstr_iter cstr_u8_at(const cstr* self, isize_t u8pos) {
     csview sv;
-    sv.buf = utf8_at(cstr_str(self), u8pos);
-    sv.size = utf8_chr_size(sv.buf);
+    sv.buf = cutf8_at(cstr_str(self), u8pos);
+    sv.size = cutf8_chr_size(sv.buf);
     c_assert(sv.size);
     return c_literal(cstr_iter){.chr = sv};
 }
@@ -223,7 +223,7 @@ STC_INLINE cstr_iter cstr_u8_at(const cstr* self, isize_t u8pos) {
 
 STC_INLINE cstr_iter cstr_begin(const cstr* self) {
     csview sv = cstr_sv(self);
-    cstr_iter it = {.chr = {sv.buf, utf8_chr_size(sv.buf)}};
+    cstr_iter it = {.chr = {sv.buf, cutf8_chr_size(sv.buf)}};
     return it;
 }
 STC_INLINE cstr_iter cstr_end(const cstr* self) {
@@ -231,13 +231,13 @@ STC_INLINE cstr_iter cstr_end(const cstr* self) {
 }
 STC_INLINE void cstr_next(cstr_iter* it) {
     it->ref += it->chr.size;
-    it->chr.size = utf8_chr_size(it->ref);
+    it->chr.size = cutf8_chr_size(it->ref);
     if (*it->ref == '\0') it->ref = NULL;
 }
 
 STC_INLINE cstr_iter cstr_advance(cstr_iter it, isize_t u8pos) {
-    it.ref = utf8_offset(it.ref, u8pos);
-    it.chr.size = utf8_chr_size(it.ref);
+    it.ref = cutf8_offset(it.ref, u8pos);
+    it.chr.size = cutf8_chr_size(it.ref);
     if (*it.ref == '\0') it.ref = NULL;
     return it;
 }
@@ -269,25 +269,25 @@ STC_INLINE void cstr_uppercase(cstr* self)
 STC_INLINE bool cstr_istarts_with(const cstr* self, const char* sub) {
     csview sv = cstr_sv(self);
     isize_t len = c_strlen(sub);
-    return len <= sv.size && !utf8_icompare((sv.size = len, sv), c_sv(sub, len));
+    return len <= sv.size && !cutf8_icompare((sv.size = len, sv), c_sv(sub, len));
 }
 
 STC_INLINE bool cstr_iends_with(const cstr* self, const char* sub) {
     csview sv = cstr_sv(self);
     isize_t len = c_strlen(sub);
-    return len <= sv.size && !utf8_icmp(sv.buf + sv.size - len, sub);
+    return len <= sv.size && !cutf8_icmp(sv.buf + sv.size - len, sub);
 }
 
 STC_INLINE int cstr_icmp(const cstr* s1, const cstr* s2)
-    { return utf8_icmp(cstr_str(s1), cstr_str(s2)); }
+    { return cutf8_icmp(cstr_str(s1), cstr_str(s2)); }
 
 STC_INLINE bool cstr_ieq(const cstr* s1, const cstr* s2) {
     csview x = cstr_sv(s1), y = cstr_sv(s2);
-    return x.size == y.size && !utf8_icompare(x, y);
+    return x.size == y.size && !cutf8_icompare(x, y);
 }
 
 STC_INLINE bool cstr_iequals(const cstr* self, const char* str)
-    { return !utf8_icmp(cstr_str(self), str); }
+    { return !cutf8_icmp(cstr_str(self), str); }
 
 // END utf8 =====
 
@@ -350,7 +350,7 @@ STC_INLINE char* cstr_copy(cstr* self, cstr s) {
 
 
 STC_INLINE char* cstr_push(cstr* self, const char* chr)
-    { return cstr_append_n(self, chr, utf8_chr_size(chr)); }
+    { return cstr_append_n(self, chr, cutf8_chr_size(chr)); }
 
 STC_INLINE void cstr_pop(cstr* self) {
     csview sv = cstr_sv(self);
@@ -406,7 +406,7 @@ STC_INLINE void cstr_replace_at(cstr* self, isize_t pos, isize_t len, const char
     { cstr_replace_at_sv(self, pos, len, c_sv(repl, c_strlen(repl))); }
 
 STC_INLINE void cstr_u8_replace(cstr* self, isize_t u8pos, isize_t u8len, const char* repl) {
-    const char* s = cstr_str(self); csview span = utf8_subview(s, u8pos, u8len);
+    const char* s = cstr_str(self); csview span = cutf8_subview(s, u8pos, u8len);
     cstr_replace_at(self, span.buf - s, span.size, repl);
 }
 
@@ -418,7 +418,7 @@ STC_INLINE void cstr_insert(cstr* self, isize_t pos, const char* str)
     { cstr_replace_at_sv(self, pos, 0, c_sv(str, c_strlen(str))); }
 
 STC_INLINE void cstr_u8_insert(cstr* self, isize_t u8pos, const char* str)
-    { cstr_insert(self, utf8_to_index(cstr_str(self), u8pos), str); }
+    { cstr_insert(self, cutf8_to_index(cstr_str(self), u8pos), str); }
 
 STC_INLINE bool cstr_getline(cstr *self, FILE *fp)
     { return cstr_getdelim(self, '\n', fp); }

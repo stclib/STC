@@ -13,35 +13,35 @@ This header file is rarely needed alone. It is included by all the string/view t
 ```
 ## Methods
 ```c++
-isize_t         utf8_count(const char *s);                      // number of utf8 runes in s
-isize_t         utf8_count_n(const char *s, isize_t nbytes);    // number of utf8 runes within n bytes
-isize_t         utf8_to_index(const char* s, isize_t u8pos);    // from utf8 pos to byte index
-int             utf8_chr_size(const char* s);                   // utf8 character size: 1-4
-const char*     utf8_at(const char *s, isize_t u8pos);          // return the char* at u8pos
-csview          utf8_subview(const char* s, isize_t u8pos, isize_t u8len); // return a csview as the span
+isize_t         cutf8_count(const char *s);                      // number of utf8 runes in s
+isize_t         cutf8_count_n(const char *s, isize_t nbytes);    // number of utf8 runes within n bytes
+isize_t         cutf8_to_index(const char* s, isize_t u8pos);    // from utf8 pos to byte index
+int             cutf8_chr_size(const char* s);                   // utf8 character size: 1-4
+const char*     cutf8_at(const char *s, isize_t u8pos);          // return the char* at u8pos
+csview          cutf8_subview(const char* s, isize_t u8pos, isize_t u8len); // return a csview as the span
 
-bool            utf8_valid(const char* s);
-bool            utf8_valid_n(const char* s, isize_t nbytes);
-uint32_t        utf8_decode(utf8_decode_t *d, uint8_t byte);    // decode next byte to utf8, returns state.
-int             utf8_encode(char *out, uint32_t codepoint);     // encode unicode cp to out. returns nbytes.
-uint32_t        utf8_peek(const char* s);                       // codepoint value at character pos s
-uint32_t        utf8_peek_at(const char* s, isize_t u8offset);  // codepoint at utf8 offset (may be negative)
-int             utf8_icmp(const char* s1, const char* s2);      // case-insensitive char* comparison
-int             utf8_icompare(csview s1, csview s2);            // case-insensitive csview comparison
+bool            cutf8_valid(const char* s);
+bool            cutf8_valid_n(const char* s, isize_t nbytes);
+uint32_t        cutf8_decode(cutf8_decode_t *d, uint8_t byte);    // decode next byte to utf8, returns state.
+int             cutf8_encode(char *out, uint32_t codepoint);     // encode unicode cp to out. returns nbytes.
+uint32_t        cutf8_peek(const char* s);                       // codepoint value at character pos s
+uint32_t        cutf8_peek_at(const char* s, isize_t u8offset);  // codepoint at utf8 offset (may be negative)
+int             cutf8_icmp(const char* s1, const char* s2);      // case-insensitive char* comparison
+int             cutf8_icompare(csview s1, csview s2);            // case-insensitive csview comparison
 
-uint32_t        utf8_casefold(uint32_t c);                      // fold to a non-unique lowercase char.
-uint32_t        utf8_tolower(uint32_t c);
-uint32_t        utf8_toupper(uint32_t c);
+uint32_t        cutf8_casefold(uint32_t c);                      // fold to a non-unique lowercase char.
+uint32_t        cutf8_tolower(uint32_t c);
+uint32_t        cutf8_toupper(uint32_t c);
 
-bool            utf8_isalpha(uint32_t c);
-bool            utf8_isalnum(uint32_t c);
-bool            utf8_isword(uint32_t c);
-bool            utf8_iscased(uint32_t c);
-bool            utf8_isblank(uint32_t c);
-bool            utf8_isspace(uint32_t c);
-bool            utf8_isupper(uint32_t c);
-bool            utf8_islower(uint32_t c);
-bool            utf8_isgroup(int group, uint32_t c);
+bool            cutf8_isalpha(uint32_t c);
+bool            cutf8_isalnum(uint32_t c);
+bool            cutf8_isword(uint32_t c);
+bool            cutf8_iscased(uint32_t c);
+bool            cutf8_isblank(uint32_t c);
+bool            cutf8_isspace(uint32_t c);
+bool            cutf8_isupper(uint32_t c);
+bool            cutf8_islower(uint32_t c);
+bool            cutf8_isgroup(int group, uint32_t c);
 ```
 
 ## Example: UTF8 iteration and case conversion

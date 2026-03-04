@@ -255,13 +255,13 @@ isize_t cstr_printf(cstr* self, const char* fmt, ...) {
 
 void cstr_u8_erase(cstr* self, const isize_t u8pos, const isize_t u8len) {
     csview b = cstr_sv(self);
-    csview span = utf8_subview(b.buf, u8pos, u8len);
+    csview span = cutf8_subview(b.buf, u8pos, u8len);
     c_memmove((void *)&span.buf[0], &span.buf[span.size], b.size - span.size - (span.buf - b.buf));
     _cstr_set_size(self, b.size - span.size);
 }
 
 bool cstr_u8_valid(const cstr* self)
-    { return utf8_valid(cstr_str(self)); }
+    { return cutf8_valid(cstr_str(self)); }
 
 static int toLower(int c)
     { return c >= 'A' && c <= 'Z' ? c + 32 : c; }
@@ -271,25 +271,25 @@ static struct {
     int      (*conv_asc)(int);
     uint32_t (*conv_utf)(uint32_t);
 }
-fn_tocase[] = {{toLower, utf8_casefold},
-               {toLower, utf8_tolower},
-               {toUpper, utf8_toupper}};
+fn_tocase[] = {{toLower, cutf8_casefold},
+               {toLower, cutf8_tolower},
+               {toUpper, cutf8_toupper}};
 
 cstr cstr_tocase_sv(csview sv, int k) {
     cstr out = {0};
     char *buf = cstr_reserve(&out, sv.size*3/2);
     isize_t sz = 0;
-    utf8_decode_t d = {.state=0};
+    cutf8_decode_t d = {.state=0};
     const char* end = sv.buf + sv.size;
 
     while (sv.buf < end) {
-        sv.buf += utf8_decode_codepoint(&d, sv.buf, end);
+        sv.buf += cutf8_decode_codepoint(&d, sv.buf, end);
 
         if (d.codep < 0x80)
             buf[sz++] = (char)fn_tocase[k].conv_asc((int)d.codep);
         else {
             uint32_t cp = fn_tocase[k].conv_utf(d.codep);
-            sz += utf8_encode(buf + sz, cp);
+            sz += cutf8_encode(buf + sz, cp);
         }
     }
     _cstr_set_size(&out, sz);

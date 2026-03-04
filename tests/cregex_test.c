@@ -320,12 +320,12 @@ TEST(cregex, utf8_bad_string)
     EXPECT_EQ(cregex_match_aio("\\wstring", bad, match), CREG_NOMATCH);
     EXPECT_EQ(cregex_match_aio("\\x{FFFD}\\bstring", bad, match), CREG_OK);
 
-    EXPECT_EQ(0, utf8_icmp(bad, "tHiS iS bAd ��StRiNg"));
-    EXPECT_EQ(0, utf8_icmp("tHiS iS bAd ��StRiNg", bad));
-    EXPECT_GT(0, utf8_icmp("tHiS iS bAd ��StRiN", bad));
-    EXPECT_GT(0, utf8_icmp(bad, "tHiS iS bAd ��StRiNgX"));
-    EXPECT_FALSE(utf8_valid(bad));
-    EXPECT_TRUE(utf8_valid_n(bad, 12));
+    EXPECT_EQ(0, cutf8_icmp(bad, "tHiS iS bAd ��StRiNg"));
+    EXPECT_EQ(0, cutf8_icmp("tHiS iS bAd ��StRiNg", bad));
+    EXPECT_GT(0, cutf8_icmp("tHiS iS bAd ��StRiN", bad));
+    EXPECT_GT(0, cutf8_icmp(bad, "tHiS iS bAd ��StRiNgX"));
+    EXPECT_FALSE(cutf8_valid(bad));
+    EXPECT_TRUE(cutf8_valid_n(bad, 12));
 }
 
 TEST(cregex, match_csview_without_match_array)

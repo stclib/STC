@@ -216,8 +216,8 @@ typedef struct _Reljunk
 static inline int
 chartorune(_Rune *rune, const char *s)
 {
-    utf8_decode_t d = {.state=0};
-    int n = utf8_decode_codepoint(&d, s, NULL);
+    cutf8_decode_t d = {.state=0};
+    int n = cutf8_decode_codepoint(&d, s, NULL);
     *rune = d.codep;
     return n;
 }
@@ -229,9 +229,9 @@ utfrune(const char *s, _Rune c, const char* eol) // search
         for (; *s != 0 && s != eol; ++s)
             if (*s == (int)c) return s;
     } else {
-        utf8_decode_t d = {.state=0};
+        cutf8_decode_t d = {.state=0};
         while (*s != 0 && s != eol) {
-            int n = utf8_decode_codepoint(&d, s, NULL);
+            int n = cutf8_decode_codepoint(&d, s, NULL);
             if (d.codep == c) return s;
             s += n;
         }
@@ -246,11 +246,11 @@ utfruneicase(const char *s, _Rune c, const char* eol) {
             if (tolower(*s) == low)
                 return s;
     } else {
-        utf8_decode_t d = {.state=0};
-        c = utf8_casefold(c);
+        cutf8_decode_t d = {.state=0};
+        c = cutf8_casefold(c);
         while (*s != 0 && s != eol) {
-            int n = utf8_decode_codepoint(&d, s, NULL);
-            if (utf8_casefold(d.codep) == c)
+            int n = cutf8_decode_codepoint(&d, s, NULL);
+            if (cutf8_casefold(d.codep) == c)
                 return s;
             s += n;
         }
@@ -415,7 +415,7 @@ _operand(_Parser *par, _Token t)
     case TOK_RUNE:
         i->r.rune = par->yyrune; break;
     case TOK_IRUNE:
-        i->r.rune = utf8_casefold(par->yyrune);
+        i->r.rune = cutf8_casefold(par->yyrune);
     }
     _pushand(par, i, i);
     par->lastwasand = true;
@@ -832,7 +832,7 @@ _bldcclass(_Parser *par)
                         _rcerror(par, CREG_MALFORMEDCHARACTERCLASS);
                         return 0;
                     }
-                    ep[-1] = par->rune_type == TOK_IRUNE ? utf8_casefold(rune) : rune;
+                    ep[-1] = par->rune_type == TOK_IRUNE ? cutf8_casefold(rune) : rune;
                     continue;
                 }
             }
@@ -844,7 +844,7 @@ _bldcclass(_Parser *par)
                 _lexutfclass(par, &rune);
                 break;
         }
-        ep[0] = ep[1] = par->rune_type == TOK_IRUNE ? utf8_casefold(rune) : rune;
+        ep[0] = ep[1] = par->rune_type == TOK_IRUNE ? cutf8_casefold(rune) : rune;
         ep += 2;
     }
 
@@ -977,15 +977,15 @@ _runematch(_Rune s, _Rune r)
     case ASC_LO: inv = 1; case ASC_lo: return inv ^ (islower((int)r) != 0);
     case ASC_UP: inv = 1; case ASC_up: return inv ^ (isupper((int)r) != 0);
     case ASC_XD: inv = 1; case ASC_xd: return inv ^ (isxdigit((int)r) != 0);
-    case UTF_AN: inv = 1; case UTF_an: return inv ^ (int)utf8_isalnum(r);
-    case UTF_BL: inv = 1; case UTF_bl: return inv ^ (int)utf8_isblank(r);
-    case UTF_SP: inv = 1; case UTF_sp: return inv ^ (int)utf8_isspace(r);
-    case UTF_LL: inv = 1; case UTF_ll: return inv ^ (int)utf8_islower(r);
-    case UTF_LU: inv = 1; case UTF_lu: return inv ^ (int)utf8_isupper(r);
-    case UTF_LC: inv = 1; case UTF_lc: return inv ^ (int)utf8_iscased(r);
-    case UTF_WR: inv = 1; case UTF_wr: return inv ^ (int)utf8_isword(r);
-    case UTF_L:  inv = 1; case UTF_l:  return inv ^ (int)utf8_isalpha(r);
-    case UTF_ND: inv = 1; case UTF_nd: return inv ^ (int)utf8_isdigit(r);
+    case UTF_AN: inv = 1; case UTF_an: return inv ^ (int)cutf8_isalnum(r);
+    case UTF_BL: inv = 1; case UTF_bl: return inv ^ (int)cutf8_isblank(r);
+    case UTF_SP: inv = 1; case UTF_sp: return inv ^ (int)cutf8_isspace(r);
+    case UTF_LL: inv = 1; case UTF_ll: return inv ^ (int)cutf8_islower(r);
+    case UTF_LU: inv = 1; case UTF_lu: return inv ^ (int)cutf8_isupper(r);
+    case UTF_LC: inv = 1; case UTF_lc: return inv ^ (int)cutf8_iscased(r);
+    case UTF_WR: inv = 1; case UTF_wr: return inv ^ (int)cutf8_isword(r);
+    case UTF_L:  inv = 1; case UTF_l:  return inv ^ (int)cutf8_isalpha(r);
+    case UTF_ND: inv = 1; case UTF_nd: return inv ^ (int)cutf8_isdigit(r);
 /* isgroup: */
     case UTF_cc: case UTF_CC:
     case UTF_lm: case UTF_LM:
@@ -1018,7 +1018,7 @@ _runematch(_Rune s, _Rune r)
     case UTF_thai: case UTF_THAI:
         n = (int)s - UTF_GRP;
         inv = n & 1;
-        return inv ^ (int)utf8_isgroup(n / 2, r);
+        return inv ^ (int)cutf8_isgroup(n / 2, r);
     }
     return s == r;
 }
@@ -1099,7 +1099,7 @@ _regexec1(const _Reprog *progp,  /* program to run */
 
                 switch (inst->type) {
                 case TOK_IRUNE:
-                    r = utf8_casefold(r); /* FALLTHRU */
+                    r = cutf8_casefold(r); /* FALLTHRU */
                 case TOK_RUNE:
                     ok = _runematch(inst->r.rune, r);
                     break;
@@ -1136,15 +1136,15 @@ _regexec1(const _Reprog *progp,  /* program to run */
                     ok = true; /* FALLTHRU */
                 case TOK_WBOUND:
                     if (ok ^ (r == 0 || s == bol || s == j->eol ||
-                              (utf8_isword(utf8_peek_at(s, -1)) ^
-                               utf8_isword(utf8_peek(s)))))
+                              (cutf8_isword(cutf8_peek_at(s, -1)) ^
+                               cutf8_isword(cutf8_peek(s)))))
                         continue;
                     break;
                 case TOK_NCCLASS:
                     ok = true; /* FALLTHRU */
                 case TOK_CCLASS:
                     ep = inst->r.classp->end;
-                    if (icase) r = utf8_casefold(r);
+                    if (icase) r = cutf8_casefold(r);
                     for (rp = inst->r.classp->spans; rp < ep; rp += 2) {
                         if ((r >= rp[0] && r <= rp[1]) || (rp[0] == rp[1] && _runematch(rp[0], r)))
                             break;

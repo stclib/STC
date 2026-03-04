@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <time.h>
 #include <stc/algorithm.h>
 #include <stc/random.h>
 

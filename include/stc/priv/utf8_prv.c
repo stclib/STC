@@ -25,7 +25,7 @@
 
 #include "utf8_tab.c"
 
-const uint8_t utf8_dtab[] = {
+const uint8_t cutf8_dtab[] = {
    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -41,7 +41,7 @@ const uint8_t utf8_dtab[] = {
   12,36,12,12,12,12,12,12,12,12,12,12,
 };
 
-int utf8_encode(char *out, uint32_t c) {
+int cutf8_encode(char *out, uint32_t c) {
     if (c < 0x80U) {
         out[0] = (char) c;
         return 1;
@@ -66,26 +66,26 @@ int utf8_encode(char *out, uint32_t c) {
     return 0;
 }
 
-uint32_t utf8_peek_at(const char* s, isize_t offset) {
-    return utf8_peek(utf8_offset(s, offset));
+uint32_t cutf8_peek_at(const char* s, isize_t offset) {
+    return cutf8_peek(cutf8_offset(s, offset));
 }
 
-bool utf8_valid(const char* s) {
-    utf8_decode_t d = {.state=0};
-    while ((utf8_decode(&d, (uint8_t)*s) != utf8_REJECT) & (*s != '\0'))
+bool cutf8_valid(const char* s) {
+    cutf8_decode_t d = {.state=0};
+    while ((cutf8_decode(&d, (uint8_t)*s) != cutf8_REJECT) & (*s != '\0'))
         ++s;
-    return d.state == utf8_ACCEPT;
+    return d.state == cutf8_ACCEPT;
 }
 
-bool utf8_valid_n(const char* s, isize_t nbytes) {
-    utf8_decode_t d = {.state=0};
+bool cutf8_valid_n(const char* s, isize_t nbytes) {
+    cutf8_decode_t d = {.state=0};
     for (; nbytes-- != 0; ++s)
-        if ((utf8_decode(&d, (uint8_t)*s) == utf8_REJECT) | (*s == '\0'))
+        if ((cutf8_decode(&d, (uint8_t)*s) == cutf8_REJECT) | (*s == '\0'))
             break;
-    return d.state == utf8_ACCEPT;
+    return d.state == cutf8_ACCEPT;
 }
 
-uint32_t utf8_casefold(uint32_t c) {
+uint32_t cutf8_casefold(uint32_t c) {
     #define _at_fold(idx) &casemappings[idx].c2
     int i;
     c_lowerbound(uint32_t, c, _at_fold, c_default_less, casefold_len, &i);
@@ -98,7 +98,7 @@ uint32_t utf8_casefold(uint32_t c) {
     return c;
 }
 
-uint32_t utf8_tolower(uint32_t c) {
+uint32_t cutf8_tolower(uint32_t c) {
     #define _at_upper(idx) &casemappings[upcase_ind[idx]].c2
     int i, n = c_countof(upcase_ind);
     c_lowerbound(uint32_t, c, _at_upper, c_default_less, n, &i);
@@ -113,7 +113,7 @@ uint32_t utf8_tolower(uint32_t c) {
     return c;
 }
 
-uint32_t utf8_toupper(uint32_t c) {
+uint32_t cutf8_toupper(uint32_t c) {
     #define _at_lower(idx) &casemappings[lowcase_ind[idx]].m2
     int i, n = c_countof(lowcase_ind);
     c_lowerbound(uint32_t, c, _at_lower, c_default_less, n, &i);
@@ -128,32 +128,32 @@ uint32_t utf8_toupper(uint32_t c) {
     return c;
 }
 
-int utf8_decode_codepoint(utf8_decode_t* d, const char* s, const char* end) { // s < end
+int cutf8_decode_codepoint(cutf8_decode_t* d, const char* s, const char* end) { // s < end
     const char* start = s;
-    do switch (utf8_decode(d, (uint8_t)*s++)) {
-        case utf8_ACCEPT: return (int)(s - start);
-        case utf8_REJECT: goto recover;
+    do switch (cutf8_decode(d, (uint8_t)*s++)) {
+        case cutf8_ACCEPT: return (int)(s - start);
+        case cutf8_REJECT: goto recover;
     } while (s != end);
 
-    recover: // non-complete utf8 is also treated as utf8_REJECT
-    d->state = utf8_ACCEPT;
+    recover: // non-complete utf8 is also treated as cutf8_REJECT
+    d->state = cutf8_ACCEPT;
     d->codep = 0xFFFD;
     //return 1;
     int n = (int)(s - start);
     return n > 2 ? n - 1 : 1;
 }
 
-int utf8_icompare(const csview s1, const csview s2) {
-    utf8_decode_t d1 = {.state=0}, d2 = {.state=0};
+int cutf8_icompare(const csview s1, const csview s2) {
+    cutf8_decode_t d1 = {.state=0}, d2 = {.state=0};
     const char *e1 = s1.buf + s1.size, *e2 = s2.buf + s2.size;
     isize_t j1 = 0, j2 = 0;
     while ((j1 < s1.size) & (j2 < s2.size)) {
         if (s2.buf[j2] == '\0') return s1.buf[j1];
 
-        j1 += utf8_decode_codepoint(&d1, s1.buf + j1, e1);
-        j2 += utf8_decode_codepoint(&d2, s2.buf + j2, e2);
+        j1 += cutf8_decode_codepoint(&d1, s1.buf + j1, e1);
+        j2 += cutf8_decode_codepoint(&d2, s2.buf + j2, e2);
 
-        int32_t c = (int32_t)utf8_casefold(d1.codep) - (int32_t)utf8_casefold(d2.codep);
+        int32_t c = (int32_t)cutf8_casefold(d1.codep) - (int32_t)cutf8_casefold(d2.codep);
         if (c != 0) return (int)c;
     }
     return (int)(s1.size - s2.size);

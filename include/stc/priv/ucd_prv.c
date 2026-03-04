@@ -1286,7 +1286,7 @@ static const UGroup _utf8_unicode_groups[U8G_SIZE] = {
     _e_arg(U8G_Thai, UNI_ENTRY(Thai)),
 };
 
-bool utf8_isgroup(int group, uint32_t c) {
+bool cutf8_isgroup(int group, uint32_t c) {
     #define _at_group(idx) &_utf8_unicode_groups[group].r16[idx].hi
     int i, n = _utf8_unicode_groups[group].nr16;
     c_lowerbound(uint32_t, c, _at_group, c_default_less, n, &i);

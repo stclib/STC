@@ -107,8 +107,8 @@ void demo4(void)
     char chr[4];
 
     c_filter(csview, s, true
-        && utf8_isupper(utf8_peek(value))
-        && (utf8_encode(chr, utf8_tolower(utf8_peek(value))),
+        && cutf8_isupper(cutf8_peek(value))
+        && (cutf8_encode(chr, cutf8_tolower(cutf8_peek(value))),
             cstr_push(&out, chr))
     );
     printf(" %s\n", cstr_str(&out));

@@ -46,19 +46,19 @@ static uint32_t utf8_toupper_bruteforce(uint32_t c) {
 TEST(utf8, utf8_casefold)
 {
     for (unsigned ch = 0; ch < 0x20000; ++ch)
-        EXPECT_EQ(utf8_casefold(ch), utf8_casefold_bruteforce(ch));
+        EXPECT_EQ(cutf8_casefold(ch), utf8_casefold_bruteforce(ch));
 }
 
 TEST(utf8, utf8_tolower)
 {
     for (unsigned ch = 0; ch < 0x20000; ++ch)
-        EXPECT_EQ(utf8_tolower(ch), utf8_tolower_bruteforce(ch));
+        EXPECT_EQ(cutf8_tolower(ch), utf8_tolower_bruteforce(ch));
 }
 
 TEST(utf8, utf8_toupper)
 {
     for (unsigned ch = 0; ch < 0x20000; ++ch)
-        EXPECT_EQ(utf8_toupper(ch), utf8_toupper_bruteforce(ch));
+        EXPECT_EQ(cutf8_toupper(ch), utf8_toupper_bruteforce(ch));
 }
 
 #if 0
@@ -68,7 +68,7 @@ TEST(utf8, bench_utf8_casefold)
     int repeats = 500;
     for (int i = 0; i < repeats; i++)
         for (unsigned ch = 1; ch < 65536; ++ch)
-            EXPECT_TRUE(utf8_casefold(ch));
+            EXPECT_TRUE(cutf8_casefold(ch));
     printf("binary=%lldus\n", (cco_ticks() - t) / repeats);
 
     t = cco_ticks();
