@@ -83,11 +83,11 @@ typedef struct {
 
 #define c_match(it, re, str) \
     cregex_iter it = {.regex=re, .input={str}, .match={{0}}}; \
-    cregex_match(it.regex, it.input.buf, it.match, CREG_NEXT) == CREG_OK && it.match[0].size;
+    cregex_match(it.regex, it.input.buf, it.match, CREG_NEXT) == CREG_OK;
 
 #define c_match_sv(it, re, strview) \
     cregex_iter it = {.regex=re, .input=strview, .match={{0}}}; \
-    cregex_match_sv(it.regex, it.input, it.match, CREG_NEXT) == CREG_OK && it.match[0].size;
+    cregex_match_sv(it.regex, it.input, it.match, CREG_NEXT) == CREG_OK;
 
 /* compile a regex from a pattern. return CREG_OK, or negative error code on failure. */
 extern int cregex_compile_pro(cregex *re, const char* pattern, int cflags);
