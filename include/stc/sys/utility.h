@@ -96,10 +96,10 @@
     while ((value = _it.ref) && !(pred)) \
         C##_next(&_it); \
     for (_i = _it; (value = _it.ref); C##_next(&_it)) { \
-        if (pred) C##_value_drop(_cnt, _it.ref), ++_n; \
-        else *_i.ref = *_it.ref, C##_next(&_i); \
+        if (pred) { C##_value_drop(_cnt, _it.ref); --_n; } \
+        else { *_i.ref = *_it.ref; C##_next(&_i); } \
     } \
-    C##_adjust_end_(_cnt, -_n); \
+    C##_adjust_end_(_cnt, _n); \
 } while (0)
 
 // --------------------------------

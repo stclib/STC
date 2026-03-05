@@ -148,9 +148,9 @@ STC_INLINE bool _cbits_disjoint(const uintptr_t* set, const uintptr_t* other, co
   #define _i_length c_GETARG(2, i_type)
 #else
   #define Self cbits
-#endif
-#ifndef i_allocator
-  #define i_allocator c
+  #ifndef i_allocator
+    #define i_allocator c
+  #endif
 #endif
 #define _i_MEMB(name) c_JOIN(Self, name)
 
@@ -329,6 +329,7 @@ STC_INLINE bool _i_MEMB(_disjoint)(const Self* self, const Self* other) {
 }
 
 #include "priv/linkage2.h"
+#undef T
 #undef i_type
 #undef _i_length
 #undef _i_MEMB
