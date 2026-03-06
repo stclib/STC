@@ -9,7 +9,7 @@ int main(void)
 
     Span2 tmp2 = cspan_submd3(&md3, 2);
     cspan_transpose(&tmp2);
-    Span last_col = cspan_submd2(&tmp2, 4);
+    Span last_col = cspan_submd2(&tmp2, tmp2.shape[0] - 1);
 
     Span2 sliced = cspan_slice(&md3, Span2, {c_ALL}, {c_ALL}, {0});
 
