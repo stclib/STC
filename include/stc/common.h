@@ -38,9 +38,9 @@
     #define ISIZE_MIN   PTRDIFF_MIN
     #define ISIZE_MAX   PTRDIFF_MAX
 #endif
-#if !defined STC_HAS_TYPEOF && (_MSC_FULL_VER >= 193933428 || \
-    defined __GNUC__ || defined __clang__ || defined __TINYC__)
-    #define STC_HAS_TYPEOF 1
+#if defined __GNUC__ || defined __clang__ || \
+    defined __TINYC__ || _MSC_FULL_VER >= 193933428
+    #define STC_HAS_TYPEOF
 #endif
 #if defined __GNUC__
   #define c_GNUATTR(...) __attribute__((__VA_ARGS__))
@@ -312,12 +312,21 @@ STC_INLINE size_t c_hash_mix_n(size_t h[], isize_t n) {
 }
 
 // generic typesafe swap
+#ifdef STC_HAS_TYPEOF
+#define c_swap(xp, yp) do { \
+    __typeof__(xp) _xp = (xp), _yp = (yp); \
+    __typeof__(0[xp]) _tv = *_xp; *_xp = *_yp; *_yp = _tv; \
+} while (0)
+#else
 #define c_swap(xp, yp) do { \
     (void)sizeof((xp) == (yp)); \
-    typedef struct { char d[sizeof *(xp)]; } _te; \
-    _te *_xp = (_te*)(xp), *_yp = (_te*)(yp); \
-    _te _e = *_xp; *_xp = *_yp; *_yp = _e; \
+    char _tv[sizeof *(xp)]; \
+    void *_xp = xp, *_yp = yp; \
+    memcpy(_tv, _xp, sizeof _tv); \
+    memcpy(_xp, _yp, sizeof _tv); \
+    memcpy(_yp, _tv, sizeof _tv); \
 } while (0)
+#endif
 
 // get next power of two
 STC_INLINE isize_t c_next_pow2(isize_t n) {

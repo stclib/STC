@@ -9,7 +9,7 @@ cco_task_struct (ticktock) {
 int ticker(struct ticktock* o) {
     cco_async (o) {
         while (1) {
-            cco_await_timer(&o->tm, 1.0);
+            cco_await_timer(&o->tm, 0.1);
             puts("tick");
         }
         cco_finalize:
@@ -21,7 +21,7 @@ int ticker(struct ticktock* o) {
 int tocker(struct ticktock* o) {
     cco_async (o) {
         while (1) {
-            cco_await_timer(&o->tm, 2.0);
+            cco_await_timer(&o->tm, 0.2);
             puts("tock");
         }
         cco_finalize:
@@ -36,7 +36,7 @@ int main(void) {
     cco_spawn(&tick, NULL, NULL, fb);
     cco_spawn(&tock, NULL, NULL, fb);
 
-    cco_timer tm = cco_make_timer(5.0);
+    cco_timer tm = cco_make_timer(0.5);
     cco_run_fiber(&fb) {
         if (cco_timer_expired(&tm)) {
             cco_stop(fb->task);

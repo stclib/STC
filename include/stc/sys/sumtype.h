@@ -105,7 +105,7 @@ int main(void) {
     }
 #define c_sumtype c_union
 
-#if defined STC_HAS_TYPEOF && STC_HAS_TYPEOF
+#ifdef STC_HAS_TYPEOF
     #define c_when(varptr) \
         for (__typeof__(varptr) _vp1 = (varptr); _vp1; _vp1 = NULL) \
         switch (_vp1->_any_.tag)

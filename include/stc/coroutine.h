@@ -106,7 +106,7 @@ typedef struct {
 #define cco_is_done(co) ((co)->base.state.pos == cco_STATE_DONE)
 #define cco_is_active(co) ((co)->base.state.pos != cco_STATE_DONE)
 
-#if defined STC_HAS_TYPEOF && STC_HAS_TYPEOF
+#ifdef STC_HAS_TYPEOF
     #define _cco_state_t(co) __typeof__((co)->base.state)
     #define _cco_validate_task_struct(co) \
         c_static_assert(/* error: co->base not first member in task struct */ \

@@ -242,13 +242,13 @@ STC_INLINE _m_result _c_MEMB(_put)(Self* self, _m_keyraw rkey, _m_rmapped rmappe
 #endif // _i_is_map
 
 STC_INLINE void _c_MEMB(_put_n)(Self* self, const _m_raw* raw, isize_t n) {
-    while (n--)
+    for (; n--; ++raw)
         #if defined _i_is_set && defined _i_no_emplace
-            _c_MEMB(_insert)(self, *raw++);
+            _c_MEMB(_insert)(self, *raw);
         #elif defined _i_is_set
-            _c_MEMB(_emplace)(self, *raw++);
+            _c_MEMB(_emplace)(self, *raw);
         #else
-            _c_MEMB(_put)(self, raw->first, raw->second), ++raw;
+            _c_MEMB(_put)(self, raw->first, raw->second);
         #endif
 }
 #endif // !_i_no_put
