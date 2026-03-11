@@ -33,7 +33,7 @@ int Philosopher(struct Philosopher* o) {
                       o->hunger >= o->right->hunger);
             o->left->hunger += (o->left->mode == ph_HUNGRY); // don't starve the neighbours
             o->right->hunger += (o->right->mode == ph_HUNGRY);
-            o->hunger = INT32_MAX;
+            o->hunger = INT32_MAX/2;
             o->mode = ph_EATING;
 
             duration = 0.5 + crand64_real();
@@ -71,7 +71,7 @@ int Dining(struct Dining* o) {
                 .left = &o->philos[(i - 1 + num_philosophers) % num_philosophers],
                 .right = &o->philos[(i + 1) % num_philosophers],
             };
-            cco_spawn(&o->philos[i], cco_wg(), &o->timer); // pass in cco_env().
+            cco_spawn(&o->philos[i], cco_wg(), &o->timer); // pass in timer as cco_env().
         }
 
         cco_on_child_error(cco_SHUTDOWN, cco_wg());

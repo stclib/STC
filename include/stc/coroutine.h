@@ -81,9 +81,7 @@ enum cco_deprecated {
 };      
 #define CCO_CANCEL cco_CANCEL                        // [deprecated]
 #define cco_cancel_group cco_cancel_all              // [deprecated]      
-#define cco_await_all_of cco_await_all               // [deprecated]
 #define cco_await_cancel_group cco_await_cancel_all  // [deprecated]
-#define cco_await_cancel_all_of cco_await_cancel_all // [deprecated]
 
 /*
  * cco_group: waitgroup for tasks/fibers
@@ -236,7 +234,7 @@ typedef struct {
         int awaitbits; \
         struct Task##_state state; \
         struct cco_task* parent_task; \
-        cco_group default_wg; \
+        cco_group wg; /* default waitgroup */ \
     } Task##_base; \
     struct Task
 
@@ -261,18 +259,18 @@ typedef struct cco_task cco_task;
 #define cco_status() (cco_fib()->status + 0)
 #define cco_error() (*(const cco_error_t*)&cco_fib()->error)
 #define cco_clear_error() (cco_fib()->error.code = 0)
-#define cco_wg() (&_cco_getbase()->default_wg)
+#define cco_wg() (&_cco_getbase()->wg)
 #define cco_parent_wg() (_cco_st->parent_wg + 0)
 
-#define cco_env(a_task) ((a_task)->base.state.fib->env)
+#define cco_env(a_task) (1 ? (a_task)->base.state.fib->env : NULL)
 #define cco_set_env(a_task, the_env) ((a_task)->base.state.fib->env = the_env)
 
 enum _cco_error_action { _cco_SET_NOTIFY = 1, _cco_SET_SHUTDOWN = 2 };
-#define cco_on_child_error(error, wg) \
+#define cco_on_child_error(error, a_group) \
     switch (error) { \
-        case cco_NOTIFY: (wg)->on_error = _cco_SET_NOTIFY; break; \
-        case cco_SHUTDOWN: (wg)->on_error = _cco_SET_SHUTDOWN; break; \
-        case 0: (wg)->on_error = 0; break; \
+        case cco_NOTIFY: (a_group)->on_error = _cco_SET_NOTIFY; break; \
+        case cco_SHUTDOWN: (a_group)->on_error = _cco_SET_SHUTDOWN; break; \
+        case 0: (a_group)->on_error = 0; break; \
         default: c_assert(false); \
     }
 
@@ -399,12 +397,14 @@ static inline int _cco_resume_task(cco_task* task)
     cco_await_OFFSET(cco_fib()->tmp_wg->spawn_count == 0, 100000); /* await_all() */ \
 } while (0)
 
+#define cco_await_all_fibers() \
+    cco_await(cco_fib() == cco_fib()->next)
+
 #define cco_await_cancel_all(a_group) do { \
     cco_group* _grp = a_group; \
     cco_cancel_all(_grp); \
     cco_await_all(_grp); \
 } while (0)
-
 
 #define cco_run_fiber(...) c_MACRO_OVERLOAD(cco_run_fiber, __VA_ARGS__)
 #define cco_run_fiber_1(fiber_ref) \

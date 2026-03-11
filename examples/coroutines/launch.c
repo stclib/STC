@@ -62,8 +62,7 @@ int taskC(struct taskC* o) {
         puts("taskC more work");
 
         // initial return value
-        {struct Output* e = cco_env(o);
-         e->value = o->x + o->y;}
+        cco_env(o)->value = o->x + o->y;
         cco_yield;
         
         cco_finalize:
@@ -86,8 +85,7 @@ int taskB(struct taskB* o) {
         cco_await_task(c_new(struct taskC, {{taskC}, 1.2f, 3.4f}));
 
         puts("taskB work");
-        {struct Output* e = cco_env(o);
-         e->value += o->d;} // accumulate return value
+        cco_env(o)->value += o->d; // accumulate return value
         cco_yield;
 
         cco_on_child_error(cco_SHUTDOWN, cco_wg()); // set error handler for the spawned tasks.
@@ -121,8 +119,7 @@ int taskA(struct taskA* o) {
         cco_await_task(c_new(struct taskB, {{taskB}, 3.1415}));
 
         puts("taskA work");
-        {struct Output* e = cco_env(o);
-         e->value = o->a;} // final return value;
+        cco_env(o)->value = o->a; // final return value;
         cco_yield;
 
         cco_finalize:

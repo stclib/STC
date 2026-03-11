@@ -102,12 +102,13 @@ void            cco_cancel_all(cco_group* wg);                      // Cancel al
                 cco_await_cancel_task(cco_task* task);              // Cancel and await for task to finalize async.
                                                                     // Shorthand for cco_cancel_task() + cco_await_task().
                 // Await spawned tasks in a specific (wait)group (for making nested await scopes):
-                cco_await_all(cco_group* wg);                       // Await for all (remaining) tasks in waitgroup to finish,
+                cco_await_all(cco_group* wg);                       // Await all (remaining) tasks in waitgroup to finish.
                 cco_await_any(cco_group* wg);                       // Await for any one spawned task in waitgroup to
                                                                     // finish, and cancel the remaining.
                 cco_await_cancel_all(cco_group* wg);                // Cancel all tasks in wg, and await for them to finalize.
                                                                     // Shorthand for cco_cancel_all(wg) + cco_await_all(wg).
-                cco_await_n(int n, cco_group* wg);                  // Awaits for n spawned tasks in wg. Does *not* cancel the remaining.
+                cco_await_n(int n, cco_group* wg);                  // Awaits n spawned tasks in wg. Does *not* cancel remaining tasks.
+                cco_await_all_fibers();                             // Awaits all fibers/spawned tasks to be joined.
 ```
 #### Channels
 A channel represents a communication syncronization point for collaborating tasks. One of the tasks should own/store
