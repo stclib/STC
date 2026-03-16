@@ -8,7 +8,7 @@ enum {num_philosophers = 5};
 enum PhMode {ph_THINKING, ph_HUNGRY, ph_EATING};
 
 // Philosopher coroutine: use task coroutine
-cco_task_struct (Philosopher, cco_timer*) { // optional: make cco_env(o) return cco_timer*
+cco_task_struct (Philosopher, cco_timer*) { // optional: make cco_data(o) return cco_timer*
     Philosopher_base base; // required
     int id;
     cco_timer timer;
@@ -22,12 +22,12 @@ int Philosopher(struct Philosopher* o) {
     cco_async (o) {
         while (1) {
             double duration = 1.0 + crand64_real()*2.0;
-            printf("%4.1f: Philosopher %d is thinking for %.1f minutes...\n", 10*cco_timer_elapsed(cco_env(o)), o->id, duration*10);
+            printf("%4.1f: Philosopher %d is thinking for %.1f minutes...\n", 10*cco_timer_elapsed(cco_data(o)), o->id, duration*10);
             o->hunger = 0;
             o->mode = ph_THINKING;
             cco_await_timer(&o->timer, duration);
 
-            printf("%4.1f: Philosopher %d is hungry...\n", 10*cco_timer_elapsed(cco_env(o)), o->id);
+            printf("%4.1f: Philosopher %d is hungry...\n", 10*cco_timer_elapsed(cco_data(o)), o->id);
             o->mode = ph_HUNGRY;
             cco_await(o->hunger >= o->left->hunger &&
                       o->hunger >= o->right->hunger);
@@ -37,7 +37,7 @@ int Philosopher(struct Philosopher* o) {
             o->mode = ph_EATING;
 
             duration = 0.5 + crand64_real();
-            printf("%4.1f: Philosopher %d is eating for %.1f minutes...\n", 10*cco_timer_elapsed(cco_env(o)), o->id, duration*10);
+            printf("%4.1f: Philosopher %d is eating for %.1f minutes...\n", 10*cco_timer_elapsed(cco_data(o)), o->id, duration*10);
             cco_await_timer(&o->timer, duration);
 
             if (o->id == 3) { // For demonstration purpose:
@@ -71,7 +71,7 @@ int Dining(struct Dining* o) {
                 .left = &o->philos[(i - 1 + num_philosophers) % num_philosophers],
                 .right = &o->philos[(i + 1) % num_philosophers],
             };
-            cco_spawn(&o->philos[i], cco_wg(), &o->timer); // pass in timer as cco_env().
+            cco_spawn(&o->philos[i], cco_wg(), &o->timer); // pass in timer as cco_data().
         }
 
         cco_await_timer(&o->timer, o->duration);

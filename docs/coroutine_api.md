@@ -60,7 +60,7 @@ void            cco_stop(Coroutine* co);                            // Coroutine
 #### Tasks (coroutine function-objects) and Fibers (green thread-like entity within a system thread)
 ```c++
                 cco_task_struct(name) {<name>_base base; ..};       // Define a custom coroutine task struct; "Extends" cco_task struct.
-                cco_task_struct(name, EnvPtr) {<name>_base base; ..}; // Also specify value type of pointer returned from cco_env(). Default: void.
+                cco_task_struct(name, <Data>*) {<name>_base base; ..}; // Also specify value type of pointer returned from cco_data(). Default: void.
 
                 cco_yield_to(cco_task* task);                       // Yield to another task (symmetric transfer of control).
 int             cco_resume(cco_task* task);                         // Resume task until it suspends (blocking). Return status.
@@ -88,8 +88,8 @@ int             cco_status();                                       // Get curre
 cco_error_t     cco_error();                                        // Get error object created from cco_throw(error) call.
                                                                     // Should be handled in a cco_finalize: section.
 cco_fiber*      cco_task_fiber(cco_task* task);                     // Get fiber associated with task.
-Env*            cco_env(cco_task* task);                            // Get environment pointer, stored in the associated fiber.
-Env*            cco_set_env(cco_task* task, Env* env);              // Set environment pointer.
+Data*           cco_data(cco_task* task);                           // Get auxiliary data pointer, stored in the associated fiber.
+Data*           cco_set_data(cco_task* task, Data* dt);             // Set auxiliary data pointer.
 ```
 #### Task/Fiber and Waitgroup Cancellation
 ```c++
@@ -124,20 +124,20 @@ storage (i.e. a constant and/or expression using variables stored in a task).
 ```
 
 #### Spawning and Running Tasks
-The `Env` type used below is by default `void`, but can be specified in *cco_task_struct()* definition.
+The `Data` type used below is by default `void`, but can be specified in *cco_task_struct()* definition.
 ```c++
 void            cco_reset_group(cco_group* wg);                     // Reset waitgroup (normally not needed).
 cco_fiber*      cco_spawn(cco_task* tsk, cco_group* wg);            // Lazily spawn a new concurrent task within a waitgroup.
-cco_fiber*      cco_spawn(cco_task* tsk, cco_group* wg, Env* env);  // Variable env may be used to point to input data or result.
-cco_fiber*      cco_spawn(cco_task* tsk, cco_group* wg, Env* env,   // This may be called from main or outside `cco_async` scope.
+cco_fiber*      cco_spawn(cco_task* tsk, cco_group* wg, Data* dt);  // Variable dt may be used to point to input data or result.
+cco_fiber*      cco_spawn(cco_task* tsk, cco_group* wg, Data* dt,   // This may be called from main or outside `cco_async` scope.
                           cco_fiber* fiber);
 
                 cco_run_task(cco_task* tsk) {}                      // Run task blocking until it and spawned fibers are finished.
-                cco_run_task(cco_task* tsk, Env *env) {}            // Run task blocking with env data
-                cco_run_task(fib_iter, cco_task* tsk, Env *env) {}  // Run task blocking. fib_iter reference the current fiber.
+                cco_run_task(cco_task* tsk, Data *dt) {}            // Run task blocking with auxiliary data
+                cco_run_task(fib_iter, cco_task* tsk, Data *dt) {}  // Run task blocking. fib_iter reference the current fiber.
 
 cco_fiber*      cco_new_fiber(cco_task* tsk);                       // Create an initial fiber from a task.
-cco_fiber*      cco_new_fiber(cco_task* tsk, Env* env);             // Create an initial fiber from a task and env (inputs or a future).
+cco_fiber*      cco_new_fiber(cco_task* tsk, Data* dt);             // Create an initial fiber from a task and dt (inputs or a result).
                 cco_run_fiber(cco_fiber** fiber_ref) {}             // Run fiber(s) blocking. Note it takes a (cco_fiber **) as arg.
                 cco_run_fiber(fib_iter, cco_fiber* fiber) {}        // Run fiber(s) blocking. fib_iter reference the current fiber.
 ```
@@ -477,7 +477,7 @@ int TaskB(struct TaskB* o) {
     cco_async (o) {
         printf("TaskB start: %g\n", o->d);
 
-        cco_await_task(&cco_env(o)->task_c);
+        cco_await_task(&cco_data(o)->task_c);
         puts("TaskB work");
 
         cco_finalize:
@@ -490,7 +490,7 @@ int TaskA(struct TaskA* o) {
     cco_async (o) {
         printf("TaskA start: %d\n", o->a);
 
-        cco_await_task(&cco_env(o)->task_b);
+        cco_await_task(&cco_data(o)->task_b);
 
         puts("TaskA work");
 
@@ -509,7 +509,7 @@ int start(struct start* o) {
     cco_async (o) {
         puts("start");
 
-        cco_await_task(&cco_env(o)->task_a);
+        cco_await_task(&cco_data(o)->task_a);
 
         cco_finalize:
         puts("done");
@@ -520,7 +520,7 @@ int start(struct start* o) {
 
 int main(void)
 {
-    struct Subtasks env = {
+    struct Subtasks data = {
         {{TaskA}, 42},
         {{TaskB}, 3.1415},
         {{TaskC}, 1.2f, 3.4f},
@@ -528,7 +528,7 @@ int main(void)
     struct start task = {{start}};
 
     int count = 0;
-    cco_run_task(&task, &env) { ++count; }
+    cco_run_task(&task, &data) { ++count; }
     printf("resumes: %d\n", count);
 }
 ```
@@ -540,7 +540,7 @@ int main(void)
 Sometimes the call-tree is dynamic or more complex, then we can dynamically allocate the coroutine frames before
 they are awaited. This is somewhat more general and simpler, but requires heap allocation. Note that the coroutine
 frames are now freed at the end of the coroutine functions, i.e. after cco_async {} scope. Example is based on
-the previous, but also shows how to use the env field in `cco_fiber` to return a value from the coroutine
+the previous, but also shows how to use the data field in `cco_fiber` to return a value from the coroutine
 call/await:
 
 <details>
@@ -739,7 +739,7 @@ the scope in that it was created.
 #define i_keydrop(p) c_free_n(*p, 1) // { puts("free task"); c_free_n(*p, 1); }
 #include <stc/queue.h>
 
-// Specify Tasks as the environment pointer type:
+// Specify Tasks as the auxiliary data pointer type:
 cco_task_struct (Scheduler, Tasks*) {
     Scheduler_base base;
     cco_task* _pulled;
@@ -757,7 +757,7 @@ cco_task_struct (TaskX) {
 
 int scheduler(struct Scheduler* o) {
     cco_async (o) {
-        cco_set_env(o, &o->tasks);
+        cco_set_data(o, &o->tasks);
 
         while (!Tasks_is_empty(&o->tasks)) {
             o->_pulled = Tasks_pull(&o->tasks);
@@ -803,7 +803,7 @@ static int TaskA(struct TaskA* o) {
         cco_yield;
 
         puts("A adds task C");
-        Tasks_push(cco_env(o), cco_cast_task(c_new(struct TaskX, {.base={taskX}, .id='C'})));
+        Tasks_push(cco_data(o), cco_cast_task(c_new(struct TaskX, {.base={taskX}, .id='C'})));
         cco_yield;
 
         puts("A is back doing more work");

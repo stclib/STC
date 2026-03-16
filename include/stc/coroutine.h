@@ -81,8 +81,10 @@ enum cco_deprecated {
     CCO_AWAIT      = cco_AWAIT,      // [deprecated]      
 };      
 #define CCO_CANCEL cco_CANCEL                        // [deprecated]
-#define cco_cancel_group cco_cancel_all              // [deprecated]      
+#define cco_cancel_group(wg) cco_cancel_all(wg)      // [deprecated]      
 #define cco_await_cancel_group cco_await_cancel_all  // [deprecated]
+#define cco_env(tsk) cco_data(tsk)                   // [deprecated]
+#define cco_set_env(tsk, dt) cco_set_data(tsk, dt)   // [deprecated]
 
 /*
  * cco_group: waitgroup for tasks/fibers
@@ -203,12 +205,12 @@ typedef struct {
     intptr_t info;
 } cco_error_t;
 
-#define cco_fiber_struct(Prefix, EnvPtr) \
-    typedef int Prefix##_env_ptr_check[sizeof((EnvPtr)0 == (void*)0)]; \
-    typedef EnvPtr Prefix##_env_ptr; \
+#define cco_fiber_struct(Prefix, DataPtr) \
+    typedef int Prefix##_data_ptr_check[sizeof((DataPtr)0 == (void*)0)]; \
+    typedef DataPtr Prefix##_data_ptr; \
     struct Prefix##_fiber { \
         struct cco_task* task; \
-        Prefix##_env_ptr env; \
+        Prefix##_data_ptr data; \
         cco_group *tmp_wg, *failed_wg; \
         struct cco_task* cur_parent_task; \
         struct cco_task_fiber *next, *parent; \
@@ -223,8 +225,8 @@ typedef struct {
 #define cco_task_struct_1(Task) \
     cco_task_struct_2(Task, void*)
 
-#define cco_task_struct_2(Task, EnvPtr) \
-    cco_fiber_struct(Task, EnvPtr); \
+#define cco_task_struct_2(Task, DataPtr) \
+    cco_fiber_struct(Task, DataPtr); \
     cco_state_struct(Task); \
     _cco_task_struct(Task)
 
@@ -263,8 +265,8 @@ typedef struct cco_task cco_task;
 #define cco_wg() (&_cco_getbase()->wg)
 #define cco_parent_wg() (_cco_st->parent_wg + 0)
 
-#define cco_env(a_task) (1 ? (a_task)->base.state.fib->env : NULL)
-#define cco_set_env(a_task, the_env) ((a_task)->base.state.fib->env = the_env)
+#define cco_data(a_task) (1 ? (a_task)->base.state.fib->data : NULL)
+#define cco_set_data(a_task, ptr) ((a_task)->base.state.fib->data = ptr)
 
 // https://www.happycoders.eu/java/structured-concurrency-structuredtaskscope/
 enum _cco_error_action { _cco_SET_SHUTDOWN = 0, _cco_SET_NOTIFY = 1, _cco_SET_IGNORE = 2 };
@@ -326,7 +328,7 @@ void _cco_throw(int32_t err_code, intptr_t info_data, cco_task* tsk, const char*
 #define cco_await_task_1(a_task) cco_await_task_2(a_task, cco_DONE)
 #define cco_await_task_2(a_task, _awaitbits) \
     do { \
-        (void)sizeof(cco_env(a_task) == _cco_st->fib->env); \
+        (void)sizeof(cco_data(a_task) == _cco_st->fib->data); \
         {cco_task* _tsk = cco_cast_task(a_task); \
         cco_fiber* _fib = _cco_getbase()->state.fib; \
         _tsk->base.awaitbits = (_awaitbits); \
@@ -340,7 +342,7 @@ void _cco_throw(int32_t err_code, intptr_t info_data, cco_task* tsk, const char*
 /* Symmetric coroutine flow of control transfer */
 #define cco_yield_to(a_task) \
     do { \
-        (void)sizeof(cco_env(a_task) == _cco_st->fib->env); \
+        (void)sizeof(cco_data(a_task) == _cco_st->fib->data); \
         {cco_task* _tsk = cco_cast_task(a_task); \
         cco_fiber* _fib = _cco_getbase()->state.fib; \
         _tsk->base.awaitbits = 0; \
@@ -363,16 +365,16 @@ static inline int _cco_resume_task(cco_task* task)
 #define cco_new_fiber(...) c_MACRO_OVERLOAD(cco_new_fiber, __VA_ARGS__)
 #define cco_new_fiber_1(a_task) \
     _cco_new_fiber(cco_cast_task(a_task), NULL)
-#define cco_new_fiber_2(a_task, env) \
-    _cco_new_fiber(cco_cast_task(a_task), ((void)sizeof((env) == cco_env(a_task)), env))
+#define cco_new_fiber_2(a_task, _data) \
+    _cco_new_fiber(cco_cast_task(a_task), ((void)sizeof((_data) == cco_data(a_task)), _data))
 
 #define cco_reset_group(a_group) ((a_group)->spawn_count = 0)
 #define cco_spawn(...) c_MACRO_OVERLOAD(cco_spawn, __VA_ARGS__)
 #define cco_spawn_2(a_task, a_group) cco_spawn_4(a_task, a_group, NULL, _cco_st->fib)
-#define cco_spawn_3(a_task, a_group, _env) cco_spawn_4(a_task, a_group, _env, _cco_st->fib)
-#define cco_spawn_4(a_task, a_group, _env, _fib) \
+#define cco_spawn_3(a_task, a_group, _data) cco_spawn_4(a_task, a_group, _data, _cco_st->fib)
+#define cco_spawn_4(a_task, a_group, _data, _fib) \
     _cco_spawn(cco_cast_task(a_task), a_group, \
-               ((void)sizeof((_env) == cco_env(a_task)), _env), \
+               ((void)sizeof((_data) == cco_data(a_task)), _data), \
                cco_cast_fib(_fib))
 
 #define cco_await_cancel_task(a_task) do { \
@@ -416,14 +418,14 @@ static inline int _cco_resume_task(cco_task* task)
 
 #define cco_run_task(...) c_MACRO_OVERLOAD(cco_run_task, __VA_ARGS__)
 #define cco_run_task_1(a_task) cco_run_fiber_2(_fibit, cco_new_fiber_1(a_task))
-#define cco_run_task_2(a_task, env) cco_run_fiber_2(_fibit, cco_new_fiber_2(a_task, env))
-#define cco_run_task_3(it, a_task, env) cco_run_fiber_2(it, cco_new_fiber_2(a_task, env))
+#define cco_run_task_2(a_task, _data) cco_run_fiber_2(_fibit, cco_new_fiber_2(a_task, _data))
+#define cco_run_task_3(it, a_task, _data) cco_run_fiber_2(it, cco_new_fiber_2(a_task, _data))
 
 extern int        cco_execute(cco_fiber* fib); // is a coroutine itself
 extern cco_fiber* cco_execute_next(cco_fiber* fib);  // resume the next fiber and return it
 
-extern cco_fiber* _cco_new_fiber(cco_task* task, void* env);
-extern cco_fiber* _cco_spawn(cco_task* task, cco_group* wg, void* env, cco_fiber* fib);
+extern cco_fiber* _cco_new_fiber(cco_task* task, void* data);
+extern cco_fiber* _cco_spawn(cco_task* task, cco_group* wg, void* data, cco_fiber* fib);
 extern void       _cco_cancel_all(cco_fiber* fib, cco_group* wg, const char* file, int32_t line);
 
 /*
@@ -577,18 +579,18 @@ void _cco_throw(int32_t err_code, intptr_t info_data, cco_task* caller, const ch
     }
 }
 
-cco_fiber* _cco_spawn(cco_task* task, cco_group* wg, void* env, cco_fiber* fib) {
+cco_fiber* _cco_spawn(cco_task* task, cco_group* wg, void* data, cco_fiber* fib) {
     cco_fiber* new_fb = fib->next ? c_new(cco_fiber, {.next = fib->next, .parent = fib}) : fib;
     new_fb->task = task;
-    new_fb->env = (env ? env : fib->env);
+    new_fb->data = (data ? data : fib->data);
     task->base.state.fib = fib->next = new_fb;
     task->base.state.parent_wg = wg;
     if (wg) wg->spawn_count += 1;
     return new_fb;
 }
 
-cco_fiber* _cco_new_fiber(cco_task* task, void* env) {
-    cco_fiber* new_fb = c_new(cco_fiber, {.task=task, .env=env});
+cco_fiber* _cco_new_fiber(cco_task* task, void* data) {
+    cco_fiber* new_fb = c_new(cco_fiber, {.task=task, .data=data});
     task->base.state.fib = new_fb->next = new_fb;
     return new_fb;
 }
@@ -598,7 +600,7 @@ void _cco_cancel_all(cco_fiber* fib, cco_group* wg, const char* file, int32_t li
         cco_task* tsk = fit->task;
         do {
             if (tsk->base.state.parent_wg == wg) {
-                fit->error = (cco_error_t){cco_CANCEL, line, file};
+                fit->error = (cco_error_t){cco_CANCEL, line, file, fib->error.info};
                 cco_stop(tsk);
                 break;
             }

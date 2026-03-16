@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stc/cstr.h>
 #include <stc/cregex.h>
 
 int main(void)
@@ -30,5 +31,10 @@ int main(void)
                 printf("  submatch %d: " c_svfmt "\n", (int)k, c_svarg(j.match[k]));
         }
     }
+    
+    cstr up = cstr_toupper(s[3].input);
+    printf("\n%s\n", cstr_str(&up));
+
+    cstr_drop(&up);
     cregex_drop(&re);
 }
