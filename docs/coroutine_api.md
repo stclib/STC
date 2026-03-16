@@ -71,12 +71,15 @@ int             cco_resume(cco_task* task);                         // Resume ta
                 cco_throw(cco_CANCEL);                              // Throw a cancellation of the current task.
                                                                     // It will silently unwind the await stack. Handling *not*
                                                                     // required, but it may be recovered in a cco_finalize: section.
-                cco_recover;                                        // Recover upstream from a cco_throw() or cancellation. Resumes from
-                                                                    // the suspend point in the current task and clears error status,
-                                                                    // cco_error().code = 0. Should be handled in cco_finalize section.
-void            cco_on_child_error(int flag, cco_group* wg);        // Catch failure in any spawned child task. Jumps to cco_finalize
-                                                                    // label, and sets cco_SHUTDOWN, which must be handled.
-                                                                    // See the dining_philosophers.c example.
+void            cco_clear_error();                                  // Clear current fiber error state.
+                cco_recover;                                        // Recover from a cco_throw() or cancellation upstream. Resumes from
+                                                                    // the suspend point in the current task and calls cco_clear_error().
+                                                                    // Should be invoked in cco_finalize section.
+void            cco_on_child_error(int flag, cco_group* wg);        // Set policy for handling failure in a spawned child task. 
+                                                                    // Default is cco_SHUTDOWN, meaning all other spawned tasks in wg
+                                                                    // are cancelled, and the parent task is notified/set in error state.
+                                                                    // Jumps to cco_finalize label where the error must be reset/recovered.
+                                                                    // Alt. flag: cco_NOTIFY, cco_IGNORE. See dining_philosophers.c example.
 ```
 #### Accessors
 ```c++

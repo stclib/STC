@@ -74,7 +74,6 @@ int Dining(struct Dining* o) {
             cco_spawn(&o->philos[i], cco_wg(), &o->timer); // pass in timer as cco_env().
         }
 
-        cco_on_child_error(cco_SHUTDOWN, cco_wg());
         cco_await_timer(&o->timer, o->duration);
         puts("Time's up! Stopping dining...");  
 

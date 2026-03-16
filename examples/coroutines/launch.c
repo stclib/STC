@@ -88,7 +88,6 @@ int taskB(struct taskB* o) {
         cco_env(o)->value += o->d; // accumulate return value
         cco_yield;
 
-        cco_on_child_error(cco_SHUTDOWN, cco_wg()); // set error handler for the spawned tasks.
         cco_spawn(c_new(struct subTask, {{subTask}, 101}), cco_wg());
         cco_spawn(c_new(struct subTask, {{subTask}, 102}), cco_wg());
         cco_spawn(c_new(struct subTask, {{subTask}, 103}), cco_wg());

@@ -72,6 +72,7 @@ enum cco_status {
 #define cco_CANCEL   (1U<<30)
 #define cco_SHUTDOWN (1U<<29)
 #define cco_NOTIFY   ((1U<<29) + 1)
+#define cco_IGNORE   ((1U<<29) + 2)
 
 enum cco_deprecated {
     CCO_DONE       = cco_DONE,       // [deprecated]
@@ -265,13 +266,13 @@ typedef struct cco_task cco_task;
 #define cco_env(a_task) (1 ? (a_task)->base.state.fib->env : NULL)
 #define cco_set_env(a_task, the_env) ((a_task)->base.state.fib->env = the_env)
 
-enum _cco_error_action { _cco_SET_NOTIFY = 1, _cco_SET_SHUTDOWN = 2 };
+// https://www.happycoders.eu/java/structured-concurrency-structuredtaskscope/
+enum _cco_error_action { _cco_SET_SHUTDOWN = 0, _cco_SET_NOTIFY = 1, _cco_SET_IGNORE = 2 };
 #define cco_on_child_error(error, a_group) \
     switch (error) { \
-        case cco_NOTIFY: (a_group)->on_error = _cco_SET_NOTIFY; break; \
         case cco_SHUTDOWN: (a_group)->on_error = _cco_SET_SHUTDOWN; break; \
-        case 0: (a_group)->on_error = 0; break; \
-        default: c_assert(false); \
+        case cco_NOTIFY: (a_group)->on_error = _cco_SET_NOTIFY; break; \
+        case cco_IGNORE: (a_group)->on_error = _cco_SET_IGNORE; break; \
     }
 
 #define cco_cast_task(tsk) \
