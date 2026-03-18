@@ -128,11 +128,12 @@ The `Data` type used below is by default `void`, but can be specified in *cco_ta
 ```c++
 void            cco_reset_group(cco_group* wg);                     // Reset waitgroup (normally not needed).
 cco_fiber*      cco_spawn(cco_task* tsk, cco_group* wg);            // Lazily spawn a new concurrent task within a waitgroup.
+                                                                    // NB: task is started first on next cco_await/yield/suspend!
 cco_fiber*      cco_spawn(cco_task* tsk, cco_group* wg, Data* dt);  // Variable dt may be used to point to input data or result.
 cco_fiber*      cco_spawn(cco_task* tsk, cco_group* wg, Data* dt,   // This may be called from main or outside `cco_async` scope.
-                          cco_fiber* fiber);
+                          cco_fiber* fiber);                        // Create fiber: cco_fiber* fb = cco_new(cco_fiber, {0});
 
-                cco_run_task(cco_task* tsk) {}                      // Run task blocking until it and spawned fibers are finished.
+                cco_run_task(cco_task* tsk) {}                      // Run task blocking until it and its spawned fibers are finished.
                 cco_run_task(cco_task* tsk, Data *dt) {}            // Run task blocking with auxiliary data
                 cco_run_task(fib_iter, cco_task* tsk, Data *dt) {}  // Run task blocking. fib_iter reference the current fiber.
 

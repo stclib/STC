@@ -44,12 +44,10 @@ int start(struct Start* o) {
 
         cco_finalize:
         cco_await_all(cco_wg());
-        
         switch (cco_error().code) {
             case cco_SHUTDOWN:
                 printf("Maintask was shut down by child %d in %s:%d\n", 
                        (int)cco_error().info, cco_error().file, cco_error().line);
-                cco_recover; // Recover from error and resume the cco_await_all() call.
         }
         puts("DONE");
     }
