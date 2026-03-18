@@ -98,7 +98,7 @@ typedef struct {
 #define cco_state_struct(Prefix) \
     struct Prefix##_state { \
         int32_t pos:24; \
-        bool drop; \
+        bool dropping; \
         struct Prefix##_fiber* fib; \
         cco_group* parent_wg; \
     }
@@ -127,7 +127,7 @@ typedef struct {
         _resume_lbl: switch (_cco_st->pos) case cco_STATE_INIT: // thanks, @liigo!
 
 #define cco_finalize /* label */ \
-    _cco_st->drop = true; /* FALLTHRU */ \
+    _cco_st->dropping = true; /* FALLTHRU */ \
     case cco_STATE_DROP
 
 #define cco_drop [fix: use cco_finalize:]
@@ -137,19 +137,19 @@ typedef struct {
 #define cco_stop(co) \
     do { \
         cco_state* _st = (cco_state*)&(co)->base.state; \
-        if (!_st->drop) { _st->pos = cco_STATE_DROP; _st->drop = true; } \
+        if (!_st->dropping) { _st->pos = cco_STATE_DROP; _st->dropping = true; } \
     } while (0)
 
 #define cco_reset_state(co) \
     do { \
         cco_state* _st = (cco_state*)&(co)->base.state; \
-        _st->pos = cco_STATE_INIT, _st->drop = false; \
+        _st->pos = cco_STATE_INIT, _st->dropping = false; \
     } while (0)
 
 #define cco_return \
     do { \
-        _cco_st->pos = (_cco_st->drop ? cco_STATE_DONE : cco_STATE_DROP); \
-        _cco_st->drop = true; \
+        _cco_st->pos = (_cco_st->dropping ? cco_STATE_DONE : cco_STATE_DROP); \
+        _cco_st->dropping = true; \
         goto _resume_lbl; \
     } while (0)
 
@@ -441,10 +441,10 @@ extern void       _cco_cancel_all(cco_fiber* fib, cco_group* wg, const char* fil
  * Using c_filter with coroutine iterators:
  */
 #define cco_flt_take(n) \
-    (c_flt_take(n), fltbase.done ? (_it.base.state.pos = cco_STATE_DROP, _it.base.state.drop = 1) : 1)
+    (c_flt_take(n), fltbase.done ? (_it.base.state.pos = cco_STATE_DROP, _it.base.state.dropping = 1) : 1)
 
 #define cco_flt_takewhile(pred) \
-    (c_flt_takewhile(pred), fltbase.done ? (_it.base.state.pos = cco_STATE_DROP, _it.base.state.drop = 1) : 1)
+    (c_flt_takewhile(pred), fltbase.done ? (_it.base.state.pos = cco_STATE_DROP, _it.base.state.dropping = 1) : 1)
 
 
 /*
@@ -610,14 +610,14 @@ void _cco_cancel_all(cco_fiber* fib, cco_group* wg, const char* file, int32_t li
 }
 
 cco_fiber* cco_execute_next(cco_fiber* fib) {
-    cco_fiber *_next = fib->next, *unlinked;
+    cco_fiber *_next = fib->next;
     int ret = cco_execute(_next);
 
     if (ret == cco_DONE) {
-        unlinked = _next;
-        _next = (_next == fib ? NULL : _next->next);
+        cco_fiber *unlink = _next;
+        _next = (fib == unlink ? NULL : _next->next);
         fib->next = _next;
-        c_free_n(unlinked, 1);
+        c_free_n(unlink, 1);
     }
     return _next;
 }

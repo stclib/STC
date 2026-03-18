@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <time.h>
 #include <stc/cstr.h>
-#include <c11/fmt.h>
 
 typedef struct {
     cstr fileName;
@@ -10,7 +9,7 @@ typedef struct {
     time_t lastWriteTime;
 }  FileMetaData;
 
-enum FMDActive {FMD_fileName, FMD_directory, FMD_size, FMD_lastWriteTime, FMD_LAST};
+enum FMDActive { FMD_fileName, FMD_directory, FMD_size, FMD_lastWriteTime, FMD_LAST };
 typedef struct { enum FMDActive activeField; bool reverse; } FMDVectorSorting;
 
 int FileMetaData_cmp(const FMDVectorSorting*, const FileMetaData*, const FileMetaData*);
@@ -42,9 +41,9 @@ void FileMetaData_drop(FileMetaData* fmd) {
 
 int main(void) {
     FMDVector vec = c_make(FMDVector, {
-        {cstr_from("WScript.cpp"), cstr_from("code/unix"), 3624, 123567},
-        {cstr_from("CanvasBackground.cpp"), cstr_from("code/unix/canvas"), 38273, 12398},
-        {cstr_from("Brush_test.cpp"), cstr_from("code/tests"), 67236, 7823},
+        { cstr_from("WScript.cpp"), cstr_from("code/unix"), 3624, 123567 },
+        { cstr_from("CanvasBackground.cpp"), cstr_from("code/unix/canvas"), 38273, 12398 },
+        { cstr_from("Brush_test.cpp"), cstr_from("code/tests"), 67236, 7823 },
     });
 
     vec.aux.reverse = true;
@@ -53,9 +52,8 @@ int main(void) {
         FMDVector_sort(&vec);
 
         for (c_each_ref(e, FMDVector, vec)) {
-            fmt_println("{:30}{:30}{:10}{:10}",
-                        cstr_str(&e->fileName), cstr_str(&e->directory),
-                        e->size, e->lastWriteTime);
+            printf("%-24s %-24s %10d %10d\n", cstr_str(&e->fileName), cstr_str(&e->directory),
+                                              (int)e->size, (int)e->lastWriteTime);
         }
         puts("");
     }
