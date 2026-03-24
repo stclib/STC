@@ -152,37 +152,38 @@
 } while (0)
 
 // --------------------------------
-// c_min, c_max, c_min_n, c_max_n
+// c_min_*, c_max_*
 // --------------------------------
 #define _c_minmax_call(fn, T, ...) \
    fn(c_make_array(T, {__VA_ARGS__}), c_sizeof((T[]){__VA_ARGS__})/c_sizeof(T))
 
-#define c_min(...) _c_minmax_call(c_min_n, isize_t, __VA_ARGS__)
-#define c_umin(...) _c_minmax_call(c_umin_n, size_t, __VA_ARGS__)
-#define c_min32(...) _c_minmax_call(c_min32_n, int32_t, __VA_ARGS__)
-#define c_fmin(...) _c_minmax_call(c_fmin_n, float, __VA_ARGS__)
-#define c_dmin(...) _c_minmax_call(c_dmin_n, double, __VA_ARGS__)
-#define c_max(...) _c_minmax_call(c_max_n, isize_t, __VA_ARGS__)
-#define c_umax(...) _c_minmax_call(c_umax_n, size_t, __VA_ARGS__)
-#define c_max32(...) _c_minmax_call(c_max32_n, int32_t, __VA_ARGS__)
-#define c_fmax(...) _c_minmax_call(c_fmax_n, float, __VA_ARGS__)
-#define c_dmax(...) _c_minmax_call(c_dmax_n, double, __VA_ARGS__)
+#define c_min_iz(...)  _c_minmax_call(c_min_izn, isize_t, __VA_ARGS__)
+#define c_min_uz(...)  _c_minmax_call(c_min_uzn, size_t, __VA_ARGS__)
+#define c_min_i32(...) _c_minmax_call(c_min_i32n, int32_t, __VA_ARGS__)
+#define c_min_f32(...) _c_minmax_call(c_min_f32n, float, __VA_ARGS__)
+#define c_min_f64(...) _c_minmax_call(c_min_f64n, double, __VA_ARGS__)
+#define c_max_iz(...)  _c_minmax_call(c_max_izn, isize_t, __VA_ARGS__)
+#define c_max_uz(...)  _c_minmax_call(c_max_uzn, size_t, __VA_ARGS__)
+#define c_max_i32(...) _c_minmax_call(c_max_i32n, int32_t, __VA_ARGS__)
+#define c_max_f32(...) _c_minmax_call(c_max_f32n, float, __VA_ARGS__)
+#define c_max_f64(...) _c_minmax_call(c_max_f64n, double, __VA_ARGS__)
 
-#define _c_minmax_def(fn, T, opr) \
-    static inline T fn(const T a[], isize_t n) { \
+#define _c_minmax_def(fn, T) \
+    static inline T c_min_##fn(const T a[], isize_t n) { \
         T x = a[0]; \
-        for (isize_t i = 1; i < n; ++i) if (a[i] opr x) x = a[i]; \
+        for (isize_t i = 1; i < n; ++i) if (a[i] < x) x = a[i]; \
+        return x; \
+    } \
+    static inline T c_max_##fn(const T a[], isize_t n) { \
+        T x = a[0]; \
+        for (isize_t i = 1; i < n; ++i) if (a[i] > x) x = a[i]; \
         return x; \
     }
-_c_minmax_def(c_min32_n, int32_t, <)
-_c_minmax_def(c_min_n, isize_t, <)
-_c_minmax_def(c_umin_n, size_t, <)
-_c_minmax_def(c_fmin_n, float, <)
-_c_minmax_def(c_dmin_n, double, <)
-_c_minmax_def(c_max32_n, int32_t, >)
-_c_minmax_def(c_max_n, isize_t, >)
-_c_minmax_def(c_umax_n, size_t, >)
-_c_minmax_def(c_fmax_n, float, >)
-_c_minmax_def(c_dmax_n, double, >)
+
+_c_minmax_def(izn, isize_t)
+_c_minmax_def(uzn, size_t)
+_c_minmax_def(i32n, int32_t)
+_c_minmax_def(f32n, float)
+_c_minmax_def(f64n, double)
 
 #endif // STC_UTILITY_H_INCLUDED
