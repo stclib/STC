@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stc/coroutine.h>
 
+struct Output;
 cco_task_struct (TaskA, struct Output*) {
     TaskA_base base;
     int a;

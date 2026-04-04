@@ -120,7 +120,7 @@ static void action(Action* action, cstr* out) {
             int res = r->func(r->v1, r->v2);
             cstr_printf(out, "v1: %d, v2: %d, res: %d\n", r->v1, r->v2, res);
         }
-        c_otherwise assert("no match" == NULL);
+        c_otherwise c_assert(0); // "no match"
     }
 }
 

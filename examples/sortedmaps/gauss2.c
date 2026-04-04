@@ -9,7 +9,7 @@
 
 int main(void)
 {
-    enum {N = 5000000};
+    enum {N = 4000000};
     uint64_t seed = (uint64_t)time(NULL);
     crand64_seed(seed);
     const double Mean = round(crand64_real()*98.0 - 49.0),

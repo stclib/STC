@@ -33,8 +33,11 @@ int main(void) {
 
     span3 md = cspan_md(arr, 4, 4, 5);
 
+    puts("------------ before -------------");
+    cspan_print(span3, "%.2f", md);
+
     zero_surface(md);
 
+    puts("\n------------ after -------------");
     cspan_print(span3, "%.2f", md);
-    puts("done");
 }

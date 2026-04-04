@@ -24,7 +24,9 @@ int main(void) {
     Fields fields = {0};
 
     for (c_match(c, &re, hay)) {
-        Fields_push(&fields, (Field){c.match[1], atoi(c.match[2].buf), c.match[3].buf[0] == 't'});
+        Fields_push(&fields, (Field){c.match[1],
+                                     atoi(c.match[2].buf),
+                                     c.match[3].buf[0] == 't'});
     }
 
     Fields answer = c_make(Fields, {

@@ -152,37 +152,38 @@
 } while (0)
 
 // --------------------------------
-// c_min_*, c_max_*
+// c_min_*(...), c_max_*(...)
 // --------------------------------
+
 #define _c_minmax_call(fn, T, ...) \
    fn(c_make_array(T, {__VA_ARGS__}), c_sizeof((T[]){__VA_ARGS__})/c_sizeof(T))
 
-#define c_min_iz(...)  _c_minmax_call(c_min_izn, isize_t, __VA_ARGS__)
-#define c_min_uz(...)  _c_minmax_call(c_min_uzn, size_t, __VA_ARGS__)
 #define c_min_i32(...) _c_minmax_call(c_min_i32n, int32_t, __VA_ARGS__)
-#define c_min_f32(...) _c_minmax_call(c_min_f32n, float, __VA_ARGS__)
-#define c_min_f64(...) _c_minmax_call(c_min_f64n, double, __VA_ARGS__)
-#define c_max_iz(...)  _c_minmax_call(c_max_izn, isize_t, __VA_ARGS__)
-#define c_max_uz(...)  _c_minmax_call(c_max_uzn, size_t, __VA_ARGS__)
 #define c_max_i32(...) _c_minmax_call(c_max_i32n, int32_t, __VA_ARGS__)
+#define c_min_zi(...)  _c_minmax_call(c_min_zin, isize_t, __VA_ARGS__)
+#define c_max_zi(...)  _c_minmax_call(c_max_zin, isize_t, __VA_ARGS__)
+#define c_min_zu(...)  _c_minmax_call(c_min_zun, size_t, __VA_ARGS__)
+#define c_max_zu(...)  _c_minmax_call(c_max_zun, size_t, __VA_ARGS__)
+#define c_min_f32(...) _c_minmax_call(c_min_f32n, float, __VA_ARGS__)
 #define c_max_f32(...) _c_minmax_call(c_max_f32n, float, __VA_ARGS__)
+#define c_min_f64(...) _c_minmax_call(c_min_f64n, double, __VA_ARGS__)
 #define c_max_f64(...) _c_minmax_call(c_max_f64n, double, __VA_ARGS__)
 
-#define _c_minmax_def(fn, T) \
-    static inline T c_min_##fn(const T a[], isize_t n) { \
+#define _c_minmax_def(ext, T) \
+    static inline T c_min_##ext(const T a[], isize_t n) { \
         T x = a[0]; \
         for (isize_t i = 1; i < n; ++i) if (a[i] < x) x = a[i]; \
         return x; \
     } \
-    static inline T c_max_##fn(const T a[], isize_t n) { \
+    static inline T c_max_##ext(const T a[], isize_t n) { \
         T x = a[0]; \
         for (isize_t i = 1; i < n; ++i) if (a[i] > x) x = a[i]; \
         return x; \
     }
 
-_c_minmax_def(izn, isize_t)
-_c_minmax_def(uzn, size_t)
 _c_minmax_def(i32n, int32_t)
+_c_minmax_def(zin, isize_t)
+_c_minmax_def(zun, size_t)
 _c_minmax_def(f32n, float)
 _c_minmax_def(f64n, double)
 

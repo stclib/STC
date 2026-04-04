@@ -47,8 +47,8 @@ if [ $run = 0 ] ; then
         #out=$(dirname $i)/$(basename $i .c).exe
         #echo $comp -I../../../stcsingle $i $clibs $oflag$out
         echo $comp $INC $i $clibs $oflag$out
-        #$comp $INC $i $clibs $oflag$out -lstc
-        $comp $INC $i $clibs $oflag$out -I../include -DSTC_STATIC
+        $comp $INC $i $clibs $oflag$out -lstc
+        #$comp $INC $i $clibs $oflag$out -I../include -DSTC_STATIC
     done
 else
     for i in */*.c ; do

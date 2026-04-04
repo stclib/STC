@@ -13,6 +13,7 @@ cc = meson.get_compiler('c')
 if cc.get_argument_syntax() == 'gcc'
   add_project_arguments(
     cc.get_supported_arguments(
+      '-Werror', '-Wconversion',
       '-Wno-missing-field-initializers',
       '-Wno-double-promotion',
       '-Wno-stringop-overflow',
@@ -21,10 +22,13 @@ if cc.get_argument_syntax() == 'gcc'
     language: ['c', 'cpp'],
   )
 elif cc.get_argument_syntax() == 'msvc'
-  # no "unsecure" funcs warnings
   add_project_arguments(
     cc.get_supported_arguments(
-      '-wd4996',
+      '-wd4996', # no "unsecure" funcs warnings
+      '-wd4189', # local var initialized not ref.
+      '-wd4200', # zero-sized array in struct/union
+      '-wd4702', # unreachable code (sumtype)
+      '-wd4324', # structure was padded due to alignment specifier (regex)
     ),
     language: ['c', 'cpp'],
   )

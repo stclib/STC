@@ -19,7 +19,7 @@ int main(void)
     cstr_replace_at(&s, 9, 5, s2);                     // "this is an example string." (1)
     printf("(1) %s\n", cstr_str(&s));
 
-    cstr_replace_at_sv(&s, 19, 6, c_sv(s3+7, 6));      // "this is an example phrase." (2)
+    cstr_replace_at_sv(&s, 19, 6, c_sv(&s3[7], 6));    // "this is an example phrase." (2)
     printf("(2) %s\n", cstr_str(&s));
 
     cstr_replace_at(&s, 8, 10, "just a");              // "this is just a phrase."     (3)
