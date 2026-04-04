@@ -1,14 +1,22 @@
 #include <stdio.h>
 #include <stc/coroutine.h>
 
-cco_task_struct (ticktock) {
-    ticktock_base base;
+cco_task_struct (TickTock) {
+    TickTock_base base;
     cco_timer tm;
 };
 
-int ticker(struct ticktock* o) {
+
+cco_task_struct (Maintask) {
+    Maintask_base base;
+    cco_timer tm;
+    struct TickTock tick, tock;
+};
+
+
+int ticker(struct TickTock* o) {
     cco_async (o) {
-        while (1) {
+        for (;;) {
             cco_await_timer(&o->tm, 0.1);
             puts("tick");
         }
@@ -18,28 +26,36 @@ int ticker(struct ticktock* o) {
     return 0;
 }
 
-int tocker(struct ticktock* o) {
+int tocker(struct TickTock* o) {
     cco_async (o) {
-        while (1) {
-            cco_await_timer(&o->tm, 0.2);
-            puts("tock");
+        for (;;) {
+            cco_await_timer(&o->tm, 0.15);
+            puts("TOCK");
         }
         cco_finalize:
-        puts("drop tock");
+        puts("drop TOCK");
+    }
+    return 0;
+}
+
+int maintask(struct Maintask* o) {
+    cco_async (o) {
+        o->tick = (struct TickTock){{ticker}};
+        o->tock = (struct TickTock){{tocker}};
+        cco_spawn(&o->tick, cco_wg());
+        cco_spawn(&o->tock, cco_wg());
+
+        cco_await_timer(&o->tm, 0.5);
+        cco_throw(cco_CANCEL);
+        cco_await_timer(&o->tm, 0.5);
+
+        cco_finalize:
+        cco_await_cancel_all(cco_wg());
+        puts("done");
     }
     return 0;
 }
 
 int main(void) {
-    struct ticktock tick = {{ticker}}, tock = {{tocker}};
-    cco_fiber* fb = c_new(cco_fiber, {0});
-    cco_spawn(&tick, NULL, NULL, fb);
-    cco_spawn(&tock, NULL, NULL, fb);
-
-    cco_timer tm = cco_make_timer(0.5);
-    cco_run_fiber(&fb) {
-        if (cco_timer_expired(&tm)) {
-            cco_stop(fb->task);
-        }
-    }
+    cco_run_task(&(struct Maintask){{maintask}});
 }

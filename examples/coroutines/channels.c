@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stc/coroutine.h>
 
-typedef cco_channel_t(int) intchan_t;
+typedef cco_chan_t(int) intchan_t;
 
 cco_task_struct (Task1) {
     Task1_base base;
@@ -20,11 +20,11 @@ cco_task_struct (Task2) {
 int task1(struct Task1* o) {
     cco_async (o) {
         cco_start_timer(&o->tmr, 0.0);
-        cco_await_get(&o->ch, &o->val);
+        cco_await_recv(&o->ch, &o->val);
         printf("task1 got %d, %f sec\n", o->val, cco_timer_elapsed(&o->tmr));
 
         cco_await(cco_timer_elapsed(&o->tmr) > 1.0);
-        cco_await_put(&o->ch, o->val*12);
+        cco_await_send(&o->ch, o->val*12);
     }
     return 0;
 }
@@ -33,9 +33,9 @@ int task2(struct Task2* o) {
     cco_async (o) {
         cco_start_timer(&o->tmr, 0.0);
         cco_await(cco_timer_elapsed(&o->tmr) > 0.4);
-        cco_await_put(o->ch_ref, 42);
+        cco_await_send(o->ch_ref, 42);
 
-        cco_await_get(o->ch_ref, &o->val);
+        cco_await_recv(o->ch_ref, &o->val);
         printf("task2 got %d, %f sec\n", o->val, cco_timer_elapsed(&o->tmr));
     }
     return 0;

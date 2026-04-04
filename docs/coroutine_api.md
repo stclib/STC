@@ -65,29 +65,13 @@ void            cco_stop(Coroutine* co);                            // Coroutine
                 cco_yield_to(cco_task* task);                       // Yield to another task (symmetric transfer of control).
 int             cco_resume(cco_task* task);                         // Resume task until it suspends (blocking). Return status.
                                                                     // Normally called by cco_run_task() driver function or a scheduler.
-
-                cco_throw(int error);                               // Throw an error. Will unwind call/await-task stack.
-                                                                    // Handling of error required in cco_finalize:, else abort().
-                cco_throw(cco_CANCEL);                              // Throw a cancellation of the current task.
-                                                                    // It will silently unwind the await stack. Handling *not*
-                                                                    // required, but it may be recovered in a cco_finalize: section.
-void            cco_clear_error();                                  // Clear current fiber error state.
-                cco_recover;                                        // Recover from a cco_throw() or cancellation upstream. Resumes from
-                                                                    // the suspend point in the current task and calls cco_clear_error().
-                                                                    // Should be invoked in cco_finalize section.
-void            cco_on_child_error(int flag, cco_group* wg);        // Set policy for handling failure in a spawned child task. 
-                                                                    // Default is cco_SHUTDOWN, meaning all other spawned tasks in wg
-                                                                    // are cancelled, and the parent task is notified/set in error state.
-                                                                    // Jumps to cco_finalize label where the error must be reset/recovered.
-                                                                    // Alt. flag: cco_NOTIFY, cco_IGNORE. See dining_philosophers.c example.
 ```
 #### Accessors
 ```c++
 cco_group*      cco_wg();                                           // Get the default waitgroup to be used for spawning tasks.
 int             cco_status();                                       // Get current return status from last cco_resume() call.
-cco_error_t     cco_error();                                        // Get error object created from cco_throw(error) call.
-                                                                    // Should be handled in a cco_finalize: section.
 cco_fiber*      cco_task_fiber(cco_task* task);                     // Get fiber associated with task.
+
 Data*           cco_data(cco_task* task);                           // Get auxiliary data pointer, stored in the associated fiber.
 Data*           cco_set_data(cco_task* task, Data* dt);             // Set auxiliary data pointer.
 ```
@@ -97,7 +81,36 @@ Data*           cco_set_data(cco_task* task, Data* dt);             // Set auxil
                                                                     // fiber it equals cco_throw(cco_CANCEL) (jumps to cco_finalize:).
 void            cco_cancel_fiber(cco_fiber* fiber);                 // Signal that fiber will be cancelled upon next suspension point.
 void            cco_cancel_all(cco_group* wg);                      // Cancel all spawned tasks in the waitgroup.
+void            cco_cancel_all_fibers();                            // Cancel all spawned tasks/fibers (except current).
 ```
+#### Task Error Handling
+```c++
+                typedef struct {                                    // Task error type.
+                    int32_t code, line;
+                    const char* file;
+                    union { intptr_t num;                           // Pass optional extra info about the error, e.g.
+                            const char* str;                        // :: cco_throw(cco_CANCEL, .str="Can't open file");
+                            void* ptr;
+                    } info;
+                } cco_err_t;
+
+                cco_throw(int error, info=0);                       // Throw an error. It will unwind the call/await-task "stack".
+                                                                    // Handling of error is required in a cco_finalize:, else it will abort().
+                cco_throw(cco_CANCEL, info=0);                      // Cancel the current task. Handling is NOT required, but it can 
+                                                                    // optionally be aborted by cco_recover to stop propagation.
+bool            cco_catch(int errcode);                             // True if errcode is issued. To be used in a cco_finalize: section.
+bool            cco_catch_any();                                    // True if there are any errors or cancellation.
+                cco_recover;                                        // Recover from a cco_throw() or cancellation upstream. Resumes from
+                                                                    // the suspend point in the current task and calls cco_clear_err().
+cco_err_t       cco_err();                                          // Get error object created from cco_throw(error) call.
+void            cco_clear_err();                                    // Clear current fiber error state. To be used in cco_finalize section.
+void            cco_on_child_error(int flag, cco_group* wg);        // Set policy for handling failure in a spawned child task. 
+                                                                    // Default is cco_SHUTDOWN, meaning all other spawned tasks in wg
+                                                                    // are cancelled, and the parent task is notified/set in error state.
+                                                                    // Jumps to cco_finalize label where the error must be reset/recovered.
+                                                                    // Alt. flag: cco_NOTIFY, cco_IGNORE. See dining_philosophers.c example.
+```
+
 #### Awaiting Tasks and Waitgroups
 ```c++
                 cco_await_task(cco_task* task);                     // Await/call until task's resume status is cco_DONE (=0).
@@ -118,9 +131,9 @@ A channel represents a communication syncronization point for collaborating task
 the channel, but communication can go both ways. **Note**: both the sending and receiving values must reference a persistant
 storage (i.e. a constant and/or expression using variables stored in a task).
 ```c++
-                cco_channel_t(Type)                                 // A channel type.
-                cco_await_put(cco_channel_t(Type)* ch, Type value); // Put data into a channel (may wait for its turn).
-                cco_await_get(cco_channel_t(Type)* ch, Type* valp); // Get (waits for) data put in the channel by another task.
+                cco_chan_t(Type)                                    // A channel type.
+                cco_await_send(cco_chan_t(Type)* ch, Type value);   // Put data into a channel (may wait for its turn).
+                cco_await_recv(cco_chan_t(Type)* ch, Type* valp);   // Get (waits for) data sent to the channel by another task.
 ```
 
 #### Spawning and Running Tasks
@@ -174,7 +187,7 @@ bool            cco_flt_takewhile(bool predicate);                  // Use inste
 | Type name         | Type definition / usage                             | Used to represent... |
 |:------------------|:----------------------------------------------------|:---------------------|
 |`cco_status`       | **enum** `cco_DONE`, `cco_AWAIT`, `cco_SUSPEND`, `cco_YIELD` | Default set of return status from coroutines |
-|`struct cco_error` | `struct { int32_t code, line; const char* file; }`    | Error object for exceptions |
+|`struct cco_err` | `struct { int32_t code, line; const char* file; }`    | Error object for exceptions |
 |`cco_task`         | Enclosure/function object                           | Basic coroutine frame type |
 |`cco_timer`        | Struct type                                         | Delay timer               |
 |`cco_semaphore`    | Struct type                                         | Synchronization basic |
@@ -496,9 +509,9 @@ int TaskA(struct TaskA* o) {
         puts("TaskA work");
 
         cco_finalize:
-        if (cco_error().code == 99) {
+        if (cco_catch(99)) {
             // if error not handled, will cause 'unhandled error'...
-            printf("TaskA recovered error '99' thrown on line %d\n", cco_error().line);
+            printf("TaskA recovered error '99' thrown on line %d\n", cco_err().line);
             cco_recover;
         }
         puts("TaskA done");
