@@ -71,7 +71,7 @@ int Dining(struct Dining* o) {
                 .left = &o->philos[(i - 1 + num_philosophers) % num_philosophers],
                 .right = &o->philos[(i + 1) % num_philosophers],
             };
-            cco_spawn(&o->philos[i], cco_wg(), &o->timer); // pass in timer as cco_data().
+            cco_spawn(&o->philos[i], cco_grp(0), &o->timer); // pass in timer as cco_data().
         }
 
         cco_await_timer(&o->timer, o->duration);
@@ -81,7 +81,7 @@ int Dining(struct Dining* o) {
         if (cco_catch(cco_SHUTDOWN)) {
             printf("Philosopher %d CANCELED the dining.\n", (int)cco_err().info.num);
         }
-        cco_await_cancel_all(cco_wg());
+        cco_await_cancel_all(cco_grp(0));
         printf("Dining time of %.1f minutes is over.\n", cco_timer_elapsed(&o->timer)*10);
     }
     return 0;

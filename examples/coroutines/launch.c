@@ -54,19 +54,19 @@ struct Output {
 int taskC(struct TaskC* o) {
     cco_async (o) {
         printf("TaskC: start %g\n", o->d);
-        //cco_await_task(c_new(struct TaskB, {{taskB}, 1.2f, 3.4f}));
 
         puts("TaskC: work");
         cco_data(o)->value += o->d; // accumulate return value
         cco_yield;
+        {
+            cco_spawn(c_new(struct SubTask, {{subTask}, 1}), cco_grp(0));
+            cco_spawn(c_new(struct SubTask, {{subTask}, 2}), cco_grp(0));
+            cco_spawn(c_new(struct SubTask, {{subTask}, 3}), cco_grp(0));
+            puts("TaskC: spawned 3 tasks");
 
-        cco_spawn(c_new(struct SubTask, {{subTask}, 1}), cco_wg());
-        cco_spawn(c_new(struct SubTask, {{subTask}, 2}), cco_wg());
-        cco_spawn(c_new(struct SubTask, {{subTask}, 3}), cco_wg());
-        puts("TaskC: spawned 3 tasks");
-        cco_await_all(cco_wg());
-        puts("TaskC: all spawned tasks done");
-
+            cco_await_all(cco_grp(0));
+            puts("TaskC: all spawned tasks done");
+        }
         cco_finalize:
         if (cco_catch(cco_SHUTDOWN)) { // just for info
             printf("TaskC: shutdown by child %d in %s:%d\n", (int)cco_err().info.num, cco_err().file, cco_err().line);
@@ -84,7 +84,7 @@ int taskB(struct TaskB* o) {
         printf("TaskB: start {%g, %g}\n", o->x, o->y);
         cco_await_task(c_new(struct TaskC, {{taskC}, 3.1415}));
 
-        cco_throw(99); // Demo: throwing an error in an awaiting task.
+        //cco_throw(99); // Demo: throwing an error in an awaiting task.
 
         puts("TaskB: work");
         
@@ -99,7 +99,7 @@ int taskB(struct TaskB* o) {
         if (cco_catch(99)) {
             printf("TaskB: handling error '99' thrown in %s:%d\n", cco_err().file, cco_err().line);
             //cco_clear_err();
-            //cco_await_cancel_all(cco_wg());
+            //cco_await_cancel_all(cco_grp(0));
             cco_recover;
         }        
         puts("TaskB: done");
@@ -113,7 +113,6 @@ int taskB(struct TaskB* o) {
 int taskA(struct TaskA* o) {
     cco_async (o) {
         printf("TaskA: start %d\n", o->a);
-        //cco_await_task(c_new(struct TaskC, {{taskC}, 3.1415}));
         cco_await_task(c_new(struct TaskB, {{taskB}, 1.2f, 3.4f}));
 
         puts("TaskA: work");

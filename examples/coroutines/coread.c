@@ -39,7 +39,7 @@ cco_task_struct (MainTask, SVec*) {
     struct FileRead reader1;
     struct FileRead reader2;
     cstr file2;
-    cco_group grp; // demo, use instead of cco_wg().
+    cco_group grp; // demo, use instead of cco_grp(0).
 };
 
 int maintask(struct MainTask* o)

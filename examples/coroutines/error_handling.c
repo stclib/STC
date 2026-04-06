@@ -13,7 +13,7 @@ int subtask(struct Subtask* o) {
 
         if (o->id == 2) {
             // Demo: throwing an error in one of the spawned tasks.
-            cco_throw(cco_CANCEL, o->id); 
+            //printf("THROW in spawned %d\n", o->id); cco_throw(cco_CANCEL, o->id); 
         }
         printf("Work task %d\n", o->id);
 
@@ -37,22 +37,22 @@ cco_task_struct (Start) {
 int start(struct Start* o) {
     cco_async (o) {
         for (c_range32(i, 6)) {
-            cco_spawn( c_new(struct Subtask, {{subtask}, i}), cco_wg(), &o->tmr );
+            cco_spawn( c_new(struct Subtask, {{subtask}, i}), cco_grp(0), &o->tmr );
         }
         puts("START");
         cco_await_timer(&o->tmr, 0.2);
 
         //puts("THROW"); cco_throw(cco_CANCEL, -1);
-        cco_await_all(cco_wg());
+        cco_await_all(cco_grp(0));
 
         cco_finalize:
-        if (cco_catch_any()) {
+        if (!cco_catch(0)) {
             if (cco_catch(cco_SHUTDOWN))
                 printf("Maintask and subtasks shutdown caused by %d in %s:%d\n",
                        (int)cco_err().info.num, cco_err().file, cco_err().line);
             else if (cco_catch(cco_CANCEL))
                 printf("Maintask was canceled in %s:%d\n", cco_err().file, cco_err().line);
-            cco_await_cancel_all(cco_wg());
+            cco_await_cancel_all(cco_grp(0));
         }
         puts("DONE");
     }

@@ -42,15 +42,15 @@ int maintask(struct Maintask* o) {
     cco_async (o) {
         o->tick = (struct TickTock){{ticker}};
         o->tock = (struct TickTock){{tocker}};
-        cco_spawn(&o->tick, cco_wg());
-        cco_spawn(&o->tock, cco_wg());
+        cco_spawn(&o->tick, cco_grp(0));
+        cco_spawn(&o->tock, cco_grp(0));
 
         cco_await_timer(&o->tm, 0.5);
         cco_throw(cco_CANCEL);
         cco_await_timer(&o->tm, 0.5);
 
         cco_finalize:
-        cco_await_cancel_all(cco_wg());
+        cco_await_cancel_all(cco_grp(0));
         puts("done");
     }
     return 0;
