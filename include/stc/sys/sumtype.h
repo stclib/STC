@@ -130,7 +130,7 @@ int main(void) {
         for (Tag##_type *x = &((Tag##_sumtype *)_vp1)->Tag.get; x; x = NULL)
 
     #define c_is_3(varptr, Tag, x) \
-        false) ; else for (Tag##_sumtype* _vp2 = c_const_cast(Tag##_sumtype*, varptr); _vp2; _vp2 = NULL) \
+        false) ; else for (Tag##_sumtype* _vp2 = c_as_mut(Tag##_sumtype*, varptr); _vp2; _vp2 = NULL) \
             if (c_is_variant(_vp2, Tag)) \
                 for (Tag##_type *x = &_vp2->Tag.get; x; x = NULL
 #endif

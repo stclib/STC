@@ -1,6 +1,5 @@
 #include <stc/coroutine.h>
 #include <stdio.h>
-#include <stdint.h>
 
 // Demonstrate calling two coroutine from a coroutine:
 // First call them concurrently, then in parallel:
@@ -81,7 +80,7 @@ struct combined {
 
 int combined(struct combined* o) {
     cco_async (o) {
-        puts("SERIAL:");
+        puts("SEQUENTIAL:");
         o->prm = (struct prime){.count = 8};
         o->fib = (struct fibonacci){.count = 12};
 

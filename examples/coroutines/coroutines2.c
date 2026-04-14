@@ -1,6 +1,5 @@
 #include <stc/coroutine.h>
 #include <stdio.h>
-#include <stdint.h>
 
 // Demonstrate calling two coroutine from a coroutine:
 // First call them concurrently, then in parallel:
@@ -78,7 +77,7 @@ int main(void) {
     struct prime prm;
     struct fibonacci fib;
 
-    puts("SERIAL:");
+    puts("SEQUENTIAL:");
     prm = (struct prime){{prime}, .count=8};
     fib = (struct fibonacci){{fibonacci}, .count=12};
 

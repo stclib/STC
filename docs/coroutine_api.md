@@ -821,7 +821,7 @@ static int TaskA(struct TaskA* o) {
         cco_yield;
 
         puts("A adds task C");
-        Tasks_push(cco_data(o), cco_cast_task(c_new(struct TaskX, {.base={taskX}, .id='C'})));
+        Tasks_push(cco_data(o), cco_as_task(c_new(struct TaskX, {.base={taskX}, .id='C'})));
         cco_yield;
 
         puts("A is back doing more work");
@@ -838,8 +838,8 @@ int main(void) {
     struct Scheduler* schedule = c_new(struct Scheduler, {
         .base={scheduler},
         .tasks = c_make(Tasks, {
-            cco_cast_task(c_new(struct TaskA, {.base={TaskA}})),
-            cco_cast_task(c_new(struct TaskX, {.base={taskX}, .id='B'})),
+            cco_as_task(c_new(struct TaskA, {.base={TaskA}})),
+            cco_as_task(c_new(struct TaskX, {.base={taskX}, .id='B'})),
         })
     });
 

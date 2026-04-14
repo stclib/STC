@@ -101,9 +101,9 @@
     #define c_realloc c_JOIN(STC_ALLOCATOR, _realloc)
     #define c_free c_JOIN(STC_ALLOCATOR, _free)
 #else
-    #define c_malloc(sz) malloc(c_i2u_size(sz))
-    #define c_calloc(n, sz) calloc(c_i2u_size(n), c_i2u_size(sz))
-    #define c_realloc(ptr, old_sz, sz) realloc(ptr, c_i2u_size(1 ? (sz) : (old_sz)))
+    #define c_malloc(sz) malloc(c_i2u_cast(sz))
+    #define c_calloc(n, sz) calloc(c_i2u_cast(n), c_i2u_cast(sz))
+    #define c_realloc(ptr, old_sz, sz) realloc(ptr, c_i2u_cast(1 ? (sz) : (old_sz)))
     #define c_free(ptr, sz) ((void)(sz), free(ptr))
 #endif
 
@@ -123,24 +123,23 @@
     #define c_assert(expr)      assert(expr)
 #endif
 #define c_container_of(p, C, m) ((C*)((char*)(1 ? (p) : &((C*)0)->m) - offsetof(C, m)))
-#define c_const_cast(Tp, p)     ((Tp)(1 ? (p) : (Tp)0))
-#define c_litstrlen(literal)    (c_sizeof("" literal) - 1)
 #define c_countof(a)            (isize_t)(sizeof(a)/sizeof 0[a])
-#define c_arraylen(a)           c_countof(a) // [deprecated]?
+#define c_as_mut(Tp, p)         ((Tp)(1 ? (p) : (Tp)0))
+#define c_safe_cast(T, From, x) ((T)(1 ? (x) : (From){0}))
 
 // expect signed ints to/from these (use with gcc -Wconversion)
 #define c_sizeof                (isize_t)sizeof
 #define c_strlen(s)             (isize_t)strlen(s)
-#define c_strncmp(a, b, ilen)   strncmp(a, b, c_i2u_size(ilen))
-#define c_memcpy(d, s, ilen)    memcpy(d, s, c_i2u_size(ilen))
-#define c_memmove(d, s, ilen)   memmove(d, s, c_i2u_size(ilen))
-#define c_memset(d, val, ilen)  memset(d, val, c_i2u_size(ilen))
-#define c_memcmp(a, b, ilen)    memcmp(a, b, c_i2u_size(ilen))
+#define c_strncmp(a, b, ilen)   strncmp(a, b, c_i2u_cast(ilen))
+#define c_memcpy(d, s, ilen)    memcpy(d, s, c_i2u_cast(ilen))
+#define c_memmove(d, s, ilen)   memmove(d, s, c_i2u_cast(ilen))
+#define c_memset(d, val, ilen)  memset(d, val, c_i2u_cast(ilen))
+#define c_memcmp(a, b, ilen)    memcmp(a, b, c_i2u_cast(ilen))
 // library internal, but may be useful in user code:
-#define c_u2i_size(u)           (isize_t)(1 ? (u) : (size_t)1) // warns if u is signed
-#define c_i2u_size(i)           (size_t)(1 ? (i) : -1)       // warns if i is unsigned
+#define c_u2i_cast(u)           (isize_t)(1 ? (u) : (size_t)1) // warns if u is signed
+#define c_i2u_cast(i)           (size_t)(1 ? (i) : -1)         // warns if i is unsigned
 #define c_uless(a, b)           ((size_t)(a) < (size_t)(b))
-#define c_safe_cast(T, From, x) ((T)(1 ? (x) : (From){0}))
+#define c_litstrlen(literal)    (c_sizeof("" literal) - 1)
 
 // x, y are i_keyraw* type, which defaults to i_key*. vp is i_key* type.
 #define c_memcmp_eq(x, y)       (memcmp(x, y, sizeof *(x)) == 0)
@@ -164,6 +163,10 @@
 #define c_foreach_reverse(...) for (c_each_reverse(__VA_ARGS__))
 #define c_forrange(...) for (c_range(__VA_ARGS__))
 #define c_forrange32(...) for (c_range32(__VA_ARGS__))
+#define c_each_item(...) c_each_ref(__VA_ARGS__)
+#define c_arraylen(a) c_countof(a)
+#define c_const_cast(p) c_as_mut(p)
+// End [deprecated]
 
 // New:
 #define c_each(...) c_MACRO_OVERLOAD(c_each, __VA_ARGS__)
@@ -175,7 +178,6 @@
 #define c_each_ref(v, C, cnt) \
     C##_value* v = (C##_value*)&v; v; ) \
     for (C##_iter v##_itr_ = C##_begin(&cnt); (v = v##_itr_.ref); C##_next(&v##_itr_)
-#define c_each_item(...) c_each_ref(__VA_ARGS__) // [deprecated]
 
 #define c_each_n(...) c_MACRO_OVERLOAD(c_each_n, __VA_ARGS__)
 #define c_each_n_3(it, C, cnt) c_each_n_4(it, C, cnt, INTPTR_MAX)

@@ -732,9 +732,9 @@ c_delete_n(cstr, stringptr, 1);
 ```
 </details>
 <details>
-<summary><b>c_swap, c_countof, c_const_cast, c_safe_case</b></summary>
+<summary><b>c_swap, c_countof, c_as_mut, c_safe_cast</b></summary>
 
-### c_swap, c_countof, c_const_cast, c_safe_case
+### c_swap, c_countof, c_as_mut, c_safe_cast
 Side effect- and typesafe macro for swapping internals of two objects of same type:
 ```c++
 double x = 1.0, y = 2.0;
@@ -750,10 +750,10 @@ isize_t n = c_countof(array);
 Type-safe casting a from const (pointer):
 ```c++
 const char cs[] = "Hello";
-char* s = c_const_cast(char*, cs); // OK
-int* ip = c_const_cast(int*, cs);  // issues a warning!
+char* s = c_as_mut(char*, cs); // OK
+int* ip = c_as_mut(int*, cs);  // illegal input type, issues a warning!
 
-// Type safe casting:
+// Casting from a specified type (double):
 #define tofloat(d) c_safe_cast(float, double, d)
 ```
 </details>

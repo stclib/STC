@@ -28,6 +28,9 @@
 #include <stddef.h>
 #include <stdbool.h>
 
+#define c_true(...) __VA_ARGS__
+#define c_false(...)
+
 #define declare_rc(C, KEY) declare_arc(C, KEY)
 #define declare_list(C, KEY) _declare_list(C, KEY,)
 #define declare_stack(C, KEY) _declare_stack(C, KEY,)
@@ -98,8 +101,12 @@ typedef union {
     const cstr_value* ref;
 } cstr_iter;
 
-#define c_true(...) __VA_ARGS__
-#define c_false(...)
+// non-owning char pointer
+typedef const char* cstr_raw;
+#define cstr_raw_cmp(x, y) strcmp(*(x), *(y))
+#define cstr_raw_eq(x, y)  (cstr_raw_cmp(x, y) == 0)
+#define cstr_raw_hash(vp)  c_hash_str(*(vp))
+
 
 #define declare_arc(SELF, VAL) \
     typedef VAL SELF##_value; \

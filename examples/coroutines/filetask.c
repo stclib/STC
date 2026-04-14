@@ -5,8 +5,8 @@
 #include <stc/cstr.h>
 #include <stc/coroutine.h>
 
-cco_task_struct (file_read) {
-    file_read_base base;
+cco_task_struct (ReadFile) {
+    ReadFile_base base;
     const char* path;
     cstr line;
     FILE* fp;
@@ -14,7 +14,7 @@ cco_task_struct (file_read) {
 };
 
 
-int file_read(struct file_read* o)
+int read_file(struct ReadFile* o)
 {
     cco_async (o) {
         o->fp = fopen(o->path, "r");
@@ -34,7 +34,7 @@ int file_read(struct file_read* o)
         cco_finalize:
         fclose(o->fp);
         cstr_drop(&o->line);
-        puts("done file_read");
+        puts("done read_file");
         break;
 
         fail:
@@ -44,22 +44,22 @@ int file_read(struct file_read* o)
 }
 
 
-cco_task_struct (count_line) {
-    count_line_base base;
+cco_task_struct (CountLine) {
+    CountLine_base base;
     cstr path;
-    struct file_read reader;
+    struct ReadFile reader;
     int lineCount;
 };
 
 
-int count_line(struct count_line* o)
+int count_line(struct CountLine* o)
 {
     cco_async (o) {
-        o->reader.base.func = file_read;
+        o->reader.base.func = read_file;
         o->reader.path = cstr_str(&o->path);
 
         while (true) {
-            // await for next cco_YIELD (or cco_DONE) in file_read()
+            // await for next cco_YIELD (or cco_DONE) in read_file()
             cco_await_task(&o->reader, cco_YIELD);
             if (cco_status() == cco_DONE) break;
             o->lineCount += 1;
@@ -77,7 +77,7 @@ int count_line(struct count_line* o)
 int main(void)
 {
     // Creates a new task
-    struct count_line countTask = {
+    struct CountLine countTask = {
         .base = {count_line},
         .path = cstr_from(__FILE__),
     };

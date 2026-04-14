@@ -60,12 +60,6 @@ extern  char* _cstr_internal_move(cstr* self, isize_t pos1, isize_t pos2);
 
 /**************************** PUBLIC API **********************************/
 
-// non-owning char pointer
-typedef             const char* cstr_raw;
-#define             cstr_raw_cmp(x, y)      strcmp(*(x), *(y))
-#define             cstr_raw_eq(x, y)       (cstr_raw_cmp(x, y) == 0)
-#define             cstr_raw_hash(vp)       c_hash_str(*(vp))
-
 #define             cstr_init() (c_literal(cstr){0})
 #define             cstr_lit(literal) cstr_from_n(literal, c_litstrlen(literal))
 

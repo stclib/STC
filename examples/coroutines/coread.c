@@ -1,4 +1,3 @@
-#include <stdlib.h>
 #include <stc/cstr.h>
 #include <stc/coroutine.h>
 

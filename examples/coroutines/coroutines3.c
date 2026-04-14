@@ -1,6 +1,5 @@
 #include <stc/coroutine.h>
 #include <stdio.h>
-#include <stdint.h>
 
 // Demonstrate calling two coroutine from a coroutine:
 // First call them concurrently, then in parallel:
@@ -15,7 +14,7 @@ bool is_prime(long long i) {
     return true;
 }
 
-cco_task_struct (prime) {
+cco_task_struct (prime, long long*) {
     prime_base base;
     int count;
     long long value;
@@ -27,11 +26,13 @@ int prime(struct prime* o) {
             o->value = 2;
             if (o->count-- == 0)
                 cco_return;
+            *cco_env(o) = o->value;
             cco_yield_v(YIELD_PRM);
         }
         for (o->value |= 1; o->count > 0; o->value += 2) {
             if (is_prime(o->value)) {
                 --o->count;
+                *cco_env(o) = o->value;
                 cco_yield_v(YIELD_PRM);
             }
         }
@@ -45,7 +46,7 @@ int prime(struct prime* o) {
 
 // Use coroutine to create a fibonacci sequence generator:
 
-cco_task_struct (fibonacci) {
+cco_task_struct (fibonacci, long long*) {
     fibonacci_base base;
     int count;
     long long value, b;
@@ -64,6 +65,7 @@ int fibonacci(struct fibonacci* o) {
             long long tmp = o->value;
             o->value = o->b;
             o->b += tmp;
+            *cco_env(o) = o->value;
             cco_yield_v(YIELD_FIB);
         }
 
@@ -83,7 +85,7 @@ cco_task_struct (combined) {
 
 int combined(struct combined* o) {
     cco_async (o) {
-        puts("SERIAL:");
+        puts("SEQUENTIAL:");
         o->prm = (struct prime){.base={prime}, .count=8};
         o->fib = (struct fibonacci){.base={fibonacci}, .count=12};
 
@@ -108,10 +110,11 @@ int combined(struct combined* o) {
 int main(void) {
     struct combined comb = {{combined}};
 
-    cco_run_task(it, &comb, NULL) {
-        if (it->status & YIELD_PRM)
-            printf("  Prime=%lld\n", comb.prm.value);
-        if (it->status & YIELD_FIB)
-            printf("  Fibon=%lld\n", comb.fib.value);
+    long long result;
+    cco_run_task(it, &comb, &result) {
+        switch (it->status) {
+            case YIELD_PRM: printf("  Prime=%lld\n", result); break;
+            case YIELD_FIB: printf("  Fibon=%lld\n", result); break;
+        }
     }
 }
