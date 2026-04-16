@@ -78,7 +78,7 @@ reduces the chance of creating bugs, as user code with raw loops and ad-hoc impl
 common algorithms and containers is minimized/eliminated.
 * STC is inherently **type safe**. Essentially, there are no opaque pointers or casting away of type information.
 Only where neccesary, generic code will use some macros to do compile-time type-checking before types are casted.
-Examples are `c_static_assert`, `c_as_mut`, `c_safe_cast` and macros for safe integer type casting.
+Examples are `c_static_assert()`, `c_as_mut()`, `c_safe_cast()` and macros for safe integer type casting.
 * Containers and algorithms all use **signed integers** for indices and sizes, and it encourange to use
 signed integers for quantities in general (unsigned integers have valid usages as bitsets and in bit operations).
 This could remove a wide range of bugs related to mixed unsigned-signed calculations and comparisons, which

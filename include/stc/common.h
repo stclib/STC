@@ -165,7 +165,7 @@
 #define c_forrange32(...) for (c_range32(__VA_ARGS__))
 #define c_each_item(...) c_each_ref(__VA_ARGS__)
 #define c_arraylen(a) c_countof(a)
-#define c_const_cast(p) c_as_mut(p)
+#define c_const_cast(Tp, p) c_as_mut(Tp, p)
 // End [deprecated]
 
 // New:

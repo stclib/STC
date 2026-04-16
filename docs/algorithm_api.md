@@ -113,40 +113,6 @@ for (c_range(i, 30, 0, -5)) printf(" %lld", i);
 // 30 25 20 15 10 5
 ```
 </details>
-<details>
-<summary><b>c_ffilter</b> - Filtered range iteration</summary>
-
-### c_ffilter
-For-loop variant of `c_filter`in generic algorithms.
-```c++
-#include <stdio.h>
-#include <stc/algorithm.h>
-#define T IVec, int
-#include <stc/stack.h>
-
-int main(void) {
-    IVec vec = c_make(IVec, {0, 1, 2, 3, 4, 5, 80, 6, 7, 80, 8, 9, 80,
-                             10, 11, 12, 13, 14, 15, 80, 16, 17});
-    #define ff_skipValue(i, x) (*i.ref != (x))
-    #define ff_isEven(i) ((*i.ref & 1) == 0)
-    #define ff_square(i) (*i.ref * *i.ref)
-
-    int sum = 0;
-    for (c_ffilter(i, IVec, vec, true
-        && c_fflt_skipwhile(i, *i.ref != 80)
-        && c_fflt_skip(i, 1)
-        && ff_isEven(i)
-        && ff_skipValue(i, 80)
-        && c_fflt_map(i, ff_square(i))
-        && c_fflt_take(i, 5)
-    )){
-        sum += *i.ref;
-    }
-    printf("sum: %d\n", sum);
-    IVec_drop(&vec);
-}
-```
-</details>
 
 ## Tagged unions
 
@@ -515,6 +481,40 @@ int main(void)
 ```
 </details>
 <details>
+<summary><b>c_ffilter</b> - Ranged filtering with iterator</summary>
+
+### c_ffilter
+For-loop variant of `c_filter`in generic algorithms.
+```c++
+#include <stdio.h>
+#include <stc/algorithm.h>
+#define T IVec, int
+#include <stc/stack.h>
+
+int main(void) {
+    IVec vec = c_make(IVec, {0, 1, 2, 3, 4, 5, 80, 6, 7, 80, 8, 9, 80,
+                             10, 11, 12, 13, 14, 15, 80, 16, 17});
+    #define ff_skipValue(i, x) (*i.ref != (x))
+    #define ff_isEven(i) ((*i.ref & 1) == 0)
+    #define ff_square(i) (*i.ref * *i.ref)
+
+    int sum = 0;
+    for (c_ffilter(i, IVec, vec, true
+        && c_fflt_skipwhile(i, *i.ref != 80)
+        && c_fflt_skip(i, 1)
+        && ff_isEven(i)
+        && ff_skipValue(i, 80)
+        && c_fflt_map(i, ff_square(i))
+        && c_fflt_take(i, 5)
+    )){
+        sum += *i.ref;
+    }
+    printf("sum: %d\n", sum);
+    IVec_drop(&vec);
+}
+```
+</details>
+<details>
 <summary><b>c_all_of, c_any_of, c_none_of</b> - Boolean container operations</summary>
 
 ### c_all_of, c_any_of, c_none_of
@@ -747,7 +747,7 @@ int array[] = {1, 2, 3, 4};
 isize_t n = c_countof(array);
 ```
 
-Type-safe casting a from const (pointer):
+Type-safe casting and cast away const (pointers):
 ```c++
 const char cs[] = "Hello";
 char* s = c_as_mut(char*, cs); // OK
