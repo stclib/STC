@@ -59,7 +59,6 @@ cco_task_struct (Dining) {
     struct Philosopher philos[num_philosophers];
     int i;
     cco_timer timer;
-    cco_group group;
 };
 
 int Dining(struct Dining* o) {

@@ -40,42 +40,42 @@ int sleeper(struct Sleeper* o) {
 }
 
 
-cco_task_struct (Maintask, void*, 2) { // NB: using 2 level task groups spawned
+cco_task_struct (Maintask, void*, 2) { // NB: using 2 level spawned task-groups
     Maintask_base base;
-    cco_group workers;
 };
 
 int maintask(struct Maintask* o) {
     cco_async (o) {
-        
-        { // sleeper - grp 0
-            cco_spawn(c_new(struct Sleeper, {{sleeper}}), cco_grp(0));
+
+        cco_group_scope { // sleeper group scope
+            cco_spawn(c_new(struct Sleeper, {{sleeper}}), cco_scope());
             cco_suspend; // start sleeper
 
-            { // workers - grp 1
+            cco_group_scope { // workers group scope
                 for (c_range32(idx, 8)) { // NB: local id, do not yield or await inside loop.
                     struct Worker* work = c_new(struct Worker, {{worker}, idx + 1});
-                    cco_spawn(work, cco_grp(1));
+                    cco_spawn(work, cco_scope());
                 }
                 cco_suspend; // starts workers.
 
-                cco_await_n(1, cco_grp(1)); // await for 1 launched worker to finish
+                cco_await_n(1, cco_scope()); // await for 1 launched worker to finish
                 puts("1 worker done.");
 
-                cco_await_n(3, cco_grp(1)); // await for 3 more workers to finish
+                cco_await_n(3, cco_scope()); // await for 3 more workers to finish
                 puts("3 more workers done");
 
                 //puts("CANCEL"); cco_throw(cco_CANCEL); // testing...
 
-                cco_await_all(cco_grp(1)); // await for remaining workers to finish
+                cco_await_all(cco_scope()); // await for remaining workers to finish
                 puts("All workers done.");
             }
 
-            cco_await_all(cco_grp(0)); // await sleeper - should finish last also in case of cancel.
+            cco_await_all(cco_scope()); // await sleeper - should finish last also in case of cancel.
         }
+
         cco_finalize:
         cco_await_cancel_groups(o); // needed in case of cancellation: cancel and await all
-                                    // spawned subtasks in both groups, first 1, then 0.
+                                    // spawned subtasks in both groups, first inner, then outer.
         puts("Maintask done");
     }
 
