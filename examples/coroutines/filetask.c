@@ -1,6 +1,5 @@
 // https://github.com/lewissbaker/cppcoro#taskt
 
-#include <time.h>
 #include <stdio.h>
 #include <stc/cstr.h>
 #include <stc/coroutine.h>

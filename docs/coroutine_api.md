@@ -136,12 +136,11 @@ storage (i.e. a constant and/or expression using variables stored in a task).
 #### Spawning and Running Tasks
 The `Data` type used below is by default `void`, but can be specified in *cco_task_struct()* definition.
 ```c++
-void            cco_reset_group(struct cco_group* grp);             // Reset task-group (normally not needed).
-void            cco_on_error(int flag, struct cco_group* grp);      // Set policy for handling failure in a spawned child task.
+void            cco_on_subtask_error(int act, struct cco_group* grp); // Set policy for error/cancelation in a spawned subtask.
                                                                     // Default is cco_SHUTDOWN, meaning all other spawned tasks in grp
                                                                     // are cancelled, and the spawner task is notified/set in error state.
                                                                     // Jumps to cco_finalize label where the error must be reset/recovered.
-                                                                    // Alt. flag: cco_NOTIFY, cco_IGNORE. See dining_philosophers.c example.
+                                                                    // cco_NOTIFY: just notify spawner task. cco_IGNORE: no action.
 
                 cco_group_scope { ... }                             // Open a new task-group scope, and use cco_scope() to get current group.
 cco_group*      cco_scope(void);                                    // Get task-group for spawned tasks in the *current* group scope.

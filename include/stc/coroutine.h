@@ -84,7 +84,6 @@ enum cco_deprecated {
 #define CCO_CANCEL cco_CANCEL                        // [deprecated]
 #define cco_env(tsk) cco_data(tsk)                   // [deprecated]
 #define cco_set_env(tsk, dt) cco_set_data(tsk, dt)   // [deprecated]
-#define cco_error() cco_err()                        // [deprecated]
 #define cco_grp(LEVEL) cco_group(LEVEL)              // [deprecated]
 
 /*
@@ -268,11 +267,11 @@ typedef struct cco_task cco_task;
 
 #define cco_fib() ((cco_fiber*)_cco_st->fib + 0)
 #define cco_parent_fib() (cco_fib()->parent + 0)
+#define cco_parent_grp() (_cco_st->parent_grp + 0)
 #define cco_status() (cco_fib()->status + 0)
 #define cco_err() (*(const cco_err_t*)&cco_fib()->error)
 #define cco_clear_err() do cco_fib()->error.code = 0; while (0)
 #define cco_catch(errcode) (cco_err().code == (errcode))
-#define cco_parent_grp() (_cco_st->parent_grp + 0)
 
 // get/set task result (and/or input data)
 #define cco_data(a_task) (1 ? (a_task)->base.state.fib->data : NULL)
@@ -280,7 +279,7 @@ typedef struct cco_task cco_task;
 
 // https://www.happycoders.eu/java/structured-concurrency-structuredtaskscope/
 enum _cco_err_action { _cco_SET_SHUTDOWN = 0, _cco_SET_NOTIFY = 1, _cco_SET_IGNORE = 2 };
-#define cco_on_error(error, a_group) \
+#define cco_on_subtask_error(error, a_group) \
     switch (error) { \
         case cco_SHUTDOWN: (a_group)->on_error = _cco_SET_SHUTDOWN; break; \
         case cco_NOTIFY: (a_group)->on_error = _cco_SET_NOTIFY; break; \
