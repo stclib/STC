@@ -96,9 +96,9 @@ int combined(struct combined* o) {
         o->prm = (struct prime){.base={prime}, .count=8};
         o->fib = (struct fibonacci){.base={fibonacci}, .count=12};
 
-        cco_spawn(&o->prm, cco_grp(0));
-        cco_spawn(&o->fib, cco_grp(0));
-        cco_await_all(cco_grp(0));
+        cco_spawn(&o->prm, cco_group(0));
+        cco_spawn(&o->fib, cco_group(0));
+        cco_await_all(cco_group(0));
 
         cco_finalize:
         puts("DONE prime and fib");

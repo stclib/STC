@@ -61,7 +61,7 @@ void            cco_stop(Coroutine* co);                            // Coroutine
 ```c++
                 cco_task_struct(name) {<name>_base base; ..};       // Define a custom coroutine task struct; "Extends" cco_task struct.
                 cco_task_struct(name, <Data>*=void*, MAX_GROUPS=1)  // Optionally specify pointer type returned from cco_data(),
-                                                                    // and the max number of waitgroups for cco_grp(index). NB: default is 1.
+                                                                    // and the max number of waitgroups for cco_group(index). NB: default is 1.
 
                 cco_yield_to(cco_task* task);                       // Yield to another task (symmetric transfer of control).
 int             cco_resume(cco_task* task);                         // Resume task until it suspends (blocking). Return status.
@@ -80,7 +80,7 @@ Data*           cco_set_data(cco_task* task, Data* dt);             // Set auxil
                 cco_cancel_task(cco_task* task);                    // Cancel a spawned task+fiber; If task runs in the current
                                                                     // fiber it equals cco_throw(cco_CANCEL) (jumps to cco_finalize:).
 void            cco_cancel_fiber(cco_fiber* fiber);                 // Signal that fiber will be cancelled upon next suspension point.
-void            cco_cancel_all(cco_group* grp);                     // Cancel all spawned tasks in the task-group.
+void            cco_cancel_all(struct cco_group* grp);              // Cancel all spawned tasks in the task-group.
 void            cco_cancel_all_fibers();                            // Cancel *all* spawned tasks/fibers (except current).
 ```
 #### Task Error Handling
@@ -96,7 +96,7 @@ void            cco_cancel_all_fibers();                            // Cancel *a
 
                 cco_throw(int error, info=0);                       // Throw an error. It will unwind the call/await-task "stack".
                                                                     // Handling of error is required in a cco_finalize:, else it will abort().
-                cco_throw(cco_CANCEL, info=0);                      // Cancel the current task. Handling is NOT required, but it can 
+                cco_throw(cco_CANCEL, info=0);                      // Cancel the current task. Handling is NOT required, but it can
                                                                     // optionally be aborted by cco_recover to stop propagation.
 bool            cco_catch(int errcode);                             // True if errcode is issued. To be used in a cco_finalize: section.
                 cco_recover;                                        // Recover from a cco_throw() or cancellation upstream. Resumes from
@@ -112,13 +112,13 @@ void            cco_clear_err();                                    // Clear cur
                 cco_await_cancel_task(cco_task* task);              // Cancel and await for task to finalize async.
                                                                     // Shorthand for cco_cancel_task() + cco_await_task().
                 // Await spawned tasks in a specific (wait)group (for making nested await scopes):
-                cco_await_all(cco_group* grp);                      // Await all (remaining) subtasks in task-group to finish.
-                cco_await_any(cco_group* grp);                      // Await for any one subtask in task-group to finish,
+                cco_await_all(struct cco_group* grp);               // Await all (remaining) subtasks in task-group to finish.
+                cco_await_any(struct cco_group* grp);               // Await for any one subtask in task-group to finish,
                                                                     // and *cancel the remaining*!
-                cco_await_n(int n, cco_group* grp);                 // Awaits n spawned tasks in grp. NB! Does *not* cancel remaining tasks.
+                cco_await_n(int n, struct cco_group* grp);          // Awaits n spawned tasks in grp. NB! Does *not* cancel remaining tasks.
                 cco_await_fibers();                                 // Awaits all fibers/spawned tasks to be joined.
 
-                cco_await_cancel_all(cco_group* grp);               // Cancel and await all spawned subtasks in grp.
+                cco_await_cancel_all(struct cco_group* grp);        // Cancel and await all spawned subtasks in grp.
                                                                     // Shorthand for cco_cancel_all(grp) + cco_await_all(grp).
                 cco_await_cancel_groups(cco_task* task);            // Cancel and await all spawned tasks in all groups in the task.
                 cco_await_cancel_fibers();                          // Cancel all running fibers (except current). Use on panic.
@@ -136,8 +136,8 @@ storage (i.e. a constant and/or expression using variables stored in a task).
 #### Spawning and Running Tasks
 The `Data` type used below is by default `void`, but can be specified in *cco_task_struct()* definition.
 ```c++
-void            cco_reset_group(cco_group* grp);                    // Reset task-group (normally not needed).
-void            cco_on_error(int flag, cco_group* grp);             // Set policy for handling failure in a spawned child task. 
+void            cco_reset_group(struct cco_group* grp);             // Reset task-group (normally not needed).
+void            cco_on_error(int flag, struct cco_group* grp);      // Set policy for handling failure in a spawned child task.
                                                                     // Default is cco_SHUTDOWN, meaning all other spawned tasks in grp
                                                                     // are cancelled, and the spawner task is notified/set in error state.
                                                                     // Jumps to cco_finalize label where the error must be reset/recovered.
@@ -145,13 +145,13 @@ void            cco_on_error(int flag, cco_group* grp);             // Set polic
 
                 cco_group_scope { ... }                             // Open a new task-group scope, and use cco_scope() to get current group.
 cco_group*      cco_scope(void);                                    // Get task-group for spawned tasks in the *current* group scope.
-cco_group*      cco_grp(int scope_level);                           // Get task-group for a specific group scope. May also be used
+cco_group*      cco_group(int scope_level);                         // Get task-group for a specific group scope. May also be used
                                                                     // without a cco_group_scope {...}. NB! see cco_task_struct(...)
 
-cco_fiber*      cco_spawn(cco_task* tsk, cco_group* grp);           // Lazily spawn a new concurrent task within a task-group.
+cco_fiber*      cco_spawn(cco_task* tsk, struct cco_group* grp);    // Lazily spawn a new concurrent task within a task-group.
                                                                     // NB: task is started first on next cco_await/yield/suspend!
-cco_fiber*      cco_spawn(cco_task* tsk, cco_group* grp, Data* dt); // Variable dt may be used to point to input data or result.
-cco_fiber*      cco_spawn(cco_task* tsk, cco_group* grp, Data* dt,  // This may be called from main or outside `cco_async` scope.
+cco_fiber*      cco_spawn(cco_task* tsk, struct cco_group* grp, Data* dt); // Variable dt may be used to point to input data or result.
+cco_fiber*      cco_spawn(cco_task* tsk, struct cco_group* grp, Data* dt,  // This may be called from main or outside `cco_async` scope.
                           cco_fiber* fiber);                        // Create fiber: cco_fiber* fb = cco_new(cco_fiber, {0});
 
                 cco_run_task(cco_task* tsk) {}                      // Run task blocking until it and its spawned fibers are finished.
@@ -399,12 +399,12 @@ int Dining(struct Dining* o) {
                 .left = &o->philos[(i - 1 + num_philosophers) % num_philosophers],
                 .right = &o->philos[(i + 1) % num_philosophers],
             };
-            cco_spawn(&o->philos[i], cco_grp(0));
+            cco_spawn(&o->philos[i], cco_group(0));
         }
         cco_await_timer(&o->tm, o->duration);
 
         cco_finalize:
-        cco_await_cancel_all(cco_grp(0));
+        cco_await_cancel_all(cco_group(0));
         puts("Dining done");
     }
     return 0;
@@ -596,10 +596,10 @@ int job1(struct job1* o) {
 
 int job_start(struct job_start* o) {
     cco_async (o) {
-        cco_spawn(c_new(struct job1, {{job1}}), cco_grp(0));
+        cco_spawn(c_new(struct job1, {{job1}}), cco_group(0));
         cco_await_timer(&o->tm, 0.1);
         puts("Ping");
-        cco_await_all(cco_grp(0));
+        cco_await_all(cco_group(0));
         puts("Ping");
         cco_await_timer(&o->tm, 0.2);
     }

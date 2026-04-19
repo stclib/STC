@@ -37,13 +37,13 @@ cco_task_struct (Start) {
 int start(struct Start* o) {
     cco_async (o) {
         for (c_range32(i, 6)) {
-            cco_spawn( c_new(struct Subtask, {{subtask}, i}), cco_grp(0), &o->tmr );
+            cco_spawn( c_new(struct Subtask, {{subtask}, i}), cco_group(0), &o->tmr );
         }
         puts("START");
         cco_await_timer(&o->tmr, 0.2);
 
         //puts("THROW"); cco_throw(cco_CANCEL, -1);
-        cco_await_all(cco_grp(0));
+        cco_await_all(cco_group(0));
 
         cco_finalize:
         if (!cco_catch(0)) {
@@ -52,7 +52,7 @@ int start(struct Start* o) {
                        (int)cco_err().info.num, cco_err().file, cco_err().line);
             else if (cco_catch(cco_CANCEL))
                 printf("Maintask was canceled in %s:%d\n", cco_err().file, cco_err().line);
-            cco_await_cancel_all(cco_grp(0));
+            cco_await_cancel_all(cco_group(0));
         }
         puts("DONE");
     }

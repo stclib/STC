@@ -58,13 +58,13 @@ int taskC(struct TaskC* o) {
         puts("TaskC: work");
         cco_data(o)->value += o->d; // accumulate return value
         cco_yield;
-        {
-            cco_spawn(c_new(struct SubTask, {{subTask}, 1}), cco_grp(0));
-            cco_spawn(c_new(struct SubTask, {{subTask}, 2}), cco_grp(0));
-            cco_spawn(c_new(struct SubTask, {{subTask}, 3}), cco_grp(0));
+        cco_group_scope {
+            cco_spawn(c_new(struct SubTask, {{subTask}, 1}), cco_scope());
+            cco_spawn(c_new(struct SubTask, {{subTask}, 2}), cco_scope());
+            cco_spawn(c_new(struct SubTask, {{subTask}, 3}), cco_scope());
             puts("TaskC: spawned 3 tasks");
 
-            cco_await_all(cco_grp(0));
+            cco_await_all(cco_scope());
             puts("TaskC: all spawned tasks done");
         }
         cco_finalize:
@@ -99,7 +99,7 @@ int taskB(struct TaskB* o) {
         if (cco_catch(99)) {
             printf("TaskB: handling error '99' thrown in %s:%d\n", cco_err().file, cco_err().line);
             //cco_clear_err();
-            //cco_await_cancel_all(cco_grp(0));
+            //cco_await_cancel_all(cco_group(0));
             cco_recover;
         }        
         puts("TaskB: done");

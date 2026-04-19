@@ -48,11 +48,11 @@ int maintask(struct MainTask* o)
         o->reader1 = (struct FileRead){{file_read}, __FILE__};
         o->reader2 = (struct FileRead){{file_read}, cstr_str(&o->file2)};
 
-        cco_spawn(&o->reader1, cco_grp(0));
-        cco_spawn(&o->reader2, cco_grp(0));
+        cco_spawn(&o->reader1, cco_group(0));
+        cco_spawn(&o->reader2, cco_group(0));
 
         cco_finalize:
-        cco_await_all(cco_grp(0));
+        cco_await_all(cco_group(0));
         cstr_drop(&o->file2);
         puts("done all");
     }
