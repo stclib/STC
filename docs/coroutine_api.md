@@ -69,7 +69,7 @@ int             cco_resume(cco_task* task);                         // Resume ta
 ```
 #### Accessors
 ```c++
-int             cco_status();                                       // Get current return status from last cco_resume() call.
+int             cco_result();                                       // Get current return status from last cco_resume() call.
 cco_fiber*      cco_task_fiber(cco_task* task);                     // Get fiber associated with task.
 
 Data*           cco_data(cco_task* task);                           // Get auxiliary data pointer, stored in the associated fiber.
@@ -98,7 +98,7 @@ void            cco_cancel_all_fibers();                            // Cancel *a
                                                                     // Handling of error is required in a cco_finalize:, else it will abort().
                 cco_throw(cco_CANCEL, info=0);                      // Cancel the current task. Handling is NOT required, but it can
                                                                     // optionally be aborted by cco_recover to stop propagation.
-bool            cco_catch(int errcode);                             // True if errcode is issued. To be used in a cco_finalize: section.
+bool            cco_state(int errcode);                             // True if errcode is issued. To be used in a cco_finalize: section.
                 cco_recover;                                        // Recover from a cco_throw() or cancellation upstream. Resumes from
                                                                     // the suspend point in the current task and calls cco_clear_err().
 cco_err_t       cco_err();                                          // Get error object created from cco_throw(error) call.
@@ -515,7 +515,7 @@ int TaskA(struct TaskA* o) {
         puts("TaskA work");
 
         cco_finalize:
-        if (cco_catch(99)) {
+        if (cco_state(99)) {
             // if error not handled, will cause 'unhandled error'...
             printf("TaskA recovered error '99' thrown on line %d\n", cco_err().line);
             cco_recover;
@@ -784,7 +784,7 @@ int scheduler(struct Scheduler* o) {
 
             cco_await_task(o->_pulled, cco_YIELD | cco_DONE);
 
-            if (cco_status() == cco_YIELD) {
+            if (cco_result() == cco_YIELD) {
                 Tasks_push(&o->tasks, o->_pulled);
             } else { // cco_DONE
                 Tasks_value_drop(&o->tasks, &o->_pulled);

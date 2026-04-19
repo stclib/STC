@@ -60,7 +60,7 @@ int count_line(struct CountLine* o)
         while (true) {
             // await for next cco_YIELD (or cco_DONE) in read_file()
             cco_await_task(&o->reader, cco_YIELD);
-            if (cco_status() == cco_DONE) break;
+            if (cco_result() == cco_DONE) break;
             o->lineCount += 1;
             cco_yield;
         }
