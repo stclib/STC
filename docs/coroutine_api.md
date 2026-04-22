@@ -41,7 +41,7 @@ scope end, and `return 0`.
                                                                     // Jumps here on cco_return, cco_throw(), cco_cancel_task(self).
                 cco_return;                                         // Finish coroutine. Jumps to cco_finalize: label. If already passed
                                                                     // it or label is absent, exit the cco_async scope.
-                cco_exit();                                         // Cancel current coroutine immediately (skip the cco_finalize: stage).
+                cco_abandon();                                      // Leave current coroutine immediately, skip cco_finalize: stage.
 
 bool            cco_is_active(Coroutine* co);                       // Is coroutine active/not done?.
 bool            cco_is_done(Coroutine* co);                         // Is coroutine done/not active?

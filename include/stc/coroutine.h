@@ -61,7 +61,7 @@ int main(void) {
 enum cco_position {
     cco_POS_INIT = 0,
     cco_POS_DONE = -1,
-    cco_POS_DROP = -2,
+    cco_POS_FINAL = -2,
 };
 enum cco_result {
     cco_DONE    = 0,
@@ -101,7 +101,7 @@ struct cco_group {
         struct Prefix##_fiber* fib; \
         struct cco_group* parent_grp; \
         int32_t pos; \
-        bool dropping; \
+        bool finalizing; \
         bool scoped; \
         int8_t scope_idx; \
         int8_t curr_scope; \
@@ -134,8 +134,8 @@ struct cco_group {
         _resume_lbl: switch (_cco_st->pos) case cco_POS_INIT: // thanks, @liigo!
 
 #define cco_finalize /* label */ \
-    _cco_st->dropping = true; /* FALLTHRU */ \
-    case cco_POS_DROP
+    _cco_st->finalizing = true; /* FALLTHRU */ \
+    case cco_POS_FINAL
 
 #define cco_drop [fix: use cco_finalize:]
 #define cco_cleanup [fix: use cco_finalize:]
@@ -143,23 +143,23 @@ struct cco_group {
 #define cco_stop(co) \
     do { \
         cco_base_state* _st = (cco_base_state*)&(co)->base.state; \
-        if (!_st->dropping) { _st->pos = cco_POS_DROP; _st->dropping = true; } \
+        if (!_st->finalizing) { _st->pos = cco_POS_FINAL; _st->finalizing = true; } \
     } while (0)
 
 #define cco_reset_state(co) \
     do { \
         cco_base_state* _st = (cco_base_state*)&(co)->base.state; \
-        _st->pos = cco_POS_INIT, _st->dropping = false; \
+        _st->pos = cco_POS_INIT, _st->finalizing = false; \
     } while (0)
 
 #define cco_return \
     do { \
-        _cco_st->pos = (_cco_st->dropping ? cco_POS_DONE : cco_POS_DROP); \
-        _cco_st->dropping = true; \
+        _cco_st->pos = (_cco_st->finalizing ? cco_POS_DONE : cco_POS_FINAL); \
+        _cco_st->finalizing = true; \
         goto _resume_lbl; \
     } while (0)
 
-#define cco_exit() \
+#define cco_abandon() \
     do { \
         _cco_st->pos = cco_POS_DONE; \
         goto _resume_lbl; \
@@ -266,12 +266,12 @@ typedef struct cco_task cco_task;
     c_container_of((cco_base_state*)_cco_st, cco_task, base.state)
 
 #define cco_fib() ((cco_fiber*)_cco_st->fib + 0)
-#define cco_parent_fib() (cco_fib()->parent + 0)
+#define cco_parent_fib() (_cco_st->fib->parent + 0)
 #define cco_parent_grp() (_cco_st->parent_grp + 0)
-#define cco_result() (cco_fib()->status + 0)
-#define cco_err() (*(const cco_err_t*)&cco_fib()->error)
-#define cco_clear_err() do cco_fib()->error.code = 0; while (0)
-#define cco_state(errcode) (cco_err().code == (errcode))
+#define cco_result() (_cco_st->fib->status + 0)
+#define cco_err() (*(const cco_err_t*)&_cco_st->fib->error)
+#define cco_clear_err() do _cco_st->fib->error.code = 0; while (0)
+#define cco_state(errcode) (_cco_st->fib->error.code == (errcode))
 
 // get/set task result (and/or input data)
 #define cco_data(a_task) (1 ? (a_task)->base.state.fib->data : NULL)
@@ -468,10 +468,10 @@ extern void       _cco_cancel_all(cco_fiber* fib, struct cco_group* grp, const c
  * Using c_filter with coroutine iterators:
  */
 #define cco_flt_take(n) \
-    (c_flt_take(n), fltbase.done ? (_it.base.state.pos = cco_POS_DROP, _it.base.state.dropping = 1) : 1)
+    (c_flt_take(n), fltbase.done ? (_it.base.state.pos = cco_POS_FINAL, _it.base.state.finalizing = 1) : 1)
 
 #define cco_flt_takewhile(pred) \
-    (c_flt_takewhile(pred), fltbase.done ? (_it.base.state.pos = cco_POS_DROP, _it.base.state.dropping = 1) : 1)
+    (c_flt_takewhile(pred), fltbase.done ? (_it.base.state.pos = cco_POS_FINAL, _it.base.state.finalizing = 1) : 1)
 
 
 /*

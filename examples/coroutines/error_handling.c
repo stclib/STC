@@ -48,13 +48,14 @@ int start(struct Start* o) {
         cco_finalize:
         if (cco_state(cco_SUCCESS))
             puts("Maintask success");
-        else {
-            if (cco_state(cco_SHUTDOWN))
-                printf("Maintask and subtasks shutdown caused by %d in %s:%d\n",
-                       (int)cco_err().info.num, cco_err().file, cco_err().line);
-            else if (cco_state(cco_CANCEL))
-                printf("Maintask was canceled in %s:%d\n", cco_err().file, cco_err().line);
+        else if (cco_state(cco_SHUTDOWN)) {
+            cco_await_all(cco_group(0));
+            printf("Maintask and subtasks shutdown caused by %d in %s:%d\n",
+                    (int)cco_err().info.num, cco_err().file, cco_err().line);
+        } else {
             cco_await_cancel_all(cco_group(0));
+            if (cco_state(cco_CANCEL))
+                printf("Maintask was canceled in %s:%d\n", cco_err().file, cco_err().line);
         }
     }
     free(o);
