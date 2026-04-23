@@ -107,18 +107,25 @@ STC_INLINE csview csview_tail(csview sv, isize_t len)
 
 /* utf8 iterator */
 STC_INLINE csview_iter csview_begin(const csview* self) {
-    csview_iter it = {.u8 = {{self->buf, cutf8_chr_size(self->buf)},
-                             self->buf + self->size}};
+    csview_iter it = {.u8={{self->buf}, self->buf + self->size}};
+    if (it.ref == it.u8.end) it.ref = NULL;
+    else it.u8.chr.size = cutf8_decode_codepoint(&it.u8.dec, it.ref, it.u8.end);
     return it;
 }
+
 STC_INLINE csview_iter csview_end(const csview* self) {
     (void)self; csview_iter it = {0}; return it;
 }
+
 STC_INLINE void csview_next(csview_iter* it) {
     it->ref += it->chr.size;
-    it->chr.size = cutf8_chr_size(it->ref);
     if (it->ref == it->u8.end) it->ref = NULL;
+    else it->chr.size = cutf8_decode_codepoint(&it->u8.dec, it->ref, it->u8.end);
 }
+
+STC_INLINE uint32_t csview_codepoint(const csview_iter* it)
+    { return it->u8.dec.codep; }
+
 
 /* utf8 */
 STC_INLINE csview csview_u8_from(const char* str, isize_t u8pos, isize_t u8len)
@@ -186,7 +193,7 @@ csview_iter csview_advance(csview_iter it, isize_t u8pos) {
     while (u8pos && it.ref != it.u8.end)
         u8pos -= (*(it.ref += inc) & 0xC0) != 0x80;
     if (it.ref == it.u8.end) it.ref = NULL;
-    else it.chr.size = cutf8_chr_size(it.ref);
+    else it.chr.size = cutf8_decode_codepoint(&it.u8.dec, it.ref, it.u8.end);
     return it;
 }
 
@@ -229,12 +236,12 @@ csview csview_u8_tail(csview sv, isize_t u8len) {
 }
 
 csview_iter csview_u8_at(csview sv, isize_t u8pos) {
-    const char *end = &sv.buf[sv.size];
-    while ((u8pos > 0) & (sv.buf != end))
-        u8pos -= (*++sv.buf & 0xC0) != 0x80;
-    sv.size = cutf8_chr_size(sv.buf);
-    c_assert(sv.buf != end);
-    return c_literal(csview_iter){.u8 = {sv, end}};
+    csview_iter it = {.u8={sv, sv.buf + sv.size, {0}}};
+    while ((u8pos > 0) & (it.ref != it.u8.end))
+        u8pos -= (*++it.ref & 0xC0) != 0x80;
+    c_assert(u8pos == 0);
+    it.chr.size = cutf8_decode_codepoint(&it.u8.dec, it.ref, it.u8.end);
+    return it;
 }
 #endif // IMPLEMENT
 

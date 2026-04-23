@@ -57,6 +57,7 @@ zsview_iter     zsview_begin(const zsview* self);                   // utf8 iter
 zsview_iter     zsview_end(const zsview* self);
 void            zsview_next(zsview_iter* it);                       // next rune
 zsview_iter     zsview_advance(zsview_iter it, isize_t u8pos);      // advance +/- runes
+uint32_t        zsview_codepoint(const zsview_iter* it);            // return cached codepoint for iter
 ```
 
 #### Helper methods for usage in containers

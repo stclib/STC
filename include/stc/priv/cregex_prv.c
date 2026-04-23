@@ -216,7 +216,7 @@ typedef struct _Reljunk
 static inline int
 chartorune(_Rune *rune, const char *s)
 {
-    cutf8_decode_t d = {.state=0};
+    cutf8_decode_t d = {0};
     int n = cutf8_decode_codepoint(&d, s, NULL);
     *rune = d.codep;
     return n;
@@ -1045,6 +1045,7 @@ _regexec1(const _Reprog *progp,  /* program to run */
     const char *s, *p;
     _Rune r, *rp, *ep;
     int n, checkstart, match = 0;
+    cutf8_decode_t decoder = {0};
 
     bool icase = progp->flags.icase;
     checkstart = j->starttype;
@@ -1078,8 +1079,11 @@ _regexec1(const _Reprog *progp,  /* program to run */
                 break;
             }
         }
-        r = *(uint8_t*)s;
-        n = r < 0x80 ? 1 : chartorune(&r, s);
+        r = *(uint8_t*)s, n = 1;
+        if (r >= 0x80) {
+            n = cutf8_decode_codepoint(&decoder, s, j->eol);
+            r = decoder.codep;
+        }
 
         /* switch run lists */
         tl = j->relist[flag];

@@ -28,15 +28,11 @@
 
 // The following functions assume valid utf8 strings:
 
-/* number of bytes in the utf8 codepoint from s */
+/* number of bytes in a utf8 codepoint given its first byte */
 STC_INLINE int cutf8_chr_size(const char *s) {
-    unsigned b = (uint8_t)*s;
-    if (b < 0x80) return 1;
-    /*if (b < 0xC2) return 0;*/
-    if (b < 0xE0) return 2;
-    if (b < 0xF0) return 3;
-    /*if (b < 0xF5)*/ return 4;
-    /*return 0;*/
+    // Every nibble represents the utf8 length given the 
+    // first 4 bits of a utf8 encoded byte.
+    return (int)((0x4322000011111111ull >> (((uint8_t)*s >> 4) << 2)) & 0xf);
 }
 
 /* number of codepoints in the utf8 string s */
@@ -49,7 +45,7 @@ STC_INLINE isize_t cutf8_count(const char *s) {
 
 STC_INLINE isize_t cutf8_count_n(const char *s, isize_t nbytes) {
     isize_t size = 0;
-    while ((nbytes-- != 0) & (*s != 0)) {
+    while ((nbytes-- > 0) & (*s != 0)) {
         size += (*++s & 0xC0) != 0x80;
     }
     return size;
@@ -80,46 +76,28 @@ STC_INLINE csview cutf8_subview(const char *s, isize_t u8pos, isize_t u8len) {
 }
 
 // ------------------------------------------------------
-// Functions below must be linked with utf8_prv.c content
+// Functions below must be linked with utf8_prv.c and utf8_decode.c
 // To call them, either define i_import before including
 // one of cstr, csview, zsview, or link with src/libstc.a
 
-/* decode next utf8 codepoint. https://bjoern.hoehrmann.de/utf-8/decoder/dfa */
-typedef struct { uint32_t state, codep; } cutf8_decode_t;
-extern const uint8_t cutf8_dtab[]; /* utf8code.c */
-#define cutf8_ACCEPT 0
-#define cutf8_REJECT 12
+#include "utf8_decode.h"
 
 extern bool     cutf8_valid(const char* s);
 extern bool     cutf8_valid_n(const char* s, isize_t nbytes);
 extern int      cutf8_encode(char *out, uint32_t c);
-extern int      cutf8_decode_codepoint(cutf8_decode_t* d, const char* s, const char* end);
 extern int      cutf8_icompare(const csview s1, const csview s2);
-extern uint32_t cutf8_peek_at(const char* s, isize_t u8offset);
 extern uint32_t cutf8_casefold(uint32_t c);
 extern uint32_t cutf8_tolower(uint32_t c);
 extern uint32_t cutf8_toupper(uint32_t c);
+
+STC_INLINE uint32_t cutf8_peek_at(const char* s, isize_t offset)
+    { return cutf8_peek(cutf8_offset(s, offset)); }
 
 STC_INLINE bool cutf8_isupper(uint32_t c)
     { return c < 128 ? (c >= 'A') & (c <= 'Z') : cutf8_tolower(c) != c; }
 
 STC_INLINE bool cutf8_islower(uint32_t c)
     { return c < 128 ? (c >= 'a') & (c <= 'z') : cutf8_toupper(c) != c; }
-
-STC_INLINE uint32_t cutf8_decode(cutf8_decode_t* d, const uint32_t byte) {
-    const uint32_t type = cutf8_dtab[byte];
-    d->codep = d->state ? (byte & 0x3fu) | (d->codep << 6)
-                        : (0xffU >> type) & byte;
-    return d->state = cutf8_dtab[256 + d->state + type];
-}
-
-STC_INLINE uint32_t cutf8_peek(const char* s) {
-    cutf8_decode_t d = {.state=0};
-    do {
-        cutf8_decode(&d, (uint8_t)*s++);
-    } while (d.state > cutf8_REJECT);
-    return d.state == cutf8_ACCEPT ? d.codep : 0xFFFD;
-}
 
 /* case-insensitive utf8 string comparison */
 STC_INLINE int cutf8_icmp(const char* s1, const char* s2) {

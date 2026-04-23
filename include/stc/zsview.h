@@ -83,7 +83,6 @@ STC_INLINE csview zsview_subview(zsview zs, isize_t pos, isize_t len) {
 }
 
 STC_INLINE zsview zsview_tail(zsview zs, isize_t len) {
-    c_assert(len >= 0);
     if (len > zs.size) len = zs.size;
     zs.str += zs.size - len; zs.size = len;
     return zs;
@@ -106,10 +105,10 @@ STC_INLINE csview zsview_u8_subview(zsview zs, isize_t u8pos, isize_t u8len)
     { return cutf8_subview(zs.str, u8pos, u8len); }
 
 STC_INLINE zsview_iter zsview_u8_at(zsview zs, isize_t u8pos) {
-    csview sv;
-    sv.buf = cutf8_at(zs.str, u8pos);
-    sv.size = cutf8_chr_size(sv.buf);
-    return c_literal(zsview_iter){.chr = sv};
+    zsview_iter it = {.ref=cutf8_at(zs.str, u8pos)};
+    if (*it.ref == '\0') it.ref = NULL;
+    else it.chr.size = cutf8_decode_codepoint(&it.u8.dec, it.ref, NULL);
+    return it;
 }
 
 STC_INLINE isize_t zsview_u8_size(zsview zs)
@@ -119,9 +118,11 @@ STC_INLINE bool zsview_u8_valid(zsview zs) // requires linking with utf8 symbols
     { return cutf8_valid_n(zs.str, zs.size); }
 
 /* utf8 iterator */
-
 STC_INLINE zsview_iter zsview_begin(const zsview* self) {
-    zsview_iter it = {.chr = {self->str, cutf8_chr_size(self->str)}}; return it;
+    zsview_iter it = {.ref=self->str};
+    if (*it.ref == '\0') it.ref = NULL;
+    else it.chr.size = cutf8_decode_codepoint(&it.u8.dec, it.ref, NULL);
+    return it;
 }
 
 STC_INLINE zsview_iter zsview_end(const zsview* self) {
@@ -130,16 +131,19 @@ STC_INLINE zsview_iter zsview_end(const zsview* self) {
 
 STC_INLINE void zsview_next(zsview_iter* it) {
     it->ref += it->chr.size;
-    it->chr.size = cutf8_chr_size(it->ref);
     if (*it->ref == '\0') it->ref = NULL;
+    else it->chr.size = cutf8_decode_codepoint(&it->u8.dec, it->ref, NULL);
 }
 
 STC_INLINE zsview_iter zsview_advance(zsview_iter it, isize_t u8pos) {
     it.ref = cutf8_offset(it.ref, u8pos);
-    it.chr.size = cutf8_chr_size(it.ref);
     if (*it.ref == '\0') it.ref = NULL;
+    else it.chr.size = cutf8_decode_codepoint(&it.u8.dec, it.ref, NULL);
     return it;
 }
+
+STC_INLINE uint32_t zsview_codepoint(const zsview_iter* it)
+    { return it->u8.dec.codep; }
 
 /* ---- Container helper functions ---- */
 

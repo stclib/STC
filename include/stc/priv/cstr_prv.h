@@ -206,35 +206,40 @@ STC_INLINE csview cstr_u8_subview(const cstr* self, isize_t u8pos, isize_t u8len
     { return cutf8_subview(cstr_str(self), u8pos, u8len); }
 
 STC_INLINE cstr_iter cstr_u8_at(const cstr* self, isize_t u8pos) {
-    csview sv;
-    sv.buf = cutf8_at(cstr_str(self), u8pos);
-    sv.size = cutf8_chr_size(sv.buf);
-    c_assert(sv.size);
-    return c_literal(cstr_iter){.chr = sv};
+    cstr_iter it = {.ref=cutf8_at(cstr_str(self), u8pos)};
+    if (*it.ref == '\0') it.ref = NULL;
+    else it.chr.size = cutf8_decode_codepoint(&it.u8.dec, it.ref, NULL);
+    return it;
 }
 
 // utf8 iterator
-
 STC_INLINE cstr_iter cstr_begin(const cstr* self) {
-    csview sv = cstr_sv(self);
-    cstr_iter it = {.chr = {sv.buf, cutf8_chr_size(sv.buf)}};
+    cstr_iter it = {.ref=cstr_str(self)};
+    if (*it.ref == '\0') it.ref = NULL;
+    else it.chr.size = cutf8_decode_codepoint(&it.u8.dec, it.ref, NULL);
     return it;
 }
+
 STC_INLINE cstr_iter cstr_end(const cstr* self) {
     (void)self; cstr_iter it = {0}; return it;
 }
+
 STC_INLINE void cstr_next(cstr_iter* it) {
     it->ref += it->chr.size;
-    it->chr.size = cutf8_chr_size(it->ref);
     if (*it->ref == '\0') it->ref = NULL;
+    else it->chr.size = cutf8_decode_codepoint(&it->u8.dec, it->ref, NULL);
 }
 
 STC_INLINE cstr_iter cstr_advance(cstr_iter it, isize_t u8pos) {
     it.ref = cutf8_offset(it.ref, u8pos);
-    it.chr.size = cutf8_chr_size(it.ref);
     if (*it.ref == '\0') it.ref = NULL;
+    else it.chr.size = cutf8_decode_codepoint(&it.u8.dec, it.ref, NULL);
     return it;
 }
+
+STC_INLINE uint32_t cstr_codepoint(const cstr_iter* it)
+    { return it->u8.dec.codep; }
+
 
 // utf8 case conversion: requires `#define i_import` before including cstr.h in one TU.
 extern  cstr cstr_tocase_sv(csview sv, int k);

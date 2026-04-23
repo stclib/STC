@@ -76,6 +76,7 @@ csview_iter     csview_begin(const csview* self);                       // utf8 
 csview_iter     csview_end(const csview* self);
 void            csview_next(csview_iter* it);                           // next utf8 codepoint
 csview_iter     csview_advance(csview_iter it, isize_t u8pos);          // advance +/- codepoints
+uint32_t        csview_codepoint(const csview_iter* it);                // return cached codepoint for iter
 ```
 
 #### Iterate tokens with *c_token*

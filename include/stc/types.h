@@ -54,6 +54,8 @@
 #define declare_sortedmap_aux(C, KEY, VAL, AUX) _declare_aatree(C, KEY, VAL, c_true, c_false, AUX aux;)
 #define declare_sortedset_aux(C, KEY, AUX) _declare_aatree(C, KEY, KEY, c_false, c_true, AUX aux;)
 
+typedef struct { uint32_t state, codep; } cutf8_decode_t;
+
 // csview : non-null terminated string view
 typedef const char csview_value;
 typedef struct csview {
@@ -62,9 +64,9 @@ typedef struct csview {
 } csview;
 
 typedef union {
-    csview_value* ref;
     csview chr;
-    struct { csview chr; csview_value* end; } u8;
+    csview_value* ref;
+    struct { csview chr; csview_value* end; cutf8_decode_t dec; } u8;
 } csview_iter;
 
 #define c_sv(...) c_MACRO_OVERLOAD(c_sv, __VA_ARGS__)
@@ -81,8 +83,9 @@ typedef struct zsview {
 } zsview;
 
 typedef union {
-    zsview_value* ref;
     csview chr;
+    zsview_value* ref;
+    struct { csview chr; cutf8_decode_t dec; } u8;
 } zsview_iter;
 
 #define c_zv(literal) (c_literal(zsview){literal, c_litstrlen(literal)})
@@ -99,6 +102,7 @@ typedef union cstr {
 typedef union {
     csview chr; // utf8 character/codepoint
     const cstr_value* ref;
+    struct { csview chr; cutf8_decode_t dec; } u8;
 } cstr_iter;
 
 // non-owning char pointer

@@ -41,6 +41,7 @@ libsrc = files(
   'src/cstr_misc.c',
   'src/cstr_io.c',
   'src/cstr_utf8.c',
+  'src/utf8_misc.c',
   'src/csview.c',
   'src/fmt.c',
   'src/random.c',

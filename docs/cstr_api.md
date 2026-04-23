@@ -127,7 +127,8 @@ bool            cstr_iends_with(const cstr* self, const char* str);     // utf8 
 cstr_iter       cstr_begin(const cstr* self);                           // iterate utf8 codepoints (runes)
 cstr_iter       cstr_end(const cstr* self);
 void            cstr_next(cstr_iter* it);                               // next rune
-cstr_iter       cstr_advance(cstr_iter it, isize_t u8pos);                // advance +/- runes
+cstr_iter       cstr_advance(cstr_iter it, isize_t u8pos);              // advance +/- runes
+uint32_t        cstr_codepoint(const cstr_iter* it);                    // return cached codepoint for iter
 
 cstr            cstr_casefold_sv(csview sv);                            // returns new casefolded utf8 cstr
 cstr            cstr_tolower_sv(csview sv);                             // returns new lowercase utf8 cstr
