@@ -106,8 +106,8 @@ STC_INLINE csview zsview_u8_subview(zsview zs, isize_t u8pos, isize_t u8len)
 
 STC_INLINE zsview_iter zsview_u8_at(zsview zs, isize_t u8pos) {
     zsview_iter it = {.ref=cutf8_at(zs.str, u8pos)};
+    it.chr.size = cutf8_decode_codepoint(&it.u8.dec, it.ref, NULL);
     if (*it.ref == '\0') it.ref = NULL;
-    else it.chr.size = cutf8_decode_codepoint(&it.u8.dec, it.ref, NULL);
     return it;
 }
 
@@ -120,8 +120,8 @@ STC_INLINE bool zsview_u8_valid(zsview zs) // requires linking with utf8 symbols
 /* utf8 iterator */
 STC_INLINE zsview_iter zsview_begin(const zsview* self) {
     zsview_iter it = {.ref=self->str};
+    it.chr.size = cutf8_decode_codepoint(&it.u8.dec, it.ref, NULL);
     if (*it.ref == '\0') it.ref = NULL;
-    else it.chr.size = cutf8_decode_codepoint(&it.u8.dec, it.ref, NULL);
     return it;
 }
 
@@ -131,14 +131,14 @@ STC_INLINE zsview_iter zsview_end(const zsview* self) {
 
 STC_INLINE void zsview_next(zsview_iter* it) {
     it->ref += it->chr.size;
+    it->chr.size = cutf8_decode_codepoint(&it->u8.dec, it->ref, NULL);
     if (*it->ref == '\0') it->ref = NULL;
-    else it->chr.size = cutf8_decode_codepoint(&it->u8.dec, it->ref, NULL);
 }
 
 STC_INLINE zsview_iter zsview_advance(zsview_iter it, isize_t u8pos) {
     it.ref = cutf8_offset(it.ref, u8pos);
+    it.chr.size = cutf8_decode_codepoint(&it.u8.dec, it.ref, NULL);
     if (*it.ref == '\0') it.ref = NULL;
-    else it.chr.size = cutf8_decode_codepoint(&it.u8.dec, it.ref, NULL);
     return it;
 }
 

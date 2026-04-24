@@ -32,7 +32,12 @@
 STC_INLINE int cutf8_chr_size(const char *s) {
     // Every nibble represents the utf8 length given the 
     // first 4 bits of a utf8 encoded byte.
-    return (int)((0x4322000011111111ull >> (((uint8_t)*s >> 4) << 2)) & 0xf);
+    //return (int)((0x4322000011111111ull >> (((uint8_t)*s >> 4) << 2)) & 0xf);
+    unsigned b = (uint8_t)*s;
+    if (b < 0x80) return 1;
+    if (b < 0xE0) return 2;
+    if (b < 0xF0) return 3;
+    return 4;
 }
 
 /* number of codepoints in the utf8 string s */
@@ -54,6 +59,7 @@ STC_INLINE isize_t cutf8_count_n(const char *s, isize_t nbytes) {
 STC_INLINE const char* cutf8_at(const char *s, isize_t u8pos) {
     while ((u8pos > 0) & (*s != 0))
         u8pos -= (*++s & 0xC0) != 0x80;
+    c_assert(u8pos == 0);
     return s;
 }
 
@@ -62,6 +68,7 @@ STC_INLINE const char* cutf8_offset(const char* s, isize_t u8pos) {
     if (u8pos < 0) u8pos = -u8pos, inc = -1;
     while (u8pos && *s)
         u8pos -= (*(s += inc) & 0xC0) != 0x80;
+    c_assert(u8pos == 0);
     return s;
 }
 

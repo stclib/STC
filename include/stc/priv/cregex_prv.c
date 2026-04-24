@@ -229,7 +229,7 @@ utfrune(const char *s, _Rune c, const char* eol) // search
         for (; *s != 0 && s != eol; ++s)
             if (*s == (int)c) return s;
     } else {
-        cutf8_decode_t d = {.state=0};
+        cutf8_decode_t d = {0};
         while (*s != 0 && s != eol) {
             int n = cutf8_decode_codepoint(&d, s, NULL);
             if (d.codep == c) return s;
@@ -246,7 +246,7 @@ utfruneicase(const char *s, _Rune c, const char* eol) {
             if (tolower(*s) == low)
                 return s;
     } else {
-        cutf8_decode_t d = {.state=0};
+        cutf8_decode_t d = {0};
         c = cutf8_casefold(c);
         while (*s != 0 && s != eol) {
             int n = cutf8_decode_codepoint(&d, s, NULL);
