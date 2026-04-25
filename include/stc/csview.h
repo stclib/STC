@@ -236,7 +236,7 @@ csview csview_u8_tail(csview sv, isize_t u8len) {
 }
 
 csview_iter csview_u8_at(csview sv, isize_t u8pos) {
-    csview_iter it = {.u8={sv, sv.buf + sv.size, {0}}};
+    csview_iter it = {.u8={sv, sv.buf + sv.size}};
     while ((u8pos > 0) & (it.ref != it.u8.end))
         u8pos -= (*++it.ref & 0xC0) != 0x80;
     c_assert(u8pos == 0);

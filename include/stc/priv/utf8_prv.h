@@ -32,12 +32,7 @@
 STC_INLINE int cutf8_chr_size(const char *s) {
     // Every nibble represents the utf8 length given the 
     // first 4 bits of a utf8 encoded byte.
-    //return (int)((0x4322000011111111ull >> (((uint8_t)*s >> 4) << 2)) & 0xf);
-    unsigned b = (uint8_t)*s;
-    if (b < 0x80) return 1;
-    if (b < 0xE0) return 2;
-    if (b < 0xF0) return 3;
-    return 4;
+    return (int)((0x4322000011111111ull >> (((uint8_t)*s >> 4) << 2)) & 0xf);
 }
 
 /* number of codepoints in the utf8 string s */
