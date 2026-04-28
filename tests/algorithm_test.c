@@ -16,7 +16,7 @@ static cstr to_roman(int value)
     cstr result = {0};
     struct roman { int d; const char* r; };
 
-    for (c_items(i, struct roman, {
+    for (c_each_item(i, struct roman, {
         {1000, "M"}, {900, "CM"},
         {500, "D"}, {400, "CD"},
         {100, "C"}, {90, "XC"},

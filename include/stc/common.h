@@ -155,15 +155,12 @@
 
 // [deprecated]:
 #define c_init(...) c_make(__VA_ARGS__)
-#define c_forlist(...) for (c_items(_VA_ARGS__))
-#define c_foritems(...) for (c_items(__VA_ARGS__))
+#define c_items(...) c_each_item(__VA_ARGS__)
+#define c_foritems(...) for (c_each_item(__VA_ARGS__))
 #define c_foreach(...) for (c_each(__VA_ARGS__))
-#define c_foreach_n(...) for (c_each_n(__VA_ARGS__))
 #define c_foreach_kv(...) for (c_each_kv(__VA_ARGS__))
-#define c_foreach_reverse(...) for (c_each_reverse(__VA_ARGS__))
 #define c_forrange(...) for (c_range(__VA_ARGS__))
 #define c_forrange32(...) for (c_range32(__VA_ARGS__))
-#define c_each_item(...) c_each_ref(__VA_ARGS__)
 #define c_arraylen(a) c_countof(a)
 #define c_const_cast(Tp, p) c_as_mut(Tp, p)
 // End [deprecated]
@@ -208,7 +205,7 @@
          _it_##key.ref != (C##_value*)_endref_##key && (key = &_it_##key.ref->first, val = &_it_##key.ref->second); \
          C##_next(&_it_##key)
 
-#define c_items(it, T, ...) \
+#define c_each_item(it, T, ...) \
     struct {T* ref; int size, index;} \
     it = {.ref=c_make_array(T, __VA_ARGS__), .size=(int)(sizeof((T[])__VA_ARGS__)/sizeof(T))} \
     ; it.index < it.size ; ++it.ref, ++it.index
@@ -243,7 +240,7 @@
 
 // drop multiple containers of same type
 #define c_drop(C, ...) \
-    do { for (c_items(_c_i2, C*, {__VA_ARGS__})) C##_drop(*_c_i2.ref); } while(0)
+    do { for (c_each_item(_c_i2, C*, {__VA_ARGS__})) C##_drop(*_c_i2.ref); } while(0)
 
 // RAII scopes
 #define c_defer(...) \

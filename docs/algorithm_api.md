@@ -61,22 +61,22 @@ for (c_each_kv(id, count, IMap, map))
 <!--{%endraw%}-->
 </details>
 <details>
-<summary><b>c_items</b> - Literal list element iteration</summary>
+<summary><b>c_each_item</b> - Literal list element iteration</summary>
 
-### c_items
+### c_each_item
 Iterate compound literal array elements. In addition to `i.ref`, you can access `i.index` and `i.size`.
 <!--{%raw%}-->
 ```c++
 // apply multiple push_backs
-for (c_items(i, int, {4, 5, 6, 7}))
+for (c_each_item(i, int, {4, 5, 6, 7}))
     list_i_push_back(&lst, *i.ref);
 
 // insert in existing map
-for (c_items(i, hmap_ii_value, {{4, 5}, {6, 7}}))
+for (c_each_item(i, hmap_ii_value, {{4, 5}, {6, 7}}))
     hmap_ii_insert(&map, i.ref->first, i.ref->second);
 
 // string literals pushed to a stack of cstr elements:
-for (c_items(i, const char*, {"Hello", "crazy", "world"}))
+for (c_each_item(i, const char*, {"Hello", "crazy", "world"}))
     stack_cstr_emplace(&stk, *i.ref);
 ```
 <!--{%endraw%}-->

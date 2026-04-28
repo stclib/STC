@@ -26,7 +26,7 @@ int main(void)
         }
         printf("\ninput: %s\n", s[i].input);
 
-        for (c_match(j, &re, s[i].input)) {
+        for (c_each_match(j, &re, s[i].input)) {
             for (c_range(k, cregex_captures(&re) + 1))
                 printf("  submatch %d: " c_svfmt "\n", (int)k, c_svarg(j.match[k]));
         }

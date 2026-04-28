@@ -29,13 +29,17 @@
 #include "types.h"
 #include "priv/utf8_prv.h"
 
+// [deprecated]:
+#define c_token(it, separator, str) c_each_split_sv(it, separator, csview_from(str))
+#define csview_token(...) csview_split(__VA_ARGS__)
+
 #define             csview_init() c_sv_1("")
 #define             csview_drop(p) c_default_drop(p)
 #define             csview_clone(sv) c_default_clone(sv)
 
 csview_iter         csview_advance(csview_iter it, isize_t u8pos);
 csview              csview_subview_pro(csview sv, isize_t pos, isize_t n);
-csview              csview_token(csview sv, const char* sep, isize_t* pos);
+csview              csview_split(csview sv, const char* sep, isize_t* pos);
 csview              csview_u8_subview(csview sv, isize_t u8pos, isize_t u8len);
 csview              csview_u8_tail(csview sv, isize_t u8len);
 csview_iter         csview_u8_at(csview sv, isize_t u8pos);
@@ -137,15 +141,10 @@ STC_INLINE isize_t csview_u8_size(csview sv)
 STC_INLINE bool csview_u8_valid(csview sv) // requires linking with utf8 symbols
     { return cutf8_valid_n(sv.buf, sv.size); }
 
-#define c_fortoken(...) for (c_token(__VA_ARGS__)) // [deprecated]
-
-#define c_token_sv(it, separator, sv) \
+#define c_each_split_sv(it, separator, sv) \
     struct { csview input, token; const char* sep; isize_t pos; } \
     it = {.input=sv, .sep=separator} ; \
-    it.pos <= it.input.size && (it.token = csview_token(it.input, it.sep, &it.pos)).buf ;
-
-#define c_token(it, separator, str) \
-    c_token_sv(it, separator, csview_from(str))
+    it.pos <= it.input.size && (it.token = csview_split(it.input, it.sep, &it.pos)).buf ;
 
 /* ---- Container helper functions ---- */
 
@@ -208,7 +207,7 @@ csview csview_subview_pro(csview sv, isize_t pos, isize_t len) {
     return sv;
 }
 
-csview csview_token(csview sv, const char* sep, isize_t* pos) {
+csview csview_split(csview sv, const char* sep, isize_t* pos) {
     isize_t sep_size = c_strlen(sep);
     csview slice = {sv.buf + *pos, sv.size - *pos};
     const char* res = c_strnstrn(slice.buf, slice.size, sep, sep_size);

@@ -211,7 +211,7 @@ int main(void) {
     IList L1 = c_make(IList, {1, 2, 3, 4, 5});
     IList L2 = c_make(IList, {10, 20, 30, 40, 50});
 
-    for (c_items(k, IList, {L1, L2})) {
+    for (c_each_item(k, IList, {L1, L2})) {
         for (c_each(i, IList, *k.ref))
             printf(" %d", *i.ref);
         puts("");
@@ -222,7 +222,7 @@ int main(void) {
 
     IList_splice_range(&L1, i, &L2, j1, j2);
 
-    for (c_items(k, IList, {L1, L2})) {
+    for (c_each_item(k, IList, {L1, L2})) {
         for (c_each(i, IList, *k.ref))
             printf(" %d", *i.ref);
         puts("");

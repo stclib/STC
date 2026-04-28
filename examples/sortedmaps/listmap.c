@@ -34,7 +34,7 @@ int main(void)
 
     // list-initialize
     struct pair {int a; const char* b;};
-    for (c_items(i, struct pair, {{2, "foo"}, {2, "bar"}, {3, "baz"}, {1, "abc"}, {5, "def"}}))
+    for (c_each_item(i, struct pair, {{2, "foo"}, {2, "bar"}, {3, "baz"}, {1, "abc"}, {5, "def"}}))
         insert(&mmap, i.ref->a, i.ref->b);
     print("#1", mmap);
 
@@ -50,7 +50,7 @@ int main(void)
     print("#4", mmap);
 
     // insert using initialization_list
-    for (c_items(it, struct pair, {{5, "one"}, {5, "two"}}))
+    for (c_each_item(it, struct pair, {{5, "one"}, {5, "two"}}))
         insert(&mmap, it.ref->a, it.ref->b);
     print("#5", mmap);
 

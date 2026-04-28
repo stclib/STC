@@ -139,7 +139,7 @@ int main(void) {
         printf(" %d", *i.ref);
     puts("");
 
-    for (c_items(i, int, {1, 4, 5, 22, 33, 2}))
+    for (c_each_item(i, int, {1, 4, 5, 22, 33, 2}))
         Deque_push_back(&q, *i.ref);
 
     for (c_each(i, Deque, q))

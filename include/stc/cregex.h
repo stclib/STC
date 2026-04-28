@@ -81,13 +81,17 @@ typedef struct {
     csview match[CREG_MAX_CAPTURES];
 } cregex_iter;
 
-#define c_match(it, re, str) \
+// [deprecated]:
+#define c_match(...) c_each_match(__VA_ARGS__)
+
+#define c_each_match(it, re, str) \
     cregex_iter it = {.regex=re, .input={str}, .match={{0}}}; \
     cregex_match(it.regex, it.input.buf, it.match, CREG_NEXT) == CREG_OK;
 
-#define c_match_sv(it, re, strview) \
+#define c_each_match_sv(it, re, strview) \
     cregex_iter it = {.regex=re, .input=strview, .match={{0}}}; \
     cregex_match_sv(it.regex, it.input, it.match, CREG_NEXT) == CREG_OK;
+
 
 /* compile a regex from a pattern. return CREG_OK, or negative error code on failure. */
 extern int cregex_compile_pro(cregex *re, const char* pattern, int cflags);

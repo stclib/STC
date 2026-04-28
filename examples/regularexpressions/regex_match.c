@@ -20,7 +20,7 @@ int main(void)
 
     // extract and convert all numbers in str to floats
     Fvec vec = {0};
-    for (c_match(i, &re, str)) {
+    for (c_each_match(i, &re, str)) {
         Fvec_push(&vec, atof(i.match[0].buf));
     }
 

@@ -18,7 +18,7 @@ int main(void) {
     const char* hay = "'Citizen Kane' (1941), 'The Wizard of Oz' (1939), 'M' (1931).";
     Movies movies = {0};
 
-    for (c_match(c, &re, hay)) {
+    for (c_each_match(c, &re, hay)) {
         Movies_push(&movies, (Movie){c.match[1], atoi(c.match[2].buf)});
     }
 

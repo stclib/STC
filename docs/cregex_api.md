@@ -141,7 +141,7 @@ if (cregex_match_aio(pattern, input, match))
     printf("Found date: " c_svfmt "\n", c_svarg(match[0]));
 ```
 
-### Iterate through regex matches, for (*c_match()*)
+### Iterate through regex matches, for (*c_each_match()*)
 
 To iterate multiple matches in an input string, you may use
 ```c++
@@ -150,10 +150,10 @@ while (cregex_match(&re, input, match, .flags=CREG_NEXT) == CREG_OK)
     for (int k = 1; k <= cregex_captures(&re); ++k)
         printf("submatch %d: " c_svfmt "\n", k, c_svarg(match[k]));
 ```
-There is also a `c_match` macro which simplifies this:
+There is also a `c_each_match` macro which simplifies this:
 ```c++
-for (c_match(it, &re, input))
-    for (c_range(k, 1, cregex_captures(&re) + 1))
+for (c_each_match(it, &re, input))
+    for (int k=1, k <= cregex_captures(&re); ++k)
         printf("submatch %d: " c_svfmt "\n", k, c_svarg(it.match[k]));
 ```
 

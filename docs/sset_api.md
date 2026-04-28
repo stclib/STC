@@ -102,7 +102,7 @@ int main(void)
     SSet second = c_make(SSet, {"red", "green", "blue"});
     SSet third={0}, fourth={0}, fifth={0};
 
-    for (c_items(i, const char*, {"orange", "pink", "yellow"}))
+    for (c_each_item(i, const char*, {"orange", "pink", "yellow"}))
         SSet_emplace(&third, *i.ref);
 
     SSet_emplace(&fourth, "potatoes");

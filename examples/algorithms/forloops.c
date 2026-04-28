@@ -22,20 +22,15 @@ int main(void)
 
     for (c_range(i, 30, 90, 2)) printf(" %d", (int)i);
 
-    puts("\n\nfor c_items:");
-    for (c_items(i, int, {12, 23, 453, 65, 676}))
-        printf(" %d", *i.ref);
-    puts("");
-
-    for (c_items(i, const char*, {"12", "23", "453", "65", "676"}))
-        printf(" %s", *i.ref);
-    puts("");
-
     IVec vec = c_make(IVec, {12, 23, 453, 65, 113, 215, 676, 34, 67, 20, 27, 66, 189, 45, 280, 199});
     IMap map = c_make(IMap, {{12, 23}, {453, 65}, {676, 123}, {34, 67}});
 
     puts("\n\nfor c_each:");
     for (c_each(i, IVec, vec))
+        printf(" %d", *i.ref);
+
+    puts("\n\nfor c_each_reverse: (stack/vec/deque");
+    for (c_each_reverse(i, IVec, vec))
         printf(" %d", *i.ref);
 
     puts("\n\nfor c_each in a map:");
@@ -49,6 +44,15 @@ int main(void)
     puts("\n\nfor c_each_kv:");
     for (c_each_kv(key, val, IMap, map))
         printf(" (%d %d)", *key, *val);
+
+    puts("\n\nfor c_each_item:");
+    for (c_each_item(i, int, {12, 23, 453, 65, 676}))
+        printf(" %d", *i.ref);
+    puts("");
+
+    for (c_each_item(i, const char*, {"12", "23", "453", "65", "676"}))
+        printf(" %s", *i.ref);
+    puts("");
 
     #define f_isOdd() (*value & 1)
 

@@ -101,7 +101,7 @@ int main(void)
     Strings first = c_make(Strings, {"red", "green", "blue"});
     Strings second={0}, third={0}, fourth={0}, fifth={0};
 
-    for (c_items(i, const char*, {"orange", "pink", "yellow"}))
+    for (c_each_item(i, const char*, {"orange", "pink", "yellow"}))
         Strings_emplace(&third, *i.ref);
 
     for (c_each(i, Strings, third))

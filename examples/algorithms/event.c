@@ -19,12 +19,12 @@ int process_event(Event evt) {
 }
 
 int main(void) {
-    for (c_items(evt, Event, {
+    for (c_each_item(i, Event, {
         c_variant(Event_KeyPress, 100),
         c_variant(Event_MouseClick, {10, 20}),
         c_variant(Event_MouseMove, {3, 1}),
     })){
-        int result = process_event(*evt.ref);
-        printf("Event %d result: %d\n", c_variant_id(evt.ref), result);
+        int result = process_event(*i.ref);
+        printf("Event %d result: %d\n", c_variant_id(i.ref), result);
     }
 }

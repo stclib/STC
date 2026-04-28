@@ -18,7 +18,7 @@ int main(void) {
         PQueue_push(&heap, crand64_uint_r(&rng, 1) & ((1<<20) - 1));
 
     // push some negative numbers too.
-    for (c_items(i, int, {-231, -32, -873, -4, -343}))
+    for (c_each_item(i, int, {-231, -32, -873, -4, -343}))
         PQueue_push(&heap, *i.ref);
 
     for (c_range(N))

@@ -147,7 +147,7 @@ int main(void)
     vec_int_push(&vec, 13);
 
     // Append a set of numbers
-    for (c_items(i, int, {7, 5, 16, 8}))
+    for (c_each_item(i, int, {7, 5, 16, 8}))
         vec_int_push(&vec, *i.ref);
 
     printf("initial:");

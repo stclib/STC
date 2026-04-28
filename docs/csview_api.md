@@ -56,7 +56,7 @@ csview          csview_trim_start(csview sv);                           // trim 
 csview          csview_trim_end(csview sv);                             // trim from end of view
 
 csview          csview_subview_pro(csview sv, isize_t pos, isize_t len);  // negative pos count from end
-csview          csview_token(csview sv, const char* sep, isize_t* start); // *start > sv.size after last token
+csview          csview_split(csview sv, const char* sep, isize_t* start); // *start > sv.size after last token
 ```
 
 #### UTF8 methods
@@ -79,15 +79,16 @@ csview_iter     csview_advance(csview_iter it, isize_t u8pos);          // advan
 uint32_t        csview_codepoint(const csview_iter* it);                // return cached codepoint for iter
 ```
 
-#### Iterate tokens with *c_token*
+#### Iterate tokens with *c_each_split_sv*
 
 Iterate tokens in an input string split by a separator string:
-- `for (c_token_sv(it, const char* separator, csview input_sv)) ...;`
+- `for (c_each_split_sv(it, const char* separator, csview input_sv)) ...;`
 - `it.token` is a csview of the current token.
 
 ```c++
-for (c_token(i, ", ", "hello, one, two, three"))
-    printf("'" c_svfmt "' ", c_svarg(i.token));
+for (c_each_split_sv(it, ", ", c_sv("hello, one, two, three"))
+    printf("'" c_svfmt "' ", c_svarg(it.token));
+
 // 'hello' 'one' 'two' 'three'
 ```
 
@@ -177,7 +178,7 @@ and does not depend on zero-terminated strings. *string_split()* function return
 
 void print_split(csview input, const char* sep)
 {
-    for (c_token_sv(i, sep, input))
+    for (c_each_token_sv(i, sep, input))
         printf("[" c_svfmt "]\n", c_svarg(i.token));
     puts("");
 }
@@ -189,7 +190,7 @@ stack_cstr string_split(csview input, const char* sep)
 {
     stack_cstr out = {0};
 
-    for (c_token(i, sep, input))
+    for (c_each_split_sv(i, sep, input))
         stack_cstr_push(&out, cstr_from_sv(i.token));
 
     return out;

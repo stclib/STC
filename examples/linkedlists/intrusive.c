@@ -14,7 +14,7 @@ void printList(List list) {
 
 int main(void) {
     List list = {0};
-    for (c_items(i, int, {6, 9, 3, 1, 7, 4, 5, 2, 8}))
+    for (c_each_item(i, int, {6, 9, 3, 1, 7, 4, 5, 2, 8}))
         List_push_back_node(&list, c_new(List_node, {.value=*i.ref}));
 
     printList(list);

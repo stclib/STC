@@ -23,7 +23,7 @@ int main(void) {
     c_assert(!re.error);
     Fields fields = {0};
 
-    for (c_match(c, &re, hay)) {
+    for (c_each_match(c, &re, hay)) {
         Fields_push(&fields, (Field){c.match[1],
                                      atoi(c.match[2].buf),
                                      c.match[3].buf[0] == 't'});
