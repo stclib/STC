@@ -108,7 +108,7 @@ uint32_t cutf8_toupper(uint32_t c) {
     return c;
 }
 
-int cutf8_icompare(const csview s1, const csview s2) {
+int cutf8_icmp_sv(const csview s1, const csview s2) {
     cutf8_decode_t d1 = {.state=0}, d2 = {.state=0};
     const char *e1 = s1.buf + s1.size, *e2 = s2.buf + s2.size;
     isize_t j1 = 0, j2 = 0;

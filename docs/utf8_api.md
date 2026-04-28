@@ -27,7 +27,7 @@ int             cutf8_encode(char *out, uint32_t codepoint);     // encode unico
 uint32_t        cutf8_peek(const char* s);                       // codepoint value at character pos s
 uint32_t        cutf8_peek_at(const char* s, isize_t u8offset);  // codepoint at utf8 offset (may be negative)
 int             cutf8_icmp(const char* s1, const char* s2);      // case-insensitive char* comparison
-int             cutf8_icompare(csview s1, csview s2);            // case-insensitive csview comparison
+int             cutf8_icmp_sv(csview s1, csview s2);             // case-insensitive csview comparison
 
 uint32_t        cutf8_casefold(uint32_t c);                      // fold to a non-unique lowercase char.
 uint32_t        cutf8_tolower(uint32_t c);

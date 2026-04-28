@@ -87,10 +87,10 @@ STC_INLINE csview cutf8_subview(const char *s, isize_t u8pos, isize_t u8len) {
 extern bool     cutf8_valid(const char* s);
 extern bool     cutf8_valid_n(const char* s, isize_t nbytes);
 extern int      cutf8_encode(char *out, uint32_t c);
-extern int      cutf8_icompare(const csview s1, const csview s2);
 extern uint32_t cutf8_casefold(uint32_t c);
 extern uint32_t cutf8_tolower(uint32_t c);
 extern uint32_t cutf8_toupper(uint32_t c);
+extern int      cutf8_icmp_sv(const csview s1, const csview s2);
 
 STC_INLINE uint32_t cutf8_peek_at(const char* s, isize_t offset)
     { return cutf8_peek(cutf8_offset(s, offset)); }
@@ -103,7 +103,7 @@ STC_INLINE bool cutf8_islower(uint32_t c)
 
 /* case-insensitive utf8 string comparison */
 STC_INLINE int cutf8_icmp(const char* s1, const char* s2) {
-    return cutf8_icompare(c_sv(s1, INTPTR_MAX), c_sv(s2, INTPTR_MAX));
+    return cutf8_icmp_sv(c_sv(s1, INTPTR_MAX), c_sv(s2, INTPTR_MAX));
 }
 
 // ------------------------------------------------------

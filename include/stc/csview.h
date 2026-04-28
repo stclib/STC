@@ -160,7 +160,7 @@ STC_INLINE bool csview_eq(const csview* x, const csview* y)
 /* ---- case insensitive ---- */
 
 STC_INLINE bool csview_iequals_sv(csview sv1, csview sv2)
-    { return sv1.size == sv2.size && !cutf8_icompare(sv1, sv2); }
+    { return sv1.size == sv2.size && !cutf8_icmp_sv(sv1, sv2); }
 
 STC_INLINE bool csview_iequals(csview sv, const char* str)
     { return csview_iequals_sv(sv, c_sv(str, c_strlen(str))); }
@@ -169,11 +169,11 @@ STC_INLINE bool csview_ieq(const csview* x, const csview* y)
     { return csview_iequals_sv(*x, *y); }
 
 STC_INLINE int csview_icmp(const csview* x, const csview* y)
-    { return cutf8_icompare(*x, *y); }
+    { return cutf8_icmp_sv(*x, *y); }
 
 STC_INLINE bool csview_istarts_with(csview sv, const char* str) {
     isize_t n = c_strlen(str);
-    return n <= sv.size && !cutf8_icompare(sv, c_sv(str, n));
+    return n <= sv.size && !cutf8_icmp_sv(sv, c_sv(str, n));
 }
 
 STC_INLINE bool csview_iends_with(csview sv, const char* str) {
