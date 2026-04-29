@@ -5,25 +5,27 @@
 #define i_keydrop(p) (printf("drop name: %s\n", cstr_str(p)), cstr_drop(p))
 #include <stc/sortedmap.h>
 
-#define T Arc, Map, (c_no_atomic) // non-atomic ref. counted Map
-#define i_keydrop(p) (printf("drop Arc:\n"), Map_drop(p))
-#include <stc/arc.h>
+#define T RcMap, Map, (c_class_key)
+#define i_keydrop(p) (printf("drop RcMap:\n"), Map_drop(p))
+#include <stc/rc.h>
 
-#define T Vec, Arc, (c_pro_key) // arc is a "pro" type
+#define T Vec, RcMap, (c_pro_key) // arc is a "pro" type
 #include <stc/vec.h>
 
-#define T List, Arc, (c_pro_key)
+#define T List, RcMap, (c_pro_key)
 #include <stc/list.h>
 
 int main(void)
 {
     Vec vec = {0};
     List list = {0};
-    c_defer(Vec_drop(&vec), List_drop(&list))
-    {
+    c_defer(
+        Vec_drop(&vec),
+        List_drop(&list)
+    ){
         // POPULATE vec with shared pointers to Maps:
         Map *map;
-        //map = Vec_push(&vec, Arc_from(Map_init()))->get;
+        //map = Vec_push(&vec, RcMap_from(Map_init()))->get;
         map = Vec_emplace(&vec, Map_init())->get;
         Map_emplace(map, "Joey", 1990);
         Map_emplace(map, "Mary", 1995);
@@ -41,12 +43,12 @@ int main(void)
         Map_emplace(map, "Tracy", 2003);
 
         // Share two Maps from the vec with the list using emplace (clone the arc):
-        List_push_back(&list, Arc_clone(vec.data[0]));
-        List_push_back(&list, Arc_clone(vec.data[1]));
+        List_push(&list, RcMap_clone(vec.data[0]));
+        List_push(&list, RcMap_clone(vec.data[1]));
 
         // Clone (deep copy) a Map from the vec to the list
         // List will contain two shared and two unshared maps.
-        map = List_push_back(&list, Arc_from(Map_clone(*vec.data[1].get)))->get;
+        map = List_push(&list, RcMap_from(Map_clone(*vec.data[1].get)))->get;
 
         // Add one more element to the cloned map:
         Map_put(map, "CLONED", 2021);

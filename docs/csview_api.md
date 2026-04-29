@@ -49,14 +49,16 @@ bool            csview_starts_with(csview sv, const char* str);
 bool            csview_ends_with(csview sv, const char* str);
 
 csview          csview_subview(csview sv, isize_t pos, isize_t len);
+csview          csview_subview_pro(csview sv, isize_t pos, isize_t len); // negative pos count from end
 csview          csview_slice(csview sv, isize_t pos1, isize_t pos2);
 csview          csview_tail(csview sv, isize_t len);                    // span of the trailing len bytes
 csview          csview_trim(csview sv);                                 // trim whitespace and ctrl-chars on both ends
 csview          csview_trim_start(csview sv);                           // trim from start of view
 csview          csview_trim_end(csview sv);                             // trim from end of view
 
-csview          csview_subview_pro(csview sv, isize_t pos, isize_t len);  // negative pos count from end
-csview          csview_split(csview sv, const char* sep, isize_t* start); // *start > sv.size after last token
+                // split by separator string or UTF8 character. *pos is start search position and is auto updated:
+csview          csview_split(csview sv, const char* sep, isize_t* pos); // *pos becomes c_NPOS after last token.
+csview          csview_strtok(csview sv, const char* delims, isize_t* pos); // split by any single UTF8-character in delims.
 ```
 
 #### UTF8 methods
@@ -79,15 +81,21 @@ csview_iter     csview_advance(csview_iter it, isize_t u8pos);          // advan
 uint32_t        csview_codepoint(const csview_iter* it);                // return cached codepoint for iter
 ```
 
-#### Iterate tokens with *c_each_split_sv*
+#### Iterate tokens with c_each_split_sv() and c_each_strtok_sv()
 
 Iterate tokens in an input string split by a separator string:
-- `for (c_each_split_sv(it, const char* separator, csview input_sv)) ...;`
+- `for (c_each_split_sv(it, const char* separator, csview input)) ...;`
 - `it.token` is a csview of the current token.
 
+Iterate tokens in an input string split by any of the UTF8 characters in delimiters:
+- `for (c_each_strtok_sv(it, const char* delimiters, csview input)) ...;`
+- `it.token` is a csview of the current token.
+
+There are also *c_each_split()* and *c_each_strtok()* which takes a `const char*` as input.
+
 ```c++
-for (c_each_split_sv(it, ", ", c_sv("hello, one, two, three"))
-    printf("'" c_svfmt "' ", c_svarg(it.token));
+for (c_each_split(it, ", ", "hello, one, two, three")
+    printf("'%.*s' ", c_svarg(it.token));
 
 // 'hello' 'one' 'two' 'three'
 ```
@@ -178,7 +186,7 @@ and does not depend on zero-terminated strings. *string_split()* function return
 
 void print_split(csview input, const char* sep)
 {
-    for (c_each_token_sv(i, sep, input))
+    for (c_each_split_sv(i, sep, input))
         printf("[" c_svfmt "]\n", c_svarg(i.token));
     puts("");
 }

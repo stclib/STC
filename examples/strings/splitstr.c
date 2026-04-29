@@ -4,10 +4,15 @@
 
 int main(void)
 {
-    puts("Split with c_each_split_sv():");
+    puts("Split with for c_each_split(...):");
 
-    for (c_each_split_sv(i, " ", c_sv("Hello World C99!")))
+    for (c_each_split(i, " - ", "Hello - World - C99!"))
         printf("'" c_svfmt "'\n", c_svarg(i.token));
+
+    puts("\nSplit with for (c_each_strtok(...)):");
+
+    for (c_each_strtok(i, " \t\n", "  Hello   \t World   \n   C99! "))
+        if (i.token.size) printf("'" c_svfmt "'\n", c_svarg(i.token));
 
     puts("\nSplit with for (c_each_match(...)):");
 
