@@ -24,6 +24,7 @@
 #define STC_UTF8_PRV_C_INCLUDED
 
 #include "utf8_tab.c"
+#include "utf8_decode.c"
 
 int cutf8_encode(char *out, uint32_t c) {
     if (c < 0x80U) {
