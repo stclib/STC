@@ -330,7 +330,7 @@ starts eating (because they must be waiting).
 <details>
 <summary>The "Dining philosophers" C implementation</summary>
 
-[ [Run this code](https://godbolt.org/z/vz5rbE7W4) ]
+[ [Run this code](https://godbolt.org/z/qa3a8savz) ]
 ```c++
 #include <stdio.h>
 #include <time.h>
@@ -458,7 +458,7 @@ and recovered using `cco_recover`. This call will resume control back to the ori
 current task. Because the "call-tree" is fixed, the coroutine frames to be called may be pre-allocated on the stack,
 which is very fast.
 
-[ [Run this code](https://godbolt.org/z/bs4vexb7T) ]
+[ [Run this code](https://godbolt.org/z/1znTeGGa4) ]
 <!--{%raw%}-->
 ```c++
 #include <stdio.h>
@@ -566,7 +566,7 @@ call/await:
 <details>
 <summary>Implementation of coroutine objects on the heap</summary>
 
-[ [Run this code](https://godbolt.org/z/8sTnhcazf) ]
+[ [Run this code](https://godbolt.org/z/GvndbPanh) ]
 <!--{%raw%}-->
 ```c++
 #include <stdio.h>
@@ -749,7 +749,7 @@ the scope in that it was created.
 <details>
 <summary>Scheduled coroutines implementation</summary>
 
-[ [Run this code](https://godbolt.org/z/W8x8ex9TK) ]
+[ [Run this code](https://godbolt.org/z/WMKGo5vMz) ]
 ```c++
 // Based on https://www.youtube.com/watch?v=8sEe-4tig_A
 #include <stdio.h>

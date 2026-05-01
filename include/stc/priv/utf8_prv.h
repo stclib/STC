@@ -45,7 +45,7 @@ STC_INLINE isize_t cutf8_count(const char *s) {
 
 STC_INLINE isize_t cutf8_count_n(const char *s, isize_t nbytes) {
     isize_t size = 0;
-    while ((nbytes-- > 0) & (*s != 0)) {
+    while (nbytes-- != 0 && *s != 0) {
         size += (*++s & 0xC0) != 0x80;
     }
     return size;

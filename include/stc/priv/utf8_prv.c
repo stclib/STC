@@ -24,6 +24,7 @@
 #define STC_UTF8_PRV_C_INCLUDED
 
 #include "utf8_tab.c"
+#include "utf8_decode.c"
 
 int cutf8_encode(char *out, uint32_t c) {
     if (c < 0x80U) {
@@ -51,17 +52,16 @@ int cutf8_encode(char *out, uint32_t c) {
 }
 
 bool cutf8_valid(const char* s) {
-    cutf8_decode_t d = {.state=0};
+    cutf8_decode_t d = {0};
     while ((cutf8_decode(&d, (uint8_t)*s) != cutf8_REJECT) & (*s != '\0'))
         ++s;
     return d.state == cutf8_ACCEPT;
 }
 
 bool cutf8_valid_n(const char* s, isize_t nbytes) {
-    cutf8_decode_t d = {.state=0};
-    for (; nbytes-- != 0; ++s)
-        if ((cutf8_decode(&d, (uint8_t)*s) == cutf8_REJECT) | (*s == '\0'))
-            break;
+    cutf8_decode_t d = {0};
+    while (nbytes-- != 0 && ((cutf8_decode(&d, (uint8_t)*s) != cutf8_REJECT) & (*s != '\0')))
+        ++s;
     return d.state == cutf8_ACCEPT;
 }
 
@@ -109,7 +109,7 @@ uint32_t cutf8_toupper(uint32_t c) {
 }
 
 int cutf8_icmp_sv(const csview s1, const csview s2) {
-    cutf8_decode_t d1 = {.state=0}, d2 = {.state=0};
+    cutf8_decode_t d1 = {0}, d2 = {0};
     const char *e1 = s1.buf + s1.size, *e2 = s2.buf + s2.size;
     isize_t j1 = 0, j2 = 0;
     while ((j1 < s1.size) & (j2 < s2.size)) {
