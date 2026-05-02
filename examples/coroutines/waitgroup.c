@@ -16,7 +16,7 @@ int worker(struct Worker* o) {
         printf("Worker %d done: %f\n", o->id, cco_timer_elapsed(&o->tm));
     }
 
-    c_free_n(o, 1);
+    c_free_obj(o);
     return 0;
 }
 
@@ -35,7 +35,7 @@ int sleeper(struct Sleeper* o) {
         printf("Sleeper done: %f\n", cco_timer_elapsed(&o->tm));
     }
 
-    c_free_n(o, 1);
+    c_free_obj(o);
     return 0;
 }
 
@@ -79,7 +79,7 @@ int maintask(struct Maintask* o) {
         puts("Maintask done");
     }
 
-    c_free_n(o, 1);
+    c_free_obj(o);
     return 0;
 }
 

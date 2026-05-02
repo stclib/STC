@@ -23,20 +23,20 @@
 #undef STC_API
 #undef STC_DEF
 
-#if !defined i_static && !defined STC_STATIC && (defined i_header || defined STC_HEADER  || \
-                                                 defined i_implement || defined STC_IMPLEMENT)
+#if !defined i_implement && (defined STC_IMPLEMENT || defined i_import)
+  #define i_implement
+#endif
+#if !(defined i_static || defined STC_STATIC) && (defined i_header || defined STC_HEADER || defined i_implement)
   #define STC_API extern
   #define STC_DEF
 #else
-  #define i_implement
   #if defined __GNUC__ || defined __clang__ || defined __INTEL_LLVM_COMPILER
     #define STC_API static __attribute__((unused))
   #else
     #define STC_API static inline
   #endif
   #define STC_DEF static
-#endif
-#if defined STC_IMPLEMENT || defined i_import
+  #undef i_implement
   #define i_implement
 #endif
 

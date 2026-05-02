@@ -32,6 +32,6 @@
 #endif // STC_UTF8_H_INCLUDED
 
 #if defined i_implement
-  #include "priv/utf8_prv.c"
+#include "priv/utf8_prv.c"
 #endif
 #include "priv/linkage2.h"

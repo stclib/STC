@@ -20,11 +20,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+#ifdef i_import
+#include "utf8_decode.c"
+#endif
+
 #ifndef STC_UTF8_PRV_C_INCLUDED
 #define STC_UTF8_PRV_C_INCLUDED
 
 #include "utf8_tab.c"
-#include "utf8_decode.c"
 
 int cutf8_encode(char *out, uint32_t c) {
     if (c < 0x80U) {

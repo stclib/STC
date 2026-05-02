@@ -28,7 +28,7 @@ int nested(struct Nested* o) {
         printf("%s%d: done\n", o->name, o->level);
     }
 
-    c_free_n(o, 1);
+    c_free_obj(o);
     return 0;
 }
 

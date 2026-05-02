@@ -178,5 +178,5 @@ STC_INLINE bool zsview_iends_with(zsview zs, const char* str) {
 #endif // STC_ZSVIEW_H_INCLUDED
 
 #if defined i_import
-  #include "priv/utf8_prv.c"
+#include "priv/utf8_prv.c"
 #endif

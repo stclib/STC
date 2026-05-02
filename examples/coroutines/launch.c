@@ -40,7 +40,7 @@ int subTask(struct SubTask* o) {
         printf("subTask%d: done\n", o->id);
     }
 
-    c_free_n(o, 1);
+    c_free_obj(o);
     return 0;
 }
 
@@ -74,7 +74,7 @@ int taskC(struct TaskC* o) {
         puts("TaskC: done");
     }
 
-    c_free_n(o, 1);
+    c_free_obj(o);
     return 0;
 }
 
@@ -105,7 +105,7 @@ int taskB(struct TaskB* o) {
         puts("TaskB: done");
     }
 
-    c_free_n(o, 1);
+    c_free_obj(o);
     return 0;
 }
 
@@ -123,7 +123,7 @@ int taskA(struct TaskA* o) {
         puts("TaskA: done");
     }
 
-    c_free_n(o, 1);
+    c_free_obj(o);
     return 0;
 }
 
