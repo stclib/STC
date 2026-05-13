@@ -109,7 +109,7 @@ If an error occurs ```cregex_compile``` returns a negative error code stored in 
 
 ### Getting the first match and making text replacements
 
-[ [Run this code](https://godbolt.org/z/cz6qfPG1E) ]
+[ [Run this code](https://godbolt.org/z/dqqv4Kb63) ]
 ```c++
 #include <stc/cregex.h>
 

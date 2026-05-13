@@ -118,7 +118,7 @@ void            smap_X_value_drop(i_key* pval);
 
 ## Examples
 
-[ [Run this code](https://godbolt.org/z/PxqWzG5Mc) ]
+[ [Run this code](https://godbolt.org/z/ajWfPbY4s) ]
 ```c++
 #include <stc/cstr.h>
 

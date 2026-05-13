@@ -16,7 +16,7 @@ This header file is rarely needed alone. It is included by all the string/view t
 isize_t         cutf8_count(const char *s);                      // number of utf8 runes in s
 isize_t         cutf8_count_n(const char *s, isize_t nbytes);    // number of utf8 runes within n bytes
 isize_t         cutf8_to_index(const char* s, isize_t u8pos);    // from utf8 pos to byte index
-int             cutf8_chr_size(const char* s);                   // utf8 character size: 1-4
+int             cutf8_chr_size(const char* s);                   // utf8 character size: 1-4 bytes
 const char*     cutf8_at(const char *s, isize_t u8pos);          // return the char* at u8pos
 csview          cutf8_subview(const char* s, isize_t u8pos, isize_t u8len); // return a csview as the span
 

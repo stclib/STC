@@ -167,6 +167,7 @@ STC_INLINE void _c_MEMB(_copy)(Self *self, const Self* other) {
 }
 
 STC_INLINE void _c_MEMB(_shrink_to_fit)(Self *self) {
+    if (self->size == self->capacity) return;
     Self tmp = _c_MEMB(_clone)(*self);
     _c_MEMB(_drop)(self); *self = tmp;
 }

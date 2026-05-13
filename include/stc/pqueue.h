@@ -50,13 +50,18 @@ STC_INLINE void _c_MEMB(_put_n)(Self* self, const _m_raw* raw, isize_t n)
 #endif
 
 STC_INLINE bool _c_MEMB(_reserve)(Self* self, const isize_t cap) {
-    if (cap != self->size && cap <= self->capacity) return true;
-    _m_value *d = (_m_value *)_i_realloc_n(self->data, self->capacity, cap);
-    return d ? (self->data = d, self->capacity = cap, true) : false;
+    isize_t n = cap == c_NPOS ? self->size : cap;
+    if ((cap > self->capacity) & (n != self->capacity)) {
+        _m_value *d = (_m_value *)_i_realloc_n(self->data, self->capacity, n);
+        if (d == NULL) return false;
+        self->data = d;
+        self->capacity = n;
+    }
+    return self->data != NULL;
 }
 
 STC_INLINE void _c_MEMB(_shrink_to_fit)(Self* self)
-    { _c_MEMB(_reserve)(self, self->size); }
+    { _c_MEMB(_reserve)(self, c_NPOS); }
 
 #ifndef _i_aux_alloc
 STC_INLINE Self _c_MEMB(_init)(void)
@@ -206,7 +211,8 @@ _c_MEMB(_erase_at)(Self* self, const isize_t idx) {
 STC_DEF _m_value*
 _c_MEMB(_push)(Self* self, _m_value value) {
     if (self->size == self->capacity)
-        _c_MEMB(_reserve)(self, self->size*3/2 + 4);
+        if (!_c_MEMB(_reserve)(self, self->size*3/2 + 4))
+            return NULL;
     _m_value *arr = self->data - 1; /* base 1 */
     isize_t c = ++self->size;
     for (; c > 1 && (i_less((&arr[c/2]), (&value))); c /= 2)

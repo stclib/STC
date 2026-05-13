@@ -68,11 +68,11 @@ typedef i_keyraw _m_raw;
     STC_INLINE isize_t _c_MEMB(_capacity)(const Self* self)
         { return self->capacity; }
 
-    STC_INLINE bool _c_MEMB(_reserve)(Self* self, isize_t n) {
-        if (n > self->capacity || (n && n == self->size)) {
+    STC_INLINE bool _c_MEMB(_reserve)(Self* self, isize_t cap) {
+        isize_t n = cap == c_NPOS ? self->size : cap;
+        if ((cap > self->capacity) & (n != self->capacity)) {
             _m_value *d = (_m_value *)_i_realloc_n(self->data, self->capacity, n);
-            if (d == NULL)
-                return false;
+            if (d == NULL) return false;
             self->data = d;
             self->capacity = n;
         }
@@ -119,7 +119,7 @@ STC_INLINE _m_value* _c_MEMB(_append_uninit)(Self *self, isize_t n) {
 }
 
 STC_INLINE void _c_MEMB(_shrink_to_fit)(Self* self)
-    { _c_MEMB(_reserve)(self, self->size); }
+    { _c_MEMB(_reserve)(self, c_NPOS); }
 
 STC_INLINE const _m_value* _c_MEMB(_front)(const Self* self)
     { return &self->data[0]; }

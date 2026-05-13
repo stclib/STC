@@ -237,7 +237,8 @@ csview csview_strtok(csview sv, const char* delims, isize_t* pos) {
     for (c_each(i, csview, in)) {
         for (const char *m = delims; *m; ++m) {
             if (cutf8_decode(&dec, (uint8_t)*m) == cutf8_ACCEPT && i.u8.dec.codep == dec.codep) {
-                in.size = i.ref - in.buf; *pos += in.size + cutf8_chr_size(i.ref);
+                in.size = i.chr.buf - in.buf;
+                *pos += in.size + i.chr.size;
                 return in;
             }
         }

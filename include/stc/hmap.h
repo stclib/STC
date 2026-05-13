@@ -106,7 +106,7 @@ STC_INLINE isize_t      _c_MEMB(_bucket_count)(Self* map) { return map->bucket_c
 STC_INLINE bool         _c_MEMB(_contains)(const Self* self, _m_keyraw rkey)
                             { return self->size && _c_MEMB(_bucket_lookup_)(self, &rkey).ref; }
 STC_INLINE void         _c_MEMB(_shrink_to_fit)(Self* self)
-                            { _c_MEMB(_reserve)(self, (isize_t)self->size); }
+                            { _c_MEMB(_reserve)(self, c_NPOS); }
 
 #ifndef i_max_load_factor
   #define i_max_load_factor 0.80f
@@ -456,12 +456,14 @@ _c_MEMB(_bucket_insert_)(const Self* self, const _m_keyraw* rkeyptr) {
 #endif
 
 STC_DEF bool
-_c_MEMB(_reserve)(Self* _self, const isize_t _newcap) {
+_c_MEMB(_reserve)(Self* _self, const isize_t _cap) {
+    isize_t _newcap = _cap == c_NPOS ? _self->size : _cap;
     isize_t _newbucks = (isize_t)((float)_newcap / (i_max_load_factor)) + 4;
     _newbucks = c_next_pow2(_newbucks);
-
-    if (_newcap < _self->size || _newbucks == _self->bucket_count)
+    if (_newbucks == _self->bucket_count ||
+        _cap <= (isize_t)((float)_self->bucket_count*(i_max_load_factor)))
         return true;
+
     Self map = *_self, *self = &map; (void)self;
     map.table = _i_new_n(_m_value, _newbucks);
     map.meta = _i_new_zeros(struct hmap_meta, _newbucks + 1);

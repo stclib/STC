@@ -179,7 +179,7 @@ STC_INLINE void         _c_MEMB(_pop_back)(Self* self) { _c_MEMB(_pop)(self); }
 #endif
 
 STC_INLINE void _c_MEMB(_shrink_to_fit)(Self* self)
-    { _c_MEMB(_reserve)(self, _c_MEMB(_size)(self)); }
+    { _c_MEMB(_reserve)(self, c_NPOS); }
 
 STC_INLINE _m_iter
 _c_MEMB(_insert_n)(Self* self, const isize_t idx, const _m_value arr[], const isize_t n) {
@@ -295,12 +295,12 @@ _c_MEMB(_drop)(const Self* cself) {
 
 STC_DEF bool
 _c_MEMB(_reserve)(Self* self, const isize_t cap) {
-    if (cap > self->capacity || (cap && cap == self->size)) {
-        _m_value* d = (_m_value*)_i_realloc_n(self->data, self->capacity, cap);
-        if (d == NULL)
-            return false;
+    isize_t n = cap == c_NPOS ? self->size : cap;
+    if ((cap > self->capacity) & (n != self->capacity)) {
+        _m_value* d = (_m_value*)_i_realloc_n(self->data, self->capacity, n);
+        if (d == NULL) return false;
         self->data = d;
-        self->capacity = cap;
+        self->capacity = n;
     }
     return self->data != NULL;
 }
