@@ -593,7 +593,7 @@ Only `i_key` is strictly required to be defined for simple non-maps:
 - `i_keyclone` *Func* - **required if** *i_keydrop* is defined (exception for **arc**, as it shares).
 - `i_keydrop` *Func* - Destroy key - defaults to empty destructor.
 - `i_keyraw` *RawKeyType* - Alternative key type. Defaults to *KeyType*
-- `i_valfrom` *Func* - Create a *KeyType* instance from a *RawKeyType*.
+- `i_keyfrom` *Func* - Create a *KeyType* instance from a *RawKeyType*.
 - `i_keytoraw` *Func* - Conversion from *KeyType* to *RawKeyType*.
 
 ### Val types template parameters (mapped values for hmap/smap only)
@@ -680,7 +680,7 @@ For the containers marked ***optional***, the features are disabled if the templ
 ## The *emplace* methods
 
 STC, like c++ STL, has two sets of methods for adding elements to containers. One set begins
-with **emplace**, e.g. *vec_X_emplace_back()*. This is an ergonimic alternative to
+with **emplace**, e.g. *vec_X_emplace_back()*. This is an ergonomic alternative to
 *vec_X_push_back()* when dealing non-trivial container elements, e.g. strings, shared pointers or
 other elements using dynamic memory or shared resources.
 
