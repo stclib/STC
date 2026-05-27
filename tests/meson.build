@@ -1,6 +1,6 @@
-tests = get_option('tests').enable_auto_if(root)
+tests = get_option('tests')
 
-if tests.enabled()
+if tests.allowed()
   tests_deps = [
     stc_dep,
     cc.find_library('m', required: false),
@@ -62,6 +62,7 @@ if tests.enabled()
       c_args: ['-D_GNU_SOURCE'],
       dependencies: tests_deps,
       install: false,
+      build_by_default: false,
     )
     foreach unit : filter
       test(
