@@ -25,12 +25,13 @@ All cstr definitions and prototypes are available by including a single header f
 cstr            cstr_lit(const char literal_only[]);                    // cstr from literal; no strlen() call.
 cstr            cstr_init(void);                                        // make an empty string
 cstr            cstr_from(const char* str);                             // construct from a zero-terminated c-string.
+cstr            cstr_from_n(const char* str, isize_t n);                // construct from first n bytes of str
 cstr            cstr_from_s(cstr s, isize_t pos, isize_t len);          // construct a substring
 cstr            cstr_from_sv(csview sv);                                // construct from a string view
 cstr            cstr_from_zv(zsview zv);                                // construct from a zero-terminated zsview
+cstr            cstr_from_file(const char* filename);                   // construct from content of a file
 cstr            cstr_from_fmt(const char* fmt, ...);                    // construct from printf() formatting
 cstr            cstr_from_replace(csview sv, csview search, csview repl, int32_t count);
-cstr            cstr_from_n(const char* str, isize_t n);                // construct from first n bytes of str
 cstr            cstr_with_capacity(isize_t cap);                        // make empty string with pre-allocated capacity.
 cstr            cstr_with_size(isize_t len, char fill);                 // make string with fill characters
 
@@ -61,8 +62,6 @@ char*           cstr_assign(cstr* self, const char* str);
 char*           cstr_assign_n(cstr* self, const char* str, isize_t n);  // assign n first bytes of str
 char*           cstr_assign_sv(cstr* self, csview sv);
 char*           cstr_copy(cstr* self, cstr s);                          // assign a clone of s
-int             cstr_printf(cstr* self, const char* fmt, ...);          // source and target must not overlap.
-isize_t         cstr_vfmt(cstr* self, isize_t start, const char* fmt, va_list args); // mostly for internal use.
 
 char*           cstr_append(cstr* self, const char* str);
 char*           cstr_append_n(cstr* self, const char* str, isize_t n);  // append n first bytes of str
@@ -71,9 +70,12 @@ char*           cstr_append_s(cstr* self, cstr str);
 int             cstr_append_fmt(cstr* self, const char* fmt, ...);      // printf() formatting
 char*           cstr_append_uninit(cstr* self, isize_t len);            // return ptr to start of uninited data
 
-void            cstr_join(cstr* self, const char* sep, cstr-vec vec);   // join and append vec/stack of cstrs
-void            cstr_join_n(cstr* self, const char* sep, const char* arr[], isize_t n); // join and append c-strings
-void            cstr_join_items(cstr* self, const char* sep, {const char* s1,...});   // join and append c-strings
+void            cstr_join(cstr* self, const char* sep, CntType, cnt);   // join/append container of cstrs or c-strings
+void            cstr_join_array(cstr* self, const char* sep, const char* arr[], isize_t n); // join/append c-strings
+void            cstr_join_array_s(cstr* self, const char* sep, cstr arr[], isize_t n);      // join/append cstrs
+
+int             cstr_printf(cstr* self, const char* fmt, ...);          // source and target must not overlap.
+isize_t         cstr_vfmt(cstr* self, isize_t start, const char* fmt, va_list args); // mostly for internal use.
 
 void            cstr_push(cstr* self, const char* chr);                 // append one utf8 char
 void            cstr_pop(cstr* self);                                   // pop one utf8 char

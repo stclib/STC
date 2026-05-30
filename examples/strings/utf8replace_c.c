@@ -20,8 +20,12 @@ int main(void)
     cstr_u8_replace(&hello, 9, 1, "😀");
     printf("%s, %d:%d\n", cstr_str(&hello), (int)cstr_u8_size(&hello), (int)cstr_size(&hello));
 
-    for (c_each(c, cstr, hello))
-        printf(c_svfmt ",", c_svarg(c.chr));
+    for (c_each(i, cstr, hello))
+        printf("%.*s,", c_svarg(i.chr));
+    puts("");
+
+    for (c_each(i, cstr, hello))
+        printf("%d, ", i.u8.dec.codep);
 
     cstr str = cstr_lit("scooby, dooby doo");
     cstr_replace(&str, "oo", "00");

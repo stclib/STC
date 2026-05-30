@@ -65,7 +65,7 @@ extern  char* _cstr_internal_move(cstr* self, isize_t pos1, isize_t pos2);
 
 extern  cstr        cstr_from_replace(csview sv, csview search, csview repl, int32_t count);
 extern  cstr        cstr_from_fmt(const char* fmt, ...) c_GNUATTR(format(printf, 1, 2));
-
+extern  cstr        cstr_from_file(const char* fname);
 extern  void        cstr_drop(const cstr* self);
 extern  cstr*       cstr_take(cstr* self, const cstr s);
 extern  char*       cstr_reserve(cstr* self, isize_t cap);
@@ -367,21 +367,21 @@ STC_INLINE char* cstr_append_sv(cstr* self, csview sv)
 STC_INLINE char* cstr_append_s(cstr* self, cstr s)
     { return cstr_append_sv(self, cstr_sv(&s)); }
 
-#define cstr_join(self, sep, vec) do { \
-    struct _vec_s { cstr* data; ptrdiff_t size; } \
-          *_vec = (struct _vec_s*)&(vec); \
-    (void)sizeof((vec).data == _vec->data && &(vec).size == &_vec->size); \
-    cstr_join_sn(self, sep, _vec->data, _vec->size); \
-} while (0);
+#define cstr_join(self, sep, CntType, cnt) do { \
+    cstr* _s = self; const CntType* _cnt = cnt; \
+    const char *_isep = sep, *_sep = cstr_is_empty(_s) ? "" : _isep; \
+    for (c_each(_i, CntType, *_cnt)) { \
+        cstr_append(_s, _sep); \
+        cstr_append(_s, CntType##_value_toraw(_i.ref)); \
+        _sep = _isep; \
+    } \
+} while (0)
 
-#define cstr_join_items(self, sep, ...) \
-    cstr_join_n(self, sep, c_make_array(const char*, __VA_ARGS__), c_sizeof((const char*[])__VA_ARGS__)/c_sizeof(char*))
-
-STC_INLINE void cstr_join_n(cstr* self, const char* sep, const char* arr[], isize_t n) {
+STC_INLINE void cstr_join_array(cstr* self, const char* sep, const char* arr[], isize_t n) {
     const char* _sep = cstr_is_empty(self) ? "" : sep;
     while (n--) { cstr_append(self, _sep); cstr_append(self, *arr++); _sep = sep; }
 }
-STC_INLINE void cstr_join_sn(cstr* self, const char* sep, const cstr arr[], isize_t n) {
+STC_INLINE void cstr_join_array_s(cstr* self, const char* sep, const cstr arr[], isize_t n) {
     const char* _sep = cstr_is_empty(self) ? "" : sep;
     while (n--) { cstr_append(self, _sep); cstr_append_s(self, *arr++); _sep = sep; }
 }
@@ -421,5 +421,9 @@ STC_INLINE void cstr_u8_insert(cstr* self, isize_t u8pos, const char* str)
 
 STC_INLINE bool cstr_getline(cstr *self, FILE *fp)
     { return cstr_getdelim(self, '\n', fp); }
+
+// [deprecated]
+#define cstr_join_items(self, sep, ...) \
+    prev_join_array(self, sep, c_make_array(const char*, __VA_ARGS__), c_sizeof((const char*[])__VA_ARGS__)/c_sizeof(char*))
 
 #endif // STC_CSTR_PRV_H_INCLUDED

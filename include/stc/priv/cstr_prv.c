@@ -188,6 +188,20 @@ char* cstr_append_uninit(cstr *self, isize_t len) {
     return b.data + b.size;
 }
 
+cstr cstr_from_file(const char* fname) {
+    cstr s = {0};
+    FILE* fp = fopen(fname, "rb");
+    if (fp) {
+        fseek(fp, 0, SEEK_END);
+        isize_t n, sz = ftell(fp);
+        char* buf = cstr_append_uninit(&s, sz);
+        rewind(fp); n = (long)fread(buf, 1, (size_t)sz, fp);
+        c_assert(n == sz);
+        fclose(fp);
+    }
+    return s;
+}
+
 bool cstr_getdelim(cstr *self, const int delim, FILE *fp) {
     int c = fgetc(fp);
     if (c == EOF)
