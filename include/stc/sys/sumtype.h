@@ -91,48 +91,48 @@ int main(void) {
 
 
 #define _c_enum_1(x,...) (x=__LINE__*1000, __VA_ARGS__)
-#define _c_vartuple_tag(T, Tag, ...) Tag,
+#define _c_vartuple_enum(T, Tag, ...) Tag,
 #define _c_vartuple_type(T, Tag, ...) typedef __VA_ARGS__ Tag##_type; typedef T Tag##_sumtype;
-#define _c_vartuple_var(T, Tag, ...) struct { enum enum_##T tag; Tag##_type get; } Tag;
+#define _c_vartuple_item(T, Tag, ...) struct { enum T##_enum id; Tag##_type item; } Tag;
 
 #define c_union(T, ...) \
     typedef union T T; \
-    enum enum_##T { c_EVAL(c_LOOP(_c_vartuple_tag, T, _c_enum_1 __VA_ARGS__, (0),)) }; \
-    c_EVAL(c_LOOP(_c_vartuple_type, T,  __VA_ARGS__, (0),)) \
+    enum T##_enum { c_EVAL(c_LOOP(_c_vartuple_enum, T, _c_enum_1 __VA_ARGS__, (0),)) }; \
+    c_EVAL(c_LOOP(_c_vartuple_type, T, __VA_ARGS__, (0),)) \
     union T { \
-        struct { enum enum_##T tag; } _any_; \
-        c_EVAL(c_LOOP(_c_vartuple_var, T, __VA_ARGS__, (0),)) \
+        enum T##_enum id; \
+        c_EVAL(c_LOOP(_c_vartuple_item, T, __VA_ARGS__, (0),)) \
     }
-#define c_sumtype c_union
+#define c_sumtype c_union // [deprecated]?
 
 #ifdef STC_HAS_TYPEOF
     #define c_when(varptr) \
         for (__typeof__(varptr) _vp1 = (varptr); _vp1; _vp1 = NULL) \
-        switch (_vp1->_any_.tag)
+        switch (_vp1->id)
 
     #define c_is_2(Tag, x) \
         break; case Tag: \
-        for (__typeof__(_vp1->Tag.get)* x = &_vp1->Tag.get; x; x = NULL)
+        for (__typeof__(_vp1->Tag.item)* x = &_vp1->Tag.item; x; x = NULL)
 
     #define c_is_3(varptr, Tag, x) \
         false) ; else for (__typeof__(varptr) _vp2 = (varptr); _vp2; _vp2 = NULL) \
             if (c_is_variant(_vp2, Tag)) \
-                for (__typeof__(_vp2->Tag.get) *x = &_vp2->Tag.get; x; x = NULL
+                for (__typeof__(_vp2->Tag.item) *x = &_vp2->Tag.item; x; x = NULL
 #else
-    typedef union { struct { int tag; } _any_; } _c_any_variant;
+    typedef union { int id; } _c_any_variant;
     #define c_when(varptr) \
         for (_c_any_variant* _vp1 = (_c_any_variant *)(varptr); \
-             _vp1; _vp1 = NULL, (void)sizeof((varptr)->_any_.tag)) \
-            switch (_vp1->_any_.tag)
+             _vp1; _vp1 = NULL, (void)sizeof((varptr)->id)) \
+            switch (_vp1->id)
 
     #define c_is_2(Tag, x) \
         break; case Tag: \
-        for (Tag##_type *x = &((Tag##_sumtype *)_vp1)->Tag.get; x; x = NULL)
+        for (Tag##_type *x = &((Tag##_sumtype *)_vp1)->Tag.item; x; x = NULL)
 
     #define c_is_3(varptr, Tag, x) \
         false) ; else for (Tag##_sumtype* _vp2 = c_as_mut(Tag##_sumtype*, varptr); _vp2; _vp2 = NULL) \
             if (c_is_variant(_vp2, Tag)) \
-                for (Tag##_type *x = &_vp2->Tag.get; x; x = NULL
+                for (Tag##_type *x = &_vp2->Tag.item; x; x = NULL
 #endif
 
 // Handling multiple tags with different payloads:
@@ -158,15 +158,18 @@ int main(void) {
     break; default:
 
 #define c_variant(Tag, ...) \
-    (c_literal(Tag##_sumtype){.Tag={.tag=Tag, .get=__VA_ARGS__}})
+    (c_literal(Tag##_sumtype){.Tag={.id=Tag, .item=__VA_ARGS__}})
 
 #define c_is_variant(varptr, Tag) \
-    ((varptr)->Tag.tag == Tag)
+    ((varptr)->Tag.id == Tag)
+
+#define c_get_variant(varptr, Tag) \
+    (c_assert(c_is_variant(varptr, Tag)), &(varptr)->Tag.item)
 
 #define c_get_if(varptr, Tag) \
-    (c_is_variant(varptr, Tag) ? &(varptr)->Tag.get : NULL)
+    (c_is_variant(varptr, Tag) ? &(varptr)->Tag.item : NULL)
 
 #define c_variant_id(varptr) \
-    ((int)(varptr)->_any_.tag)
+    ((varptr)->id)
 
 #endif // STC_SUMTYPE_H_INCLUDED

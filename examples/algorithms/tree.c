@@ -9,12 +9,12 @@ c_union (Tree,
     (Tree_NODE, struct { int value; Tree *left, *right; }),
 );
 
-void Tree_drop(Tree* self) {
-    if (c_is(self, Tree_NODE, n)) {
+void Tree_drop(Tree* tree) {
+    if (c_is(tree, Tree_NODE, n)) {
         Tree_drop(n->left);
         Tree_drop(n->right);
     }
-    free(self);
+    free(tree);
 }
 
 int Tree_sum(Tree* tree) {

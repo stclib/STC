@@ -114,7 +114,7 @@ for (c_range(i, 30, 0, -5)) printf(" %lld", i);
 ```
 </details>
 
-## Tagged unions
+## Tagged unions (sumtypes)
 
 This is a tiny, robust and fully typesafe implementation of tagged unions. They work
 similarly as in Zig, Odin and Rust, and is just as easy and safe to use.
@@ -135,8 +135,9 @@ c_union (SumType,
     (EnumTagN, UnionTypeN),                             // (final comma is optional)
 );
 
-SumType       c_variant(EnumTag tag, UnionType value);  // Construct a tagged union variant.
-bool          c_is_variant(SumType* obj, EnumTag tag);  // Does obj hold tag?
+SumType       c_variant(EnumTag tag, EnumTag_type val); // Construct a tagged union variant.
+bool          c_is_variant(SumType* obj, EnumTag tag);  // True if obj holds the tag.
+EnumTag_type* c_get(SumType* obj, EnumTag tag);         // Assert err if obj does does not hold the tag.
 EnumTag_type* c_get_if(SumType* obj, EnumTag tag);      // NULL if obj does does not hold the tag.
 int           c_variant_id(SumType* obj);               // (mainly for debugging)
 
