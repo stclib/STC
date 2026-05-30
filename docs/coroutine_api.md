@@ -69,11 +69,11 @@ int             cco_resume(cco_task* task);                         // Resume ta
 ```
 #### Accessors
 ```c++
-int             cco_result();                                       // Get current return status from last cco_resume() call.
+int             cco_result();                                       // Get return status from last cco_resume() call.
 cco_fiber*      cco_task_fiber(cco_task* task);                     // Get fiber associated with task.
 
 Data*           cco_data(cco_task* task);                           // Get auxiliary data pointer, stored in the associated fiber.
-Data*           cco_set_data(cco_task* task, Data* dt);             // Set auxiliary data pointer.
+Data*           cco_set_data_ptr(cco_task* task, Data* dt);         // Set auxiliary data pointer.
 ```
 #### Task/Fiber and Waitgroup Cancellation
 ```c++
@@ -98,11 +98,11 @@ void            cco_cancel_all_fibers();                            // Cancel *a
                                                                     // Handling of error is required in a cco_finalize:, else it will abort().
                 cco_throw(cco_CANCEL, info=0);                      // Cancel the current task. Handling is NOT required, but it can
                                                                     // optionally be aborted by cco_recover to stop propagation.
-bool            cco_state(int errcode);                             // True if errcode is issued. To be used in a cco_finalize: section.
+int             cco_error();                                        // Return current error code. To be used in a cco_finalize: section.
                 cco_recover;                                        // Recover from a cco_throw() or cancellation upstream. Resumes from
-                                                                    // the suspend point in the current task and calls cco_clear_err().
+                                                                    // the suspend point in the current task and calls cco_clear_error().
+void            cco_clear_error();                                  // Clear current fiber error state. To be used in cco_finalize section.
 cco_err_t       cco_err();                                          // Get error object created from cco_throw(error) call.
-void            cco_clear_err();                                    // Clear current fiber error state. To be used in cco_finalize section.
 ```
 
 #### Awaiting Tasks and Waitgroups
@@ -193,7 +193,7 @@ bool            cco_flt_takewhile(bool predicate);                  // Use inste
 ## Types
 | Type name         | Type definition / usage                             | Used to represent... |
 |:------------------|:----------------------------------------------------|:---------------------|
-|`cco_status`       | **enum** `cco_DONE`, `cco_AWAIT`, `cco_SUSPEND`, `cco_YIELD` | Default set of return status from coroutines |
+|`cco_result`       | **enum** `cco_DONE`, `cco_AWAIT`, `cco_SUSPEND`, `cco_YIELD` | Default set of return status from coroutines |
 |`struct cco_err` | `struct { int32_t code, line; const char* file; }`    | Error object for exceptions |
 |`cco_task`         | Enclosure/function object                           | Basic coroutine frame type |
 |`cco_timer`        | Struct type                                         | Delay timer               |
@@ -515,7 +515,7 @@ int TaskA(struct TaskA* o) {
         puts("TaskA work");
 
         cco_finalize:
-        if (cco_state(99)) {
+        if (cco_error() == 99) {
             // if error not handled, will cause 'unhandled error'...
             printf("TaskA recovered error '99' thrown on line %d\n", cco_err().line);
             cco_recover;
@@ -777,7 +777,7 @@ cco_task_struct (TaskX) {
 
 int scheduler(struct Scheduler* o) {
     cco_async (o) {
-        cco_set_data(o, &o->tasks);
+        cco_set_data_ptr(o, &o->tasks);
 
         while (!Tasks_is_empty(&o->tasks)) {
             o->_pulled = Tasks_pull(&o->tasks);

@@ -74,10 +74,10 @@ int Dining(struct Dining* o) {
         }
 
         cco_await_timer(&o->timer, o->duration);
-        puts("Time's up! Stopping dining...");  
+        puts("Time's up! Stopping dining...");
 
         cco_finalize:
-        if (cco_state(cco_SHUTDOWN)) {
+        if (cco_error() == cco_SHUTDOWN) {
             printf("Philosopher %d CANCELED the dining.\n", (int)cco_err().info.num);
         }
         cco_await_cancel_all(cco_group(0));

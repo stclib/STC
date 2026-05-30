@@ -18,7 +18,7 @@ int subtask(struct Subtask* o) {
         printf("Work task %d\n", o->id);
 
         cco_finalize:
-        if (cco_state(cco_CANCEL)) {
+        if (cco_error() == cco_CANCEL) {
             printf("Cancelling %d due to %d\n", o->id, (int)cco_err().info.num);
             //cco_recover; // Cancel the cancellation...
         }
@@ -46,15 +46,15 @@ int start(struct Start* o) {
         cco_await_all(cco_group(0));
 
         cco_finalize:
-        if (cco_state(cco_SUCCESS))
+        if (cco_error() == cco_OK)
             puts("Maintask success");
-        else if (cco_state(cco_SHUTDOWN)) {
+        else if (cco_error() == cco_SHUTDOWN) {
             cco_await_all(cco_group(0));
             printf("Maintask and subtasks shutdown caused by %d in %s:%d\n",
                     (int)cco_err().info.num, cco_err().file, cco_err().line);
         } else {
             cco_await_cancel_all(cco_group(0));
-            if (cco_state(cco_CANCEL))
+            if (cco_error() == cco_CANCEL)
                 printf("Maintask was canceled in %s:%d\n", cco_err().file, cco_err().line);
         }
     }

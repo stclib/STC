@@ -23,7 +23,7 @@ cbits sieveOfEratosthenes(isize_t n)
 
 int main(void)
 {
-    int n = 100000000;
+    int n = 1000000;
     printf("Computing prime numbers up to %d\n", n);
 
     clock_t t = clock();

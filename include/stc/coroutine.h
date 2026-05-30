@@ -59,17 +59,18 @@ int main(void) {
 #include "common.h"
 
 enum cco_position {
-    cco_POS_INIT = 0,
-    cco_POS_DONE = -1,
+    cco_POS_INIT  = 0,
+    cco_POS_DONE  = -1,
     cco_POS_FINAL = -2,
 };
-enum cco_result {
-    cco_DONE    = 0,
-    cco_YIELD   = 1<<12,
-    cco_SUSPEND = 1<<13,
-    cco_AWAIT   = 1<<14,
+enum cco_status_bits {
+    cco_DONE      = 0,
+    cco_RECEIVED  = 1<<11,
+    cco_YIELD     = 1<<12,
+    cco_SUSPEND   = 1<<13,
+    cco_AWAIT     = 1<<14,
 };
-#define cco_SUCCESS  0
+#define cco_OK       0
 #define cco_CANCEL   (1U<<30)
 #define cco_SHUTDOWN (1U<<29)
 #define cco_NOTIFY   ((1U<<29) + 1)
@@ -79,12 +80,16 @@ enum cco_deprecated {
     CCO_DONE       = cco_DONE,       // [deprecated]
     CCO_YIELD      = cco_YIELD,      // [deprecated]
     CCO_SUSPEND    = cco_SUSPEND,    // [deprecated]
-    CCO_AWAIT      = cco_AWAIT,      // [deprecated]      
-};      
-#define CCO_CANCEL cco_CANCEL                        // [deprecated]
-#define cco_env(tsk) cco_data(tsk)                   // [deprecated]
-#define cco_set_env(tsk, dt) cco_set_data(tsk, dt)   // [deprecated]
-#define cco_grp(LEVEL) cco_group(LEVEL)              // [deprecated]
+    CCO_AWAIT      = cco_AWAIT,      // [deprecated]
+};
+#define CCO_CANCEL cco_CANCEL                            // [deprecated]
+#define cco_SUCCESS cco_OK                               // [deprecated]
+#define cco_env(tsk) cco_data(tsk)                       // [deprecated]
+#define cco_set_env(tsk, dt) cco_set_data_ptr(tsk, dt)   // [deprecated]
+#define cco_grp(LEVEL) cco_group(LEVEL)                  // [deprecated]
+#define cco_state(errcode) (cco_error() == (errcode))    // [deprecated]
+#define cco_drop [fix: use cco_finalize:]
+#define cco_cleanup [fix: use cco_finalize:]
 
 /*
  * struct cco_group (wait-group / task-group):
@@ -137,9 +142,6 @@ struct cco_group {
     _cco_st->finalizing = true; /* FALLTHRU */ \
     case cco_POS_FINAL
 
-#define cco_drop [fix: use cco_finalize:]
-#define cco_cleanup [fix: use cco_finalize:]
-
 #define cco_stop(co) \
     do { \
         cco_base_state* _st = (cco_base_state*)&(co)->base.state; \
@@ -165,26 +167,32 @@ struct cco_group {
         goto _resume_lbl; \
     } while (0)
 
-#define cco_yield_v(status) cco_yield_v_OFFSET(status, 0)
-#define cco_yield_v_OFFSET(status, N) \
+#define cco_yield_v(status) cco_yield_alt(status, 0)
+#define cco_yield_alt(status, N) \
     do { \
-        _cco_st->pos = __LINE__ + N; return status; \
-        case __LINE__ + N:; \
+        _cco_st->pos = __LINE__ + N*100000; return status; \
+        case __LINE__ + N*100000:; \
     } while (0)
 
 #define cco_yield \
     cco_yield_v(cco_YIELD)
 
+#define cco_yield_block(...) \
+    do { __VA_ARGS__; cco_yield; } while (0)
+
+#define cco_yield_data(o, data) \
+    cco_yield_v((*cco_data(o) = data, cco_YIELD))
+
 #define cco_suspend \
     cco_yield_v(cco_SUSPEND)
 
-#define cco_await(until) cco_await_OFFSET(until, 0)
-#define cco_await_OFFSET(until, N) \
+#define cco_await(until) cco_await_alt(until, 0)
+#define cco_await_alt(until, N) \
     do { \
-        _cco_st->pos = __LINE__ + N; /* FALLTHRU */ \
-        case __LINE__ + N: if (!(until)) return cco_AWAIT; \
+        _cco_st->pos = __LINE__ + N*100000; /* FALLTHRU */ \
+        case __LINE__ + N*100000: if (!(until)) return cco_AWAIT; \
     } while (0)
-    
+
 /* cco_await_coroutine(): assumes coroutine returns a status value (int) */
 #define cco_await_coroutine(...) c_MACRO_OVERLOAD(cco_await_coroutine, __VA_ARGS__)
 #define cco_await_coroutine_1(corocall) cco_await_coroutine_2(corocall, cco_DONE)
@@ -270,12 +278,12 @@ typedef struct cco_task cco_task;
 #define cco_parent_grp() (_cco_st->parent_grp + 0)
 #define cco_result() (_cco_st->fib->status + 0)
 #define cco_err() (*(const cco_err_t*)&_cco_st->fib->error)
-#define cco_clear_err() do _cco_st->fib->error.code = 0; while (0)
-#define cco_state(errcode) (_cco_st->fib->error.code == (errcode))
+#define cco_clear_error() (void)(_cco_st->fib->error.code = 0)
+#define cco_error() (_cco_st->fib->error.code + 0)
 
 // get/set task result (and/or input data)
 #define cco_data(a_task) (1 ? (a_task)->base.state.fib->data : NULL)
-#define cco_set_data(a_task, ptr) do (a_task)->base.state.fib->data = (ptr); while (0)
+#define cco_set_data_ptr(a_task, ptr) (void)((a_task)->base.state.fib->data = (ptr))
 
 // https://www.happycoders.eu/java/structured-concurrency-structuredtaskscope/
 enum _cco_err_action { _cco_SET_SHUTDOWN = 0, _cco_SET_NOTIFY = 1, _cco_SET_IGNORE = 2 };
@@ -412,7 +420,7 @@ static inline int _cco_resume_task(cco_task* task)
 #define cco_await_any(a_group) do { /* await 1; cancel remaining */ \
     cco_await_n(1, a_group); \
     cco_cancel_all(cco_fib()->tmp_grp); \
-    cco_await_OFFSET(cco_fib()->tmp_grp->spawn_count == 0, 100000); /* await_all() */ \
+    cco_await_alt(cco_fib()->tmp_grp->spawn_count == 0, 1); /* await_all() */ \
 } while (0)
 
 #define cco_await_fibers() \
@@ -503,7 +511,7 @@ typedef struct { ptrdiff_t acq_count; } cco_semaphore;
         cco_await((chan)->written); \
         *(_val_ptr) = (chan)->value; \
         (chan)->written = false; \
-        cco_yield_v_OFFSET(cco_SUSPEND, 100000); \
+        cco_yield_alt(cco_RECEIVED, 1); \
     } while (0)
 
 #define cco_await_send(chan, _val) \
@@ -511,7 +519,7 @@ typedef struct { ptrdiff_t acq_count; } cco_semaphore;
         cco_await(!(chan)->written); \
         (chan)->value = _val; \
         (chan)->written = true; \
-        cco_await_OFFSET(!(chan)->written, 100000); \
+        cco_await_alt(!(chan)->written, 1); \
     } while (0)
 
 
@@ -654,7 +662,7 @@ int cco_execute(cco_fiber* fib) {
         while (1) {
             fib->cur_parent_task = fib->task->base.parent_task;
             fib->cur_awaitbits = fib->task->base.awaitbits;
-            fib->status = cco_resume(fib->task);
+            fib->status = cco_resume(fib->task); // => cco_result()
             if (fib->error.code) {
                 // Note: if fib->status == cco_DONE, fib->task may already be destructed.
                 if (fib->status == cco_DONE) {
