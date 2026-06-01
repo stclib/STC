@@ -74,8 +74,8 @@ int maintask(struct Maintask* o) {
         }
 
         cco_finalize:
-        cco_await_cancel_groups(o); // needed in case of cancellation: cancel and await all
-                                    // spawned subtasks in both groups, first inner, then outer.
+        cco_await_despawn(o); // needed in case of cancellation: cancel and await all
+                              // spawned subtasks in both groups, first inner, then outer.
         puts("Maintask done");
     }
 

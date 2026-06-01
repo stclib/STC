@@ -88,6 +88,7 @@ enum cco_deprecated {
 #define cco_set_env(tsk, dt) cco_set_data_ptr(tsk, dt)   // [deprecated]
 #define cco_grp(LEVEL) cco_group(LEVEL)                  // [deprecated]
 #define cco_state(errcode) (cco_error() == (errcode))    // [deprecated]
+#define cco_await_cancel_groups(tsk) cco_await_despawn(tsk) // [deprecated]
 #define cco_drop [fix: use cco_finalize:]
 #define cco_cleanup [fix: use cco_finalize:]
 
@@ -434,7 +435,7 @@ static inline int _cco_resume_task(cco_task* task)
     } \
 } while (0)
 
-#define cco_await_cancel_groups(tsk) \
+#define cco_await_despawn(tsk) \
     for (_cco_st->scope_idx = c_countof((tsk)->base.state.group) - 1; _cco_st->scope_idx >= 0; --_cco_st->scope_idx) \
         cco_await_cancel_all(&_cco_st->group[_cco_st->scope_idx])
 
