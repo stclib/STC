@@ -120,7 +120,8 @@ cco_err_t       cco_err();                                          // Get error
 
                 cco_await_cancel_all(struct cco_group* grp);        // Cancel and await all spawned subtasks in grp.
                                                                     // Shorthand for cco_cancel_all(grp) + cco_await_all(grp).
-                cco_await_despawn(cco_task* task);                  // Cancel and await all spawned tasks in all groups in the task.
+                cco_await_shutdown(cco_task* task);                 // Cancel and await all spawned tasks in all groups in the task.
+                                                                    // Used for closing running subtasks on error/throw at cco_finalize.
                 cco_await_cancel_fibers();                          // Cancel all running fibers (except current). Use on panic.
 ```
 #### Channels

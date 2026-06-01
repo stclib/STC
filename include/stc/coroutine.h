@@ -88,7 +88,7 @@ enum cco_deprecated {
 #define cco_set_env(tsk, dt) cco_set_data_ptr(tsk, dt)   // [deprecated]
 #define cco_grp(LEVEL) cco_group(LEVEL)                  // [deprecated]
 #define cco_state(errcode) (cco_error() == (errcode))    // [deprecated]
-#define cco_await_cancel_groups(tsk) cco_await_despawn(tsk) // [deprecated]
+#define cco_await_cancel_groups(tsk) cco_await_shutdown(tsk) // [deprecated]
 #define cco_drop [fix: use cco_finalize:]
 #define cco_cleanup [fix: use cco_finalize:]
 
@@ -102,10 +102,12 @@ struct cco_group {
     uint32_t cancelled:1;
 };
 
+
 #define cco_state_struct(Prefix, GROUPS) \
     struct Prefix##_state { \
         struct Prefix##_fiber* fib; \
-        struct cco_group* parent_grp; \
+        struct cco_group *parent_grp, *tmp_grp; \
+        struct cco_task_state *tmp_st; \
         int32_t pos; \
         bool finalizing; \
         bool scoped; \
@@ -226,7 +228,7 @@ typedef struct {
     struct Prefix##_fiber { \
         struct cco_task* task; \
         Prefix##_data_ptr data; \
-        struct cco_group *tmp_grp, *failed_grp; \
+        struct cco_group* failed_grp; \
         struct cco_task* cur_parent_task; \
         struct cco_task_fiber *next, *parent; \
         struct cco_task_state recover_state; \
@@ -408,20 +410,20 @@ static inline int _cco_resume_task(cco_task* task)
 } while (0)
 
 #define cco_await_n(n, a_group) do { /* does not cancel remaining */ \
-    cco_fib()->tmp_grp = a_group; \
-    cco_fib()->tmp_grp->await_count = cco_fib()->tmp_grp->spawn_count - (n); \
-    cco_await(cco_fib()->tmp_grp->spawn_count <= cco_fib()->tmp_grp->await_count); \
+    _cco_st->tmp_grp = a_group; \
+    _cco_st->tmp_grp->await_count = _cco_st->tmp_grp->spawn_count - (n); \
+    cco_await(_cco_st->tmp_grp->spawn_count <= _cco_st->tmp_grp->await_count); \
 } while (0)
 
 #define cco_await_all(a_group) do { \
-    cco_fib()->tmp_grp = a_group; \
-    cco_await(cco_fib()->tmp_grp->spawn_count == 0); \
+    _cco_st->tmp_grp = a_group; \
+    cco_await(_cco_st->tmp_grp->spawn_count == 0); \
 } while (0)
 
 #define cco_await_any(a_group) do { /* await 1; cancel remaining */ \
     cco_await_n(1, a_group); \
-    cco_cancel_all(cco_fib()->tmp_grp); \
-    cco_await_alt(cco_fib()->tmp_grp->spawn_count == 0, 1); /* await_all() */ \
+    cco_cancel_all(_cco_st->tmp_grp); \
+    cco_await_alt(_cco_st->tmp_grp->spawn_count == 0, 1); /* await_all() */ \
 } while (0)
 
 #define cco_await_fibers() \
@@ -435,9 +437,11 @@ static inline int _cco_resume_task(cco_task* task)
     } \
 } while (0)
 
-#define cco_await_despawn(tsk) \
-    for (_cco_st->scope_idx = c_countof((tsk)->base.state.group) - 1; _cco_st->scope_idx >= 0; --_cco_st->scope_idx) \
-        cco_await_cancel_all(&_cco_st->group[_cco_st->scope_idx])
+#define cco_await_shutdown(tsk) \
+    do for (_cco_st->tmp_st = (cco_base_state*)&(tsk)->base.state, _cco_st->scope_idx = c_countof((tsk)->base.state.group) - 1 \
+            ; _cco_st->tmp_st->scope_idx >= 0 \
+            ; --_cco_st->tmp_st->scope_idx) \
+        cco_await_cancel_all(&_cco_st->tmp_st->group[_cco_st->tmp_st->scope_idx]); while (0)
 
 #define cco_await_cancel_fibers() do { \
     cco_cancel_all(NULL); \

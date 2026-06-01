@@ -64,7 +64,7 @@ int maintask(struct Maintask* o) {
                 cco_await_n(3, cco_scope()); // await for 3 more workers to finish
                 puts("3 more workers done");
 
-                //puts("CANCEL"); cco_throw(cco_CANCEL); // testing...
+                puts("CANCEL"); cco_throw(cco_CANCEL); // testing...
 
                 cco_await_all(cco_scope()); // await for remaining workers to finish
                 puts("All workers done.");
@@ -74,8 +74,8 @@ int maintask(struct Maintask* o) {
         }
 
         cco_finalize:
-        cco_await_despawn(o); // needed in case of cancellation: cancel and await all
-                              // spawned subtasks in both groups, first inner, then outer.
+        cco_await_shutdown(o); // required in case of cancellation: cancel and await remaining
+                               // spawned subtasks in both groups, first inner, then outer scope.
         puts("Maintask done");
     }
 
