@@ -103,7 +103,7 @@ struct cco_group {
 };
 
 
-#define cco_state_struct(Prefix, GROUPS) \
+#define _cco_state_struct(Prefix, GROUPS) \
     struct Prefix##_state { \
         struct Prefix##_fiber* fib; \
         struct cco_group *parent_grp, *tmp_grp; \
@@ -222,10 +222,10 @@ typedef struct {
     union { intptr_t num; const char* str; void* ptr; } info;
 } cco_err_t;
 
-#define cco_fiber_struct(Prefix, DataPtr) \
+#define _cco_fiber_struct(Prefix, DataPtr) \
     typedef int Prefix##_data_ptr_check[sizeof((DataPtr)0 == (void*)0)]; \
     typedef DataPtr Prefix##_data_ptr; \
-    struct Prefix##_fiber { \
+    typedef struct Prefix##_fiber { \
         struct cco_task* task; \
         Prefix##_data_ptr data; \
         struct cco_group* failed_grp; \
@@ -235,7 +235,7 @@ typedef struct {
         cco_err_t error; \
         int cur_awaitbits, status; \
         cco_base base; /* is a coroutine object itself (but not a task) */ \
-    }
+    } Prefix##_fiber
 
 /* Define a Task struct */
 #define cco_task_struct(...) c_MACRO_OVERLOAD(cco_task_struct, __VA_ARGS__)
@@ -246,8 +246,8 @@ typedef struct {
     cco_task_struct_3(Task, DataPtr, 1)
 
 #define cco_task_struct_3(Task, DataPtr, GROUPS) \
-    cco_fiber_struct(Task, DataPtr); \
-    cco_state_struct(Task, GROUPS); \
+    _cco_fiber_struct(Task, DataPtr); \
+    _cco_state_struct(Task, GROUPS); \
     _cco_task_struct(Task)
 
 #define _cco_task_struct(Task) \
@@ -261,11 +261,11 @@ typedef struct {
     struct Task
 
 /* Base state type */
-typedef cco_state_struct(cco_task, 1) cco_base_state;
+typedef _cco_state_struct(cco_task, 1) cco_base_state;
 typedef struct { cco_base_state state; } cco_base;
 
 /* Base cco_task type */
-cco_fiber_struct(cco_task, void*);
+_cco_fiber_struct(cco_task, void*);
 _cco_task_struct(cco_task) { cco_task_base base; };
 
 typedef struct cco_task_fiber cco_fiber;
@@ -437,11 +437,12 @@ static inline int _cco_resume_task(cco_task* task)
     } \
 } while (0)
 
-#define cco_await_shutdown(tsk) \
-    do for (_cco_st->tmp_st = (cco_base_state*)&(tsk)->base.state, _cco_st->scope_idx = c_countof((tsk)->base.state.group) - 1 \
-            ; _cco_st->tmp_st->scope_idx >= 0 \
-            ; --_cco_st->tmp_st->scope_idx) \
-        cco_await_cancel_all(&_cco_st->tmp_st->group[_cco_st->tmp_st->scope_idx]); while (0)
+#define cco_await_shutdown(a_task) do { \
+    for (_cco_st->tmp_st = (cco_base_state*)&(a_task)->base.state, _cco_st->scope_idx = c_countof((a_task)->base.state.group) - 1 \
+         ; _cco_st->tmp_st->scope_idx >= 0 \
+         ; --_cco_st->tmp_st->scope_idx) \
+        cco_await_cancel_all(&_cco_st->tmp_st->group[_cco_st->tmp_st->scope_idx]); \
+} while (0)
 
 #define cco_await_cancel_fibers() do { \
     cco_cancel_all(NULL); \

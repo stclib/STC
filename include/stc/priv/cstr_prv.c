@@ -193,9 +193,9 @@ cstr cstr_from_file(const char* fname) {
     FILE* fp = fopen(fname, "rb");
     if (fp) {
         fseek(fp, 0, SEEK_END);
-        isize_t n, sz = ftell(fp);
+        isize_t n = 0, sz = ftell(fp);
         char* buf = cstr_append_uninit(&s, sz);
-        rewind(fp); n = (long)fread(buf, 1, (size_t)sz, fp);
+        if (buf) { rewind(fp); n = (isize_t)fread(buf, 1, (size_t)sz, fp); }
         c_assert(n == sz);
         fclose(fp);
     }

@@ -117,7 +117,7 @@ for (c_range(i, 30, 0, -5)) printf(" %lld", i);
 ## Tagged unions (sumtypes)
 
 This is a tiny, robust and fully typesafe implementation of tagged unions. They work
-similarly as in Zig, Odin and Rust, and is just as easy and safe to use.
+similarly as in Zig, Odin or Rust, and is just as easy and safe to use.
 Each tuple/parentesized field is an enum (tag) with an associated data type (payload),
 called a *variant* of the sum type. The type itself is a **union** type, aka. a sum type.
 
@@ -128,33 +128,42 @@ Synopsis:
 ```c++
 // Define a sum type
 c_union (SumType,
-    (EnumTagA, UnionTypeA),
-    (EnumTagB, UnionTypeB),
-    (EnumTagC, EnumTagB_type),                          // use same payload type as EnumTagB
-    ...
-    (EnumTagN, UnionTypeN),                             // (final comma is optional)
+    (TagA, UnionTypeA),
+    (TagB, UnionTypeB),
+    (TagC, UnionTypeC),  // final comma is optional
 );
 
-SumType       c_variant(EnumTag tag, EnumTag_type val); // Construct a tagged union variant.
-bool          c_is_variant(SumType* obj, EnumTag tag);  // True if obj holds the tag.
-EnumTag_type* c_get(SumType* obj, EnumTag tag);         // Assert err if obj does does not hold the tag.
-EnumTag_type* c_get_if(SumType* obj, EnumTag tag);      // NULL if obj does does not hold the tag.
-int           c_variant_id(SumType* obj);               // (mainly for debugging)
+// This creates the types:
+
+enum SumType_kind { TagA=NN, TagB, TagC, };
+
+typedef union SumType {
+    int id;
+    struct { enum SumType_kind id; TagA_type item; } TagA;
+    struct { enum SumType_kind id; TagB_type item; } TagB;
+    struct { enum SumType_kind id; TagC_type item; } TagC;
+} SumType;
+
+SumType       c_variant(SumType_kind tagX, TagX_type item);  // Construct a tagged union variant (typesafe).
+bool          c_is_variant(SumType* obj, SumType_kind tag);  // True if obj holds the tag.
+EnumTag_type* c_get_if(SumType* obj, SumType_kind tag);      // NULL unless obj holds the tag.
+EnumTag_type* c_get(SumType* obj, SumType_kind tag);         // Assert error unless obj holds the tag.
+int           c_variant_id(SumType* obj);                    // (mainly for debugging)
 
 // Use a sum type
 c_when (SumType* obj) {
-    c_is(EnumTagA, EnumTagA_type* x)
+    c_is(TagA, TagA_type* x)
         ActionA(x);
-    c_is_same(EnumTagB, EnumTagC, EnumTagD)             // same payload types (checked)
-        ActionBCD(obj->EnumTagB.var);
-    c_is(EnumTagX) c_or_is(EnumTagY)                    // different payload types
+    c_is_same(TagB, TagC, TagD)                              // same payload types (checked)
+        ActionBCD(obj->TagB.item);
+    c_is(TagX) c_or_is(TagY)                                 // different payload types
         ActionXY();
-    c_otherwise                                         // optional, silence exhaustiveness-check
+    c_otherwise                                              // optional, silence exhaustiveness-check
         ActionElse(obj);
 }
 
 // Use a single sum type (*)
-if (c_is(SumType* obj, EnumTagX, EnumTagX_type* x))
+if (c_is(SumType* obj, TagX, TagX_type* x))
     ActionX(x);
 ```
 The **c_when** statement is exhaustive. The compiler will give a warning if not all variants are
@@ -178,28 +187,28 @@ shown or in the _drop() function of Example 2 below.
 #include <stc/algorithm.h>
 
 c_union (Tree,
-    (Empty, bool),
-    (Leaf, int),
-    (Node, struct {int value; Tree *left, *right;})
+    (Tree_Empty, bool),
+    (Tree_Leaf, int),
+    (Tree_Node, struct {int value; Tree *left, *right;})
 );
 
 int tree_sum(Tree* t) {
     c_when (t) {
-        c_is(Empty) return 0;
-        c_is(Leaf, v) return *v;
-        c_is(Node, n) return n->value + tree_sum(n->left) + tree_sum(n->right);
+        c_is(Tree_Empty) return 0;
+        c_is(Tree_Leaf, v) return *v;
+        c_is(Tree_Node, n) return n->value + tree_sum(n->left) + tree_sum(n->right);
     }
     return -1;
 }
 
 int main(void) {
     Tree* tree =
-    &c_variant(Node, {1,
-        &c_variant(Node, {2,
-            &c_variant(Leaf, 3),
-            &c_variant(Leaf, 4)
+    &c_variant(Tree_Node, {1,
+        &c_variant(Tree_Node, {2,
+            &c_variant(Tree_Leaf, 3),
+            &c_variant(Tree_Leaf, 4)
         }),
-        &c_variant(Leaf, 5)
+        &c_variant(Tree_Leaf, 5)
     });
 
     printf("sum = %d\n", tree_sum(tree));

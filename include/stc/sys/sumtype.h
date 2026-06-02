@@ -93,14 +93,14 @@ int main(void) {
 #define _c_enum_1(x,...) (x=__LINE__*1000, __VA_ARGS__)
 #define _c_vartuple_enum(T, Tag, ...) Tag,
 #define _c_vartuple_type(T, Tag, ...) typedef __VA_ARGS__ Tag##_type; typedef T Tag##_sumtype;
-#define _c_vartuple_item(T, Tag, ...) struct { enum T##_enum id; Tag##_type item; } Tag;
+#define _c_vartuple_item(T, Tag, ...) struct { enum T##_kind id; Tag##_type item; } Tag;
 
 #define c_union(T, ...) \
     typedef union T T; \
-    enum T##_enum { c_EVAL(c_LOOP(_c_vartuple_enum, T, _c_enum_1 __VA_ARGS__, (0),)) }; \
+    enum T##_kind { c_EVAL(c_LOOP(_c_vartuple_enum, T, _c_enum_1 __VA_ARGS__, (0),)) }; \
     c_EVAL(c_LOOP(_c_vartuple_type, T, __VA_ARGS__, (0),)) \
     union T { \
-        enum T##_enum id; \
+        enum T##_kind id; \
         c_EVAL(c_LOOP(_c_vartuple_item, T, __VA_ARGS__, (0),)) \
     }
 #define c_sumtype c_union // [deprecated]?
