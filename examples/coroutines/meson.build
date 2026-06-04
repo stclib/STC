@@ -16,6 +16,7 @@ foreach sample : [
   'scheduler',
   'triples',
   'waitgroup',
+  'corotree',
 ]
   test(
     sample,

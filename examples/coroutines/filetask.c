@@ -50,7 +50,6 @@ cco_task_struct (CountLine) {
     int lineCount;
 };
 
-
 int count_line(struct CountLine* o)
 {
     cco_async (o) {
@@ -58,9 +57,9 @@ int count_line(struct CountLine* o)
         o->reader.path = cstr_str(&o->path);
 
         while (true) {
-            // await for next cco_YIELD (or cco_DONE) in read_file()
-            cco_await_task(&o->reader, cco_YIELD);
-            if (cco_result() == cco_DONE) break;
+            // Await for next cco_S_YIELD or cco_S_DONE in read_file():
+            cco_await_task(&o->reader, cco_S_YIELD);
+            if (cco_yielded() == cco_S_DONE) break;
             o->lineCount += 1;
             cco_yield;
         }

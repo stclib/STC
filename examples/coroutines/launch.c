@@ -71,6 +71,7 @@ int taskC(struct TaskC* o) {
         if (cco_error() == cco_SHUTDOWN) { // just for info
             printf("TaskC: shutdown by child %d in %s:%d\n", (int)cco_err().info.num, cco_err().file, cco_err().line);
         }
+        cco_await_shutdown(o);
         puts("TaskC: done");
     }
 
