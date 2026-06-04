@@ -40,7 +40,7 @@ int iterpair(struct iterpair* I) {
     }
 
     puts("done");
-    return 0; // cco_S_DONE
+    return 0; // cco_DONE_S
 }
 
 int main(void) {
@@ -64,11 +64,11 @@ enum cco_position {
     cco_POS_FINAL  = -2,
 };
 enum cco_status_bits {
-    cco_S_DONE    = 0,
-    cco_S_RECEIVE = 1<<11,
-    cco_S_YIELD   = 1<<12,
-    cco_S_SUSPEND = 1<<13,
-    cco_S_AWAIT   = 1<<14,
+    cco_DONE_S    = 0,
+    cco_RECEIVE_S = 1<<11,
+    cco_YIELD_S   = 1<<12,
+    cco_SUSPEND_S = 1<<13,
+    cco_AWAIT_S   = 1<<14,
 };
 #define cco_OK       0
 #define cco_CANCEL   (1U<<30)
@@ -79,11 +79,11 @@ enum cco_status_bits {
 #define _cco_LBL     (1000000+__LINE__)
 
 enum cco_deprecated {
-    cco_DONE = cco_S_DONE, CCO_DONE = cco_S_DONE,        // [deprecated]
-    cco_AWAIT = cco_S_AWAIT, CCO_AWAIT = cco_S_AWAIT,    // [deprecated]
-    cco_YIELD = cco_S_YIELD, CCO_YIELD = cco_S_YIELD,    // [deprecated]
-    cco_SUSPEND = cco_S_SUSPEND, CCO_SUSPEND = cco_S_SUSPEND, // [deprecated]
-    cco_RECEIVED = cco_S_RECEIVE,                        // [deprecated]
+    cco_DONE = cco_DONE_S, CCO_DONE = cco_DONE_S,        // [deprecated]
+    cco_AWAIT = cco_AWAIT_S, CCO_AWAIT = cco_AWAIT_S,    // [deprecated]
+    cco_YIELD = cco_YIELD_S, CCO_YIELD = cco_YIELD_S,    // [deprecated]
+    cco_SUSPEND = cco_SUSPEND_S, CCO_SUSPEND = cco_SUSPEND_S, // [deprecated]
+    cco_RECEIVED = cco_RECEIVE_S,                        // [deprecated]
 };
 #define CCO_CANCEL cco_CANCEL                            // [deprecated]
 #define cco_SUCCESS cco_OK                               // [deprecated]
@@ -181,26 +181,26 @@ struct cco_group {
     } while (0)
 
 #define cco_yield \
-    cco_yield_v(cco_S_YIELD)
+    cco_yield_v(cco_YIELD_S)
 
 #define cco_yield_data(o, data) cco_yield_data_LBL(o, data, _cco_LBL)
 #define cco_yield_data_LBL(o, data, LBL) \
-    cco_yield_LBL((*cco_data(o) = data, cco_S_YIELD), LBL)
+    cco_yield_LBL((*cco_data(o) = data, cco_YIELD_S), LBL)
 
-#define cco_suspend cco_yield_v(cco_S_SUSPEND)
+#define cco_suspend cco_yield_v(cco_SUSPEND_S)
 #define cco_suspend_LBL(LBL) \
-    cco_yield_LBL(cco_S_SUSPEND, LBL)
+    cco_yield_LBL(cco_SUSPEND_S, LBL)
 
 #define cco_await(until) cco_await_LBL(until, _cco_LBL)
 #define cco_await_LBL(until, LBL) \
     do { \
         _cco_st->pos = LBL; /* FALLTHRU */ \
-        case LBL: if (!(until)) return cco_S_AWAIT; \
+        case LBL: if (!(until)) return cco_AWAIT_S; \
     } while (0)
 
 /* cco_await_coroutine(): assumes coroutine returns a status value (int) */
 #define cco_await_coroutine(...) c_MACRO_OVERLOAD(cco_await_coroutine, __VA_ARGS__)
-#define cco_await_coroutine_1(corocall) cco_await_coroutine_2(corocall, cco_S_DONE)
+#define cco_await_coroutine_1(corocall) cco_await_coroutine_2(corocall, cco_DONE_S)
 #define cco_await_coroutine_2(corocall, status_bits) cco_await_coroutine_LBL(corocall, status_bits, _cco_LBL)
 #define cco_await_coroutine_LBL(corocall, status_bits, LBL) \
     do { \
@@ -213,7 +213,7 @@ struct cco_group {
 
 /* cco_run_coroutine(): assumes coroutine returns a status value (int) */
 #define cco_run_coroutine(corocall) \
-    while ((1 ? (corocall) : -1) != cco_S_DONE)
+    while ((1 ? (corocall) : -1) != cco_DONE_S)
 
 
 /*
@@ -287,7 +287,7 @@ typedef struct cco_task cco_task;
 #define cco_error() (_cco_st->fib->error.code + 0)
 
 // get/set task result (and/or input data)
-#define cco_data(a_task) (1 ? (a_task)->base.state.fib->data : NULL)
+#define cco_data(a_task) ((a_task)->base.state.fib->data + 0)
 #define cco_set_data_ptr(a_task, ptr) (void)((a_task)->base.state.fib->data = (ptr))
 
 // https://www.happycoders.eu/java/structured-concurrency-structuredtaskscope/
@@ -331,7 +331,7 @@ void _cco_throw(cco_task* caller, cco_err_t err);
 
 /* Asymmetric coroutine await/call */
 #define cco_await_task(...) c_MACRO_OVERLOAD(cco_await_task, __VA_ARGS__)
-#define cco_await_task_1(a_task) cco_await_task_LBL(a_task, cco_S_DONE, _cco_LBL)
+#define cco_await_task_1(a_task) cco_await_task_LBL(a_task, cco_DONE_S, _cco_LBL)
 #define cco_await_task_2(a_task, status_bits) cco_await_task_LBL(a_task, status_bits, _cco_LBL)
 #define cco_await_task_LBL(a_task, status_bits, LBL) \
     do { \
@@ -342,7 +342,7 @@ void _cco_throw(cco_task* caller, cco_err_t err);
         _tsk->base.parent_task = _cco_gettask(); \
         _tsk->base.state.fib = _fib; \
         _fib->task = _tsk;} \
-        cco_yield_LBL(cco_S_SUSPEND, LBL); \
+        cco_yield_LBL(cco_SUSPEND_S, LBL); \
     } while (0)
 
 
@@ -357,7 +357,7 @@ void _cco_throw(cco_task* caller, cco_err_t err);
         _tsk->base.parent_task = NULL; \
         _tsk->base.state.fib = _fib; \
         _fib->task = _tsk;} \
-        cco_yield_LBL(cco_S_SUSPEND, LBL); \
+        cco_yield_LBL(cco_SUSPEND_S, LBL); \
     } while (0)
 
 
@@ -411,7 +411,7 @@ static inline int _cco_resume_task(cco_task* task)
 #define cco_await_cancel_task_LBL(a_task, LBL) do { \
     cco_task* _tsk2 = cco_as_task(a_task); \
     cco_cancel_task(_tsk2); \
-    cco_await_task_LBL(_tsk2, cco_S_DONE, LBL); \
+    cco_await_task_LBL(_tsk2, cco_DONE_S, LBL); \
 } while (0)
 
 #define cco_await_n(n, a_group) cco_await_n_LBL(n, a_group, _cco_LBL)
@@ -531,7 +531,7 @@ typedef struct { ptrdiff_t acq_count; } cco_semaphore;
         cco_await_LBL((chan)->written, LBL); \
         *(_val_ptr) = (chan)->value; \
         (chan)->written = false; \
-        cco_yield_LBL(cco_S_RECEIVE, 2000000+LBL); \
+        cco_yield_LBL(cco_RECEIVE_S, 2000000+LBL); \
     } while (0)
 
 #define cco_await_send(chan, _val) cco_await_send_LBL(chan, _val, _cco_LBL)
@@ -685,8 +685,8 @@ int cco_execute(cco_fiber* fib) {
     fib->status = cco_resume(fib->task); // => cco_yielded()
 
     if (fib->error.code) {
-        // Note: if fib->status == cco_S_DONE, fib->task may already be destructed.
-        if (fib->status == cco_S_DONE) { // task has finalized
+        // Note: if fib->status == cco_DONE_S, fib->task may already be destructed.
+        if (fib->status == cco_DONE_S) { // task has finalized
             fib->task = fib->cur_parent_task; // resume in parent task
             if (fib->task == NULL) { // i.e. task was entry-point in fib
                 if (fib->failed_grp) {

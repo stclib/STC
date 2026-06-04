@@ -16,8 +16,9 @@ int inorder(struct Traverse* o) {
     cco_async (o) {
         if (o->node->left)
             cco_await_task(c_new(struct Traverse, {{inorder}, o->node->left}));
-        
-        cco_yield_data(o, o->node->value);
+
+        *cco_data(o) = o->node->value;
+        cco_yield;
 
         if (o->node->right)
             cco_await_task(c_new(struct Traverse, {{inorder}, o->node->right}));
@@ -38,10 +39,10 @@ int main(void) {
         };
 
     struct Traverse* traverse = c_new(struct Traverse, {{inorder}, tree});
-    int result;
-    cco_run_task(fib, traverse, &result)
+    int value;
+    cco_run_task(fib, traverse, &value)
     {
-        if (fib->status == cco_S_YIELD)
-            printf("val: %d\n", result);
+        if (fib->status == cco_YIELD_S)
+            printf("val: %d\n", value);
     }
 }

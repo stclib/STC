@@ -33,9 +33,9 @@ scope end, and `return 0`.
                 cco_async (Coroutine* co) {...}                     // The coroutine scope.
 
                 cco_yield_v(status);                                // Suspend execution with custom status returned.
-                cco_yield;                                          // Suspend execution. Short for cco_yield_v(cco_S_YIELD)
-                cco_suspend;                                        // Suspend execution. Short for cco_yield_v(cco_S_SUSPEND)
-                cco_await(bool condition);                          // Suspend with cco_S_AWAIT status if condition is false,
+                cco_yield;                                          // Suspend execution. Short for cco_yield_v(cco_YIELD_S)
+                cco_suspend;                                        // Suspend execution. Short for cco_yield_v(cco_SUSPEND_S)
+                cco_await(bool condition);                          // Suspend with cco_AWAIT_S status if condition is false,
                                                                     // resumes at the condition test, not after.
                 cco_finalize:                                       // Label marks where cleanup of the task/coroutine frame happens.
                                                                     // Jumps here on cco_return, cco_throw(), cco_cancel_task(self).
@@ -52,8 +52,8 @@ void            cco_stop(Coroutine* co);                            // Coroutine
 
 #### Simple Coroutines (non-Task types)
 ```c++
-                cco_await_coroutine(corofunc(co));                  // Await for coroutine to finish, else suspend with cco_S_AWAIT.
-                cco_await_coroutine(corofunc(co), int awaitbits);   // Await until coroutine resume status is in (awaitbits | cco_S_DONE).
+                cco_await_coroutine(corofunc(co));                  // Await for coroutine to finish, else suspend with cco_AWAIT_S.
+                cco_await_coroutine(corofunc(co), int awaitbits);   // Await until coroutine resume status is in (awaitbits | cco_DONE_S).
                 cco_run_coroutine(corofunc(co)) {};                 // Run blocking until coroutine is finished.
 ```
 
@@ -107,8 +107,8 @@ cco_err_t       cco_err();                                          // Get error
 
 #### Awaiting Tasks and Waitgroups
 ```c++
-                cco_await_task(cco_task* task);                     // Await/call until task's resume status is cco_S_DONE (=0).
-                cco_await_task(cco_task* task, int awaitbits);      // Await until task's resume status is in (awaitbits | cco_S_DONE).
+                cco_await_task(cco_task* task);                     // Await/call until task's resume status is cco_DONE_S (=0).
+                cco_await_task(cco_task* task, int awaitbits);      // Await until task's resume status is in (awaitbits | cco_DONE_S).
                 cco_await_cancel_task(cco_task* task);              // Cancel and await for task to finalize async.
                                                                     // Shorthand for cco_cancel_task() + cco_await_task().
                 // Await spawned tasks in a specific (wait)group (for making nested await scopes):
@@ -194,7 +194,7 @@ bool            cco_flt_takewhile(bool predicate);                  // Use inste
 ## Types
 | Type name         | Type definition / usage                             | Used to represent... |
 |:------------------|:----------------------------------------------------|:---------------------|
-|`cco_status_bits`  | **enum** `cco_S_DONE`, `cco_S_AWAIT`, `cco_S_SUSPEND`, `cco_S_YIELD` | Default set of return status from coroutines |
+|`cco_status_bits`  | **enum** `cco_DONE_S`, `cco_AWAIT_S`, `cco_SUSPEND_S`, `cco_YIELD_S` | Default set of return status from coroutines |
 |`struct cco_err` | `struct { int32_t code, line; const char* file; }`    | Error object for exceptions |
 |`cco_task`         | Enclosure/function object                           | A base coroutine function-object type. |
 |`cco_timer`        | Struct type                                         | Delay/sleep timer               |
@@ -208,13 +208,13 @@ bool            cco_flt_takewhile(bool predicate);                  // Use inste
 Be particularly careful with control variables in loops.
 3. Do not call ***cco_suspend***, ***cco_yield..*** or ***cco_await..*** inside a `switch` statement. Use `if-else-if` in those cases.
 4. Never use regular `return` inside ***cco_async*** scope, always use ***cco_return***.
-5. Resuming a coroutine after it has returned 0 (cco_S_DONE) is undefined behaviour ***if*** there is additional
+5. Resuming a coroutine after it has returned 0 (cco_DONE_S) is undefined behaviour ***if*** there is additional
 code between the ***cco_async*** scope and `return 0`.
 6. There may only be one ***cco_async*** scope per coroutine.
 
 ## Implementation and examples
 A plain coroutine may have any signature, however this implementation has specific support for
-coroutines which returns `int`, indicating cco_S_DONE, cco_S_AWAIT, cco_S_SUSPEND, cco_S_YIELD, or a custom int value.
+coroutines which returns `int`, indicating cco_DONE_S, cco_AWAIT_S, cco_SUSPEND_S, cco_YIELD_S, or a custom int value.
 It also require a struct pointer as one of the parameters, which must contains a member of type ***cco_base*** named `base`.
 The coroutine struct should normally store all *local* variables to be used within the coroutine
 (technically those where its usage crosses over a ***cco_yield..***, ***cco_await..*** or a ***cco_suspend***
@@ -740,8 +740,8 @@ The task-objects have the added benefit that coroutines can be managed by a sche
 which is useful when dealing with large numbers of coroutines (like in simulations).
 Below is a simple coroutine scheduler using a queue. It sends the suspended coroutines
 to the end of the queue, and resumes the coroutine in the front.
-Note that the scheduler awaits the next cco_S_YIELD to be returned, not *only* the default cco_S_DONE
-(in the code below, `| cco_S_DONE` is redundant and only to show how to await for multiple/custom bit-values).
+Note that the scheduler awaits the next cco_YIELD_S to be returned, not *only* the default cco_DONE_S
+(in the code below, `| cco_DONE_S` is redundant and only to show how to await for multiple/custom bit-values).
 
 The example heap allocates the coroutine frames on a queue, so that the scheduler can pick the next coroutine to
 execute from a pool of coroutines. This also allows it to run on a different thread/scope that may outlive
@@ -783,11 +783,11 @@ int scheduler(struct Scheduler* o) {
         while (!Tasks_is_empty(&o->tasks)) {
             o->_pulled = Tasks_pull(&o->tasks);
 
-            cco_await_task(o->_pulled, cco_S_YIELD | cco_S_DONE);
+            cco_await_task(o->_pulled, cco_YIELD_S | cco_DONE_S);
 
-            if (cco_yielded() == cco_S_YIELD) {
+            if (cco_yielded() == cco_YIELD_S) {
                 Tasks_push(&o->tasks, o->_pulled);
-            } else { // cco_S_DONE
+            } else { // cco_DONE_S
                 Tasks_value_drop(&o->tasks, &o->_pulled);
             }
         }
