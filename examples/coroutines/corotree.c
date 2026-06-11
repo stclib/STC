@@ -42,7 +42,7 @@ int main(void) {
     int value;
     cco_run_task(fib, traverse, &value)
     {
-        if (fib->status == cco_YIELD_S)
+        if (fib->status == cco_YIELD)
             printf("val: %d\n", value);
     }
 }

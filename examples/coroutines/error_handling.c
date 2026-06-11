@@ -46,7 +46,7 @@ int start(struct Start* o) {
         cco_await_all(cco_group(0));
 
         cco_finalize:
-        if (cco_error() == cco_OK)
+        if (cco_error() == 0)
             puts("Maintask success");
         else if (cco_error() == cco_SHUTDOWN) {
             cco_await_all(cco_group(0));

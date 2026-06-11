@@ -42,7 +42,7 @@ int Philosopher(struct Philosopher* o) {
 
             if (o->id == 3) { // For demonstration purpose:
                 // CANCELING after philosopher 3 has eaten.
-                cco_throw(cco_CANCEL, o->id);
+                cco_throw(cco_CANCEL, {o->id});
             }
         }
         cco_finalize:

@@ -20,7 +20,7 @@ int Scheduler(struct Scheduler* o) {
 
             int status = cco_resume(o->pulled);
 
-            if (status == cco_YIELD_S) {
+            if (status == cco_YIELD) {
                 Tasks_push(&o->tasks, o->pulled);
             } else {
                 Tasks_value_drop(&o->tasks, &o->pulled);
