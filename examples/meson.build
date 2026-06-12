@@ -1,6 +1,6 @@
-examples = get_option('examples').enable_auto_if(root)
+examples = get_option('examples')
 
-if examples.enabled()
+if examples.allowed()
   example_deps = [
     stc_dep,
     cc.find_library('m', required: false),

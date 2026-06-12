@@ -167,7 +167,6 @@ if flex_exe.found()
   meson.override_find_program('checkscoped', checkscoped_exe)
 endif
 
-root = not meson.is_subproject()
 subdir('tests')
 subdir('examples')
 
