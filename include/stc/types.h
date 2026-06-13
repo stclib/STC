@@ -146,7 +146,7 @@ typedef const char* cstr_raw;
         AUXDEF \
     } SELF; \
 \
-    typedef struct { \
+    typedef struct SELF##_iter { \
         SELF##_value *ref; \
         ptrdiff_t pos; \
         const SELF* _s; \
@@ -156,7 +156,7 @@ typedef const char* cstr_raw;
     typedef VAL SELF##_value; \
     typedef struct SELF##_node SELF##_node; \
 \
-    typedef struct { \
+    typedef struct SELF##_iter { \
         SELF##_value *ref; \
         SELF##_node *const *_last, *prev; \
     } SELF##_iter; \
@@ -174,7 +174,7 @@ typedef const char* cstr_raw;
             MAP_ONLY( struct SELF##_value ) \
     SELF##_value, SELF##_entry; \
 \
-    typedef struct { \
+    typedef struct SELF##_result { \
         SELF##_value *ref; \
         size_t idx; \
         bool inserted; \
@@ -182,7 +182,7 @@ typedef const char* cstr_raw;
         uint16_t dist; \
     } SELF##_result; \
 \
-    typedef struct { \
+    typedef struct SELF##_iter { \
         SELF##_value *ref, *_end; \
         struct hmap_meta *_mref; \
     } SELF##_iter; \
@@ -203,12 +203,12 @@ typedef const char* cstr_raw;
             MAP_ONLY( struct SELF##_value ) \
     SELF##_value, SELF##_entry; \
 \
-    typedef struct { \
+    typedef struct SELF##_result { \
         SELF##_value *ref; \
         bool inserted; \
     } SELF##_result; \
 \
-    typedef struct { \
+    typedef struct SELF##_iter { \
         SELF##_value *ref; \
         SELF##_node *_d; \
         int _top; \
@@ -228,7 +228,7 @@ typedef const char* cstr_raw;
 
 #define _declare_stack(SELF, VAL, AUXDEF) \
     typedef VAL SELF##_value; \
-    typedef struct { SELF##_value *ref, *end; } SELF##_iter; \
+    typedef struct SELF##_iter { SELF##_value *ref, *end; } SELF##_iter; \
     typedef struct SELF { SELF##_value *data; ptrdiff_t size, capacity; AUXDEF } SELF
 
 #endif // STC_TYPES_H_INCLUDED
