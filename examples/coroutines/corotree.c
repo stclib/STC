@@ -17,8 +17,8 @@ int inorder(struct Traverse* o) {
         if (o->node->left)
             cco_await_task(c_new(struct Traverse, {{inorder}, o->node->left}));
 
-        *cco_data(o) = o->node->value;
-        cco_yield;
+        // *cco_data(o) = o->node->value; cco_yield;
+        cco_yield_data(o, o->node->value);
 
         if (o->node->right)
             cco_await_task(c_new(struct Traverse, {{inorder}, o->node->right}));

@@ -69,7 +69,7 @@ int             cco_resume(cco_task* task);                         // Resume ta
 ```
 #### Accessors
 ```c++
-int             cco_yielded();                                      // Get returned status from last cco_await_task() call.
+int             cco_status();                                       // Get returned status from last cco_await_task() call.
 cco_fiber*      cco_task_fiber(cco_task* task);                     // Get fiber associated with task.
 
 Data*           cco_data(cco_task* task);                           // Get auxiliary data pointer, stored in the associated fiber.
@@ -787,7 +787,7 @@ int scheduler(struct Scheduler* o) {
 
             cco_await_task(o->_pulled, cco_YIELD | cco_DONE);
 
-            if (cco_yielded() == cco_YIELD) {
+            if (cco_status() == cco_YIELD) {
                 Tasks_push(&o->tasks, o->_pulled);
             } else { // cco_DONE
                 Tasks_value_drop(&o->tasks, &o->_pulled);
