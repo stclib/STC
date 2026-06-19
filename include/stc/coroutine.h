@@ -677,7 +677,7 @@ bool _cco_cancel_all(cco_fiber* fib, struct cco_group* grp, const char* file, in
             if (!grp || tsk->base.state.parent_grp == grp) {
                 fit->error = (cco_err_t){cco_CANCEL, line, file, fib->error.info};
                 //_cco_throw(tsk, (cco_err_t){cco_CANCEL, line, file, fib->error.info})
-                cco_stop(tsk);
+                cco_stop(fit->task); // don't modify.
                 break;
             }
             tsk = tsk->base.awaiter;
