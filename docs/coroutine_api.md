@@ -79,9 +79,9 @@ Data*           cco_set_data_ptr(cco_task* task, Data* dt);         // Set auxil
 ```c++
                 cco_cancel_task(cco_task* task);                    // Cancel a spawned task+fiber; If task runs in the current
                                                                     // fiber it equals cco_throw(cco_CANCEL) (jumps to cco_finalize:).
-void            cco_cancel_fiber(cco_fiber* fiber);                 // Signal that fiber will be cancelled upon next suspension point.
-void            cco_cancel_all(struct cco_group* grp);              // Cancel all spawned tasks in the task-group.
-void            cco_cancel_all_fibers();                            // Cancel *all* spawned tasks/fibers (except current).
+void            cco_cancel_all(struct cco_group* grp);              // Cancel all spawned subtasks in the task-group.
+void            cco_cancel_fiber(cco_fiber* fiber);                 // Cancel current task in fiber upon next suspension point.
+
 ```
 #### Task Error Handling
 ```c++
@@ -109,18 +109,19 @@ cco_err_t       cco_err();                                          // Get error
 ```c++
                 cco_await_task(cco_task* task);                     // Await/call until task's resume status is cco_DONE (=0).
                 cco_await_task(cco_task* task, int awaitbits);      // Await until task's resume status is in (awaitbits | cco_DONE).
-                cco_await_cancel_task(cco_task* task);              // Cancel and await for task to finalize async.
-                                                                    // Shorthand for cco_cancel_task() + cco_await_task().
+
                 // Await spawned tasks in a specific (wait)group (for making nested await scopes):
-                cco_await_all(struct cco_group* grp);               // Await all (remaining) subtasks in task-group to finish.
-                cco_await_any(struct cco_group* grp);               // Await for any one subtask in task-group to finish,
-                                                                    // and *cancel the remaining*!
-                cco_await_n(int n, struct cco_group* grp);          // Awaits n spawned tasks in grp. NB! Does *not* cancel remaining tasks.
+                cco_await_all(struct cco_group* grp);               // Await all (remaining) subtasks in task-group grp to finish.
+                cco_await_any(struct cco_group* grp);               // Await any subtask in task-group to finish, and *cancel remaining*!
+                cco_await_n(int n, struct cco_group* grp);          // Await n spawned tasks in grp. NB! Does *not* cancel remaining tasks.
+                cco_await_subtasks(cco_task* task);                 // Await all spawned tasks in all groups in the task.
                 cco_await_fibers();                                 // Awaits all fibers/spawned tasks to be joined.
 
                 cco_await_cancel_all(struct cco_group* grp);        // Cancel and await all spawned subtasks in grp.
                                                                     // Shorthand for cco_cancel_all(grp) + cco_await_all(grp).
-                cco_await_shutdown(cco_task* task);                 // Cancel and await all spawned tasks in all groups in the task.
+                cco_await_cancel_task(cco_task* task);              // Cancel and await for a task to finalize async.
+                                                                    // Shorthand for cco_cancel_task() + cco_await_task().
+                cco_await_cancel_subtasks(cco_task* task);          // Cancel and await all spawned tasks in all groups in the task.
                                                                     // Used for closing running subtasks on error/throw at cco_finalize.
                 cco_await_cancel_fibers();                          // Cancel all running fibers (except current). Use on panic.
 ```
@@ -129,9 +130,9 @@ A channel represents a communication syncronization point for collaborating task
 the channel, but communication can go both ways. **Note**: both the sending and receiving values must reference a persistant
 storage (i.e. a constant and/or expression using variables stored in a task).
 ```c++
-                cco_chan_t(Type)                                    // A channel type.
-                cco_await_send(cco_chan_t(Type)* ch, Type value);   // Put data into a channel (may wait for its turn).
-                cco_await_recv(cco_chan_t(Type)* ch, Type* valp);   // Get (waits for) data sent to the channel by another task.
+                cco_channel_t(T)                                    // A channel type.
+                cco_await_send(cco_channel_t(T)* ch, T value);      // Put data into a channel (may wait for its turn).
+                cco_await_receive(cco_channel_t(T)* ch, T* valp);   // Get (waits for) data sent to the channel by another task.
 ```
 
 #### Spawning and Running Tasks

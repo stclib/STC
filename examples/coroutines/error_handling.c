@@ -13,7 +13,7 @@ int subtask(struct Subtask* o) {
 
         if (o->id == 2) {
             // Demo: throwing an error in one of the spawned tasks.
-            //printf("THROW in spawned %d\n", o->id); cco_throw(cco_CANCEL, o->id); 
+            //printf("THROW in subtask %d\n", o->id); cco_throw(cco_CANCEL, {o->id}); 
         }
         printf("Work task %d\n", o->id);
 
@@ -42,7 +42,7 @@ int start(struct Start* o) {
         puts("START");
         cco_await_timer(&o->tmr, 0.2);
 
-        //puts("THROW"); cco_throw(cco_CANCEL, -1);
+        //puts("THROW"); cco_throw(cco_CANCEL, {-1});
         cco_await_all(cco_group(0));
 
         cco_finalize:

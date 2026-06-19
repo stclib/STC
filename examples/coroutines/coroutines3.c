@@ -26,13 +26,13 @@ int prime(struct prime* o) {
             o->value = 2;
             if (o->count-- == 0)
                 cco_return;
-            *cco_env(o) = o->value;
+            *cco_data(o) = o->value;
             cco_yield_v(YIELD_PRM);
         }
         for (o->value |= 1; o->count > 0; o->value += 2) {
             if (is_prime(o->value)) {
                 --o->count;
-                *cco_env(o) = o->value;
+                *cco_data(o) = o->value;
                 cco_yield_v(YIELD_PRM);
             }
         }
@@ -65,7 +65,7 @@ int fibonacci(struct fibonacci* o) {
             long long tmp = o->value;
             o->value = o->b;
             o->b += tmp;
-            *cco_env(o) = o->value;
+            *cco_data(o) = o->value;
             cco_yield_v(YIELD_FIB);
         }
 

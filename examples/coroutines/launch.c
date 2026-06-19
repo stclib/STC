@@ -26,7 +26,7 @@ int subTask(struct SubTask* o) {
             printf("SubTask%d: step %c\n", o->id, o->step);
             
             if (o->id == 2 && o->step == 'b') {
-               //cco_throw(cco_CANCEL, o->id); // Demo: throwing an error in one of the spawned tasks.
+               //cco_throw(cco_CANCEL, {o->id}); // Demo: throwing an error in one of the spawned tasks.
             }
             cco_yield;
         }
@@ -67,11 +67,12 @@ int taskC(struct TaskC* o) {
             cco_await_all(cco_scope());
             puts("TaskC: all spawned tasks done");
         }
+
         cco_finalize:
         if (cco_error() == cco_SHUTDOWN) { // just for info
             printf("TaskC: shutdown by child %d in %s:%d\n", (int)cco_err().info.num, cco_err().file, cco_err().line);
+            cco_await_subtasks(o); // await remaining cancelled subtasks
         }
-        cco_await_shutdown(o);
         puts("TaskC: done");
     }
 
