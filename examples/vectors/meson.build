@@ -10,6 +10,7 @@ foreach sample : [
       files(f'@sample@.c'),
       dependencies: example_deps,
       install: false,
+      build_by_default: false,
     ),
     suite: 'vec',
   )

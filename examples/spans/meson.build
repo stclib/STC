@@ -21,6 +21,7 @@ foreach sample : [
       files(f'@sample@.c'),
       dependencies: span_deps,
       install: false,
+      build_by_default: false,
     ),
     suite: 'cspan',
   )
