@@ -223,7 +223,7 @@ typedef const char* cstr_raw;
 
 #define _declare_inplace_stack(SELF, VAL, CAP, AUXDEF) \
     typedef VAL SELF##_value; \
-    typedef struct { SELF##_value *ref, *end; } SELF##_iter; \
+    typedef struct SELF##_iter { SELF##_value *ref, *end; } SELF##_iter; \
     typedef struct SELF { ptrdiff_t size; SELF##_value data[CAP]; AUXDEF } SELF
 
 #define _declare_stack(SELF, VAL, AUXDEF) \

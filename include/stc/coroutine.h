@@ -571,20 +571,13 @@ typedef struct { ptrdiff_t acq_count; } cco_semaphore;
       #define _c_LINKC __declspec(dllimport)
     #endif
     #ifndef _WINDOWS_ // windows.h
-      typedef long long LARGE_INTEGER;
-      _c_LINKC int __stdcall QueryPerformanceCounter(LARGE_INTEGER*);
-      //_c_LINKC int __stdcall QueryPerformanceFrequency(LARGE_INTEGER*);
+      union _LARGE_INTEGER;
+      _c_LINKC int __stdcall QueryPerformanceCounter(union _LARGE_INTEGER*);
     #endif
     #define cco_timer_freq() 10000000LL /* 1/10th microseconds */
-    //static inline long long cco_timer_freq(void) {
-    //    long long quad;
-    //    QueryPerformanceFrequency((LARGE_INTEGER*)&quad);
-    //    return quad;
-    //}
-
     static inline long long cco_timer_ticks(void) {
         long long quad;
-        QueryPerformanceCounter((LARGE_INTEGER*)&quad);
+        QueryPerformanceCounter((union _LARGE_INTEGER*)&quad);
         return quad;
     }
 #else
@@ -708,7 +701,7 @@ int cco_execute(cco_fiber* fib) {
     if (fib->error.code) {
         // Note: if fib->status == cco_DONE, fib->task may already be destructed.
         if (fib->status == cco_DONE) { // task has finalized
-            fib->task = fib->cur_awaiter; // resume in awaiting task
+            fib->task = fib->cur_awaiter; // transfer control back to the awaiting task
             if (fib->task == NULL) { // i.e. task was entry-point in fib
                 if (fib->failed_grp) {
                     int32_t err = cco_SUBTASK_FAIL;
