@@ -1016,7 +1016,7 @@ STC is generally very memory efficient. Memory usage for the different container
 
 ## Version 4.3
 - Breaking changes:
-    - **cstr** and **csview** now uses *shared linking* by default. Implement by either defining `i_implement` or `i_static` before including.
+    - **cstr** and **csview** now uses *shared linking* by default. Implement by defining `i_implement` before including.
     - Renamed "stc/calgo.h" => `"stc/algorithm.h"`
     - Moved "stc/algo/coroutine.h" => `"stc/coroutine.h"`
         - Much improved with some new API and added features.

@@ -98,10 +98,9 @@ typedef struct {
     _Bool overwrite;
 } fmt_stream;
 
-#if defined FMT_STATIC || defined STC_STATIC || defined i_static
-  #define FMT_API static
-  #define FMT_DEF static
-#elif defined FMT_IMPLEMENT || defined STC_IMPLEMENT || defined i_implement
+#undef FMT_API
+#undef FMT_DEF
+#if defined FMT_IMPLEMENT || defined STC_IMPLEMENT || defined i_implement
   #define FMT_API extern
   #define FMT_DEF
 #else
@@ -298,4 +297,3 @@ FMT_DEF int _fmt_parse(char* p, int nargs, const char *fmt, ...) {
 #endif
 #endif
 #undef i_implement
-#undef i_static

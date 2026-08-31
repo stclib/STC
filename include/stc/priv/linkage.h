@@ -23,21 +23,24 @@
 #undef STC_API
 #undef STC_DEF
 
-#if !defined i_implement && (defined STC_IMPLEMENT || defined i_import)
+#if !defined i_implement && (defined STC_IMPLEMENT || defined i_import || defined i_body)
   #define i_implement
 #endif
-#if !(defined i_static || defined STC_STATIC) && (defined i_header || defined STC_HEADER || defined i_implement)
+#if defined i_header || defined STC_HEADER || defined i_implement
+  // external linking, used for non-templated modules
   #define STC_API extern
   #define STC_DEF
 #else
+  // static linking, default for templated containers
   #if defined __GNUC__ || defined __clang__ || defined __INTEL_LLVM_COMPILER
     #define STC_API static __attribute__((unused))
   #else
     #define STC_API static inline
   #endif
   #define STC_DEF static
-  #undef i_implement
-  #define i_implement
+  #ifndef i_implement
+    #define i_implement
+  #endif
 #endif
 
 #if defined i_aux && defined i_allocator

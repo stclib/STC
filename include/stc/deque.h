@@ -34,13 +34,15 @@
 #ifndef _i_prefix
   #define _i_prefix deque_
 #endif
+#include "priv/template.h"
+
 #define _pop _pop_front
 #define _pull _pull_front
-#include "priv/template.h"
 #include "priv/queue_prv.h"
 #undef _pop
 #undef _pull
 
+#ifndef i_body
 STC_API _m_value*   _c_MEMB(_push_front)(Self* self, _m_value value);
 STC_API _m_iter     _c_MEMB(_insert_n)(Self* self, isize_t idx, const _m_value* arr, isize_t n);
 STC_API _m_iter     _c_MEMB(_insert_uninit)(Self* self, isize_t idx, isize_t n);
@@ -121,6 +123,8 @@ STC_INLINE bool _c_MEMB(_contains)(const Self* self, _m_raw raw)
 #if defined _i_has_cmp
 #include "priv/sort_prv.h"
 #endif // _i_has_cmp
+
+#endif // !i_body
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined i_implement

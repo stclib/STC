@@ -84,8 +84,9 @@
   #define _i_prefix list_
 #endif
 #include "priv/template.h"
-
 #define _i_is_list
+
+#ifndef i_body
 #ifndef i_declared
   _c_DEFTYPES(_declare_list, Self, i_key, _i_aux_def);
 #endif
@@ -229,6 +230,8 @@ STC_INLINE bool _c_MEMB(_eq)(const Self* self, const Self* other) {
     return !(i.ref || j.ref);
 }
 #endif
+
+#endif // !i_body
 
 // -------------------------- IMPLEMENTATION -------------------------
 #if defined i_implement

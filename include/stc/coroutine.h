@@ -737,5 +737,4 @@ int cco_execute(cco_fiber* fib) {
 }
 #endif // IMPLEMENT
 #undef i_implement
-#undef i_static
 #undef i_header

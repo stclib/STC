@@ -30,8 +30,8 @@
 #undef i_realloc
 #undef i_free
 
-#undef i_static
 #undef i_header
+#undef i_body
 #undef i_implement
 #undef i_import
 

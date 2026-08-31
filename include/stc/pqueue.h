@@ -34,6 +34,8 @@
 #endif
 #define _i_sorted
 #include "priv/template.h"
+
+#ifndef i_body
 #ifndef i_declared
   _c_DEFTYPES(_declare_stack, Self, i_key, _i_aux_def);
 #endif
@@ -167,6 +169,7 @@ STC_INLINE bool _c_MEMB(_eq)(const Self* self, const Self* other) {
 #endif
 }
 #endif // _i_has_eq
+#endif // !i_body
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined i_implement

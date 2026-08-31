@@ -72,6 +72,8 @@ struct hmap_meta { uint16_t hashx:6, dist:10; }; // dist: 0=empty, 1=PSL 0, 2=PS
 #endif
 #define _i_hasher
 #include "priv/template.h"
+
+#ifndef i_body
 #ifndef i_declared
   _c_DEFTYPES(_declare_htable, Self, _i_MAP_ONLY, _i_SET_ONLY, i_key, i_val, _i_aux_def);
 #endif
@@ -303,6 +305,7 @@ _c_MEMB(_eq)(const Self* self, const Self* other) {
     }
     return true;
 }
+#endif // !i_body
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined i_implement
