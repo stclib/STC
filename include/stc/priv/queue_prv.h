@@ -179,7 +179,7 @@ STC_INLINE isize_t _c_MEMB(_index)(const Self* self, _m_iter it)
 STC_INLINE void _c_MEMB(_adjust_end_)(Self* self, isize_t n)
     { self->end = (self->end + n) & self->capmask; }
 
-#endif && !i_body
+#endif // !i_body
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined i_implement
