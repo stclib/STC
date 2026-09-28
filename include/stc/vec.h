@@ -290,8 +290,6 @@ _c_MEMB(_clear)(Self* self) {
 STC_DEF void
 _c_MEMB(_drop)(const Self* cself) {
     Self* self = (Self*)cself;
-    if (self->capacity == 0)
-        return;
     _c_MEMB(_clear)(self);
     _i_free_n(self->data, self->capacity);
 }
