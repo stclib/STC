@@ -24,7 +24,6 @@
 
 #ifndef STC_CSVIEW_H_INCLUDED
 #define STC_CSVIEW_H_INCLUDED
-
 #include "common.h"
 #include "types.h"
 #include "priv/utf8_prv.h"
@@ -37,13 +36,13 @@
 #define             csview_drop(p) c_default_drop(p)
 #define             csview_clone(sv) c_default_clone(sv)
 
-csview_iter         csview_advance(csview_iter it, isize_t u8pos);
-csview              csview_subview_pro(csview sv, isize_t pos, isize_t n);
-csview              csview_split(csview sv, const char* separator, isize_t* pos);
-csview              csview_strtok(csview sv, const char* delimiters, isize_t* pos);
-csview              csview_u8_subview(csview sv, isize_t u8pos, isize_t u8len);
-csview              csview_u8_tail(csview sv, isize_t u8len);
-csview_iter         csview_u8_at(csview sv, isize_t u8pos);
+STC_EXTERN csview_iter  csview_advance(csview_iter it, isize_t u8pos);
+STC_EXTERN csview       csview_subview_pro(csview sv, isize_t pos, isize_t n);
+STC_EXTERN csview       csview_split(csview sv, const char* separator, isize_t* pos);
+STC_EXTERN csview       csview_strtok(csview sv, const char* delimiters, isize_t* pos);
+STC_EXTERN csview       csview_u8_subview(csview sv, isize_t u8pos, isize_t u8len);
+STC_EXTERN csview       csview_u8_tail(csview sv, isize_t u8len);
+STC_EXTERN csview_iter  csview_u8_at(csview sv, isize_t u8pos);
 
 STC_INLINE csview   csview_from(const char* str)
     { return c_literal(csview){str, c_strlen(str)}; }
@@ -276,5 +275,8 @@ csview_iter csview_u8_at(csview sv, isize_t u8pos) {
 #endif // IMPLEMENT
 
 #if defined i_import
-#include "priv/utf8_prv.c"
+  #include "priv/utf8_prv.c"
 #endif
+#undef i_header
+#undef i_implement
+#undef i_import

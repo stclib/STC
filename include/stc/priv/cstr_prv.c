@@ -30,10 +30,10 @@ void cstr_drop(const cstr* self) {
         cstr_l_drop(self);
 }
 
-cstr* cstr_take(cstr* self, const cstr s) {
-    if (cstr_is_long(self) && self->lon.data != s.lon.data)
+cstr* cstr_take(cstr* self, const cstr unowned) {
+    if (cstr_is_long(self))
         cstr_l_drop(self);
-    *self = s;
+    *self = unowned;
     return self;
 }
 

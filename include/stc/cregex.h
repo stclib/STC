@@ -94,7 +94,7 @@ typedef struct {
 
 
 /* compile a regex from a pattern. return CREG_OK, or negative error code on failure. */
-extern int cregex_compile_pro(cregex *re, const char* pattern, int cflags);
+STC_EXTERN int cregex_compile_pro(cregex *re, const char* pattern, int cflags);
 
 #define cregex_compile(...) \
     c_ARG_4(__VA_ARGS__, cregex_compile_pro(__VA_ARGS__), cregex_compile_pro(__VA_ARGS__, CREG_DEFAULT), _too_few_args_)
@@ -109,20 +109,20 @@ STC_INLINE cregex cregex_from(const char* pattern)
     { return cregex_make(pattern, CREG_DEFAULT); }
 
 /* destroy regex */
-extern void cregex_drop(cregex* re);
+STC_EXTERN void cregex_drop(cregex* re);
 
 /* number of capture groups in a regex pattern, excluding the full match capture (0) */
-extern int cregex_captures(const cregex* re);
+STC_EXTERN int cregex_captures(const cregex* re);
 
 /* ----- Private ----- */
 
 struct cregex_match_opt { csview* match; int flags; int _dummy; };
 struct cregex_replace_opt { int count; bool(*xform)(int group, csview match, cstr* out); int flags; int _dummy; };
 
-extern int cregex_match_opt(const cregex* re, const char* input, const char* input_end, struct cregex_match_opt opt);
-extern int cregex_match_aio_opt(const char* pattern, const char* input, const char* input_end, struct cregex_match_opt opt);
-extern cstr cregex_replace_opt(const cregex* re, const char* input, const char* input_end, const char* replace, struct cregex_replace_opt opt);
-extern cstr cregex_replace_aio_opt(const char* pattern, const char* input, const char* input_end, const char* replace, struct cregex_replace_opt opt);
+STC_EXTERN int cregex_match_opt(const cregex* re, const char* input, const char* input_end, struct cregex_match_opt opt);
+STC_EXTERN int cregex_match_aio_opt(const char* pattern, const char* input, const char* input_end, struct cregex_match_opt opt);
+STC_EXTERN cstr cregex_replace_opt(const cregex* re, const char* input, const char* input_end, const char* replace, struct cregex_replace_opt opt);
+STC_EXTERN cstr cregex_replace_aio_opt(const char* pattern, const char* input, const char* input_end, const char* replace, struct cregex_replace_opt opt);
 
 static inline int cregex_match_sv_opt(const cregex* re, csview sv, struct cregex_match_opt opt)
     { return cregex_match_opt(re, sv.buf, sv.buf+sv.size, opt); }

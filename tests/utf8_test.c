@@ -1,7 +1,5 @@
 #include <stc/cstr.h>
 #include <stc/utf8.h>
-#include <stc/csview.h>
-#include <stc/coroutine.h>
 #include "ctest.h"
 
 static uint32_t utf8_casefold_bruteforce(uint32_t c) {

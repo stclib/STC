@@ -40,8 +40,8 @@ typedef struct {
     int _has_next;
 } crand64_normal_dist;
 
-STC_API double crand64_normal(crand64_normal_dist* d);
-STC_API double crand64_normal_r(crand64* rng, uint64_t stream, crand64_normal_dist* d);
+STC_EXTERN double crand64_normal(crand64_normal_dist* d);
+STC_EXTERN double crand64_normal_r(crand64* rng, uint64_t stream, crand64_normal_dist* d);
 
 #if INTPTR_MAX == INT64_MAX
   #define crandWS crand64
@@ -224,8 +224,7 @@ STC_INLINE int64_t crand32_uniform(crand32_uniform_dist* d)
 #define STC_RANDOM_IMPLEMENT
 #include <math.h>
 
-STC_DEF double
-crand64_normal_r(crand64* rng, uint64_t stream, crand64_normal_dist* d) {
+double crand64_normal_r(crand64* rng, uint64_t stream, crand64_normal_dist* d) {
     double v1, v2, sq, rt;
     if (d->_has_next++ & 1)
         return d->_next*d->stddev + d->mean;
@@ -241,7 +240,7 @@ crand64_normal_r(crand64* rng, uint64_t stream, crand64_normal_dist* d) {
     return (v1*rt)*d->stddev + d->mean;
 }
 
-STC_DEF double crand64_normal(crand64_normal_dist* d)
+double crand64_normal(crand64_normal_dist* d)
     { return crand64_normal_r(_stc64(), 1, d); }
 
 #endif // IMPLEMENT

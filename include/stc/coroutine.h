@@ -279,6 +279,15 @@ _cco_task_struct(cco_task) { cco_task_base base; };
 typedef struct cco_task_fiber cco_fiber;
 typedef struct cco_task cco_task;
 
+STC_EXTERN int        cco_execute(cco_fiber* fib);
+STC_EXTERN cco_fiber* cco_execute_next(cco_fiber* fib);  // resume the next fiber and return it
+
+STC_EXTERN cco_fiber* _cco_new_fiber(cco_task* task, void* data);
+STC_EXTERN cco_fiber* _cco_spawn(cco_task* task, struct cco_group* grp, void* data, cco_fiber* fib);
+STC_EXTERN bool       _cco_cancel_all(cco_fiber* fib, struct cco_group* grp, const char* file, int32_t line);
+STC_EXTERN void       _cco_throw(cco_task* caller, cco_err_t err);
+
+
 #define _cco_getbase() \
     c_container_of((cco_base_state*)_cco_st, cco_task_base, state)
 #define _cco_gettask() \
@@ -324,7 +333,6 @@ enum cco_err_policy { cco_POLICY_SHUTDOWN = 0, cco_POLICY_NOTIFY = 1, cco_POLICY
         cco_return; \
         case LBL:; \
     } while (0)
-void _cco_throw(cco_task* caller, cco_err_t err);
 
 
 /* Recover the thrown error; to be used in cco_finalize section upon handling cco_err().code */
@@ -490,12 +498,6 @@ static inline int _cco_resume_task(cco_task* task)
 #define cco_run_task_2(a_task, _data) cco_run_fiber_2(_fibit, cco_new_fiber_2(a_task, _data))
 #define cco_run_task_3(it, a_task, _data) cco_run_fiber_2(it, cco_new_fiber_2(a_task, _data))
 
-extern int        cco_execute(cco_fiber* fib);
-extern cco_fiber* cco_execute_next(cco_fiber* fib);  // resume the next fiber and return it
-
-extern cco_fiber* _cco_new_fiber(cco_task* task, void* data);
-extern cco_fiber* _cco_spawn(cco_task* task, struct cco_group* grp, void* data, cco_fiber* fib);
-extern bool       _cco_cancel_all(cco_fiber* fib, struct cco_group* grp, const char* file, int32_t line);
 
 /*
  * Iterate containers with already defined iterator (prefer to use in coroutines only):

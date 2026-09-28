@@ -55,36 +55,36 @@ enum  { cstr_s_cap = sizeof(cstr_buf) - 2 };
 #define cstr_l_drop(s)          c_free((s)->lon.data, cstr_l_cap(s) + 1)
 
 #define cstr_is_long(s)         ((s)->sml.size >= 128)
-extern  char* _cstr_init(cstr* self, isize_t len, isize_t cap);
-extern  char* _cstr_internal_move(cstr* self, isize_t pos1, isize_t pos2);
+STC_EXTERN char* _cstr_init(cstr* self, isize_t len, isize_t cap);
+STC_EXTERN char* _cstr_internal_move(cstr* self, isize_t pos1, isize_t pos2);
 
 /**************************** PUBLIC API **********************************/
 
 #define             cstr_init() (c_literal(cstr){0})
 #define             cstr_lit(literal) cstr_from_n(literal, c_litstrlen(literal))
 
-extern  cstr        cstr_from_replace(csview sv, csview search, csview repl, int32_t count);
-extern  cstr        cstr_from_fmt(const char* fmt, ...) c_GNUATTR(format(printf, 1, 2));
-extern  cstr        cstr_from_file(const char* fname);
-extern  void        cstr_drop(const cstr* self);
-extern  cstr*       cstr_take(cstr* self, const cstr s);
-extern  char*       cstr_reserve(cstr* self, isize_t cap);
-extern  void        cstr_shrink_to_fit(cstr* self);
-extern  char*       cstr_resize(cstr* self, isize_t size, char value);
-extern  isize_t     cstr_find_at(const cstr* self, isize_t pos, const char* search);
-extern  isize_t     cstr_find_sv(const cstr* self, csview search);
-extern  char*       cstr_assign_n(cstr* self, const char* str, isize_t len);
-extern  char*       cstr_append_n(cstr* self, const char* str, isize_t len);
-extern  isize_t     cstr_append_fmt(cstr* self, const char* fmt, ...) c_GNUATTR(format(printf, 2, 3));
-extern  char*       cstr_append_uninit(cstr *self, isize_t len);
+STC_EXTERN  cstr        cstr_from_replace(csview sv, csview search, csview repl, int32_t count);
+STC_EXTERN  cstr        cstr_from_fmt(const char* fmt, ...) c_GNUATTR(format(printf, 1, 2));
+STC_EXTERN  cstr        cstr_from_file(const char* fname);
+STC_EXTERN  void        cstr_drop(const cstr* self);
+STC_EXTERN  cstr*       cstr_take(cstr* self, const cstr s);
+STC_EXTERN  char*       cstr_reserve(cstr* self, isize_t cap);
+STC_EXTERN  void        cstr_shrink_to_fit(cstr* self);
+STC_EXTERN  char*       cstr_resize(cstr* self, isize_t size, char value);
+STC_EXTERN  isize_t     cstr_find_at(const cstr* self, isize_t pos, const char* search);
+STC_EXTERN  isize_t     cstr_find_sv(const cstr* self, csview search);
+STC_EXTERN  char*       cstr_assign_n(cstr* self, const char* str, isize_t len);
+STC_EXTERN  char*       cstr_append_n(cstr* self, const char* str, isize_t len);
+STC_EXTERN  isize_t     cstr_append_fmt(cstr* self, const char* fmt, ...) c_GNUATTR(format(printf, 2, 3));
+STC_EXTERN  char*       cstr_append_uninit(cstr *self, isize_t len);
 
-extern  bool        cstr_getdelim(cstr *self, int delim, FILE *fp);
-extern  void        cstr_erase(cstr* self, isize_t pos, isize_t len);
-extern  isize_t     cstr_printf(cstr* self, const char* fmt, ...) c_GNUATTR(format(printf, 2, 3));
-extern  isize_t     cstr_vfmt(cstr* self, isize_t start, const char* fmt, va_list args);
-extern  size_t      cstr_hash(const cstr *self);
-extern  bool        cstr_u8_valid(const cstr* self);
-extern  void        cstr_u8_erase(cstr* self, isize_t u8pos, isize_t u8len);
+STC_EXTERN  bool        cstr_getdelim(cstr *self, int delim, FILE *fp);
+STC_EXTERN  void        cstr_erase(cstr* self, isize_t pos, isize_t len);
+STC_EXTERN  isize_t     cstr_printf(cstr* self, const char* fmt, ...) c_GNUATTR(format(printf, 2, 3));
+STC_EXTERN  isize_t     cstr_vfmt(cstr* self, isize_t start, const char* fmt, va_list args);
+STC_EXTERN  size_t      cstr_hash(const cstr *self);
+STC_EXTERN  bool        cstr_u8_valid(const cstr* self);
+STC_EXTERN  void        cstr_u8_erase(cstr* self, isize_t u8pos, isize_t u8len);
 
 STC_INLINE cstr_buf cstr_getbuf(cstr* s) {
     return cstr_is_long(s) ? c_literal(cstr_buf){s->lon.data, cstr_l_size(s), cstr_l_cap(s)}
@@ -242,7 +242,7 @@ STC_INLINE uint32_t cstr_codepoint(const cstr_iter* it)
 
 
 // utf8 case conversion: requires `#define i_import` before including cstr.h in one TU.
-extern  cstr cstr_tocase_sv(csview sv, int k);
+STC_EXTERN  cstr cstr_tocase_sv(csview sv, int k);
 
 STC_INLINE cstr cstr_casefold_sv(csview sv)
     { return cstr_tocase_sv(sv, 0); }
@@ -421,9 +421,5 @@ STC_INLINE void cstr_u8_insert(cstr* self, isize_t u8pos, const char* str)
 
 STC_INLINE bool cstr_getline(cstr *self, FILE *fp)
     { return cstr_getdelim(self, '\n', fp); }
-
-// [deprecated]
-#define cstr_join_items(self, sep, ...) \
-    prev_join_array(self, sep, c_make_array(const char*, __VA_ARGS__), c_sizeof((const char*[])__VA_ARGS__)/c_sizeof(char*))
 
 #endif // STC_CSTR_PRV_H_INCLUDED

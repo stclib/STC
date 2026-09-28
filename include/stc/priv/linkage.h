@@ -28,7 +28,11 @@
 #endif
 #if defined i_header || defined STC_HEADER || defined i_implement
   // external linking, used for non-templated modules
-  #define STC_API extern
+  #ifdef __cplusplus
+    #define STC_API extern "C"
+  #else
+    #define STC_API extern
+  #endif
   #define STC_DEF
 #else
   // static linking, default for templated containers

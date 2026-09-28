@@ -84,13 +84,14 @@ STC_INLINE csview cutf8_subview(const char *s, isize_t u8pos, isize_t u8len) {
 
 #include "utf8_decode.h"
 
-extern bool     cutf8_valid(const char* s);
-extern bool     cutf8_valid_n(const char* s, isize_t nbytes);
-extern int      cutf8_encode(char *out, uint32_t c);
-extern uint32_t cutf8_casefold(uint32_t c);
-extern uint32_t cutf8_tolower(uint32_t c);
-extern uint32_t cutf8_toupper(uint32_t c);
-extern int      cutf8_icmp_sv(const csview s1, const csview s2);
+STC_EXTERN bool     cutf8_valid(const char* s);
+STC_EXTERN bool     cutf8_valid_n(const char* s, isize_t nbytes);
+STC_EXTERN int      cutf8_encode(char *out, uint32_t c);
+STC_EXTERN uint32_t cutf8_casefold(uint32_t c);
+STC_EXTERN uint32_t cutf8_tolower(uint32_t c);
+STC_EXTERN uint32_t cutf8_toupper(uint32_t c);
+STC_EXTERN int      cutf8_icmp_sv(const csview s1, const csview s2);
+STC_EXTERN bool     cutf8_isgroup(int group, uint32_t c);
 
 STC_INLINE uint32_t cutf8_peek_at(const char* s, isize_t offset)
     { return cutf8_peek(cutf8_offset(s, offset)); }
@@ -119,8 +120,6 @@ enum cutf8_group {
     U8G_Latin, U8G_Thai,
     U8G_SIZE
 };
-
-extern bool cutf8_isgroup(int group, uint32_t c);
 
 STC_INLINE bool cutf8_isdigit(uint32_t c)
     { return c < 128 ? (c >= '0') & (c <= '9') : cutf8_isgroup(U8G_Nd, c); }

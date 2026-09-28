@@ -23,7 +23,6 @@
 #ifndef STC_UTF8_DECODE_C_INCLUDED
 #define STC_UTF8_DECODE_C_INCLUDED
 
-#include "../types.h"
 #include "utf8_decode.h"
 
 int cutf8_decode_codepoint(cutf8_decode_t* d, const char* s, const char* end) { // s < end

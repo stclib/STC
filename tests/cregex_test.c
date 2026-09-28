@@ -3,7 +3,6 @@
 #include <stc/csview.h>
 #include <stc/algorithm.h>
 #include "ctest.h"
-#include <string.h>
 
 #define M_START(m) ((m).buf - input)
 #define M_END(m) (M_START(m) + (m).size)

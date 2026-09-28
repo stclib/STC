@@ -22,11 +22,12 @@
  */
 #ifndef STC_UTF8_DECODE_H_INCLUDED
 #define STC_UTF8_DECODE_H_INCLUDED
+#include "../types.h"
 
 enum { cutf8_ACCEPT=0, cutf8_REJECT=12 };
 
-extern int      cutf8_decode_codepoint(cutf8_decode_t* d, const char* s, const char* end); // s < end
-extern uint32_t cutf8_peek(const char* s);
+STC_EXTERN int      cutf8_decode_codepoint(cutf8_decode_t* d, const char* s, const char* end); // s < end
+STC_EXTERN uint32_t cutf8_peek(const char* s);
 
 static inline uint32_t cutf8_decode(cutf8_decode_t* d, const uint32_t byte) {
     /* decode next utf8 codepoint. https://bjoern.hoehrmann.de/utf-8/decoder/dfa */

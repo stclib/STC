@@ -48,6 +48,11 @@
   #define c_GNUATTR(...)
 #endif
 #define STC_INLINE static inline c_GNUATTR(unused)
+#ifdef __cplusplus
+  #define STC_EXTERN extern "C"
+#else
+  #define STC_EXTERN extern
+#endif
 #define c_ZI PRIiPTR
 #define c_ZU PRIuPTR
 #define c_NPOS INTPTR_MAX
