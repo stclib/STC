@@ -329,25 +329,26 @@ STC_DEF isize_t _c_MEMB(_capacity)(const Self* map) {
 }
 
 static void _c_MEMB(_wipe_)(Self* self) {
-    if (self->size == 0)
-        return;
-    _m_value* d = self->table, *_end = &d[self->bucket_count];
-    struct hmap_meta* m = self->meta;
-    for (; d != _end; ++d)
+    _m_value* d = self->table;
+    const struct hmap_meta* m = self->meta;
+    const isize n = self->bucket_count;
+    for (isize i = 0; i < n; ++i)
         if ((m++)->dist)
-            _c_MEMB(_value_drop)(self, d);
+            _c_MEMB(_value_drop)(self, &d[i]);
 }
 
 STC_DEF void _c_MEMB(_drop)(const Self* cself) {
     Self* self = (Self*)cself;
-    if (self->bucket_count > 0) {
-        _c_MEMB(_wipe_)(self);
-        _i_free_n(self->meta, self->bucket_count + 1);
-        _i_free_n(self->table, self->bucket_count);
-    }
+    if (cself->meta == NULL)
+        return;
+    _c_MEMB(_wipe_)(self);
+    _i_free_n(self->meta, self->bucket_count + 1);
+    _i_free_n(self->table, self->bucket_count);
 }
 
 STC_DEF void _c_MEMB(_clear)(Self* self) {
+    if (self->meta == NULL)
+        return;
     _c_MEMB(_wipe_)(self);
     self->size = 0;
     c_memset(self->meta, 0, c_sizeof(struct hmap_meta)*self->bucket_count);

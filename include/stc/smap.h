@@ -599,10 +599,10 @@ _c_MEMB(_drop_r_)(Self* s, int32_t tn) {
 STC_DEF void
 _c_MEMB(_drop)(const Self* cself) {
     Self* self = (Self*)cself;
-    if (self->capacity != 0) {
-        _c_MEMB(_drop_r_)(self, self->root);
-        _i_free_n(self->nodes, self->capacity + 1);
-    }
+    if (self->nodes == NULL)
+        return;
+    _c_MEMB(_drop_r_)(self, self->root);
+    _i_free_n(self->nodes, self->capacity + 1);
 }
 
 #endif // i_implement

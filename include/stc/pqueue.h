@@ -79,12 +79,15 @@ STC_INLINE Self _c_MEMB(_with_capacity)(const isize_t cap)
 #endif
 
 STC_INLINE void _c_MEMB(_clear)(Self* self) {
-    isize_t i = self->size; self->size = 0;
-    while (i--) { i_keydrop((self->data + i)); }
+    isize_t i = self->size;
+    while (i-- != 0) { i_keydrop((self->data + i)); }
+    self->size = 0;
 }
 
 STC_INLINE void _c_MEMB(_drop)(const Self* cself) {
     Self* self = (Self*)cself;
+    if (self->data == NULL)
+        return;
     _c_MEMB(_clear)(self);
     _i_free_n(self->data, self->capacity);
 }

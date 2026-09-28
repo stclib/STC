@@ -203,6 +203,8 @@ _c_MEMB(_clear)(Self* self) {
 STC_DEF void
 _c_MEMB(_drop)(const Self* cself) {
     Self* self = (Self*)cself;
+    if (self->cbuf == NULL)
+        return;
     _c_MEMB(_clear)(self);
     _i_free_n(self->cbuf, self->capmask + 1);
 }

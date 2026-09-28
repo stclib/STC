@@ -81,9 +81,8 @@ typedef i_keyraw _m_raw;
 #endif // i_capacity
 
 STC_INLINE void _c_MEMB(_clear)(Self* self) {
-    if (self->size == 0) return;
-    _m_value *p = self->data + self->size;
-    while (p-- != self->data) { i_keydrop(p); }
+    isize_t i = self->size;
+    while (i-- != 0) { i_keydrop((self->data + i)); }
     self->size = 0;
 }
 
@@ -91,6 +90,8 @@ STC_INLINE void _c_MEMB(_drop)(const Self* cself) {
     Self* self = (Self*)cself;
     _c_MEMB(_clear)(self);
 #ifndef i_capacity
+    if (self->data == NULL)
+        return;
     _i_free_n(self->data, self->capacity);
 #endif
 }
