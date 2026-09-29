@@ -28,14 +28,6 @@
 #include "types.h"
 #include "priv/utf8_prv.h"
 
-// [deprecated]:
-#define c_token(...) c_each_split(__VA_ARGS__)
-#define csview_token(...) csview_split(__VA_ARGS__)
-
-#define             csview_init() c_sv_1("")
-#define             csview_drop(p) c_default_drop(p)
-#define             csview_clone(sv) c_default_clone(sv)
-
 STC_EXTERN csview_iter  csview_advance(csview_iter it, isize_t u8pos);
 STC_EXTERN csview       csview_subview_pro(csview sv, isize_t pos, isize_t n);
 STC_EXTERN csview       csview_split(csview sv, const char* separator, isize_t* pos);
@@ -44,6 +36,7 @@ STC_EXTERN csview       csview_u8_subview(csview sv, isize_t u8pos, isize_t u8le
 STC_EXTERN csview       csview_u8_tail(csview sv, isize_t u8len);
 STC_EXTERN csview_iter  csview_u8_at(csview sv, isize_t u8pos);
 
+#define             csview_init() c_sv_1("")
 STC_INLINE csview   csview_from(const char* str)
     { return c_literal(csview){str, c_strlen(str)}; }
 STC_INLINE csview   csview_from_n(const char* str, isize_t n)

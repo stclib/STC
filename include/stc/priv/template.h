@@ -45,37 +45,15 @@
   #define c_use_arc2      (1<<2)
   #define c_use_rc2       c_use_arc2
   #define c_no_clone      (1<<3)
+  #define c_use_eq        (1<<4)
   #define c_use_cmp       (1<<5)
-  #define c_use_eq        (1<<6)
   #define c_use_compare   (c_use_cmp | c_use_eq)
-  #define c_compare_key   (1<<7)
-  #define c_class_key     (1<<8)
-  #define c_class_val     (1<<9)
-  #define c_pro_key       (1<<10)
-  #define c_pro_val       (1<<11)
 
-  #define c_use_comp c_use_compare // [deprecated]
-  #define c_comp_key c_compare_key // [deprecated]
-  #define c_keycomp  c_compare_key // [deprecated]
-  #define c_cmpclass c_compare_key // [deprecated]
-  #define c_keyclass c_class_key   // [deprecated]
-  #define c_valclass c_class_val   // [deprecated]
-  #define c_keypro   c_pro_key     // [deprecated]
-  #define c_valpro   c_pro_val     // [deprecated]
-#endif
-#ifdef i_keycomp                   // [deprecated]
-  #define i_compare_key i_keycomp
-#elif defined i_comp_key           // [deprecated]
-  #define i_compare_key i_comp_key
-#elif defined i_keyclass           // [deprecated]
-  #define i_class_key i_keyclass
-#elif defined i_keypro             // [deprecated]
-  #define i_pro_key i_keypro
-#endif
-#if defined i_valclass             // [deprecated]
-  #define i_class_val i_valclass
-#elif defined i_valpro             // [deprecated]
-  #define i_pro_val i_valpro
+  #define c_compare_key   (1<<6)
+  #define c_class_key     (1<<7)
+  #define c_class_val     (1<<8)
+  #define c_pro_key       (1<<9)
+  #define c_pro_val       (1<<10)
 #endif
 
 #if defined T && !defined i_type

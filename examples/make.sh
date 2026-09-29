@@ -8,8 +8,8 @@ if [ "$(uname)" = 'Linux' ]; then
     oflag='-o '
 fi
 common="-std=c99 -Wpedantic -Wall -Werror"
-#cc=clang; cflags="-s -O3 $common"
 cc=gcc; cflags="-s -O3 $common"
+#cc=clang; cflags="-s -O3 $common"
 #cc=gcc; cflags="-g $sanitize $common"
 #cc=gcc; cflags="-x c++ -std=c++17 -O2 -s -DSTC_IMPLEMENT -Di_import"
 #cc=tcc; cflags="-std=c99"
@@ -18,8 +18,10 @@ cc=gcc; cflags="-s -O3 $common"
 
 if [ "$cc" = "cl" ]; then
     oflag='/Fe:'
+    stclib='../meson_msvc/stc.lib'
 else
     oflag='-o '
+    stclib='-lstc'
 fi
 
 run=0
@@ -37,27 +39,16 @@ else
     comp="$cc $cflags"
 fi
 
-INC=
-#INC=-I../include
+#INC=
+INC=-I../include
 #INC=-I../../stcsingle
 #CPATH=
-if [ $run = 0 ] ; then
-    for i in */*.c ; do
-        out=$(basename $i .c).exe
-        #out=$(dirname $i)/$(basename $i .c).exe
-        #echo $comp -I../../../stcsingle $i $clibs $oflag$out
-        echo $comp $INC $i $clibs $oflag$out
-        $comp $INC $i $clibs $oflag$out -lstc
-        #$comp $INC $i $clibs $oflag$out -I../include -DSTC_STATIC
-    done
-else
-    for i in */*.c ; do
-        out=$(basename $i .c).exe
-        #out=$(dirname $i)/$(basename $i .c).exe
-        echo $comp $INC $i $clibs $oflag$out
-        $comp $INC $i $clibs $oflag$out -lstc
-        if [ -f $out ]; then ./$out; fi
-    done
-fi
+for i in */*.c ; do
+    out=$(basename $i .c).exe
+    #out=$(dirname $i)/$(basename $i .c).exe
+    echo $comp $INC $i $clibs $oflag$out $stclib
+    $comp $INC $i $clibs $oflag$out $stclib
+    if [ $run = 1 -a -f $out ]; then ./$out; fi
+done
 
-#rm -f a.out *.o *.obj # *.exe
+rm -f a.out *.o *.obj # *.exe

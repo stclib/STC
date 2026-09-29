@@ -146,10 +146,10 @@ STC_INLINE void         _c_MEMB(_put_n)(Self* self, const _m_raw* raw, isize_t n
 #endif
 
 #ifndef _i_aux_alloc
-    STC_INLINE Self         _c_MEMB(_init)(void) { return c_literal(Self){0}; }
+    STC_INLINE Self     _c_MEMB(_init)(void) { return c_literal(Self){0}; }
     #ifndef _i_no_put
-    STC_INLINE Self         _c_MEMB(_from_n)(const _m_raw* raw, isize_t n)
-                                { Self cx = {0}; _c_MEMB(_put_n)(&cx, raw, n); return cx; }
+        STC_INLINE Self _c_MEMB(_from_n)(const _m_raw* raw, isize_t n)
+                            { Self cx = {0}; _c_MEMB(_put_n)(&cx, raw, n); return cx; }
     #endif
 #endif
 

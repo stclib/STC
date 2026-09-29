@@ -160,7 +160,7 @@ STC_INLINE Self _c_MEMB(_from_ptr)(_m_value* ptr) {
     if (ptr) {
         enum {OFFSET = offsetof(_c_MEMB(_ctrl), value)};
         // Adds 2 dummy bytes to ensure that the second if-test in _drop() is safe.
-        catomic_long* _rc = (catomic_long*)i_malloc(OFFSET + 2);
+        catomic_long* _rc = (catomic_long*)i_malloc((OFFSET + 2));
         out.ctrl2 = (_c_MEMB(_ctrl)*) _rc;
         out.ctrl2->counter = 1;
     }
@@ -176,7 +176,7 @@ STC_INLINE void _c_MEMB(_drop)(const Self* self) {
         if ((char*)self->ctrl2 + OFFSET == (char*)self->get) {
             i_free((void*)self->ctrl2, c_sizeof *self->ctrl2); // _make()
         } else {
-            i_free((void*)self->ctrl2, OFFSET + 2); // _from_ptr()
+            i_free((void*)self->ctrl2, (OFFSET + 2)); // _from_ptr()
             i_free(self->get, c_sizeof *self->get);
         }
     }
