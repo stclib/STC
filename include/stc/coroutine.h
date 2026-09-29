@@ -138,8 +138,7 @@ struct cco_group {
 #endif
 
 #define cco_async(co) \
-    if (0) goto _resume_lbl; \
-    else for (_cco_state_t(co)* _cco_st = (_cco_assert_task_struct(co), (_cco_state_t(co)*) &(co)->base.state) \
+    for (_cco_state_t(co)* _cco_st = (_cco_assert_task_struct(co), (_cco_state_t(co)*) &(co)->base.state) \
               ; _cco_st->pos != cco_POS_DONE \
               ; _cco_st->pos = cco_POS_DONE, \
                 (void)(sizeof((co)->base) > sizeof(cco_base) && (_cco_st->parent_grp ? --_cco_st->parent_grp->spawn_count : 0))) \
@@ -147,6 +146,7 @@ struct cco_group {
 
 #define cco_finalize /* label */ \
     _cco_st->finalizing = true; /* FALLTHRU */ \
+    if (0) goto _resume_lbl; \
     case cco_POS_FINAL
 
 #define cco_stop(co) \
@@ -181,6 +181,7 @@ struct cco_group {
 #define cco_yield_v_AT(status_bit, LBL) \
     do { \
         _cco_st->pos = LBL; return status_bit; \
+        if (0) goto _resume_lbl; \
         case LBL:; \
     } while (0)
 
@@ -196,6 +197,7 @@ struct cco_group {
     do { \
         _cco_st->pos = LBL; /* FALLTHRU */ \
         case LBL: if (!(until)) return cco_AWAIT; \
+        if (0) goto _resume_lbl; \
     } while (0)
 
 /* cco_await_coroutine(): assumes coroutine returns a status value (int) */
@@ -208,6 +210,7 @@ struct cco_group {
         case LBL: { \
             int _res = corocall; \
             if (_res & ~(status_bits)) return _res; \
+            if (0) goto _resume_lbl; \
         } \
     } while (0)
 
@@ -407,7 +410,7 @@ static inline int _cco_resume_task(cco_task* task)
 #define cco_spawn_3(a_task, a_group, _data) cco_spawn_4(a_task, a_group, _data, _cco_st->fib)
 #define cco_spawn_4(a_task, a_group, _data, _fib) \
     _cco_spawn(cco_as_task(a_task), a_group, \
-               ((void)sizeof((_data) == cco_data(a_task)), _data), \
+               ((void)sizeof((_data) == cco_data(a_task)), (void*)_data), \
                cco_as_fiber(_fib))
 
 
@@ -427,9 +430,8 @@ static inline int _cco_resume_task(cco_task* task)
 
 #define cco_await_cancel_task(a_task) cco_await_cancel_task_AT(a_task, _cco_LBL)
 #define cco_await_cancel_task_AT(a_task, LBL) do { \
-    cco_task* _tsk2 = cco_as_task(a_task); \
-    cco_cancel_task(_tsk2); \
-    cco_await_task_AT(_tsk2, cco_DONE, LBL); \
+    cco_cancel_task(a_task); \
+    cco_await_task_AT(a_task, cco_DONE, LBL); \
 } while (0)
 
 #define cco_await_n(n, a_group) cco_await_n_AT(n, a_group, _cco_LBL)
@@ -458,9 +460,8 @@ static inline int _cco_resume_task(cco_task* task)
 
 #define cco_await_cancel_all(a_group) cco_await_cancel_all_AT(a_group, _cco_LBL)
 #define cco_await_cancel_all_AT(a_group, LBL) do { \
-    struct cco_group* _grp = a_group; \
-    cco_cancel_all(_grp); \
-    cco_await_all_AT(_grp, LBL); /* local var OK here */ \
+    cco_cancel_all(a_group); \
+    cco_await_all_AT(a_group, LBL); /* local var OK here */ \
 } while (0)
 
 #define cco_await_cancel_subtasks(a_task) cco_await_cancel_subtasks_AT(a_task, _cco_LBL)

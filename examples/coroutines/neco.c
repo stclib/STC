@@ -57,5 +57,6 @@ int maintask(struct Maintask* o) {
 }
 
 int main(void) {
-    cco_run_task(&(struct Maintask){{maintask}});
+    struct Maintask mt = {{maintask}};
+    cco_run_task(&mt);
 }
