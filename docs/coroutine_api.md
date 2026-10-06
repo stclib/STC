@@ -60,7 +60,7 @@ void            cco_stop(Coroutine* co);                            // Coroutine
 #### Tasks (coroutine function-objects) and Fibers (green thread-like entity within a system thread)
 ```c++
                 cco_task_struct(name) {<name>_base base; ..};       // Define a custom coroutine task struct; "Extends" cco_task struct.
-                cco_task_struct(name, <Data>*=void*, MAX_GROUPS=1)  // Optionally specify pointer type returned from cco_data(),
+                cco_task_struct(name, <Data>* = void*, MAX_GROUPS=1) // Optionally specify pointer type returned from cco_data(),
                                                                     // and the max number of waitgroups for cco_group(index). NB: default is 1.
 
                 cco_yield_to(cco_task* task);                       // Yield to another task (symmetric transfer of control).
@@ -70,17 +70,17 @@ int             cco_resume(cco_task* task);                         // Resume ta
 #### Accessors
 ```c++
 int             cco_status();                                       // Get returned status from last cco_await_task() call.
-cco_fiber*      cco_task_fiber(cco_task* task);                     // Get fiber associated with task.
-
-Data*           cco_data(cco_task* task);                           // Get auxiliary data pointer, stored in the associated fiber.
-Data*           cco_set_data_ptr(cco_task* task, Data* dt);         // Set auxiliary data pointer.
+cco_fiber*      cco_fib();                                          // Get fiber associated with current task.
+cco_group*      cco_parent_group()                                  // Get group which current task was spawned with (NULL if not spawned).
+Data*           cco_data(cco_task* task);                           // Get auxiliary data pointer, stored in task's associated fiber.
+void            cco_set_data_ptr(cco_task* task, Data* dt);         // Set auxiliary data pointer.
 ```
 #### Task/Fiber and Waitgroup Cancellation
 ```c++
-                cco_cancel_task(cco_task* task);                    // Cancel a spawned task+fiber; If task runs in the current
+cco_task*       cco_cancel_task(cco_task* task);                    // Cancel a spawned task+fiber; If task runs in the current
                                                                     // fiber it equals cco_throw(cco_CANCEL) (jumps to cco_finalize:).
+cco_fiber*      cco_cancel_fiber(cco_fiber* fiber);                 // Cancel fiber with its current task upon next suspension point.
 void            cco_cancel_all(struct cco_group* grp);              // Cancel all spawned subtasks in the task-group.
-void            cco_cancel_fiber(cco_fiber* fiber);                 // Cancel current task in fiber upon next suspension point.
 
 ```
 #### Task Error Handling
@@ -89,20 +89,23 @@ void            cco_cancel_fiber(cco_fiber* fiber);                 // Cancel cu
                     int32_t code, line;
                     const char* file;
                     union { intptr_t num;                           // Pass optional extra info about the error, e.g.
-                            const char* str;                        //    cco_throw(cco_CANCEL, .str="Giving up");
-                            void* ptr;                              // or cco_throw(MYERR, -99); // i.e., .num=-99
+                            const char* str;                        //    cco_throw(cco_CANCEL, {.str="Giving up"});
+                            void* ptr;                              // or cco_throw(MYERR, {123}); // i.e., {.num=123}
                     } info;
                 } cco_err_t;
 
-                cco_throw(int error, info=0);                       // Throw an error. It will unwind the call/await-task "stack".
+                cco_throw(int error, info = {0});                   // Throw an error. It will unwind the call/await-task "stack".
                                                                     // Handling of error is required in a cco_finalize:, else it will abort().
-                cco_throw(cco_CANCEL, info=0);                      // Cancel the current task. Handling is NOT required, but it can
+                cco_throw(cco_CANCEL, info = {0});                  // Cancel the current task. Handling is NOT required, but it can
                                                                     // optionally be aborted by cco_recover to stop propagation.
 int             cco_error();                                        // Return current error code. To be used in a cco_finalize: section.
                 cco_recover;                                        // Recover from a cco_throw() or cancellation upstream. Resumes from
                                                                     // the suspend point in the current task and calls cco_clear_error().
 void            cco_clear_error();                                  // Clear current fiber error state. To be used in cco_finalize section.
 cco_err_t       cco_err();                                          // Get error object created from cco_throw(error) call.
+
+cco_task*       cco_as_task(MyTask* tsk)                            // Type-checked casting to cco_task*
+cco_fiber*      cco_as_fiber(MyFiber* fib)                          // Type-checked casting to cco_fiber*
 ```
 
 #### Awaiting Tasks and Waitgroups

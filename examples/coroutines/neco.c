@@ -40,8 +40,8 @@ int tocker(struct TickTock* o) {
 
 int maintask(struct Maintask* o) {
     cco_async (o) {
-        o->tick = (struct TickTock){{ticker}};
-        o->tock = (struct TickTock){{tocker}};
+        o->tick = c_literal(struct TickTock){{ticker}};
+        o->tock = c_literal(struct TickTock){{tocker}};
         cco_spawn(&o->tick, cco_group(0));
         cco_spawn(&o->tock, cco_group(0));
 

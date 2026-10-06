@@ -62,9 +62,9 @@ int fibonacci(struct fibonacci* o) {
             if (o->count-- == 0)
                 cco_return;
             // NB! locals lasts only until next yield/await!
-            long long tmp = o->value;
+            {long long tmp = o->value;
             o->value = o->b;
-            o->b += tmp;
+            o->b += tmp;}
             *cco_data(o) = o->value;
             cco_yield_v(YIELD_FIB);
         }
@@ -86,15 +86,15 @@ cco_task_struct (combined) {
 int combined(struct combined* o) {
     cco_async (o) {
         puts("SEQUENTIAL:");
-        o->prm = (struct prime){.base={prime}, .count=8};
-        o->fib = (struct fibonacci){.base={fibonacci}, .count=12};
+        o->prm = c_literal(struct prime){.base={prime}, .count=8};
+        o->fib = c_literal(struct fibonacci){.base={fibonacci}, .count=12};
 
         cco_await_task(&o->prm);
         cco_await_task(&o->fib);
 
         puts("\nCONCURRENT:");
-        o->prm = (struct prime){.base={prime}, .count=8};
-        o->fib = (struct fibonacci){.base={fibonacci}, .count=12};
+        o->prm = c_literal(struct prime){.base={prime}, .count=8};
+        o->fib = c_literal(struct fibonacci){.base={fibonacci}, .count=12};
 
         cco_spawn(&o->prm, cco_group(0));
         cco_spawn(&o->fib, cco_group(0));

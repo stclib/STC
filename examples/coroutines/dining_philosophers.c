@@ -16,16 +16,17 @@ cco_task_struct (Philosopher, cco_timer*) { // optional: make cco_data(o) return
     int hunger;
     struct Philosopher* left;
     struct Philosopher* right;
+    double duration;
 };
 
 int Philosopher(struct Philosopher* o) {
     cco_async (o) {
         while (1) {
-            double duration = 1.0 + crand64_real()*2.0;
-            printf("%4.1f: Philosopher %d is thinking for %.1f minutes...\n", 10*cco_timer_elapsed(cco_data(o)), o->id, duration*10);
+            o->duration = 1.0 + crand64_real()*2.0;
+            printf("%4.1f: Philosopher %d is thinking for %.1f minutes...\n", 10*cco_timer_elapsed(cco_data(o)), o->id, o->duration*10);
             o->hunger = 0;
             o->mode = ph_THINKING;
-            cco_await_timer(&o->timer, duration);
+            cco_await_timer(&o->timer, o->duration);
 
             printf("%4.1f: Philosopher %d is hungry...\n", 10*cco_timer_elapsed(cco_data(o)), o->id);
             o->mode = ph_HUNGRY;
@@ -36,9 +37,9 @@ int Philosopher(struct Philosopher* o) {
             o->hunger = INT32_MAX/2;
             o->mode = ph_EATING;
 
-            duration = 0.5 + crand64_real();
-            printf("%4.1f: Philosopher %d is eating for %.1f minutes...\n", 10*cco_timer_elapsed(cco_data(o)), o->id, duration*10);
-            cco_await_timer(&o->timer, duration);
+            o->duration = 0.5 + crand64_real();
+            printf("%4.1f: Philosopher %d is eating for %.1f minutes...\n", 10*cco_timer_elapsed(cco_data(o)), o->id, o->duration*10);
+            cco_await_timer(&o->timer, o->duration);
 
             if (o->id == 3) { // For demonstration purpose:
                 // CANCELING after philosopher 3 has eaten.
@@ -64,7 +65,7 @@ cco_task_struct (Dining) {
 int Dining(struct Dining* o) {
     cco_async (o) {
         for (int i = 0; i < num_philosophers; ++i) {
-            o->philos[i] = (struct Philosopher){
+            o->philos[i] = c_literal(struct Philosopher){
                 .base = {Philosopher},
                 .id = i + 1,
                 .left = &o->philos[(i - 1 + num_philosophers) % num_philosophers],

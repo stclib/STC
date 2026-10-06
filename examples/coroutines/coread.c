@@ -45,8 +45,8 @@ int maintask(struct MainTask* o)
     cco_async (o) {
         o->file2 = cstr_from(__FILE__);
         cstr_replace(&o->file2, "coread.c", "waitgroup.c");
-        o->reader1 = (struct FileRead){{file_read}, __FILE__};
-        o->reader2 = (struct FileRead){{file_read}, cstr_str(&o->file2)};
+        o->reader1 = c_literal(struct FileRead){{file_read}, __FILE__};
+        o->reader2 = c_literal(struct FileRead){{file_read}, cstr_str(&o->file2)};
 
         cco_spawn(&o->reader1, cco_group(0));
         cco_spawn(&o->reader2, cco_group(0));

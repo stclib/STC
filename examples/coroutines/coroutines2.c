@@ -60,9 +60,9 @@ int fibonacci(struct fibonacci* o) {
             if (o->count-- == 0)
                 cco_return;
             // NB! locals lasts only until next yield/await!
-            long long tmp = o->value;
+            {long long tmp = o->value;
             o->value = o->b;
-            o->b += tmp;
+            o->b += tmp;}
             cco_yield_v(YIELD_FIB);
         }
 
@@ -78,8 +78,8 @@ int main(void) {
     struct fibonacci fib;
 
     puts("SEQUENTIAL:");
-    prm = (struct prime){{prime}, .count=8};
-    fib = (struct fibonacci){{fibonacci}, .count=12};
+    prm = c_literal(struct prime){{prime}, .count=8};
+    fib = c_literal(struct fibonacci){{fibonacci}, .count=12};
 
     cco_run_task(&prm) {
         printf("  Prime=%lld\n", prm.value);
@@ -90,8 +90,8 @@ int main(void) {
 
 
     puts("\nCONCURRENT:");
-    prm = (struct prime){{prime}, .count=8};
-    fib = (struct fibonacci){{fibonacci}, .count=12};
+    prm = c_literal(struct prime){{prime}, .count=8};
+    fib = c_literal(struct fibonacci){{fibonacci}, .count=12};
 
     cco_fiber* fb = c_new(cco_fiber, 0);
     cco_spawn(&prm, NULL, NULL, fb);
