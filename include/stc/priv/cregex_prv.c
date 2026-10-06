@@ -1316,7 +1316,7 @@ void cregex_drop(cregex* self) {
     c_free(self->prog, self->prog->allocsize);
 }
 
-int cregex_match_opt(const cregex* re, const char* input, const char* input_end, struct cregex_match_opt opt) {
+int cregex_match_opt(const cregex* re, const char* input, const char* input_end, cregex_match_opt_s opt) {
     int res = _regexec(re->prog, input, input_end, cregex_captures(re) + 1, opt.match, opt.flags);
     switch (res) {
         case 1: return CREG_OK;
@@ -1325,7 +1325,7 @@ int cregex_match_opt(const cregex* re, const char* input, const char* input_end,
     }
 }
 
-int cregex_match_aio_opt(const char* pattern, const char* input, const char* input_end, struct cregex_match_opt opt) {
+int cregex_match_aio_opt(const char* pattern, const char* input, const char* input_end, cregex_match_opt_s opt) {
     cregex re = cregex_make(pattern, opt.flags);
     if (re.error != CREG_OK) return re.error;
     int res = cregex_match_opt(&re, input, input_end, opt);
@@ -1333,13 +1333,13 @@ int cregex_match_aio_opt(const char* pattern, const char* input, const char* inp
     return res;
 }
 
-cstr cregex_replace_opt(const cregex* re, const char* input, const char* input_end, const char* replace, struct cregex_replace_opt opt) {
+cstr cregex_replace_opt(const cregex* re, const char* input, const char* input_end, const char* replace, cregex_replace_opt_s opt) {
     cstr out = {0};
     cstr subst = {0};
     csview match[CREG_MAX_CAPTURES];
     int nmatch = cregex_captures(re) + 1;
     bool copy = !(opt.flags & CREG_STRIP);
-    struct cregex_match_opt mopt = {match};
+    cregex_match_opt_s mopt = {match};
     opt.count += (opt.count != 0);
 
     while (--opt.count && cregex_match_opt(re, input, input_end, mopt) == CREG_OK) {
@@ -1358,7 +1358,7 @@ cstr cregex_replace_opt(const cregex* re, const char* input, const char* input_e
     return out;
 }
 
-cstr cregex_replace_aio_opt(const char* pattern, const char* input, const char* input_end, const char* replace, struct cregex_replace_opt opt) {
+cstr cregex_replace_aio_opt(const char* pattern, const char* input, const char* input_end, const char* replace, cregex_replace_opt_s opt) {
     cregex re = {0};
     if (cregex_compile_pro(&re, pattern, opt.flags) != CREG_OK)
         assert(0);

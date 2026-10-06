@@ -7,7 +7,8 @@
 
 The API is simple and includes powerful string pattern matches and replace functions. See example below and in the example folder.
 
-## Constants
+## Flags (bit-or'able)
+    - CREG_DEFAULT    - 0, no flags applied
 - compile-flags
     - CREG_DOTALL     - dot matches newline too: can be set/overridden by (?s) and (?-s) in the RE
     - CREG_ICASE      - ignore case mode: can be set/overridden by (?i) and (?-i) in the RE
