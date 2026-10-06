@@ -42,22 +42,19 @@ int main(void)
 // IWYU pragma: private, include "stc/algorithm.h"
 #ifndef STC_CRANGE_H_INCLUDED
 #define STC_CRANGE_H_INCLUDED
-
-#include "../priv/linkage.h"
 #include "../common.h"
 
-// crange: isize_t range -----
+// crange: -----
 
 typedef isize_t crange_value;
 typedef struct { crange_value start, end, step, value; } crange;
 typedef struct { crange_value *ref, end, step; } crange_iter;
 
-STC_INLINE crange crange_make_3(crange_value start, crange_value stop, crange_value step)
-    { crange r = {start, stop - (step > 0), step}; return r; }
-
 #define crange_make(...) c_MACRO_OVERLOAD(crange_make, __VA_ARGS__)
 #define crange_make_1(stop) crange_make_3(0, stop, 1) // NB! arg is stop
 #define crange_make_2(start, stop) crange_make_3(start, stop, 1)
+STC_INLINE crange crange_make_3(crange_value start, crange_value stop, crange_value step)
+    { crange r = {start, stop - (step > 0), step}; return r; }
 
 STC_INLINE crange_iter crange_begin(crange* self) {
     self->value = self->start;
@@ -76,13 +73,14 @@ STC_INLINE crange_iter crange_advance(crange_iter it, size_t n) {
     return it;
 }
 
-// iota: c++-like std::iota, use in iterations on-the-fly -----
-// Note: c_iota() does not compile with c++, crange does.
+// c_iota -----
+
+// c++-like std::iota, for use in algorithms like c_filter() -----
+// NOTE: c_iota does not compile with c++, crange does.
 #define c_iota(...) c_MACRO_OVERLOAD(c_iota, __VA_ARGS__)
 #define c_iota_1(start) c_iota_3(start, INTPTR_MAX, 1) // NB! arg is start.
 #define c_iota_2(start, stop) c_iota_3(start, stop, 1)
-#define c_iota_3(start, stop, step) ((crange[]){crange_make_3(start, stop, step)})[0]
-
+#define c_iota_3(first, stop, STEP) ((crange){first, (stop) - ((STEP) > 0), STEP})
 
 // crange32 -----
 
@@ -90,12 +88,12 @@ typedef int32_t crange32_value;
 typedef struct { crange32_value start, end, step, value; } crange32;
 typedef struct { crange32_value *ref, end, step; } crange32_iter;
 
-STC_INLINE crange32 crange32_make_3(crange32_value start, crange32_value stop, crange32_value step)
-    { crange32 r = {start, stop - (step > 0), step}; return r; }
-
 #define crange32_make(...) c_MACRO_OVERLOAD(crange32_make, __VA_ARGS__)
 #define crange32_make_1(stop) crange32_make_3(0, stop, 1) // NB! arg is stop
 #define crange32_make_2(start, stop) crange32_make_3(start, stop, 1)
+
+STC_INLINE crange32 crange32_make_3(crange32_value start, crange32_value stop, crange32_value step)
+    { crange32 r = {start, stop - (step > 0), step}; return r; }
 
 STC_INLINE crange32_iter crange32_begin(crange32* self) {
     self->value = self->start;
@@ -114,5 +112,11 @@ STC_INLINE crange32_iter crange32_advance(crange32_iter it, uint32_t n) {
     return it;
 }
 
-#include "../priv/linkage2.h"
+// c_iota32 -----
+// NOTE: c_iota32 does not compile with c++, crange32 does.
+#define c_iota32(...) c_MACRO_OVERLOAD(c_iota32, __VA_ARGS__)
+#define c_iota32_1(start) c_iota32_3(start, INTPTR_MAX, 1) // NB! arg is start.
+#define c_iota32_2(start, stop) c_iota32_3(start, stop, 1)
+#define c_iota32_3(first, stop, STEP) ((crange32){first, (stop) - ((STEP) > 0), STEP})
+
 #endif // STC_CRANGE_H_INCLUDE

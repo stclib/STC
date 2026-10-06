@@ -13,7 +13,7 @@ typedef struct {
 
 // Make Song a "class" by defining _clone and _drop "members":
 Song Song_init(const char* artist, const char* title)
-    { return (Song){cstr_from(artist), cstr_from(title)}; }
+    { Song s = {cstr_from(artist), cstr_from(title)}; return s; }
 
 Song Song_clone(Song s) {
     s.artist = cstr_clone(s.artist);
@@ -47,8 +47,8 @@ inline static size_t SongView_hash(const SongView* xw)
 // "c_compare_key" specifies the type/view to convert to/from and binds _cmp, _eq, _hash functions.
 #define T SongArc, Song, (c_class_key | c_use_eq) // also enable _cmp/_hash for arc keycmp (SongView).
 #define i_compare_key SongView
-#define i_keytoraw(x) ((SongView){.artist=cstr_str(&x->artist), .title=cstr_str(&x->title)})
-#define i_keyfrom(sw) ((Song){.artist=cstr_from(sw.artist), .title=cstr_from(sw.title)})
+#define i_keytoraw(x) (c_literal(SongView){.artist=cstr_str(&x->artist), .title=cstr_str(&x->title)})
+#define i_keyfrom(sw) (c_literal(Song){.artist=cstr_from(sw.artist), .title=cstr_from(sw.title)})
 #include <stc/arc.h>
 
 // Create a set of SongArc
@@ -58,9 +58,9 @@ inline static size_t SongView_hash(const SongView* xw)
 void example3(void)
 {
     SongSet set1 = c_make(SongSet, {
-        (SongView){"Bob Dylan", "The Times They Are A Changing"},
-        (SongView){"Aretha Franklin", "Bridge Over Troubled Water"},
-        (SongView){"Thalia", "Entre El Mar y Una Estrella"},
+        c_literal(SongView){"Bob Dylan", "The Times They Are A Changing"},
+        c_literal(SongView){"Aretha Franklin", "Bridge Over Troubled Water"},
+        c_literal(SongView){"Thalia", "Entre El Mar y Una Estrella"},
     });
 
     SongSet set2 = {0};
@@ -68,15 +68,15 @@ void example3(void)
     c_copy_to(SongSet, &set2, set1);
 
     // Add a few more SongArcs to set2.
-    SongSet_emplace(&set2, (SongView){"Bob Dylan", "The Times They Are A Changing"});
-    SongSet_emplace(&set2, (SongView){"Michael Jackson", "Billie Jean"});
+    SongSet_emplace(&set2, c_literal(SongView){"Bob Dylan", "The Times They Are A Changing"});
+    SongSet_emplace(&set2, c_literal(SongView){"Michael Jackson", "Billie Jean"});
 
     // The previous line is identical to:
-    //   SongSet_insert(&set2, SongArc_make((Song){cstr_lit("Michael Jackson"), cstr_lit("Billie Jean")}));
+    //   SongSet_insert(&set2, SongArc_make(c_literal(Song){cstr_lit("Michael Jackson"), cstr_lit("Billie Jean")}));
 
     // We now have two sets with some shared, some unique entries.
     // Remove "Thalia" from set1. Song is not destroyed, there is still one reference in set2:
-    SongSet_erase(&set1, (SongView){"Thalia", "Entre El Mar y Una Estrella"});
+    SongSet_erase(&set1, c_literal(SongView){"Thalia", "Entre El Mar y Una Estrella"});
 
     int n = 0;
     for (c_each_item(i, SongSet, {set1, set2})) {
@@ -86,7 +86,7 @@ void example3(void)
                                              cstr_str(&s.ref->get->artist),
                                              SongArc_use_count(*s.ref));
     }
-    const SongArc* found = SongSet_get(&set2, (SongView){"Aretha Franklin", "Bridge Over Troubled Water"});
+    const SongArc* found = SongSet_get(&set2, c_literal(SongView){"Aretha Franklin", "Bridge Over Troubled Water"});
     if (found) printf("FOUND: %s\n", cstr_str(&found->get->title));
 
     c_drop(SongSet, &set1, &set2);

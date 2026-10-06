@@ -6,10 +6,10 @@ typedef struct { cstr name, last; } Person;
 typedef struct { const char *name, *last; } Person_raw;
 
 Person Person_from(Person_raw raw)
-    { return (Person){.name = cstr_from(raw.name), .last = cstr_from(raw.last)}; }
+    { Person p={.name = cstr_from(raw.name), .last = cstr_from(raw.last)}; return p; }
 
 Person_raw Person_toraw(Person* p)
-    { return (Person_raw){.name = cstr_str(&p->name), .last = cstr_str(&p->last)}; }
+    { Person_raw r={.name = cstr_str(&p->name), .last = cstr_str(&p->last)}; return r; }
 
 int Person_raw_cmp(const Person_raw* a, const Person_raw* b) {
     int c = strcmp(a->name, b->name);
@@ -42,12 +42,15 @@ void Person_drop(Person* p) {
 #define T Persons, PersArc, (c_pro_key | c_use_eq)
 #include <stc/vec.h>
 
+PersArc PersArc_ctor(const char* fname, const char* lname)
+    { return PersArc_from(c_literal(Person_raw){fname, lname}); }
+
 
 int main(void)
 {
     Persons vec = {0};
-    PersArc laura = PersArc_from((Person_raw){"Laura", "Palmer"});
-    PersArc bobby = PersArc_from((Person_raw){"Bobby", "Briggs"});
+    PersArc laura = PersArc_ctor("Laura", "Palmer");
+    PersArc bobby = PersArc_ctor("Bobby", "Briggs");
 
     c_defer(
         PersArc_drop(&laura),
@@ -55,8 +58,8 @@ int main(void)
         Persons_drop(&vec)
     ){
         // Use Persons_emplace() to implicitly call PersArc_from() on the argument:
-        Persons_emplace(&vec, (Person_raw){"Audrey", "Home"});
-        Persons_emplace(&vec, (Person_raw){"Dale", "Cooper"});
+        Persons_emplace(&vec, c_literal(Person_raw){"Audrey", "Home"});
+        Persons_emplace(&vec, c_literal(Person_raw){"Dale", "Cooper"});
 
         Persons_push(&vec, PersArc_clone(laura));
         Persons_push(&vec, PersArc_clone(bobby));
@@ -68,7 +71,7 @@ int main(void)
         puts("");
 
         // Look-up Audrey!
-        const PersArc *a = Persons_find(&vec, (Person_raw){"Audrey", "Home"}).ref;
+        const PersArc *a = Persons_find(&vec, c_literal(Person_raw){"Audrey", "Home"}).ref;
         if (a) {
             Person_raw p = Persons_value_toraw(a); // two-level unwrap!
             printf("found: %s %s\n", p.name, p.last);

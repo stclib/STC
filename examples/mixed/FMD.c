@@ -47,7 +47,7 @@ int main(void) {
     });
 
     vec.aux.reverse = true;
-    for (c_range_t(enum FMDActive, field, FMD_LAST)) {
+    for (c_range_t(enum FMDActive, field, FMD_fileName, FMD_LAST)) {
         vec.aux.activeField = field;
         FMDVector_sort(&vec);
 

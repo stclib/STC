@@ -29,12 +29,12 @@ typedef struct { Mat r00, r01, r10, r11; } Partition;
 Partition partition(Mat A) {
     int m = A.shape[0];
     int n = A.shape[1];
-    return (Partition){
-        .r00 = cspan_slice(&A, Mat, {0, m/2}, {0, n/2}),
-        .r01 = cspan_slice(&A, Mat, {0, m/2}, {n/2, n}),
-        .r10 = cspan_slice(&A, Mat, {m/2, m}, {0, n/2}),
-        .r11 = cspan_slice(&A, Mat, {m/2, m}, {n/2, n}),
-    };
+    Partition p;
+    p.r00 = cspan_slice(&A, Mat, {0, m/2}, {0, n/2});
+    p.r01 = cspan_slice(&A, Mat, {0, m/2}, {n/2, n});
+    p.r10 = cspan_slice(&A, Mat, {m/2, m}, {0, n/2});
+    p.r11 = cspan_slice(&A, Mat, {m/2, m}, {n/2, n});
+    return p;
 }
 
 void recursive_matrix_product(Mat A, Mat B, OutMat C) {

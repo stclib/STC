@@ -6,7 +6,8 @@ typedef struct Viking {
 } Viking;
 
 Viking Viking_make(cstr_raw name, cstr_raw country) {
-    return (Viking){.name = cstr_from(name), .country = cstr_from(country)};
+    Viking v = {.name = cstr_from(name), .country = cstr_from(country)};
+    return v;
 }
 
 void Viking_drop(Viking* vk) {

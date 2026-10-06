@@ -331,8 +331,8 @@ STC_DEF isize_t _c_MEMB(_capacity)(const Self* map) {
 static void _c_MEMB(_wipe_)(Self* self) {
     _m_value* d = self->table;
     const struct hmap_meta* m = self->meta;
-    const isize n = self->bucket_count;
-    for (isize i = 0; i < n; ++i)
+    const isize_t n = self->bucket_count;
+    for (isize_t i = 0; i < n; ++i)
         if ((m++)->dist)
             _c_MEMB(_value_drop)(self, &d[i]);
 }

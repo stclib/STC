@@ -205,7 +205,7 @@ STC_INLINE _m_raw _c_MEMB(_toraw)(const Self* self)
 // move ownership to receiving arc
 STC_INLINE Self _c_MEMB(_move)(Self* self) {
     Self arc = *self;
-    *self = (Self){0};
+    *self = c_literal(Self){0};
     return arc; // now unowned
 }
 

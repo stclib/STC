@@ -126,8 +126,8 @@ struct ctest {
     template <> void CTEST_IMPL_TEARDOWN_FNAME(sname)(struct CTEST_IMPL_DATA_SNAME(sname)* fixt)
 
 #define CTEST_FIXTURE(sname) \
-    template <typename T> void CTEST_IMPL_SETUP_FNAME(sname)(T* self) { } \
-    template <typename T> void CTEST_IMPL_TEARDOWN_FNAME(sname)(T* self) { } \
+    template <typename _Ty> void CTEST_IMPL_SETUP_FNAME(sname)(_Ty* self) { } \
+    template <typename _Ty> void CTEST_IMPL_TEARDOWN_FNAME(sname)(_Ty* self) { } \
     struct CTEST_IMPL_DATA_SNAME(sname)
 
 #define CTEST_IMPL_CTEST(sname, tname, tskip) \

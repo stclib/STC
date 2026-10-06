@@ -18,22 +18,22 @@ int main(void)
     List* v;
     ListDeque store_a = {.aux=&myalloc};                // All containers in STC can be initialized with {0}.
 
-    v = ListDeque_push(&store_a, (List){.aux=&myalloc}); // push() returns a pointer to the new element in vec.
+    v = ListDeque_push(&store_a, c_literal(List){.aux=&myalloc}); // push() returns a pointer to the new element in vec.
     List_push(v, 100.0);
     List_push(v, 200.0);
 
-    v = ListDeque_push(&store_a, (List){.aux=&myalloc});
+    v = ListDeque_push(&store_a, c_literal(List){.aux=&myalloc});
     List_push(v, 300.0);
     List_push(v, 400.0);
 
     printf("alloc: %d\n", (int)myalloc.bytes);
     ListDeque store_b = {.aux=&myalloc};
 
-    v = ListDeque_push(&store_b, (List){.aux=&myalloc});
+    v = ListDeque_push(&store_b, c_literal(List){.aux=&myalloc});
     List_push(v, 10.0);
     List_push(v, 20.0);
 
-    v = ListDeque_push(&store_b, (List){.aux=&myalloc});
+    v = ListDeque_push(&store_b, c_literal(List){.aux=&myalloc});
     List_push(v, 30.0);
     List_push(v, 40.0);
 

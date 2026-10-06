@@ -25,7 +25,25 @@ int Tree_sum(Tree* tree) {
     }
     return -1;
 }
-/*
+
+#if 1 // HEAP allocated
+
+int main(void) {
+    Tree* tree =
+    c_new(Tree, c_variant(Tree_NODE, {1,
+        c_new(Tree, c_variant(Tree_NODE, {2,
+            c_new(Tree, c_variant(Tree_LEAF, 3)),
+            c_new(Tree, c_variant(Tree_LEAF, 4))
+        })),
+        c_new(Tree, c_variant(Tree_LEAF, 5))
+    }));
+
+    printf("HEAP tree sum = %d\n", Tree_sum(tree));
+    Tree_drop(tree);
+}
+
+#else // STACK allocated (fails in C++)
+
 int main(void) {
     Tree* tree =
     &c_variant(Tree_NODE, {1,
@@ -36,20 +54,7 @@ int main(void) {
         &c_variant(Tree_LEAF, 5)
     });
 
-    printf("sum = %d\n", Tree_sum(tree));
+    printf("STACK tree sum = %d\n", Tree_sum(tree));
 }
-*/
 
-int main(void) {
-    Tree* tree = 
-    c_new(Tree, c_variant(Tree_NODE, {1,
-        c_new(Tree, c_variant(Tree_NODE, {2,
-            c_new(Tree, c_variant(Tree_LEAF, 3)),
-            c_new(Tree, c_variant(Tree_LEAF, 4))
-        })),
-        c_new(Tree, c_variant(Tree_LEAF, 5))
-    }));
-    
-    printf("sum = %d\n", Tree_sum(tree));
-    Tree_drop(tree);
-}
+#endif

@@ -92,7 +92,7 @@ TEST(cspan, equality) {
     });
     Span2 test2 = cspan_md(test.data, 3, 3);
 
-    //puts(""); cspan_print(Span2, cspan_slice(&base2, Span2, {0, 3}, {1, 4}), "%d");
+    //puts(""); cspan_print(Span2, "%d", cspan_slice(&base2, Span2, {0, 3}, {1, 4}));
 
     // Test every 3x3 subtile in base2 against the test2 tile.
     for (c_range(y, base2.shape[0] - 3 + 1)) {
