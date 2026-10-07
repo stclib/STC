@@ -44,30 +44,32 @@ int             cregex_match_sv(const cregex* re, csview sv,
 bool            cregex_is_match(const cregex* re, const char* str);
 
                 // All-in-one single match (compile + match + drop)
+                // Pre C23: At least one of the optional parameters must be specified., e.g: .flags=CREG_STRIP
 int             cregex_match_aio(const char* pattern, const char* str,
                         csview match[] = NULL, int flags = CREG_DEFAULT);
 int             cregex_match_aio_sv(const char* pattern, csview sv,
                         csview match[] = NULL, int flags = CREG_DEFAULT);
 
-                // Replace count matched instances, optionally transform the replacement.
+                // Replace the first `count` matched instances, optionally transform the replacement.
+                // Pre C23: At least one of the optional parameters must be specified., e.g: .transform=myfunc
 cstr            cregex_replace(const cregex* re, const char* str, const char* replace,
                         int count = 0 /* all */,
-                        bool(*xform)(int group, csview match, cstr* result) = NULL,
-                        int flags = CREG_DEFAULT); /* match|replace flags */
+                        int flags = CREG_DEFAULT /* match|replace flags */,
+                        bool(*transform)(int group, csview match, cstr* result) = NULL);
 cstr            cregex_replace_sv(const cregex* re, csview sv, const char* replace,
                         int count = 0 /* all */,
-                        bool(*xform)(int group, csview match, cstr* result) = NULL,
-                        int flags = CREG_DEFAULT);
+                        int flags = CREG_DEFAULT /* match|replace flags */,
+                        bool(*transform)(int group, csview match, cstr* result) = NULL);
 
                 // All-in-one replacement (compile + match/replace + drop)
 cstr            cregex_replace_aio(const char* pattern, const char* str, const char* replace,
                         int count = 0 /* all */,
-                        bool(*xform)(int group, csview match, cstr* result) = NULL,
-                        int flags = CREG_DEFAULT); /* compile|match|replace flags */
+                        int flags = CREG_DEFAULT /* match|replace flags */,
+                        bool(*transform)(int group, csview match, cstr* result) = NULL);
 cstr            cregex_replace_aio_sv(const char* pattern, csview sv, const char* replace,
                         int count = 0 /* all */,
-                        bool(*xform)(int group, csview match, cstr* result) = NULL,
-                        int flags = CREG_DEFAULT);
+                        int flags = CREG_DEFAULT /* match|replace flags */,
+                        bool(*transform)(int group, csview match, cstr* result) = NULL);
 ```
 
 ### Error codes

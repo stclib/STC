@@ -130,7 +130,7 @@ STC_EXTERN int cregex_captures(const cregex* re);
 /* ----- Private ----- */
 
 typedef struct { csview* match; int flags; } cregex_match_opt_s;
-typedef struct { int count; bool(*xform)(int group, csview match, cstr* out); int flags; } cregex_replace_opt_s;
+typedef struct { int count, flags; bool(*transform)(int group, csview match, cstr* out); } cregex_replace_opt_s;
 
 #define _cregex_match(re, str, ...) cregex_match_opt(re, str, NULL, (cregex_match_opt_s){__VA_ARGS__})
 #define _cregex_match_sv(re, sv, ...) cregex_match_sv_opt(re, sv, (cregex_match_opt_s){__VA_ARGS__})

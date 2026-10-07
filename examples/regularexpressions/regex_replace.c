@@ -30,7 +30,7 @@ int main(void)
         printf("fixed: %s\n", cstr_str(&str));
 
         /* US date format, and add 10 years to dates: */
-        cstr_take(&str, cregex_replace_aio_sv(pattern, csview_from(input), "$1/$3/$2", .xform=add_10_years));
+        cstr_take(&str, cregex_replace_aio_sv(pattern, csview_from(input), "$1/$3/$2", .transform=add_10_years));
         printf("us+10: %s\n", cstr_str(&str));
 
         /* Wrap first date inside []: */

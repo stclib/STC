@@ -273,7 +273,7 @@ TEST(cregex, replace)
         EXPECT_STREQ(cstr_str(&str), "start date: YYYY-MM-DD, end date: YYYY-MM-DD");
 
         // US date format, and add 10 years to dates:
-        cstr_take(&str, cregex_replace_aio_sv(pattern, csview_from(input), "$1/$3/$2", .xform=add_10_years));
+        cstr_take(&str, cregex_replace_aio_sv(pattern, csview_from(input), "$1/$3/$2", .transform=add_10_years));
         EXPECT_STREQ(cstr_str(&str), "start date: 2025/31/12, end date: 2032/28/02");
 
         // Wrap only the first date inside []:

@@ -3,15 +3,19 @@
 
 # STC - Smart Template Containers
 
-## Version 6.0 RC5
-STC is a mature, comprehensive, general purpose container and algorithm library for C99/C11.
-It has excellent ergonomics and requires virtually no boilerplate code. The library adds many
+## Version 6.0 RC6
+STC is a comprehensive, generic, typesafe container and algorithm library for C99/C11.
+It has excellent ergonomics and requires hardly any boilerplate code. The library adds many
 missing features to C, like common data containers, algorithms, and abstractions found in
 contemporary system languages like Zig, Rust, and C++. Containers and algorithms are templated
 or generic, which allows for a fully typesafe, compact, and high performance implementation.
 
 <details>
 <summary><b>Version 6 NEWS</b></summary>
+RC 6 has done some breaking changes to cregex match() and replace(), specifically it renames
+the optional parameter 'xform' to 'transform', and moves it to be the last parameter in replace().
+Getting close to the V6.0 Release!
+
 Release Candidate 5 has fixed lots of smaller bugs and C++ incompabilities in Coroutines,
 Regex and CSpan, and now have proper C-linkage when called from C++.
 

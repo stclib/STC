@@ -1343,7 +1343,7 @@ cstr cregex_replace_opt(const cregex* re, const char* input, const char* input_e
     opt.count += (opt.count != 0);
 
     while (--opt.count && cregex_match_opt(re, input, input_end, mopt) == CREG_OK) {
-        _build_substitution(replace, nmatch, match, opt.xform, &subst);
+        _build_substitution(replace, nmatch, match, opt.transform, &subst);
         const isize_t mpos = (match[0].buf - input);
         if (copy & (mpos > 0))
             cstr_append_n(&out, input, mpos);
