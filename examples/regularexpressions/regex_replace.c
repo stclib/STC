@@ -26,7 +26,7 @@ int main(void)
         printf("INPUT: %s\n", input);
 
         /* replace with a fixed string, extended all-in-one call: */
-        cstr_take(&str, cregex_replace_aio(pattern, input, "YYYY-MM-DD"));
+        cstr_take(&str, cregex_replace_aio(pattern, input, "YYYY-MM-DD", 0));
         printf("fixed: %s\n", cstr_str(&str));
 
         /* US date format, and add 10 years to dates: */
@@ -34,7 +34,7 @@ int main(void)
         printf("us+10: %s\n", cstr_str(&str));
 
         /* Wrap first date inside []: */
-        cstr_take(&str, cregex_replace_aio(pattern, input, "[$0]"));
+        cstr_take(&str, cregex_replace_aio(pattern, input, "[$0]", 0));
         printf("brack: %s\n", cstr_str(&str));
 
         /* Shows how to compile RE separately */
@@ -43,7 +43,7 @@ int main(void)
             continue; /* break c_defer */
 
         /* European date format. */
-        cstr_take(&str, cregex_replace(&re, input, "$3.$2.$1"));
+        cstr_take(&str, cregex_replace(&re, input, "$3.$2.$1", 0));
         printf("euros: %s\n", cstr_str(&str));
 
         /* Strip out everything but the matches */
@@ -51,7 +51,7 @@ int main(void)
         printf("strip: %s\n", cstr_str(&str));
 
         /* Wrap all words in ${} */
-        cstr_take(&str, cregex_replace_aio("[a-z]+", "52 apples and 31 mangoes", "$${$0}"));
+        cstr_take(&str, cregex_replace_aio("[a-z]+", "52 apples and 31 mangoes", "$${$0}", 0));
         printf("curly: %s\n", cstr_str(&str));
     }
 }
