@@ -156,7 +156,7 @@
 // --------------------------------
 
 #define _c_minmax_call(fn, T, ...) \
-   fn(c_make_array(T, {__VA_ARGS__}), c_sizeof((T[]){__VA_ARGS__})/c_sizeof(T))
+   fn(c_make_array(T, {__VA_ARGS__}), c_literal_count(T, {__VA_ARGS__}))
 
 #define c_min_i32(...) _c_minmax_call(c_min_i32n, int32_t, __VA_ARGS__)
 #define c_max_i32(...) _c_minmax_call(c_max_i32n, int32_t, __VA_ARGS__)

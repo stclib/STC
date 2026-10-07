@@ -107,17 +107,17 @@ int main(void) {
 
 #ifdef STC_HAS_TYPEOF
     #define c_when(varptr) \
-        for (__typeof__(varptr) _vp1 = (varptr); _vp1; _vp1 = NULL) \
+        for (c_typeof(varptr) _vp1 = (varptr); _vp1; _vp1 = NULL) \
         switch (_vp1->id)
 
     #define c_is_2(Tag, x) \
         break; case Tag: \
-        for (__typeof__(_vp1->Tag.item)* x = &_vp1->Tag.item; x; x = NULL)
+        for (c_typeof(_vp1->Tag.item)* x = &_vp1->Tag.item; x; x = NULL)
 
     #define c_is_3(varptr, Tag, x) \
-        false) ; else for (__typeof__(varptr) _vp2 = (varptr); _vp2; _vp2 = NULL) \
+        false) ; else for (c_typeof(varptr) _vp2 = (varptr); _vp2; _vp2 = NULL) \
             if (c_is_variant(_vp2, Tag)) \
-                for (__typeof__(_vp2->Tag.item) *x = &_vp2->Tag.item; x; x = NULL
+                for (c_typeof(_vp2->Tag.item) *x = &_vp2->Tag.item; x; x = NULL
 #else
     typedef union { int id; } _c_any_variant;
     #define c_when(varptr) \

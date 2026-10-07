@@ -38,8 +38,8 @@
     #define ISIZE_MIN   PTRDIFF_MIN
     #define ISIZE_MAX   PTRDIFF_MAX
 #endif
-#if defined __GNUC__ || defined __clang__ || \
-    defined __TINYC__ || _MSC_FULL_VER >= 193933428
+#if defined __GNUC__ || defined __clang__ || defined __TINYC__ || \
+    defined __cplusplus || _MSC_FULL_VER >= 193933428
     #define STC_HAS_TYPEOF
 #endif
 #if defined __GNUC__
@@ -48,11 +48,7 @@
   #define c_GNUATTR(...)
 #endif
 #define STC_INLINE static inline c_GNUATTR(unused)
-#ifdef __cplusplus
-  #define STC_EXTERN extern "C"
-#else
-  #define STC_EXTERN extern
-#endif
+
 #define c_ZI PRIiPTR
 #define c_ZU PRIuPTR
 #define c_NPOS INTPTR_MAX
@@ -64,8 +60,8 @@
 #define c_JOIN(a, b) c_JOIN0(a, b)
 #define c_NUMARGS(...) _c_APPLY_ARG_N((__VA_ARGS__, _c_RSEQ_N))
 #define _c_APPLY_ARG_N(args) _c_ARG_N args
-#define _c_RSEQ_N 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1,
-#define _c_ARG_N(_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,_12,_13,_14,_15,_16,_17,_18,_19,_20,N,...) N
+#define _c_RSEQ_N 32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1,
+#define _c_ARG_N(_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,_12,_13,_14,_15,_16,_17,_18,_19,_20,_21,_22,_23,_24,_25,_26,_27,_28,_29,_30,_31,_32,N,...) N
 
 // Saturated overloading
 // #define foo(...) foo_I(__VA_ARGS__, c_COMMA_N(foo_3), c_COMMA_N(foo_2), c_COMMA_N(foo_1),)(__VA_ARGS__)
@@ -89,15 +85,30 @@
 #ifndef __cplusplus
     #define c_new(T, ...) ((T*)c_safe_memcpy(c_malloc(c_sizeof(T)), ((T[]){__VA_ARGS__}), c_sizeof(T)))
     #define c_literal(T) (T)
+    #define c_literal_count(T, ...) (sizeof((T[])__VA_ARGS__) / sizeof(T))
     #define c_make_array(T, ...) ((T[])__VA_ARGS__)
     #define c_make_array2d(T, N, ...) ((T[][N])__VA_ARGS__)
-#else
+    #define c_const_arr_ref(T, name) T const* name
+    #define STC_EXTERN extern
+    #define c_typeof(x) __typeof__(x)
+    #define c_static_assert(expr)   (void)sizeof(int[(expr) ? 1 : -1])
+    #define c_safe_cast(T, From, x) ((T)(1 ? (x) : (From){0}))
+#else // C++
     #include <new>
+    #include <array>
+    #include <initializer_list>
     #define c_new(T, ...) new (c_malloc(c_sizeof(T))) T(__VA_ARGS__)
-    #define c_literal(T) T
-    template<typename T, int M, int N> struct _c_Array { T data[M][N]; };
-    #define c_make_array(T, ...) (_c_Array<T, 1, sizeof((T[])__VA_ARGS__)/sizeof(T)>{{__VA_ARGS__}}.data[0])
-    #define c_make_array2d(T, N, ...) (_c_Array<T, sizeof((T[][N])__VA_ARGS__)/sizeof(T[N]), N>{__VA_ARGS__}.data)
+    template <typename _Ty> struct _ArgType { using type = _Ty; };
+    #define c_literal(T) _ArgType<T>::type
+    #define c_literal_count(T, ...) std::initializer_list<T>__VA_ARGS__.size()
+    template <typename _Ty, int _M, int _N> struct _c_Array { _Ty data[_M][_N]; };
+    #define c_make_array(T, ...) _c_Array<T, 1, c_literal_count(T, __VA_ARGS__)>{{__VA_ARGS__}}.data[0]
+    #define c_make_array2d(T, N, ...) _c_Array<T, c_literal_count(T[N], __VA_ARGS__), N>{__VA_ARGS__}.data
+    #define c_const_arr_ref(T, name) T const (&name)[]
+    #define STC_EXTERN extern "C"
+    #define c_typeof(x) std::remove_reference_t<decltype((x))>
+    #define c_static_assert(expr) (void)0
+    #define c_safe_cast(T, From, x) reinterpret_cast<T>(static_cast<From>(x))
 #endif
 
 #ifdef STC_ALLOCATOR
@@ -122,7 +133,6 @@
     c_free(_tp, _n*c_sizeof(T)); \
 } while (0)
 
-#define c_static_assert(expr)   (void)sizeof(int[(expr) ? 1 : -1])
 #if defined STC_NDEBUG || defined NDEBUG
     #define c_assert(expr)      (void)sizeof(expr)
 #else
@@ -131,7 +141,6 @@
 #define c_container_of(p, C, m) ((C*)((char*)(1 ? (p) : &((C*)0)->m) - offsetof(C, m)))
 #define c_countof(a)            (isize_t)(sizeof(a)/sizeof 0[a])
 #define c_as_mut(Tp, p)         ((Tp)(1 ? (p) : (Tp)0))
-#define c_safe_cast(T, From, x) ((T)(1 ? (x) : (From){0}))
 
 // expect signed ints to/from these (use with gcc -Wconversion)
 #define c_sizeof                (isize_t)sizeof
@@ -161,7 +170,6 @@
 
 // [deprecated]:
 #define c_init(...) c_make(__VA_ARGS__)
-#define c_items(...) c_each_item(__VA_ARGS__)
 #define c_foritems(...) for (c_each_item(__VA_ARGS__))
 #define c_foreach(...) for (c_each(__VA_ARGS__))
 #define c_foreach_kv(...) for (c_each_kv(__VA_ARGS__))
@@ -212,8 +220,8 @@
          C##_next(&_it_##key)
 
 #define c_each_item(it, T, ...) \
-    struct {T* ref; int size, index;} \
-    it = {.ref=c_make_array(T, __VA_ARGS__), .size=(int)(sizeof((T[])__VA_ARGS__)/sizeof(T))} \
+    struct { c_const_arr_ref(T, _ref); T* ref; int size, index; } \
+    it = {._ref=c_make_array(T, __VA_ARGS__), .ref = (T*)it._ref, .size=(int)c_literal_count(T, __VA_ARGS__)} \
     ; it.index < it.size ; ++it.ref, ++it.index
 
 // c_range, c_range32: python-like int range iteration
@@ -238,11 +246,11 @@
 
 // make container from a literal list
 #define c_make(C, ...) \
-    C##_from_n(c_make_array(C##_raw, __VA_ARGS__), c_sizeof((C##_raw[])__VA_ARGS__)/c_sizeof(C##_raw))
+    C##_from_n(c_make_array(C##_raw, __VA_ARGS__), c_literal_count(C##_raw, __VA_ARGS__))
 
 // put multiple raw-type elements from a literal list into a container
 #define c_put_items(C, cnt, ...) \
-    C##_put_n(cnt, c_make_array(C##_raw, __VA_ARGS__), c_sizeof((C##_raw[])__VA_ARGS__)/c_sizeof(C##_raw))
+    C##_put_n(cnt, c_make_array(C##_raw, __VA_ARGS__), c_literal_count(C##_raw, __VA_ARGS__))
 
 // drop multiple containers of same type
 #define c_drop(C, ...) \
@@ -309,7 +317,7 @@ STC_INLINE size_t c_hash_str(const char *str) {
 }
 
 #define c_hash_mix(...) /* non-commutative hash combine */ \
-    c_hash_mix_n(c_make_array(size_t, {__VA_ARGS__}), c_sizeof((size_t[]){__VA_ARGS__})/c_sizeof(size_t))
+    c_hash_mix_n(c_make_array(size_t, {__VA_ARGS__}), c_literal_count(size_t, {__VA_ARGS__}))
 
 STC_INLINE size_t c_hash_mix_n(size_t h[], isize_t n) {
     for (isize_t i = 1; i < n; ++i) h[0] += h[0] ^ h[i];
@@ -319,8 +327,8 @@ STC_INLINE size_t c_hash_mix_n(size_t h[], isize_t n) {
 // generic typesafe swap
 #ifdef STC_HAS_TYPEOF
 #define c_swap(xp, yp) do { \
-    __typeof__(xp) _xp = (xp), _yp = (yp); \
-    __typeof__(0[xp]) _tv = *_xp; *_xp = *_yp; *_yp = _tv; \
+    c_typeof(xp) _xp = (xp), _yp = (yp); \
+    c_typeof(0[xp]) _tv = *_xp; *_xp = *_yp; *_yp = _tv; \
 } while (0)
 #else
 #define c_swap(xp, yp) do { \

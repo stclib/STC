@@ -114,42 +114,46 @@ STC_EXTERN void cregex_drop(cregex* re);
 /* number of capture groups in a regex pattern, excluding the full match capture (0) */
 STC_EXTERN int cregex_captures(const cregex* re);
 
-/* match: return CREG_OK, CREG_NOMATCH or CREG_MATCHERROR. */
-#define cregex_match(re, ...) cregex_match_opt(re, _crx_match(__VA_ARGS__,0))
-#define cregex_match_sv(re, ...) cregex_match_sv_opt(re, _crx_match(__VA_ARGS__,0))
-#define cregex_is_match(re, str) (cregex_match(re, str) == CREG_OK)
-/* all-in-one: compile RE pattern + match + free */
-#define cregex_match_aio(pattern, ...) cregex_match_aio_opt(pattern, _crx_match(__VA_ARGS__,0))
-#define cregex_match_aio_sv(pattern, ...) cregex_match_aio_sv_opt(pattern, _crx_match(__VA_ARGS__,0))
+/* cregex_match*(): return CREG_OK, CREG_NOMATCH or CREG_MATCHERROR. aio = all-in-one, i.e. compile, match (, replace), drop */
+#define cregex_match(...) _cregex_match(__VA_ARGS__,)
+#define cregex_match_sv(...) _cregex_match_sv(__VA_ARGS__,)
+#define cregex_match_aio(...) _cregex_match_aio(__VA_ARGS__,)
+#define cregex_match_aio_sv(...) _cregex_match_aio_sv(__VA_ARGS__,)
+#define cregex_is_match(re, str) (_cregex_match(re, str, 0) == CREG_OK)
 
-/* replace: return a cstr where matches are replaced with a substitute string expression */
-#define cregex_replace(re, ...) cregex_replace_opt(re, _crx_replace(__VA_ARGS__,0))
-#define cregex_replace_sv(re, ...) cregex_replace_sv_opt(re, _crx_replace(__VA_ARGS__,0))
-/* all-in-one: compile RE string pattern + match + replace + free */
-#define cregex_replace_aio(pattern, ...) cregex_replace_aio_opt(pattern, _crx_replace(__VA_ARGS__,0))
-#define cregex_replace_aio_sv(pattern, ...) cregex_replace_aio_sv_opt(pattern, _crx_replace(__VA_ARGS__,0))
+/* cregex_replace*(): return a cstr where matches are replaced with a substitute string expression */
+#define cregex_replace(...) _cregex_replace(__VA_ARGS__,)
+#define cregex_replace_sv(...) _cregex_replace_sv(__VA_ARGS__,)
+#define cregex_replace_aio(...) _cregex_replace_aio(__VA_ARGS__,)
+#define cregex_replace_aio_sv(...) _cregex_replace_aio_sv(__VA_ARGS__,)
 
 /* ----- Private ----- */
 
-typedef struct { csview* match; int flags, _dummy; } cregex_match_opt_s;
-typedef struct { int count; bool(*xform)(int group, csview match, cstr* out); int flags, _dummy; } cregex_replace_opt_s;
+typedef struct { csview* match; int flags; } cregex_match_opt_s;
+typedef struct { int count; bool(*xform)(int group, csview match, cstr* out); int flags; } cregex_replace_opt_s;
 
-#define _crx_match(inp, ...) inp, 0, c_literal(cregex_match_opt_s){__VA_ARGS__}
-#define _crx_replace(inp, repl, ...) inp, 0, repl, c_literal(cregex_replace_opt_s){__VA_ARGS__}
+#define _cregex_match(re, str, ...) cregex_match_opt(re, str, NULL, (cregex_match_opt_s){__VA_ARGS__})
+#define _cregex_match_sv(re, sv, ...) cregex_match_sv_opt(re, sv, (cregex_match_opt_s){__VA_ARGS__})
+#define _cregex_match_aio(pattern, str, ...) cregex_match_aio_opt(pattern, str, NULL, (cregex_match_opt_s){__VA_ARGS__})
+#define _cregex_match_aio_sv(pattern, sv, ...) cregex_match_aio_sv_opt(pattern, sv, (cregex_match_opt_s){__VA_ARGS__})
+#define _cregex_replace(re, str, repl, ...) cregex_replace_opt(re, str, NULL, repl, (cregex_replace_opt_s){__VA_ARGS__})
+#define _cregex_replace_sv(re, sv, repl, ...) cregex_replace_sv_opt(re, sv, repl, (cregex_replace_opt_s){__VA_ARGS__})
+#define _cregex_replace_aio(pattern, str, repl, ...) cregex_replace_aio_opt(pattern, str, NULL, repl, (cregex_replace_opt_s){__VA_ARGS__})
+#define _cregex_replace_aio_sv(pattern, sv, repl, ...) cregex_replace_aio_sv_opt(pattern, sv, repl, (cregex_replace_opt_s){__VA_ARGS__})
 
 STC_EXTERN int cregex_match_opt(const cregex* re, const char* input, const char* input_end, cregex_match_opt_s opt);
 STC_EXTERN int cregex_match_aio_opt(const char* pattern, const char* input, const char* input_end, cregex_match_opt_s opt);
-STC_EXTERN cstr cregex_replace_opt(const cregex* re, const char* input, const char* input_end, const char* replace, cregex_replace_opt_s opt);
-STC_EXTERN cstr cregex_replace_aio_opt(const char* pattern, const char* input, const char* input_end, const char* replace, cregex_replace_opt_s opt);
+STC_EXTERN cstr cregex_replace_opt(const cregex* re, const char* input, const char* input_end, const char* repl, cregex_replace_opt_s opt);
+STC_EXTERN cstr cregex_replace_aio_opt(const char* pattern, const char* input, const char* input_end, const char* repl, cregex_replace_opt_s opt);
 
-static inline int cregex_match_sv_opt(const cregex* re, csview sv, int _d, cregex_match_opt_s opt)
-    { (void)_d; return cregex_match_opt(re, sv.buf, sv.buf+sv.size, opt); }
-static inline int cregex_match_aio_sv_opt(const char* pattern, csview sv, int _d, cregex_match_opt_s opt)
-    { (void)_d; return cregex_match_aio_opt(pattern, sv.buf, sv.buf+sv.size, opt); }
-static inline cstr cregex_replace_sv_opt(const cregex* re, csview sv, int _d, const char* replace, cregex_replace_opt_s opt)
-    { (void)_d; return cregex_replace_opt(re, sv.buf, sv.buf+sv.size, replace, opt); }
-static inline cstr cregex_replace_aio_sv_opt(const char* pattern, csview sv, int _d, const char* replace, cregex_replace_opt_s opt)
-    { (void)_d; return cregex_replace_aio_opt(pattern, sv.buf, sv.buf+sv.size, replace, opt); }
+static inline int cregex_match_sv_opt(const cregex* re, csview sv, cregex_match_opt_s opt)
+    { return cregex_match_opt(re, sv.buf, sv.buf+sv.size, opt); }
+static inline int cregex_match_aio_sv_opt(const char* pattern, csview sv, cregex_match_opt_s opt)
+    { return cregex_match_aio_opt(pattern, sv.buf, sv.buf+sv.size, opt); }
+static inline cstr cregex_replace_sv_opt(const cregex* re, csview sv, const char* repl, cregex_replace_opt_s opt)
+    { return cregex_replace_opt(re, sv.buf, sv.buf+sv.size, repl, opt); }
+static inline cstr cregex_replace_aio_sv_opt(const char* pattern, csview sv, const char* repl, cregex_replace_opt_s opt)
+    { return cregex_replace_aio_opt(pattern, sv.buf, sv.buf+sv.size, repl, opt); }
 #endif // STC_CREGEX_H_INCLUDED
 
 #if defined STC_IMPLEMENT || defined i_implement || defined i_import

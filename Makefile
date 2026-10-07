@@ -11,7 +11,7 @@ ifeq ($(origin CXX),default)
 	CXX := g++
 endif
 
-CFLAGS    ?= -std=c11 -Iinclude -O3 -MMD -Werror -Wpedantic -Wall -Wextra -Wconversion -Wno-missing-field-initializers
+CFLAGS    ?= -std=c11 -Iinclude -O3 -MMD -Werror -Wall -Wextra -Wconversion -Wno-missing-field-initializers # -Wpedantic
 CXXFLAGS  ?= -std=c++20 -Iinclude -O3 -MMD -Wall
 ifeq ($(CC),tcc)
   AR_RCS  ?= tcc -ar rcs

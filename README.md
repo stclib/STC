@@ -3,7 +3,7 @@
 
 # STC - Smart Template Containers
 
-## Version 6.0 RC4
+## Version 6.0 RC5
 STC is a mature, comprehensive, general purpose container and algorithm library for C99/C11.
 It has excellent ergonomics and requires virtually no boilerplate code. The library adds many
 missing features to C, like common data containers, algorithms, and abstractions found in
@@ -12,6 +12,11 @@ or generic, which allows for a fully typesafe, compact, and high performance imp
 
 <details>
 <summary><b>Version 6 NEWS</b></summary>
+Release Candidate 5 has fixed lots of smaller bugs and C++ incompabilities in Coroutines,
+Regex and CSpan, and now have proper C-linkage when called from C++.
+
+A number of deprecated symbols in common.h and coroutine.h are removed.
+
 Apologies for the multiple API changes particularly on the coroutine, cspan and cregex modules
 after V5.1. From upcoming V6.0 release, API is planned to be stable and changes will be
 made backward compatible.

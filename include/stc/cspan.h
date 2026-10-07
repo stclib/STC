@@ -66,6 +66,7 @@ int demo2() {
     #define STC_CSPAN_INDEX_TYPE int32_t
 #endif
 typedef STC_CSPAN_INDEX_TYPE _istride;
+typedef _istride _ituple3[3];
 
 #define using_cspan use_cspan                   // [deprecated]
 #define using_cspan2 use_cspan2                 // [deprecated]
@@ -178,7 +179,7 @@ use_cspan_tuple(7); use_cspan_tuple(8);
 // Create a global scope 1d-span from constant initializer list, otherwise like c_make(Span, ...).
 #define cspan_make(Span, ...) \
     ((Span)cspan_from_n(c_make_array(Span##_value, __VA_ARGS__), \
-                        sizeof((Span##_value[])__VA_ARGS__)/sizeof(Span##_value)))
+                        c_literal_count(Span##_value, __VA_ARGS__)))
 
 // Make 1d-span from a c-array.
 #define cspan_from_array(array) \
@@ -197,14 +198,14 @@ use_cspan_tuple(7); use_cspan_tuple(8);
 // Accessors
 //
 #define cspan_size(self) _cspan_size((self)->shape, cspan_rank(self))
-#define cspan_rank(self) c_arraylen((self)->shape) // constexpr
+#define cspan_rank(self) c_countof((self)->shape) // constexpr
 #define cspan_at(self, ...) ((self)->data + cspan_index(self, __VA_ARGS__))
 #define cspan_front(self) ((self)->data)
 #define cspan_back(self) ((self)->data + cspan_size(self) - 1)
 
-#define cspan_index(...) cspan_index_fn(__VA_ARGS__, c_COMMA_N(cspan_index_3d), c_COMMA_N(cspan_index_2d), \
-                                                     c_COMMA_N(cspan_index_1d),)(__VA_ARGS__)
-#define cspan_index_fn(self, i,j,k,n, ...) c_TUPLE_AT_1(n, cspan_index_nd,)
+#define cspan_index(...) cspan_index_I(__VA_ARGS__, c_COMMA_N(cspan_index_3d), c_COMMA_N(cspan_index_2d), \
+                                                    c_COMMA_N(cspan_index_1d),)(__VA_ARGS__)
+#define cspan_index_I(self, i,j,k,n, ...) c_TUPLE_AT_1(n, cspan_index_nd,)
 #define cspan_index_1d(self, i)     (c_static_assert(cspan_rank(self) == 1), \
                                      c_assert((i) < (self)->shape[0]), \
                                      (i)*(self)->stride.d[0])
@@ -265,7 +266,7 @@ typedef enum {c_ROWMAJOR, c_COLMAJOR, c_STRIDED} cspan_layout;
 #define cspan_slice(self, Outspan, ...) \
     Outspan##_slice_((self)->data, (self)->shape, (self)->stride.d, \
                      c_make_array2d(const isize_t, 3, {__VA_ARGS__}), \
-                     (c_static_assert(cspan_rank(self) == sizeof((isize_t[][3]){__VA_ARGS__})/sizeof(isize_t[3])), cspan_rank(self)))
+                     (c_static_assert(cspan_rank(self) == c_literal_count(_ituple3, {__VA_ARGS__})), cspan_rank(self)))
 
 // submd#(): Reduces rank, fully typesafe + range checked by default
 //           int ms3[N1][N2][N3];
@@ -356,7 +357,7 @@ STC_INLINE void _cspan_transpose(_istride shape[], _istride stride[], int rank) 
 }
 
 STC_INLINE isize_t _cspan_index(const _istride shape[], const _istride stride[],
-                              const isize_t args[], int rank) {
+                                const isize_t args[], int rank) {
     isize_t off = 0;
     (void)shape;
     while (rank-- != 0) {

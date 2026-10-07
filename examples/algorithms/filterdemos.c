@@ -46,7 +46,7 @@ fn main() {
 void demo2(void)
 {
     IVec vector = {0};
-    crange iota1 = crange_make(1, INT_MAX);
+    crange iota1 = crange_make(1, INT32_MAX);
     c_filter(crange, iota1, true         // Infinite range of integers
         && c_flt_skipwhile(*value != 11) // Skip initial numbers unequal 11
         && (*value % 2) != 0             // Collect odd numbers

@@ -7,21 +7,21 @@ if [ "$(uname)" = 'Linux' ]; then
     clibs='-lm' # -pthread
     oflag='-o '
 fi
-common="-std=c99 -Wpedantic -Wall -Werror"
-cc=gcc; cflags="-s -O3 $common"
-#cc=clang; cflags="-s -O3 $common"
-#cc=gcc; cflags="-g $sanitize $common"
-#cc=gcc; cflags="-x c++ -std=c++17 -O2 -s -DSTC_IMPLEMENT -Di_import"
-#cc=tcc; cflags="-std=c99"
-#cc=cl; cflags="-nologo -O2 -MD -W3 -std:c11 -wd4003"
-#cc=cl; cflags="-nologo -c -TP -std:c++20 -wd4003 -DSTC_IMPLEMENT -Di_import"
+common="-Wall -Werror"
+cc=gcc; cflags="-std=c99 -s -O3 $common"
+#cc=clang; cflags="-std=c99 -s -O3 $common"
+#cc=gcc; cflags="-std=c99 -g $sanitize $common"
+#cc=gcc; cflags="-x c++ -std=c++20 -s -O2 $common"
+#cc=tcc; cflags="-std=c11"
+#cc=cl; cflags="-nologo -EHsc -O2 -MD -W3 -std:c11 -wd4003"
+#cc=cl; cflags="-nologo -EHsc -O2 -MD -TP -std:c++20 -Zc:preprocessor -wd4003"
 
 if [ "$cc" = "cl" ]; then
-    oflag='/Fe:'
-    stclib='../meson_msvc/stc.lib'
-else
-    oflag='-o '
-    stclib='-lstc'
+    oflag="-Fe:"
+    stclib="-c" # "../meson_msvc/stc.lib"
+elif [ "$cc" = "gcc" -o "$cc" = "clang" -o "$cc" = "tcc" ]; then
+    oflag="-o "
+    stclib="-lstc" # "../build/Windows_$cc/libstc.a"
 fi
 
 run=0
@@ -33,11 +33,6 @@ if [ "$1" = '-run' ]; then
   run=1
   shift
 fi
-if [ ! -z "$1" ] ; then
-    comp="$@"
-else
-    comp="$cc $cflags"
-fi
 
 #INC=
 INC=-I../include
@@ -46,8 +41,9 @@ INC=-I../include
 for i in */*.c ; do
     out=$(basename $i .c).exe
     #out=$(dirname $i)/$(basename $i .c).exe
-    echo $comp $INC $i $clibs $oflag$out $stclib
-    $comp $INC $i $clibs $oflag$out $stclib
+    echo $cc $cflags $INC $i $clibs $stclib $oflag$out
+    $cc $cflags $INC $i $clibs $stclib $oflag$out
+    echo "___________________________________________________________________________________________"
     if [ $run = 1 -a -f $out ]; then ./$out; fi
 done
 
