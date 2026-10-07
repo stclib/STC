@@ -269,7 +269,7 @@ TEST(cregex, replace)
         cstr_drop(&str), cregex_drop(&re)
     ){
         // replace with a fixed string, extended all-in-one call:
-        cstr_take(&str, cregex_replace_aio(pattern, input, "YYYY-MM-DD"));
+        cstr_take(&str, cregex_replace_aio(pattern, input, "YYYY-MM-DD", 0));
         EXPECT_STREQ(cstr_str(&str), "start date: YYYY-MM-DD, end date: YYYY-MM-DD");
 
         // US date format, and add 10 years to dates:
@@ -281,7 +281,7 @@ TEST(cregex, replace)
         EXPECT_STREQ(cstr_str(&str), "start date: [2015-12-31], end date: 2022-02-28");
 
         // Wrap all words in ${}
-        cstr_take(&str, cregex_replace_aio("[a-z]+", "52 apples and 31 mangoes", "$${$0}"));
+        cstr_take(&str, cregex_replace_aio("[a-z]+", "52 apples and 31 mangoes", "$${$0}", 0));
         EXPECT_STREQ(cstr_str(&str), "52 ${apples} ${and} 31 ${mangoes}");
 
         // Compile RE separately
@@ -289,7 +289,7 @@ TEST(cregex, replace)
         EXPECT_EQ(cregex_captures(&re), 3);
 
         // European date format.
-        cstr_take(&str, cregex_replace(&re, input, "$3.$2.$1"));
+        cstr_take(&str, cregex_replace(&re, input, "$3.$2.$1", 0));
         EXPECT_STREQ(cstr_str(&str), "start date: 31.12.2015, end date: 28.02.2022");
 
         // Strip out everything but the matches
@@ -333,6 +333,6 @@ TEST(cregex, match_csview_without_match_array)
         re = cregex_from("^second$");
         const char* buffer = "only second word is in csview";
         csview input = c_sv(buffer + 5, 6);
-        EXPECT_EQ(cregex_match_sv(&re, input), CREG_OK);
+        EXPECT_EQ(cregex_match_sv(&re, input, NULL), CREG_OK);
     }
 }
