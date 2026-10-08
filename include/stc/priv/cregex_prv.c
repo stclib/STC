@@ -383,7 +383,7 @@ static void _operator(_Parser *par, _Token type);
 static void _pushand(_Parser *par, _Reinst *first, _Reinst *last);
 static void _pushator(_Parser *par, _Token type);
 static void _evaluntil(_Parser *par, _Token type);
-static int  _bldcclass(_Parser *par);
+static _Token _bldcclass(_Parser *par);
 
 static void
 _rcerror(_Parser *par, cregex_result err)
