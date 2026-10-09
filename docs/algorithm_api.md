@@ -364,7 +364,7 @@ Erase linearily in containers using a predicate. `value` is a pointer to each el
 - void `c_erase_if`(**CntType**, cnt_ptr, pred). Use with ***list**, ***hmap***, ***hset***, ***smap***, and ***sset***.
 - void `c_eraseremove_if`(**CntType**, cnt_ptr, pred). Use with ***stack***, ***vec***, ***deque***, and ***queue*** only.
 
-[ [Run this code](https://godbolt.org/z/PKrsbnEd8) ]
+[ [Run this code](https://godbolt.org/z/6sbdMvn74) ]
 <!--{%raw%}-->
 ```c++
 #include <stdio.h>
