@@ -129,7 +129,7 @@ bool            c_memcmp_eq(const i_keyraw* a, const i_keyraw* b);    // !memcmp
 
 ## Examples
 
-[ [Run this code](https://godbolt.org/z/4aacGMGsj) ]
+[ [Run this code](https://godbolt.org/z/bzce7T41x) ]
 ```c++
 #include <stc/cstr.h>
 
@@ -222,7 +222,7 @@ int main(void)
 ### Example 4: Advanced
 Key type is struct. Based on https://doc.rust-lang.org/std/collections/struct.HashMap.html
 
-[ [Run this code](https://godbolt.org/z/WcKb1fdrz) ]
+[ [Run this code](https://godbolt.org/z/Tv1Ys6YxP) ]
 ```c++
 #include <stc/cstr.h>
 
@@ -285,7 +285,7 @@ In example 4 we needed to construct a lookup key which may allocate strings, and
 In this example we use keyraw feature to make it simpler to use and avoids the creation of a Viking object
 entirely when doing lookup.
 
-[ [Run this code](https://godbolt.org/z/Te45qrExa) ]
+[ [Run this code](https://godbolt.org/z/bTv57M4as) ]
 <!--{%raw%}-->
 ```c++
 #include <stc/cstr.h>

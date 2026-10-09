@@ -885,7 +885,7 @@ void maptest()
 ```
 Another example is to sort struct elements by the *active field* and *reverse* flag:
 
-[ [Run this code](https://godbolt.org/z/eqrGGzbKh) ]
+[ [Run this code](https://godbolt.org/z/67Yah1nz5) ]
 ```c++
 #include <stdio.h>
 #include <time.h>

@@ -337,7 +337,7 @@ starts eating (because they must be waiting).
 <details>
 <summary>The "Dining philosophers" C implementation</summary>
 
-[ [Run this code](https://godbolt.org/z/qa3a8savz) ]
+[ [Run this code](https://godbolt.org/z/qKfc7eevn) ]
 ```c++
 #include <stdio.h>
 #include <time.h>
@@ -356,16 +356,17 @@ cco_task_struct (Philosopher) {
     int hunger;
     struct Philosopher* left;
     struct Philosopher* right;
+    double duration;
 };
 
 int Philosopher(struct Philosopher* o) {
     cco_async (o) {
         while (1) {
-            double duration = 1.0 + crand64_real()*2.0;
-            printf("Philosopher %d is thinking for %.0f minutes...\n", o->id, duration*10);
+            o->duration = 1.0 + crand64_real()*2.0;
+            printf("Philosopher %d is thinking for %.0f minutes...\n", o->id, o->duration*10);
             o->hunger = 0;
             o->mode = ph_THINKING;
-            cco_await_timer(&o->tm, duration);
+            cco_await_timer(&o->tm, o->duration);
 
             printf("Philosopher %d is hungry...\n", o->id);
             o->mode = ph_HUNGRY;
@@ -376,9 +377,9 @@ int Philosopher(struct Philosopher* o) {
             o->hunger = INT32_MAX;
             o->mode = ph_EATING;
 
-            duration = 0.5 + crand64_real();
-            printf("Philosopher %d is eating for %.0f minutes...\n", o->id, duration*10);
-            cco_await_timer(&o->tm, duration);
+            o->duration = 0.5 + crand64_real();
+            printf("Philosopher %d is eating for %.0f minutes...\n", o->id, o->duration*10);
+            cco_await_timer(&o->tm, o->duration);
         }
         cco_finalize:
         printf("Philosopher %d done\n", o->id);
@@ -465,7 +466,7 @@ and recovered using `cco_recover`. This call will resume control back to the ori
 current task. Because the "call-tree" is fixed, the coroutine frames to be called may be pre-allocated on the stack,
 which is very fast.
 
-[ [Run this code](https://godbolt.org/z/1znTeGGa4) ]
+[ [Run this code](https://godbolt.org/z/h748xqxdj) ]
 <!--{%raw%}-->
 ```c++
 #include <stdio.h>
@@ -756,7 +757,7 @@ the scope in that it was created.
 <details>
 <summary>Scheduled coroutines implementation</summary>
 
-[ [Run this code](https://godbolt.org/z/WMKGo5vMz) ]
+[ [Run this code](https://godbolt.org/z/crrvboz35) ]
 ```c++
 // Based on https://www.youtube.com/watch?v=8sEe-4tig_A
 #include <stdio.h>

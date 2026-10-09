@@ -118,7 +118,7 @@ void            smap_X_value_drop(i_key* pval);
 
 ## Examples
 
-[ [Run this code](https://godbolt.org/z/ajWfPbY4s) ]
+[ [Run this code](https://godbolt.org/z/vGhnY5Pbf) ]
 ```c++
 #include <stc/cstr.h>
 
@@ -157,7 +157,7 @@ Translate a
 [C++ example using *insert* and *emplace*](https://en.cppreference.com/w/cpp/container/map/try_emplace)
  to STC:
 
-[ [Run this code](https://godbolt.org/z/5G6vhvGqo) ]
+[ [Run this code](https://godbolt.org/z/o3hxzrr7E) ]
 ```c++
 #include <stc/cstr.h>
 #define T strmap, cstr, cstr, (c_pro_key | c_pro_val)
@@ -189,7 +189,7 @@ int main(void)
 ### Example 3
 This example uses a smap with cstr as mapped value. Note the `i_pro_val` usage.
 
-[ [Run this code](https://godbolt.org/z/zK1v5jdcM) ]
+[ [Run this code](https://godbolt.org/z/YMKoodE4o) ]
 <!--{%raw%}-->
 ```c++
 #include <stc/cstr.h>

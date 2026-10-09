@@ -201,7 +201,7 @@ int main(void)
 ### Example 3
 Splice {**30**, **40**} from *L2* into *L1* before **3**:
 
-[ [Run this code](https://godbolt.org/z/854zGeKq6) ]
+[ [Run this code](https://godbolt.org/z/qqs57es6K) ]
 ```c++
 #include <stdio.h>
 #define T IList, int
