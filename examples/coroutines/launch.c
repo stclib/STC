@@ -32,10 +32,10 @@ int subTask(struct SubTask* o) {
         }
 
         cco_finalize:
-        if (cco_error() == cco_CANCEL) {
+        if (cco_catch(cco_CANCEL)) {
             printf("SubTask%d: cancelled at %s:%d\n", o->id, cco_err().file, cco_err().line);
             //cco_recover;     // clear cancellation and resume after the cco_throw() above.
-            //cco_clear_error(); // alt: just clear errcode to avoid all other subtasks to be cancelled.
+            //cco_clear_err(); // alt: just clear errcode to avoid all other subtasks to be cancelled.
         }
         printf("subTask%d: done\n", o->id);
     }
@@ -69,9 +69,9 @@ int taskC(struct TaskC* o) {
         }
 
         cco_finalize:
-        if (cco_error() == cco_SHUTDOWN) { // just for info
+        if (cco_catch(cco_SHUTDOWN)) { // just for info
             printf("TaskC: shutdown by child %d in %s:%d\n", (int)cco_err().info.num, cco_err().file, cco_err().line);
-            cco_await_subtasks(o); // await remaining cancelled subtasks
+            cco_await_subtasks(); // await remaining cancelled subtasks
         }
         puts("TaskC: done");
     }
@@ -98,9 +98,9 @@ int taskB(struct TaskB* o) {
         cco_yield;
         
         cco_finalize:
-        if (cco_error() == 99) {
+        if (cco_catch(99)) {
             printf("TaskB: handling error '99' thrown in %s:%d\n", cco_err().file, cco_err().line);
-            //cco_clear_error();
+            //cco_clear_err();
             //cco_await_cancel_all(cco_group(0));
             cco_recover;
         }        

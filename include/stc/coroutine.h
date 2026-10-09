@@ -96,12 +96,12 @@ struct cco_group {
     struct Prefix##_state { \
         struct Prefix##_fiber* fib; \
         struct cco_group *parent_grp, *tmp_grp; \
-        struct cco_task_state *tmp_st; \
         int32_t pos; \
         bool finalizing; \
-        bool scoped; \
         int8_t scope_idx; \
         int8_t curr_scope; \
+        int8_t n_scopes: 7; \
+        uint8_t scoped: 1; \
         struct cco_group group[GROUPS]; \
     }
 
@@ -111,19 +111,19 @@ struct cco_group {
 
 #ifdef STC_HAS_TYPEOF
     #define _cco_state_t(co) c_typeof((co)->base.state)
-    #define _cco_check_grp_level(index) ((index) < c_countof(_cco_st->group))
-    #define _cco_assert_task_struct(co) \
+    #define cco_num_scopes() c_countof(_cco_st->group)
+    #define _cco_init_task_struct(co) \
         c_static_assert(/* error: co->base not first member in task struct */ \
                         sizeof((co)->base) == sizeof(cco_base) || \
                         offsetof(c_typeof(*(co)), base) == 0)
-#else
+#else // fallback for older MSVC compilers
     #define _cco_state_t(co) cco_base_state
-    #define _cco_check_grp_level(index) true
-    #define _cco_assert_task_struct(co) (void)0
+    #define cco_num_scopes() _cco_st->n_scopes
+    #define _cco_init_task_struct(co) (co)->base.state.n_scopes = c_countof((co)->base.state.group)
 #endif
 
 #define cco_async(co) \
-    for (_cco_state_t(co)* _cco_st = (_cco_assert_task_struct(co), (_cco_state_t(co)*) &(co)->base.state) \
+    for (_cco_state_t(co)* _cco_st = (_cco_init_task_struct(co), (_cco_state_t(co)*) &(co)->base.state) \
               ; _cco_st->pos != cco_POS_DONE \
               ; _cco_st->pos = cco_POS_DONE, \
                 (void)(sizeof((co)->base) > sizeof(cco_base) && (_cco_st->parent_grp ? --_cco_st->parent_grp->spawn_count : 0))) \
@@ -286,8 +286,7 @@ STC_EXTERN void       _cco_throw(cco_task* caller, cco_err_t err);
 #define cco_parent_group() (_cco_st->parent_grp + 0) // set if current was spawned
 #define cco_status() (_cco_st->fib->status + 0)
 #define cco_err() (*(const cco_err_t*)&_cco_st->fib->error)
-#define cco_clear_error() (void)(_cco_st->fib->error.code = 0)
-#define cco_error() (_cco_st->fib->error.code + 0)   // alias for cco_err().code
+#define cco_clear_err() (void)(_cco_st->fib->error.code = 0)
 
 // get/set task result (and/or input data)
 #define cco_data(a_task) (1 ? (a_task)->base.state.fib->data : NULL)
@@ -297,7 +296,7 @@ STC_EXTERN void       _cco_throw(cco_task* caller, cco_err_t err);
 enum cco_err_policy { cco_POLICY_SHUTDOWN = 0, cco_POLICY_NOTIFY = 1, cco_POLICY_IGNORE = 2 };
 #define cco_on_subtask_error(tsk, policy) \
     do { \
-        cco_group* _group = (tsk)->base.state.group; \
+        struct cco_group* _group = (tsk)->base.state.group; \
         enum cco_err_policy _pol = policy; \
         c_assert(_pol <= cco_POLICY_IGNORE); \
         for (int _i = 0; _i < c_countof((tsk)->base.state.group); ++_i) \
@@ -334,6 +333,8 @@ enum cco_err_policy { cco_POLICY_SHUTDOWN = 0, cco_POLICY_NOTIFY = 1, cco_POLICY
         } \
     } while (0)
 
+#define cco_catch(err_code) \
+    (_cco_st->fib->error.code == (err_code))
 
 /* Asymmetric coroutine await/call */
 #define cco_await_task(...) c_MACRO_OVERLOAD(cco_await_task, __VA_ARGS__)
@@ -381,12 +382,12 @@ static inline int _cco_resume_task(cco_task* task)
     _cco_new_fiber(cco_as_task(a_task), ((void)sizeof((_data) == cco_data(a_task)), _data))
 
 #define cco_group_scope \
-    for (c_assert(_cco_check_grp_level(_cco_st->curr_scope)), \
+    for (c_assert(_cco_st->curr_scope < cco_num_scopes()), \
          ++_cco_st->curr_scope, _cco_st->scoped = 1; \
          _cco_st->scoped; \
          --_cco_st->curr_scope, _cco_st->scoped = 0)
 #define cco_scope() (c_assert(_cco_st->curr_scope > 0), &_cco_st->group[_cco_st->curr_scope - 1])
-#define cco_group(LEVEL) (c_static_assert(_cco_check_grp_level(LEVEL)), &_cco_st->group[LEVEL])
+#define cco_group(LEVEL) (c_static_assert((LEVEL) < cco_num_scopes()), &_cco_st->group[LEVEL])
 
 #define cco_spawn(...) c_MACRO_OVERLOAD(cco_spawn, __VA_ARGS__)
 #define cco_spawn_2(a_task, a_group) cco_spawn_4(a_task, a_group, NULL, _cco_st->fib)
@@ -442,8 +443,8 @@ static inline cco_task* _cco_cancel_task(cco_task* tsk, cco_err_t err) {
     cco_await_AT(_cco_st->tmp_grp->spawn_count == 0, (LBL + 2000000)); /* await_all() */ \
 } while (0)
 
-#define cco_await_fibers() cco_await_fibers_AT(LBL)
-#define cco_await_fibers_AT(LBL) \
+#define cco_await_all_fibers() cco_await_all_fibers_AT(LBL)
+#define cco_await_all_fibers_AT(LBL) \
     cco_await_AT(cco_fib() == cco_fib()->next, LBL)
 
 #define cco_await_cancel_all(a_group) cco_await_cancel_all_AT(a_group, _cco_LBL)
@@ -453,26 +454,26 @@ static inline cco_task* _cco_cancel_task(cco_task* tsk, cco_err_t err) {
     cco_await_all_AT(_cco_st->tmp_grp, LBL); \
 } while (0)
 
-#define cco_await_cancel_subtasks(a_task) cco_await_cancel_subtasks_AT(a_task, _cco_LBL)
-#define cco_await_cancel_subtasks_AT(a_task, LBL) do { \
-    for (_cco_st->tmp_st = (cco_base_state*)&(a_task)->base.state, _cco_st->scope_idx = c_countof((a_task)->base.state.group) - 1 \
-         ; _cco_st->tmp_st->scope_idx >= 0 \
-         ; --_cco_st->tmp_st->scope_idx) \
-        cco_await_cancel_all_AT(&_cco_st->tmp_st->group[_cco_st->tmp_st->scope_idx], LBL); \
+#define cco_await_cancel_subtasks() cco_await_cancel_subtasks_AT(_cco_LBL)
+#define cco_await_cancel_subtasks_AT(LBL) do { \
+    for (_cco_st->scope_idx = cco_num_scopes() - 1 \
+         ; _cco_st->scope_idx >= 0 \
+         ; --_cco_st->scope_idx) \
+        cco_await_cancel_all_AT(&_cco_st->group[_cco_st->scope_idx], LBL); \
 } while (0)
 
-#define cco_await_subtasks(a_task) cco_await_subtasks_AT(a_task, _cco_LBL)
-#define cco_await_subtasks_AT(a_task, LBL) do { \
-    for (_cco_st->tmp_st = (cco_base_state*)&(a_task)->base.state, _cco_st->scope_idx = c_countof((a_task)->base.state.group) - 1 \
-         ; _cco_st->tmp_st->scope_idx >= 0 \
-         ; --_cco_st->tmp_st->scope_idx) \
-        cco_await_all_AT(&_cco_st->tmp_st->group[_cco_st->tmp_st->scope_idx], LBL); \
+#define cco_await_subtasks() cco_await_subtasks_AT(_cco_LBL)
+#define cco_await_subtasks_AT(LBL) do { \
+    for (_cco_st->scope_idx = cco_num_scopes() - 1 \
+         ; _cco_st->scope_idx >= 0 \
+         ; --_cco_st->scope_idx) \
+        cco_await_all_AT(&_cco_st->group[_cco_st->scope_idx], LBL); \
 } while (0)
 
-#define cco_await_cancel_fibers() cco_await_cancel_fibers_AT(_cco_LBL)
-#define cco_await_cancel_fibers_AT(LBL) do { \
+#define cco_await_cancel_all_fibers() cco_await_cancel_fibers_AT(_cco_LBL)
+#define cco_await_cancel_all_fibers_AT(LBL) do { \
     cco_cancel_all(NULL); \
-    cco_await_fibers_AT(LBL); \
+    cco_await_all_fibers_AT(LBL); \
 } while (0)
 
 

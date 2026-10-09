@@ -183,7 +183,7 @@ use_cspan_tuple(7); use_cspan_tuple(8);
 
 // Make 1d-span from a c-array.
 #define cspan_from_array(array) \
-    cspan_from_n(array, c_arraylen(array))
+    cspan_from_n(array, c_countof(array))
 
 // Make 1d-span from a vec or stack container.
 #define cspan_from_vec(container) \

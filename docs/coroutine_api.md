@@ -94,14 +94,14 @@ void            cco_cancel_all(struct cco_group* grp);              // Cancel al
                     } info;
                 } cco_err_t;
 
-                cco_throw(int error, info = {0});                   // Throw an error. It will unwind the call/await-task "stack".
+                cco_throw(int err_code, info = {0});                // Throw an error. It will unwind the call/await-task "stack".
                                                                     // Handling of error is required in a cco_finalize:, else it will abort().
                 cco_throw(cco_CANCEL, info = {0});                  // Cancel the current task. Handling is NOT required, but it can
                                                                     // optionally be aborted by cco_recover to stop propagation.
-int             cco_error();                                        // Return current error code. To be used in a cco_finalize: section.
+bool            cco_catch(int err_code);                            // Return true if current error code matches err_code. Use in cco_finalize:
                 cco_recover;                                        // Recover from a cco_throw() or cancellation upstream. Resumes from
-                                                                    // the suspend point in the current task and calls cco_clear_error().
-void            cco_clear_error();                                  // Clear current fiber error state. To be used in cco_finalize section.
+                                                                    // the suspend point in the current task and calls cco_clear_err().
+void            cco_clear_err();                                    // Clear current fiber error state. To be used in cco_finalize section.
 cco_err_t       cco_err();                                          // Get error object created from cco_throw(error) call.
 
 cco_task*       cco_as_task(MyTask* tsk)                            // Type-checked casting to cco_task*
@@ -117,16 +117,16 @@ cco_fiber*      cco_as_fiber(MyFiber* fib)                          // Type-chec
                 cco_await_all(struct cco_group* grp);               // Await all (remaining) subtasks in task-group grp to finish.
                 cco_await_any(struct cco_group* grp);               // Await any subtask in task-group to finish, and *cancel remaining*!
                 cco_await_n(int n, struct cco_group* grp);          // Await n spawned tasks in grp. NB! Does *not* cancel remaining tasks.
-                cco_await_subtasks(cco_task* task);                 // Await all spawned tasks in all groups in the task.
-                cco_await_fibers();                                 // Awaits all fibers/spawned tasks to be joined.
+                cco_await_subtasks();                               // Await all spawned tasks in all groups in current task.
+                cco_await_all_fibers();                             // Awaits all fibers/spawned tasks to be joined.
 
                 cco_await_cancel_all(struct cco_group* grp);        // Cancel and await all spawned subtasks in grp.
                                                                     // Shorthand for cco_cancel_all(grp) + cco_await_all(grp).
                 cco_await_cancel_task(cco_task* task);              // Cancel and await for a task to finalize async.
                                                                     // Shorthand for cco_cancel_task() + cco_await_task().
-                cco_await_cancel_subtasks(cco_task* task);          // Cancel and await all spawned tasks in all groups in the task.
-                                                                    // Used for closing running subtasks on error/throw at cco_finalize.
-                cco_await_cancel_fibers();                          // Cancel all running fibers (except current). Use on panic.
+                cco_await_cancel_subtasks();                        // Cancel and await all spawned subtasks (in all groups) in current task.
+                                                                    // Used for closing running subtasks on error/throw during finalize.
+                cco_await_cancel_all_fibers();                      // Cancel and await all running tasks/fibers (except current). Use on panic.
 ```
 #### Channels
 A channel represents a communication syncronization point for collaborating tasks. One of the tasks should own/store
@@ -522,7 +522,7 @@ int TaskA(struct TaskA* o) {
         puts("TaskA work");
 
         cco_finalize:
-        if (cco_error() == 99) {
+        if (cco_catch(99)) {
             // if error not handled, will cause 'unhandled error'...
             printf("TaskA recovered error '99' thrown on line %d\n", cco_err().line);
             cco_recover;

@@ -36,16 +36,16 @@ template params:
 int main(void) {
     int nums[] = {23, 321, 5434, 25, 245, 1, 654, 33, 543, 21};
 
-    ints_sort(nums, c_arraylen(nums));
+    ints_sort(nums, c_countof(nums));
 
-    for (int i = 0; i < c_arraylen(nums); i++)
+    for (int i = 0; i < c_countof(nums); i++)
         printf(" %d", nums[i]);
     puts("");
 
-    isize_t idx = ints_binary_search(nums, 25, c_arraylen(nums));
+    isize_t idx = ints_binary_search(nums, 25, c_countof(nums));
     if (idx != c_NPOS) printf("found: %d\n", nums[idx]);
 
-    idx = ints_lower_bound(nums, 200, c_arraylen(nums));
+    idx = ints_lower_bound(nums, 200, c_countof(nums));
     if (idx != c_NPOS) printf("found lower 200: %d\n", nums[idx]);
 }
 
