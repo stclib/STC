@@ -187,7 +187,7 @@
     _c_each(it, C, start, (end).ref, _)
 
 #define c_each_ref(v, C, cnt) \
-    C##_value* v = (C##_value*)&v; v; ) \
+    C##_value *v, **v##_r_ = &v; v##_r_; v##_r_ = NULL) \
     for (C##_iter v##_itr_ = C##_begin(&cnt); (v = v##_itr_.ref); C##_next(&v##_itr_)
 
 #define c_each_n(...) c_MACRO_OVERLOAD(c_each_n, __VA_ARGS__)
@@ -213,8 +213,8 @@
     _c_each_kv(key, val, C, start, (end).ref)
 
 #define _c_each_kv(key, val, C, start, endref) /* private */ \
-    const C##_key *key = (const C##_key*)&key; key; ) \
-    for (C##_mapped *val; key; key = NULL) \
+    const C##_key *key, **key##_r_ = &key; key##_r_; ) \
+    for (C##_mapped *val; key##_r_; key##_r_ = NULL) \
     for (C##_iter _it_##key = start, *_endref_##key = c_safe_cast(C##_iter*, C##_value*, endref); \
          _it_##key.ref != (C##_value*)_endref_##key && (key = &_it_##key.ref->first, val = &_it_##key.ref->second); \
          C##_next(&_it_##key)
