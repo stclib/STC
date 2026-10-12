@@ -53,7 +53,7 @@ int maintask(struct MainTask* o)
         cco_await_all(cco_group(0));
 
         cco_finalize:
-        cco_await_cancel_all(cco_group(0));
+        cco_await_cancel(cco_group(0));
         cstr_drop(&o->file2);
         puts("done all");
     }

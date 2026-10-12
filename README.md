@@ -3,7 +3,7 @@
 
 # STC - Smart Template Containers
 
-## Version 6.0 RC6
+## Version 6.0 RC7
 STC is a comprehensive, generic, typesafe container and algorithm library for C99/C11.
 It has excellent ergonomics and requires hardly any boilerplate code. The library adds many
 missing features to C, like common data containers, algorithms, and abstractions found in
@@ -12,7 +12,10 @@ or generic, which allows for a fully typesafe, compact, and high performance imp
 
 <details>
 <summary><b>Version 6 NEWS</b></summary>
-RC 6 has done some breaking changes to cregex match() and replace(), specifically it renames
+RC7 renamed `cco_await_cancel_all(group)` [deprecated] to `cco_await_cancel(group)` and fixes
+undefined behaviour in `c_each_ref(..)` and `c_each_kv(..)` range iterator macros.
+
+RC6 has some breaking changes to cregex match() and cregex replace(), specifically it renames
 the optional parameter 'xform' to 'transform', and moves it to be the last parameter in replace().
 Getting close to the V6.0 Release!
 

@@ -53,7 +53,7 @@ int start(struct Start* o) {
             printf("Maintask and subtasks shutdown caused by %d in %s:%d\n",
                     (int)cco_err().info.num, cco_err().file, cco_err().line);
         } else {
-            cco_await_cancel_all(cco_group(0));
+            cco_await_cancel(cco_group(0));
             if (cco_catch(cco_CANCEL))
                 printf("Maintask was canceled in %s:%d\n", cco_err().file, cco_err().line);
         }

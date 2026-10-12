@@ -61,7 +61,7 @@ void            cco_stop(Coroutine* co);                            // Coroutine
 ```c++
                 cco_task_struct(name) {<name>_base base; ..};       // Define a custom coroutine task struct; "Extends" cco_task struct.
                 cco_task_struct(name, <Data>* = void*, MAX_GROUPS=1) // Optionally specify pointer type returned from cco_data(),
-                                                                    // and the max number of waitgroups for cco_group(index). NB: default is 1.
+                                                                    // and the max number of waitgroups for cco_group(INDEX).
 
                 cco_yield_to(cco_task* task);                       // Yield to another task (symmetric transfer of control).
 int             cco_resume(cco_task* task);                         // Resume task until it suspends (blocking). Return status.
@@ -77,10 +77,12 @@ void            cco_set_data_ptr(cco_task* task, Data* dt);         // Set auxil
 ```
 #### Task/Fiber and Waitgroup Cancellation
 ```c++
-cco_task*       cco_cancel_task(cco_task* task);                    // Cancel a spawned task+fiber; If task runs in the current
-                                                                    // fiber it equals cco_throw(cco_CANCEL) (jumps to cco_finalize:).
+void            cco_cancel(struct cco_group* grp);                  // Cancel all spawned subtasks+fibers in the task-group upon next
+                                                                    // suspension point.
+cco_task*       cco_cancel_task(cco_task* task);                    // Cancel a spawned task+fiber. Like cco_throw(cco_CANCEL), but
+                                                                    // control is not immediately transferred to cco_finalize: when
+                                                                    // task is the current running.
 cco_fiber*      cco_cancel_fiber(cco_fiber* fiber);                 // Cancel fiber with its current task upon next suspension point.
-void            cco_cancel_all(struct cco_group* grp);              // Cancel all spawned subtasks in the task-group.
 
 ```
 #### Task Error Handling
@@ -117,16 +119,17 @@ cco_fiber*      cco_as_fiber(MyFiber* fib)                          // Type-chec
                 cco_await_all(struct cco_group* grp);               // Await all (remaining) subtasks in task-group grp to finish.
                 cco_await_any(struct cco_group* grp);               // Await any subtask in task-group to finish, and *cancel remaining*!
                 cco_await_n(int n, struct cco_group* grp);          // Await n spawned tasks in grp. NB! Does *not* cancel remaining tasks.
-                cco_await_subtasks();                               // Await all spawned tasks in all groups in current task.
-                cco_await_all_fibers();                             // Awaits all fibers/spawned tasks to be joined.
+                cco_await_subtasks();                               // Await all spawned tasks in all groups spawned from current task.
+                cco_await_all_fibers();                             // Await all fibers/spawned tasks (globally in current thread).
 
-                cco_await_cancel_all(struct cco_group* grp);        // Cancel and await all spawned subtasks in grp.
-                                                                    // Shorthand for cco_cancel_all(grp) + cco_await_all(grp).
+                cco_await_cancel(struct cco_group* grp);            // Cancel and await all spawned subtasks in grp.
+                                                                    // Shorthand for cco_cancel(grp) + cco_await_all(grp).
                 cco_await_cancel_task(cco_task* task);              // Cancel and await for a task to finalize async.
                                                                     // Shorthand for cco_cancel_task() + cco_await_task().
-                cco_await_cancel_subtasks();                        // Cancel and await all spawned subtasks (in all groups) in current task.
+                cco_await_cancel_subtasks();                        // Cancel and await all tasks in all groups spawned from current task.
                                                                     // Used for closing running subtasks on error/throw during finalize.
-                cco_await_cancel_all_fibers();                      // Cancel and await all running tasks/fibers (except current). Use on panic.
+                cco_await_cancel_all_fibers();                      // Cancel and await all running tasks/fibers (except current)
+                                                                    // to force closedown of program with proper coroutines cleanup.
 ```
 #### Channels
 A channel represents a communication syncronization point for collaborating tasks. One of the tasks should own/store
@@ -152,7 +155,7 @@ void            cco_on_subtask_error(cco_task* tsk, int policy);    // Set polic
                 cco_group_scope { ... }                             // Open a new task-group scope, and use cco_scope() to get current group.
 cco_group*      cco_scope(void);                                    // Get task-group for spawned tasks in the *current* group scope.
 cco_group*      cco_group(int scope_level);                         // Get task-group for a specific group scope. May also be used
-                                                                    // without a cco_group_scope {...}. NB! see cco_task_struct(...)
+                                                                    // without a cco_group_scope {...}. NB! see MAX_GROUPS in cco_task_struct(...)
 
 cco_fiber*      cco_spawn(cco_task* tsk, struct cco_group* grp);    // Lazily spawn a new concurrent task within a task-group.
                                                                     // NB: task is started first on next cco_await/yield/suspend!
@@ -411,7 +414,7 @@ int Dining(struct Dining* o) {
         cco_await_timer(&o->tm, o->duration);
 
         cco_finalize:
-        cco_await_cancel_all(cco_group(0));
+        cco_await_cancel(cco_group(0));
         puts("Dining done");
     }
     return 0;

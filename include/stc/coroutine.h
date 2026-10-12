@@ -80,6 +80,8 @@ enum cco_status_bits {
 #define cco_env(tsk) cco_data(tsk)                       // [deprecated]
 #define cco_set_env(tsk, ptr) cco_set_data_ptr(tsk, ptr) // [deprecated]
 #define cco_cleanup cco_finalize                         // [deprecated]
+#define cco_cancel_all cco_cancel                        // [deprecated]
+#define cco_await_cancel_all cco_await_cancel            // [deprecated]
 
 /*
  * struct cco_group (wait-group / task-group):
@@ -272,7 +274,7 @@ STC_EXTERN cco_fiber* cco_execute_next(cco_fiber* fib);  // resume the next fibe
 
 STC_EXTERN cco_fiber* _cco_new_fiber(cco_task* task, void* data);
 STC_EXTERN cco_fiber* _cco_spawn(cco_task* task, struct cco_group* grp, void* data, cco_fiber* fib);
-STC_EXTERN bool       _cco_cancel_all(cco_fiber* fib, struct cco_group* grp, const char* file, int32_t line);
+STC_EXTERN bool       _cco_cancel(cco_fiber* fib, struct cco_group* grp, const char* file, int32_t line);
 STC_EXTERN void       _cco_throw(cco_task* caller, cco_err_t err);
 
 #define _cco_getbase() \
@@ -402,8 +404,8 @@ static inline cco_task* _cco_cancel_task(cco_task* tsk, cco_err_t err) {
 }
 
 /* Cancel all tasks in a group and unwind await stack */
-#define cco_cancel_all(a_group) \
-    _cco_cancel_all(cco_fib(), a_group, __FILE__, __LINE__)
+#define cco_cancel(a_group) \
+    _cco_cancel(cco_fib(), a_group, __FILE__, __LINE__)
 
 
 /*
@@ -426,7 +428,7 @@ static inline cco_task* _cco_cancel_task(cco_task* tsk, cco_err_t err) {
 #define cco_await_any(a_group) cco_await_any_AT(a_group, _cco_LBL)
 #define cco_await_any_AT(a_group, LBL) do { /* await 1; cancel remaining */ \
     cco_await_n_AT(1, a_group, LBL); \
-    cco_cancel_all(_cco_st->tmp_grp); \
+    cco_cancel(_cco_st->tmp_grp); \
     cco_await_AT(_cco_st->tmp_grp->spawn_count == 0, (LBL + 2000000)); /* await_all() */ \
 } while (0)
 
@@ -451,10 +453,10 @@ static inline cco_task* _cco_cancel_task(cco_task* tsk, cco_err_t err) {
 #define cco_await_cancel_task_AT(a_task, LBL) \
     cco_await_task_AT(cco_cancel_task(a_task), cco_DONE, LBL)
 
-#define cco_await_cancel_all(a_group) cco_await_cancel_all_AT(a_group, _cco_LBL)
-#define cco_await_cancel_all_AT(a_group, LBL) do { \
+#define cco_await_cancel(a_group) cco_await_cancel_AT(a_group, _cco_LBL)
+#define cco_await_cancel_AT(a_group, LBL) do { \
     _cco_st->tmp_grp = a_group; \
-    cco_cancel_all(_cco_st->tmp_grp); \
+    cco_cancel(_cco_st->tmp_grp); \
     cco_await_all_AT(_cco_st->tmp_grp, LBL); \
 } while (0)
 
@@ -463,12 +465,12 @@ static inline cco_task* _cco_cancel_task(cco_task* tsk, cco_err_t err) {
     for (_cco_st->scope_idx = cco_num_scopes() - 1 \
          ; _cco_st->scope_idx >= 0 \
          ; --_cco_st->scope_idx) \
-        cco_await_cancel_all_AT(&_cco_st->group[_cco_st->scope_idx], LBL); \
+        cco_await_cancel_AT(&_cco_st->group[_cco_st->scope_idx], LBL); \
 } while (0)
 
 #define cco_await_cancel_all_fibers() cco_await_cancel_all_fibers_AT(_cco_LBL)
 #define cco_await_cancel_all_fibers_AT(LBL) do { \
-    cco_cancel_all(NULL); \
+    cco_cancel(NULL); \
     cco_await_all_fibers_AT(LBL); \
 } while (0)
 
@@ -681,7 +683,7 @@ cco_fiber* _cco_new_fiber(cco_task* task, void* data) {
     return new_fb;
 }
 
-bool _cco_cancel_all(cco_fiber* fib, struct cco_group* grp, const char* file, int32_t line) {
+bool _cco_cancel(cco_fiber* fib, struct cco_group* grp, const char* file, int32_t line) {
     // Cancel all tasks/fibers spawned in grp
     if (grp && grp->spawn_count == 0)
         return false;
@@ -727,7 +729,7 @@ int cco_execute(cco_fiber* fib) {
                     int32_t err = cco_SUBTASK_FAIL;
                     switch (fib->failed_grp->on_error) {
                         case cco_POLICY_SHUTDOWN: // cancel all other tasks in the failed group, and notify parent.
-                            _cco_cancel_all(fib, fib->failed_grp, fib->error.file, fib->error.line);
+                            _cco_cancel(fib, fib->failed_grp, fib->error.file, fib->error.line);
                             err = cco_SHUTDOWN; /* FALLTHRU */
                         case cco_POLICY_NOTIFY:   // notify parent that subtask failed.
                             fib->parent->error = fib->error;

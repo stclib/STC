@@ -50,7 +50,7 @@ int maintask(struct Maintask* o) {
         cco_await_timer(&o->tm, 0.5);
 
         cco_finalize:
-        cco_await_cancel_all(cco_group(0));
+        cco_await_cancel(cco_group(0));
         puts("done");
     }
     return 0;

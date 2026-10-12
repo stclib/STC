@@ -101,7 +101,7 @@ int taskB(struct TaskB* o) {
         if (cco_catch(99)) {
             printf("TaskB: handling error '99' thrown in %s:%d\n", cco_err().file, cco_err().line);
             //cco_clear_err();
-            //cco_await_cancel_all(cco_group(0));
+            //cco_await_cancel(cco_group(0));
             cco_recover;
         }        
         puts("TaskB: done");

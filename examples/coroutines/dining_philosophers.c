@@ -81,7 +81,7 @@ int Dining(struct Dining* o) {
         if (cco_catch(cco_SHUTDOWN)) {
             printf("Philosopher %d CANCELED the dining.\n", (int)cco_err().info.num);
         }
-        cco_await_cancel_all(cco_group(0));
+        cco_await_cancel(cco_group(0));
         printf("Dining time of %.1f minutes is over.\n", cco_timer_elapsed(&o->timer)*10);
     }
     return 0;
