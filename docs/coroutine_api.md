@@ -1,30 +1,29 @@
 # STC [Coroutines](../include/stc/coroutine.h)
 ![Coroutine](pics/coroutine.png)
 
-This is a small, portable, ergonomic implementation of coroutines in C99.
+## A compact, portable, and ergonomic implementation of structured concurrency in pure C99
 
-* Stackless, fully typesafe coroutines.
-* Supports spawning of concurrent tasks using ***fibers/green threads***, managed by the internal scheduler.
-* Tasks may be associated with a ***task-group***, which must be awaited for to finish.
-* Supports both ***asymmetric/structured concurrency*** and ***symmetric transfer*** of control between coroutines.
-* Strong error handling and cleanup support. Users may *throw* errors and handle/recover from them up the "call stack"
-(resume from the original suspension point).
-* Asynchronous coroutine destruction/cleanup support.
-* The coroutine frames/objects will be cleaned up at the `cco_finalize:` label inside the `cco_async` scope.
-This will also happen on errors thrown and on coroutine cancellation.
-* Fibers are allocated on the heap and automatically freed by the scheduler. Coroutine frames are provided
-by the user, and can be either stack or heap allocated.
-* Unhandled errors will exit program with an error message including the offending throw's line number.
-* Tiny memory usage, about 100 bytes overhead per fiber, and 50 bytes per coroutine object/task.
+* Stackless, fully typesafe coroutines using the fiber model (analogous to threads), but works in a single thread.
+* Fully supports ***structured concurrency:*** spawn (or fork) concurrent **tasks** with lifetimes limited by the spawner's lifetime.
+    * By default, cancels all other spawned sub-tasks if one of them cancels or fails, and propagates error to the spawner task.
+    * Spawning a new task creates a new fiber in which it runs.
+    * Supports multi-level ***task-group*** scopes, where each scope/group can be awaited to complete all its spawned subtasks.
+* Supports awaiting a task (aka "calling" a task), which then "runs in" the same fiber as the task awaiter.
+* A task embeds a self-contained function, which may have an optional `cco_finalize:` label where error handling and cleanup should be done.
+* Supports `cco_throw()` for error and cancellation. This propagates up the "call"/awaiter stack, or back to its spawner.
+* Supports both ***asymmetric/structured concurrency*** and ***symmetric transfer***, which does not automatically resume control back to its caller task when it is done.
+* Destruction/cleanup of tasks may also be *asynchronous* (unlike e.g. c++ coroutines).
+* Fiber objects are allocated on the heap and automatically freed by the default scheduler.
+* Task objects are provided by the user, and may be either stack or heap allocated.
+* Unhandled throw-errors will exit program with an error message including the offending throw's line number/info.
+* Tiny memory usage, about 120 bytes overhead per base fiber and 64 bytes per base task.
 
-Because coroutines are stackless, a common usage is to let each coroutine frame store the coroutine
-frames to be called/awaited for, typically on the stack. The coroutine frame holds the local
-variables and input/output used within its coroutine scope. This has the advantage
-that coroutines become truely lightweight and may therefore be used in memory constrained / embedded systems.
+Because coroutines are stackless, a common usage is to store task objects to be spawned or awaited for inside
+the parent task object, which aligns with structured concurrency lifetime requirements. This is also quite
+optimal for memory usage, so such tasks may be used in memory constrained and embedded systems.
 
-The coroutine frames may alternatively be allocated on the heap, e.g. individually allocated just before
-they are called/awaited for. In this case, each coroutine must free themselves between the `cco_async`
-scope end, and `return 0`.
+When tasks are allocated on the heap, they are often dynamically allocated just before they are spawned or
+awaited for. Then each task may free itself after the `cco_async` scope block, right before `return 0`.
 
 ## Methods and statements
 
@@ -37,10 +36,10 @@ scope end, and `return 0`.
                 cco_suspend;                                        // Suspend execution. Short for cco_yield_v(cco_SUSPEND)
                 cco_await(bool condition);                          // Suspend with cco_AWAIT status if condition is false,
                                                                     // resumes at the condition test, not after.
-                cco_finalize:                                       // Label marks where cleanup of the task/coroutine frame happens.
-                                                                    // Jumps here on cco_return, cco_throw(), cco_cancel_task(self).
+                cco_finalize:                                       // Label for cleanup/error handling in the task/coroutine frame.
+                                                                    // Jumps here directly on cco_return and cco_throw().
                 cco_return;                                         // Finish coroutine. Jumps to cco_finalize: label. If already passed
-                                                                    // it or label is absent, exit the cco_async scope.
+                                                                    // it or label is absent, exit out of the cco_async scope.
                 cco_abandon();                                      // Leave current coroutine immediately, skip cco_finalize: stage.
 
 bool            cco_is_active(Coroutine* co);                       // Is coroutine active/not done?.
@@ -212,22 +211,21 @@ bool            cco_flt_takewhile(bool predicate);                  // Use inste
 
 ## Rules
 1. All cco-features must be called/placed in the ***cco_async*** scope.
-2. Generally, do not declare local variables within a ***cco_async*** scope. They are only alive until next
-***cco_suspend***, ***cco_yield..***, or ***cco_await..***!! Normally place them in the coroutine struct.
-Be particularly careful with control variables in loops.
-3. Do not call ***cco_suspend***, ***cco_yield..*** or ***cco_await..*** inside a `switch` statement. Use `if-else-if` in those cases.
-4. Never use regular `return` inside ***cco_async*** scope, always use ***cco_return***.
-5. Resuming a coroutine after it has returned 0 (cco_DONE) is undefined behaviour ***if*** there is additional
-code between the ***cco_async*** scope and `return 0`.
+2. Generally, do not declare local variables within a ***cco_async*** scope. They are only alive until
+next ***cco_suspend***, ***cco_yield..***, or ***cco_await..*** (be particularly careful with control
+variables in loops). Place them in the coroutine struct! This applies also for coroutine *input* parameters
+and *return*/*output* data. However, these may often be better managed with the `cco_data()` mechanism.
+3. You may not call ***cco_suspend***, ***cco_yield..*** or ***cco_await..*** inside a `switch` statement.
+Generally avoid `switch` and use `if-else-if` instead.
+4. Never use regular `return` inside ***cco_async*** scope, use ***cco_return*** instead.
+5. Resuming a coroutine after it has returned 0 (cco_DONE) is undefined behaviour ***unless*** the
+the coroutine object itself is still alive (valid). The coroutine may then also be reinitialized and reused.
 6. There may only be one ***cco_async*** scope per coroutine.
 
 ## Implementation and examples
 A plain coroutine may have any signature, however this implementation has specific support for
 coroutines which returns `int`, indicating cco_DONE, cco_AWAIT, cco_SUSPEND, cco_YIELD, or a custom int value.
 It also require a struct pointer as one of the parameters, which must contains a member of type ***cco_base*** named `base`.
-The coroutine struct should normally store all *local* variables to be used within the coroutine
-(technically those where its usage crosses over a ***cco_yield..***, ***cco_await..*** or a ***cco_suspend***
-statement), along with *input* and *output* data/parameters for the coroutine.
 
 Both asymmetric and symmetric coroutine control flow transfer are supported when using ***tasks***
 (closures/functors), and they may be combined. Be aware of that cleanup (if needed) is harder to ensure
@@ -340,7 +338,7 @@ starts eating (because they must be waiting).
 <details>
 <summary>The "Dining philosophers" C implementation</summary>
 
-[ [Run this code](https://godbolt.org/z/qKfc7eevn) ]
+[ [Run this code](https://godbolt.org/z/11afsvncj) ]
 ```c++
 #include <stdio.h>
 #include <time.h>
