@@ -36,11 +36,12 @@ c_union (Action,
 );
 
 void Action_drop(Action* self) {
-    if (c_is(self, ActionSpeak, s))
+    c_when (self, ActionSpeak, s) {
         cstr_drop(s);
+    }
 }
 
-void action(Action* action) {
+void my_action(Action* action) {
     c_when (action) {
         c_is(ActionSpeak, s) {
             printf("Asked to speak: %s\n", cstr_str(s));
@@ -65,9 +66,9 @@ int main(void) {
     Action act2 = c_variant(ActionQuit, 1);
     Action act3 = c_variant(ActionRunFunc, {add, 5, 6});
 
-    action(&act1);
-    action(&act2);
-    action(&act3);
+    my_action(&act1);
+    my_action(&act2);
+    my_action(&act3);
 
     c_drop(Action, &act1, &act2, &act3);
 }
@@ -80,62 +81,32 @@ int main(void) {
 #define _c_EMPTY()
 #define _c_LOOP_INDIRECTION() c_LOOP
 #define _c_LOOP_END_1 ,_c_LOOP1
-#define _c_LOOP0(f,T,x,...) f c_EXPAND((T, c_EXPAND x)) _c_LOOP_INDIRECTION _c_EMPTY()()(f,T,__VA_ARGS__)
+#define _c_LOOP0(f,U,x,...) f c_EXPAND((U, c_EXPAND x)) _c_LOOP_INDIRECTION _c_EMPTY()()(f,U,__VA_ARGS__)
 #define _c_LOOP1(...)
 #define _c_CHECK(x,...) c_TUPLE_AT_1(__VA_ARGS__,x,)
 #define _c_E0(...) __VA_ARGS__
 #define _c_E1(...) _c_E0(_c_E0(_c_E0(_c_E0(_c_E0(_c_E0(__VA_ARGS__))))))
 #define _c_E2(...) _c_E1(_c_E1(_c_E1(_c_E1(_c_E1(_c_E1(__VA_ARGS__))))))
 #define c_EVAL(...) _c_E2(_c_E2(_c_E2(__VA_ARGS__))) // currently supports up to 130 variants
-#define c_LOOP(f,T,x,...) _c_CHECK(_c_LOOP0, c_JOIN(_c_LOOP_END_, c_NUMARGS(c_EXPAND x)))(f,T,x,__VA_ARGS__)
+#define c_LOOP(f,U,x,...) _c_CHECK(_c_LOOP0, c_JOIN(_c_LOOP_END_, c_NUMARGS(c_EXPAND x)))(f,U,x,__VA_ARGS__)
 
 
 #define _c_enum_1(x,...) (x=__LINE__*1000, __VA_ARGS__)
-#define _c_vartuple_enum(T, Tag, ...) Tag,
-#define _c_vartuple_type(T, Tag, ...) typedef __VA_ARGS__ Tag##_type; typedef T Tag##_sumtype;
-#define _c_vartuple_item(T, Tag, ...) struct { enum T##_kind id; Tag##_type item; } Tag;
+#define _c_vartuple_enum(U, Tag, ...) Tag,
+#define _c_vartuple_type(U, Tag, ...) typedef __VA_ARGS__ Tag##_type; typedef U Tag##_sumtype;
+#define _c_vartuple_item(U, Tag, ...) struct { enum U##_tag id; Tag##_type item; } Tag;
 
-#define c_union(T, ...) \
-    typedef union T T; \
-    enum T##_kind { c_EVAL(c_LOOP(_c_vartuple_enum, T, _c_enum_1 __VA_ARGS__, (0),)) }; \
-    c_EVAL(c_LOOP(_c_vartuple_type, T, __VA_ARGS__, (0),)) \
-    union T { \
-        enum T##_kind id; \
-        c_EVAL(c_LOOP(_c_vartuple_item, T, __VA_ARGS__, (0),)) \
+#define c_union(U, ...) \
+    typedef union U U; \
+    enum U##_tag { c_EVAL(c_LOOP(_c_vartuple_enum, U, _c_enum_1 __VA_ARGS__, (0),)) }; \
+    c_EVAL(c_LOOP(_c_vartuple_type, U, __VA_ARGS__, (0),)) \
+    union U { \
+        enum U##_tag id; \
+        c_EVAL(c_LOOP(_c_vartuple_item, U, __VA_ARGS__, (0),)) \
     }
 #define c_sumtype c_union // [deprecated]?
 
-#ifdef STC_HAS_TYPEOF
-    #define c_when(varptr) \
-        for (c_typeof(varptr) _vp1 = (varptr); _vp1; _vp1 = NULL) \
-        switch (_vp1->id)
-
-    #define c_is_2(Tag, x) \
-        break; case Tag: \
-        for (c_typeof(_vp1->Tag.item)* x = &_vp1->Tag.item; x; x = NULL)
-
-    #define c_is_3(varptr, Tag, x) \
-        false) ; else for (c_typeof(varptr) _vp2 = (varptr); _vp2; _vp2 = NULL) \
-            if (c_is_variant(_vp2, Tag)) \
-                for (c_typeof(_vp2->Tag.item) *x = &_vp2->Tag.item; x; x = NULL
-#else
-    typedef union { int id; } _c_any_variant;
-    #define c_when(varptr) \
-        for (_c_any_variant* _vp1 = (_c_any_variant *)(varptr); \
-             _vp1; _vp1 = NULL, (void)sizeof((varptr)->id)) \
-            switch (_vp1->id)
-
-    #define c_is_2(Tag, x) \
-        break; case Tag: \
-        for (Tag##_type *x = &((Tag##_sumtype *)_vp1)->Tag.item; x; x = NULL)
-
-    #define c_is_3(varptr, Tag, x) \
-        false) ; else for (Tag##_sumtype* _vp2 = c_as_mut(Tag##_sumtype*, varptr); _vp2; _vp2 = NULL) \
-            if (c_is_variant(_vp2, Tag)) \
-                for (Tag##_type *x = &_vp2->Tag.item; x; x = NULL
-#endif
-
-// Handling multiple tags with different payloads:
+#define c_when(...) c_MACRO_OVERLOAD(c_when, __VA_ARGS__)
 #define c_is(...) c_MACRO_OVERLOAD(c_is, __VA_ARGS__)
 #define c_is_1(Tag) \
     break; case Tag:
@@ -143,31 +114,44 @@ int main(void) {
 #define c_or_is(Tag) \
     ; case Tag:
 
-// Type checked multiple tags with same payload:
-#define c_is_same(...) c_MACRO_OVERLOAD(c_is_same, __VA_ARGS__)
-#define _c_chk(Tag1, Tag2) \
-    case 1 ? Tag1 : sizeof((Tag1##_type*)0 == (Tag2##_type*)0):
-#define c_is_same_2(Tag1, Tag2) \
-    break; _c_chk(Tag1, Tag2) case Tag2:
-#define c_is_same_3(Tag1, Tag2, Tag3) \
-    break; _c_chk(Tag1, Tag2) _c_chk(Tag2, Tag3) case Tag3:
-#define c_is_same_4(Tag1, Tag2, Tag3, Tag4) \
-    break; _c_chk(Tag1, Tag2) _c_chk(Tag2, Tag3) _c_chk(Tag3, Tag4) case Tag4:
-
 #define c_otherwise \
     break; default:
+
+#ifdef STC_HAS_TYPEOF
+    #define c_when_1(varptr) \
+        for (c_typeof(varptr) _vp1 = (varptr); _vp1; _vp1 = NULL) \
+        switch (_vp1->id)
+
+    #define c_when_3(varptr, Tag, x) \
+        for (c_typeof((varptr)->Tag.item) *x = &(varptr)->Tag.item \
+             ; x && c_container_of(x, Tag##_sumtype, Tag.item)->Tag.id == Tag \
+             ; x = NULL)
+
+    #define c_is_2(Tag, x) \
+        break; case Tag: \
+        for (c_typeof(_vp1->Tag.item)* x = &_vp1->Tag.item; x; x = NULL)
+#else
+    typedef union { int id; } _c_any_variant;
+    #define c_when(varptr) \
+        for (_c_any_variant* _vp1 = (_c_any_variant *)(varptr); \
+             _vp1; _vp1 = NULL, (void)sizeof((varptr)->id)) \
+            switch (_vp1->id)
+
+    #define c_when_3(varptr, Tag, x) \
+        for (Tag##_type *x = &(varptr)->Tag.item \
+            ; x && c_container_of(x, Tag##_sumtype, Tag.item)->Tag.id == Tag \
+            ; x = NULL)
+
+    #define c_is_2(Tag, x) \
+        break; case Tag: \
+        for (Tag##_type *x = &((Tag##_sumtype *)_vp1)->Tag.item; x; x = NULL)
+#endif
 
 #define c_variant(Tag, ...) \
     (c_literal(Tag##_sumtype){.Tag={.id=Tag, .item=__VA_ARGS__}})
 
 #define c_is_variant(varptr, Tag) \
     ((varptr)->Tag.id == Tag)
-
-#define c_get_variant(varptr, Tag) \
-    (c_assert(c_is_variant(varptr, Tag)), &(varptr)->Tag.item)
-
-#define c_get_if(varptr, Tag) \
-    (c_is_variant(varptr, Tag) ? &(varptr)->Tag.item : NULL)
 
 #define c_variant_id(varptr) \
     ((varptr)->id)

@@ -16,7 +16,7 @@ void Tree_drop(Tree*);
 #include <stc/rc.h>
 
 void Tree_drop(Tree* self) {
-    if (c_is(self, Tree_NODE, n)) {
+    c_when (self, Tree_NODE, n) {
         RcTree_drop(&n->left);
         RcTree_drop(&n->right);
     }

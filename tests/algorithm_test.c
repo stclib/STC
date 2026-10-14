@@ -104,8 +104,9 @@ c_union (Action,
 );
 
 void Action_drop(Action* self) {
-    if (c_is(self, ActionSpeak, s))
+    c_when (self, ActionSpeak, s) {
         cstr_drop(s);
+    }
 }
 
 static void action(Action* action, cstr* out) {

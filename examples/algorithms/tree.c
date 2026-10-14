@@ -10,7 +10,7 @@ c_union (Tree,
 );
 
 void Tree_drop(Tree* tree) {
-    if (c_is(tree, Tree_NODE, n)) {
+    c_when (tree, Tree_NODE, n) {
         Tree_drop(n->left);
         Tree_drop(n->right);
     }

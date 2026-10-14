@@ -126,58 +126,50 @@ called a *variant* of the sum type. The type itself is a **union** type, aka. a 
 
 Synopsis:
 ```c++
-// Define a sum type
-c_union (SumType,
-    (TagA, UnionTypeA),
-    (TagB, UnionTypeB),
-    (TagC, UnionTypeC),  // final comma is optional
+// Define a tagged union
+c_union (MyUnion,
+    (TagA, VariantTypeA),
+    (TagB, VariantTypeB),
+    (TagC, VariantTypeC),  // final comma is optional
 );
 
-// This creates the types:
+// This generates the types:
 
-enum SumType_kind { TagA=NN, TagB, TagC, };
+enum MyUnion_tag { TagA=NN, TagB, TagC, };
 
-typedef union SumType {
+typedef union MyUnion {
     int id;
-    struct { enum SumType_kind id; TagA_type item; } TagA;
-    struct { enum SumType_kind id; TagB_type item; } TagB;
-    struct { enum SumType_kind id; TagC_type item; } TagC;
-} SumType;
+    struct { enum MyUnion_tag id; TagA_type item; } TagA;
+    struct { enum MyUnion_tag id; TagB_type item; } TagB;
+    struct { enum MyUnion_tag id; TagC_type item; } TagC;
+} MyUnion;
 
-SumType       c_variant(SumType_kind tagX, TagX_type item);  // Construct a tagged union variant (typesafe).
-bool          c_is_variant(SumType* obj, SumType_kind tag);  // True if obj holds the tag.
-EnumTag_type* c_get_if(SumType* obj, SumType_kind tag);      // NULL unless obj holds the tag.
-EnumTag_type* c_get(SumType* obj, SumType_kind tag);         // Assert error unless obj holds the tag.
-int           c_variant_id(SumType* obj);                    // (mainly for debugging)
+MyUnion       c_variant(MyUnion_tag tag, Tag_type payload);     // Construct a tagged union variant (typesafe).
+bool          c_is_variant(MyUnion* obj, enum MyUnion_tag tag); // True if obj holds the tag.
+int           c_variant_id(MyUnion* obj);                       // (mainly for debugging)
 
-// Use a sum type
-c_when (SumType* obj) {
-    c_is(TagA, TagA_type* x)
-        ActionA(x);
-    c_is_same(TagB, TagC, TagD)                              // same payload types (checked)
-        ActionBCD(obj->TagB.item);
-    c_is(TagX) c_or_is(TagY)                                 // different payload types
-        ActionXY();
-    c_otherwise                                              // optional, silence exhaustiveness-check
+// Access the union:
+c_when (obj) {         /* MyUnion* obj */
+    c_is(TagA, a)      /* TagA_type* a */                       // handle one tag
+        ActionA(a);
+    c_is(TagB) c_or_is(TagC)                                    // handle two different variants the same
+        ActionBC();
+    c_otherwise                                                 // optional, silences exhaustiveness-check
         ActionElse(obj);
 }
 
-// Use a single sum type (*)
-if (c_is(SumType* obj, TagX, TagX_type* x))
-    ActionX(x);
+// Access a single variant only:
+c_when (obj, TagC, c) {
+    ActionC(c);
+}
 ```
 The **c_when** statement is exhaustive. The compiler will give a warning if not all variants are
 covered by **c_is** (requires `-Wall` or `-Wswitch` gcc/clang compiler flag). The first enum tag
 is deliberately set to `__LINE__*1000` in order to easier detect zero/un-initialized variants
 and distinguish between types (can be inspected with c_variant_id()).
 
-* Note: The `x` variables in the synopsis are "auto" type declared/defined - see examples.
-* Caveat 1: `c_when()` and `if (c_is())` behaves like a one-iteration loop; i.e, the use of `continue`
-  and `break` will just break out of its block (meaning not out of any outer loop/switch).
-* Caveat 2: Sum types will generally not work in coroutines because the `x` variable is local and therefore
-will not be preserved across `cco_suspend` / `cco_yield..` / `cco_await..`.
-* Caveat 3: The second usage (*), `c_is(obj, TAG, x)` may only be used isolated in an if-statement, like
-shown or in the _drop() function of Example 2 below.
+* Caveat: Sum types will generally not work in coroutines because the variant pointer in c_when()
+is local and will therefore not be preserved across `cco_suspend` / `cco_yield..` / `cco_await..`.
 
 ### Example 1
 
@@ -219,7 +211,7 @@ int main(void) {
 This example has two sum types. The `MessageChangeColor` variant uses the `Color` sum type as
 its data type (payload). Because C does not have namespaces, it is recommended to prefix the variant names with the sum type name, as with regular enums.
 
-[ [Run this code](https://godbolt.org/z/c8EqnGs3n) ]
+[ [Run this code](https://godbolt.org/z/erWMT9cex) ]
 ```c++
 // https://doc.rust-lang.org/book/ch18-03-pattern-syntax.html#destructuring-enums
 #include <stdio.h>
@@ -239,8 +231,9 @@ c_union (Message,
 );
 
 void Message_drop(Message* m) {
-    if (c_is(m, MessageWrite, s))
+    c_when (m, MessageWrite, s) {
         cstr_drop(s);
+    }
 }
 
 int main(void) {
