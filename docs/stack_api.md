@@ -13,7 +13,7 @@ See the c++ class [std::stack](https://en.cppreference.com/w/cpp/container/stack
 ```c++
 #define T <ct>, <kt>[, (<opt>)[, <CAP>]] // shorthand for defining stack name, i_key, and i_opt
 // <CAP>: If given, stack becomes an inplace stack using runtime stack memory only with CAP capacity.
-// Common <opt> traits:
+// Common <opt> element type traits:
 //   c_compare_key - Key type <kt> is a comparable typedef'ed type. Auto-enables c_use_compare.
 //                Binds <kt>_cmp(), <kt>_eq() "member" function names.
 //   c_class_key - Additionally binds <kt>_clone() and <kt>_drop() function names.
@@ -50,8 +50,8 @@ See the c++ class [std::stack](https://en.cppreference.com/w/cpp/container/stack
 ```c++
 stack_X         stack_X_init(void);
 stack_X         stack_X_with_capacity(isize_t cap);
-stack_X         stack_X_with_size(isize_t size, i_keyraw rawval);
-stack_X         stack_X_with_size_uninit(isize_t size);
+stack_X         stack_X_with_size(isize_t size, i_keyraw rawval);               // stack with size elements inited with rawval
+stack_X         stack_X_with_size_uninit(isize_t size);                         // stack with size uninitialized elements
 
 stack_X         stack_X_clone(stack_X st);
 void            stack_X_copy(stack_X* self, const stack_X* other);
@@ -83,13 +83,13 @@ i_key*          stack_X_back_mut(stack_X* self);
 
 i_key*          stack_X_push(stack_X* self, i_key value);
 i_key*          stack_X_emplace(stack_X* self, i_keyraw raw);
-i_key*          stack_X_append_uninit(stack_X* self, isize_t n);
-
+i_key*          stack_X_append_uninit(stack_X* self, isize_t n);                // appends n unitialized elements
+                                                                                // and returns a pointer to first of them
 void            stack_X_pop(stack_X* self);                                     // destroy last element
 i_key           stack_X_pull(stack_X* self);                                    // move out last element
 
 // Requires either i_use_cmp, i_cmp or i_less defined:
-void            stack_X_sort(stack_X* self);                                    // quicksort from sort.h
+void            stack_X_sort(stack_X* self);                                    // uses quicksort from sort.h
 isize_t         stack_X_lower_bound(const stack_X* self, const i_keyraw raw);   // return c_NPOS if not found
 isize_t         stack_X_binary_search(const stack_X* self, const i_keyraw raw); // return c_NPOS if not found
 

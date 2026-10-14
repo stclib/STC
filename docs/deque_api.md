@@ -11,7 +11,7 @@ See the c++ class [std::deque](https://en.cppreference.com/w/cpp/container/deque
 
 ```c++
 #define T <ct>, <kt>[, (<opt>)] // shorthand for defining deque name, i_key, and i_opt
-// Common <opt> traits:
+// Common <opt> element type traits:
 //   c_compare_key - Key type <kt> is a comparable typedef'ed type. Auto-enables c_use_compare.
 //                Binds <kt>_cmp(), <kt>_eq() "member" function names.
 //   c_class_key - Additionally binds <kt>_clone() and <kt>_drop() function names.

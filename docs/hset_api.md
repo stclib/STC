@@ -8,7 +8,7 @@ A **hset** is an associative container that contains a set of unique objects of 
 
 ```c++
 #define T <ct>, <kt>[, (<opt>)] // shorthand for defining set name, i_key, and i_opt
-// Common <opt> traits:
+// Common <opt> element type traits:
 //   c_compare_key - Key type <kt> is a comparable typedef'ed type.
 //                 Binds <kt>_eq(), <kt>_hash() "member" function names.
 //   c_class_key - Additionally binds <kt>_clone() and <kt>_drop() function names.

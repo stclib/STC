@@ -8,7 +8,7 @@ See the c++ class [std::queue](https://en.cppreference.com/w/cpp/container/queue
 ## Header file and declaration
 ```c++
 #define T <ct>, <kt>[, (<opt>)] // shorthand for defining queue name, i_key, and i_opt
-// Common <opt> traits:
+// Common <opt> element type traits:
 //   c_compare_key - Key type <kt> is a comparable;
 //                Binds <kt>_less() (and <kt>_cmp()) "member" function names.
 //   c_class_key - Binds <kt>_clone() and <kt>_drop() function names.

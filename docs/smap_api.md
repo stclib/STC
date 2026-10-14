@@ -16,7 +16,7 @@ See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) fo
 
 ```c++
 #define T <ct>, <kt>, <vt>[, (<opt>)] // shorthand for defining map name, i_key, i_val, and i_opt
-// Common <opt> traits:
+// Common <opt> element type traits:
 //   c_compare_key - Key type <kt> is a comparable typedef'ed type.
 //                 Binds <kt>_cmp() "member" function name.
 //   c_class_key - Additionally binds <kt>_clone() and <kt>_drop() function names.

@@ -13,7 +13,7 @@ See the c++ class [std::vector](https://en.cppreference.com/w/cpp/container/vect
 
 ```c++
 #define T <ct>, <kt>[, (<opt>)] // shorthand for defining vec name, i_key and i_opt
-// Common <opt> traits:
+// Common <opt> element type traits:
 //   c_compare_key - Key type <kt> is a comparable typedef'ed type. Auto-enables c_use_compare.
 //                Binds <kt>_cmp(), <kt>_eq() "member" function names.
 //   c_class_key - Additionally binds <kt>_clone() and <kt>_drop() function names.
@@ -50,8 +50,8 @@ See the c++ class [std::vector](https://en.cppreference.com/w/cpp/container/vect
 ```c++
 vec_X           vec_X_init(void);
 vec_X           vec_X_with_capacity(isize_t size);
-vec_X           vec_X_with_size(isize_t size, i_keyraw rawval);
-vec_X           vec_X_with_size_uninit(isize_t size);
+vec_X           vec_X_with_size(isize_t size, i_keyraw rawval);             // vec with size elements inited with rawval
+vec_X           vec_X_with_size_uninit(isize_t size);                       // vec with size uninitialized elements
 
 vec_X           vec_X_clone(vec_X vec);
 void            vec_X_copy(vec_X* self, const vec_X* other);
@@ -82,7 +82,7 @@ i_key*          vec_X_front_mut(vec_X* self);
 i_key*          vec_X_back_mut(vec_X* self);
 
                 // Requires either i_use_cmp, i_cmp or i_less defined:
-void            vec_X_sort(vec_X* self);                                    // quicksort from sort.h
+void            vec_X_sort(vec_X* self);                                    // uses quicksort from sort.h
 isize_t         vec_X_lower_bound(const vec_X* self, const i_keyraw raw);   // return c_NPOS if not found
 isize_t         vec_X_binary_search(const vec_X* self, const i_keyraw raw); // return c_NPOS if not found
 
@@ -95,9 +95,10 @@ void            vec_X_pop(vec_X* self);                                     // d
 void            vec_X_pop_back(vec_X* self);                                // alias for pop
 i_key           vec_X_pull(vec_X* self);                                    // move out last element
 
-vec_X_iter      vec_X_insert_n(vec_X* self, isize_t idx, const i_key arr[], isize_t n); // move values
-vec_X_iter      vec_X_insert_at(vec_X* self, vec_X_iter it, i_key value);   // move value
-vec_X_iter      vec_X_insert_uninit(vec_X* self, isize_t idx, isize_t n);   // return iter at idx
+vec_X_iter      vec_X_insert_n(vec_X* self, isize_t idx, const i_key arr[], isize_t n); // bulk move inserts n elements
+vec_X_iter      vec_X_insert_at(vec_X* self, vec_X_iter it, i_key value);
+vec_X_iter      vec_X_insert_uninit(vec_X* self, isize_t idx, isize_t n);   // inserts n unitialized elements
+                                                                            //  at idx, and returns an iter at idx.
 
 vec_X_iter      vec_X_emplace_n(vec_X* self, isize_t idx, const i_keyraw raw[], isize_t n);
 vec_X_iter      vec_X_emplace_at(vec_X* self, vec_X_iter it, i_keyraw raw);
