@@ -96,6 +96,7 @@ TEST(algorithm, c_filter)
 
 c_union (Action,
     (ActionSpeak, cstr),
+    (ActionSing, cstr),
     (ActionQuit, bool),
     (ActionRunFunc, struct {
         int (*func)(int, int);
@@ -111,7 +112,8 @@ void Action_drop(Action* self) {
 
 static void action(Action* action, cstr* out) {
     c_when (action) {
-        c_is(ActionSpeak, s) {
+        c_is(ActionSpeak) c_or_is(ActionSing, s) {
+            (void)(s == &(ActionSpeak_type){0});
             cstr_printf(out, "Asked to speak: %s\n", cstr_str(s));
         }
         c_is(ActionQuit) {
@@ -130,20 +132,23 @@ static int add(int a, int b) {
 }
 
 TEST(algorithm, c_union) {
-    Action act1 = c_variant(ActionSpeak, cstr_from("Hello"));
+    Action actX = c_variant(ActionSing, cstr_from("Sing-a-long"));
+    Action act1 = c_variant(ActionSpeak, cstr_from("Speak your mind"));
     Action act2 = c_variant(ActionQuit, 1);
     Action act3 = c_variant(ActionRunFunc, {add, 5, 6});
 
     cstr res = {0};
+    action(&actX, &res);
+    EXPECT_STREQ(cstr_str(&res), "Asked to speak: Sing-a-long\n");
     action(&act1, &res);
-    EXPECT_STREQ(cstr_str(&res), "Asked to speak: Hello\n");
+    EXPECT_STREQ(cstr_str(&res), "Asked to speak: Speak your mind\n");
     action(&act2, &res);
     EXPECT_STREQ(cstr_str(&res), "Asked to quit!\n");
     action(&act3, &res);
     EXPECT_STREQ(cstr_str(&res), "v1: 5, v2: 6, res: 11\n");
 
     EXPECT_TRUE(c_is_variant(&act1, ActionSpeak));
-    EXPECT_STREQ(cstr_str(&act1.ActionSpeak.item), "Hello");
+    EXPECT_STREQ(cstr_str(&act1.ActionSpeak.item), "Speak your mind");
 
     c_drop(Action, &act1, &act2, &act3);
     c_drop(cstr, &res);

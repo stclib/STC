@@ -101,17 +101,28 @@ int main(void) {
     enum U##_tag { c_EVAL(c_LOOP(_c_vartuple_enum, U, _c_enum_1 __VA_ARGS__, (0),)) }; \
     c_EVAL(c_LOOP(_c_vartuple_type, U, __VA_ARGS__, (0),)) \
     union U { \
-        enum U##_tag id; \
+        int tag_id; \
+        enum U##_tag tag; \
         c_EVAL(c_LOOP(_c_vartuple_item, U, __VA_ARGS__, (0),)) \
     }
+
 #define c_sumtype c_union // [deprecated]?
 
 #define c_when(...) c_MACRO_OVERLOAD(c_when, __VA_ARGS__)
+#define c_when_3(varptr, Tag, x) \
+    for (Tag##_type *x = &(varptr)->Tag.item \
+        ; x && c_container_of(x, Tag##_sumtype, Tag.item)->Tag.id == Tag \
+        ; x = NULL)
+
 #define c_is(...) c_MACRO_OVERLOAD(c_is, __VA_ARGS__)
 #define c_is_1(Tag) \
     break; case Tag:
 
-#define c_or_is(Tag) \
+#define c_is_2(Tag, x) \
+    break c_or_is_2(Tag, x)
+
+#define c_or_is(...) c_MACRO_OVERLOAD(c_or_is, __VA_ARGS__)
+#define c_or_is_1(Tag) \
     ; case Tag:
 
 #define c_otherwise \
@@ -120,31 +131,19 @@ int main(void) {
 #ifdef STC_HAS_TYPEOF
     #define c_when_1(varptr) \
         for (c_typeof(varptr) _vp1 = (varptr); _vp1; _vp1 = NULL) \
-        switch (_vp1->id)
+        switch (_vp1->tag)
 
-    #define c_when_3(varptr, Tag, x) \
-        for (c_typeof((varptr)->Tag.item) *x = &(varptr)->Tag.item \
-             ; x && c_container_of(x, Tag##_sumtype, Tag.item)->Tag.id == Tag \
-             ; x = NULL)
-
-    #define c_is_2(Tag, x) \
-        break; case Tag: \
+    #define c_or_is_2(Tag, x) \
+        ; case Tag: \
         for (c_typeof(_vp1->Tag.item)* x = &_vp1->Tag.item; x; x = NULL)
 #else
-    typedef union { int id; } _c_any_variant;
-    #define c_when(varptr) \
-        for (_c_any_variant* _vp1 = (_c_any_variant *)(varptr); \
-             _vp1; _vp1 = NULL, (void)sizeof((varptr)->id)) \
-            switch (_vp1->id)
+    #define c_when_1(varptr) \
+        for (const int* _vp_id = &(varptr)->tag_id; _vp_id; _vp_id = NULL) \
+            switch (*_vp_id)
 
-    #define c_when_3(varptr, Tag, x) \
-        for (Tag##_type *x = &(varptr)->Tag.item \
-            ; x && c_container_of(x, Tag##_sumtype, Tag.item)->Tag.id == Tag \
-            ; x = NULL)
-
-    #define c_is_2(Tag, x) \
-        break; case Tag: \
-        for (Tag##_type *x = &((Tag##_sumtype *)_vp1)->Tag.item; x; x = NULL)
+    #define c_or_is_2(Tag, x) \
+        ; case Tag: \
+        for (Tag##_type *x = &c_container_of(_vp_id, Tag##_sumtype, tag_id)->Tag.item; x; x = NULL)
 #endif
 
 #define c_variant(Tag, ...) \
@@ -154,6 +153,6 @@ int main(void) {
     ((varptr)->Tag.id == Tag)
 
 #define c_variant_id(varptr) \
-    ((varptr)->id)
+    ((varptr)->tag)
 
 #endif // STC_SUMTYPE_H_INCLUDED
