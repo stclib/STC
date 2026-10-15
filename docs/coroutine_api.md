@@ -68,7 +68,7 @@ int             cco_resume(cco_task* task);                         // Resume ta
 ```
 #### Accessors
 ```c++
-int             cco_status();                                       // Get returned status from last cco_await_task() call.
+int             cco_status();                                       // Get returned status from last cco_await*()/cco_yield*/cco_suspend.
 cco_fiber*      cco_fib();                                          // Get fiber associated with current task.
 cco_group*      cco_parent_group()                                  // Get group which current task was spawned with (NULL if not spawned).
 Data*           cco_data(cco_task* task);                           // Get auxiliary data pointer, stored in task's associated fiber.
@@ -99,7 +99,7 @@ cco_fiber*      cco_cancel_fiber(cco_fiber* fiber);                 // Cancel fi
                                                                     // Handling of error is required in a cco_finalize:, else it will abort().
                 cco_throw(cco_CANCEL, info = {0});                  // Cancel the current task. Handling is NOT required, but it can
                                                                     // optionally be aborted by cco_recover to stop propagation.
-bool            cco_catch(int err_code);                            // Return true if current error code matches err_code. Use in cco_finalize:
+bool            cco_error(int err_code);                            // Return true if current error code matches err_code. Use in cco_finalize:
                 cco_recover;                                        // Recover from a cco_throw() or cancellation upstream. Resumes from
                                                                     // the suspend point in the current task and calls cco_clear_err().
 void            cco_clear_err();                                    // Clear current fiber error state. To be used in cco_finalize section.
@@ -524,7 +524,7 @@ int TaskA(struct TaskA* o) {
         puts("TaskA work");
 
         cco_finalize:
-        if (cco_catch(99)) {
+        if (cco_error(99)) {
             // if error not handled, will cause 'unhandled error'...
             printf("TaskA recovered error '99' thrown on line %d\n", cco_err().line);
             cco_recover;

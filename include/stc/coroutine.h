@@ -63,25 +63,26 @@ enum cco_position {
     cco_POS_DONE   = -1,
     cco_POS_FINAL  = -2,
 };
-enum cco_status_bits {
+enum cco_status_bits { // suspend status
     cco_DONE    = 0,
-    cco_RECEIVE = 1<<11,
-    cco_YIELD   = 1<<12,
-    cco_SUSPEND = 1<<13,
-    cco_AWAIT   = 1<<14,
+    cco_AWAIT   = 1<<(sizeof(int)*8 - 2),
+    cco_SUSPEND = 1<<(sizeof(int)*8 - 3),
+    cco_YIELD   = 1<<(sizeof(int)*8 - 4),
+    cco_RECEIVE = 1<<(sizeof(int)*8 - 5),
 };
-#define cco_NONE 0              // no errors
-#define cco_CANCEL (1U<<30)     // can be left unhandled
-#define cco_SHUTDOWN (1U<<29)   // can be left unhandled
-#define cco_SUBTASK_FAIL ((1U<<29) + 1)
+#define cco_OK           0                      // no errors
+#define cco_CANCEL       (1U<<30)               // may be left unhandled
+#define cco_SHUTDOWN     (1U<<29)               // may be left unhandled
+#define cco_SUBTASK_FAIL (cco_SHUTDOWN + 1)     // must be handled
 
-#define _cco_LBL     (__LINE__ + 1000000)
-
+// Deprecated:
 #define cco_env(tsk) cco_data(tsk)                       // [deprecated]
 #define cco_set_env(tsk, ptr) cco_set_data_ptr(tsk, ptr) // [deprecated]
 #define cco_cleanup cco_finalize                         // [deprecated]
 #define cco_cancel_all cco_cancel                        // [deprecated]
 #define cco_await_cancel_all cco_await_cancel            // [deprecated]
+#define cco_catch cco_error                              // [deprecated]
+#define cco_NONE cco_OK                                  // [deprecated]
 
 /*
  * struct cco_group (wait-group / task-group):
@@ -92,7 +93,6 @@ struct cco_group {
     uint32_t on_error:7;
     uint32_t cancelled:1;
 };
-
 
 #define _cco_state_struct(Prefix, GROUPS) \
     struct Prefix##_state { \
@@ -161,6 +161,7 @@ struct cco_group {
         goto _resume_lbl; \
     } while (0)
 
+#define _cco_LBL     (__LINE__ + 1000000)
 
 #define cco_yield               cco_yield_v(cco_YIELD)
 #define cco_yield_v(status_bit) cco_yield_v_AT(status_bit, _cco_LBL)
@@ -336,7 +337,7 @@ enum cco_err_policy { cco_POLICY_SHUTDOWN = 0, cco_POLICY_NOTIFY = 1, cco_POLICY
         } \
     } while (0)
 
-#define cco_catch(err_code) \
+#define cco_error(err_code) \
     (_cco_st->fib->error.code == (err_code))
 
 #define cco_resume(a_task) \
