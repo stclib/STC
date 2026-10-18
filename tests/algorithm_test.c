@@ -96,7 +96,7 @@ TEST(algorithm, c_filter)
 
 c_union (Action,
     (ActionSpeak, cstr),
-    (ActionSing, cstr),
+    (ActionLog, cstr),
     (ActionQuit, bool),
     (ActionRunFunc, struct {
         int (*func)(int, int);
@@ -112,9 +112,8 @@ void Action_drop(Action* self) {
 
 static void action(Action* action, cstr* out) {
     c_when (action) {
-        c_is(ActionSpeak) c_or_is(ActionSing, s) {
-            (void)(s == &(ActionSpeak_type){0});
-            cstr_printf(out, "Asked to speak: %s\n", cstr_str(s));
+        c_is_in( c_tag(ActionSpeak) c_tag(ActionLog) ) {
+            cstr_printf(out, "Asked to speak or log message: %s\n", cstr_str(&action->ActionSpeak.item));
         }
         c_is(ActionQuit) {
             cstr_printf(out, "Asked to quit!\n");
@@ -123,7 +122,9 @@ static void action(Action* action, cstr* out) {
             int res = r->func(r->v1, r->v2);
             cstr_printf(out, "v1: %d, v2: %d, res: %d\n", r->v1, r->v2, res);
         }
-        c_otherwise c_assert(0); // "no match"
+        c_otherwise {
+            c_assert(0); // "no match"
+        }
     }
 }
 
@@ -132,23 +133,23 @@ static int add(int a, int b) {
 }
 
 TEST(algorithm, c_union) {
-    Action actX = c_variant(ActionSing, cstr_from("Sing-a-long"));
-    Action act1 = c_variant(ActionSpeak, cstr_from("Speak your mind"));
+    Action act1 = c_variant(ActionSpeak, cstr_from("Hello!"));
     Action act2 = c_variant(ActionQuit, 1);
     Action act3 = c_variant(ActionRunFunc, {add, 5, 6});
+    Action act4 = c_variant(ActionLog, cstr_from("Alert mode on"));
 
     cstr res = {0};
-    action(&actX, &res);
-    EXPECT_STREQ(cstr_str(&res), "Asked to speak: Sing-a-long\n");
     action(&act1, &res);
-    EXPECT_STREQ(cstr_str(&res), "Asked to speak: Speak your mind\n");
+    EXPECT_STREQ(cstr_str(&res), "Asked to speak or log message: Hello!\n");
     action(&act2, &res);
     EXPECT_STREQ(cstr_str(&res), "Asked to quit!\n");
     action(&act3, &res);
     EXPECT_STREQ(cstr_str(&res), "v1: 5, v2: 6, res: 11\n");
+    action(&act4, &res);
+    EXPECT_STREQ(cstr_str(&res), "Asked to speak or log message: Alert mode on\n");
 
     EXPECT_TRUE(c_is_variant(&act1, ActionSpeak));
-    EXPECT_STREQ(cstr_str(&act1.ActionSpeak.item), "Speak your mind");
+    EXPECT_STREQ(cstr_str(&act1.ActionSpeak.item), "Hello!");
 
     c_drop(Action, &act1, &act2, &act3);
     c_drop(cstr, &res);

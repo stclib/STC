@@ -144,22 +144,23 @@ typedef union MyUnion {
     struct { enum MyUnion_tag id; TagC_type item; } TagC;
 } MyUnion;
 
-MyUnion       c_variant(MyUnion_tag tag, Tag_type payload);     // Construct a tagged union variant (typesafe).
-bool          c_is_variant(MyUnion* obj, enum MyUnion_tag tag); // True if obj holds the tag.
-int           c_variant_id(MyUnion* obj);                       // (mainly for debugging)
+MyUnion       c_variant(MyUnion_tag tag, Tag_type payload);   // Construct a tagged union variant (typesafe).
+bool          c_is_variant(MyUnion* u, enum MyUnion_tag tag); // True if obj holds the tag.
+Tag_type*     c_get_if(MyUnion* u, enum MyUnion_tag tag);     // Return item pointer or NULL if it does not hold tag.
+int           c_variant_id(MyUnion* u);                       // (mainly for debugging)
 
 // Access the union:
-c_when (obj) {         /* MyUnion* obj */
-    c_is(TagA, a)      /* TagA_type* a */                       // handle one tag
+c_when (&var) {         /* MyUnion var */
+    c_is(TagA, a)       /* TagA_type* a */                      // handle one variant
         ActionA(a);
-    c_is(TagB) c_or_is(TagC)                                    // handle two different variants the same
+    c_is_in( c_tag(TagB) c_tag(TagC) )                          // handle multiple variants at once
         ActionBC();
     c_otherwise                                                 // optional, silences exhaustiveness-check
         ActionElse(obj);
 }
 
 // Access a single variant only:
-c_when (obj, TagC, c) {
+c_when (&var, TagC, c) {
     ActionC(c);
 }
 ```

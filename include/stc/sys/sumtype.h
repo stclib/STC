@@ -79,7 +79,7 @@ int main(void) {
 #include "../common.h"
 
 #define _c_EMPTY()
-#define _c_LOOP_INDIRECTION() c_LOOP
+#define _c_LOOP_INDIRECTION() _c_LOOP
 #define _c_LOOP_END_1 ,_c_LOOP1
 #define _c_LOOP0(f,U,x,...) f c_EXPAND((U, c_EXPAND x)) _c_LOOP_INDIRECTION _c_EMPTY()()(f,U,__VA_ARGS__)
 #define _c_LOOP1(...)
@@ -87,9 +87,8 @@ int main(void) {
 #define _c_E0(...) __VA_ARGS__
 #define _c_E1(...) _c_E0(_c_E0(_c_E0(_c_E0(_c_E0(_c_E0(__VA_ARGS__))))))
 #define _c_E2(...) _c_E1(_c_E1(_c_E1(_c_E1(_c_E1(_c_E1(__VA_ARGS__))))))
-#define c_EVAL(...) _c_E2(_c_E2(_c_E2(__VA_ARGS__))) // currently supports up to 130 variants
-#define c_LOOP(f,U,x,...) _c_CHECK(_c_LOOP0, c_JOIN(_c_LOOP_END_, c_NUMARGS(c_EXPAND x)))(f,U,x,__VA_ARGS__)
-
+#define _c_EVAL(...) _c_E2(_c_E2(_c_E2(__VA_ARGS__))) // currently supports up to 130 variants
+#define _c_LOOP(f,U,x,...) _c_CHECK(_c_LOOP0, c_JOIN(_c_LOOP_END_, c_NUMARGS(c_EXPAND x)))(f,U,x,__VA_ARGS__)
 
 #define _c_enum_1(x,...) (x=__LINE__*1000, __VA_ARGS__)
 #define _c_vartuple_enum(U, Tag, ...) Tag,
@@ -98,12 +97,12 @@ int main(void) {
 
 #define c_union(U, ...) \
     typedef union U U; \
-    enum U##_tag { c_EVAL(c_LOOP(_c_vartuple_enum, U, _c_enum_1 __VA_ARGS__, (0),)) }; \
-    c_EVAL(c_LOOP(_c_vartuple_type, U, __VA_ARGS__, (0),)) \
+    enum U##_tag { _c_EVAL(_c_LOOP(_c_vartuple_enum, U, _c_enum_1 __VA_ARGS__, (0),)) }; \
+    _c_EVAL(_c_LOOP(_c_vartuple_type, U, __VA_ARGS__, (0),)) \
     union U { \
         int tag_id; \
         enum U##_tag tag; \
-        c_EVAL(c_LOOP(_c_vartuple_item, U, __VA_ARGS__, (0),)) \
+        _c_EVAL(_c_LOOP(_c_vartuple_item, U, __VA_ARGS__, (0),)) \
     }
 
 #define c_sumtype c_union // [deprecated]?
@@ -115,15 +114,12 @@ int main(void) {
         ; x = NULL)
 
 #define c_is(...) c_MACRO_OVERLOAD(c_is, __VA_ARGS__)
-#define c_is_1(Tag) \
-    break; case Tag:
+#define c_is_1(Tag) break; case Tag:
 
-#define c_is_2(Tag, x) \
-    break c_or_is_2(Tag, x)
-
-#define c_or_is(...) c_MACRO_OVERLOAD(c_or_is, __VA_ARGS__)
-#define c_or_is_1(Tag) \
-    ; case Tag:
+/* c_is_in( c_tag(Shape_CIRCLE) c_tag(Shape_ELLIPSIS) ..) {..} */
+#define c_is_in(...) break; __VA_ARGS__
+#define c_tag(Tag) case Tag:
+#define c_or_is(Tag) ; case Tag: // [deprecated] alternative to c_is_in()
 
 #define c_otherwise \
     break; default:
@@ -133,16 +129,16 @@ int main(void) {
         for (c_typeof(varptr) _vp1 = (varptr); _vp1; _vp1 = NULL) \
         switch (_vp1->tag)
 
-    #define c_or_is_2(Tag, x) \
-        ; case Tag: \
+    #define c_is_2(Tag, x) \
+        break; case Tag: \
         for (c_typeof(_vp1->Tag.item)* x = &_vp1->Tag.item; x; x = NULL)
 #else
     #define c_when_1(varptr) \
         for (const int* _vp_id = &(varptr)->tag_id; _vp_id; _vp_id = NULL) \
             switch (*_vp_id)
 
-    #define c_or_is_2(Tag, x) \
-        ; case Tag: \
+    #define c_is_2(Tag, x) \
+        break; case Tag: \
         for (Tag##_type *x = &c_container_of(_vp_id, Tag##_sumtype, tag_id)->Tag.item; x; x = NULL)
 #endif
 
@@ -151,6 +147,9 @@ int main(void) {
 
 #define c_is_variant(varptr, Tag) \
     ((varptr)->Tag.id == Tag)
+
+#define c_get_if(varptr, Tag) \
+    ((varptr)->Tag.id == Tag ? &(varptr)->Tag.item : NULL)
 
 #define c_variant_id(varptr) \
     ((varptr)->tag)
