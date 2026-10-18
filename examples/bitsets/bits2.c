@@ -33,7 +33,7 @@ int main(void)
     puts("");
 
     printf("all: ");
-    Bits_set_pattern(&s1, 0x3333333333333333);
+    Bits_set_pattern(&s1, (size_t)0x3333333333333333);
     for (c_range(i, Bits_size(&s1)))
         printf("%d", Bits_test(&s1, i));
     puts("");

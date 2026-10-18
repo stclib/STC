@@ -58,14 +58,20 @@ TEST_EXE    := $(BUILDDIR)/tests/test_all$(DOTEXE)
 
 PROGRAMS	:= $(EX_EXES) $(TEST_EXE)
 
-fast:
-	@$(MAKE) -j --no-print-directory all
+.PHONY: lib lib-slow all all-slow clean distclean
 
-all: $(PROGRAMS)
+lib:
+	@$(MAKE) -j --no-print-directory lib-slow
+
+all:
+	@$(MAKE) -j --no-print-directory all-slow
+
+lib-slow: $(LIB_PATH)
+	@echo
+
+all-slow: $(LIB_PATH) $(PROGRAMS)
 	@echo
 	@$(TEST_EXE)
-
-$(PROGRAMS): $(LIB_PATH)
 
 clean:
 	@$(RM_F) $(LIB_OBJS) $(EX_OBJS) $(TEST_OBJS) $(LIB_DEPS) $(EX_DEPS) $(TEST_DEPS) $(LIB_PATH) $(EX_EXES) $(TEST_EXE)
@@ -74,9 +80,6 @@ clean:
 distclean:
 	@$(RM_F) -r build
 	@echo "All Cleaned"
-
-lib: $(LIB_PATH)
-	@echo
 
 $(LIB_PATH): $(LIB_OBJS)
 	@printf "\r\e[2K%s" "$(AR_RCS) $@"
@@ -103,6 +106,5 @@ $(TEST_EXE): $(TEST_OBJS)
 
 
 .SECONDARY: $(EX_OBJS) # Prevent deleting objs after building
-.PHONY: fast all clean distclean lib
 
 -include $(LIB_DEPS) $(TEST_DEPS) $(EX_DEPS)
