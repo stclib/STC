@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-/* cbox: heap allocated boxed type
+/* box: Pointer abstraction, like C++'s unique_ptr and Rust's Box.
 #include <stc/cstr.h>
 
 typedef struct { cstr name, email; } Person;

@@ -20,14 +20,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-/* arc: atomic reference counted shared_ptr (new implementation)
+/* arc: Atomic Reference Counted pointer, like C++'s shared_ptr and Rust's Arc.
  *
  * The difference between arc and arc2 is that arc only takes up one pointer,
  * whereas arc2 uses two. arc cannot be constructed from an already allocated pointer,
- * which arc2 may. To use arc2, specify the `(c_use_arc2)` option after the key type, e.g.:
- * #define T MyArc, MyType, (c_use_arc2 | c_no_atomic)
- */
-/*
+ * which arc2 may. To use arc2, `#include <stc/arc2.h>`. There are also the non-atomic
+ * reference counting <stc/rc.h> and <stc/rc2.h> headers.
+
 #include <stc/cstr.h>
 
 typedef struct { cstr name, last; } Person;

@@ -21,18 +21,31 @@
  * SOFTWARE.
  */
 
-// Unordered map - implemented with the robin-hood hashing scheme.
+// (Non-Atomic) Reference Counted pointer abstraction, like Rust's Rc.
+// May NOT take a preallocated pointer in construction, so only needs to store 1 pointer.
 /*
-#define T IRefc, int
+#define T IRc, int
 #include <stc/rc.h>
-#include <stdio.h>
+
+#define T IRcVec, IRc, (c_pro_key)
+#include <stc/vec.h>
 
 int main(void) {
-    IRefc rc = IRefc_make(42);
-    IRefc_drop(&rc);
+    IRc rc_a = IRc_make(42);              // allocates ref count and data in one.
+    int a = *rc_a.get;
+    IRc rc_b = IRc_make(77);
+    int b = *rc_b.get;
+
+    IRcVec v = c_make(IRcVec, {1, 2, 3}); // like IRcVec_push(IRc_make(1)), etc..
+    IRcVec_push(&v, IRc_make(4));         // push takes an IRc as argument.
+    IRcVec_emplace(&v, 5);                // emplace: takes the IRc's element value directly!
+    IRcVec_push(&v, IRc_clone(rc_a));     // share rc_a with the vector, ref count = 2.
+
+    c_drop(IRc, &rc_a, &rc_b);            // rc_a reduces ref count to 1, rc_b is destructed.
+    IRcVec_drop(&v);                      // rc_a is now destructed
 }
 */
 
-#define i_no_atomic
 #define _i_prefix rc_
+#define i_no_atomic
 #include "arc.h"
