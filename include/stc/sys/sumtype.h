@@ -115,11 +115,7 @@ int main(void) {
 
 #define c_is(...) c_MACRO_OVERLOAD(c_is, __VA_ARGS__)
 #define c_is_1(Tag) break; case Tag:
-
-/* c_is_in( c_tag(Shape_CIRCLE) c_tag(Shape_ELLIPSIS) ..) {..} */
-#define c_is_in(...) break; __VA_ARGS__
-#define c_tag(Tag) case Tag:
-#define c_or_is(Tag) ; case Tag: // [deprecated] alternative to c_is_in()
+#define c_or_is(Tag) ; case Tag:
 
 #define c_otherwise \
     break; default:

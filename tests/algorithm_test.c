@@ -112,7 +112,7 @@ void Action_drop(Action* self) {
 
 static void action(Action* action, cstr* out) {
     c_when (action) {
-        c_is_in( c_tag(ActionSpeak) c_tag(ActionLog) ) {
+        c_is(ActionSpeak) c_or_is(ActionLog) {
             cstr_printf(out, "Asked to speak or log message: %s\n", cstr_str(&action->ActionSpeak.item));
         }
         c_is(ActionQuit) {

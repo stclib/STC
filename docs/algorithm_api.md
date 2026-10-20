@@ -151,11 +151,11 @@ int           c_variant_id(MyUnion* u);                       // (mainly for deb
 
 // Access the union:
 c_when (&var) {         /* MyUnion var */
-    c_is(TagA, a)       /* TagA_type* a */                      // handle one variant
+    c_is(TagA, a)       /* TagA_type* a */                    // handle one variant
         ActionA(a);
-    c_is_in( c_tag(TagB) c_tag(TagC) )                          // handle multiple variants at once
+    c_is(TagB) c_or_is(TagC)                                  // handle multiple variants at once
         ActionBC();
-    c_otherwise                                                 // optional, silences exhaustiveness-check
+    c_otherwise                                               // optional, silences exhaustiveness-check
         ActionElse(obj);
 }
 
