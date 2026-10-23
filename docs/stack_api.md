@@ -82,9 +82,13 @@ i_key*          stack_X_front_mut(stack_X* self);
 i_key*          stack_X_back_mut(stack_X* self);
 
 i_key*          stack_X_push(stack_X* self, i_key value);
-i_key*          stack_X_emplace(stack_X* self, i_keyraw raw);
-i_key*          stack_X_append_uninit(stack_X* self, isize_t n);                // appends n unitialized elements
-                                                                                // and returns a pointer to first of them
+i_key*          stack_X_emplace(stack_X* self, i_keyraw raw);                   // only available when i_keyraw is defined (not built-ins)
+
+i_key*          stack_X_put_n(stack_X* self, i_keyraw raw[], isize_t n);        // bulk append raw arr elements and return
+                                                                                // a pointer to the first. Used by c_make().
+i_key*          stack_X_append_uninit(stack_X* self, isize_t n);                // bulk append n unitialized elements
+                                                                                // and return a pointer to the first.
+
 void            stack_X_pop(stack_X* self);                                     // destroy last element
 i_key           stack_X_pull(stack_X* self);                                    // move out last element
 

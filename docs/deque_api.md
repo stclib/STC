@@ -83,22 +83,24 @@ isize_t         deque_X_lower_bound(const deque_X* self, const i_keyraw raw);   
 isize_t         deque_X_binary_search(const deque_X* self, const i_keyraw raw);  // return c_NPOS if not found
 
 i_key*          deque_X_push_front(deque_X* self, i_key value);
-i_key*          deque_X_emplace_front(deque_X* self, i_keyraw raw);
-void            deque_X_pop_front(deque_X* self);
-i_key           deque_X_pull_front(deque_X* self);                               // move out front element
-
 i_key*          deque_X_push_back(deque_X* self, i_key value);
 i_key*          deque_X_push(deque_X* self, i_key value);                        // alias for push_back()
-i_key*          deque_X_emplace_back(deque_X* self, i_keyraw raw);
-i_key*          deque_X_emplace(deque_X* self, i_keyraw raw);                    // alias for emplace_back()
+
+void            deque_X_pop_front(deque_X* self);
+i_key           deque_X_pull_front(deque_X* self);                               // move out front element
 void            deque_X_pop_back(deque_X* self);                                 // remove and destroy back()
 i_key           deque_X_pull_back(deque_X* self);                                // move out last element
 
-deque_X_iter    deque_X_insert_n(deque_X* self, isize_t idx, const i_key[] arr, isize_t n);  // move values
-deque_X_iter    deque_X_insert_at(deque_X* self, deque_X_iter it, i_key value);  // move value
-deque_X_iter    deque_X_insert_uninit(deque_X* self, isize_t idx, isize_t n);        // uninitialized data
+bool            deque_X_put_n(deque_X* self, const i_keyraw arr[], isize_t n);   // bulk append rawarr elements.
+deque_X_iter    deque_X_insert_n(deque_X* self, isize_t idx, const i_key arr[], isize_t n);  // bulk move values
+deque_X_iter    deque_X_insert_at(deque_X* self, deque_X_iter it, i_key value);  // move single value
+deque_X_iter    deque_X_insert_uninit(deque_X* self, isize_t idx, isize_t n);    // insert uninitialized data
 
-deque_X_iter    deque_X_emplace_n(deque_X* self, isize_t idx, const i_keyraw[] arr, isize_t n);
+                // Note: emplace-functions are only available when a i_keyraw is defined (ie. not built-ins):
+i_key*          deque_X_emplace_front(deque_X* self, i_keyraw raw);
+i_key*          deque_X_emplace_back(deque_X* self, i_keyraw raw);
+i_key*          deque_X_emplace(deque_X* self, i_keyraw raw);                    // alias for emplace_back()
+deque_X_iter    deque_X_emplace_n(deque_X* self, isize_t idx, const i_keyraw arr[], isize_t n);
 deque_X_iter    deque_X_emplace_at(deque_X* self, deque_X_iter it, i_keyraw raw);
 
 void            deque_X_erase_n(deque_X* self, isize_t idx, isize_t n);

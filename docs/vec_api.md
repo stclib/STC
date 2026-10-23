@@ -55,7 +55,6 @@ vec_X           vec_X_with_size_uninit(isize_t size);                       // v
 
 vec_X           vec_X_clone(vec_X vec);
 void            vec_X_copy(vec_X* self, const vec_X* other);
-vec_X_iter      vec_X_copy_to(vec_X* self, isize_t idx, const i_key* arr, isize_t n);
 vec_X           vec_X_move(vec_X* self);                                    // move
 void            vec_X_take(vec_X* self, vec_X unowned);                     // take ownership of unowned
 void            vec_X_drop(const vec_X* self);                              // destructor
@@ -88,20 +87,25 @@ isize_t         vec_X_binary_search(const vec_X* self, const i_keyraw raw); // r
 
 i_key*          vec_X_push(vec_X* self, i_key value);
 i_key*          vec_X_push_back(vec_X* self, i_key value);                  // alias for push
+
+                // emplace: only available when i_keyraw is defined (not built-ins)
 i_key*          vec_X_emplace(vec_X* self, i_keyraw raw);
 i_key*          vec_X_emplace_back(vec_X* self, i_keyraw raw);              // alias for emplace
+vec_X_iter      vec_X_emplace_n(vec_X* self, isize_t idx, const i_keyraw raw[], isize_t n); // bulk insert raw-type elements
+vec_X_iter      vec_X_emplace_at(vec_X* self, vec_X_iter it, i_keyraw raw); // single value insert
 
 void            vec_X_pop(vec_X* self);                                     // destroy last element
 void            vec_X_pop_back(vec_X* self);                                // alias for pop
 i_key           vec_X_pull(vec_X* self);                                    // move out last element
 
-vec_X_iter      vec_X_insert_n(vec_X* self, isize_t idx, const i_key arr[], isize_t n); // bulk move inserts n elements
-vec_X_iter      vec_X_insert_at(vec_X* self, vec_X_iter it, i_key value);
-vec_X_iter      vec_X_insert_uninit(vec_X* self, isize_t idx, isize_t n);   // inserts n unitialized elements
-                                                                            //  at idx, and returns an iter at idx.
+i_key*          vec_X_put_n(vec_X* self, const i_keyraw arr[], isize_t n);  // bulk append raw-type elements
+                                                                            // and return a pointer to the first.
+vec_X_iter      vec_X_copy_n(vec_X* self, isize_t idx, const i_key arr[], isize_t n); // bulk copy-insert arr elements
 
-vec_X_iter      vec_X_emplace_n(vec_X* self, isize_t idx, const i_keyraw raw[], isize_t n);
-vec_X_iter      vec_X_emplace_at(vec_X* self, vec_X_iter it, i_keyraw raw);
+vec_X_iter      vec_X_insert_n(vec_X* self, isize_t idx, const i_key arr[], isize_t n); // bulk move-insert arr elements
+vec_X_iter      vec_X_insert_at(vec_X* self, vec_X_iter it, i_key value);
+vec_X_iter      vec_X_insert_uninit(vec_X* self, isize_t idx, isize_t n);   // bulk insert n unitialized elements at
+                                                                            // idx and return an iter at idx
 
 vec_X_iter      vec_X_erase_n(vec_X* self, isize_t idx, isize_t n);
 vec_X_iter      vec_X_erase_at(vec_X* self, vec_X_iter it);

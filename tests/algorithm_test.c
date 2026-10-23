@@ -69,7 +69,7 @@ TEST(algorithm, c_filter)
 
     EXPECT_EQ(42, sum);
 
-    uint64_t hash = 0;
+    size_t hash = 0;
     c_filter(IVec, vec, hash = c_hash_mix(hash, (size_t)*value));
     EXPECT_EQ(658, (isize_t)hash);
 

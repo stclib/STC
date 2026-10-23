@@ -56,7 +56,7 @@ typedef i_keyraw _m_raw;
         { (void)self; return i_capacity; }
 
     STC_INLINE bool _c_MEMB(_reserve)(Self* self, isize_t n)
-        { (void)self; c_assert(n <= i_capacity); return true; }
+        { (void)self; c_assert(n <= i_capacity); return n <= i_capacity; }
 #else
     STC_INLINE Self _c_MEMB(_move)(Self *self) {
         Self m = *self;
@@ -112,9 +112,8 @@ STC_INLINE void _c_MEMB(_value_drop)(const Self* self, _m_value* val)
 
 STC_INLINE _m_value* _c_MEMB(_append_uninit)(Self *self, isize_t n) {
     isize_t len = self->size;
-    if (len + n >= _c_MEMB(_capacity)(self))
-        if (!_c_MEMB(_reserve)(self, len*3/2 + n))
-            return NULL;
+    if (len + n >= _c_MEMB(_capacity)(self) && !_c_MEMB(_reserve)(self, len*3/2 + n))
+        return NULL;
     self->size += n;
     return self->data + len;
 }
@@ -138,9 +137,8 @@ STC_INLINE _m_value* _c_MEMB(_top_mut)(Self* self)
     { return _c_MEMB(_back_mut)(self); }
 
 STC_INLINE _m_value* _c_MEMB(_push)(Self* self, _m_value val) {
-    if (self->size == _c_MEMB(_capacity)(self))
-        if (!_c_MEMB(_reserve)(self, self->size*3/2 + 4))
-            return NULL;
+    if (self->size == _c_MEMB(_capacity)(self) && !_c_MEMB(_reserve)(self, self->size*3/2 + 4))
+        return NULL;
     _m_value* vp = self->data + self->size++;
     *vp = val; return vp;
 }
@@ -152,8 +150,15 @@ STC_INLINE _m_value _c_MEMB(_pull)(Self* self)
     { c_assert(self->size); return self->data[--self->size]; }
 
 #ifndef _i_no_put
-STC_INLINE void _c_MEMB(_put_n)(Self* self, const _m_raw* raw, isize_t n)
-    { while (n--) _c_MEMB(_push)(self, i_keyfrom((*raw))), ++raw; }
+    STC_INLINE _m_value* _c_MEMB(_put_n)(Self* self, const _m_raw* raw, isize_t n) {
+        if (self->size + n > _c_MEMB(_capacity)(self) && !_c_MEMB(_reserve)(self, self->size*3/2 + n))
+            return NULL;
+        _m_value* p = &self->data[self->size];
+        self->size += n;
+        for (isize_t i = 0; i < n; ++i, ++raw)
+            p[i] = i_keyfrom((*raw));
+        return p;
+    }
 #endif
 
 #if !defined _i_aux_alloc && !defined i_capacity
@@ -211,8 +216,9 @@ STC_INLINE void _c_MEMB(_copy)(Self *self, const Self* other) {
     if (self == other) return;
     _c_MEMB(_clear)(self);
     _c_MEMB(_reserve)(self, other->size);
-    for (c_range(i, other->size))
-        self->data[self->size++] = i_keyclone((other->data[i]));
+    self->size = other->size;
+    for (isize_t i = 0; i < other->size; ++i)
+        self->data[i] = i_keyclone((other->data[i]));
 }
 
 STC_INLINE _m_value _c_MEMB(_value_clone)(const Self* self, _m_value val)

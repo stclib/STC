@@ -145,38 +145,37 @@ _c_MEMB(_push_front)(Self* self, _m_value value) {
 
 STC_DEF void
 _c_MEMB(_erase_n)(Self* self, const isize_t idx, const isize_t n) {
-    const isize_t len = _c_MEMB(_size)(self);
-    c_assert(idx + n <= len);
+    const isize_t sz = _c_MEMB(_size)(self);
+    c_assert(idx + n <= sz);
     for (isize_t i = idx + n - 1; i >= idx; --i)
-        i_keydrop(_c_MEMB(_at_mut)(self, i));
-    for (isize_t i = idx, j = i + n; j < len; ++i, ++j)
-        *_c_MEMB(_at_mut)(self, i) = *_c_MEMB(_at)(self, j);
+        i_keydrop(&self->cbuf[_cbuf_topos(self, i)]);
+    for (isize_t pos = _cbuf_topos(self, idx), j = idx + n; j < sz; ++pos, ++j)
+        self->cbuf[pos & self->capmask] = self->cbuf[_cbuf_topos(self, j)];
     self->end = (self->end - n) & self->capmask;
 }
 
 STC_DEF _m_iter
 _c_MEMB(_insert_uninit)(Self* self, const isize_t idx, const isize_t n) {
-    const isize_t len = _c_MEMB(_size)(self);
+    const isize_t sz = _c_MEMB(_size)(self);
     _m_iter it = {._s=self};
-    if (len + n >= self->capmask)
-        if (!_c_MEMB(_reserve)(self, len + n)) // minimum 2x expand
-            return it;
+    if (sz + n >= self->capmask && !_c_MEMB(_reserve)(self, sz + n)) // minimum 2x expand
+        return it;
     it.pos = _cbuf_topos(self, idx);
     it.ref = self->cbuf + it.pos;
     self->end = (self->end + n) & self->capmask;
 
     if (it.pos < self->end) // common case because of reserve policy
-        c_memmove(it.ref + n, it.ref, (len - idx)*c_sizeof *it.ref);
-    else for (isize_t i = len - 1, j = i + n; i >= idx; --i, --j)
-        *_c_MEMB(_at_mut)(self, j) = *_c_MEMB(_at)(self, i);
+        c_memmove(it.ref + n, it.ref, (sz - idx)*c_sizeof *it.ref);
+    else for (isize_t j = sz - 1, pos = _cbuf_topos(self, j + n); j >= idx; --pos, --j)
+        self->cbuf[pos & self->capmask] = self->cbuf[_cbuf_topos(self, j)];
     return it;
 }
 
 STC_DEF _m_iter
 _c_MEMB(_insert_n)(Self* self, const isize_t idx, const _m_value* arr, const isize_t n) {
     _m_iter it = _c_MEMB(_insert_uninit)(self, idx, n);
-    for (isize_t i = idx, j = 0; j < n; ++i, ++j)
-        *_c_MEMB(_at_mut)(self, i) = arr[j];
+    if (it.ref) for (isize_t pos = _cbuf_topos(self, idx), j = 0; j < n; ++pos, ++j)
+        self->cbuf[pos & self->capmask] = arr[j];
     return it;
 }
 
@@ -184,8 +183,8 @@ _c_MEMB(_insert_n)(Self* self, const isize_t idx, const _m_value* arr, const isi
 STC_DEF _m_iter
 _c_MEMB(_emplace_n)(Self* self, const isize_t idx, const _m_raw* raw, const isize_t n) {
     _m_iter it = _c_MEMB(_insert_uninit)(self, idx, n);
-    for (isize_t i = idx, j = 0; j < n; ++i, ++j)
-        *_c_MEMB(_at_mut)(self, i) = i_keyfrom(raw[j]);
+    if (it.ref) for (isize_t pos = _cbuf_topos(self, idx), j = 0; j < n; ++pos, ++j)
+        self->cbuf[pos & self->capmask] = i_keyfrom(raw[j]);
     return it;
 }
 #endif

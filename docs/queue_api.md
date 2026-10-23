@@ -59,9 +59,11 @@ i_key*          queue_X_front(const queue_X* self);
 i_key*          queue_X_back(const queue_X* self);
 
 i_key*          queue_X_push(queue_X* self, i_key value);
-i_key*          queue_X_emplace(queue_X* self, i_keyraw raw);
+i_key*          queue_X_emplace(queue_X* self, i_keyraw raw);      // only available when i_keyraw is defined (not built-ins)
 void            queue_X_pop(queue_X* self);
 i_key           queue_X_pull(queue_X* self);                       // move out last element
+
+bool            queue_X_put_n(queue_X* self, const i_keyraw rawarr[], isize_t n); // bulk append rawarr elements.
 
 queue_X_iter    queue_X_begin(const queue_X* self);
 queue_X_iter    queue_X_end(const queue_X* self);
