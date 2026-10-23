@@ -139,11 +139,11 @@ STC_INLINE cstr cstr_clone(cstr s) {
 
 #define SSO_CALL(s, call) (cstr_is_long(s) ? cstr_l_##call : cstr_s_##call)
 
-STC_INLINE void _cstr_set_size(cstr* self, isize_t len)
+STC_INLINE void cstr_set_size_unchecked(cstr* self, isize_t len)
     { SSO_CALL(self, set_size(self, len)); }
 
 STC_INLINE void cstr_clear(cstr* self)
-    { _cstr_set_size(self, 0); }
+    { cstr_set_size_unchecked(self, 0); }
 
 STC_INLINE char* cstr_data(cstr* self)
     { return SSO_CALL(self, data(self)); }
@@ -355,7 +355,7 @@ STC_INLINE void cstr_pop(cstr* self) {
     csview sv = cstr_sv(self);
     const char* s = sv.buf + sv.size;
     while ((*--s & 0xC0) == 0x80) ;
-    _cstr_set_size(self, (s - sv.buf));
+    cstr_set_size_unchecked(self, (s - sv.buf));
 }
 
 STC_INLINE char* cstr_append(cstr* self, const char* str)

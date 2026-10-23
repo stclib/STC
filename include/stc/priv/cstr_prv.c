@@ -88,7 +88,7 @@ char* cstr_resize(cstr* self, const isize_t size, const char value) {
             return NULL;
         c_memset(b.data + b.size, value, size - b.size);
     }
-    _cstr_set_size(self, size);
+    cstr_set_size_unchecked(self, size);
     return b.data;
 }
 
@@ -101,7 +101,7 @@ isize_t cstr_find_at(const cstr* self, const isize_t pos, const char* search) {
 
 char* cstr_assign_n(cstr* self, const char* str, const isize_t len) {
     char* d = cstr_reserve(self, len);
-    if (d) { _cstr_set_size(self, len); c_memmove(d, str, len); }
+    if (d) { c_memmove(d, str, len); cstr_set_size_unchecked(self, len); }
     return d;
 }
 
@@ -114,7 +114,7 @@ char* cstr_append_n(cstr* self, const char* str, const isize_t len) {
         if (off <= (size_t)b.size) str = b.data + off; /* handle self append */
     }
     c_memcpy(b.data + b.size, str, len);
-    _cstr_set_size(self, b.size + len);
+    cstr_set_size_unchecked(self, b.size + len);
     return b.data;
 }
 
@@ -122,7 +122,7 @@ void cstr_erase(cstr* self, const isize_t pos, isize_t len) {
     cstr_buf b = cstr_getbuf(self);
     if (len > b.size - pos) len = b.size - pos;
     c_memmove(&b.data[pos], &b.data[pos + len], b.size - (pos + len));
-    _cstr_set_size(self, b.size - len);
+    cstr_set_size_unchecked(self, b.size - len);
 }
 #endif // STC_CSTR_CORE_C_INCLUDED
 
@@ -153,7 +153,7 @@ char* _cstr_internal_move(cstr* self, const isize_t pos1, const isize_t pos2) {
         if (newlen > b.cap)
             b.data = cstr_reserve(self, b.size*3/2 + pos2 - pos1);
         c_memmove(&b.data[pos2], &b.data[pos1], b.size - pos1);
-        _cstr_set_size(self, newlen);
+        cstr_set_size_unchecked(self, newlen);
     }
     return b.data;
 }
@@ -184,7 +184,7 @@ char* cstr_append_uninit(cstr *self, isize_t len) {
     cstr_buf b = cstr_getbuf(self);
     if (b.size + len > b.cap && (b.data = cstr_reserve(self, b.size*3/2 + len)) == NULL)
         return NULL;
-    _cstr_set_size(self, b.size + len);
+    cstr_set_size_unchecked(self, b.size + len);
     return b.data + b.size;
 }
 
@@ -210,11 +210,11 @@ bool cstr_getdelim(cstr *self, const int delim, FILE *fp) {
     cstr_buf b = cstr_getbuf(self);
     for (;;) {
         if (c == delim || c == EOF) {
-            _cstr_set_size(self, pos);
+            cstr_set_size_unchecked(self, pos);
             return true;
         }
         if (pos == b.cap) {
-            _cstr_set_size(self, pos);
+            cstr_set_size_unchecked(self, pos);
             char* data = cstr_reserve(self, (b.cap = b.cap*3/2 + 16));
             b.data = data;
         }
@@ -229,7 +229,7 @@ isize_t cstr_vfmt(cstr* self, isize_t start, const char* fmt, va_list args) {
     const int n = vsnprintf(NULL, 0ULL, fmt, args);
     vsnprintf(cstr_reserve(self, start + n) + start, (size_t)n+1, fmt, args2);
     va_end(args2);
-    _cstr_set_size(self, start + n);
+    cstr_set_size_unchecked(self, start + n);
     return n;
 }
 
@@ -271,7 +271,7 @@ void cstr_u8_erase(cstr* self, const isize_t u8pos, const isize_t u8len) {
     csview b = cstr_sv(self);
     csview span = cutf8_subview(b.buf, u8pos, u8len);
     c_memmove((void *)&span.buf[0], &span.buf[span.size], b.size - span.size - (span.buf - b.buf));
-    _cstr_set_size(self, b.size - span.size);
+    cstr_set_size_unchecked(self, b.size - span.size);
 }
 
 bool cstr_u8_valid(const cstr* self)
@@ -306,7 +306,7 @@ cstr cstr_tocase_sv(csview sv, int k) {
             sz += cutf8_encode(buf + sz, cp);
         }
     }
-    _cstr_set_size(&out, sz);
+    cstr_set_size_unchecked(&out, sz);
     cstr_shrink_to_fit(&out);
     return out;
 }

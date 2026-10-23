@@ -1294,7 +1294,7 @@ _build_substitution(const char* replace, int nmatch, const csview match[],
         dst[len++] = *replace++;
     }
     cstr_drop(&tr_str);
-    _cstr_set_size(subst, len);
+    cstr_set_size_unchecked(subst, len);
 }
 
 
