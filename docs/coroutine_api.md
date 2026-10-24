@@ -131,8 +131,8 @@ cco_fiber*      cco_as_fiber(MyFiber* fib)                          // Type-chec
                                                                     // to force closedown of program with proper coroutines cleanup.
 ```
 #### Channels
-A channel represents a communication syncronization point for collaborating tasks. One of the tasks should own/store
-the channel, but communication can go both ways. **Note**: both the sending and receiving values must reference a persistant
+A channel represents a communication synchronization point for collaborating tasks. One of the tasks should own/store
+the channel, but communication can go both ways. **Note**: both the sending and receiving values must reference a persistent
 storage (i.e. a constant and/or expression using variables stored in a task).
 ```c++
                 cco_channel_t(T)                                    // A channel type.
