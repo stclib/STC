@@ -36,9 +36,6 @@
 #endif
 #include "priv/template.h"
 #ifndef i_declared
-    #if c_NUMARGS(i_type) == 4
-      #define i_capacity c_GETARG(4, i_type)
-    #endif
     #ifdef i_capacity
       #define i_no_clone
       _c_DEFTYPES(_declare_inplace_stack, Self, i_key, i_capacity, _i_aux_def);

@@ -64,11 +64,29 @@
   #define i_key c_GETARG(2, i_type)
   #ifdef _i_is_map
     #define i_val c_GETARG(3, i_type)
-    #if c_NUMARGS(i_type) == 4
+    #if c_NUMARGS(i_type) >= 4
       #define i_opt c_GETARG(4, i_type)+0
+      #if c_NUMARGS(i_type) == 5
+        #undef i_allocator
+        #define i_allocator c_GETARG(5, i_type)
+        #if defined i_aux
+          #define _i_aux_alloc
+        #endif
+      #endif
     #endif
   #elif c_NUMARGS(i_type) >= 3
     #define i_opt c_GETARG(3, i_type)+0
+    #if c_NUMARGS(i_type) == 4
+      #if c_GETARG(4, i_type) > 0
+        #define i_capacity c_GETARG(4, i_type)
+      #else
+        #undef i_allocator // ! Already defined in linkage.h to "c", but does not seem to give error on redefine?
+        #define i_allocator c_GETARG(4, i_type)
+        #if defined i_aux
+          #define _i_aux_alloc // i.e creating a "new" container instance requires .aux to be initialized with an allocator!
+        #endif
+      #endif
+    #endif
   #endif
 #elif !defined Self && defined i_type
   #define Self i_type
@@ -76,13 +94,7 @@
   #define Self c_JOIN(_i_prefix, i_tag)
 #endif
 
-#if defined i_aux && c_NUMARGS(i_aux) == 2
-  // shorthand for defining i_aux AND i_allocator as a one-liner combo.
-  #define _i_aux_alloc
-  #define _i_aux_def c_GETARG(1, i_aux) aux;
-  #undef i_allocator // override:
-  #define i_allocator c_GETARG(2, i_aux)
-#elif defined i_aux
+#if defined i_aux
   #define _i_aux_def i_aux aux;
 #else
   #define _i_aux_def

@@ -840,7 +840,7 @@ or allocator function pointer or a context which the function pointers can use. 
 libraries solve this by adding an opaque pointer (void*) or function pointer(s) into
 the data structure for the user to manage. Because most containers are templated,
 an auxiliary template parameter, `i_aux` may be defined to extend the container with
-typesafe custom attributes.
+typesafe custom data fields.
 
 The example below shows how to customize containers to work with PostgreSQL memory management.
 It adds a MemoryContext to each container by defining the `i_aux` template parameter.
@@ -856,11 +856,15 @@ allocated size of the given pointer, unlike standard `realloc` and `free`.
 
 ```c++
 // pgs_alloc.h
+#ifndef PSG_ALLOC_H
+#define PSG_ALLOC_H
 #define pgs_malloc(sz) MemoryContextAlloc(self->aux.memctx, sz)
 #define pgs_calloc(n, sz) MemoryContextAllocZero(self->aux.memctx, (n)*(sz))
 #define pgs_realloc(p, old_sz, sz) (p ? repalloc(p, sz) : pgs_malloc(sz))
 #define pgs_free(p, sz) (p ? pfree(p) : (void)0) // pfree/repalloc does not accept NULL.
+#endif
 
+// template parameters (works with all templated containers):
 #define i_aux struct { MemoryContext memctx; }
 #define i_allocator pgs
 #define i_no_clone
@@ -883,14 +887,13 @@ void maptest()
         printf("%d:%d ", i.ref->first, i.ref->second);
 
     IMap_drop(&map); // uses psg_free()
-    MemoryContextDelete(map.aux.memctx);
+    MemoryContextDelete(map.aux.memctx); // must be done after drop
 }
 ```
 Another example is to sort struct elements by the *active field* and *reverse* flag:
 
 [ [Run this code](https://godbolt.org/z/67Yah1nz5) ]
 ```c++
-#include <stdio.h>
 #include <time.h>
 #include <stc/cstr.h>
 #include <c11/fmt.h>
@@ -943,12 +946,12 @@ int main(void) {
         vec.aux.activeField = field;
         FMDVector_sort(&vec);
 
-        for (c_each(i, FMDVector, vec)) {
+        fmt_println("------- sort {} ---------------", field);
+        for (c_each_ref(e, FMDVector, vec)) {
             fmt_println("{:30}{:30}{:10}{:10}",
-                        cstr_str(&i.ref->fileName), cstr_str(&i.ref->directory),
-                        i.ref->size, i.ref->lastWriteTime);
+                        cstr_str(&e->fileName), cstr_str(&e->directory),
+                        e->size, e->lastWriteTime);
         }
-        puts("");
     }
     FMDVector_drop(&vec);
 }

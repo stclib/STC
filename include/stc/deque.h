@@ -148,7 +148,7 @@ _c_MEMB(_erase_n)(Self* self, const isize_t idx, const isize_t n) {
     const isize_t sz = _c_MEMB(_size)(self);
     c_assert(idx + n <= sz);
     for (isize_t i = idx + n - 1; i >= idx; --i)
-        i_keydrop(&self->cbuf[_cbuf_topos(self, i)]);
+        i_keydrop((self->cbuf + _cbuf_topos(self, i)));
     for (isize_t pos = _cbuf_topos(self, idx), j = idx + n; j < sz; ++pos, ++j)
         self->cbuf[pos & self->capmask] = self->cbuf[_cbuf_topos(self, j)];
     self->end = (self->end - n) & self->capmask;

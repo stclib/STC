@@ -2,14 +2,12 @@
 #include <stc/algorithm.h>
 #include "myalloc.h"
 
-#define T List, double, (c_use_eq)
-#define i_aux MyAlloc* // define an auxiliary field `aux` in the List
-#define i_allocator my // explicitly define allocator prefix.
+#define T List, double, (c_use_eq), my // define allocator prefix = my, i.e. my_malloc, my_calloc, my_realloc, my_free.
+#define i_aux MyAlloc*                 // define an auxiliary member field `aux` in List type
 #include <stc/stack.h>
 
-#define T ListDeque, List, (c_class_key | c_use_eq)
-// Shorthand for defining both i_aux AND i_allocator as above, in one line:
-#define i_aux MyAlloc*, my
+#define T ListDeque, List, (c_class_key | c_use_eq), my
+#define i_aux MyAlloc*
 #include <stc/deque.h>
 
 int main(void)
@@ -40,13 +38,14 @@ int main(void)
     printf("store_a == store_b is %s.\n", ListDeque_eq(&store_a, &store_b) ? "true" : "false");
     printf("alloc: %d\n", (int)myalloc.bytes);
 
-    ListDeque store_c = ListDeque_clone(store_a); // Make a deep-copy, using myalloc.
+    ListDeque store_c = ListDeque_clone(store_a); // Make a deep-copy (including .aux), using myalloc.
+    printf("store_a == store_c is %s.\n", ListDeque_eq(&store_a, &store_c) ? "true" : "false");
 
     for (c_each(i, ListDeque, store_c))           // Loop through the cloned deque
         for (c_each(j, List, *i.ref))
             printf(" %g", *j.ref);
-    printf("\nalloc: %d\n", (int)myalloc.bytes);
 
+    printf("\nalloc: %d\n", (int)myalloc.bytes);
     c_drop(ListDeque, &store_a, &store_b, &store_c);  // Free all 9 storages.
     printf("alloc: %d\n", (int)myalloc.bytes);
 }
