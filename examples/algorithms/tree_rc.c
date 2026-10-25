@@ -2,7 +2,7 @@
 #include <stc/algorithm.h>
 #include <stc/types.h>
 
-declare_rc(RcTree, union Tree);
+c_declare_rc(RcTree, union Tree);
 
 c_union (Tree,
     (Tree_EMPTY, bool),

@@ -108,7 +108,7 @@ typedef i_keyraw _m_raw;
 // ------------ Arc1 size of one pointer (union) -------------
 
 #ifndef i_declared
-_c_DEFTYPES(declare_arc, Self, i_key);
+_c_DEFTYPES(c_declare_arc, Self, i_key);
 #endif
 struct _c_MEMB(_ctrl) {
     _m_value value;
@@ -137,7 +137,7 @@ STC_INLINE void _c_MEMB(_drop)(const Self* self) {
 #else // ------------ Arc2 size of two pointers -------------
 
 #ifndef i_declared
-_c_DEFTYPES(declare_arc2, Self, i_key);
+_c_DEFTYPES(c_declare_arc2, Self, i_key);
 #endif
 struct _c_MEMB(_ctrl) {
     catomic_long counter; // nb! counter <-> value order is swapped.

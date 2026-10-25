@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stc/types.h>
 
-declare_vec(vec_i32, int);
-declare_vec(vec_pnt, struct Point);
+c_declare_vec(vec_i32, int);
+c_declare_vec(vec_pnt, struct Point);
 
 typedef struct MyStruct {
     vec_i32 intvec;

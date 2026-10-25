@@ -26,7 +26,7 @@
 // ------------------------------------------------------
 // The following requires linking with utf8 symbols.
 // To call them, either define i_import before including
-// one of cstr, csview, zsview, or link with src/libstc.o.
+// one of cstr, csview, csviewz, or link with src/libstc.o.
 
 /* The tables below are extracted from the RE2 library */
 

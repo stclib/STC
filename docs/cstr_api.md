@@ -28,7 +28,7 @@ cstr            cstr_from(const char* str);                             // const
 cstr            cstr_from_n(const char* str, isize_t n);                // construct from first n bytes of str
 cstr            cstr_from_s(cstr s, isize_t pos, isize_t len);          // construct a substring
 cstr            cstr_from_sv(csview sv);                                // construct from a string view
-cstr            cstr_from_zv(zsview zv);                                // construct from a zero-terminated zsview
+cstr            cstr_from_zv(csviewz zv);                                // construct from a zero-terminated csviewz
 cstr            cstr_from_file(const char* filename);                   // construct from content of a file
 cstr            cstr_from_fmt(const char* fmt, ...);                    // construct from printf() formatting
 cstr            cstr_from_replace(csview sv, csview search, csview repl, int32_t count);
@@ -48,9 +48,9 @@ bool            cstr_is_empty(const cstr* self);                        // test 
 const char*     cstr_str(const cstr* self);                             // get const char*
 char*           cstr_data(cstr* self);                                  // get mutable char*
 cstr_buf        cstr_getbuf(cstr* self);                                // to mutable buffer struct (with capacity)
-zsview          cstr_zv(const cstr* self);                              // to zero-terminated string view
+csviewz         cstr_zv(const cstr* self);                              // to zero-terminated string view
 csview          cstr_sv(const cstr* self);                              // to csview string view
-zsview          cstr_tail(cstr* self, isize_t len);                     // to zsview subview of the trailing len bytes
+csviewz         cstr_tail(cstr* self, isize_t len);                     // to csviewz subview of the trailing len bytes
 csview          cstr_subview(const cstr* self, isize_t pos, isize_t len); // to csview subview from pos and length len
 
 void            cstr_clear(cstr* self);
@@ -113,13 +113,13 @@ bool            cstr_getdelim(cstr *self, int delim, FILE *stream);     // does 
 ```c++
 cstr            cstr_u8_from(const char* str, isize_t u8pos, isize_t u8len);// make cstr from an utf8 substring
 isize_t         cstr_u8_size(const cstr* self);                         // number of utf8 runes
-isize_t         cstr_u8_to_index(const cstr* self, isize_t u8pos);        // get byte index at rune position
-cstr_iter       cstr_u8_at(const cstr* self, isize_t u8pos);              // get rune at rune position
+isize_t         cstr_u8_to_index(const cstr* self, isize_t u8pos);      // get byte index at rune position
+cstr_iter       cstr_u8_at(const cstr* self, isize_t u8pos);            // get rune at rune position
 csview          cstr_u8_subview(const cstr* self, isize_t u8pos, isize_t u8len);
-zsview          cstr_u8_tail(cstr* self, isize_t u8len);                  // subview of the trailing len runes
+csviewz         cstr_u8_tail(cstr* self, isize_t u8len);                // subview of the trailing len runes
 void            cstr_u8_insert(cstr* self, isize_t u8pos, const char* ins);
 void            cstr_u8_replace(cstr* self, isize_t u8pos, isize_t u8len, const char* repl);
-void            cstr_u8_erase(cstr* self, isize_t u8pos, isize_t u8len);    // erase u8len runes from u8pos
+void            cstr_u8_erase(cstr* self, isize_t u8pos, isize_t u8len); // erase u8len runes from u8pos
 bool            cstr_u8_valid(const cstr* self);                        // verify that str is valid utf8
 
 bool            cstr_iequals(const cstr* self, const char* str);        // utf8 case-insensitive comparison
@@ -161,7 +161,7 @@ char*           c_strnstrn(const char* str, isize_t slen, const char* needle, is
 | `cstr`          | `struct { ... }`                             | The string type      |
 | `cstr_value`    | `char`                                       | String element type  |
 | `cstr_iter`     | `union { cstr_value *ref; csview chr; }`     | String iterator      |
-| `cstr_buf`      | `struct { char *data; isize_t size, cap; }` | String buffer type   |
+| `cstr_buf`      | `struct { char *data; isize_t size, cap; }`  | String buffer type   |
 
 ## Constants and macros
 

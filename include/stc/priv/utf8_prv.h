@@ -80,7 +80,7 @@ STC_INLINE csview cutf8_subview(const char *s, isize_t u8pos, isize_t u8len) {
 // ------------------------------------------------------
 // Functions below must be linked with utf8_prv.c and utf8_decode.c
 // To call them, either define i_import before including
-// one of cstr, csview, zsview, or link with src/libstc.a
+// one of cstr, csview, csviewz, or link with src/libstc.a
 
 #include "utf8_decode.h"
 

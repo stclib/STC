@@ -90,9 +90,9 @@ STC_INLINE cstr_buf cstr_getbuf(cstr* s) {
     return cstr_is_long(s) ? c_literal(cstr_buf){s->lon.data, cstr_l_size(s), cstr_l_cap(s)}
                            : c_literal(cstr_buf){s->sml.data, cstr_s_size(s), cstr_s_cap};
 }
-STC_INLINE zsview cstr_zv(const cstr* s) {
-    return cstr_is_long(s) ? c_literal(zsview){s->lon.data, cstr_l_size(s)}
-                           : c_literal(zsview){s->sml.data, cstr_s_size(s)};
+STC_INLINE csviewz cstr_zv(const cstr* s) {
+    return cstr_is_long(s) ? c_literal(csviewz){s->lon.data, cstr_l_size(s)}
+                           : c_literal(csviewz){s->sml.data, cstr_s_size(s)};
 }
 STC_INLINE csview cstr_sv(const cstr* s) {
     return cstr_is_long(s) ? c_literal(csview){s->lon.data, cstr_l_size(s)}
@@ -111,7 +111,7 @@ STC_INLINE cstr cstr_from(const char* str)
 STC_INLINE cstr cstr_from_sv(csview sv)
     { return cstr_from_n(sv.buf, sv.size); }
 
-STC_INLINE cstr cstr_from_zv(zsview zv)
+STC_INLINE cstr cstr_from_zv(csviewz zv)
     { return cstr_from_n(zv.str, zv.size); }
 
 STC_INLINE cstr cstr_with_size(const isize_t size, const char value) {
@@ -176,11 +176,11 @@ STC_INLINE csview cstr_subview(const cstr* self, isize_t pos, isize_t len) {
     return c_literal(csview){sv.buf + pos, len};
 }
 
-STC_INLINE zsview cstr_tail(const cstr* self, isize_t len) {
+STC_INLINE csviewz cstr_tail(const cstr* self, isize_t len) {
     c_assert(len >= 0);
     csview sv = cstr_sv(self);
     if (len > sv.size) len = sv.size;
-    return c_literal(zsview){&sv.buf[sv.size - len], len};
+    return c_literal(csviewz){&sv.buf[sv.size - len], len};
 }
 
 // BEGIN utf8 functions =====
@@ -194,12 +194,12 @@ STC_INLINE isize_t cstr_u8_size(const cstr* self)
 STC_INLINE isize_t cstr_u8_to_index(const cstr* self, isize_t u8pos)
     { return cutf8_to_index(cstr_str(self), u8pos); }
 
-STC_INLINE zsview cstr_u8_tail(const cstr* self, isize_t u8len) {
+STC_INLINE csviewz cstr_u8_tail(const cstr* self, isize_t u8len) {
     csview sv = cstr_sv(self);
     const char* p = &sv.buf[sv.size];
     while (u8len && p != sv.buf)
         u8len -= (*--p & 0xC0) != 0x80;
-    return c_literal(zsview){p, sv.size - (p - sv.buf)};
+    return c_literal(csviewz){p, sv.size - (p - sv.buf)};
 }
 
 STC_INLINE csview cstr_u8_subview(const cstr* self, isize_t u8pos, isize_t u8len)

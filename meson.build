@@ -104,7 +104,7 @@ install_headers(
   'include/stc/types.h',
   'include/stc/utf8.h',
   'include/stc/vec.h',
-  'include/stc/zsview.h',
+  'include/stc/csviewz.h',
   subdir: 'stc',
 )
 

@@ -1,7 +1,7 @@
 # STC [UTF8](../include/stc/utf8.h): string functionality
 ![String](pics/string.jpg)
 
-This contains low-level utf8 functions which are used by [cstr](cstr_api.md) (string), [csview](csview_api.md) (string-view), and [zsview](zsview_api.md) (zero-terminated string-view). A utf8 codepoint is often
+This contains low-level utf8 functions which are used by [cstr](cstr_api.md) (string), [csview](csview_api.md) (string-view), and [csviewz](csviewz_api.md) (zero-terminated string-view). A utf8 codepoint is often
 referred to as a ***rune***, and can be 1 to 4 bytes long.
 
 ## Header file
@@ -47,18 +47,18 @@ bool            cutf8_isgroup(int group, uint32_t c);
 ## Example: UTF8 iteration and case conversion
 ```c++
 #include <stc/cstr.h>
-#include <stc/zsview.h>
+#include <stc/csviewz.h>
 
 int main(void)
 {
-    zsview say = c_zv("Liberté, égalité, fraternité.");
+    csviewz say = c_zv("Liberté, égalité, fraternité.");
     printf("%s\n", zs.str);
 
-    for (c_each(i, zsview, say))
+    for (c_each(i, csviewz, say))
         printf(c_svfmt " ", c_svarg(i.chr));
     puts("");
 
-    cstr upper = cstr_toupper_sv(zsview_sv(say));
+    cstr upper = cstr_toupper_sv(csviewz_sv(say));
     printf("%s\n", cstr_str(&upper));
     cstr_drop(&upper);
 }

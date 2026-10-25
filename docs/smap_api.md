@@ -21,11 +21,11 @@ See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) fo
 //                 Binds <kt>_cmp() "member" function name.
 //   c_class_key - Additionally binds <kt>_clone() and <kt>_drop() function names.
 //                 All containers used as keys themselves can be specified with the c_class_key trait.
-//   c_pro_key   - "Pro" key type, use e.g. for built-in `cstr`, `zsview`, `rc`, `arc`, `box` as i_key.
+//   c_pro_key   - "Pro" key type, use e.g. for built-in `cstr`, `csviewz`, `rc`, `arc`, `box` as i_key.
 //                 These support conversion to/from a "raw" input type (such as const char*) when
 //                 using <ct>_emplace*() functions, and may do optimized lookups via the raw type.
 //   c_class_val - Only binds <vt>_clone() and <vt>_drop() function names.
-//   c_pro_val   - "Pro" val type, use e.g. for built-in `cstr`, `zsview`, `rc`, `arc`, `box` as i_val.
+//   c_pro_val   - "Pro" val type, use e.g. for built-in `cstr`, `csviewz`, `rc`, `arc`, `box` as i_val.
 //                 These support conversion to/from a "raw" input type (such as const char*) when
 //                 using <ct>_emplace*() functions.
 

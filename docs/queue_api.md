@@ -13,7 +13,7 @@ See the c++ class [std::queue](https://en.cppreference.com/w/cpp/container/queue
 //                Binds <kt>_less() (and <kt>_cmp()) "member" function names.
 //   c_class_key - Binds <kt>_clone() and <kt>_drop() function names.
 //                All containers used as keys themselves can be specified with the c_class_key trait.
-//   c_pro_key   - "Pro" key type, use e.g. for built-in `cstr`, `zsview`, `rc`, `arc`, `box` as i_key.
+//   c_pro_key   - "Pro" key type, use e.g. for built-in `cstr`, `csviewz`, `rc`, `arc`, `box` as i_key.
 //                These support conversion to/from a "raw" input type (such as const char*) when
 //                using <ct>_emplace*() functions.
 

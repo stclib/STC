@@ -3,7 +3,7 @@
 
 # STC - Smart Template Containers
 
-## Version 6.0 RC7
+## Version 6.0 RC8
 STC is a comprehensive, generic, typesafe container and algorithm library for C99/C11.
 It has excellent ergonomics and requires hardly any boilerplate code. The library adds many
 missing features to C, like common data containers, algorithms, and abstractions found in
@@ -12,6 +12,12 @@ or generic, which allows for a fully typesafe, compact, and high performance imp
 
 <details>
 <summary><b>Version 6 NEWS</b></summary>
+Release Candidate 8: Renamed the zero-terminated string view ***zsview*** to **csviewz** to
+follow the naming convention and to make it clearer that it is a variant of **csview**. The
+previous ***zsview*** header/type is available but deprecated, and will be removed in the furure.
+Additionally, container pre-declaration macros ***declare_..()*** have been prefixed with `c_`,
+to follow convention for macros in STC.
+
 RC7 renamed `cco_await_cancel_all(group)` [deprecated] to `cco_await_cancel(group)` and fixes
 undefined behaviour in `c_each_ref(..)` and `c_each_kv(..)` range iterator macros.
 
@@ -19,8 +25,8 @@ RC6 has some breaking changes to cregex match() and cregex replace(), specifical
 the optional parameter 'xform' to 'transform', and moves it to be the last parameter in replace().
 Getting close to the V6.0 Release!
 
-Release Candidate 5 has fixed lots of smaller bugs and C++ incompabilities in Coroutines,
-Regex and CSpan, and now have proper C-linkage when called from C++.
+RC5 has fixed lots of smaller bugs and C++ incompabilities in Coroutines,
+Regex and cspan, and now have proper C-linkage when called from C++.
 
 A number of deprecated symbols in common.h and coroutine.h are removed.
 
@@ -28,7 +34,7 @@ Apologies for the multiple API changes particularly on the coroutine, cspan and 
 after V5.1. From upcoming V6.0 release, API is planned to be stable and changes will be
 made backward compatible.
 
-V6.0:
+V6.0 beta:
 - New powerful V2 coroutines with waitgroups, cancellation and async finalization.
 - Fixed #149: improved cregex API and fixed bug on word-boundary match.
 - Fixed #143: major container initialization flaw.
@@ -37,7 +43,7 @@ V6.0:
 - Fixed #138: general hash function bug.
 - Fixed queue/deque shrink_to_fit() and reserve() bugs.
 - Fixed i_aux and custom allocations bugs.
-- Fixed #136: missing exports in hmap, #137: declare_hash_set()
+- Fixed #136: missing exports in hmap, #137: c_declare_hash_set()
 - Fixed #133: bug in vec/stack _begin() and _rbegin().
 - Fixed #129 & #150: Makefile bugs and improvements.
 - Fixed #128: bug in cstr_istarts_with().
@@ -122,7 +128,7 @@ Views
 -----
 - [***cspan*** - dynamic multi-dimensional (sub)span array view](docs/cspan_api.md)
 - [***csview*** - string view (non-zero terminated)](docs/csview_api.md)
-- [***zsview*** - zero-terminated string view](docs/zsview_api.md)
+- [***csviewz*** - zero-terminated string view](docs/csviewz_api.md)
 
 Algorithms
 ----------
@@ -196,7 +202,7 @@ you may define STC_IMPLEMENT on top of the file once instead):
 ```
 The non-templated types  **cstr**, **csview**, **cregex**, **cspan** and **random**, are built as a library (libstc),
 and is using the ***meson*** build system. However, the most common functions in **csview** and **random** are inlined.
-The bitset **cbits**, the zero-terminated string view **zsview** and **algorthm** are all fully inlined and need no
+The bitset **cbits**, the zero-terminated string view **csviewz** and **algorthm** are all fully inlined and need no
 linking with the stc-library.
 </details>
 <details>
@@ -542,7 +548,7 @@ the `|` operator, conventionally enclosed in parentheses. The complete list of *
  #### What traits to use on container element types in STC?
   - ***cstr***, ***arc***, ***box*** as elements: `c_pro_key` (or `c_pro_val` for maps)
   - all remaining templated containers used as elements: `c_class_key` (or `c_class_val` for maps)
-  - ***csview***, ***zsview*** as elements: `c_comp_key`
+  - ***csview***, ***csviewz*** as elements: `c_comp_key`
 
 When `c_comp_key` trait is specified, the following KeyType member functions names are bound:
 ```c++
@@ -797,7 +803,7 @@ MyVec_push(&vec, 42);
 Pre-declare templated container in header file. The container can then e.g. be a member of a
 struct defined in a header file.
 - If the container will use an auxiliary member the with `i_aux AuxType` parameter, the declaration
-must also add it as the last argument: `declare_vec_aux(VecType, Element, AuxType)`.
+must also add it as the last argument: `c_declare_vec_aux(VecType, Element, AuxType)`.
 - Up to, but not including C23, a `(c_declared)` option must be specified when defining the container.
 See example below.
 
@@ -808,7 +814,7 @@ See example below.
 #include <stc/types.h>   // include various container data structure templates
 
 // declare PointVec as a vec. Also struct Point may be incomplete/undeclared.
-declare_vec(PointVec, struct Point);
+c_declare_vec(PointVec, struct Point);
 
 typedef struct Dataset {
     PointVec vertices;
@@ -1004,7 +1010,7 @@ STC is generally very memory efficient. Memory usage for the different container
 - This is a major new version, with serveral breaking changes compared to 4.3
     - Some API changes in `cregex`.
     - Some API changes in `cstr` and `csview`.
-    - Renamed czsview type to `zsview`, some API changes.
+    - Renamed czsview type to `csviewz`, some API changes.
     - Renamed all member Container_empty() functions to `Container_is_empty()`.
     - Changed API in `random` numbers.
     - c_init renamed to `c_make`
@@ -1025,7 +1031,7 @@ STC is generally very memory efficient. Memory usage for the different container
     - New header `hset.h` renamed from cset.h
     - New header `smap.h` renamed from csmap.h
     - New header `sset.h` renamed from csset.h
-    - New header `zsview.h` renamed from czview.h
+    - New header `csviewz.h` renamed from csviewz.h
     - New header `random.h` renamed from crand.h
     - New header `types.h` renamed from forward.h
 

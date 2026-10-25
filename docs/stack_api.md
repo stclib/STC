@@ -18,7 +18,7 @@ See the c++ class [std::stack](https://en.cppreference.com/w/cpp/container/stack
 //                Binds <kt>_cmp(), <kt>_eq() "member" function names.
 //   c_class_key - Additionally binds <kt>_clone() and <kt>_drop() function names.
 //                E.g., if <kt> is any STC container, c_class_key trait should be specified.
-//   c_pro_key   - "Pro" key type, use e.g. for built-in `cstr`, `zsview`, `rc`, `arc`, `box` as keys.
+//   c_pro_key   - "Pro" key type, use e.g. for built-in `cstr`, `csviewz`, `rc`, `arc`, `box` as keys.
 //                These support conversion to/from a "raw" input type (such as const char*) when
 //                using <ct>_emplace*() functions, and may do optimized lookups via the raw type.
 //   c_use_eq   - Enable equality <kt>_eq() for _find() and <ct>_eq() for the container itself.
