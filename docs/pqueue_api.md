@@ -8,8 +8,8 @@ See the c++ class [std::priority_queue](https://en.cppreference.com/w/cpp/contai
 ## Header file and declaration
 
 ```c++
-#define T <ct>, <kt>[, (<opt>)] // shorthand for defining pqueue name, i_key, and i_opt
-// Common <opt> element type traits:
+#define T <ct>, <kt>[, (<traits>)[, <alloc>]] // shorthand for defining pqueue name, i_key, and i_allocator prefix
+// Common element-type traits:
 //   c_compare_key - Key type <kt> is a comparable typedef'ed type. Auto-enables c_use_compare.
 //                Binds <kt>_cmp() "member" function name.
 //   c_class_key - Additionally binds <kt>_clone() and <kt>_drop() function names.
@@ -21,7 +21,7 @@ See the c++ class [std::priority_queue](https://en.cppreference.com/w/cpp/contai
 // Alternative to defining T:
 #define i_key <kt>       // Key type. Container type name <ct> defaults to pqueue_<kt>.
 
-// Override/define when not the <opt> traits are specified:
+// Optional overrides/defines when not type-traits are specified:
 #define i_cmp <fn>       // Three-way comparison of two i_key (or i_keyraw)
 #define i_less <fn>      // Alternative less-comparison. i_cmp is deduced from i_less.
 #define i_eq <fn>        // Optional equality comparison, otherwise deduced from given i_cmp.

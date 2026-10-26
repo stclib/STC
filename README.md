@@ -3,34 +3,35 @@
 
 # STC - Smart Template Containers
 
-## Version 6.0 RC8
-STC is a comprehensive, generic, typesafe container and algorithm library for C99/C11.
-It has excellent ergonomics and requires hardly any boilerplate code. The library adds many
-missing features to C, like common data containers, algorithms, and abstractions found in
-contemporary system languages like Zig, Rust, and C++. Containers and algorithms are templated
-or generic, which allows for a fully typesafe, compact, and high performance implementation.
+## Version 6.0 Release Candidate 8
+STC is an inovative, generic, typesafe container and algorithm library for C99/C11.
+The main goals are optimal ergonomics, speed, compactness and to provide useful abstractions,
+which makes code readable and easy to review. The library adds many missing features to C
+like common data containers, algorithms, and abstractions found in contemporary system languages
+like Zig, Rust, and C++, like tagged unions, corpoutines and fast unicode regex and string functions.
+Containers and algorithms are templated/generic, which allows for a fully typesafe and performant implementation.
 
 <details>
 <summary><b>Version 6 NEWS</b></summary>
-Release Candidate 8: Renamed the zero-terminated string view ***zsview*** to **csviewz** to
-follow the naming convention and to make it clearer that it is a variant of **csview**. The
-previous ***zsview*** header/type is available but deprecated, and will be removed in the furure.
-Additionally, container pre-declaration macros ***declare_..()*** have been prefixed with `c_`,
-to follow convention for macros in STC.
 
-RC7 renamed `cco_await_cancel_all(group)` [deprecated] to `cco_await_cancel(group)` and fixes
+**RC8** renamed the zero-terminated string view ***zsview*** to **csviewz** which
+follows the naming convention and makes it clearer that it is a variant of **csview**. The
+previous ***zsview*** header/type is available but deprecated, and will be removed in the furure.
+Additionally, container pre-declaration macros ***declare_..()*** have been prefixed with ***c_***
+to follow convention for macros in STC. ***Unfortunately, this will break code where `declare_..()` is used***.
+
+**RC7** renamed `cco_await_cancel_all(group)` [deprecated] to `cco_await_cancel(group)` and fixes
 undefined behaviour in `c_each_ref(..)` and `c_each_kv(..)` range iterator macros.
 
-RC6 has some breaking changes to cregex match() and cregex replace(), specifically it renames
+**RC6** has some breaking changes to cregex match() and cregex replace(), specifically it renames
 the optional parameter 'xform' to 'transform', and moves it to be the last parameter in replace().
 Getting close to the V6.0 Release!
 
-RC5 has fixed lots of smaller bugs and C++ incompabilities in Coroutines,
-Regex and cspan, and now have proper C-linkage when called from C++.
+**RC5** has fixed lots of smaller bugs and C++ incompabilities in Coroutines, Regex and cspan,
+and now have proper C-linkage when called from C++. Also a number of deprecated symbols in common.h
+and coroutine.h are removed.
 
-A number of deprecated symbols in common.h and coroutine.h are removed.
-
-Apologies for the multiple API changes particularly on the coroutine, cspan and cregex modules
+**RC4** Apologies for the multiple API changes particularly on the coroutine, cspan and cregex modules
 after V5.1. From upcoming V6.0 release, API is planned to be stable and changes will be
 made backward compatible.
 
@@ -43,7 +44,7 @@ V6.0 beta:
 - Fixed #138: general hash function bug.
 - Fixed queue/deque shrink_to_fit() and reserve() bugs.
 - Fixed i_aux and custom allocations bugs.
-- Fixed #136: missing exports in hmap, #137: c_declare_hash_set()
+- Fixed #136: missing exports in hashmap, #137: c_declare_hash_set()
 - Fixed #133: bug in vec/stack _begin() and _rbegin().
 - Fixed #129 & #150: Makefile bugs and improvements.
 - Fixed #128: bug in cstr_istarts_with().
@@ -52,7 +53,7 @@ V6.0 beta:
 
 V5.1:
 - Specifying containers with non-trivial element types can now be done with a single `#define`
-prior to including the container (using `c_class_key`, `c_pro_key`, and `c_comp_key` option *traits*).
+prior to including the container (using `c_class_key`, `c_pro_key`, and `c_compare_key` option *traits*).
 - Users may now define `T` as a shorthand for `i_type`.
 - Replaced **arc** with a new implementation which take up only one pointer. Previous arc is now available as a traits option (c_use_arc2). The new **arc** may not be constructed from an object pointer, for that use **arc2**.
 - Updated and fixed bugs in **cregex** to handle invalid utf8 strings.
@@ -70,10 +71,10 @@ V5.0:
 - Added single/multi-dimensional generic **span** type, with numpy-like slicing.
 - Updated coroutines support with *structured concurrency* and *symmetric coroutines*.
 - Updated coroutines support with proper *error handling* and *error recovery*.
-- Template parameter `T` lets you define container type plus `i_key` and `i_val` (or `i_opt`) all in one line.
+- Template parameter `T` lets you define container type plus `i_key` and `i_val` (and element-type *traits*) all in one line.
 - Template parameters `i_class_key` and `i_class_val` to specify types with `_drop()` and `_clone()` functions defined.
 - Template parameters `i_pro_key` and `i_pro_val` to specify `cstr`, `box` and `arc` types (users may also define pro-types).
-- **hmap** now uses *Robin Hood hashing* (very fast on clang compiler).
+- **hashmap** now uses *Robin Hood hashing* (very fast on clang compiler).
 - Several new algorithms added, e.g. `c_filter` (ranges-like), `c_shuffle`, `c_reverse`.
 See also [version history](#version-history) for breaking changes in V5.0.
 </details>
@@ -119,10 +120,10 @@ Containers
 - [***deque*** - double-ended queue](docs/deque_api.md)
 - [***queue*** - queue type](docs/queue_api.md)
 - [***pqueue*** - priority queue](docs/pqueue_api.md)
-- [***hashmap*** - unordered map](docs/hmap_api.md)
-- [***hashset*** - unordered set](docs/hset_api.md)
-- [***sortedmap*** - binary tree map](docs/smap_api.md)
-- [***sortedset*** - binary tree set](docs/sset_api.md)
+- [***hashmap*** - unordered map](docs/hashmap_api.md)
+- [***hashset*** - unordered set](docs/hashset_api.md)
+- [***sortedmap*** - binary tree map](docs/sortedmap_api.md)
+- [***sortedset*** - binary tree set](docs/sortedset_api.md)
 
 Views
 -----
@@ -256,16 +257,18 @@ int main(void)
     Floats_drop(&nums);
 }
 ```
-For associative containers and priority queues (hmap, hset, smap, sset, pqueue), comparison/lookup functions
-are assumed to be defined. I.e. if they are not specified with template parameters, it assumes default
-comparison operators works. To enable search/sort for the remaining containers (stack, vec, queue, deque),
-define `i_cmp` or `i_eq` and/or `i_less` for the element type. If the element type is an integral type,
-just define `i_use_cmp` (will use  `==` and `<` operators for comparisons).
+For associative containers and priority queues (hashmap, hashset, sortedmap, sortedset, pqueue),
+comparison/lookup functions are assumed to be defined. I.e. if they are not specified with template
+parameters, it assumes default comparison operators works. To enable search/sort for the remaining
+containers (stack, vec, queue, deque), define `i_cmp` or `i_eq` and/or `i_less` for the element type.
+If the element type is an integral type, just specify the **c_use_cmp** trait (will use  `==` and `<`
+operators for comparisons).
 
 If an element destructor `i_keydrop` is defined, `i_keyclone` function is required.
-*Alternatively `#define i_opt c_no_clone` to disable container cloning.*
+Alternatively specify the **c_no_clone** trait when defining `T` to disable container cloning.
 
-Let's make a vector of vectors, which can be cloned. All of its element vectors will be destroyed when destroying the Vec2D.
+Let's make a vector of vectors, which can be cloned. All of its element vectors will be destroyed
+when destroying the Vec2D.
 
 [ [Run this code](https://godbolt.org/z/39oabTjPv) ]
 ```c++
@@ -532,14 +535,15 @@ The associated/bound member functions are only required to be implemented if the
 actually needs them. Trait flags works as boolean properties, and may be combined using 
 the `|` operator, conventionally enclosed in parentheses. The complete list of *trait flags*:
 
-  - **c_comp_key** - specifies that *KeyType* has comparison/hash member functions _cmp() and _hash().
+  - **c_compare_key** - specifies that *KeyType* has comparison/hash member functions _cmp() and _hash().
   - **c_class_key** - specifies that *KeyType* additionally has _clone() and _drop() functions.
   - **c_class_val** - specifies that *ValType* has _clone() and _drop() functions (comparison not relevant).
   - **c_pro_key** - specifies that *KeyType* has _clone() and _drop() functions, _cmp() and _hash() functions, however using type *KeyType*_raw, and functions converting between *KeyType* and *KeyType*_raw.
   - **c_pro_val** - like `c_class_val`, but also expects member _from(), which converts from *ValType*_raw to *ValType*, specifically for the _emplace\*() container functions.
 
   Other traits that can be combined with the `|` operator:
-  - **c_use_cmp** - enables sort/seach for vector-like type, using `<` comparison on integral types, or _cmp() for c_pro_key/c_class_key/c_compare_key elements.
+  - **c_use_cmp** - specifies that *KeyType* should use `<` comparison on integral types, or the _cmp() member function
+  when the element-type has been specified with a c_pro_key/c_class_key/c_compare_key *trait*.
   - **c_use_eq** - enables equality function using `==` on integral types, or the _eq() member for "pro/class/cmp" elements.
   - **c_no_clone** - disable clone functionality for container.
   - **c_no_atomic** - used with **arc** type, do simple fast reference counting instead of thread safe atomics.
@@ -548,13 +552,13 @@ the `|` operator, conventionally enclosed in parentheses. The complete list of *
  #### What traits to use on container element types in STC?
   - ***cstr***, ***arc***, ***box*** as elements: `c_pro_key` (or `c_pro_val` for maps)
   - all remaining templated containers used as elements: `c_class_key` (or `c_class_val` for maps)
-  - ***csview***, ***csviewz*** as elements: `c_comp_key`
+  - ***csview***, ***csviewz*** as elements: `c_compare_key`
 
-When `c_comp_key` trait is specified, the following KeyType member functions names are bound:
+When `c_compare_key` trait is specified, the following KeyType member functions names are bound:
 ```c++
-int         KeyType_cmp(const KeyType* x, const KeyType* y);  // c_comp_key, or c_class_key
-bool        KeyType_eq(const KeyType* x, const KeyType* y);   // c_comp_key, or (c_class_key | c_use_eq)
-size_t      KeyType_hash(const KeyType* kp);                  // c_comp_key, or (c_class_key | c_use_eq)
+int         KeyType_cmp(const KeyType* x, const KeyType* y);  // c_compare_key, or c_class_key
+bool        KeyType_eq(const KeyType* x, const KeyType* y);   // c_compare_key, or (c_class_key | c_use_eq)
+size_t      KeyType_hash(const KeyType* kp);                  // c_compare_key, or (c_class_key | c_use_eq)
 ```
 NB: The above functions are expected for container types that requires them, without specifying the traits.
 
@@ -614,8 +618,8 @@ Only `i_key` is strictly required to be defined for simple non-maps:
 - `i_keyfrom` *Func* - Create a *KeyType* instance from a *RawKeyType*.
 - `i_keytoraw` *Func* - Conversion from *KeyType* to *RawKeyType*.
 
-### Val types template parameters (mapped values for hmap/smap only)
-- `i_val` *ValType* - **required** for **hmap** and **smap** containers.
+### Val types template parameters (mapped values for hashmap/smap only)
+- `i_val` *ValType* - **required** for **hashmap** and **smap** containers.
 - `i_valclone` *Func* - **required if** *i_valdrop* is defined (exception for **arc**, as it shares).
 - `i_valdrop` *Func* - Destroy mapped val - defaults to empty destructor.
 - `i_valraw` *RawValType* - Alternative mapped type. Defaults to *ValType*
@@ -627,30 +631,33 @@ Only `i_key` is strictly required to be defined for simple non-maps:
 <summary>Details on traits template parameters</summary>
 
 ### Details on traits template parameters
-Normally it is simplest to specify the traits template parameters via the *Traits* argument to `T`,
-however they can be specified as separate template parameters as well. Specifically, `i_comp_key`
-can be specified as a different type than `i_key` (**c_comp_key** always makes it equal to `i_key`).
-This enables a container to be associated with an additional alternative "raw" input key/val-type,
-and one may specify convertion functions between them. Specifically the string, **cstr** and smart
-pointers, **box** and **arc** uses this to enhance ergonmics, but every container may gain efficiency
-and usage enhancements from this general built-in mechanism.
+Normally it is simplest to specify the element type traits via the *traits* argument to `T`,
+however they can be specified as separate template parameters as well. Specifically, `i_compare_key`
+can be specified as a different type than `i_key` (however, if specifying the **c_compare_key** trait
+when defining `T`, the `i_compare_key` defaults to `i_key`). This enables a container to be associated
+with an additional "raw" input key/val-type, and convertion functions between them may be specified.
+Specifically the string, **cstr**, **csviewz**, and the smart pointers, **box** and **arc** uses this
+to enhance ergonmics, but every container may gain look-up efficiency and ergonomic enhancements by
+this general built-in mechanism.
 
-- `i_comp_key` *RawType* - Defines ***i_keyraw*** and binds ***i_cmp***, ***i_eq***, and ***i_hash*** to
+#### Key traits parameters
+
+- ` i_compare_key` *RawType* - Defines ***i_keyraw*** and binds ***i_cmp***, ***i_eq***, and ***i_hash*** to
 *RawType_cmp()*, *RawType_eq()*, and *RawType_hash()* comparison functions/macro names. In addition
 ***i_keyfrom***, ***i_keytoraw*** are bound to conversion functions *KeyType_from(RawType\*)* and *KeyType_toraw()*.
     - If neither ***i_key*** nor ***i_class_key*** are defined, ***i_key*** will be defined as *RawType*. In this case,
     ***i_keyfrom***, ***i_keytoraw*** are bound to default pass-through conversion macros.
-    - Useful alone for containers of views (like csview) - may use **c_comp_key** option in that case.
+    - Useful alone for containers of views (like csview) - may use **c_compare_key** option in that case.
 - `i_class_key` *KeyType*
     - Defines ***i_key*** and binds ***i_keyclone***, ***i_keydrop*** to *KeyType_clone()* and *KeyType_drop()*
     function/macro names.
-    - Unless `i_comp_key` or `i_keyraw` are also specified, comparison functions associated with ***i_comp_key*** are
+    - Unless ` i_compare_key` or `i_keyraw` are also specified, comparison functions associated with *** i_compare_key*** are
     also bound.
     - Use with container of containers, or in general when the element type has *_clone()* and *_drop()*
     "member" functions.
 - `i_pro_key` *KeyType* - Use with "pro"-element types, i.e. library types like **cstr**, **box** and **arc**.
-It combines the ***i_class_key*** and ***i_comp_key*** properties. Defining ***i_pro_key*** is equal to defining
-    - ***i_comp_key*** *KeyType_raw*.
+It combines the ***i_class_key*** and *** i_compare_key*** properties. Defining ***i_pro_key*** is equal to defining
+    - *** i_compare_key*** *KeyType_raw*.
     - ***i_class_key*** *KeyType*
     - I.e. `i_key`, `i_keyclone`, `i_keydrop`, `i_keyraw`, `i_keyfrom`, `i_keytoraw`, `i_cmp`, `i_eq`, `i_hash`
     will all be textually bound to function names. See the vikings.c example on how to create and instantiate
@@ -686,7 +693,7 @@ For the containers marked ***optional***, the features are disabled if the templ
 | vec, deque, list  | `i_use_cmp`          | `i_use_cmp`          || `i_eq`             | `i_cmp` / `i_less` | yes      |
 | stack             | n/a                  | `i_use_cmp`          || n/a                | `i_cmp` / `i_less` | yes      |
 | box, arc          | `i_use_cmp`          | `i_use_cmp`          || `i_eq` + `i_hash`  | `i_cmp` / `i_less` | yes      |
-| hmap, hset        |                      | n/a                  || `i_eq` + `i_hash`  | n/a                | no       |
+| hashmap, hset        |                      | n/a                  || `i_eq` + `i_hash`  | n/a                | no       |
 | smap, sset        |                      |                      || `i_cmp` / `i_less` | `i_cmp` / `i_less` | no       |
 | pqueue            | n/a                  |                      || n/a                | `i_cmp` / `i_less` | no       |
 | queue             | n/a                  | n/a                  || n/a                | n/a                | n/a      |
@@ -703,7 +710,7 @@ with **emplace**, e.g. *vec_X_emplace_back()*. This is an ergonomic alternative 
 other elements using dynamic memory or shared resources.
 
 The **emplace** methods ***construct*** / ***clone*** the given raw-type element when it is added
-to the container (specified normally using i_pro_key/i_pro_val or i_comp_key or the c_-option variants).
+to the container (specified normally using i_pro_key/i_pro_val or  i_compare_key or the c_-option variants).
 In contrast, the *non-emplace* methods ***moves*** the element into the container.
 
 **Note**: For containers with integral/trivial element types, or when neither `i_keyraw/i_valraw` is defined,
@@ -711,8 +718,8 @@ the **emplace** functions are ***not*** available (or needed), as it can easier 
 
 | non-emplace: Move          | emplace: Embedded copy         | Container                   |
 |:---------------------------|:-------------------------------|:----------------------------|
-| insert(), push()           | emplace()                      | hmap, smap, hset, sset      |
-| insert_or_assign()         | emplace_or_assign()            | hmap, smap                  |
+| insert(), push()           | emplace()                      | hashmap, smap, hset, sset      |
+| insert_or_assign()         | emplace_or_assign()            | hashmap, smap                  |
 | push()                     | emplace()                      | queue, pqueue, stack        |
 | push_back(), push()        | emplace_back()                 | deque, list, vec            |
 | push_front()               | emplace_front()                | deque, list                 |
@@ -747,24 +754,24 @@ methods to the container value type.
 Rawvalues are primarily beneficial for **lookup** and **map insertions**, however the
 **emplace** methods constructs `cstr`-objects from the rawvalues, but only when required:
 ```c++
-hmap_cstr_emplace(&map, "Hello", "world");
+hashmap_cstr_emplace(&map, "Hello", "world");
 // Two cstr-objects were constructed by emplace
 
-hmap_cstr_emplace(&map, "Hello", "again");
+hashmap_cstr_emplace(&map, "Hello", "again");
 // No cstr was constructed because "Hello" was already in the map.
 
-hmap_cstr_put(&map, "Hello", "there");
+hashmap_cstr_put(&map, "Hello", "there");
 // Only cstr_lit("there") constructed. "world" was destructed and replaced.
 
-hmap_cstr_insert(&map, cstr_lit("Hello"), cstr_lit("you"));
+hashmap_cstr_insert(&map, cstr_lit("Hello"), cstr_lit("you"));
 // Two cstr's constructed outside call, but both destructed by insert
 // because "Hello" existed. No mem-leak but less efficient.
 
-it = hmap_cstr_find(&map, "Hello");
+it = hashmap_cstr_find(&map, "Hello");
 // No cstr constructed for lookup, although keys are cstr-type.
 ```
 Apart from strings, maps and sets are normally used with trivial value types. However, the
-last example on the **hmap** page demonstrates how to specify a map with non-trivial keys.
+last example on the **hashmap** page demonstrates how to specify a map with non-trivial keys.
 </details>
 <details>
 <summary>The <b>erase</b> methods</summary>
@@ -773,8 +780,8 @@ last example on the **hmap** page demonstrates how to specify a map with non-tri
 
 | Name                      | Description                  | Container                                |
 |:--------------------------|:-----------------------------|:-----------------------------------------|
-| erase()                   | key based                    | smap, sset, hmap, hset, cstr             |
-| erase_at()                | iterator based               | smap, sset, hmap, hset, vec, deque, list |
+| erase()                   | key based                    | smap, sset, hashmap, hset, cstr             |
+| erase_at()                | iterator based               | smap, sset, hashmap, hset, vec, deque, list |
 | erase_range()             | iterator based               | smap, sset, vec, deque, list             |
 | erase_n()                 | index based                  | vec, deque, cstr                         |
 | remove()                  | remove all matching values   | list                                     |
@@ -857,8 +864,8 @@ allocated size of the given pointer, unlike standard `realloc` and `free`.
 `self->aux` is accessible from the following template parameters / container combinations:
 - `i_allocator`: **all containers**
 - `i_eq` : **all containers**
-- `i_cmp`, `i_less`: **all containers except hmap and hset**
-- `i_hash`: **hmap and hset**
+- `i_cmp`, `i_less`: **all containers except hashmap and hset**
+- `i_hash`: **hashmap and hset**
 
 ```c++
 // pgs_alloc.h
@@ -994,7 +1001,7 @@ STC is generally very memory efficient. Memory usage for the different container
 - **cspan**, 1 pointer and 2 \* dimension \* int32_t. Does not own data!
 - **list**: Type size: 1 pointer. Each node allocates a struct to store its value and a next pointer.
 - **deque**, **queue**:  Type size: 2 pointers, 2 isize_t. Otherwise like *vec*.
-- **hmap/hset**: Type size: 2 pointers, 2 int32_t (default). *hmap* uses one table of keys+value, and one table of precomputed hash-value/used bucket, which occupies only one byte per bucket. The closed hashing has a default max load factor of 85%, and hash table scales by 1.5x when reaching that.
+- **hashmap/hset**: Type size: 2 pointers, 2 int32_t (default). *hashmap* uses one table of keys+value, and one table of precomputed hash-value/used bucket, which occupies only one byte per bucket. The closed hashing has a default max load factor of 85%, and hash table scales by 1.5x when reaching that.
 - **smap/sset**: Type size: 1 pointer. *smap* manages its own ***array of tree-nodes*** for allocation efficiency. Each node uses two 32-bit ints for child nodes, and one byte for `level`, but has ***no parent node***.
 - **arc**: Type size: 1 pointer, 1 long for the shared reference counter + memory for the shared element.
 - **arc2**: Type size: 2 pointers, 1 long for the shared reference counter + memory for the shared element.
@@ -1027,7 +1034,7 @@ STC is generally very memory efficient. Memory usage for the different container
     - New header `stack.h` renamed from cstack.h
     - New header `queue.h` renamed from cqueue.h
     - New header `pqueue.h` renamed from cpque.h
-    - New header `hmap.h` renamed from cmap.h
+    - New header `hashmap.h` renamed from cmap.h
     - New header `hset.h` renamed from cset.h
     - New header `smap.h` renamed from csmap.h
     - New header `sset.h` renamed from csset.h

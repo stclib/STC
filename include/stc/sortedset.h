@@ -25,23 +25,23 @@
 /*
 #include <stdio.h>
 
-#define T Intset, int
+#define T ISet, int
 #include <stc/sortedset.h> // sorted set of int
 
 int main(void) {
-    Intset set = {0};
-    Intset_insert(&set, 5);
-    Intset_insert(&set, 8);
-    Intset_insert(&set, 3);
-    Intset_insert(&set, 5);
+    ISet set = {0};
+    ISet_insert(&set, 5);
+    ISet_insert(&set, 8);
+    ISet_insert(&set, 3);
+    ISet_insert(&set, 5);
 
-    for (c_each(k, Intset, set))
+    for (c_each(k, ISet, set))
         printf(" %d\n", *k.ref);
 
-    Intset_drop(&set);
+    ISet_drop(&set);
 }
 */
 
 #define _i_prefix sset_
 #define _i_is_set
-#include "smap.h"
+#include "sortedmap.h"

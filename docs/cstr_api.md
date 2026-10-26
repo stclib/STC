@@ -28,7 +28,7 @@ cstr            cstr_from(const char* str);                             // const
 cstr            cstr_from_n(const char* str, isize_t n);                // construct from first n bytes of str
 cstr            cstr_from_s(cstr s, isize_t pos, isize_t len);          // construct a substring
 cstr            cstr_from_sv(csview sv);                                // construct from a string view
-cstr            cstr_from_zv(csviewz zv);                                // construct from a zero-terminated csviewz
+cstr            cstr_from_zv(csviewz zv);                               // construct from a zero-terminated csviewz
 cstr            cstr_from_file(const char* filename);                   // construct from content of a file
 cstr            cstr_from_fmt(const char* fmt, ...);                    // construct from printf() formatting
 cstr            cstr_from_replace(csview sv, csview search, csview repl, int32_t count);

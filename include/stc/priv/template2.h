@@ -25,7 +25,8 @@
 #undef i_type
 #undef i_class
 #undef i_tag
-#undef i_opt
+#undef i_traits
+#undef i_opt       // [deprecated]
 #undef i_capacity
 
 #undef i_compare_key  // define i_keyraw, and bind i_cmp, i_eq, i_hash "class members"

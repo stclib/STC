@@ -72,8 +72,8 @@ for (c_each_item(i, int, {4, 5, 6, 7}))
     list_i_push_back(&lst, *i.ref);
 
 // insert in existing map
-for (c_each_item(i, hmap_ii_value, {{4, 5}, {6, 7}}))
-    hmap_ii_insert(&map, i.ref->first, i.ref->second);
+for (c_each_item(i, hashmap_ii_value, {{4, 5}, {6, 7}}))
+    hashmap_ii_insert(&map, i.ref->first, i.ref->second);
 
 // string literals pushed to a stack of cstr elements:
 for (c_each_item(i, const char*, {"Hello", "crazy", "world"}))
@@ -355,7 +355,7 @@ two containers. `value` is the pointer to each element in predicate. See example
 
 ### c_erase_if, c_eraseremove_if
 Erase linearily in containers using a predicate. `value` is a pointer to each element in predicate.
-- void `c_erase_if`(**CntType**, cnt_ptr, pred). Use with ***list**, ***hmap***, ***hset***, ***smap***, and ***sset***.
+- void `c_erase_if`(**CntType**, cnt_ptr, pred). Use with ***list**, ***hashmap***, ***hset***, ***smap***, and ***sset***.
 - void `c_eraseremove_if`(**CntType**, cnt_ptr, pred). Use with ***stack***, ***vec***, ***deque***, and ***queue*** only.
 
 [ [Run this code](https://godbolt.org/z/6sbdMvn74) ]

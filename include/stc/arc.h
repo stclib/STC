@@ -90,7 +90,7 @@ int main(void) {
 #include "priv/template.h"
 typedef i_keyraw _m_raw;
 
-#if c_OPTION(c_no_atomic)
+#if c_HAS_TRAIT(c_no_atomic)
   #define i_no_atomic
 #endif
 #if !defined i_no_atomic
@@ -101,7 +101,7 @@ typedef i_keyraw _m_raw;
   #define _i_atomic_dec_and_test(v) !(--*(v))
 #endif
 
-#if c_OPTION(c_use_arc2)
+#if c_HAS_TRAIT(c_use_arc2)
   #define i_arc2
 #endif
 #if !(defined i_arc2 || defined STC_USE_ARC2)

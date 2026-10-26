@@ -15,8 +15,8 @@ See similar c++ class [std::unique_ptr](https://en.cppreference.com/w/cpp/memory
 ## Header file and declaration
 
 ```c++
-#define T <ct>, <kt>[, (<opt>)] // shorthand for defining box name, i_key, and i_opt
-// Common <opt> element type traits:
+#define T <ct>, <kt>[, (<traits>)[, <alloc>]] // shorthand for defining box name, i_key, and i_allocator prefix
+// Common element-type traits:
 //   c_compare_key - Key type <kt> is a comparable typedef'ed type. Auto-enables c_use_compare.
 //                Binds <kt>_cmp(), <kt>_eq(), <kt>_hash() "member" function names.
 //   c_class_key - Additionally binds <kt>_clone() and <kt>_drop() function names.
@@ -30,12 +30,12 @@ See similar c++ class [std::unique_ptr](https://en.cppreference.com/w/cpp/memory
 //                Uses operators '<', '>' unless *c_compare/class/pro*_key was also specified.
 //   c_use_compare - Shorthand for (c_use_cmp | c_use_eq).
 //
-// To apply multiple traits, specify e.g. (c_class_key | c_use_cmp) as <opt>.
+// To apply multiple traits, specify e.g. (c_class_key | c_use_cmp) as <traits>.
 
 // Alternative to defining T:
 #define i_key <kt>       // Key type. Container type name <ct> defaults to box_<kt>.
 
-// Override/define when not the <opt> traits are specified:
+// Optional overrides/defines when not type-traits are specified:
 #define i_cmp <fn>       // Three-way comparison of two i_key (or i_keyraw)
 #define i_less <fn>      // Alternative less-comparison. i_cmp is deduced from i_less.
 #define i_eq <fn>        // Optional equality comparison, otherwise deduced from given i_cmp.

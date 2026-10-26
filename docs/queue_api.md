@@ -7,8 +7,8 @@ See the c++ class [std::queue](https://en.cppreference.com/w/cpp/container/queue
 
 ## Header file and declaration
 ```c++
-#define T <ct>, <kt>[, (<opt>)] // shorthand for defining queue name, i_key, and i_opt
-// Common <opt> element type traits:
+#define T <ct>, <kt>[, (<traits>)[, <alloc>]] // shorthand for defining queue name, i_key, and i_allocator prefix
+// Common element-type traits:
 //   c_compare_key - Key type <kt> is a comparable;
 //                Binds <kt>_less() (and <kt>_cmp()) "member" function names.
 //   c_class_key - Binds <kt>_clone() and <kt>_drop() function names.
@@ -21,7 +21,7 @@ See the c++ class [std::queue](https://en.cppreference.com/w/cpp/container/queue
 // Alternative to defining T:
 #define i_key <t>             // define key type. container type name <ct> defaults to queue_<kt>.
 
-// Override/define when not the <opt> traits are specified:
+// Optional overrides/defines when not type-traits are specified:
 #define i_cmp <fn>            // three-way compare two i_keyraw* : REQUIRED IF i_keyraw is a non-integral type
 #define i_less <fn>           // optional/alternative less-comparison. Is transformed to an i_cmp
 #define i_eq <fn>             // optional equality comparison. Implicitly defined with i_cmp, but not i_less.
