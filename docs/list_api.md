@@ -11,8 +11,8 @@ All functions have **O**(1) complexity, apart from *list_X_count()* and *list_X_
 and *list_X_sort()* which is **O**(*n* log(*n*)).
 
 ***Iterator invalidation***: Adding, removing and moving the elements within the list, or across several lists
-will invalidate other iterators currently refering to these elements and their immediate succesive elements.
-However, an iterator to a succesive element can both be dereferenced and advanced. After advancing, it is
+will invalidate other iterators currently referring to these elements and their immediate successive elements.
+However, an iterator to a successive element can both be dereferenced and advanced. After advancing, it is
 in a fully valid state. This implies that if `list_X_insert(&L, list_X_advance(it,1), x)` and
 `list_X_erase_at(&L, list_X_advance(it,1))` are used consistently, only iterators to erased elements are invalidated.
 
@@ -30,7 +30,7 @@ See the c++ class [std::list](https://en.cppreference.com/w/cpp/container/list) 
 //                E.g., if <kt> is any STC container, c_class_key trait should be specified.
 //   c_pro_key   - "Pro" key type, use e.g. for built-in `cstr`, `csviewz`, `rc`, `arc`, `box` as keys.
 //                These support conversion to/from a "raw" input type (such as const char*) when
-//                using <ct>_emplace*() functions, and may do optimized lookups via the raw type.
+//                using <ct>_emplace*() functions, and may do optimized look-ups via the raw type.
 //   c_use_eq   - Enable equality <kt>_eq() for _find() and <ct>_eq() for the container itself.
 //                Uses operator '==' unless *c_compare/class/pro*_key was also specified.
 //   c_use_cmp  - Enable 3-way comparison <kt>_cmp() function for _sort().

@@ -1,7 +1,7 @@
 # STC [crand64 / crand32](../include/stc/random.h): Pseudo Random Number Generator
 ![Random](pics/random.jpg)
 
-A high quality, very fast 32- and 64-bit Pseudo Random Number Geneator (PRNG). It features
+A high quality, very fast 32- and 64-bit Pseudo Random Number Generator (PRNG). It features
 uniform and normal distributed random numbers and float/doubles conversions.
 
 <details>
@@ -18,8 +18,8 @@ uses a modified output function that incorporate a "stream" parameter value.
       output samples.
     - Requires *jump-functions*, which the user must call in order to split up the output ranges before parallel execution.
     - Overkill: Even to create "as few as" 2^64 random numbers in one thread at 1ns per number takes 584 years.
-    - The generator may end up in "zeroland" or "oneland" states (nearly all bits 0s or 1s for multiple outputs in a row), and will
-      generate low quality output. See [A Quick Look at Xoshiro256\*\*](https://www.pcg-random.org/posts/a-quick-look-at-xoshiro256.html).
+    - The generator may end up in "zero-land" or "one-land" states (nearly all bits 0's or 1's for multiple outputs in a row),
+      and will generate low quality output. See [A Quick Look at Xoshiro256\*\*](https://www.pcg-random.org/posts/a-quick-look-at-xoshiro256.html).
     - Output is not fed back into the state, instead every possible bit-state is iterated over by applying XOR and
       SHIFT bit-operations only. As with Mersenne-Twister, the extreme period length has a cost: Because of the regulated
       state changes, a relative expensive output function with two multiplications is needed to achieve high quality output.

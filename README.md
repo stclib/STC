@@ -82,14 +82,14 @@ See also [version history](#version-history) for breaking changes in V5.0.
 <summary><b>Why use STC?</b></summary>
 
 #### A. Supplementing features missing in the C standard library
-* A wide set of high performance, generic/templated typesafe container types, including smart pointers and bitsets.
-* String type with utf8 support and short string optimization (sso), plus two string-view types.
-* Typesafe and ergonomic **sum type** implementation, aka. tagged union or variant.
+* A wide set of high performance, generic/templated type-safe container types, including smart pointers and bitsets.
+* String type with UTF-8 support and short string optimization (SSO), plus two string-view types.
+* Type-safe and ergonomic **sum type** implementation, aka. tagged union or variant.
 * A **coroutine** implementation with good ergonomics, error handling/recovery and cleanup support.
-* Fast, modern **regular expressions** with full utf8 and a subset of unicode character classes support.
+* Fast, modern **regular expressions** with full UTF-8 and a subset of Unicode character classes support.
 * Ranges algorithms like *iota* and filter views like *take, skip, take-while, skip-while, map*.
 * Generic algorithms, iterators and loop abstractions. Blazing fast *sort, binary search* and *lower bound*.
-* Single/multi-dimensional generic **span view** with arbitrary array dimensions and numpy array-like slicing.
+* Single/multi-dimensional generic **span view** with arbitrary array dimensions and Numpy array-like slicing.
 
 #### B. Improved safety and increased productivity
 * Abstractions for raw loops, ranged iteration over containers, and generic ranges algorithms. All this
@@ -98,13 +98,13 @@ common algorithms and containers is minimized/eliminated.
 * STC is inherently **type safe**. Essentially, there are no opaque pointers or casting away of type information.
 Only where necessary, generic code will use some macros to do compile-time type-checking before types are casted.
 Examples are `c_static_assert()`, `c_as_mut()`, `c_safe_cast()` and macros for safe integer type casting.
-* Containers and algorithms all use **signed integers** for indices and sizes, and it encourange to use
-signed integers for quantities in general (unsigned integers have valid usages as bitsets and in bit operations).
+* Containers and algorithms all use **signed integers** for indices and sizes, and it encourage to use
+signed integers for quantities in general (unsigned integers have valid usages as bit-sets and in bit operations).
 This could remove a wide range of bugs related to mixed unsigned-signed calculations and comparisons, which
 intuitively gives the wrong answer in many cases.
 * Tagged unions in C are common, but normally unsafely implemented. Traditionally, it leaves the inactive payload
 data readily accessible to user code, and there is no general way to ensure that the payload is assigned along with
-the tag, or that they match. STC **sum type** is a typesafe version of tagged unions which eliminates all those
+the tag, or that they match. STC **sum type** is a type-safe version of tagged unions which eliminates all those
 safety concerns.
 </details>
 
@@ -155,7 +155,7 @@ Algorithms
 - **Uniform, easy-to-learn API** - For the generic containers and algorithms, simply include the headers. The API and functionality resembles c++ STL or Rust and is fully listed in the docs. Uniform usage across the various containers.
 - **No signed/unsigned mixing** - Unsigned sizes and indices mixed with signed for comparison and calculation is asking for trouble. STC only uses signed numbers in the API for this reason.
 - **Small footprint** - Small source code and generated executables.
-- **Dual mode compilation** - By default it is a header-only library with inline and static methods, but you can easily switch to create a shared library without changing existing source files. Non-generic types, like (utf8) strings are compiled with external linking. one See the [installation section](#installation).
+- **Dual mode compilation** - By default it is a header-only library with inline and static methods, but you can easily switch to create a shared library without changing existing source files. Non-generic types, like (UTF-8) strings are compiled with external linking. one See the [installation section](#installation).
 - **No callback functions** - All passed template argument functions/macros are directly called from the implementation, no slow callbacks which requires storage.
 - **Compiles with C++ and C99** - C code can be compiled with C++ (container element types must be POD).
 - **Pre-declaration** - Templated containers may be [pre-declared](#pre-declarations) without including the full API/implementation.
@@ -417,7 +417,7 @@ Benchmark notes:
 - Containers uses value types `uint64_t` and pairs of `uint64_t` for the maps.
 - Black bars indicates performance variation between various platforms/compilers.
 - Iterations and access are repeated 4 times over n elements.
-- access: no entryfor *forward_list*, *deque*, and *vector* because these c++ containers does not have native *find()*.
+- access: no entry for *forward_list*, *deque*, and *vector* because these c++ containers does not have native *find()*.
 - **deque**: *insert*: n/3 push_front(), n/3 push_back()+pop_front(), n/3 push_back().
 - **map and unordered map**: *insert*: n/2 random numbers, n/2 sequential numbers. *erase*: n/2 keys in the map, n/2 random keys.
 </details>
@@ -426,7 +426,7 @@ Benchmark notes:
 
 ## Some unique features of STC
 
-1. ***Centralized analysis of template parameters***. The analyser assigns values to all
+1. ***Centralized analysis of template parameters***. The analyzer assigns values to all
 non-specified template parameters using meta-programming. You may specify a set of "standard"
 template parameters for each container, but as a minimum *only one is required*: `T` or
 `i_key` (+ `i_val` for maps). In this case, STC assumes that the elements are of basic types.
@@ -581,7 +581,7 @@ as sorting and linear search are not enabled by default. Maps/sets/priority queu
 it uses the _cmp() member function by default. However the _cmp() member is also used for
 equality comparison, so in order to use the _eq() member, **c_use_eq** must be specified!
 - For plain structs (PODs), define `i_cmp` / `i_eq` / `i_hash` macros when needed, or make it
-into a "keyclass" (or even "keypro") by defining required member functions.
+into a "keyclass" (or even "pro_key") by defining required member functions.
 
 When `c_pro_key` is specified, the following KeyType member functions names are bound:
 ```c++
@@ -603,7 +603,7 @@ ValType_raw ValType_toraw(const ValType* kp);                              // c_
 ```
 
 ### Key types template parameters
-The assosicated element member functions defined from using traits template parameters may also be
+The associated element member functions defined from using traits template parameters may also be
 specified/overridden by defining specific template parameters before including the container.
 Only `i_key` is strictly required to be defined for simple non-maps:
 
@@ -632,14 +632,14 @@ Only `i_key` is strictly required to be defined for simple non-maps:
 
 ### Details on traits template parameters
 
-- `i_comp_key` *RawType* - Defines ***i_keyraw*** and binds ***i_cmp***, ***i_eq***, and ***i_hash*** to
+- `i_compare_key` *RawType* - Defines ***i_keyraw*** and binds ***i_cmp***, ***i_eq***, and ***i_hash*** to
 Normally it is simplest to specify the element type traits via the *traits* argument to `T`,
 however they can be specified as separate template parameters as well. Specifically, `i_compare_key`
 can be specified as a different type than `i_key` (however, if specifying the **c_compare_key** trait
 when defining `T`, the `i_compare_key` defaults to `i_key`). This enables a container to be associated
 with an additional "raw" input key/val-type, and conversion functions between them may be specified.
 Specifically the string, **cstr**, **csviewz**, and the smart pointers, **box** and **arc** uses this
-to enhance ergonmics, but every container may gain look-up efficiency and ergonomic enhancements by
+to enhance ergonomics, but every container may gain look-up efficiency and ergonomic enhancements by
 this general built-in mechanism.
 
 #### Key traits parameters
@@ -675,7 +675,7 @@ It combines the ***i_class_key*** and *** i_compare_key*** properties. Defining 
 #### Conversion between alternative key or val types
 - `i_keyraw` *RawType* - Lookup/emplace-function argument "raw" type. Defaults to *i_key*.
 - `i_keyfrom` *Func(r)* - Conversion func from a *i_keyraw* to return a *i_key* type.
-- `i_keytoraw` *Func(p)*  - Conversion func from a *i_key* pointer to a *i_keyraw* type. **[required]** if *i_keyraw* was defined. By default, it returns the dereferenced *i_key* value.
+- `i_keytoraw` *Func(p)*  - Conversion func from a *i_key* pointer to a *i_keyraw* type. **[required]** if *i_keyraw* was defined. By default, it returns the de-referenced *i_key* value.
 - `i_valraw` *RawType* - Emplace-function argument "raw" type. Defaults to *i_val*.
 - `i_valfrom` *Func(r)* - Conversion func from a *i_valraw* to return a *i_val* type.
 - `i_valtoraw` *Func(p)*  - Conversion func from a *i_val* pointer to a *i_valraw* type.
@@ -780,13 +780,13 @@ last example on the **hashmap** page demonstrates how to specify a map with non-
 
 ## The *erase* methods
 
-| Name                      | Description                  | Container                                |
-|:--------------------------|:-----------------------------|:-----------------------------------------|
-| erase()                   | key based                    | smap, sset, hashmap, hset, cstr             |
-| erase_at()                | iterator based               | smap, sset, hashmap, hset, vec, deque, list |
-| erase_range()             | iterator based               | smap, sset, vec, deque, list             |
-| erase_n()                 | index based                  | vec, deque, cstr                         |
-| remove()                  | remove all matching values   | list                                     |
+| Name                      | Description         | Container                                |
+|:--------------------------|:--------------------|:-----------------------------------------|
+| erase()                   | key based           | sortedmap, sortedset, hashmap, hashset, cstr |
+| erase_at()                | iterator based      | sortedmap, sortedset, hashmap, hashset, vec, deque, list |
+| erase_range()             | iterator based      | sortedmap, sortedset, vec, deque, list   |
+| erase_n()                 | index based         | vec, deque, cstr                         |
+| remove()                  | remove all matching | list                                     |
 </details>
 <details>
 <summary>User-defined container type name</summary>
@@ -808,8 +808,8 @@ MyVec_push(&vec, 42);
 <details>
 <summary>Pre-declarations</summary>
 
-## Pre-declarations
-Pre-declare templated container in header file. The container can then e.g. be a member of a
+## Predeclarations
+Predeclare templated container in header file. The container can then e.g. be a member of a
 struct defined in a header file.
 - If the container will use an auxiliary member the with `i_aux AuxType` parameter, the declaration
 must also add it as the last argument: `c_declare_vec_aux(VecType, Element, AuxType)`.
@@ -855,7 +855,7 @@ or allocator function pointer or a context which the function pointers can use. 
 libraries solve this by adding an opaque pointer (void*) or function pointer(s) into
 the data structure for the user to manage. Because most containers are templated,
 an auxiliary template parameter, `i_aux` may be defined to extend the container with
-typesafe custom data fields.
+type-safe custom data fields.
 
 The example below shows how to customize containers to work with PostgreSQL memory management.
 It adds a MemoryContext to each container by defining the `i_aux` template parameter.
@@ -973,9 +973,9 @@ int main(void) {
 ```
 </details>
 <details>
-<summary>Extended templated containers (advanced)</summary>
+<summary>Add functions to existing templated containers (advanced)</summary>
 
-## Extended templated containers
+## Add functions to existing templated containers
 
 It is possible to extend the functionality of templated container by adding functions to them,
 while having all the input and derived/defaulted template parameters available. Below we add
@@ -1003,8 +1003,8 @@ STC is generally very memory efficient. Memory usage for the different container
 - **cspan**, 1 pointer and 2 \* dimension \* int32_t. Does not own data!
 - **list**: Type size: 1 pointer. Each node allocates a struct to store its value and a next pointer.
 - **deque**, **queue**:  Type size: 2 pointers, 2 isize_t. Otherwise like *vec*.
-- **hashmap/hset**: Type size: 2 pointers, 2 int32_t (default). *hashmap* uses one table of keys+value, and one table of precomputed hash-value/used bucket, which occupies only one byte per bucket. The closed hashing has a default max load factor of 85%, and hash table scales by 1.5x when reaching that.
-- **smap/sset**: Type size: 1 pointer. *smap* manages its own ***array of tree-nodes*** for allocation efficiency. Each node uses two 32-bit ints for child nodes, and one byte for `level`, but has ***no parent node***.
+- **hashmap**, **hashset**: Type size: 2 pointers, 2 int32_t (default). *hashmap* uses one table of keys+value, and one table of precomputed hash-value/used bucket, which occupies only one byte per bucket. The closed hashing has a default max load factor of 85%, and hash table scales by 1.5x when reaching that.
+- **sortedmap/sortedset**: Type size: 1 pointer. *smap* manages its own ***array of tree-nodes*** for allocation efficiency. Each node uses two 32-bit ints for child nodes, and one byte for `level`, but has ***no parent node***.
 - **arc**: Type size: 1 pointer, 1 long for the shared reference counter + memory for the shared element.
 - **arc2**: Type size: 2 pointers, 1 long for the shared reference counter + memory for the shared element.
 - **box**: Type size: 1 pointer + memory for the pointed-to element.
@@ -1037,9 +1037,9 @@ STC is generally very memory efficient. Memory usage for the different container
     - New header `queue.h` renamed from cqueue.h
     - New header `pqueue.h` renamed from cpque.h
     - New header `hashmap.h` renamed from cmap.h
-    - New header `hset.h` renamed from cset.h
-    - New header `smap.h` renamed from csmap.h
-    - New header `sset.h` renamed from csset.h
+    - New header `hashset.h` renamed from cset.h
+    - New header `sortedmap.h` renamed from csmap.h
+    - New header `sortedset.h` renamed from csset.h
     - New header `csviewz.h` renamed from csviewz.h
     - New header `random.h` renamed from crand.h
     - New header `types.h` renamed from forward.h
@@ -1059,8 +1059,8 @@ STC is generally very memory efficient. Memory usage for the different container
 - **cspan**: Added **column-major** order (fortran) multidimensional spans and transposed views (changed representation of strides).
 - All new faster and smaller **queue** and **deque** implementations, using a circular buffer.
 - Renamed i_extern => `i_import` (i_extern deprecated).
-    - Define `i_import` before `#include <stc/cstr.h>` will also define full utf8 case conversions.
-    - Define `i_import` before `#include <stc/cregex.h>` will also define cstr + utf8 tables.
+    - Define `i_import` before `#include <stc/cstr.h>` will also define full UTF-8 case conversions.
+    - Define `i_import` before `#include <stc/cregex.h>` will also define cstr + UTF-8 tables.
 - Renamed c_make() => ***c_make()*** macro for initializing containers with element lists. c_make deprecated.
 - Removed deprecated uppercase flow-control macro names.
 - Other smaller additions, bug fixes and improved documentation.
@@ -1094,18 +1094,6 @@ Major changes:
 - Support for [uppercase flow-control](include/stc/priv/altnames.h) macro names in common.h.
 - Some API changes in **cregex** and **cstr**.
 - Create single header container versions with python script.
-
-
-## API changes summary V4.0
-- Added **cregex** with documentation - powerful regular expressions.
-- Added: `c_forfilter`: container iteration with "piped" filtering using && operator. 4 built-in filters.
-- Added: **crange**: number generator type, which can be iterated (e.g. with *c_forfilter*).
-- Added back **coption** - command line argument parsing.
-- New + renamed loop iteration/scope macros:
-    - `c_foritems`: macro replacing *c_forarray* and *c_apply*. Iterate a compound literal list.
-- Updated **cstr**, now always takes self as pointer, like all containers except csview.
-- Updated **vec**, **deque**, changed `*_range*` function names.
-
 </details>
 
 ---

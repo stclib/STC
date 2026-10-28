@@ -116,9 +116,9 @@ for (c_range(i, 30, 0, -5)) printf(" %lld", i);
 
 ## Tagged unions (sumtypes)
 
-This is a tiny, robust and fully typesafe implementation of tagged unions. They work
+This is a tiny, robust and fully type-safe implementation of tagged unions. They work
 similarly as in Zig, Odin or Rust, and is just as easy and safe to use.
-Each tuple/parentesized field is an enum (tag) with an associated data type (payload),
+Each tuple/parenthesized field is an enum (tag) with an associated data type (payload),
 called a *variant* of the sum type. The type itself is a **union** type, aka. a sum type.
 
 <details>

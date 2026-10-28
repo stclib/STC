@@ -1,7 +1,7 @@
 # STC [UTF8](../include/stc/utf8.h): string functionality
 ![String](pics/string.jpg)
 
-This contains low-level utf8 functions which are used by [cstr](cstr_api.md) (string), [csview](csview_api.md) (string-view), and [csviewz](csviewz_api.md) (zero-terminated string-view). A utf8 codepoint is often
+This contains low-level utf8 functions which are used by [cstr](cstr_api.md) (string), [csview](csview_api.md) (string-view), and [csviewz](csviewz_api.md) (zero-terminated string-view). A UTF-8 codepoint is often
 referred to as a ***rune***, and can be 1 to 4 bytes long.
 
 ## Header file

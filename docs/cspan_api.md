@@ -3,7 +3,7 @@
 
 The **cspan** types are templated non-owning *single* and *multi-dimensional* views of an array.
 It supports both row-major and column-major layout efficiently, in a addition to slicing
-capabilities similar to [python's numpy arrays](https://numpy.org/doc/stable/user/basics.indexing.html).
+capabilities similar to [python's Numpy arrays](https://numpy.org/doc/stable/user/basics.indexing.html).
 Note that **cspan** stores indices as int32_t. Multi-dimensional spans can have up to INT32_MAX elements
 in the RANK-1 inner dimensions in total, and INT32_MAX in the outer dimension. Currently limited to 8
 dimensions due to ergonomics and optimization of one-dimensional spans. More dimensions can be added with

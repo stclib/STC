@@ -3,7 +3,7 @@
 
 ## A compact, portable, and ergonomic implementation of structured concurrency in pure C99
 
-* Stackless, fully typesafe coroutines using the fiber model (analogous to threads), but works in a single thread.
+* Stackless, fully type-safe coroutines using the fiber model (analogous to threads), but works in a single thread.
 * Fully supports ***structured concurrency:*** spawn (or fork) concurrent **tasks** with lifetimes limited by the spawner's lifetime.
     * By default, cancels all other spawned sub-tasks if one of them cancels or fails, and propagates error to the spawner task.
     * Spawning a new task creates a new fiber in which it runs.
@@ -218,7 +218,7 @@ and *return*/*output* data. However, these may often be better managed with the 
 3. You may not call ***cco_suspend***, ***cco_yield..*** or ***cco_await..*** inside a `switch` statement.
 Generally avoid `switch` and use `if-else-if` instead.
 4. Never use regular `return` inside ***cco_async*** scope, use ***cco_return*** instead.
-5. Resuming a coroutine after it has returned 0 (cco_DONE) is undefined behaviour ***unless*** the
+5. Resuming a coroutine after it has returned 0 (cco_DONE) is undefined behavior ***unless*** the
 the coroutine object itself is still alive (valid). The coroutine may then also be reinitialized and reused.
 6. There may only be one ***cco_async*** scope per coroutine.
 
@@ -332,7 +332,7 @@ int main(void) {
 A common usage of coroutines is long-running concurrent tasks, often found in video games. An example of this is the
 [Dining philosopher's problem](https://en.wikipedia.org/wiki/Dining_philosophers_problem). The following
 implementation uses `cco_await` and `cco_suspend`. It avoids deadlocks by awaiting for both forks to be
-available before aquiring them. It also avoids starvation by increasing both neighbor's hunger when a philosopher
+available before acquiring them. It also avoids starvation by increasing both neighbor's hunger when a philosopher
 starts eating (because they must be waiting).
 
 <details>
@@ -431,7 +431,7 @@ int main(void)
 ----
 ### Tasks
 A task is a coroutine functor/enclosure. Users must define a custom task type, which *extends* the basic ***cco_task***
-in a typesafe manner:
+in a type-safe manner:
 ```c++
 cco_task_struct (MyTask) {
     MyTask_base base;
@@ -456,7 +456,7 @@ int main(void) {
 #### Error handling with tasks
 Tasks allows for scheduling coroutines and more efficient deep nesting of coroutine calls/awaits.
 Also, tasks have an excellent error handling mechanism, i.e. an error can be thrown, which will unwind the "call stack",
-and errors may be handled and recoveded higher up in the call tree in a simple, structured manner.
+and errors may be handled and recovered higher up in the call tree in a simple, structured manner.
 
 <details>
 <summary>Implementation of nested awaiting coroutines with error handling</summary>
@@ -464,7 +464,7 @@ and errors may be handled and recoveded higher up in the call tree in a simple, 
 The following example shows a task `start` which awaits `TaskA`, => awaits `TaskB`, => awaits `TaskC`. `TaskC` throws
 an error, which causes unwinding of the call stack. The error is finally handled in `TaskA`'s `cco_async` scope
 and recovered using `cco_recover`. This call will resume control back to the original suspension point in the
-current task. Because the "call-tree" is fixed, the coroutine frames to be called may be pre-allocated on the stack,
+current task. Because the "call-tree" is fixed, the coroutine frames to be called may be preallocated on the stack,
 which is very fast.
 
 [ [Run this code](https://godbolt.org/z/h748xqxdj) ]

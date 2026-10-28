@@ -3,7 +3,7 @@
 
 ## Description
 
-**cregex** is a small and fast unicode UTF8 regular expression parser. It is based on Rob Pike's non-backtracking NFA-based regular expression implementation for the Plan 9 project. See Russ Cox's articles [Implementing Regular Expressions](https://swtch.com/~rsc/regexp/) on why NFA-based regular expression engines often are superiour to the common backtracking implementations (hint: NFAs have no "bad/slow" RE patterns).
+**cregex** is a small and fast Unicode UTF8 regular expression parser. It is based on Rob Pike's non-backtracking NFA-based regular expression implementation for the Plan 9 project. See Russ Cox's articles [Implementing Regular Expressions](https://swtch.com/~rsc/regexp/) on why NFA-based regular expression engines often are superior to the common backtracking implementations (hint: NFAs have no "bad/slow" RE patterns).
 
 The API is simple and includes powerful string pattern matches and replace functions. See example below and in the example folder.
 
@@ -109,7 +109,7 @@ if (re2.error != CREG_OK)
 cregex_drop(&re2);
 cregex_drop(&re1);
 ```
-If an error occurs ```cregex_compile``` returns a negative error code stored in re2.error.
+If an error occurs ```cregex_compile``` returns a negative error code stored in `re2.error`.
 
 ### Getting the first match and making text replacements
 
@@ -254,4 +254,4 @@ and specific scripts like \p{Tibetan}. Only code points from the Basic Multiling
 are matched from the supported classes.
 - {n, m} syntax for repeating previous token min-max times.
 - Non-capturing groups
-- Lookaround and backreferences (cannot be implemented efficiently).
+- Look-around and back-references (cannot be implemented efficiently).

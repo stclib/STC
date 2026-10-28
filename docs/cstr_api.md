@@ -9,7 +9,7 @@ operate with strings of single-byte characters, terminated by the null character
 efficient functions for handling case-conversion, iteration and indexing into UTF8
 codepoints (runes).
 
-**cstr** uses short strings optimization (sso), which eliminates heap memory allocation
+**cstr** uses short strings optimization (SSO), which eliminates heap memory allocation
 for string capacity up to 22 bytes.
 
 ## Header file

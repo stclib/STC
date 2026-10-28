@@ -1,13 +1,13 @@
 # STC [csview](../include/stc/csview.h): Non-zero terminated String View
 ![String](pics/string.jpg)
 
-The type **csview** is a ***non-zero terminated*** and ***utf8-iterable*** string view. It refers to a
+The type **csview** is a ***non-zero terminated*** and ***UTF-8 iterable*** string view. It refers to a
 constant contiguous sequence of char-elements with the first element of the sequence at position zero.
 The implementation holds two members: a pointer to constant char and a size. See [csviewz](csviewz_api.md)
 for a ***zero-terminated*** string view/span type.
 
 **csview** never allocates memory, and therefore need not be destructed. Its lifetime is limited by the
-source string storage. It keeps the length of the string, which redcues the need to call *strlen()* in
+source string storage. It keeps the length of the string, which reduces the need to call *strlen()* in
 usage.
 
 - **csview** iterators works on UTF8 codepoints - like **cstr** and **csviewz** (see Example 2).

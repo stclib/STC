@@ -12,9 +12,9 @@ See the c++ class [std::stack](https://en.cppreference.com/w/cpp/container/stack
 
 ```c++
 #define T <ct>, <kt>[, (<traits>)[, <CAP>]] // shorthand for defining stack name, i_key, and i_allocator prefix
-// <CAP>: If given, stack becomes an inplace stack using runtime stack memory only with CAP capacity.
+// <CAP>: If given, stack becomes an in-place stack using runtime stack memory only with CAP capacity.
 // Common element-type traits:
-//   c_compare_key - Key type <kt> is a comparable typedef'ed type. Auto-enables c_use_compare.
+//   c_compare_key - Key type <kt> is a type-defined comparable type. Auto-enables c_use_compare.
 //                Binds <kt>_cmp(), <kt>_eq() "member" function names.
 //   c_class_key - Additionally binds <kt>_clone() and <kt>_drop() function names.
 //                E.g., if <kt> is any STC container, c_class_key trait should be specified.
