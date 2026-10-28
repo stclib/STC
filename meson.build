@@ -130,8 +130,8 @@ install_headers(
 )
 
 install_headers(
-  'include/c11/fmt.h',
-  subdir: 'c11',
+  'include/stc/c11/fmt.h',
+  subdir: 'stc/c11',
 )
 
 stc_dep = declare_dependency(
