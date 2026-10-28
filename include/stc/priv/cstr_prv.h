@@ -54,14 +54,14 @@ enum  { cstr_s_cap = sizeof(cstr_buf) - 2 };
 #define cstr_l_data(s)          (s)->lon.data
 #define cstr_l_drop(s)          c_free((s)->lon.data, cstr_l_cap(s) + 1)
 
-#define cstr_is_long(s)         ((s)->sml.size >= 128)
 STC_EXTERN char* _cstr_init(cstr* self, isize_t len, isize_t cap);
 STC_EXTERN char* _cstr_internal_move(cstr* self, isize_t pos1, isize_t pos2);
 
 /**************************** PUBLIC API **********************************/
 
-#define             cstr_init() (c_literal(cstr){0})
-#define             cstr_lit(literal) cstr_from_n(literal, c_litstrlen(literal))
+#define                 cstr_init()       (c_literal(cstr){0})
+#define                 cstr_lit(literal) cstr_from_n(literal, c_litstrlen(literal))
+#define                 cstr_is_long(s)   ((s)->sml.size >= 128)
 
 STC_EXTERN  cstr        cstr_from_replace(csview sv, csview search, csview repl, int32_t count);
 STC_EXTERN  cstr        cstr_from_fmt(const char* fmt, ...) c_GNUATTR(format(printf, 1, 2));

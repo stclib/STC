@@ -90,10 +90,10 @@ int main(void) {
 #define _c_EVAL(...) _c_E2(_c_E2(_c_E2(__VA_ARGS__))) // currently supports up to 130 variants
 #define _c_LOOP(f,U,x,...) _c_CHECK(_c_LOOP0, c_JOIN(_c_LOOP_END_, c_NUMARGS(c_EXPAND x)))(f,U,x,__VA_ARGS__)
 
-#define _c_enum_1(x,...) (x=__LINE__*1000, __VA_ARGS__)
+#define _c_enum_1(x,...) (x=__LINE__*100, __VA_ARGS__)
 #define _c_vartuple_enum(U, Tag, ...) Tag,
 #define _c_vartuple_type(U, Tag, ...) typedef __VA_ARGS__ Tag##_type; typedef U Tag##_sumtype;
-#define _c_vartuple_item(U, Tag, ...) struct { enum U##_tag id; Tag##_type item; } Tag;
+#define _c_vartuple_item(U, Tag, ...) struct { enum U##_tag id; Tag##_type val; } Tag;
 
 #define c_union(U, ...) \
     typedef union U U; \
@@ -101,16 +101,15 @@ int main(void) {
     _c_EVAL(_c_LOOP(_c_vartuple_type, U, __VA_ARGS__, (0),)) \
     union U { \
         int tag_id; \
-        enum U##_tag tag; \
+        struct { enum U##_tag id; } _tag; \
         _c_EVAL(_c_LOOP(_c_vartuple_item, U, __VA_ARGS__, (0),)) \
     }
 
-#define c_sumtype c_union // [deprecated]?
 
 #define c_when(...) c_MACRO_OVERLOAD(c_when, __VA_ARGS__)
 #define c_when_3(varptr, Tag, x) \
-    for (Tag##_type *x = &(varptr)->Tag.item \
-        ; x && c_container_of(x, Tag##_sumtype, Tag.item)->Tag.id == Tag \
+    for (Tag##_type *x = &(varptr)->Tag.val \
+        ; x && c_container_of(x, Tag##_sumtype, Tag.val)->Tag.id == Tag \
         ; x = NULL)
 
 #define c_is(...) c_MACRO_OVERLOAD(c_is, __VA_ARGS__)
@@ -123,11 +122,11 @@ int main(void) {
 #ifdef STC_HAS_TYPEOF
     #define c_when_1(varptr) \
         for (c_typeof(varptr) _vp1 = (varptr); _vp1; _vp1 = NULL) \
-        switch (_vp1->tag)
+        switch (_vp1->_tag.id)
 
     #define c_is_2(Tag, x) \
         break; case Tag: \
-        for (c_typeof(_vp1->Tag.item)* x = &_vp1->Tag.item; x; x = NULL)
+        for (c_typeof(_vp1->Tag.val)* x = &_vp1->Tag.val; x; x = NULL)
 #else
     #define c_when_1(varptr) \
         for (const int* _vp_id = &(varptr)->tag_id; _vp_id; _vp_id = NULL) \
@@ -135,19 +134,22 @@ int main(void) {
 
     #define c_is_2(Tag, x) \
         break; case Tag: \
-        for (Tag##_type *x = &c_container_of(_vp_id, Tag##_sumtype, tag_id)->Tag.item; x; x = NULL)
+        for (Tag##_type *x = &c_container_of(_vp_id, Tag##_sumtype, tag_id)->Tag.val; x; x = NULL)
 #endif
 
 #define c_variant(Tag, ...) \
-    (c_literal(Tag##_sumtype){.Tag={.id=Tag, .item=__VA_ARGS__}})
+    (c_literal(Tag##_sumtype){.Tag={.id=Tag, .val=__VA_ARGS__}})
 
-#define c_is_variant(varptr, Tag) \
-    ((varptr)->Tag.id == Tag)
+#define c_is_variant(uptr, Tag) \
+    ((uptr)->Tag.id == Tag)
 
-#define c_get_if(varptr, Tag) \
-    ((varptr)->Tag.id == Tag ? &(varptr)->Tag.item : NULL)
+#define c_get_if(uptr, Tag) \
+    ((uptr)->Tag.id == Tag ? &(uptr)->Tag.val : NULL)
 
-#define c_variant_id(varptr) \
-    ((varptr)->tag)
+#define c_variant_id(uptr) \
+    ((uptr)->tag_id + 0)
+
+// The following is [deprecated]
+#define c_sumtype c_union
 
 #endif // STC_SUMTYPE_H_INCLUDED

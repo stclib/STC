@@ -113,7 +113,7 @@ void Action_drop(Action* self) {
 static void action(Action* action, cstr* out) {
     c_when (action) {
         c_is(ActionSpeak) c_or_is(ActionLog) {
-            cstr_printf(out, "Asked to speak or log message: %s\n", cstr_str(&action->ActionSpeak.item));
+            cstr_printf(out, "Asked to speak or log message: %s\n", cstr_str(&action->ActionSpeak.val));
         }
         c_is(ActionQuit) {
             cstr_printf(out, "Asked to quit!\n");
@@ -149,7 +149,7 @@ TEST(algorithm, c_union) {
     EXPECT_STREQ(cstr_str(&res), "Asked to speak or log message: Alert mode on\n");
 
     EXPECT_TRUE(c_is_variant(&act1, ActionSpeak));
-    EXPECT_STREQ(cstr_str(&act1.ActionSpeak.item), "Hello!");
+    EXPECT_STREQ(cstr_str(&act1.ActionSpeak.val), "Hello!");
 
     c_drop(Action, &act1, &act2, &act3);
     c_drop(cstr, &res);
