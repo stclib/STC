@@ -1,6 +1,6 @@
 # STC Algorithms
 
-STC contains many generic algorithms and loop abstactions. Raw loops are one of the most prominent
+STC contains many generic algorithms and loop abstractions. Raw loops are one of the most prominent
 sources for errors in C and C++ code. By using the loop abstractions below, your code becomes more
 descriptive and reduces chances of making mistakes. It is generally easier to read and write too.
 
@@ -332,7 +332,7 @@ int main(void) {
 <summary><b>c_find, c_reverse, c_copy_to, c_erase</b> - Container/array operations</summary>
 
 ### c_find_if, c_find_reverse_if
-Find linearily in containers using a predicate. `value` is a pointer to each element in predicate.
+Find linearly in containers using a predicate. `value` is a pointer to each element in predicate.
 ***outiter_ptr*** must be defined prior to call.
 - void `c_find_if`(**CntType**, cnt, outiter_ptr, pred).
 - void `c_find_if`(**CntType**, startiter, enditer, outiter_ptr, pred)
@@ -354,8 +354,8 @@ two containers. `value` is the pointer to each element in predicate. See example
 - void `c_copy_if`(**OutCnt**, outcnt_ptr, **CntType**, cnt, pred)
 
 ### c_erase_if, c_eraseremove_if
-Erase linearily in containers using a predicate. `value` is a pointer to each element in predicate.
-- void `c_erase_if`(**CntType**, cnt_ptr, pred). Use with ***list**, ***hashmap***, ***hset***, ***smap***, and ***sset***.
+Erase linearly in containers using a predicate. `value` is a pointer to each element in predicate.
+- void `c_erase_if`(**CntType**, cnt_ptr, pred). Use with ***list**, ***hashmap***, ***hashset***, ***sortedmap***, and ***sortedset***.
 - void `c_eraseremove_if`(**CntType**, cnt_ptr, pred). Use with ***stack***, ***vec***, ***deque***, and ***queue*** only.
 
 [ [Run this code](https://godbolt.org/z/6sbdMvn74) ]

@@ -88,7 +88,7 @@ See also [version history](#version-history) for breaking changes in V5.0.
 * A **coroutine** implementation with good ergonomics, error handling/recovery and cleanup support.
 * Fast, modern **regular expressions** with full utf8 and a subset of unicode character classes support.
 * Ranges algorithms like *iota* and filter views like *take, skip, take-while, skip-while, map*.
-* Generic algorithms, iterators and loop abstactions. Blazing fast *sort, binary search* and *lower bound*.
+* Generic algorithms, iterators and loop abstractions. Blazing fast *sort, binary search* and *lower bound*.
 * Single/multi-dimensional generic **span view** with arbitrary array dimensions and numpy array-like slicing.
 
 #### B. Improved safety and increased productivity
@@ -96,14 +96,14 @@ See also [version history](#version-history) for breaking changes in V5.0.
 reduces the chance of creating bugs, as user code with raw loops and ad-hoc implementation of
 common algorithms and containers is minimized/eliminated.
 * STC is inherently **type safe**. Essentially, there are no opaque pointers or casting away of type information.
-Only where neccesary, generic code will use some macros to do compile-time type-checking before types are casted.
+Only where necessary, generic code will use some macros to do compile-time type-checking before types are casted.
 Examples are `c_static_assert()`, `c_as_mut()`, `c_safe_cast()` and macros for safe integer type casting.
 * Containers and algorithms all use **signed integers** for indices and sizes, and it encourange to use
 signed integers for quantities in general (unsigned integers have valid usages as bitsets and in bit operations).
 This could remove a wide range of bugs related to mixed unsigned-signed calculations and comparisons, which
 intuitively gives the wrong answer in many cases.
 * Tagged unions in C are common, but normally unsafely implemented. Traditionally, it leaves the inactive payload
-data readily accesible to user code, and there is no general way to ensure that the payload is assigned along with
+data readily accessible to user code, and there is no general way to ensure that the payload is assigned along with
 the tag, or that they match. STC **sum type** is a typesafe version of tagged unions which eliminates all those
 safety concerns.
 </details>
@@ -203,7 +203,7 @@ you may define STC_IMPLEMENT on top of the file once instead):
 ```
 The non-templated types  **cstr**, **csview**, **cregex**, **cspan** and **random**, are built as a library (libstc),
 and is using the ***meson*** build system. However, the most common functions in **csview** and **random** are inlined.
-The bitset **cbits**, the zero-terminated string view **csviewz** and **algorthm** are all fully inlined and need no
+The bitset **cbits**, the zero-terminated string view **csviewz** and **algorithm** are all fully inlined and need no
 linking with the stc-library.
 </details>
 <details>
@@ -528,7 +528,7 @@ A vector of searchable string vectors:
 ```
 
 ### Traits template arguments for the key (and val) types
-There are a number of *trait flags* which can be specified as the thrird (fourth for maps)
+There are a number of *trait flags* which can be specified as the third (fourth for maps)
 comma-separated argument to the `T` template/macro definition. They associate/binds the key 
 (and val) element type names with a set of common "member" function names or properties of the types.
 The associated/bound member functions are only required to be implemented if the container
@@ -576,7 +576,7 @@ void        ValType_drop(ValType* vp);                        // c_class_val
 
 **Notes**:
 - **c_use_cmp** is only required to be specified for **vec**, **stack**, **deque**, **list**,
-as sorting and linear seach are not enabled by default. Maps/sets/priority queues expects member comparison functions defined.
+as sorting and linear search are not enabled by default. Maps/sets/priority queues expects member comparison functions defined.
 - Comparison uses `<` and `==` operators by default, whereas when **c_class_key/c_pro_key** are specified
 it uses the _cmp() member function by default. However the _cmp() member is also used for
 equality comparison, so in order to use the _eq() member, **c_use_eq** must be specified!
@@ -631,11 +631,13 @@ Only `i_key` is strictly required to be defined for simple non-maps:
 <summary>Details on traits template parameters</summary>
 
 ### Details on traits template parameters
+
+- `i_comp_key` *RawType* - Defines ***i_keyraw*** and binds ***i_cmp***, ***i_eq***, and ***i_hash*** to
 Normally it is simplest to specify the element type traits via the *traits* argument to `T`,
 however they can be specified as separate template parameters as well. Specifically, `i_compare_key`
 can be specified as a different type than `i_key` (however, if specifying the **c_compare_key** trait
 when defining `T`, the `i_compare_key` defaults to `i_key`). This enables a container to be associated
-with an additional "raw" input key/val-type, and convertion functions between them may be specified.
+with an additional "raw" input key/val-type, and conversion functions between them may be specified.
 Specifically the string, **cstr**, **csviewz**, and the smart pointers, **box** and **arc** uses this
 to enhance ergonmics, but every container may gain look-up efficiency and ergonomic enhancements by
 this general built-in mechanism.
@@ -1014,7 +1016,7 @@ STC is generally very memory efficient. Memory usage for the different container
 ## Version history
 
 ## Version 5.0 changes
-- This is a major new version, with serveral breaking changes compared to 4.3
+- This is a major new version, with several breaking changes compared to 4.3
     - Some API changes in `cregex`.
     - Some API changes in `cstr` and `csview`.
     - Renamed czsview type to `csviewz`, some API changes.
