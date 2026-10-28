@@ -29,7 +29,7 @@ void        fmt_close(fmt_stream* ss);
 * (c) operamint, 2022-2026, MIT License.
 -----------------------------------------------------------------------------------
 #define i_implement
-#include "c11/fmt.h"
+#include "stc/c11/fmt.h"
 
 int main(void) {
     const double pi = 3.141592653589793;

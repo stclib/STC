@@ -31,29 +31,29 @@
 #define c_true(...) __VA_ARGS__
 #define c_false(...)
 
-#define declare_rc(C, KEY) declare_arc(C, KEY)
-#define declare_rc2(SELF, VAL) declare_arc2(SELF, VAL)
-#define declare_list(C, KEY) _declare_list(C, KEY,)
-#define declare_stack(C, KEY) _declare_stack(C, KEY,)
-#define declare_vec(C, KEY) _declare_stack(C, KEY,)
-#define declare_pqueue(C, KEY) _declare_stack(C, KEY,)
-#define declare_queue(C, KEY) _declare_queue(C, KEY,)
-#define declare_deque(C, KEY) _declare_queue(C, KEY,)
-#define declare_hashmap(C, KEY, VAL) _declare_htable(C, c_true, c_false, KEY, VAL,)
-#define declare_hashset(C, KEY) _declare_htable(C, c_false, c_true, KEY, KEY,)
-#define declare_sortedmap(C, KEY, VAL) _declare_aatree(C, c_true, c_false, KEY, VAL,)
-#define declare_sortedset(C, KEY) _declare_aatree(C, c_false, c_true, KEY, KEY,)
+#define c_declare_rc(C, KEY) c_declare_arc(C, KEY)
+#define c_declare_rc2(SELF, VAL) c_declare_arc2(SELF, VAL)
+#define c_declare_list(C, KEY) _declare_list(C, KEY,)
+#define c_declare_stack(C, KEY) _declare_stack(C, KEY,)
+#define c_declare_vec(C, KEY) _declare_stack(C, KEY,)
+#define c_declare_pqueue(C, KEY) _declare_stack(C, KEY,)
+#define c_declare_queue(C, KEY) _declare_queue(C, KEY,)
+#define c_declare_deque(C, KEY) _declare_queue(C, KEY,)
+#define c_declare_hashmap(C, KEY, VAL) _declare_htable(C, c_true, c_false, KEY, VAL,)
+#define c_declare_hashset(C, KEY) _declare_htable(C, c_false, c_true, KEY, KEY,)
+#define c_declare_sortedmap(C, KEY, VAL) _declare_aatree(C, c_true, c_false, KEY, VAL,)
+#define c_declare_sortedset(C, KEY) _declare_aatree(C, c_false, c_true, KEY, KEY,)
 
-#define declare_list_aux(C, KEY, AUX) _declare_list(C, KEY, AUX aux;)
-#define declare_stack_aux(C, KEY, AUX) _declare_stack(C, KEY, AUX aux;)
-#define declare_vec_aux(C, KEY, AUX) _declare_stack(C, KEY, AUX aux;)
-#define declare_pqueue_aux(C, KEY, AUX) _declare_stack(C, KEY, AUX aux;)
-#define declare_queue_aux(C, KEY, AUX) _declare_queue(C, KEY, AUX aux;)
-#define declare_deque_aux(C, KEY, AUX) _declare_queue(C, KEY, AUX aux;)
-#define declare_hashmap_aux(C, KEY, VAL) _declare_htable(C, c_true, c_false, KEY, VAL, AUX aux;)
-#define declare_hashset_aux(C, KEY) _declare_htable(C, c_false, c_true, KEY, KEY, AUX aux;)
-#define declare_sortedmap_aux(C, KEY, VAL) _declare_aatree(C, c_true, c_false, KEY, VAL, AUX aux;)
-#define declare_sortedset_aux(C, KEY) _declare_aatree(C, c_false, c_true, KEY, KEY, AUX aux;)
+#define c_declare_list_aux(C, KEY, AUX) _declare_list(C, KEY, AUX aux;)
+#define c_declare_stack_aux(C, KEY, AUX) _declare_stack(C, KEY, AUX aux;)
+#define c_declare_vec_aux(C, KEY, AUX) _declare_stack(C, KEY, AUX aux;)
+#define c_declare_pqueue_aux(C, KEY, AUX) _declare_stack(C, KEY, AUX aux;)
+#define c_declare_queue_aux(C, KEY, AUX) _declare_queue(C, KEY, AUX aux;)
+#define c_declare_deque_aux(C, KEY, AUX) _declare_queue(C, KEY, AUX aux;)
+#define c_declare_hashmap_aux(C, KEY, VAL) _declare_htable(C, c_true, c_false, KEY, VAL, AUX aux;)
+#define c_declare_hashset_aux(C, KEY) _declare_htable(C, c_false, c_true, KEY, KEY, AUX aux;)
+#define c_declare_sortedmap_aux(C, KEY, VAL) _declare_aatree(C, c_true, c_false, KEY, VAL, AUX aux;)
+#define c_declare_sortedset_aux(C, KEY) _declare_aatree(C, c_false, c_true, KEY, KEY, AUX aux;)
 
 typedef struct { uint32_t state, codep; } cutf8_decode_t;
 
@@ -76,20 +76,24 @@ typedef union {
 #define c_svfmt "%.*s"
 #define c_svarg(sv) (int)(sv).size, (sv).buf // printf(c_svfmt "\n", c_svarg(sv));
 
-// zsview : zero-terminated string view
-typedef csview_value zsview_value;
-typedef struct zsview {
-    zsview_value* str;
+// csviewz : zero-terminated string view
+typedef csview_value csviewz_value;
+typedef struct csviewz {
+    csviewz_value* str;
     ptrdiff_t size;
-} zsview;
+} csviewz;
 
 typedef union {
     struct { csview chr; cutf8_decode_t dec; } u8;
     csview chr;
-    zsview_value* ref;
-} zsview_iter;
+    csviewz_value* ref;
+} csviewz_iter;
 
-#define c_zv(literal) (c_literal(zsview){literal, c_litstrlen(literal)})
+#define c_zv(literal) (c_literal(csviewz){literal, c_litstrlen(literal)})
+
+typedef csviewz zsview;             // [deprecated]
+typedef csviewz_value zsview_value; // [deprecated]
+typedef csviewz_iter zsview_iter;   // [deprecated]
 
 // cstr : zero-terminated owning string (short string optimized - sso)
 typedef char cstr_value;
@@ -112,7 +116,7 @@ typedef const char* cstr_raw;
 #define cstr_raw_hash(vp)  c_hash_str(*(vp))
 
 
-#define declare_arc(SELF, VAL) \
+#define c_declare_arc(SELF, VAL) \
     typedef VAL SELF##_value; \
     typedef struct SELF##_ctrl SELF##_ctrl; \
 \
@@ -121,7 +125,7 @@ typedef const char* cstr_raw;
         SELF##_ctrl* ctrl; \
     } SELF
 
-#define declare_arc2(SELF, VAL) \
+#define c_declare_arc2(SELF, VAL) \
     typedef VAL SELF##_value; \
     typedef struct SELF##_ctrl SELF##_ctrl; \
 \
@@ -130,7 +134,7 @@ typedef const char* cstr_raw;
         SELF##_ctrl* ctrl2; \
     } SELF
 
-#define declare_box(SELF, VAL) \
+#define c_declare_box(SELF, VAL) \
     typedef VAL SELF##_value; \
 \
     typedef struct SELF { \
@@ -151,6 +155,11 @@ typedef const char* cstr_raw;
         ptrdiff_t pos; \
         const SELF* _s; \
     } SELF##_iter
+
+#define _declare_inplace_queue(SELF, VAL, CAP, AUXDEF) \
+    typedef VAL SELF##_value; \
+    typedef struct SELF { ptrdiff_t start, end; SELF##_value cbuf[CAP]; AUXDEF } SELF; \
+    typedef struct SELF##_iter { SELF##_value *ref; ptrdiff_t pos; const SELF* _s; } SELF##_iter
 
 #define _declare_list(SELF, VAL, AUXDEF) \
     typedef VAL SELF##_value; \

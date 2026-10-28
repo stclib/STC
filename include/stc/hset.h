@@ -21,23 +21,25 @@
  * SOFTWARE.
  */
 
-// Unordered set - implemented with the robin-hood hashing scheme.
+// Hashed set/Unordered set - implemented with the robin-hood hashing scheme.
+// NB! This header is [deprecated]; use hashset.h instead
 /*
-#define T iset, int
+#define T ISet, int
 #include <stc/hashset.h>
 #include <stdio.h>
 
 int main(void) {
-    iset set = {0};
-    iset_insert(&set, 5);
-    iset_insert(&set, 8);
+    ISet set = {0};
+    ISet_insert(&set, 5);
+    ISet_insert(&set, 8);
 
-    for (c_each(i, iset, set))
-        printf("set %d\n", *i.ref);
-    iset_drop(&set);
+    for (c_each(i, ISet, set))
+        printf(" %d\n", *i.ref);
+
+    ISet_drop(&set);
 }
 */
 
 #define _i_prefix hset_
 #define _i_is_set
-#include "hmap.h"
+#include "hashmap.h"

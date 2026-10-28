@@ -1,26 +1,27 @@
-# STC [hset](../include/stc/hset.h): HashSet (unordered)
-![Set](pics/set.jpg)
+# STC [hashset](../include/stc/hashset.h): HashSet (unordered)
+![Set](pics/hashset.jpg)
 
-A **hset** is an associative container that contains a set of unique objects of type i_key. Search, insertion, and removal have average constant-time complexity. See the c++ class
+A **hashset** is an associative container that contains a set of unique objects of type i_key.
+Search, insertion, and removal have average constant-time complexity. See the c++ class
 [std::unordered_set](https://en.cppreference.com/w/cpp/container/unordered_set) for a functional description.
 
 ## Header file and declaration
 
 ```c++
-#define T <ct>, <kt>[, (<opt>)] // shorthand for defining set name, i_key, and i_opt
-// Common <opt> element type traits:
+#define T <ct>, <kt>[, (<traits>)[, <alloc>]] // shorthand for defining set name, i_key, and i_allocator prefix
+// Common element-type traits:
 //   c_compare_key - Key type <kt> is a comparable typedef'ed type.
 //                 Binds <kt>_eq(), <kt>_hash() "member" function names.
 //   c_class_key - Additionally binds <kt>_clone() and <kt>_drop() function names.
 //                 All containers used as keys themselves can be specified with the c_class_key trait.
-//   c_pro_key   - "Pro" key type, use e.g. for built-in `cstr`, `zsview`, `rc`, `arc`, `box` as i_key.
+//   c_pro_key   - "Pro" key type, use e.g. for built-in `cstr`, `csviewz`, `rc`, `arc`, `box` as i_key.
 //                 These support conversion to/from a "raw" input type (such as const char*) when
 //                 using <ct>_emplace*() functions, and may do optimized lookups via the raw type.
 
 // Alternative to defining T:
 #define i_key <t>             // define key type. container type name <ct> defaults to hset_<kt>.
 
-// Override/define when not the <opt> traits are specified:
+// Optional overrides/defines when not type-traits are specified:
 #define i_hash <fn>           // hash func i_keyraw*: Required if i_keyraw is non-pod type
 #define i_eq or i_cmp <fn>    // equality comparison. i_eq is implicitly defined from i_cmp.
 #define i_keydrop <fn>        // destroy key func - defaults to empty destruct

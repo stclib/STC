@@ -104,7 +104,7 @@ install_headers(
   'include/stc/types.h',
   'include/stc/utf8.h',
   'include/stc/vec.h',
-  'include/stc/zsview.h',
+  'include/stc/csviewz.h',
   subdir: 'stc',
 )
 
@@ -130,8 +130,8 @@ install_headers(
 )
 
 install_headers(
-  'include/c11/fmt.h',
-  subdir: 'c11',
+  'include/stc/c11/fmt.h',
+  subdir: 'stc/c11',
 )
 
 stc_dep = declare_dependency(

@@ -166,15 +166,12 @@
 #define c_default_toraw(vp)     (*(vp))
 #define c_default_drop(vp)      ((void) (vp))
 
+#define c_newtype(name, ValType) typedef struct { ValType val; } name
+
 // Control block macros
 
 // [deprecated]:
 #define c_init(...) c_make(__VA_ARGS__)
-#define c_foritems(...) for (c_each_item(__VA_ARGS__))
-#define c_foreach(...) for (c_each(__VA_ARGS__))
-#define c_foreach_kv(...) for (c_each_kv(__VA_ARGS__))
-#define c_forrange(...) for (c_range(__VA_ARGS__))
-#define c_forrange32(...) for (c_range32(__VA_ARGS__))
 #define c_arraylen(a) c_countof(a)
 #define c_const_cast(Tp, p) c_as_mut(Tp, p)
 // End [deprecated]

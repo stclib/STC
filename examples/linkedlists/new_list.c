@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stc/types.h>
 
-declare_list(list_i32, int32_t);
-declare_list(list_pnt, struct Point);
+c_declare_list(list_i32, int32_t);
+c_declare_list(list_pnt, struct Point);
 
 typedef struct {
     list_i32 intlist;

@@ -1,6 +1,6 @@
 d=$(git rev-parse --show-toplevel)
-mkdir -p $d/../stcsingle/c11
-python singleheader.py $d/include/c11/fmt.h   $d/../stcsingle/c11/fmt.h
+mkdir -p $d/../stcsingle/stc/c11
+python singleheader.py $d/include/stc/c11/fmt.h   $d/../stcsingle/stc/c11/fmt.h
 python singleheader.py $d/include/stc/algorithm.h $d/../stcsingle/stc/algorithm.h
 python singleheader.py $d/include/stc/coroutine.h $d/../stcsingle/stc/coroutine.h
 python singleheader.py $d/include/stc/sort.h $d/../stcsingle/stc/sort.h
@@ -23,7 +23,7 @@ python singleheader.py $d/include/stc/sset.h   $d/../stcsingle/stc/sortedset.h
 python singleheader.py $d/include/stc/stack.h  $d/../stcsingle/stc/stack.h
 python singleheader.py $d/include/stc/cstr.h    $d/../stcsingle/stc/cstr.h
 python singleheader.py $d/include/stc/csview.h  $d/../stcsingle/stc/csview.h
-python singleheader.py $d/include/stc/zsview.h  $d/../stcsingle/stc/zsview.h
+python singleheader.py $d/include/stc/csviewz.h  $d/../stcsingle/stc/csviewz.h
 python singleheader.py $d/include/stc/vec.h    $d/../stcsingle/stc/vec.h
 python singleheader.py $d/include/stc/types.h $d/../stcsingle/stc/types.h
 echo "$d/../stcsingle headers updated"

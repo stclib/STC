@@ -2,7 +2,7 @@
 #include <time.h>
 #include <stc/random.h>
 #include <stc/types.h>
-declare_queue(queue_pnt, struct Point);
+c_declare_queue(queue_pnt, struct Point);
 
 typedef struct Point { int x, y; } Point;
 

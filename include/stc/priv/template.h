@@ -39,7 +39,7 @@
   #define _m_result _c_MEMB(_result)
   #define _m_node _c_MEMB(_node)
 
-  #define c_OPTION(flag)  ((i_opt) & (flag))
+  #define c_HAS_TRAIT(flag)  ((i_traits) & (flag))
   #define c_declared      (1<<0)
   #define c_no_atomic     (1<<1)
   #define c_use_arc2      (1<<2)
@@ -56,6 +56,9 @@
   #define c_pro_val       (1<<10)
 #endif
 
+#ifdef i_opt       // [deprecated]
+  #define i_traits i_opt
+#endif
 #if defined T && !defined i_type
   #define i_type T
 #endif
@@ -65,7 +68,7 @@
   #ifdef _i_is_map
     #define i_val c_GETARG(3, i_type)
     #if c_NUMARGS(i_type) >= 4
-      #define i_opt c_GETARG(4, i_type)+0
+      #define i_traits c_GETARG(4, i_type)+0
       #if c_NUMARGS(i_type) == 5
         #undef i_allocator
         #define i_allocator c_GETARG(5, i_type)
@@ -75,7 +78,7 @@
       #endif
     #endif
   #elif c_NUMARGS(i_type) >= 3
-    #define i_opt c_GETARG(3, i_type)+0
+    #define i_traits c_GETARG(3, i_type)+0
     #if c_NUMARGS(i_type) == 4
       #if c_GETARG(4, i_type) > 0
         #define i_capacity c_GETARG(4, i_type)
@@ -100,33 +103,33 @@
   #define _i_aux_def
 #endif
 
-#if c_OPTION(c_declared)
+#if c_HAS_TRAIT(c_declared)
   #define i_declared
 #endif
-#if c_OPTION(c_use_cmp)
+#if c_HAS_TRAIT(c_use_cmp)
   #define i_use_cmp
 #endif
-#if c_OPTION(c_use_eq)
+#if c_HAS_TRAIT(c_use_eq)
   #define i_use_eq
 #endif
-#if c_OPTION(c_no_clone) || defined _i_is_arc
+#if c_HAS_TRAIT(c_no_clone) || defined _i_is_arc
   #define i_no_clone
 #endif
-#if c_OPTION(c_class_key)
+#if c_HAS_TRAIT(c_class_key)
   #define i_class_key i_key
 #endif
-#if c_OPTION(c_class_val)
+#if c_HAS_TRAIT(c_class_val)
   #define i_class_val i_val
 #endif
-#if c_OPTION(c_compare_key)
+#if c_HAS_TRAIT(c_compare_key)
   #define i_compare_key i_key
   #define i_use_cmp
   #define i_use_eq
 #endif
-#if c_OPTION(c_pro_key)
+#if c_HAS_TRAIT(c_pro_key)
   #define i_pro_key i_key
 #endif
-#if c_OPTION(c_pro_val)
+#if c_HAS_TRAIT(c_pro_val)
   #define i_pro_val i_val
 #endif
 
@@ -188,7 +191,7 @@
 
 #if !defined i_key
   #error "No i_key defined"
-#elif defined i_keyraw && !(c_OPTION(c_compare_key) || defined i_keytoraw)
+#elif defined i_keyraw && !(c_HAS_TRAIT(c_compare_key) || defined i_keytoraw)
   #error "If i_compare_key / i_keyraw is defined, i_keytoraw must be defined too"
 #elif !defined i_no_clone && (defined i_keyclone ^ defined i_keydrop)
   #error "Both i_keyclone and i_keydrop must be defined, if any (unless i_no_clone defined)."

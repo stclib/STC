@@ -1,7 +1,7 @@
 #include <stc/cstr.h>
 #include <stc/types.h>
 
-declare_sortedmap(PntMap, struct Point, int);
+c_declare_sortedmap(PntMap, struct Point, int);
 
 // Use forward declared PntMap in struct
 typedef struct {

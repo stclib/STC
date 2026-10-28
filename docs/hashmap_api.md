@@ -1,33 +1,36 @@
-# STC [hmap](../include/stc/hmap.h): HashMap (unordered)
-![Map](pics/map.jpg)
+# STC [hashmap](../include/stc/hashmap.h): HashMap (unordered)
+![Map](pics/hashmap.jpg)
 
-A **hmap** is an associative container that contains key-value pairs with unique keys. Search, insertion, and removal of elements
-have average constant-time complexity. Internally, the elements are not sorted in any particular order, but organized into
-buckets. Which bucket an element is placed into depends entirely on the hash of its key. This allows fast access to individual
-elements, since once the hash is computed, it refers to the exact bucket the element is placed into. It is implemented as closed
-hashing (aka open addressing) with linear probing, and without leaving tombstones on erase.
+A **hashmap** is an associative container that contains key-value pairs with unique keys. Search, insertion,
+and removal of elements have average constant-time complexity. Internally, the elements are not sorted in any
+particular order, but organized into buckets. Which bucket an element is placed into depends entirely on the
+hash of its key. This allows fast access to individual elements, since once the hash is computed, it refers to
+the exact bucket the element is placed into. It is implemented as closed hashing (aka open addressing) with
+linear probing, and without leaving tombstones on erase.
 
-***Iterator invalidation***: References and iterators are invalidated after erase. No iterators are invalidated after insert,
-unless the hash-table need to be extended. The hash table size can be reserved prior to inserts if the total max size is known.
-The order of elements may not be preserved after erase. It is still possible to erase elements when iterating through
-the container by setting the iterator to the value returned from *erase_at()*, which references the next element. Note that a small number of elements may be visited twice when doing this, but all elements will be visited.
+***Iterator invalidation***: References and iterators are invalidated after erase. No iterators are invalidated
+after insert, unless the hash-table need to be extended. The hash table size can be reserved prior to inserts
+if the total max size is known. The order of elements may not be preserved after erase. It is still possible to
+erase elements when iterating through the container by setting the iterator to the value returned from *erase_at()*,
+which references the next element. Note that a small number of elements may be visited twice when doing this,
+but all elements will be visited.
 
 See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/container/unordered_map) for a functional description.
 
 ## Header file and declaration
 
 ```c++
-#define T <ct>, <kt>, <vt>[, (<opt>)] // shorthand for defining map name, i_key, i_val, and i_opt
-// Common <opt> element type traits:
+#define T <ct>, <kt>, <vt>[, (<traits>)[, <alloc>]] // shorthand for defining map name, i_key, i_val, and type traits
+// Common element-type traits:
 //   c_compare_key - Key type <kt> is a comparable typedef'ed type.
 //                 Binds <kt>_eq(), <kt>_hash() "member" function names.
 //   c_class_key - Additionally binds <kt>_clone() and <kt>_drop() function names.
 //                 All containers used as keys can be specified with the c_class_key trait.
-//   c_pro_key   - "Pro" key type, use e.g. for built-in `cstr`, `zsview`, `rc`, `arc`, `box` as i_key.
+//   c_pro_key   - "Pro" key type, use e.g. for built-in `cstr`, `csviewz`, `rc`, `arc`, `box` as i_key.
 //                 These support conversion to/from a "raw" input type (such as const char*) when
 //                 using <ct>_emplace*() functions, and may do optimized lookups via the raw type.
 //   c_class_val - Only binds <vt>_clone() and <vt>_drop() function names.
-//   c_pro_val   - "Pro" val type, use e.g. for built-in `cstr`, `zsview`, `rc`, `arc`, `box` as i_val.
+//   c_pro_val   - "Pro" val type, use e.g. for built-in `cstr`, `csviewz`, `rc`, `arc`, `box` as i_val.
 //                 These support conversion to/from a "raw" input type (such as const char*) when
 //                 using <ct>_emplace*() functions.
 
@@ -35,7 +38,7 @@ See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/contain
 #define i_key <t>        // Key type. Container type name <ct> defaults to hmap_<kt>.
 #define i_val <t>        // Val type.
 
-// Override/define when not the <opt> traits are specified:
+// Optional overrides/defines when not type-traits are specified:
 #define i_hash <fn>      // Hash func i_keyraw*: Required if i_keyraw is non-pod type
 #define i_cmp <fn>       // Three-way comparison of two i_key (or i_keyraw)
 #define i_less <fn>      // Alternative less-comparison. i_cmp is deduced from i_less.
@@ -55,7 +58,7 @@ See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/contain
 hmap_X          hmap_X_init(void);
 hmap_X          hmap_X_with_capacity(isize_t cap);
 
-hmap_X          hmap_X_clone(hmap_x map);
+hmap_X          hmap_X_clone(hmap_X map);
 void            hmap_X_copy(hmap_X* self, const hmap_X* other);
 void            hmap_X_take(hmap_X* self, hmap_X unowned);                               // take ownership of unowned
 hmap_X          hmap_X_move(hmap_X* self);                                               // move
@@ -117,7 +120,7 @@ bool            c_memcmp_eq(const i_keyraw* a, const i_keyraw* b);    // !memcmp
 
 | Type name          | Type definition                                 | Used to represent...          |
 |:-------------------|:------------------------------------------------|:------------------------------|
-| `hmap_X`           | `struct { ... }`                                | The hmap type                 |
+| `hmap_X`           | `struct { ... }`                                | The hashmap type              |
 | `hmap_X_key`       | `i_key`                                         | The key type                  |
 | `hmap_X_mapped`    | `i_val`                                         | The mapped type               |
 | `hmap_X_value`     | `struct { const i_key first; i_val second; }`   | The value: key is immutable   |
@@ -164,7 +167,7 @@ int main(void)
 ```
 
 ### Example 2
-Demonstrate hmap with mapped POD type Vec3i: hmap<int, Vec3i>:
+Demonstrate hashmap with mapped POD type Vec3i: hashmap<int, Vec3i>:
 
 [ [Run this code](https://godbolt.org/z/x69YdzxM4) ]
 ```c++
@@ -191,7 +194,7 @@ int main(void)
 ```
 
 ### Example 3
-Inverse: Demonstrate hmap with plain-old-data key type Vec3i and int as mapped type: hmap<Vec3i, int>.
+Inverse: Demonstrate hashmap with plain-old-data key type Vec3i and int as mapped type: hashmap<Vec3i, int>.
 
 [ [Run this code](https://godbolt.org/z/EfaKEcW8z) ]
 ```c++
@@ -332,7 +335,8 @@ Viking_raw Viking_toraw(const Viking* vp) {
     Viking_raw rv = {cstr_str(&vp->name), cstr_str(&vp->country)}; return rv;
 }
 
-// Define the map. Viking is now a "pro"-type:
+// Define the map. Viking is now a "pro"-type because of the added Viking_raw type
+// and the conversion functions from/to Viking type:
 #define T Vikings, Viking, int, (c_pro_key)
 #include <stc/hashmap.h>
 

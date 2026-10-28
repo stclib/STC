@@ -1,9 +1,9 @@
-# STC [smap](../include/stc/smap.h): Sorted Map
-![Map](pics/smap.jpg)
+# STC [sortedmap](../include/stc/sortedmap.h): Sorted Map
+![Map](pics/sortedmap.jpg)
 
-A **smap** is a sorted associative container that contains key-value pairs with unique keys. Keys are sorted by
-using the comparison function *keyCompare*. Search, removal, and insertion operations have logarithmic complexity.
-**smap** is implemented as an AA-tree (Arne Andersson, 1993), which tends to create a flatter structure
+A **sortedmap** is an ordered associative container that contains key-value pairs with unique keys. Keys are sorted
+using the key comparison function from `i_cmp`. Search, removal, and insertion operations have logarithmic complexity.
+**sortedmap** is implemented as an AA-tree (Arne Andersson, 1993), which tends to create a flatter structure
 (slightly more balanced) than red-black trees.
 
 ***Iterator invalidation***: Iterators are invalidated after insert and erase. References are only invalidated
@@ -15,17 +15,17 @@ See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) fo
 ## Header file and declaration
 
 ```c++
-#define T <ct>, <kt>, <vt>[, (<opt>)] // shorthand for defining map name, i_key, i_val, and i_opt
-// Common <opt> element type traits:
+#define T <ct>, <kt>, <vt>[, (<traits>)[, <alloc>]] // shorthand for defining map name, i_key, i_val, and type traits
+// Common element-type traits:
 //   c_compare_key - Key type <kt> is a comparable typedef'ed type.
 //                 Binds <kt>_cmp() "member" function name.
 //   c_class_key - Additionally binds <kt>_clone() and <kt>_drop() function names.
 //                 All containers used as keys themselves can be specified with the c_class_key trait.
-//   c_pro_key   - "Pro" key type, use e.g. for built-in `cstr`, `zsview`, `rc`, `arc`, `box` as i_key.
+//   c_pro_key   - "Pro" key type, use e.g. for built-in `cstr`, `csviewz`, `rc`, `arc`, `box` as i_key.
 //                 These support conversion to/from a "raw" input type (such as const char*) when
 //                 using <ct>_emplace*() functions, and may do optimized lookups via the raw type.
 //   c_class_val - Only binds <vt>_clone() and <vt>_drop() function names.
-//   c_pro_val   - "Pro" val type, use e.g. for built-in `cstr`, `zsview`, `rc`, `arc`, `box` as i_val.
+//   c_pro_val   - "Pro" val type, use e.g. for built-in `cstr`, `csviewz`, `rc`, `arc`, `box` as i_val.
 //                 These support conversion to/from a "raw" input type (such as const char*) when
 //                 using <ct>_emplace*() functions.
 
@@ -33,7 +33,7 @@ See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) fo
 #define i_key <t>        // define key type. container type name <ct> defaults to smap_<kt>.
 #define i_val <t>        // define val type.
 
-// Override/define when not the <opt> traits are specified:
+// Optional overrides/defines when not type-traits are specified:
 #define i_cmp <fn>       // Three-way comparison of two i_key (or i_keyraw)
 #define i_less <fn>      // Alternative less-comparison. i_cmp is deduced from i_less.
 #define i_eq <fn>        // Optional equality comparison, otherwise deduced from given i_cmp.
@@ -51,7 +51,7 @@ See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) fo
 
 ```c++
 smap_X          smap_X_init(void);
-sset_X          smap_X_with_capacity(isize_t cap);
+smap_X          smap_X_with_capacity(isize_t cap);
 
 smap_X          smap_X_clone(smap_x map);
 void            smap_X_copy(smap_X* self, const smap_X* other);
@@ -122,8 +122,7 @@ void            smap_X_value_drop(i_key* pval);
 ```c++
 #include <stc/cstr.h>
 
-#define i_pro_key cstr // special macro for i_key = cstr
-#define i_pro_val cstr // ditto
+#define T smap_cstr, cstr, cstr, (c_pro_key | c_pro_val)
 #include <stc/sortedmap.h>
 
 int main(void)
@@ -187,7 +186,7 @@ int main(void)
 ```
 
 ### Example 3
-This example uses a smap with cstr as mapped value. Note the `i_pro_val` usage.
+This example uses a sortedmap with cstr as mapped value. Note the `i_pro_val` usage.
 
 [ [Run this code](https://godbolt.org/z/YMKoodE4o) ]
 <!--{%raw%}-->
@@ -221,7 +220,7 @@ int main(void)
 <!--{%endraw%}-->
 
 ### Example 4
-Demonstrate smap with plain-old-data key type Vec3i and int as mapped type: smap<Vec3i, int>.
+Demonstrate sortedmap with plain-old-data key type Vec3i and int as mapped type: smap<Vec3i, int>.
 
 [ [Run this code](https://godbolt.org/z/za77Eq4ac) ]
 ```c++

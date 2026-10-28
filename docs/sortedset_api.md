@@ -1,27 +1,29 @@
-# STC [sset](../include/stc/sset.h): Sorted Set
-![Set](pics/sset.jpg)
+# STC [sortedset](../include/stc/sortedset.h): Sorted Set
+![Set](pics/sortedset.jpg)
 
-A **sset** is an associative container that contains a sorted set of unique objects of type *i_key*. Sorting is done using the key comparison function *keyCompare*. Search, removal, and insertion operations have logarithmic complexity. **sset** is implemented as an AA-tree.
+A **sortedset** is an associative container that contains an ordered set of unique objects of type *i_key*.
+Ordering is done using the key comparison function from `i_cmp`. Search, removal, and insertion operations
+have logarithmic complexity. **sortedset** is implemented as an AA-tree.
 
 See the c++ class [std::set](https://en.cppreference.com/w/cpp/container/set) for a functional description.
 
 ## Header file and declaration
 
 ```c++
-#define T <ct>, <kt>[, (<opt>)] // shorthand for defining set name, i_key, and i_opt
-// Common <opt> element type traits:
+#define T <ct>, <kt>[, (<traits>)[, <alloc>]] // shorthand for defining set name, i_key, and i_allocator prefix
+// Common element-type traits:
 //   c_compare_key - Key type <kt> is a comparable typedef'ed type.
 //                 Binds <kt>_cmp() "member" function name.
 //   c_class_key - Additionally binds <kt>_clone() and <kt>_drop() function names.
 //                 All containers used as keys themselves can be specified with the c_class_key trait.
-//   c_pro_key   - "Pro" key type, use e.g. for built-in `cstr`, `zsview`, `rc`, `arc`, `box` as i_key.
+//   c_pro_key   - "Pro" key type, use e.g. for built-in `cstr`, `csviewz`, `rc`, `arc`, `box` as i_key.
 //                 These support conversion to/from a "raw" input type (such as const char*) when
 //                 using <ct>_emplace*() functions, and may do optimized lookups via the raw type.
 
 // Alternative to defining T:
 #define i_key <t>              // define key type. container type name <ct> defaults to sset_<kt>.
 
-// Override/define when not the <opt> traits are specified:
+// Optional overrides/defines when not type-traits are specified:
 #define i_cmp <fn>            // three-way compare two i_keyraw* : REQUIRED IF i_keyraw is a non-integral type
 #define i_less <fn>           // optional/alternative less-comparison. Is transformed to an i_cmp
 #define i_eq <fn>             // optional equality comparison. Implicitly defined with i_cmp, but not i_less.

@@ -12,13 +12,13 @@ See the c++ class [std::vector](https://en.cppreference.com/w/cpp/container/vect
 ## Header file and declaration
 
 ```c++
-#define T <ct>, <kt>[, (<opt>)] // shorthand for defining vec name, i_key and i_opt
-// Common <opt> element type traits:
+#define T <ct>, <kt>[, (<traits>)[, <alloc>]] // shorthand for defining vec name, i_key, and i_allocator prefix
+// Common element-type traits:
 //   c_compare_key - Key type <kt> is a comparable typedef'ed type. Auto-enables c_use_compare.
 //                Binds <kt>_cmp(), <kt>_eq() "member" function names.
 //   c_class_key - Additionally binds <kt>_clone() and <kt>_drop() function names.
 //                E.g., if <kt> is any STC container, c_class_key trait should be specified.
-//   c_pro_key   - "Pro" key type, use e.g. for built-in `cstr`, `zsview`, `rc`, `arc`, `box` as keys.
+//   c_pro_key   - "Pro" key type, use e.g. for built-in `cstr`, `csviewz`, `rc`, `arc`, `box` as keys.
 //                These support conversion to/from a "raw" input type (such as const char*) when
 //                using <ct>_emplace*() functions, and may do optimized lookups via the raw type.
 //   c_use_eq   - Enable equality <kt>_eq() for _find() and <ct>_eq() for the container itself.
@@ -27,12 +27,12 @@ See the c++ class [std::vector](https://en.cppreference.com/w/cpp/container/vect
 //                Uses operators '<', '>' unless *c_compare/class/pro*_key was also specified.
 //   c_use_compare - Shorthand for (c_use_cmp | c_use_eq).
 //
-// To enable multiple traits, specify e.g. (c_class_key | c_use_cmp) as <opt>.
+// To enable multiple traits, specify e.g. (c_class_key | c_use_cmp) as <traits>.
 
 // Alternative to defining T:
 #define i_key <kt>       // Key type. Container type name <ct> defaults to vec_<kt>.
 
-// Override/define when not the <opt> traits are specified:
+// Optional overrides/defines when not type-traits are specified:
 #define i_cmp <fn>       // Three-way compare two i_keyraw*
 #define i_less <fn>      // Less comparison. Alternative to i_cmp
 #define i_eq <fn>        // Equality comparison. Implicitly defined with i_cmp, but not with i_less.

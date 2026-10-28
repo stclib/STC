@@ -22,25 +22,27 @@
  */
 
 // Sorted set - implemented as an AA-tree (balanced binary tree).
+// NB! This header is [deprecated]; use sortedset.h instead
 /*
 #include <stdio.h>
 
-#define T Intset, int
+#define T ISet, int
 #include <stc/sortedset.h> // sorted set of int
 
 int main(void) {
-    Intset s = {0};
-    Intset_insert(&s, 5);
-    Intset_insert(&s, 8);
-    Intset_insert(&s, 3);
-    Intset_insert(&s, 5);
+    ISet set = {0};
+    ISet_insert(&set, 5);
+    ISet_insert(&set, 8);
+    ISet_insert(&set, 3);
+    ISet_insert(&set, 5);
 
-    for (c_each(k, Intset, s))
-        printf("set %d\n", *k.ref);
-    Intset_drop(&s);
+    for (c_each(k, ISet, set))
+        printf(" %d\n", *k.ref);
+
+    ISet_drop(&set);
 }
 */
 
 #define _i_prefix sset_
 #define _i_is_set
-#include "smap.h"
+#include "sortedmap.h"

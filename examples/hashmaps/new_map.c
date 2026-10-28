@@ -1,7 +1,7 @@
 #include <stc/cstr.h>
 #include <stc/types.h>
 
-declare_hashmap(Pntmap, struct Point, int);
+c_declare_hashmap(Pntmap, struct Point, int);
 
 typedef struct MyStruct {
     Pntmap pntmap;

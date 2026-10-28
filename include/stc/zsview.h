@@ -22,6 +22,7 @@
  */
 
 // zsview is a zero-terminated string view.
+// NB! zsview.h is now deprecated and replaced by csviewz.h
 
 #ifndef STC_ZSVIEW_H_INCLUDED
 #define STC_ZSVIEW_H_INCLUDED

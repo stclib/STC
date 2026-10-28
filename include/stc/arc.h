@@ -90,7 +90,7 @@ int main(void) {
 #include "priv/template.h"
 typedef i_keyraw _m_raw;
 
-#if c_OPTION(c_no_atomic)
+#if c_HAS_TRAIT(c_no_atomic)
   #define i_no_atomic
 #endif
 #if !defined i_no_atomic
@@ -101,14 +101,14 @@ typedef i_keyraw _m_raw;
   #define _i_atomic_dec_and_test(v) !(--*(v))
 #endif
 
-#if c_OPTION(c_use_arc2)
+#if c_HAS_TRAIT(c_use_arc2)
   #define i_arc2
 #endif
 #if !(defined i_arc2 || defined STC_USE_ARC2)
 // ------------ Arc1 size of one pointer (union) -------------
 
 #ifndef i_declared
-_c_DEFTYPES(declare_arc, Self, i_key);
+_c_DEFTYPES(c_declare_arc, Self, i_key);
 #endif
 struct _c_MEMB(_ctrl) {
     _m_value value;
@@ -137,7 +137,7 @@ STC_INLINE void _c_MEMB(_drop)(const Self* self) {
 #else // ------------ Arc2 size of two pointers -------------
 
 #ifndef i_declared
-_c_DEFTYPES(declare_arc2, Self, i_key);
+_c_DEFTYPES(c_declare_arc2, Self, i_key);
 #endif
 struct _c_MEMB(_ctrl) {
     catomic_long counter; // nb! counter <-> value order is swapped.

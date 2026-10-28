@@ -41,4 +41,4 @@ int main(void) {
 
 #define _i_prefix hset_
 #define _i_is_set
-#include "hmap.h"
+#include "hashmap.h"

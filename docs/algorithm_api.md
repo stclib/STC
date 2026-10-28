@@ -72,8 +72,8 @@ for (c_each_item(i, int, {4, 5, 6, 7}))
     list_i_push_back(&lst, *i.ref);
 
 // insert in existing map
-for (c_each_item(i, hmap_ii_value, {{4, 5}, {6, 7}}))
-    hmap_ii_insert(&map, i.ref->first, i.ref->second);
+for (c_each_item(i, hashmap_ii_value, {{4, 5}, {6, 7}}))
+    hashmap_ii_insert(&map, i.ref->first, i.ref->second);
 
 // string literals pushed to a stack of cstr elements:
 for (c_each_item(i, const char*, {"Hello", "crazy", "world"}))
@@ -144,10 +144,10 @@ typedef union MyUnion {
     struct { enum MyUnion_tag id; TagC_type item; } TagC;
 } MyUnion;
 
-MyUnion       c_variant(MyUnion_tag tag, Tag_type payload);   // Construct a tagged union variant (typesafe).
-bool          c_is_variant(MyUnion* u, enum MyUnion_tag tag); // True if obj holds the tag.
-Tag_type*     c_get_if(MyUnion* u, enum MyUnion_tag tag);     // Return item pointer or NULL if it does not hold tag.
-int           c_variant_id(MyUnion* u);                       // (mainly for debugging)
+MyUnion       c_variant(MyUnion_tag tag, Tag_type payload);    // Construct a typesafe tagged union variant.
+bool          c_is_variant(MyUnion* u, enum MyUnion_tag tag);  // True if u holds the tag.
+int           c_variant_id(MyUnion* u);                        // (mainly for debugging)
+Tag_type*     c_get_if(MyUnion* u, enum MyUnion_tag tag);      // Return item pointer or NULL if it does not hold tag.
 
 // Access the union:
 c_when (&var) {         /* MyUnion var */
@@ -156,7 +156,7 @@ c_when (&var) {         /* MyUnion var */
     c_is(TagB) c_or_is(TagC)                                  // handle multiple variants at once
         ActionBC();
     c_otherwise                                               // optional, silences exhaustiveness-check
-        ActionElse(obj);
+        ActionElse(&var);
 }
 
 // Access a single variant only:
@@ -355,7 +355,7 @@ two containers. `value` is the pointer to each element in predicate. See example
 
 ### c_erase_if, c_eraseremove_if
 Erase linearly in containers using a predicate. `value` is a pointer to each element in predicate.
-- void `c_erase_if`(**CntType**, cnt_ptr, pred). Use with ***list**, ***hmap***, ***hset***, ***smap***, and ***sset***.
+- void `c_erase_if`(**CntType**, cnt_ptr, pred). Use with ***list**, ***hashmap***, ***hashset***, ***sortedmap***, and ***sortedset***.
 - void `c_eraseremove_if`(**CntType**, cnt_ptr, pred). Use with ***stack***, ***vec***, ***deque***, and ***queue*** only.
 
 [ [Run this code](https://godbolt.org/z/6sbdMvn74) ]
@@ -736,9 +736,9 @@ c_delete_n(cstr, stringptr, 1);
 ```
 </details>
 <details>
-<summary><b>c_swap, c_countof, c_as_mut, c_safe_cast</b></summary>
+<summary><b>c_swap, c_countof, c_as_mut, c_newtype</b></summary>
 
-### c_swap, c_countof, c_as_mut, c_safe_cast
+### c_swap, c_countof, c_as_mut, c_newtype
 Side effect- and typesafe macro for swapping internals of two objects of same type:
 ```c++
 double x = 1.0, y = 2.0;
@@ -751,14 +751,24 @@ int array[] = {1, 2, 3, 4};
 isize_t n = c_countof(array);
 ```
 
-Type-safe casting and cast away const (pointers):
+Safely casting const pointer into a mutable pointer:
 ```c++
 const char cs[] = "Hello";
 char* s = c_as_mut(char*, cs); // OK
 int* ip = c_as_mut(int*, cs);  // illegal input type, issues a warning!
+```
 
-// Casting from a specified type (double):
-#define tofloat(d) c_safe_cast(float, double, d)
+Create a new distinct (semantic) type for safe function APIs.
+```c++
+c_newtype(OrderID, uint32_t);
+c_newtype(UserID, uint32_t);
+c_newtype(ProductID, uint32_t);
+c_newtype(Quantity, int);
+
+OrderID placeOrder(UserID user, OrderID order);
+...
+OrderID order = placeOrder((UserID){user}, (ProductID){product}, (Quantity){1});
+printf("User %u, Order %u\n", user.val, order.val);
 ```
 </details>
 
