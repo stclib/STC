@@ -83,10 +83,10 @@
       #if c_GETARG(4, i_type) > 0
         #define i_capacity c_GETARG(4, i_type)
       #else
-        #undef i_allocator // ! Already defined in linkage.h to "c", but does not seem to give error on redefine?
+        #undef i_allocator
         #define i_allocator c_GETARG(4, i_type)
         #if defined i_aux
-          #define _i_aux_alloc // i.e creating a "new" container instance requires .aux to be initialized with an allocator!
+          #define _i_aux_alloc // i.e creating a new container instance requires .aux to be initialized with an allocator!s
         #endif
       #endif
     #endif

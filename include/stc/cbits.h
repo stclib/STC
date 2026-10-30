@@ -145,17 +145,14 @@ STC_INLINE bool _cbits_disjoint(const uintptr_t* set, const uintptr_t* other, co
 #endif
 #if defined i_type
   #define Self c_GETARG(1, i_type)
-  #define _i_length c_GETARG(2, i_type)
+  #define _i_fixed_size c_GETARG(2, i_type)
 #else
   #define Self cbits
-  #ifndef i_allocator
-    #define i_allocator c
-  #endif
 #endif
 #define _i_MEMB(name) c_JOIN(Self, name)
 
 
-#if !defined _i_length // DYNAMIC SIZE BITARRAY
+#if !defined _i_fixed_size // DYNAMIC SIZE BITARRAY
 
 typedef struct { uintptr_t *buffer; isize_t _size; } Self;
 #define _i_assert(x) c_assert(x)
@@ -224,14 +221,14 @@ STC_INLINE cbits cbits_with_pattern(const isize_t size, const uintptr_t pattern)
     return set;
 }
 
-#else // _i_length: FIXED SIZE BITARRAY
+#else // _i_fixed_size: FIXED SIZE BITARRAY
 
 #define _i_assert(x) (void)0
 
-typedef struct { uintptr_t buffer[(_i_length - 1)/_cbits_WB + 1]; } Self;
+typedef struct { uintptr_t buffer[(_i_fixed_size - 1)/_cbits_WB + 1]; } Self;
 
 STC_INLINE void     _i_MEMB(_drop)(Self* self) { (void)self; }
-STC_INLINE isize_t  _i_MEMB(_size)(const Self* self) { (void)self; return _i_length; }
+STC_INLINE isize_t  _i_MEMB(_size)(const Self* self) { (void)self; return _i_fixed_size; }
 STC_INLINE Self     _i_MEMB(_move)(Self* self) { return *self; }
 STC_INLINE Self*    _i_MEMB(_take)(Self* self, Self other) { *self = other; return self; }
 STC_INLINE Self     _i_MEMB(_clone)(Self other) { return other; }
@@ -240,17 +237,17 @@ STC_INLINE void     _i_MEMB(_set_all)(Self *self, const bool value);
 STC_INLINE void     _i_MEMB(_set_pattern)(Self *self, const uintptr_t pattern);
 
 STC_INLINE Self _i_MEMB(_with_size)(const isize_t size, const bool value) {
-    c_assert(size <= _i_length);
+    c_assert(size <= _i_fixed_size);
     Self set; _i_MEMB(_set_all)(&set, value);
     return set;
 }
 
 STC_INLINE Self _i_MEMB(_with_pattern)(const isize_t size, const uintptr_t pattern) {
-    c_assert(size <= _i_length);
+    c_assert(size <= _i_fixed_size);
     Self set; _i_MEMB(_set_pattern)(&set, pattern);
     return set;
 }
-#endif // _i_length
+#endif // _i_fixed_size
 
 // COMMON:
 
@@ -331,7 +328,7 @@ STC_INLINE bool _i_MEMB(_disjoint)(const Self* self, const Self* other) {
 #include "priv/linkage2.h"
 #undef T
 #undef i_type
-#undef _i_length
+#undef _i_fixed_size
 #undef _i_MEMB
 #undef _i_assert
 #undef Self

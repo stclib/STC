@@ -874,7 +874,6 @@ allocated size of the given pointer, unlike standard `realloc` and `free`.
 #ifndef PSG_ALLOC_H
 #define PSG_ALLOC_H
 #define pgs_malloc(sz) MemoryContextAlloc(self->aux.memctx, sz)
-#define pgs_calloc(n, sz) MemoryContextAllocZero(self->aux.memctx, (n)*(sz))
 #define pgs_realloc(p, old_sz, sz) (p ? repalloc(p, sz) : pgs_malloc(sz))
 #define pgs_free(p, sz) (p ? pfree(p) : (void)0) // pfree/repalloc does not accept NULL.
 #endif

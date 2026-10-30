@@ -72,18 +72,18 @@ In the following, `X` is the value of `i_key` unless `T` is defined.
 ```c++
 arc_X           arc_X_init();                                   // empty shared pointer
 arc_X           arc_X_from(i_keyraw raw);                       // create an arc from raw type (available if i_keyraw defined by user).
-arc_X           arc2_X_from_ptr(i_key* ptr);                    // NB! arc2 only: create an arc from raw pointer. Takes ownership of p.
+arc_X           arc2_X_from_ptr(i_key* ptr);                    // arc2 only: create an arc from raw pointer. Takes ownership of ptr.
 arc_X           arc_X_make(i_key key);                          // create an arc from constructed key object. Faster than from_ptr().
 
 arc_X           arc_X_clone(arc_X other);                       // return other with increased use count
 void            arc_X_assign(arc_X* self, const arc_X* other);  // shared assign (increases use count)
 void            arc_X_take(arc_X* self, arc_X unowned);         // take ownership of unowned.
 arc_X           arc_X_move(arc_X* self);                        // transfer ownership to receiver; self becomes NULL
-arc_X           arc1_X_toarc(i_key* ptr);                       // NB! arc1 only: convert raw pointer previously created by arc back to arc.
 void            arc_X_drop(const arc_X* self);                  // destruct (decrease use count, free at 0)
 
-long            arc_X_use_count(arc_X arc);
-void            arc2_X_reset_to(arc_X* self, i_key* ptr);       // NB! arc2 only: assign new arc from ptr. Takes ownership of p.
+arc_X           arc_X_toarc(i_key* arc_raw_ptr);                // arc only: convert raw pointer previously created by arc back to arc.
+void            arc2_X_reset_to(arc2_X* self, i_key* ptr);      // arc2 only: assign new arc2 from ptr. Takes ownership of ptr.
+long            arc_X_use_count(arc_X arc);                     // return number of references to arc.
 
 size_t          arc_X_hash(const arc_X* self);                  // hash value
 int             arc_X_cmp(const arc_X* x, const arc_X* y);      // compares pointer addresses if no `i_cmp` is specified

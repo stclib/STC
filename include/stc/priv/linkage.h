@@ -47,17 +47,23 @@
   #endif
 #endif
 
+#ifdef STC_ALLOCATOR
+  #define i_allocator STC_ALLOCATOR
+#endif
 #if defined i_aux && defined i_allocator
   #define _i_aux_alloc
 #endif
-#ifndef i_allocator
+#if !defined i_allocator
   #define i_allocator c
 #endif
-#ifndef i_free
-  #define i_malloc c_JOIN(i_allocator, _malloc)
-  #define i_calloc c_JOIN(i_allocator, _calloc)
-  #define i_realloc c_JOIN(i_allocator, _realloc)
-  #define i_free c_JOIN(i_allocator, _free)
+#if !defined i_malloc && defined i_realloc // in case only i_realloc and i_free is defined
+  #define i_malloc(new_sz) i_realloc(NULL, 0, new_sz)
+#elif !defined i_malloc
+  #define i_malloc(new_sz) c_JOIN(i_allocator, _malloc)(new_sz)
+#endif
+#if !defined i_realloc
+  #define i_realloc(ptr, sz, new_sz) c_JOIN(i_allocator, _realloc)(ptr, sz, new_sz)
+  #define i_free(ptr, sz) c_JOIN(i_allocator, _free)(ptr, sz)
 #endif
 
 #if defined __clang__ && !defined __cplusplus

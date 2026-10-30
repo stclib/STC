@@ -63,6 +63,7 @@ i_key*          box_X_release(box_X* self);                     // release owned
 void            box_X_drop(const box_X* self);                  // destruct the contained object and free its heap memory.
 
 void            box_X_reset_to(box_X* self, i_key* ptr);        // assign ptr, and take ownership of ptr.
+long            box_X_use_count(box_X box);                     // return number of references to box (0 or 1).
 
 size_t          box_X_hash(const box_X* x);                     // hash value
 int             box_X_cmp(const box_X* x, const box_X* y);      // compares pointer addresses if no `i_cmp` is specified

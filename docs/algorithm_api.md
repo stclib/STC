@@ -707,15 +707,14 @@ c_filter(crange, c_iota(3), true
 ```
 </details>
 <details>
-<summary><b>c_malloc, c_calloc, c_realloc, c_free, c_new, c_delete_n</b> - Allocator helpers</summary>
+<summary><b>c_malloc, c_realloc, c_free, c_new, c_new_n, c_delete_n</b> - Allocator helpers</summary>
 
-### c_malloc, c_calloc, c_realloc, c_free
+### c_malloc, c_realloc, c_free
 Memory allocator wrappers which uses signed sizes. Note that the signatures for
 *c_realloc()* and *c_free()* have an extra size parameter. These will be used as
-default in containers unless `i_malloc`, `i_calloc`, `i_realloc`, and `i_free` are user defined. See
+default in containers unless `i_malloc`, `i_realloc`, and `i_free` are user defined. See
 [Per container-instance customization](../README.md#per-container-instance-customization)
 - void* `c_malloc`(isize_t sz)
-- void* `c_calloc`(isize_t n, isize_t sz)
 - void* `c_realloc`(void* old_p, isize_t old_sz, isize_t new_sz)
 - void  `c_free`(void* p, isize_t sz)
 

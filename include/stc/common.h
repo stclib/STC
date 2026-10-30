@@ -78,7 +78,6 @@
 #define c_ARG_4(a, b, c, d, ...) d
 
 #define _i_new_n(T, n) ((T*)i_malloc((n)*c_sizeof(T)))
-#define _i_new_zeros(T, n) ((T*)i_calloc((n), c_sizeof(T)))
 #define _i_realloc_n(ptr, old_n, n) i_realloc((ptr), (old_n)*c_sizeof *(ptr), (n)*c_sizeof *(ptr))
 #define _i_free_n(ptr, n) i_free((ptr), (n)*c_sizeof *(ptr))
 
@@ -113,7 +112,7 @@
 
 #ifdef STC_ALLOCATOR
     #define c_malloc(sz) c_JOIN(STC_ALLOCATOR, _malloc)(sz)
-    #define c_calloc(n, sz) c_JOIN(STC_ALLOCATOR, _calloc)(n, sz)
+    #define c_calloc(n, sz) c_JOIN(STC_ALLOCATOR, _calloc)(n, sz) // Not required, not used by STC
     #define c_realloc(p, old_sz, sz) c_JOIN(STC_ALLOCATOR, _realloc)(p, old_sz, sz)
     #define c_free(p, sz) c_JOIN(STC_ALLOCATOR, _free)(p, sz)
 #else

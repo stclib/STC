@@ -1,51 +1,51 @@
 #include <stdio.h>
-#include <stc/algorithm.h>
 #include "myalloc.h"
+//#define STC_ALLOCATOR myalloc
 
-#define T List, double, (c_use_eq), my // define allocator prefix = my, i.e. my_malloc, my_calloc, my_realloc, my_free.
-#define i_aux MyAlloc*                 // define an auxiliary member field `aux` in List type
+#define T List, double, (c_use_eq), myalloc // define allocator prefix, i.e. myalloc_malloc, myalloc_realloc, myalloc_free.
+#define i_aux MyAlloc*                      // define an auxiliary member field `aux` in List type
 #include <stc/stack.h>
 
-#define T ListDeque, List, (c_class_key | c_use_eq), my
+#define T ListDeque, List, (c_class_key | c_use_eq), myalloc
 #define i_aux MyAlloc*
 #include <stc/deque.h>
 
 int main(void)
 {
-    MyAlloc myalloc = {.bytes=0};
+    MyAlloc alloc = {.bytes=0};
     List* v;
-    ListDeque store_a = {.aux=&myalloc};                // All containers in STC can be initialized with {0}.
+    ListDeque store_a = {.aux=&alloc};                // All containers in STC can be initialized with {0}.
 
-    v = ListDeque_push(&store_a, c_literal(List){.aux=&myalloc}); // push() returns a pointer to the new element in vec.
+    v = ListDeque_push(&store_a, c_literal(List){.aux=&alloc}); // push() returns a pointer to the new element in vec.
     List_push(v, 100.0);
     List_push(v, 200.0);
 
-    v = ListDeque_push(&store_a, c_literal(List){.aux=&myalloc});
+    v = ListDeque_push(&store_a, c_literal(List){.aux=&alloc});
     List_push(v, 300.0);
     List_push(v, 400.0);
 
-    printf("alloc: %d\n", (int)myalloc.bytes);
-    ListDeque store_b = {.aux=&myalloc};
+    printf("alloc: %d\n", (int)alloc.bytes);
+    ListDeque store_b = {.aux=&alloc};
 
-    v = ListDeque_push(&store_b, c_literal(List){.aux=&myalloc});
+    v = ListDeque_push(&store_b, c_literal(List){.aux=&alloc});
     List_push(v, 10.0);
     List_push(v, 20.0);
 
-    v = ListDeque_push(&store_b, c_literal(List){.aux=&myalloc});
+    v = ListDeque_push(&store_b, c_literal(List){.aux=&alloc});
     List_push(v, 30.0);
     List_push(v, 40.0);
 
     printf("store_a == store_b is %s.\n", ListDeque_eq(&store_a, &store_b) ? "true" : "false");
-    printf("alloc: %d\n", (int)myalloc.bytes);
+    printf("alloc: %d\n", (int)alloc.bytes);
 
-    ListDeque store_c = ListDeque_clone(store_a); // Make a deep-copy (including .aux), using myalloc.
+    ListDeque store_c = ListDeque_clone(store_a); // Make a deep-copy (including .aux), using alloc.
     printf("store_a == store_c is %s.\n", ListDeque_eq(&store_a, &store_c) ? "true" : "false");
 
     for (c_each(i, ListDeque, store_c))           // Loop through the cloned deque
         for (c_each(j, List, *i.ref))
             printf(" %g", *j.ref);
 
-    printf("\nalloc: %d\n", (int)myalloc.bytes);
+    printf("\nalloc: %d\n", (int)alloc.bytes);
     c_drop(ListDeque, &store_a, &store_b, &store_c);  // Free all 9 storages.
-    printf("alloc: %d\n", (int)myalloc.bytes);
+    printf("alloc: %d\n", (int)alloc.bytes);
 }

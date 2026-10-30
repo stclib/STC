@@ -80,8 +80,8 @@ _c_DEFTYPES(c_declare_box, Self, i_key);
 STC_INLINE Self _c_MEMB(_init)(void)
     { return c_literal(Self){0}; }
 
-STC_INLINE long _c_MEMB(_use_count)(const Self* self)
-    { return (long)(self->get != NULL); }
+STC_INLINE long _c_MEMB(_use_count)(Self box)
+    { return (long)(box.get != NULL); }
 
 
 // c++: std::make_unique<i_key>(val)

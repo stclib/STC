@@ -351,7 +351,7 @@ STC_DEF void _c_MEMB(_clear)(Self* self) {
         return;
     _c_MEMB(_wipe_)(self);
     self->size = 0;
-    c_memset(self->meta, 0, c_sizeof(struct hmap_meta)*self->bucket_count);
+    c_memset(self->meta, 0, self->bucket_count*c_sizeof(struct hmap_meta));
 }
 
 #ifdef _i_is_map
@@ -470,11 +470,12 @@ _c_MEMB(_reserve)(Self* _self, const isize_t _cap) {
 
     Self map = *_self, *self = &map; (void)self;
     map.table = _i_new_n(_m_value, _newbucks);
-    map.meta = _i_new_zeros(struct hmap_meta, _newbucks + 1);
+    map.meta = _i_new_n(struct hmap_meta, _newbucks + 1);
     map.bucket_count = _newbucks;
 
     bool ok = map.table && map.meta;
     if (ok) {  // Rehash:
+        c_memset(map.meta, 0, _newbucks*c_sizeof(struct hmap_meta));
         map.meta[_newbucks].dist = _distmask; // end-mark for iter
         const _m_value* d = _self->table;
         const struct hmap_meta* m = _self->meta;

@@ -161,7 +161,7 @@ STC_INLINE bool cstr_is_empty(const cstr* self)
     { return cstr_size(self) == 0; }
 
 STC_INLINE isize_t cstr_capacity(const cstr* self)
-    { return cstr_is_long(self) ? cstr_l_cap(self) : cstr_s_cap; }
+    { return cstr_is_long(self) ? cstr_l_cap(self) : (isize_t)cstr_s_cap; }
 
 STC_INLINE isize_t cstr_to_index(const cstr* self, cstr_iter it)
     { return it.ref - cstr_str(self); }
