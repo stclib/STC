@@ -75,36 +75,22 @@ int main(void) {
 */
 #ifndef STC_SUMTYPE_H_INCLUDED
 #define STC_SUMTYPE_H_INCLUDED
+#include "reflect.h"
 
-#include "../common.h"
-
-#define _c_EMPTY()
-#define _c_LOOP_INDIRECTION() _c_LOOP
-#define _c_LOOP_END_1 ,_c_LOOP1
-#define _c_LOOP0(f,U,x,...) f c_EXPAND((U, c_EXPAND x)) _c_LOOP_INDIRECTION _c_EMPTY()()(f,U,__VA_ARGS__)
-#define _c_LOOP1(...)
-#define _c_CHECK(x,...) c_TUPLE_AT_1(__VA_ARGS__,x,)
-#define _c_E0(...) __VA_ARGS__
-#define _c_E1(...) _c_E0(_c_E0(_c_E0(_c_E0(_c_E0(_c_E0(__VA_ARGS__))))))
-#define _c_E2(...) _c_E1(_c_E1(_c_E1(_c_E1(_c_E1(_c_E1(__VA_ARGS__))))))
-#define _c_EVAL(...) _c_E2(_c_E2(_c_E2(__VA_ARGS__))) // currently supports up to 130 variants
-#define _c_LOOP(f,U,x,...) _c_CHECK(_c_LOOP0, c_JOIN(_c_LOOP_END_, c_NUMARGS(c_EXPAND x)))(f,U,x,__VA_ARGS__)
-
-#define _c_enum_1(x,...) (x=__LINE__*100, __VA_ARGS__)
-#define _c_vartuple_enum(U, Tag, ...) Tag,
-#define _c_vartuple_type(U, Tag, ...) typedef __VA_ARGS__ Tag##_type; typedef U Tag##_sumtype;
-#define _c_vartuple_item(U, Tag, ...) struct { enum U##_tag id; Tag##_type val; } Tag;
+#define _rfl_union_enum(U, Tag, ...) Tag,
+#define _rfl_union_enum_1(x, ...) (x=__LINE__*100, __VA_ARGS__)
+#define _rfl_union_type(U, Tag, ...) typedef __VA_ARGS__ Tag##_type; typedef U Tag##_sumtype;
+#define _rfl_union_field(U, Tag, ...) struct { enum U##_tag id; Tag##_type val; } Tag;
 
 #define c_union(U, ...) \
     typedef union U U; \
-    enum U##_tag { _c_EVAL(_c_LOOP(_c_vartuple_enum, U, _c_enum_1 __VA_ARGS__, (0),)) }; \
-    _c_EVAL(_c_LOOP(_c_vartuple_type, U, __VA_ARGS__, (0),)) \
+    enum U##_tag { c_reflect_each(U, _rfl_union_enum, _rfl_union_enum_1 __VA_ARGS__) }; \
+    c_reflect_each(U, _rfl_union_type, __VA_ARGS__) \
     union U { \
         int tag_id; \
         struct { enum U##_tag id; } _tag; \
-        _c_EVAL(_c_LOOP(_c_vartuple_item, U, __VA_ARGS__, (0),)) \
+        c_reflect_each(U, _rfl_union_field, __VA_ARGS__) \
     }
-
 
 #define c_when(...) c_MACRO_OVERLOAD(c_when, __VA_ARGS__)
 #define c_when_3(varptr, Tag, x) \
