@@ -21,8 +21,6 @@
  * SOFTWARE.
  */
 // This implements serialization in C.
-// ref: https://www.boost.org/doc/libs/latest/libs/serialization/doc/tutorial.html
-//      https://github.com/pantonante/boost-serialization-examples/tree/master/simple
 #ifndef STC_SERIALIZE_H_INCLUDED
 #define STC_SERIALIZE_H_INCLUDED
 
@@ -30,7 +28,7 @@
 #include <stc/sys/reflect.h>
 
 #define _rfl_fmt(x) _Generic ((x), \
-    _Bool: "%d", \
+    _Bool: "B", \
     unsigned char: "%hhu", \
     signed char: "%hhd", \
     char: "%c", \
@@ -46,49 +44,51 @@
     double: "%g", \
     long double: "%Lg", \
     char*: "\"%s\"", \
-    wchar_t*: "\"%ls\"", \
-    void*: "%p", \
-    const char*: "\"%s\"", \
-    const wchar_t*: "\"%ls\"", \
-    const void*: "%p", \
-    default: 0)
+    char const*: "\"%s\"", \
+    default: "")
 
-#define _fx_typedef(S, name, flag, objtype, ...) \
-    typedef objtype __VA_ARGS__ S##_##name##_t;
-
-#define _fx_struct_field(S, name, ...) \
-    S##_##name##_t name;
-
-#define _fx_field_to_json(S, name, flag, objtype, ...) \
-    _rfl_field_to_json(S, name, (flag+0), self->name, objtype##_to_json, __VA_ARGS__);
+enum {  CSER_EXCLUDE = 1<<0,
+        CSER_POINTER = 1<<1,
+        STC_SER_ = 0, 
+        STC_SER_CSER_EXCLUDE = CSER_EXCLUDE,
+        STC_SER_CSER_POINTER = CSER_POINTER };
+#define STC_EMIT_
+#define STC_EMIT_CSER_EXCLUDE
+#define STC_EMIT_CSER_POINTER *
 
 static inline void _to_json(const void* self, FILE* fp)
-    {}
+    { fprintf(fp, "<MISSING>"); (void)self; }
 
-#define _rfl_field_to_json(S, name, flag, field, tojson, ...) do { \
-    if (flag == 1) break; /* don't serialize this field */ \
-    char _buf[128]; \
+#define _fx_struct_field(S, name, baretype, specifiers, ...) \
+    baretype specifiers STC_EMIT_##__VA_ARGS__ name;
+
+#define _fx_field_to_json(S, name, baretype, specifiers, ...) \
+    _rfl_field_to_json(S, name, baretype, STC_EMIT_##__VA_ARGS__ self->name, STC_SER_##__VA_ARGS__);
+
+#define _rfl_field_to_json(S, name, baretype, field, flag) do { \
+    if (flag == CSER_EXCLUDE) break; /* don't serialize this field */ \
+    fprintf(fp, "%s\"" #name "\": ", (first ? "" : ", ")); \
     const char* _fmt = _rfl_fmt(field); \
-    if (_fmt == NULL) { \
-        fprintf(fp, "%s\"" #name "\": ", (first ? "" : ", ")); \
-        tojson(&field, fp); \
-    } else { \
-        sprintf(_buf, "%s\"" #name "\": %s", (first ? "  " : ", "), _fmt); \
-        fprintf(fp, _buf, field); \
-    } first = false; \
+    if (_fmt[0] == 'B') \
+        fprintf(fp, "%s", (*(_Bool*)(&field) ? "true" : "false")); \
+    else if (_fmt[0] != 0) \
+        fprintf(fp, _fmt, field); /* includes char* */ \
+    else if (flag != CSER_POINTER) \
+        baretype##_to_json(&field, fp); \
+    else { /* if pointer */ } \
+    first = false; \
 } while(0)
 
 #define c_struct(S, ...) \
     typedef struct S S; \
-    c_reflect_each(S, _fx_typedef, __VA_ARGS__) \
  \
     struct S { \
         c_reflect_each(S, _fx_struct_field, __VA_ARGS__) \
     }; \
  \
     void S##_to_json(const S* self, FILE* fp) { \
-        fprintf(fp, "{\"" #S "\": {"); \
         bool first = true; \
+        fprintf(fp, "{\"" #S "\": {"); \
         c_reflect_each(S, _fx_field_to_json, __VA_ARGS__) \
         fprintf(fp, "}}\n"); \
     } \

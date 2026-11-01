@@ -67,7 +67,7 @@ all:
 	@$(MAKE) -j --no-print-directory all-slow
 
 lib-slow: $(LIB_PATH)
-	@echo
+	@echo " - stclib ready"
 
 all-slow: $(LIB_PATH) $(PROGRAMS)
 	@echo
