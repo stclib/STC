@@ -47,37 +47,90 @@
     char const*: "\"%s\"", \
     default: "")
 
-enum {  CSER_EXCLUDE = 1<<0,
-        CSER_POINTER = 1<<1,
-        STC_SER_ = 0, 
-        STC_SER_CSER_EXCLUDE = CSER_EXCLUDE,
-        STC_SER_CSER_POINTER = CSER_POINTER };
-#define STC_EMIT_
-#define STC_EMIT_CSER_EXCLUDE
-#define STC_EMIT_CSER_POINTER *
+enum {  CSERDE_SKIP = 1<<0, CSERDE_PTR = 1<<1,
+        STC_FLAG_CSERDE_SKIP = CSERDE_SKIP,
+        STC_FLAG_CSERDE_PTR = CSERDE_PTR, STC_FLAG_ = 0 };
+#define STC_DEREF_
+#define STC_DEREF_CSERDE_PTR *
+#define STC_DEREF_CSERDE_SKIP
+#define STC_REF_ &
+#define STC_REF_CSERDE_PTR
+#define STC_REF_CSERDE_SKIP &
 
-static inline void _to_json(const void* self, FILE* fp)
-    { fprintf(fp, "<MISSING>"); (void)self; }
+#define T cserde_table, intptr_t, intptr_t // ptr->intptr and intptr->ptr
+#include "../hashmap.h"
 
-#define _fx_struct_field(S, name, baretype, specifiers, ...) \
-    baretype specifiers STC_EMIT_##__VA_ARGS__ name;
+typedef struct {
+    FILE* fp;
+    cserde_table table;
+    bool first;
+    int next_oid;
+} cserde_archive;
 
-#define _fx_field_to_json(S, name, baretype, specifiers, ...) \
-    _rfl_field_to_json(S, name, baretype, STC_EMIT_##__VA_ARGS__ self->name, STC_SER_##__VA_ARGS__);
+static inline void cserde_archive_reset(cserde_archive* ar, FILE* fp) {
+    cserde_table_clear(&ar->table);
+    if (ar->fp) fclose(ar->fp);
+    ar->fp = fp;
+    ar->first = true;
+    ar->next_oid = 0;
+}
 
-#define _rfl_field_to_json(S, name, baretype, field, flag) do { \
-    if (flag == CSER_EXCLUDE) break; /* don't serialize this field */ \
-    fprintf(fp, "%s\"" #name "\": ", (first ? "" : ", ")); \
-    const char* _fmt = _rfl_fmt(field); \
+static inline void cserde_archive_drop(cserde_archive* ar) {
+    cserde_table_drop(&ar->table);
+    if (ar->fp) fclose(ar->fp);
+}
+
+
+static inline _Bool _to_bool_from_opaque(const void* ref)
+    { return *(const _Bool*)ref; }
+
+static inline void _to_json(const void* self, cserde_archive* ar)
+    { fprintf(ar->fp, "<MISSING>"); (void)self; }
+
+
+#define _fx_struct_field(S, NAME, OBJTYPE, SPECIFIERS, ...) \
+    OBJTYPE SPECIFIERS STC_DEREF_##__VA_ARGS__ NAME;
+
+
+#define _fx_field_to_json(S, NAME, OBJTYPE, SPECIFIERS, ...) \
+    _rfl_field_to_json(S, NAME, OBJTYPE, STC_DEREF_##__VA_ARGS__, STC_REF_##__VA_ARGS__, STC_FLAG_##__VA_ARGS__);
+
+#define _rfl_field_to_json(S, NAME, OBJTYPE, DEREF, REF, FLAG) do { \
+    if (!cserde_save_pointer(#NAME, REF self->NAME, FLAG, ar)) \
+        break; \
+    const char* _fmt = _rfl_fmt(DEREF self->NAME); \
     if (_fmt[0] == 'B') \
-        fprintf(fp, "%s", (*(_Bool*)(&field) ? "true" : "false")); \
+        fprintf(ar->fp, "%s", _to_bool_from_opaque(REF self->NAME) ? "true" : "false"); \
     else if (_fmt[0] != 0) \
-        fprintf(fp, _fmt, field); /* includes char* */ \
-    else if (flag != CSER_POINTER) \
-        baretype##_to_json(&field, fp); \
-    else { /* if pointer */ } \
-    first = false; \
+        fprintf(ar->fp, _fmt, DEREF self->NAME); /* includes char* */ \
+    else \
+        OBJTYPE##_to_json(REF self->NAME, ar); \
+    if (FLAG == CSERDE_PTR) fprintf(ar->fp, "}"); \
 } while(0)
+
+
+bool cserde_save_pointer(const char* name, const void* field,
+                         int flag, cserde_archive* ar) {
+    if (flag == CSERDE_SKIP)
+        return false; /* don't serialize this field */
+    fprintf(ar->fp, "%s\"%s\":", (ar->first ? "" : ","), name);
+    ar->first = false;
+    if (flag == CSERDE_PTR) {
+        int oid = 0, last = ar->next_oid;
+        if (field != NULL) {
+            cserde_table_result res = cserde_table_insert(&ar->table, (intptr_t)field, ar->next_oid + 1);
+            oid = res.inserted ? ++ar->next_oid : res.ref->second;
+        }
+        fprintf(ar->fp, "{\"__oid\":%d", oid);
+        if (oid <= last) {
+            fprintf(ar->fp, "}");
+            return false;
+        } else
+            fprintf(ar->fp, ", \"__new\":");
+    }
+    return true;
+}
+
 
 #define c_struct(S, ...) \
     typedef struct S S; \
@@ -86,11 +139,11 @@ static inline void _to_json(const void* self, FILE* fp)
         c_reflect_each(S, _fx_struct_field, __VA_ARGS__) \
     }; \
  \
-    void S##_to_json(const S* self, FILE* fp) { \
-        bool first = true; \
-        fprintf(fp, "{\"" #S "\": {"); \
+    void S##_to_json(S* self, cserde_archive* ar) { \
+        ar->first = true; \
+        fprintf(ar->fp, "{"); \
         c_reflect_each(S, _fx_field_to_json, __VA_ARGS__) \
-        fprintf(fp, "}}\n"); \
+        fprintf(ar->fp, "}"); \
     } \
     struct _dummy
 
