@@ -48,12 +48,17 @@
   #define c_use_eq        (1<<4)
   #define c_use_cmp       (1<<5)
   #define c_use_compare   (c_use_cmp | c_use_eq)
-
-  #define c_compare_key   (1<<6)
-  #define c_class_key     (1<<7)
-  #define c_class_val     (1<<8)
-  #define c_pro_key       (1<<9)
-  #define c_pro_val       (1<<10)
+  
+  #define c_serde         (1<<6)
+  #define c_serde_key     (1<<7)
+  #define c_serde_val     (1<<8)
+  #define c_serde_kv      (c_serde_key | c_serde_val)
+  #define c_compare_key   (1<<10)
+  #define c_class_key     (1<<11)
+  #define c_class_val     (1<<12)
+  #define c_pro_key       (1<<13)
+  #define c_pro_val       (1<<14)
+  #define c_pro_kv        (c_pro_key | c_pro_val)
 #endif
 
 #ifdef i_opt       // [deprecated]
@@ -103,6 +108,12 @@
   #define _i_aux_def
 #endif
 
+#if c_HAS_TRAIT(c_serde_key) || (c_HAS_TRAIT(c_serde) && c_HAS_TRAIT(c_pro_key | c_class_key)) 
+  #define i_serde_key i_key
+#endif
+#if c_HAS_TRAIT(c_serde_val) || (c_HAS_TRAIT(c_serde) && c_HAS_TRAIT(c_pro_val | c_class_val))
+  #define i_serde_val i_val
+#endif
 #if c_HAS_TRAIT(c_declared)
   #define i_declared
 #endif

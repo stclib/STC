@@ -32,10 +32,7 @@
 #undef i_compare_key  // define i_keyraw, and bind i_cmp, i_eq, i_hash "class members"
 #undef i_class_key
 #undef i_pro_key
-#undef i_cmpclass  // [deprecated]
-#undef i_keycomp   // [deprecated]
-#undef i_keyclass  // [deprecated]
-#undef i_keypro    // [deprecated]
+#undef i_serde_key
 
 #undef i_key
 #undef i_keyclone
@@ -50,8 +47,7 @@
 
 #undef i_class_val
 #undef i_pro_val
-#undef i_valclass  // [deprecated]
-#undef i_valpro    // [deprecated]
+#undef i_serde_val
 
 #undef i_val
 #undef i_valclone

@@ -28,6 +28,7 @@
 #include <stdlib.h> /* malloc */
 #include <stddef.h> /* size_t */
 #include <stdarg.h> /* cstr_vfmt() */
+#include "../sys/archive.h"
 /**************************** PRIVATE API **********************************/
 
 #if defined __GNUC__ && !defined __clang__
@@ -182,6 +183,9 @@ STC_INLINE csviewz cstr_tail(const cstr* self, isize_t len) {
     if (len > sv.size) len = sv.size;
     return c_literal(csviewz){&sv.buf[sv.size - len], len};
 }
+
+STC_INLINE void cstr_to_json(const cstr* self, cserde_archive* ar)
+   { fprintf(ar->fp, "\"%s\"", cstr_str(self)); }
 
 // BEGIN utf8 functions =====
 

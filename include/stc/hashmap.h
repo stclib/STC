@@ -305,6 +305,15 @@ _c_MEMB(_eq)(const Self* self, const Self* other) {
     }
     return true;
 }
+
+#if c_HAS_TRAIT(c_serde | c_serde_key | c_serde_val) // serialization support
+#ifdef _i_is_map 
+  #include "priv/serialize_map.h"
+#else
+  #include "priv/serialize_seq.h"
+#endif
+#endif
+
 #endif // !i_body
 
 /* -------------------------- IMPLEMENTATION ------------------------- */

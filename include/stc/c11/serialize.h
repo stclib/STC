@@ -25,27 +25,8 @@
 #define STC_SERIALIZE_H_INCLUDED
 
 #include <stdio.h>
-#include <stc/sys/reflect.h>
-
-#define _rfl_fmt(x) _Generic ((x), \
-    _Bool: "B", \
-    unsigned char: "%hhu", \
-    signed char: "%hhd", \
-    char: "%c", \
-    short: "%hd", \
-    unsigned short: "%hu", \
-    int: "%d", \
-    unsigned: "%u", \
-    long: "%ld", \
-    unsigned long: "%lu", \
-    long long: "%lld", \
-    unsigned long long: "%llu", \
-    float: "%g", \
-    double: "%g", \
-    long double: "%Lg", \
-    char*: "\"%s\"", \
-    char const*: "\"%s\"", \
-    default: "")
+#include "../sys/archive.h"
+#include "../sys/reflect.h"
 
 enum {  CSERDE_SKIP = 1<<0, CSERDE_PTR = 1<<1,
         STC_FLAG_CSERDE_SKIP = CSERDE_SKIP,
@@ -56,33 +37,6 @@ enum {  CSERDE_SKIP = 1<<0, CSERDE_PTR = 1<<1,
 #define STC_REF_ &
 #define STC_REF_CSERDE_PTR
 #define STC_REF_CSERDE_SKIP &
-
-#define T cserde_table, intptr_t, intptr_t // ptr->intptr and intptr->ptr
-#include "../hashmap.h"
-
-typedef struct {
-    FILE* fp;
-    cserde_table table;
-    bool first;
-    int next_oid;
-} cserde_archive;
-
-static inline void cserde_archive_reset(cserde_archive* ar, FILE* fp) {
-    cserde_table_clear(&ar->table);
-    if (ar->fp) fclose(ar->fp);
-    ar->fp = fp;
-    ar->first = true;
-    ar->next_oid = 0;
-}
-
-static inline void cserde_archive_drop(cserde_archive* ar) {
-    cserde_table_drop(&ar->table);
-    if (ar->fp) fclose(ar->fp);
-}
-
-
-static inline _Bool _to_bool_from_opaque(const void* ref)
-    { return *(const _Bool*)ref; }
 
 static inline void _to_json(const void* self, cserde_archive* ar)
     { fprintf(ar->fp, "<MISSING>"); (void)self; }
@@ -98,7 +52,7 @@ static inline void _to_json(const void* self, cserde_archive* ar)
 #define _rfl_field_to_json(S, NAME, OBJTYPE, DEREF, REF, FLAG) do { \
     if (!cserde_save_pointer(#NAME, REF self->NAME, FLAG, ar)) \
         break; \
-    const char* _fmt = _rfl_fmt(DEREF self->NAME); \
+    const char* _fmt = c_generic_fmt(DEREF self->NAME); \
     if (_fmt[0] == 'B') \
         fprintf(ar->fp, "%s", _to_bool_from_opaque(REF self->NAME) ? "true" : "false"); \
     else if (_fmt[0] != 0) \
@@ -109,32 +63,8 @@ static inline void _to_json(const void* self, cserde_archive* ar)
 } while(0)
 
 
-bool cserde_save_pointer(const char* name, const void* field,
-                         int flag, cserde_archive* ar) {
-    if (flag == CSERDE_SKIP)
-        return false; /* don't serialize this field */
-    fprintf(ar->fp, "%s\"%s\":", (ar->first ? "" : ","), name);
-    ar->first = false;
-    if (flag == CSERDE_PTR) {
-        int oid = 0, last = ar->next_oid;
-        if (field != NULL) {
-            cserde_table_result res = cserde_table_insert(&ar->table, (intptr_t)field, ar->next_oid + 1);
-            oid = res.inserted ? ++ar->next_oid : res.ref->second;
-        }
-        fprintf(ar->fp, "{\"__oid\":%d", oid);
-        if (oid <= last) {
-            fprintf(ar->fp, "}");
-            return false;
-        } else
-            fprintf(ar->fp, ", \"__new\":");
-    }
-    return true;
-}
-
-
 #define c_struct(S, ...) \
     typedef struct S S; \
- \
     struct S { \
         c_reflect_each(S, _fx_struct_field, __VA_ARGS__) \
     }; \
@@ -148,3 +78,47 @@ bool cserde_save_pointer(const char* name, const void* field,
     struct _dummy
 
 #endif // STC_SERIALIZE_H_INCLUDED
+
+/* -------------------------- IMPLEMENTATION ------------------------- */
+#if !defined STC_SERIALIZE_C_INCLUDED && defined STC_IMPLEMENT
+#define STC_SERIALIZE_C_INCLUDED
+
+#define T cserde_table, intptr_t, intptr_t, (c_declared)
+#include "../hashmap.h"
+
+void cserde_archive_reset(cserde_archive* ar, FILE* fp) {
+    cserde_table_clear(&ar->table);
+    if (ar->fp) fclose(ar->fp);
+    ar->fp = fp;
+    ar->first = true;
+    ar->next_oid = 0;
+}
+
+void cserde_archive_drop(cserde_archive* ar) {
+    cserde_table_drop(&ar->table);
+    if (ar->fp) fclose(ar->fp);
+}
+
+bool cserde_save_pointer(const char* name, const void* field,
+                         int flag, cserde_archive* ar) {
+    if (flag == CSERDE_SKIP)
+        return false; /* don't serialize this field */
+    fprintf(ar->fp, "%s\"%s\":", (ar->first ? "" : ","), name);
+    ar->first = false;
+    if (flag == CSERDE_PTR) {
+        int oid = 0, last = ar->next_oid;
+        if (field != NULL) {
+            cserde_table_result res = cserde_table_insert(&ar->table, (intptr_t)field, ar->next_oid + 1);
+            oid = (int)(res.inserted ? ++ar->next_oid : res.ref->second);
+        }
+        fprintf(ar->fp, "{\"__oid\":%d", oid);
+        if (oid <= last) {
+            fprintf(ar->fp, "}");
+            return false;
+        } else
+            fprintf(ar->fp, ", \"__new\":");
+    }
+    return true;
+}
+#endif
+#undef i_implement

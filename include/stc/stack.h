@@ -262,10 +262,6 @@ STC_INLINE isize_t _c_MEMB(_index)(const Self* self, _m_iter it)
 STC_INLINE void _c_MEMB(_adjust_end_)(Self* self, isize_t n)
     { self->size += n; }
 
-#if defined _i_has_cmp
-#include "priv/sort_prv.h"
-#endif // _i_has_cmp
-
 #if defined _i_has_eq
 STC_INLINE _m_iter _c_MEMB(_find_in)(const Self* self, _m_iter i1, _m_iter i2, _m_raw raw) {
     (void)self;
@@ -298,4 +294,13 @@ STC_INLINE bool _c_MEMB(_eq)(const Self* self, const Self* other) {
 #endif
 }
 #endif // _i_has_eq
+
+#if c_HAS_TRAIT(c_serde | c_serde_key) // serialization support
+#include "priv/serialize_seq.h"
+#endif
+
+#if defined _i_has_cmp
+#include "priv/sort_prv.h"
+#endif // _i_has_cmp
+
 #include "sys/finalize.h"

@@ -268,6 +268,14 @@ STC_INLINE Self _c_MEMB(_from_n)(const _m_raw* raw, isize_t n)
 STC_INLINE Self _c_MEMB(_with_capacity)(const isize_t cap)
     { Self cx = {0}; _c_MEMB(_reserve)(&cx, cap); return cx; }
 #endif
+
+#if c_HAS_TRAIT(c_serde | c_serde_key | c_serde_val) // serialization support
+#ifdef _i_is_map 
+  #include "priv/serialize_map.h"
+#else
+  #include "priv/serialize_seq.h"
+#endif
+#endif
 #endif // !i_body
 
 /* -------------------------- IMPLEMENTATION ------------------------- */

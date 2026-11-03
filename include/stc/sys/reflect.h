@@ -58,4 +58,23 @@
 #define c_is_type(x, type) \
     _Generic((x), type: 1, default: 0)
 
+#define c_generic_fmt(x) _Generic ((x), \
+    _Bool: "B", \
+    unsigned char: "%hhu", \
+    signed char: "%hhd", \
+    char: "%c", \
+    short: "%hd", \
+    unsigned short: "%hu", \
+    int: "%d", \
+    unsigned: "%u", \
+    long: "%ld", \
+    unsigned long: "%lu", \
+    long long: "%lld", \
+    unsigned long long: "%llu", \
+    float: "%g", \
+    double: "%g", \
+    char*: "\"%s\"", \
+    char const*: "\"%s\"", \
+    default: "")
+
 #endif // STC_REFLECT_H_INCLUDED

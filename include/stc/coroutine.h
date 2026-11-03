@@ -652,7 +652,7 @@ static inline double cco_timer_remaining(cco_timer* tm) {
 #endif // STC_COROUTINE_H_INCLUDED
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if (defined i_implement || defined STC_IMPLEMENT) && !defined STC_COROUTINE_IMPLEMENT
+#if defined STC_IMPLEMENT && !defined STC_COROUTINE_IMPLEMENT
 #define STC_COROUTINE_IMPLEMENT
 #include <stdio.h>
 

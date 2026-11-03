@@ -172,6 +172,10 @@ STC_INLINE bool _c_MEMB(_eq)(const Self* self, const Self* other) {
 #endif
 }
 #endif // _i_has_eq
+
+#if c_HAS_TRAIT(c_serde | c_serde_key) // serialization support
+#include "priv/serialize_seq.h"
+#endif
 #endif // !i_body
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
