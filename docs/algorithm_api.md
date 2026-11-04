@@ -146,8 +146,8 @@ typedef union MyUnion {
 
 MyUnion       c_variant(MyUnion_tag tag, Tag_type payload);    // Construct a typesafe tagged union variant.
 bool          c_is_variant(MyUnion* u, enum MyUnion_tag tag);  // True if u holds the tag.
-int           c_variant_id(MyUnion* u);                        // (mainly for debugging)
-Tag_type*     c_get_if(MyUnion* u, enum MyUnion_tag tag);      // Return item pointer or NULL if it does not hold tag.
+Tag_type*     c_get_variant(MyUnion* u, enum MyUnion_tag tag); // Return item pointer, or NULL if it does not hold tag.
+int           c_variant_tag(MyUnion* u);                       // tag=1,2,... tag=0 means it holds no value.
 
 // Access the union:
 c_when (&var) {         /* MyUnion var */

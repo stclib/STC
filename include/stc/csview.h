@@ -24,9 +24,7 @@
 
 #ifndef STC_CSVIEW_H_INCLUDED
 #define STC_CSVIEW_H_INCLUDED
-#include "common.h"
-#include "types.h"
-#include "priv/utf8_prv.h"
+#include "csviewz.h"
 
 STC_EXTERN csview_iter  csview_advance(csview_iter it, isize_t u8pos);
 STC_EXTERN csview       csview_subview_pro(csview sv, isize_t pos, isize_t n);

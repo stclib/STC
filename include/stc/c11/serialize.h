@@ -60,7 +60,7 @@ static inline void _to_json(const void* self, cserde_archive* ar)
     else \
         OBJTYPE##_to_json(REF self->NAME, ar); \
     if (FLAG == CSERDE_PTR) \
-        { --ar->level; fprintf(ar->fp, STC_NL "%*s}", STC_IND(ar)); } \
+        { --ar->level; fprintf(ar->fp, "%s%*s}", _SRD_NL, _SRD_IND); } \
 } while(0)
 
 
@@ -72,11 +72,12 @@ static inline void _to_json(const void* self, cserde_archive* ar)
  \
     void S##_to_json(S* self, cserde_archive* ar) { \
         ar->first = true; \
+        if (!ar->fmt.comma) ar->fmt = cserde_normal; \
         ++ar->level; \
-        fprintf(ar->fp, "{" STC_NL "%*s", STC_IND(ar)); \
+        fprintf(ar->fp, "{%s%*s", _SRD_NL, _SRD_IND); \
         c_reflect_each(S, _fx_field_to_json, __VA_ARGS__) \
         --ar->level; \
-        fprintf(ar->fp, STC_NL "%*s}", STC_IND(ar)); \
+        fprintf(ar->fp, "%s%*s}", _SRD_NL, _SRD_IND); \
     } \
     struct _dummy
 
@@ -89,13 +90,12 @@ static inline void _to_json(const void* self, cserde_archive* ar)
 #define T cserde_table, intptr_t, intptr_t, (c_declared)
 #include "../hashmap.h"
 
-bool cserde_save_pointer(const char* name, const void* field,
-                         int flag, cserde_archive* ar) {
+bool cserde_save_pointer(const char* name, const void* field, int flag, cserde_archive* ar) {
     if (flag == CSERDE_SKIP)
         return false; /* don't serialize this field */
     if (!ar->first)
-        fprintf(ar->fp, "," STC_NL "%*s", STC_IND(ar));
-    fprintf(ar->fp, "\"%s\":" STC_SP, name);
+        fprintf(ar->fp, "%s%s%*s", _SRD_COMMA, _SRD_NL, _SRD_IND);
+    fprintf(ar->fp, "\"%s\":%s", name, _SRD_SPACE);
     ar->first = false;
     if (flag == CSERDE_PTR) {
         int oid = 0, last = ar->next_oid;
@@ -104,13 +104,15 @@ bool cserde_save_pointer(const char* name, const void* field,
             oid = (int)(res.inserted ? ++ar->next_oid : res.ref->second);
         }
         ++ar->level;
-        fprintf(ar->fp, "{"STC_NL "%*s\"oid__\":" STC_SP "%d", STC_IND(ar), oid);
+        fprintf(ar->fp, "{%s%*s\"%s\":%s%d",
+                _SRD_NL, _SRD_IND, (oid > last ? "oid__":"ref__"), _SRD_SPACE, oid);
         if (oid <= last) {
             --ar->level;
-            fprintf(ar->fp, STC_NL "%*s}", STC_IND(ar));
+            fprintf(ar->fp, "%s%*s}", _SRD_NL, _SRD_IND);
             return false;
         } else
-            fprintf(ar->fp, "," STC_NL "%*s\"val__\":" STC_SP, STC_IND(ar));
+            fprintf(ar->fp, "%s%s%*s\"val__\":%s",
+                    _SRD_COMMA, _SRD_NL, _SRD_IND, _SRD_SPACE);
     }
     return true;
 }

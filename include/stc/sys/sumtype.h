@@ -78,7 +78,7 @@ int main(void) {
 #include "reflect.h"
 
 #define _rfl_union_enum(U, Tag, ...) Tag,
-#define _rfl_union_enum_1(x, ...) (x=__LINE__*100, __VA_ARGS__)
+#define _rfl_union_enum_1(x, ...) (x=1, __VA_ARGS__)
 #define _rfl_union_type(U, Tag, ...) typedef __VA_ARGS__ Tag##_type; typedef U Tag##_sumtype;
 #define _rfl_union_field(U, Tag, ...) struct { enum U##_tag id; Tag##_type val; } Tag;
 
@@ -129,10 +129,10 @@ int main(void) {
 #define c_is_variant(uptr, Tag) \
     ((uptr)->Tag.id == Tag)
 
-#define c_get_if(uptr, Tag) \
+#define c_get_variant(uptr, Tag) \
     ((uptr)->Tag.id == Tag ? &(uptr)->Tag.val : NULL)
 
-#define c_variant_id(uptr) \
+#define c_variant_tag(uptr) \
     ((uptr)->tag_id + 0)
 
 // The following is [deprecated]

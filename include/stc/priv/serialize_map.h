@@ -37,7 +37,8 @@ STC_INLINE void _c_MEMB(_to_json)(Self* self, cserde_archive* ar) {
 #endif
 
     for (_m_iter it = _c_MEMB(_begin)(self); it.ref; _c_MEMB(_next)(&it)) {
-        fprintf(ar->fp, "%s" STC_NL "%*s[", (first ? "" : ","), STC_IND(ar));
+        const char* comma = first ? "" : (_SRD_SPACE[0] ? ", " : ",");
+        fprintf(ar->fp, "%s%s%*s[", comma, _SRD_NL, _SRD_IND);
 #ifndef i_serde_key
         if (_keyfmt[0] == 'B') \
             fprintf(ar->fp, "%s", _to_bool_from_opaque(&it.ref->first) ? "true" : "false");
@@ -46,7 +47,7 @@ STC_INLINE void _c_MEMB(_to_json)(Self* self, cserde_archive* ar) {
 #else
         c_JOIN(i_serde_key, _to_json)(&it.ref->first, ar);
 #endif
-        fprintf(ar->fp, "," STC_SP);
+        fprintf(ar->fp, ",%s", _SRD_SPACE);
 #ifndef i_serde_val
         if (_valfmt[0] == 'B') \
             fprintf(ar->fp, "%s", _to_bool_from_opaque(&it.ref->second) ? "true" : "false");
@@ -59,5 +60,5 @@ STC_INLINE void _c_MEMB(_to_json)(Self* self, cserde_archive* ar) {
         first = 0;
     }
     --ar->level;
-    fprintf(ar->fp, STC_NL "%*s]", STC_IND(ar));
+    fprintf(ar->fp, "%s%*s]", _SRD_NL, _SRD_IND);
 }
