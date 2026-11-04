@@ -27,13 +27,14 @@
 
 STC_INLINE void _c_MEMB(_to_json)(Self* self, cserde_archive* ar) {
     fprintf(ar->fp, "[");
+    ++ar->level;
     int first = 1;
 #ifndef i_serde_key
     const char* _fmt = c_generic_fmt((i_key){0});
 #endif
 
     for (_m_iter it = _c_MEMB(_begin)(self); it.ref; _c_MEMB(_next)(&it)) {
-        if (!first) fprintf(ar->fp, ",");
+        fprintf(ar->fp, "%s" STC_NL "%*s", (first ? "" : ","), STC_IND(ar));
 #ifndef i_serde_key
         if (_fmt[0] == 'B') \
             fprintf(ar->fp, "%s", _to_bool_from_opaque(it.ref) ? "true" : "false");
@@ -44,5 +45,6 @@ STC_INLINE void _c_MEMB(_to_json)(Self* self, cserde_archive* ar) {
 #endif
         first = 0;
     }
-    fprintf(ar->fp, "]");
+    --ar->level;
+    fprintf(ar->fp, STC_NL "%*s]", STC_IND(ar));
 }

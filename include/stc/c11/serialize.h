@@ -59,7 +59,8 @@ static inline void _to_json(const void* self, cserde_archive* ar)
         fprintf(ar->fp, _fmt, DEREF self->NAME); /* includes char* */ \
     else \
         OBJTYPE##_to_json(REF self->NAME, ar); \
-    if (FLAG == CSERDE_PTR) fprintf(ar->fp, "}"); \
+    if (FLAG == CSERDE_PTR) \
+        { --ar->level; fprintf(ar->fp, STC_NL "%*s}", STC_IND(ar)); } \
 } while(0)
 
 
@@ -71,9 +72,11 @@ static inline void _to_json(const void* self, cserde_archive* ar)
  \
     void S##_to_json(S* self, cserde_archive* ar) { \
         ar->first = true; \
-        fprintf(ar->fp, "{"); \
+        ++ar->level; \
+        fprintf(ar->fp, "{" STC_NL "%*s", STC_IND(ar)); \
         c_reflect_each(S, _fx_field_to_json, __VA_ARGS__) \
-        fprintf(ar->fp, "}"); \
+        --ar->level; \
+        fprintf(ar->fp, STC_NL "%*s}", STC_IND(ar)); \
     } \
     struct _dummy
 
@@ -85,6 +88,32 @@ static inline void _to_json(const void* self, cserde_archive* ar)
 
 #define T cserde_table, intptr_t, intptr_t, (c_declared)
 #include "../hashmap.h"
+
+bool cserde_save_pointer(const char* name, const void* field,
+                         int flag, cserde_archive* ar) {
+    if (flag == CSERDE_SKIP)
+        return false; /* don't serialize this field */
+    if (!ar->first)
+        fprintf(ar->fp, "," STC_NL "%*s", STC_IND(ar));
+    fprintf(ar->fp, "\"%s\":" STC_SP, name);
+    ar->first = false;
+    if (flag == CSERDE_PTR) {
+        int oid = 0, last = ar->next_oid;
+        if (field != NULL) {
+            cserde_table_result res = cserde_table_insert(&ar->table, (intptr_t)field, ar->next_oid + 1);
+            oid = (int)(res.inserted ? ++ar->next_oid : res.ref->second);
+        }
+        ++ar->level;
+        fprintf(ar->fp, "{"STC_NL "%*s\"oid__\":" STC_SP "%d", STC_IND(ar), oid);
+        if (oid <= last) {
+            --ar->level;
+            fprintf(ar->fp, STC_NL "%*s}", STC_IND(ar));
+            return false;
+        } else
+            fprintf(ar->fp, "," STC_NL "%*s\"val__\":" STC_SP, STC_IND(ar));
+    }
+    return true;
+}
 
 void cserde_archive_reset(cserde_archive* ar, FILE* fp) {
     cserde_table_clear(&ar->table);
@@ -99,26 +128,5 @@ void cserde_archive_drop(cserde_archive* ar) {
     if (ar->fp) fclose(ar->fp);
 }
 
-bool cserde_save_pointer(const char* name, const void* field,
-                         int flag, cserde_archive* ar) {
-    if (flag == CSERDE_SKIP)
-        return false; /* don't serialize this field */
-    fprintf(ar->fp, "%s\"%s\":", (ar->first ? "" : ","), name);
-    ar->first = false;
-    if (flag == CSERDE_PTR) {
-        int oid = 0, last = ar->next_oid;
-        if (field != NULL) {
-            cserde_table_result res = cserde_table_insert(&ar->table, (intptr_t)field, ar->next_oid + 1);
-            oid = (int)(res.inserted ? ++ar->next_oid : res.ref->second);
-        }
-        fprintf(ar->fp, "{\"__oid\":%d", oid);
-        if (oid <= last) {
-            fprintf(ar->fp, "}");
-            return false;
-        } else
-            fprintf(ar->fp, ", \"__new\":");
-    }
-    return true;
-}
 #endif
 #undef i_implement
