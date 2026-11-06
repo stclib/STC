@@ -29,7 +29,7 @@ int FileMetaData_cmp(const FMDVectorSorting* aux, const FileMetaData* a, const F
         case FMD_directory: return dir*cstr_cmp(&a->directory, &b->directory);
         case FMD_size: return dir*c_default_cmp(&a->size, &b->size);
         case FMD_lastWriteTime: return dir*c_default_cmp(&a->lastWriteTime, &b->lastWriteTime);
-        default:;
+        case FMD_LAST:;
     }
     return 0;
 }

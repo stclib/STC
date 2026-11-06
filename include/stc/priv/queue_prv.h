@@ -177,7 +177,7 @@ STC_INLINE isize_t _c_MEMB(_index)(const Self* self, _m_iter it)
 STC_INLINE void _c_MEMB(_adjust_end_)(Self* self, isize_t n)
     { self->end = (self->end + n) & self->capmask; }
 
-#if c_HAS_TRAIT(c_serde | c_serde_key) // serialization support
+#if c_HAS_TRAIT(c_use_serde | c_serde_key) // serialization support
 #include "serialize_seq.h"
 #endif
 

@@ -24,7 +24,7 @@
 #ifndef STC_CSERDE_ARCHIVE_H_
 #define STC_CSERDE_ARCHIVE_H_
 
-#include <stdio.h>
+#include "cstream.h"
 #include "../types.h"
 
 // used for both ptr->intptr and intptr->ptr
@@ -35,16 +35,16 @@ typedef struct { const char *newln, *comma, *space; int indent; } cserde_fmt;
 #define cserde_compact ((const cserde_fmt){"", ",", "", 0})
 #define cserde_pretty ((const cserde_fmt){"\n", ", ", " ", 2})
 
+// construct: cserde_archive ar = {cserde_pretty, {stdout}};
 typedef struct cserde_archive {
-    FILE* fp;
-    cserde_fmt fmt;
+    cserde_fmt fmt;     // INIT required
+    cstream stream;     // defaults to string-stream
     cserde_table table; // ptr <=> oid mapping
     bool first;         // at first item in object?
     int16_t level;      // indent nesting level
     int next_oid;       // object id
 } cserde_archive;
 
-extern void cserde_archive_reset(cserde_archive* ar, FILE* fp);
 extern void cserde_archive_drop(cserde_archive* ar);
 extern bool cserde_save_pointer(const char* name, const void* field,
                                 int flag, cserde_archive* ar);
@@ -52,8 +52,8 @@ extern bool cserde_save_pointer(const char* name, const void* field,
 static inline _Bool _to_bool_from_opaque(const void* ref)
     { return *(const _Bool*)ref; }
 
-#define _SRD_NL ar->fmt.newln
-#define _SRD_COMMA ar->fmt.comma
-#define _SRD_SPACE ar->fmt.space
-#define _SRD_IND ar->fmt.indent*ar->level, "" // usage: fprintf(fp, "%*s", _SRD_IND)
+#define SRD_NL ar->fmt.newln
+#define SRD_COMMA ar->fmt.comma
+#define SRD_SPACE ar->fmt.space
+#define SRD_IND ar->fmt.indent*ar->level, "" // usage: fprintf(fp, "%*s", SRD_IND)
 #endif

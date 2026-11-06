@@ -25,8 +25,13 @@
 #include "../sys/archive.h"
 #include "../sys/reflect.h"
 
-STC_INLINE void _c_MEMB(_to_json)(Self* self, cserde_archive* ar) {
-    fprintf(ar->fp, "[");
+STC_API void _c_MEMB(_to_json)(Self* self, cserde_archive* ar);
+
+/* -------------------------- IMPLEMENTATION ------------------------- */
+#if defined i_implement
+
+STC_DEF void _c_MEMB(_to_json)(Self* self, cserde_archive* ar) {
+    cstream_printf(&ar->stream, "[");
     ++ar->level;
     int first = 1;
 #ifndef i_serde_key
@@ -37,28 +42,29 @@ STC_INLINE void _c_MEMB(_to_json)(Self* self, cserde_archive* ar) {
 #endif
 
     for (_m_iter it = _c_MEMB(_begin)(self); it.ref; _c_MEMB(_next)(&it)) {
-        const char* comma = first ? "" : (_SRD_SPACE[0] ? ", " : ",");
-        fprintf(ar->fp, "%s%s%*s[", comma, _SRD_NL, _SRD_IND);
+        const char* comma = first ? "" : (SRD_SPACE[0] ? SRD_COMMA : ",");
+        cstream_printf(&ar->stream, "%s%s%*s[", comma, SRD_NL, SRD_IND);
 #ifndef i_serde_key
         if (_keyfmt[0] == 'B') \
-            fprintf(ar->fp, "%s", _to_bool_from_opaque(&it.ref->first) ? "true" : "false");
+            cstream_printf(&ar->stream, "%s", _to_bool_from_opaque(&it.ref->first) ? "true" : "false");
         else if (_keyfmt[0] != 0)
-            fprintf(ar->fp, _keyfmt, it.ref->first);
+            cstream_printf(&ar->stream, _keyfmt, it.ref->first);
 #else
         c_JOIN(i_serde_key, _to_json)(&it.ref->first, ar);
 #endif
-        fprintf(ar->fp, ",%s", _SRD_SPACE);
+        cstream_printf(&ar->stream, ",%s", SRD_SPACE);
 #ifndef i_serde_val
         if (_valfmt[0] == 'B') \
-            fprintf(ar->fp, "%s", _to_bool_from_opaque(&it.ref->second) ? "true" : "false");
+            cstream_printf(&ar->stream, "%s", _to_bool_from_opaque(&it.ref->second) ? "true" : "false");
         else if (_valfmt[0] != 0)
-            fprintf(ar->fp, _valfmt, it.ref->second);
+            cstream_printf(&ar->stream, _valfmt, it.ref->second);
 #else
         c_JOIN(i_serde_val, _to_json)(&it.ref->second, ar);
 #endif
-        fprintf(ar->fp, "]");
+        cstream_printf(&ar->stream, "]");
         first = 0;
     }
     --ar->level;
-    fprintf(ar->fp, "%s%*s]", _SRD_NL, _SRD_IND);
+    cstream_printf(&ar->stream, "%s%*s]", SRD_NL, SRD_IND);
 }
+#endif

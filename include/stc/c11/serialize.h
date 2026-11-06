@@ -29,63 +29,69 @@
 #include "../sys/reflect.h"
 
 enum {  CSERDE_SKIP = 1<<0, CSERDE_PTR = 1<<1,
-        STC_FLAG_CSERDE_SKIP = CSERDE_SKIP,
-        STC_FLAG_CSERDE_PTR = CSERDE_PTR, STC_FLAG_ = 0 };
-#define STC_DEREF_
-#define STC_DEREF_CSERDE_PTR *
-#define STC_DEREF_CSERDE_SKIP
-#define STC_REF_ &
-#define STC_REF_CSERDE_PTR
-#define STC_REF_CSERDE_SKIP &
+        SRD_FLAG_CSERDE_SKIP = CSERDE_SKIP,
+        SRD_FLAG_CSERDE_PTR = CSERDE_PTR, SRD_FLAG_ = 0 };
+#define SRD_DEREF_
+#define SRD_DEREF_CSERDE_PTR *
+#define SRD_DEREF_CSERDE_SKIP
+#define SRD_REF_ &
+#define SRD_REF_CSERDE_PTR
+#define SRD_REF_CSERDE_SKIP &
 
 static inline void _to_json(const void* self, cserde_archive* ar)
-    { fprintf(ar->fp, "<MISSING>"); (void)self; }
+    { cstream_printf(&ar->stream, "<MISSING>"); (void)self; }
 
 
 #define _fx_struct_field(S, NAME, OBJTYPE, SPECIFIERS, ...) \
-    OBJTYPE SPECIFIERS STC_DEREF_##__VA_ARGS__ NAME;
+    OBJTYPE SPECIFIERS SRD_DEREF_##__VA_ARGS__ NAME;
 
 
 #define _fx_field_to_json(S, NAME, OBJTYPE, SPECIFIERS, ...) \
-    _rfl_field_to_json(S, NAME, OBJTYPE, STC_DEREF_##__VA_ARGS__, STC_REF_##__VA_ARGS__, STC_FLAG_##__VA_ARGS__);
+    _rfl_field_to_json(S, NAME, OBJTYPE, SRD_DEREF_##__VA_ARGS__, SRD_REF_##__VA_ARGS__, SRD_FLAG_##__VA_ARGS__);
 
 #define _rfl_field_to_json(S, NAME, OBJTYPE, DEREF, REF, FLAG) do { \
     if (!cserde_save_pointer(#NAME, REF self->NAME, FLAG, ar)) \
         break; \
     const char* _fmt = c_generic_fmt(DEREF self->NAME); \
     if (_fmt[0] == 'B') \
-        fprintf(ar->fp, "%s", _to_bool_from_opaque(REF self->NAME) ? "true" : "false"); \
+        cstream_printf(&ar->stream, "%s", _to_bool_from_opaque(REF self->NAME) ? "true" : "false"); \
     else if (_fmt[0] != 0) \
-        fprintf(ar->fp, _fmt, DEREF self->NAME); /* includes char* */ \
+        cstream_printf(&ar->stream, _fmt, DEREF self->NAME); /* includes char* */ \
     else \
         OBJTYPE##_to_json(REF self->NAME, ar); \
     if (FLAG == CSERDE_PTR) \
-        { --ar->level; fprintf(ar->fp, "%s%*s}", _SRD_NL, _SRD_IND); } \
+        { --ar->level; cstream_printf(&ar->stream, "%s%*s}", SRD_NL, SRD_IND); } \
 } while(0)
 
+#define cserde_define_struct(S) \
+    _cserde_define_struct(S, serde_struct_##S)
 
-#define c_struct(S, ...) \
+#define cserde_implement_struct(S) \
+    _cserde_implement_struct(S, serde_struct_##S)
+
+#define _cserde_define_struct(S, ...) \
     typedef struct S S; \
     struct S { \
         c_reflect_each(S, _fx_struct_field, __VA_ARGS__) \
     }; \
- \
+    void S##_to_json(S* self, cserde_archive* ar)
+
+#define _cserde_implement_struct(S, ...) \
     void S##_to_json(S* self, cserde_archive* ar) { \
+        c_assert(ar->fmt.comma); \
         ar->first = true; \
-        if (!ar->fmt.comma) ar->fmt = cserde_normal; \
         ++ar->level; \
-        fprintf(ar->fp, "{%s%*s", _SRD_NL, _SRD_IND); \
+        cstream_printf(&ar->stream, "{%s%*s", SRD_NL, SRD_IND); \
         c_reflect_each(S, _fx_field_to_json, __VA_ARGS__) \
         --ar->level; \
-        fprintf(ar->fp, "%s%*s}", _SRD_NL, _SRD_IND); \
+        cstream_printf(&ar->stream, "%s%*s}", SRD_NL, SRD_IND); \
     } \
     struct _dummy
 
 #endif // STC_SERIALIZE_H_INCLUDED
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if !defined STC_SERIALIZE_C_INCLUDED && defined STC_IMPLEMENT
-#define STC_SERIALIZE_C_INCLUDED
+#if defined STC_IMPLEMENT_CSERDE
 
 #define T cserde_table, intptr_t, intptr_t, (c_declared)
 #include "../hashmap.h"
@@ -93,9 +99,10 @@ static inline void _to_json(const void* self, cserde_archive* ar)
 bool cserde_save_pointer(const char* name, const void* field, int flag, cserde_archive* ar) {
     if (flag == CSERDE_SKIP)
         return false; /* don't serialize this field */
+    const char *nl_or_space = SRD_NL[0] ? "\n" : SRD_SPACE;
     if (!ar->first)
-        fprintf(ar->fp, "%s%s%*s", _SRD_COMMA, _SRD_NL, _SRD_IND);
-    fprintf(ar->fp, "\"%s\":%s", name, _SRD_SPACE);
+        cstream_printf(&ar->stream, ",%s%*s", nl_or_space, SRD_IND);
+    cstream_printf(&ar->stream, "\"%s\":%s", name, SRD_SPACE);
     ar->first = false;
     if (flag == CSERDE_PTR) {
         int oid = 0, last = ar->next_oid;
@@ -104,30 +111,22 @@ bool cserde_save_pointer(const char* name, const void* field, int flag, cserde_a
             oid = (int)(res.inserted ? ++ar->next_oid : res.ref->second);
         }
         ++ar->level;
-        fprintf(ar->fp, "{%s%*s\"%s\":%s%d",
-                _SRD_NL, _SRD_IND, (oid > last ? "oid__":"ref__"), _SRD_SPACE, oid);
+        cstream_printf(&ar->stream, "{%s%*s\"%s\":%s%d",
+                       SRD_NL, SRD_IND, (oid > last ? "oid__":"ref__"), SRD_SPACE, oid);
         if (oid <= last) {
             --ar->level;
-            fprintf(ar->fp, "%s%*s}", _SRD_NL, _SRD_IND);
+            cstream_printf(&ar->stream, "%s%*s}", SRD_NL, SRD_IND);
             return false;
         } else
-            fprintf(ar->fp, "%s%s%*s\"val__\":%s",
-                    _SRD_COMMA, _SRD_NL, _SRD_IND, _SRD_SPACE);
+            cstream_printf(&ar->stream, ",%s%*s\"val__\":%s",
+                           nl_or_space, SRD_IND, SRD_SPACE);
     }
     return true;
 }
 
-void cserde_archive_reset(cserde_archive* ar, FILE* fp) {
-    cserde_table_clear(&ar->table);
-    if (ar->fp) fclose(ar->fp);
-    ar->fp = fp;
-    ar->first = true;
-    ar->next_oid = 0;
-}
-
 void cserde_archive_drop(cserde_archive* ar) {
     cserde_table_drop(&ar->table);
-    if (ar->fp) fclose(ar->fp);
+    cstream_drop(&ar->stream);
 }
 
 #endif

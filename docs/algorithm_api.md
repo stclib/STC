@@ -167,7 +167,7 @@ c_when (&var, TagC, c) {
 The **c_when** statement is exhaustive. The compiler will give a warning if not all variants are
 covered by **c_is** (requires `-Wall` or `-Wswitch` gcc/clang compiler flag). The first enum tag
 is deliberately set to `__LINE__*1000` in order to easier detect zero/un-initialized variants
-and distinguish between types (can be inspected with c_variant_id()).
+and distinguish between types (can be inspected with c_variant_tag()).
 
 * Caveat: Sum types will generally not work in coroutines because the variant pointer in c_when()
 is local and will therefore not be preserved across `cco_suspend` / `cco_yield..` / `cco_await..`.

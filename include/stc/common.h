@@ -34,7 +34,6 @@
 
 #ifndef ISIZE_MAX
     typedef ptrdiff_t   isize_t;
-    typedef isize_t     isize; // [deprecated]
     #define ISIZE_MIN   PTRDIFF_MIN
     #define ISIZE_MAX   PTRDIFF_MAX
 #endif

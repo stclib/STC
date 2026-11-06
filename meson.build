@@ -13,7 +13,9 @@ cc = meson.get_compiler('c')
 if cc.get_argument_syntax() == 'gcc'
   add_project_arguments(
     cc.get_supported_arguments(
-      '-Werror', '-Wconversion',
+      '-Werror',
+      '-Wconversion',
+      '-Wswitch-enum',
       '-Wno-missing-field-initializers',
       '-Wno-double-promotion',
       '-Wno-stringop-overflow',

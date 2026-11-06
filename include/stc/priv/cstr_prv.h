@@ -185,7 +185,7 @@ STC_INLINE csviewz cstr_tail(const cstr* self, isize_t len) {
 }
 
 STC_INLINE void cstr_to_json(const cstr* self, cserde_archive* ar)
-   { fprintf(ar->fp, "\"%s\"", cstr_str(self)); }
+   { cstream_printf(&ar->stream, "\"%s\"", cstr_str(self)); }
 
 // BEGIN utf8 functions =====
 
