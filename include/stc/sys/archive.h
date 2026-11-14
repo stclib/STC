@@ -40,20 +40,23 @@ typedef struct cserde_archive {
     cserde_fmt fmt;     // INIT required
     cstream stream;     // defaults to string-stream
     cserde_table table; // ptr <=> oid mapping
-    bool first;         // at first item in object?
+    bool initial;       // at first item in object?
     int16_t level;      // indent nesting level
     int next_oid;       // object id
 } cserde_archive;
 
 extern void cserde_archive_drop(cserde_archive* ar);
-extern bool cserde_save_pointer(const char* name, const void* field,
-                                int flag, cserde_archive* ar);
-
-static inline _Bool _to_bool_from_opaque(const void* ref)
-    { return *(const _Bool*)ref; }
+extern bool cserde_save_field(const char* name, void** field,
+                              int flag, cserde_archive* ar);
+extern int  cserde_register_object(void* field, cserde_archive* ar);
 
 #define SRD_NL ar->fmt.newln
 #define SRD_COMMA ar->fmt.comma
 #define SRD_SPACE ar->fmt.space
 #define SRD_IND ar->fmt.indent*ar->level, "" // usage: fprintf(fp, "%*s", SRD_IND)
+#if 1
+  #define PRINT_OBJ_ID() printf("#%d ", ar->next_oid)
+#else
+  #define PRINT_OBJ_ID() (void)0
+#endif
 #endif

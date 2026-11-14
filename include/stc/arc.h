@@ -244,6 +244,10 @@ STC_INLINE Self _c_MEMB(_clone)(Self owned) {
         { return i_hash(rx); }
 #endif // i_no_hash
 
+#if c_HAS_TRAIT(c_use_serde | c_serde_key) // serialization support
+  #include "priv/serialize_arc.h"
+#endif // c_use_serde
+
 #undef ctrl
 #undef i_no_atomic
 #undef i_arc2

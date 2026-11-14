@@ -33,38 +33,54 @@ STC_API void _c_MEMB(_to_json)(Self* self, cserde_archive* ar);
 STC_DEF void _c_MEMB(_to_json)(Self* self, cserde_archive* ar) {
     cstream_printf(&ar->stream, "[");
     ++ar->level;
-    int first = 1;
+    //++ar->next_oid;
 #ifndef i_serde_key
     const char* _keyfmt = c_generic_fmt((i_key){0});
 #endif
 #ifndef i_serde_val
     const char* _valfmt = c_generic_fmt((i_val){0});
 #endif
-
+    const char* comma = ""; int oid;
     for (_m_iter it = _c_MEMB(_begin)(self); it.ref; _c_MEMB(_next)(&it)) {
-        const char* comma = first ? "" : (SRD_SPACE[0] ? SRD_COMMA : ",");
         cstream_printf(&ar->stream, "%s%s%*s[", comma, SRD_NL, SRD_IND);
+        ++ar->next_oid;
+        oid = cserde_register_object(&it.ref->first, ar);
+        comma = SRD_SPACE[0] ? SRD_COMMA : ",";
+        PRINT_OBJ_ID();
+        if (oid < ar->next_oid) {
+            cstream_printf(&ar->stream, "{%s%*s\"<OBJ>\":%s%d%s%*s}",
+                           SRD_NL, ar->fmt.indent*(ar->level + 1), "",
+                           SRD_SPACE, oid, SRD_NL, SRD_IND);
+            ar->next_oid += 2;
+        } else
 #ifndef i_serde_key
         if (_keyfmt[0] == 'B') \
-            cstream_printf(&ar->stream, "%s", _to_bool_from_opaque(&it.ref->first) ? "true" : "false");
+            cstream_printf(&ar->stream, "%s", it.ref->first ? "true" : "false");
         else if (_keyfmt[0] != 0)
             cstream_printf(&ar->stream, _keyfmt, it.ref->first);
 #else
         c_JOIN(i_serde_key, _to_json)(&it.ref->first, ar);
 #endif
         cstream_printf(&ar->stream, ",%s", SRD_SPACE);
+        oid = cserde_register_object(&it.ref->second, ar);
+        PRINT_OBJ_ID();
+        if (oid < ar->next_oid) {
+            cstream_printf(&ar->stream, "{%s%*s\"<OBJ>\":%s%d%s%*s}",
+                           SRD_NL, ar->fmt.indent*(ar->level + 1), "",
+                           SRD_SPACE, oid, SRD_NL, SRD_IND);
+            ar->next_oid += 2;
+        } else
 #ifndef i_serde_val
         if (_valfmt[0] == 'B') \
-            cstream_printf(&ar->stream, "%s", _to_bool_from_opaque(&it.ref->second) ? "true" : "false");
+            cstream_printf(&ar->stream, "%s", it.ref->second ? "true" : "false");
         else if (_valfmt[0] != 0)
             cstream_printf(&ar->stream, _valfmt, it.ref->second);
 #else
         c_JOIN(i_serde_val, _to_json)(&it.ref->second, ar);
 #endif
         cstream_printf(&ar->stream, "]");
-        first = 0;
     }
     --ar->level;
     cstream_printf(&ar->stream, "%s%*s]", SRD_NL, SRD_IND);
 }
-#endif
+#endif // i_implement

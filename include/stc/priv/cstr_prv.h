@@ -184,8 +184,12 @@ STC_INLINE csviewz cstr_tail(const cstr* self, isize_t len) {
     return c_literal(csviewz){&sv.buf[sv.size - len], len};
 }
 
-STC_INLINE void cstr_to_json(const cstr* self, cserde_archive* ar)
-   { cstream_printf(&ar->stream, "\"%s\"", cstr_str(self)); }
+STC_INLINE void cstr_to_json(const cstr* self, cserde_archive* ar) {
+    extern csviewz cjson_escape_str(const csview in, cstr* out);
+    cstr tmp = {0};
+    cstream_printf(&ar->stream, "\"%s\"", cjson_escape_str(cstr_sv(self), &tmp).str);
+    cstr_drop(&tmp);
+}
 
 // BEGIN utf8 functions =====
 

@@ -164,5 +164,10 @@ STC_INLINE void _c_MEMB(_assign)(Self* self, Self* owned) {
     STC_INLINE size_t _c_MEMB(_raw_hash)(const _m_raw* rx)
         { return i_hash(rx); }
 #endif // i_no_hash
+
+#if c_HAS_TRAIT(c_use_serde | c_serde_key) // serialization support
+    #include "priv/serialize_arc.h"
+#endif // c_use_serde
+
 #undef _i_is_box
 #include "sys/finalize.h"

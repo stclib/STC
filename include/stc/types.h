@@ -57,7 +57,7 @@
 
 typedef struct { uint32_t state, codep; } cutf8_decode_t;
 
-// csview : non-null terminated string view
+// csview : string view, non-zero terminated
 typedef const char csview_value;
 typedef struct csview {
     csview_value* buf;
@@ -76,7 +76,7 @@ typedef union {
 #define c_svfmt "%.*s"
 #define c_svarg(sv) (int)(sv).size, (sv).buf // printf(c_svfmt "\n", c_svarg(sv));
 
-// csviewz : zero-terminated string view
+// csviewz : string view, zero-terminated
 typedef csview_value csviewz_value;
 typedef struct csviewz {
     csviewz_value* str;
