@@ -166,7 +166,7 @@ STC_INLINE void _c_MEMB(_assign)(Self* self, Self* owned) {
 #endif // i_no_hash
 
 #if c_HAS_TRAIT(c_use_serde | c_serde_key) // serialization support
-    #include "priv/serialize_arc.h"
+    #include "priv/serialize_box.h"
 #endif // c_use_serde
 
 #undef _i_is_box

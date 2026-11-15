@@ -22,8 +22,8 @@
  */
 // This is part of implementing serialization in C.
 // To be included by arc and box.
-#include "sys/archive.h"
-#include "sys/reflect.h"
+#include "../sys/archive.h"
+#include "../sys/reflect.h"
 
 STC_API void _c_MEMB(_to_json)(Self* self, cserde_archive* ar);
 
@@ -32,12 +32,12 @@ STC_API void _c_MEMB(_to_json)(Self* self, cserde_archive* ar);
 
 STC_DEF void _c_MEMB(_to_json)(Self* self, cserde_archive* ar) {
     ++ar->level;
-    ++ar->next_oid;
-    int oid = cserde_register_object(self->get, ar);
-    if (oid < ar->next_oid) { // for box, only if a raw pointer referred to it before this point.
+    ++ar->next_tokpos;
+    int tokpos = _cserde_register_object(self->get, ar);
+    if (tokpos < ar->next_tokpos) { // for box, only if a raw pointer referred to it before this point.
         cstream_printf(&ar->stream, "{%s%*s\"<REF>\":%s", SRD_NL, SRD_IND, SRD_SPACE);
         PRINT_OBJ_ID();
-        cstream_printf(&ar->stream, "%d", oid);
+        cstream_printf(&ar->stream, "%d", tokpos);
     } else {
         cstream_printf(&ar->stream, "{%s%*s\"<PTR>\":%s", SRD_NL, SRD_IND, SRD_SPACE);
         PRINT_OBJ_ID();

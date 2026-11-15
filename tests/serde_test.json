@@ -1,0 +1,45 @@
+{
+  "task": "Hello, this is a cstr",
+  "amount": 42,
+  "point": {
+    "x": 1,
+    "y": 2,
+    "z": 42
+  },
+  "edge_point": {
+    "<PTR>": {
+      "x": 1,
+      "y": 2,
+      "z": 3
+    }
+  },
+  "name": "Alan\tTuring",
+  "dbox": {
+    "<PTR>": 3.1415
+  },
+  "intmap": [
+    [232, 333],
+    [77, 99],
+    [12, 32]
+  ],
+  "intptr2": {
+    "<REF>": 36
+  },
+  "user_id": 123456,
+  "intptr": {
+    "<REF>": 36
+  },
+  "top_point": {
+    "<REF>": 14
+  },
+  "numbers": [
+    3.213,
+    54.33,
+    2.231,
+    2.32
+  ],
+  "dptr": {
+    "<REF>": 28
+  },
+  "cost": 299.4
+}

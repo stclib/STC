@@ -40,13 +40,13 @@ STC_DEF void _c_MEMB(_to_json)(Self* self, cserde_archive* ar) {
     for (_m_iter it = _c_MEMB(_begin)(self); it.ref; _c_MEMB(_next)(&it)) {
         cstream_printf(&ar->stream, "%s%s%*s", comma, SRD_NL, SRD_IND);
         comma = SRD_SPACE[0] ? SRD_COMMA : ",";
-        int oid = cserde_register_object(it.ref, ar);
+        int tokpos = _cserde_register_object(it.ref, ar);
         PRINT_OBJ_ID();
-        if (oid < ar->next_oid) {
+        if (tokpos < ar->next_tokpos) {
             cstream_printf(&ar->stream, "{%s%*s\"<OBJ>\":%s%d%s%*s}",
                            SRD_NL, ar->fmt.indent*(ar->level + 1), "",
-                           SRD_SPACE, oid, SRD_NL, SRD_IND);
-            ar->next_oid += 2;
+                           SRD_SPACE, tokpos, SRD_NL, SRD_IND);
+            ar->next_tokpos += 2;
         } else
 #ifndef i_serde_key
         if (_fmt[0] == 'B') \

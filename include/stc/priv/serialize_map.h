@@ -33,25 +33,24 @@ STC_API void _c_MEMB(_to_json)(Self* self, cserde_archive* ar);
 STC_DEF void _c_MEMB(_to_json)(Self* self, cserde_archive* ar) {
     cstream_printf(&ar->stream, "[");
     ++ar->level;
-    //++ar->next_oid;
 #ifndef i_serde_key
     const char* _keyfmt = c_generic_fmt((i_key){0});
 #endif
 #ifndef i_serde_val
     const char* _valfmt = c_generic_fmt((i_val){0});
 #endif
-    const char* comma = ""; int oid;
+    const char* comma = ""; int tokpos;
     for (_m_iter it = _c_MEMB(_begin)(self); it.ref; _c_MEMB(_next)(&it)) {
         cstream_printf(&ar->stream, "%s%s%*s[", comma, SRD_NL, SRD_IND);
-        ++ar->next_oid;
-        oid = cserde_register_object(&it.ref->first, ar);
+        ++ar->next_tokpos;
+        tokpos = _cserde_register_object(&it.ref->first, ar);
         comma = SRD_SPACE[0] ? SRD_COMMA : ",";
         PRINT_OBJ_ID();
-        if (oid < ar->next_oid) {
+        if (tokpos < ar->next_tokpos) {
             cstream_printf(&ar->stream, "{%s%*s\"<OBJ>\":%s%d%s%*s}",
                            SRD_NL, ar->fmt.indent*(ar->level + 1), "",
-                           SRD_SPACE, oid, SRD_NL, SRD_IND);
-            ar->next_oid += 2;
+                           SRD_SPACE, tokpos, SRD_NL, SRD_IND);
+            ar->next_tokpos += 2;
         } else
 #ifndef i_serde_key
         if (_keyfmt[0] == 'B') \
@@ -62,13 +61,13 @@ STC_DEF void _c_MEMB(_to_json)(Self* self, cserde_archive* ar) {
         c_JOIN(i_serde_key, _to_json)(&it.ref->first, ar);
 #endif
         cstream_printf(&ar->stream, ",%s", SRD_SPACE);
-        oid = cserde_register_object(&it.ref->second, ar);
+        tokpos = _cserde_register_object(&it.ref->second, ar);
         PRINT_OBJ_ID();
-        if (oid < ar->next_oid) {
+        if (tokpos < ar->next_tokpos) {
             cstream_printf(&ar->stream, "{%s%*s\"<OBJ>\":%s%d%s%*s}",
                            SRD_NL, ar->fmt.indent*(ar->level + 1), "",
-                           SRD_SPACE, oid, SRD_NL, SRD_IND);
-            ar->next_oid += 2;
+                           SRD_SPACE, tokpos, SRD_NL, SRD_IND);
+            ar->next_tokpos += 2;
         } else
 #ifndef i_serde_val
         if (_valfmt[0] == 'B') \

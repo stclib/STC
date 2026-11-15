@@ -39,23 +39,23 @@ typedef struct { const char *newln, *comma, *space; int indent; } cserde_fmt;
 typedef struct cserde_archive {
     cserde_fmt fmt;     // INIT required
     cstream stream;     // defaults to string-stream
-    cserde_table table; // ptr <=> oid mapping
+    cserde_table table; // ptr <=> tokpos mapping
     bool initial;       // at first item in object?
     int16_t level;      // indent nesting level
-    int next_oid;       // object id
+    int next_tokpos;    // index in corresponding jsmn tokens array
 } cserde_archive;
 
 extern void cserde_archive_drop(cserde_archive* ar);
-extern bool cserde_save_field(const char* name, void** field,
-                              int flag, cserde_archive* ar);
-extern int  cserde_register_object(void* field, cserde_archive* ar);
+extern bool _cserde_save_field(const char* name, void** field,
+                               int flag, cserde_archive* ar);
+extern int  _cserde_register_object(void* field, cserde_archive* ar);
 
 #define SRD_NL ar->fmt.newln
 #define SRD_COMMA ar->fmt.comma
 #define SRD_SPACE ar->fmt.space
 #define SRD_IND ar->fmt.indent*ar->level, "" // usage: fprintf(fp, "%*s", SRD_IND)
 #if 1
-  #define PRINT_OBJ_ID() printf("#%d ", ar->next_oid)
+  #define PRINT_OBJ_ID() printf("#%d ", ar->next_tokpos)
 #else
   #define PRINT_OBJ_ID() (void)0
 #endif

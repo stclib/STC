@@ -56,13 +56,16 @@
 #if !defined i_allocator
   #define i_allocator c
 #endif
-#if !defined i_malloc && defined i_realloc // in case only i_realloc and i_free is defined
+// Derive i_malloc from i_realloc if i_realloc is defined.
+#if !defined i_malloc && defined i_realloc
   #define i_malloc(new_sz) i_realloc(NULL, 0, new_sz)
-#elif !defined i_malloc
+#elif !defined i_malloc // ..and not defined i_realloc
+  // Derive both from i_allocator. Note, i_realloc will not be defined
+  // if only i_malloc is and will produce compiler error if used.
   #define i_malloc(new_sz) c_JOIN(i_allocator, _malloc)(new_sz)
-#endif
-#if !defined i_realloc
   #define i_realloc(ptr, sz, new_sz) c_JOIN(i_allocator, _realloc)(ptr, sz, new_sz)
+#endif
+#ifndef i_free
   #define i_free(ptr, sz) c_JOIN(i_allocator, _free)(ptr, sz)
 #endif
 

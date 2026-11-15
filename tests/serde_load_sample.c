@@ -3,6 +3,10 @@
 #include "stc/sys/jsmn.h"
 #include "stc/c11/serialize.h"
 
+// Demo of loading and traversing a serialized json file jsmn recursively.
+// This is a basis for deserialization of the saved struct graph, however
+// visit_nodes() will be written as a recursive coroutine.
+
 static inline csview json_tok(const char* js, jsmntok_t tok) {
     return c_sv_2(js + tok.start, (isize_t)(tok.end - tok.start));
 }
@@ -90,12 +94,8 @@ const char* json_unescape_str(const char *in, isize_t in_len, cstr* out);
 
 int main(void) // (int argc, char* argv[])
 {
-    cstr json_str = {0};
-    json_str = cstr_from_file("SoundbanksInfo.json");
-    //cstr_str json = cstr_from("{\"user\": \"johndoe\", \"uid\": 1000}");
-    //json_str = cstr_from_file("serde_test.json");
-    //json_str = cstr_from_file("departments.json");
+    cstr json_str = cstr_from_file("serde_test.json");
     csviewz json = cstr_zv(&json_str);
     traverse_jsmn(json);
-    return 0;
+    cstr_drop(&json_str);
 }
